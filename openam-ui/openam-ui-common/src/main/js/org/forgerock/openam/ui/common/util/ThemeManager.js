@@ -31,41 +31,96 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "org/forgerock/commons/ui/common/main/Configuration"
 ], function ($, _, Constants, Configuration) {
 
+    /**
+     * @exports org/forgerock/openam/ui/common/util/ThemeManager
+     */
     var obj = {},
-        themeConfigPromise;
+        promise = null,
+        loadThemeCSS = function (theme) {
 
-    obj.loadThemeCSS = function (theme) {
+            $("<link/>", {
+                rel: "icon",
+                type: "image/x-icon",
+                href: require.toUrl(theme.path + theme.icon)
+            }).appendTo("head");
 
-        $("head").find("link[type='image/x-icon']").remove();
-        $("head").find("link[type='text/css']").remove();
+            $("<link/>", {
+                rel: "shortcut icon",
+                type: "image/x-icon",
+                href: require.toUrl(theme.path + theme.icon)
+            }).appendTo("head");
 
-        $("<link/>", {
-            rel: "icon",
-            type: "image/x-icon",
-            href: require.toUrl(theme.path + theme.icon)
-        }).appendTo("head");
+            $("<link/>", {
+                rel: "stylesheet",
+                type: "text/css",
+                href: theme.stylesheet
+            }).appendTo("head");
 
-        $("<link/>", {
-            rel: "shortcut icon",
-            type: "image/x-icon",
-            href: require.toUrl(theme.path + theme.icon)
-        }).appendTo("head");
+            $("body").removeClass("hidden");
+        },
 
-        $("<link/>", {
-            rel: "stylesheet",
-            type: "text/css",
-            href: theme.stylesheet
-        }).appendTo("head");
+        /**
+         * Loads the theme configuration json.
+         * <p> Returns promise of theme configuration if it has not already been requested.
+         * @returns {object} promise containing the theme configuration object
+         */
+        loadThemeConfig = function () {
+            if (promise === null) {
+                promise = $.getJSON(require.toUrl(Constants.THEME_CONFIG_PATH));
+            }
+            return promise;
+        },
 
-        $("body").removeClass("hidden");
-    };
+        /**
+         * Maps each realm to its corresponding object in the configuration
+         * <p>
+         * If a theme is found for that realm, then that theme name will be returned
+         * other wise the default theme name will be returned.
+         * Theme configurations can contain wildcards within regular expressions.
+         * If these are present this method will try to match the pattern with the current realm.
+         * @returns {string} theme The selected theme configuration name.
+         */
+        mapRealmToTheme = function () {
+            var returnedTheme = "default",
+                subrealm = Configuration.globalData.auth.subRealm,
+                realmString = subrealm ? subrealm : document.domain;
 
-    obj.loadThemeConfig = function () {
-        if (themeConfigPromise === undefined) {
-            themeConfigPromise = $.getJSON(require.toUrl(Constants.THEME_CONFIG_PATH));
-        }
-        return themeConfigPromise;
-    };
+            _.each(obj.data.themes, function (theme) {
+                _.each(theme.realms, function (realm) {
+                    if (theme.regex) {
+                        var pattern = new RegExp(realm);
+                        if (pattern.test(realmString)) {
+                            returnedTheme = theme.name;
+                            return false;
+                        }
+                    } else {
+                        if (realm === realmString) {
+                            returnedTheme = theme.name;
+                            return false;
+                        }
+                    }
+                });
+            });
+
+            return returnedTheme;
+        },
+
+        updateSrc = function (value) {
+            if (_.has(value, "src")) {
+                value.src = require.toUrl(value.src);
+            }
+        },
+
+        updateSrcProperties = function (config) {
+            var i;
+            if (config.themes && _.isArray(config.themes)) {
+                for (i = 0; i < config.themes.length; i++) {
+                    _.each(config.themes[i].settings, updateSrc);
+                }
+            } else {
+                _.each(config.settings, updateSrc);
+            }
+        };
 
     obj.getTheme = function (basePath) {
         var theme = {},
@@ -73,16 +128,15 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
             realmDefined = typeof Configuration.globalData.auth.subRealm !== "undefined",
             themeName, defaultTheme;
 
-
-        //find out if the theme has changed
-        if (Configuration.globalData.theme && obj.mapRealmToTheme() === Configuration.globalData.theme.name) {
+        // find out if the theme has changed
+        if (Configuration.globalData.theme && mapRealmToTheme() === Configuration.globalData.theme.name) {
             //no change so use the existing theme
             return $.Deferred().resolve(Configuration.globalData.theme);
         } else {
-            return obj.loadThemeConfig().then(function (themeConfig) {
+            return loadThemeConfig().then(function (themeConfig) {
                 obj.data = themeConfig;
-                Configuration.globalData.themeConfig = obj.updateSrcProperties(themeConfig);
-                themeName = obj.mapRealmToTheme();
+                Configuration.globalData.themeConfig = updateSrcProperties(themeConfig);
+                themeName = mapRealmToTheme();
                 theme = _.reject(obj.data.themes, function (t) {return t.name !== themeName;})[0];
 
                 if (theme.name !== "default" && theme.path === "") {
@@ -98,59 +152,10 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                     }
                 }
 
-                obj.loadThemeCSS(theme);
+                loadThemeCSS(theme);
                 Configuration.globalData.theme = theme;
                 return theme;
             });
-        }
-    };
-
-    obj.mapRealmToTheme = function () {
-        var testString,
-            theme = "default",
-            subrealm = Configuration.globalData.auth.subRealm;
-
-        if (subrealm && subrealm.substring(1).length !== 0) {
-            testString = subrealm.substring(1);
-        } else {
-            testString = document.domain;
-        }
-
-        _.each(obj.data.themes,function (t) {
-            _.each(t.realms,function (r) {
-                if (t.regex) {
-                    var patt = new RegExp(r);
-                    if (patt.test(testString)) {
-                        theme = t.name;
-                        return false;
-                    }
-                } else {
-                    if (r === testString) {
-                        theme = t.name;
-                        return false;
-                    }
-                }
-
-            });
-        });
-
-        return theme;
-    };
-
-    obj.updateSrcProperties = function (config) {
-        var i;
-        if (config.themes && _.isArray(config.themes)) {
-            for (i = 0; i < config.themes.length; i++) {
-                _.each(config.themes[i].settings, obj.updateSrc);
-            }
-        } else {
-            _.each(config.settings, obj.updateSrc);
-        }
-    };
-
-    obj.updateSrc = function (value) {
-        if (_.has(value, "src")) {
-            value.src = require.toUrl(value.src);
         }
     };
 
