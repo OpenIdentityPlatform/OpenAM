@@ -55,8 +55,6 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                 type: "text/css",
                 href: theme.stylesheet
             }).appendTo("head");
-
-            $("body").removeClass("hidden");
         },
 
         /**

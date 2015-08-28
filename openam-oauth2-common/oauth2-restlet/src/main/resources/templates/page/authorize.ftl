@@ -33,9 +33,9 @@
         <title>OAuth2 Authorization Server</title>
     </head>
 
-    <body>
-        <div id="wrapper" class="hidden">Loading...</div>
-        <footer id="footer" class="footer hidden"></footer>
+    <body style="display:none">
+        <div id="wrapper">Loading...</div>
+        <footer id="footer" class="footer"></footer>
         <script type="text/javascript">
             pageData = {
                 <#if realm??>realm: "${realm?js_string}",</#if>

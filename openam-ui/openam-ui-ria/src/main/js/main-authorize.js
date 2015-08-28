@@ -95,7 +95,6 @@ require([
         $("#wrapper").html(baseTemplate(data));
         $("#content").html(formTemplate(data));
         $("#footer").html(footerTemplate(data));
-        $("#wrapper, #footer").removeClass("hidden");
     });
 
 });
