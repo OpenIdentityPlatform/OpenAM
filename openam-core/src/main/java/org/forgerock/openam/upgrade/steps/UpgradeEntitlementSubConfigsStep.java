@@ -344,7 +344,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
                     DEBUG.message("Modifying application " + name + " ; setting combiner: " + combiner);
                 }
                 final Application application = getApplication(name);
-                application.setEntitlementCombinerName(combiner);
+                application.setEntitlementCombinerName(EntitlementUtils.getEntitlementCombiner(combiner));
                 entitlementService.storeApplication(application);
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException ee) {
