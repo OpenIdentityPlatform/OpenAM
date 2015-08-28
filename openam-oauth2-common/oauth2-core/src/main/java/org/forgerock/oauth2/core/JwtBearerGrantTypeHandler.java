@@ -22,8 +22,10 @@ import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 import static org.forgerock.oauth2.core.Utils.*;
 
 import java.util.Set;
+
 import javax.inject.Inject;
 
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -53,7 +55,8 @@ public class JwtBearerGrantTypeHandler extends GrantTypeHandler {
     public AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
             OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException,
             InvalidRequestException, InvalidGrantException, InvalidCodeException,
-            ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException {
+            ServerException, UnauthorizedClientException, InvalidScopeException, 
+            InvalidClientException, NotFoundException {
 
         final String jwtParameter = request.getParameter(OAuth2Constants.SAML20.ASSERTION);
         final OAuth2Jwt jwt = OAuth2Jwt.create(jwtParameter);
@@ -78,6 +81,8 @@ public class JwtBearerGrantTypeHandler extends GrantTypeHandler {
         final AccessToken accessToken = tokenStore.createAccessToken(grantType, BEARER, null,
                 jwt.getSubject(), clientRegistration.getClientId(), redirectUri, authorizationScope,
                 null, null, validatedClaims, request);
+
+        providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
         if (authorizationScope != null && !authorizationScope.isEmpty()) {
             accessToken.addExtraData(SCOPE, joinScope(authorizationScope));
