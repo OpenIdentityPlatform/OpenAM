@@ -1,4 +1,5 @@
 {
+    "root": true,
     "env": {
         /**
          * AMD is commented out as this will hide the error of forgetting to add a global directive
@@ -6,8 +7,459 @@
         // "amd": true,
         "browser": true
     },
-    "root": true,
     "rules": {
+        /*
+         * --------------------------------------------------------------------------------
+         * ERROR RULES
+         *
+         * These are rules we're sure about. They will cause the build to fail.
+         * --------------------------------------------------------------------------------
+         */
+
+        /**
+         * Disallow trailing commas in object and array literals.
+         *
+         * var foo = { # bad
+         *     bar: "baz",
+         * };
+         * var arr = [1, 2,];
+         *
+         * var foo = { # good
+         *     bar: "baz"
+         * };
+         * var arr = [1, 2];
+         */
+        "comma-dangle": 2,
+        /**
+         * Require following curly brace conventions.
+         *
+         * if (foo) return; # bad
+         *
+         * if (foo) { return; } # good
+         */
+        "curly": 2,
+        /**
+         * Use === and not ==.
+         *
+         * if (a == b) { # bad
+         *
+         * if (a === b) { # good
+         */
+        "eqeqeq": [2, "smart"],
+        /**
+         * Require a capital letter for constructors.
+         *
+         * var f = Foo(); # bad
+         *
+         * var f = new Foo(); # good
+         */
+        "new-cap": [2, {
+            "capIsNew": false
+        }],
+        /**
+         * Disallow array constructor.
+         *
+         * var f = new Array(); # bad
+         *
+         * var f = []; # good
+         */
+        "no-array-constructor": 2,
+        /**
+         * Disallow arguments.caller.
+         *
+         * var f = arguments.caller; # bad
+         */
+        "no-caller": 2,
+        /**
+         * Disallow assignment in conditional statements.
+         *
+         * if (foo = 3) # bad
+         *
+         * if (foo === 3) # good
+         */
+        "no-cond-assign": [2, "always"],
+        /**
+         * Disallow use of constant expressions in conditions
+         *
+         * if (false) { # bad
+         *
+         * if (x === 0) { # good
+         */
+        "no-constant-condition": 2,
+        /**
+         * Disallow debugger keyword.
+         *
+         * debugger; # bad
+         */
+        "no-debugger": 2,
+        /**
+         * Disallow variable deletion
+         *
+         * var x; # bad
+         * delete x;
+         *
+         */
+        "no-delete-var": 2,
+        /**
+         * Disallow duplicate arguments.
+         *
+         * function (a, b, a) { # bad
+         *
+         * function (a, b) { # good
+         */
+        "no-dupe-args": 2,
+        /**
+         * Disallow duplicate keys in objects.
+         *
+         * var foo = { # bad
+         *     bar: 1,
+         *     bar: 2
+         * };
+         *
+         * var foo = { # good
+         *     bar: 1,
+         *     qux: 2
+         * };
+         */
+        "no-dupe-keys": 2,
+        /**
+         * Disallow empty block statements.
+         *
+         * if (foo) { # bad
+         * }
+         *
+         * if (foo) { # good
+         *     foo++;
+         * }
+         */
+        "no-empty": 2,
+        /**
+         * Disallow empty labels.
+         *
+         * labeled: # bad
+         *     var x = 10;
+         */
+        "no-empty-label": 2,
+        /**
+         * Disallow eval.
+         *
+         * eval("var x"); # bad
+         */
+        "no-eval": 2,
+        /**
+         * Disallow assignment of the exception parameter.
+         *
+         * try { # bad
+         *     // code
+         * } catch (e) {
+         *     e = 10;
+         * }
+         */
+        "no-ex-assign": 2,
+        /**
+         * Disallow extra semicolons.
+         *
+         * var x = 5;; # bad
+         *
+         * var x = 5; # good
+         */
+        "no-extra-semi": 2,
+        /**
+         * Disallow case statement fallthrough.
+         *
+         * switch (foo) { # bad
+         *     case 1:
+         *     case 2:
+         *         bar = 3;
+         * }
+         *
+         * switch (foo) { # good
+         *     case 1:
+         *         bar = 3;
+         *         break;
+         *     case 2:
+         *         bar = 3;
+         * }
+         */
+        "no-fallthrough": 2,
+        /**
+         * Disallow floating decimals.
+         *
+         * var a = .5; # bad
+         * var b = 4.;
+         *
+         * var a = 0.5; # good
+         * var b = 4.0;
+         */
+        "no-floating-decimal": 2,
+        /**
+         * Disallow function assignment.
+         *
+         * function foo() {} # bad
+         * foo = bar;
+         */
+        "no-func-assign": 2,
+        /**
+         * Disallow implied eval.
+         *
+         * setTimeout("alert('Hi!');", 100); # bad
+         *
+         * setTimeout(function() { # good
+         *     alert("Hi!");
+         * }, 100);
+         */
+        "no-implied-eval": 2,
+        /**
+         * Only permit declarations at the first level of a program or function body.
+         *
+         * if (test) { # bad
+         *     function foo() {}
+         * }
+         */
+        "no-inner-declarations": 2,
+        /**
+         * Disallow labels that are variable names.
+         *
+         * var x = 3;
+         * x:
+         *     for (;;) {
+         *         break x;
+         *     }
+         */
+        "no-label-var": 2,
+        /**
+         * Disallow unnecessary nested blocks.
+         *
+         * { # bad
+         *     var foo = bar();
+         * }
+         */
+        "no-lone-blocks": 2,
+        /**
+         * Disallow functions in loops.
+         *
+         * for (var i = 0; i < 10; i++) { # bad
+         *     funcs[i] = function() {
+         *         return i;
+         *     };
+         * }
+         */
+        "no-loop-func": 2,
+        /**
+         * Disallow new for side effects.
+         *
+         * new Person(); # bad
+         *
+         * var thing = new Thing(); # good
+         */
+        "no-new": 2,
+        /**
+         * Disallow function constructor.
+         *
+         * var f = new Function(); # bad
+         *
+         * var f = function() {}; # good
+         */
+        "no-new-func": 2,
+        /**
+         * Disallow object constructor.
+         *
+         * var f = new Object(); # bad
+         *
+         * var f = {}; # good
+         */
+        "no-new-object": 2,
+        /**
+         * Disallow creating new instances of String, Number and Boolean.
+         *
+         * var f = new Number(); # bad
+         * var g = new String();
+         * var h = new Boolean();
+         *
+         * var f = 0; # good
+         * var g = "";
+         * var h = false;
+         */
+        "no-new-wrappers": 2,
+        /**
+         * Disallow global object function calls
+         *
+         * var x = Math(); # bad
+         */
+        "no-obj-calls": 2,
+        /**
+         * Disallow octal literals.
+         *
+         * var num = 071; # bad
+         *
+         * var num = 57; # good
+         */
+        "no-octal": 2,
+        /**
+         * Disallow octal escape sequences in strings.
+         *
+         * var num = "\071"; # bad
+         *
+         * var num = "k"; # good
+         */
+        "no-octal-escape": 2,
+        /**
+         * Disallow use of __proto__.
+         *
+         * f.__proto__.toString.call(f); # bad
+         */
+        "no-proto": 2,
+        /**
+         * Disallow declaring the same variable more than once.
+         *
+         * var a, a; # bad
+         */
+        "no-redeclare": 2,
+        /**
+         * Disallow assignment in a return statement.
+         *
+         * return foo = bar + 2; # bad
+         */
+        "no-return-assign": 2,
+        /**
+         * Disallow comparisons where both sides are the same variable.
+         *
+         * if (a === a) { # bad
+         */
+        "no-self-compare": 2,
+        /**
+         * Disallow use of the comma operator.
+         *
+         * a = b + 1, a + b; # bad
+         *
+         * a = b + 1; # good
+         * a + b;
+         */
+        "no-sequences": 2,
+        /**
+         * Disallow shadowing of restricted names.
+         *
+         * var undefined = 3; # bad
+         */
+        "no-shadow-restricted-names": 2,
+        /**
+         * Disallow sparse arrays.
+         *
+         * var items = [1, , 2]; # bad
+         *
+         * var items = [1, undefined, 2]; # good
+         */
+        "no-sparse-arrays": 2,
+        /**
+         * Disallow unexpected multiline expressions.
+         *
+         * var foo = bar # bad
+         * ();
+         *
+         * var foo = bar(); # good
+         */
+        "no-unexpected-multiline": 2,
+        /**
+         * Disallow unreachable code.
+         *
+         * x = 1; # bad
+         * return x;
+         * x = 3;
+         *
+         * x = 1; # good
+         * x = 3;
+         * return x;
+         */
+        "no-unreachable": 2,
+        /**
+         * Disallow unused expressions.
+         *
+         * a && b(); # bad
+         *
+         * if (a) { # good
+         *     b();
+         * }
+         */
+        "no-unused-expressions": 2,
+        /**
+         * Disallow use of variables before they are defined.
+         *
+         * x = 3; # bad
+         * var x;
+         *
+         * var x; # good
+         * x = 3;
+         */
+        "no-use-before-define": 2,
+        /**
+         * Disallow with statements.
+         *
+         * with (foo) { # bad
+         *     // ...
+         * }
+         */
+        "no-with": 2,
+        /**
+         * Require one variable declaration per scope. Required for JSLint compliance.
+         *
+         * var apples # bad
+         * var bananas
+         *
+         * var apples, # good
+         *     bananas
+         */
+        "one-var": [2, "always"],
+        /**
+         * Require use of second argument for parseInt().
+         *
+         * var a = parseInt(x); # bad
+         *
+         * var a = parseInt(x, 10); # good
+         */
+        "radix": 2,
+        /**
+         * Semicolons must be used any place where they are valid.
+         *
+         * var name = "ESLint" # bad
+         *
+         * var name = "ESLint"; # good
+         */
+        "semi": 2,
+        /**
+         * Space required after return, throw and case statements.
+         *
+         * return-1 # bad
+         *
+         * return -1 # good
+         */
+        "space-return-throw-case": 2,
+        /**
+         * Require use of isNaN over comparisons with NaN constant.
+         *
+         * if (foo === NaN) { # bad
+         *
+         * if (isNan(foo)) { # good
+         */
+        "use-isnan": 2,
+        /**
+         * Require IIFEs to be wrapped in parentheses.
+         *
+         * var x = function() { return 1; }(); # bad
+         *
+         * var x = (function() { return 1; })(); # good
+         */
+        "wrap-iife": 2,
+
+        /*
+         * --------------------------------------------------------------------------------
+         * WARNING RULES
+         *
+         * These are rules that we want to turn into errors but can't yet because there are
+         * too many violations. As we fix the violations, we will transition them into
+         * error rules.
+         * --------------------------------------------------------------------------------
+         */
+
         /**
          * Camel cased variable names.
          *
@@ -21,13 +473,9 @@
          *     appleAndPears: true
          * }
          */
-        "camelcase": [2, {
+        "camelcase": [1, {
             "properties": "always"
         }],
-        /**
-         * Use === and not ==. Required for JSLint compliance.
-         */
-        "eqeqeq": [2, "smart"],
         /**
          * 4 space indent.
          *
@@ -37,7 +485,7 @@
          * function() { # good
          * ····var apples
          */
-        "indent": [2, 4, {
+        "indent": [1, 4, {
             /**
              * One level indent on switch cases.
              *
@@ -62,7 +510,7 @@
         /**
          * Maximum line length of 120 characters.
          */
-        "max-len": [2, 120, 4],
+        "max-len": [1, 120, 4],
         /**
          * Multiple spaces not allowed.
          *
@@ -70,7 +518,7 @@
          *
          * var fruit·=·"apples" # good
          */
-        "no-multi-spaces": 2,
+        "no-multi-spaces": 1,
         /**
          * Use of undeclared global variables not allowed.
          *
@@ -81,7 +529,7 @@
          * define([], function() {
          *     apples = 10;
          */
-        "no-undef": 2,
+        "no-undef": 1,
         /**
          * Spaces inside of curly braces.
          *
@@ -89,17 +537,7 @@
          *
          * { apples: true } # good
          */
-        "object-curly-spacing": [2, "always"],
-        /**
-         * Require one variable declaration per scope. Required for JSLint compliance.
-         *
-         * var apples # bad
-         * var bananas
-         *
-         * var apples, # good
-         *     bananas
-         */
-        "one-var": [2, "always"],
+        "object-curly-spacing": [1, "always"],
         /**
          * Double quotes for string literals. Single quotes allowed to avoid escaping
          *
@@ -108,7 +546,7 @@
          * var string = "this is a string" # good
          * var string = 'this is a "string"' # good
          */
-        "quotes": [2, "double", "avoid-escape"],
+        "quotes": [1, "double", "avoid-escape"],
         /**
          * Space required after keywords.
          *
@@ -118,7 +556,7 @@
          * if (fruit) { # good. Space before else is not enforced but recommended
          * } else {
          */
-        "space-after-keywords": [2, "always"],
+        "space-after-keywords": [1, "always"],
         /**
          * Space required before opening block curly brace.
          *
@@ -128,7 +566,7 @@
          * if (fruit) { # good
          *     function fruit() {}
          */
-        "space-before-blocks": [2, "always"],
+        "space-before-blocks": [1, "always"],
         /**
          * Space required before function parenthesis.
          *
@@ -136,7 +574,7 @@
          *
          * function () { # good
          */
-        "space-before-function-paren": [2, "always"],
+        "space-before-function-paren": [1, "always"],
         /**
          * Spaces not allowed in parentheses.
          *
@@ -144,7 +582,7 @@
          *
          * fruit("apple") # good
          */
-        "space-in-parens": [2, "never"],
+        "space-in-parens": [1, "never"],
         /**
          * Spaces required around infix operators
          *
@@ -152,21 +590,13 @@
          *
          * var numOfApples = 1 + 2 - 3 # good
          */
-        "space-infix-ops": [2, {
+        "space-infix-ops": [1, {
             "int32Hint": false
         }],
         /**
-         * Space required after return, throw and case statements.
-         *
-         * return-1 # bad
-         *
-         * return -1 # good
-         */
-        "space-return-throw-case": 2,
-        /**
          * Validates that JSDoc is syntactically correct.
          */
-        "valid-jsdoc": [2, {
+        "valid-jsdoc": [1, {
             "prefer": {
                 /**
                  * Prefer using returns over return
@@ -181,23 +611,16 @@
              * If there is no return statement, a @returns annotation is not required.
              */
             "requireReturn": false
-        }],
-        /**
-         * Semicolons must be used any place where they are valid.
-         *
-         * var name = "ESLint" # bad
-         *
-         * var name = "ESLint"; # good
-         */
-        "semi": 2
+        }]
 
-        // TODO: Add these additional rules once we have confidence in the current set being stable
+        /*
+         * --------------------------------------------------------------------------------
+         * DISABLED RULES
+         *
+         * These are rules we want to evaluate and promote to warnings.
+         * --------------------------------------------------------------------------------
+         */
         /**
-         * comma-dangle
-         * no-debugger
-         * no-empty
-         * no-unreachable
-         * curly
          * no-alert
          * no-unused-vars
          * array-bracket-spacing (no space)
