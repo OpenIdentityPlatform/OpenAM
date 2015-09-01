@@ -50,7 +50,7 @@
                     <#if response_type??>responseType: "${response_type?js_string}",</#if>
                     <#if client_id??>clientId: "${client_id?js_string}",</#if>
                     formTarget: "${(target!'.')?js_string}",
-                    displayName: "${display_name?js_string}",
+                    <#if display_name??>displayName: "${display_name?js_string}",</#if>
                     displayScopes: []
                 }
             };
