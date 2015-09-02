@@ -19,9 +19,10 @@ define("config/process/AMConfig", [
     "jquery",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, Constants, EventManager, SMSGlobalDelegate, UIUtils) {
+], function ($, Constants, EventManager, Router, SMSGlobalDelegate, UIUtils) {
     var obj = [
         {
             startEvent: Constants.EVENT_LOGOUT,
@@ -138,9 +139,8 @@ define("config/process/AMConfig", [
             ],
             processDescription: function (event, _, Configuration, Navigation) {
                 if (_.contains(Configuration.loggedUser.roles, "ui-admin")) {
-
                     Navigation.addLink({
-                        "url": "#realms/" + encodeURIComponent("/"),
+                        "url": "#" + Router.getLink(Router.configuration.routes.realmDefault, [encodeURIComponent("/")]),
                         "name": $.t("console.common.topLevelRealm"),
                         "cssClass": "dropdown-sub"
                     }, "admin", "realms");
@@ -158,7 +158,7 @@ define("config/process/AMConfig", [
                         _.forEach(data.result, function (realm) {
                             if (realm.active === true && realm.path !== "/" && realms.length < 2) {
                                 realms.push({
-                                    "url": "#realms/" + encodeURIComponent(realm.path),
+                                    "url": "#" + Router.getLink(Router.configuration.routes.realmDefault, [encodeURIComponent(realm.path)]),
                                     "name": realm.name,
                                     "cssClass": "dropdown-sub"
                                 });

@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
                 parent = element.parent();
 
                 this.$el.find(".sidenav ol > li").removeClass("active");
-                element.parentsUntil( this.$el.find(".sidenav"), "li" ).addClass("active");
+                element.parentsUntil(this.$el.find(".sidenav"), "li").addClass("active");
 
                 // Expand any collapsed element direct above. Only works one level up
                 if (parent.parent().hasClass("collapse")) {
@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
         },
         navigateToPage: function (event) {
             this.$el.find(".sidenav ol > li").removeClass("active");
-            $(event.currentTarget).parentsUntil( this.$el.find(".sidenav"), "li" ).addClass("active");
+            $(event.currentTarget).parentsUntil(this.$el.find(".sidenav"), "li").addClass("active");
 
             this.nextRenderPage = true;
         },
@@ -56,7 +56,7 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
             if (this.route && this.nextRenderPage) {
                 ModuleLoader.load(this.route.page).then(
                     _.bind(function (module) {
-                         this.renderPage(module, this.args);
+                        this.renderPage(module, this.args);
                     }, this),
                     _.bind(function () {
                         throw "Unable to render page for module " + this.route.page;
