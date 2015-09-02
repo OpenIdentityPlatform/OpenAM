@@ -17,22 +17,9 @@
 package org.forgerock.openam.forgerockrest.session;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.adapt;
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import static org.forgerock.util.promise.Promises.*;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
@@ -72,6 +59,17 @@ import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.promise.Promise;
+
+import javax.inject.Inject;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents Sessions that can queried via a REST interface.
@@ -185,14 +183,11 @@ public class SessionResource implements CollectionResourceProvider {
     }
 
     protected String getTokenIdFromCookie(Context context, String cookieName) {
-        List<String> cookieValue = StringUtils.getParameter(context.asContext(HttpContext.class).getHeaderAsString("cookie"), ";",
-                cookieName);
-
-        if (!cookieValue.isEmpty()) {
-            return cookieValue.get(0);
-        } else {
-            return null;
+        final List<String> header = context.asContext(HttpContext.class).getHeader(cookieName.toLowerCase());
+        if (!header.isEmpty()) {
+            return header.get(0);
         }
+        return null;
     }
 
     protected String getTokenIdFromHeader(Context context, String cookieName) {
