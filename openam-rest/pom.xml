@@ -80,23 +80,23 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.json</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.xml</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.servlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.slf4j</artifactId>
         </dependency>
         <dependency>

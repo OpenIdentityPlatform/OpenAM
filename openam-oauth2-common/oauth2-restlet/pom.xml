@@ -65,21 +65,21 @@
         </dependency>
 
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.json</artifactId>
         </dependency>
 
         <!-- Restlet -->
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.jackson</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.freemarker</artifactId>
             <exclusions>
                 <exclusion>
@@ -90,7 +90,7 @@
             <!--scope>provided</scope-->
         </dependency>
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.servlet</artifactId>
         </dependency>
         <dependency>

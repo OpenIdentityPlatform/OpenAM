@@ -170,43 +170,31 @@ Copyright: Copyright (c) University Corporation for Advanced Internet Developmen
 Version: openws-1.4.2-1.jar
 Copyright: Copyright 2007 University Corporation for Advanced Internet Development, Inc.
 
-Version: org.osgi.core-4.0.0.jar
-Copyright: Copyright (c) OSGi Alliance (2010, 2012). All Rights Reserved.
-
-Version: org.restlet.ext.freemarker-2.1.7.jar
+Version: org.restlet.ext.freemarker-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.ext.jackson-2.1.7.jar
+Version: org.restlet.ext.jackson-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.ext.net-2.1.7.jar
+Version: org.restlet.ext.net-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.ext.servlet-2.1.7.jar
+Version: org.restlet.ext.servlet-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.ext.ssl-2.1.7.jar
+Version: org.restlet.ext.ssl-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.ext.xml-2.1.7.jar
+Version: org.restlet.ext.xml-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.jse-org.restlet-2.1.7.jar
+Version: org.restlet.jee-org.restlet-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.jse-org.restlet.ext.json-2.1.7.jar
+Version: org.restlet.jee-org.restlet.ext.json-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.jse-org.restlet.lib.org.json-2.0.jar
-Copyright: Copyright 2005-2012 Restlet S.A.S.
-
-Version: org.restlet.osgi-org.restlet-2.1.7.jar
-Copyright: Copyright 2005-2012 Restlet S.A.S.
-
-Version: org.restlet.osgi-org.restlet.ext.json-2.1.7.jar
-Copyright: Copyright 2005-2012 Restlet S.A.S.
-
-Version: org.restlet.osgi-org.restlet.lib.org.json-2.0.jar
+Version: org.restlet.jee-org.restlet.lib.org.json-2.0.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
 Version: serializer-2.7.1.jar
