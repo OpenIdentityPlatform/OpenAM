@@ -124,7 +124,7 @@ public class VersionBehaviourConfigListener implements ServiceListener, Resource
      * @param warningEnabled {@inheritDoc}
      */
     @Override
-    public void setIsWarningEnabled(boolean warningEnabled) {
+    public void setWarningEnabled(boolean warningEnabled) {
     }
 
     @Override
