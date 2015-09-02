@@ -24,10 +24,7 @@
  *
  * $Id: IdRepoDataStoreProvider.java,v 1.6 2008/08/06 17:29:26 exu Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS
  */
 
 package com.sun.identity.plugin.datastore.impl;
@@ -37,7 +34,6 @@ import com.sun.identity.shared.locale.Locale;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 
-import com.sun.identity.common.DNUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
@@ -53,9 +49,7 @@ import com.sun.identity.sm.SMSEntry;
 import org.forgerock.openam.utils.CollectionUtils;
 
 import java.security.AccessController;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -301,14 +295,17 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
                 "multipleMatches"));
         }
         // single user found.
-        AMIdentity amId = (AMIdentity)amIdSet.iterator().next();
+        final AMIdentity amId = (AMIdentity)amIdSet.iterator().next();
+        final String universalId = IdUtils.getUniversalId(amId);
+
         if (debug.messageEnabled()) {
             debug.message("IdRepoDataStoreProvider.getUserID()"
                 + " Name=: " + amId.getName()
                 + " DN=: " + amId.getDN()
-                + " univId=: " + IdUtils.getUniversalId(amId));
+                + " univId=: " + universalId);
         }
-        return DNUtils.normalizeDN(IdUtils.getUniversalId(amId));
+
+        return universalId;
     }
 
     /**
