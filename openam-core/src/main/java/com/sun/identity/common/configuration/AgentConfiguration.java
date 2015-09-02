@@ -32,6 +32,7 @@ package com.sun.identity.common.configuration;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
@@ -42,6 +43,7 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.FQDNUrl;
 import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.InvalidAttributeNameException;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
@@ -1025,18 +1027,26 @@ public class AgentConfiguration {
         Map dummy = new HashMap();
         dummy.putAll(attrValues);
         Map result = new HashMap();
-        Set attributeSchemas = getAgentAttributeSchemas(agentType);
-        
+        Set<AttributeSchema> attributeSchemas = getAgentAttributeSchemas(agentType);
+
+        boolean isAttrFreeFormInSchema = false;
         if ((attributeSchemas != null) && !attributeSchemas.isEmpty()) {
-            for (Iterator i = attributeSchemas.iterator(); i.hasNext(); ) {
-                AttributeSchema as = (AttributeSchema)i.next();
+            for (AttributeSchema as : attributeSchemas ) {
                 Set values = parseAttributeMap(as, dummy);
                 if (values != null) {
                     result.put(as.getName(), values);
                 }
+                isAttrFreeFormInSchema |= ATTR_NAME_FREE_FORM.equals(as.getName());
             }
         }
+
         if (!dummy.isEmpty()) {
+
+            if (!isAttrFreeFormInSchema) {
+                throw new InvalidAttributeNameException(IUMSConstants.UMS_BUNDLE_NAME,
+                        "sms-validation_failed_invalid_name", dummy.keySet().toArray());
+            }
+
             Set freeForm = new HashSet();
             for (Iterator i = dummy.keySet().iterator(); i.hasNext(); ) {
                 String name = (String)i.next();
