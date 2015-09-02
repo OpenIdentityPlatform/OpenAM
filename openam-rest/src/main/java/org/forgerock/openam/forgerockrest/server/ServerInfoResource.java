@@ -158,6 +158,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("socialImplementations", getSocialAuthnImplementations(realm));
             result.put("referralsEnabled", String.valueOf(PolicyConfig.isReferralsEnabled()));
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
+            result.put("realm", realm);
 
             String hostName = URI.create(httpContext.getPath()).getHost();
 
