@@ -43,6 +43,7 @@ import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.rest.authz.LoggingAuthzModule;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.AuditFilterWrapper;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
 /**
@@ -79,7 +80,9 @@ public class Routers {
 
         @Override
         public Route route(String uriTemplate) {
-            invalidRealms.add(firstPathSegment(uriTemplate));
+            if (!StringUtils.isEmpty(uriTemplate)) {
+                invalidRealms.add(firstPathSegment(uriTemplate));
+            }
             return new Route(router, defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter,
                     uriTemplate);
         }
