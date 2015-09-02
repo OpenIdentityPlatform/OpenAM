@@ -351,6 +351,17 @@
          */
         "no-sparse-arrays": 2,
         /**
+         * Use of undeclared global variables not allowed.
+         *
+         * define([], function() { # bad
+         *     apples = 10;
+         *
+         * *global define apples:true* # good
+         * define([], function() {
+         *     apples = 10;
+         */
+        "no-undef": 2,
+        /**
          * Disallow unexpected multiline expressions.
          *
          * var foo = bar # bad
@@ -519,17 +530,6 @@
          * var fruit·=·"apples" # good
          */
         "no-multi-spaces": 1,
-        /**
-         * Use of undeclared global variables not allowed.
-         *
-         * define([], function() { # bad
-         *     apples = 10;
-         *
-         * *global define apples:true* # good
-         * define([], function() {
-         *     apples = 10;
-         */
-        "no-undef": 1,
         /**
          * Spaces inside of curly braces.
          *

@@ -14,7 +14,7 @@
  * Copyright 2011-2015 ForgeRock AS.
  */
 
-/*global, define*/
+/*global define*/
 define('config/routes/AMRoutesConfig', [], function () {
     return {
         "forgotPassword": {
