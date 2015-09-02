@@ -24,9 +24,6 @@
  *
  * $Id: IdRepoDataStoreProvider.java,v 1.6 2008/08/06 17:29:26 exu Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
@@ -40,7 +37,6 @@ import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.DNUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
@@ -298,14 +294,17 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
                 "multipleMatches"));
         }
         // single user found.
-        AMIdentity amId = (AMIdentity)amIdSet.iterator().next();
+        final AMIdentity amId = (AMIdentity)amIdSet.iterator().next();
+        final String universalId = IdUtils.getUniversalId(amId);
+
         if (debug.messageEnabled()) {
             debug.message("IdRepoDataStoreProvider.getUserID()"
                 + " Name=: " + amId.getName()
                 + " DN=: " + amId.getDN()
-                + " univId=: " + IdUtils.getUniversalId(amId));
+                + " univId=: " + universalId);
         }
-        return DNUtils.normalizeDN(IdUtils.getUniversalId(amId));
+
+        return universalId;
     }
 
     /**
