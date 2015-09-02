@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         subjectI18n: { "key": "console.authorization.policies.edit.subjectTypes.", "title": ".title", "props": ".props." },
         IDENTITY_RESOURCE: "Identity",
 
-        render: function (schema, callback, element, itemID, itemData) {
+        render: function (schema, element, itemID, itemData, callback) {
             var self = this;
             this.setElement(element);
 
@@ -141,10 +141,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     self.$el.find(".clear-left").remove();
 
                     if (!self.$el.parents("#dropbox").length || self.$el.hasClass("editing")) {
-                        self.buildHTML(itemData, hiddenData, schema);
+                        self.buildHTML(itemData, hiddenData, schema).done(function () {
+                            self.animateIn();
+                        });
                     }
 
-                    self.animateIn();
                 }, delay);
             }
         },
@@ -153,7 +154,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             var self = this,
                 itemDataEl = this.$el.find(".item-data"),
                 schemaProps = schema.config.properties,
-                i18nKey;
+                i18nKey,
+                htmlBuiltPromise = $.Deferred();
 
             if (schema.title === self.IDENTITY_RESOURCE) {
                 _.each(["users", "groups"], function (identityType) {
@@ -164,7 +166,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                         title: identityType,
                         i18nKey: self.subjectI18n.key + schema.title + self.subjectI18n.props + identityType,
                         dataSource: identityType
-                    }, itemDataEl);
+                    }, itemDataEl, htmlBuiltPromise.resolve);
                 });
             } else {
                 _.map(schemaProps, function (value, key) {
@@ -193,8 +195,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                             break;
                     }
                 });
+                htmlBuiltPromise.resolve();
             }
-            this.$el.find(".condition-attr").wrapAll('<div class="no-float"></div>');
+
+            htmlBuiltPromise.done(function () {
+                self.$el.find(".condition-attr").wrapAll("<div class='no-float'></div>");
+            });
+
+            return htmlBuiltPromise;
         },
 
         setDefaultJsonValues: function (schema) {

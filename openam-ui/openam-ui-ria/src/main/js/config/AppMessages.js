@@ -129,14 +129,6 @@ define("config/AppMessages", [
         "resTypeErrorNoActions": {
             msg: "config.messages.AdminMessages.policies.error.noActions",
             type: "error"
-        },
-        "ruleErrorFullLogical": {
-            msg: "config.messages.AdminMessages.policies.ruleErrorFullLogical",
-            type: "error"
-        },
-        "ruleHelperTryAndOr": {
-            msg: "config.messages.AdminMessages.policies.ruleHelperTryAndOr",
-            type: "info"
         }
     };
 });

@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         },
         SCRIPT_RESOURCE: "Script",
 
-        render: function (schema, callback, element, itemID, itemData) {
+        render: function (schema, element, itemID, itemData, callback) {
             var self = this,
                 hiddenData = {};
 
@@ -171,10 +171,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     }
 
                     if (!self.$el.parents("#dropbox").length || self.$el.hasClass("editing")) {
-                        self.buildHTML(itemData, hiddenData, schema);
+                        self.buildHTML(itemData, hiddenData, schema).done(function () {
+                            self.animateIn();
+                        });
                     }
 
-                    self.animateIn();
                 }, delay);
             }
         },
@@ -203,18 +204,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 schemaProps = schema.config.properties,
                 i18nKey,
                 attributesWrapper,
-                attributesSelector = ".condition-attr";
+                htmlBuiltPromise = $.Deferred();
 
             function buildScriptAttr() {
                 new ArrayAttr().render({
-                    itemData: itemData,
-                    hiddenData: hiddenData,
-                    data: [hiddenData[itemData.type]],
-                    title: "scriptId",
-                    i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "scriptId",
-                    dataSource: "scripts",
-                    multiple: false
-                }, itemDataEl);
+                    itemData: itemData, hiddenData: hiddenData, data: [hiddenData[itemData.type]],
+                    title: "scriptId", dataSource: "scripts", multiple: false,
+                    i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "scriptId"
+                }, itemDataEl, htmlBuiltPromise.resolve);
             }
 
             if (itemData.type === "SimpleTime") {
@@ -234,13 +231,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     dataSource: "enforcementTimeZone",
                     multiple: false
                 }, itemDataEl);
+                htmlBuiltPromise.resolve();
             } else if (schema.title === self.SCRIPT_RESOURCE) {
                 attributesWrapper = '<div class="no-float"></div>';
                 if (itemData && itemData.scriptId) {
                     PoliciesDelegate.getScriptById(itemData.scriptId).done(function (script) {
                         hiddenData[itemData.type] = script.name;
                         buildScriptAttr();
-                        self.animateIn();
                     });
                 } else {
                     buildScriptAttr();
@@ -293,9 +290,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                             break;
                     }
                 });
+                htmlBuiltPromise.resolve();
             }
 
-            this.$el.find(attributesSelector).wrapAll(attributesWrapper);
+            htmlBuiltPromise.done(function () {
+                self.$el.find(".condition-attr").wrapAll(attributesWrapper);
+            });
+
+            return htmlBuiltPromise;
         },
 
         setDefaultJsonValues: function (schema) {

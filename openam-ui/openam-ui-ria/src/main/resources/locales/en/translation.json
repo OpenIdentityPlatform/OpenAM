@@ -70,8 +70,6 @@
                     }
                 },
                 "policies": {
-                    "ruleErrorFullLogical": "The parent logical container can only accept one child.",
-                    "ruleHelperTryAndOr": "If more than one child is required, try changing<br>the type, or adding a child of type AND or OR.",
                     "unableToRetrievePolicy": "Unable to retrieve policy",
                     "invalidResource": "Invalid resource",
                     "duplicateResource": "Duplicate resource",
@@ -839,8 +837,7 @@
                     "step6": "Specify Response Attributes",
                     "step7": "Review Configuration and Finish",
                     "deleteLogical": "Deleting will also remove any child objects",
-                    "manageRulesDescription": "To define rules, click the Condition or Logical buttons above, enter the relevant options, and then drag the block into place in the rule set above. Each block can be configured both before and after is has been moved. Only rules inside the rule set section will be included in the created policy. To edit a Condition, click the pencil icon, or double-click the item.",
-                    "logical": "Logical",
+                    "addLogical": "Add a Logical Operator",
                     "selectResourceTypeHelper": "In order to define resources please select resource type first.",
                     "selectResourceType": "Select Resource Type",
                     "noResourceTypeNoActions": "In order to select actions please select resource type first.",
@@ -848,6 +845,9 @@
                     "availableActions": "Available Resource Type Actions",
                     "selectedActions": "Selected Actions",
                     "subjectAttributesPlaceholder": "Select or search for subject attributes",
+                    "addEnvironmentCondition": "Add an Environment Condition",
+                    "addSubjectCondition": "Add a Subject Condition",
+                    "canAcceptOneChild": "The \"Not...\" logical operator can only accept one child",
 
                     "summaryReview": {
                         "noName": "There is no name...",
@@ -862,9 +862,9 @@
                     },
 
                     "operators": {
-                        "NOT": "NOT",
-                        "OR": "OR",
-                        "AND": "AND"
+                        "NOT": "Not...",
+                        "OR": "Any of...",
+                        "AND": "All of..."
                     },
 
                     "subjectTypes": {

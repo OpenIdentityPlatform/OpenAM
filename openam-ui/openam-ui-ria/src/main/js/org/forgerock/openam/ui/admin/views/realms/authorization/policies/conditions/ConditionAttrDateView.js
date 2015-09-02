@@ -19,7 +19,8 @@
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrDateView", [
     "jquery",
     "underscore",
-    "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView"
+    "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
+    "bootstrap-datetimepicker"
 ], function ($, _, ConditionAttrBaseView) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrDate.html",

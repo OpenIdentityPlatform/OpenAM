@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
         operatorI18nKey: "console.authorization.policies.edit.operators.",
 
-        render: function (args, callback, element, itemID, firstChild) {
+        render: function (args, element, itemID, firstChild, callback) {
             var self = this;
 
             this.data = $.extend(true, {}, args);

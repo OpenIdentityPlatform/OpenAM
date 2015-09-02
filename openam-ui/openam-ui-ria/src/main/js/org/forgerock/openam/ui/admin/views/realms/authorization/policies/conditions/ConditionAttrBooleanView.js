@@ -42,22 +42,25 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 return;
             }
 
-            var target = $(e.currentTarget),
-                buttonControl = target.closest(".btn-group"),
-                label = buttonControl.prev("label").data().title,
-                secondButton = buttonControl.find(".btn.btn-primary");
+            var btn = $(e.currentTarget),
+                btnGroup = btn.parent(".btn-group"),
+                parentBtnGroup,
+                label,
+                secondBtnGroup;
 
-            if (target.hasClass("btn-primary")) {
+            if (btnGroup.hasClass("active")) {
                 return;
             }
 
-            this.data.itemData[label] = target.data("val");
+            parentBtnGroup = btnGroup.parent(".btn-group");
+            label = parentBtnGroup.prev("label").data().title;
 
-            secondButton.removeClass("btn-primary");
-            secondButton.addClass("btn-default");
+            secondBtnGroup = parentBtnGroup.find(".btn-group.active");
 
-            target.addClass("btn-primary");
-            target.removeClass("btn-default");
+            this.data.itemData[label] = btn.data("val");
+
+            secondBtnGroup.removeClass("active");
+            btnGroup.addClass("active");
         }
     });
 });

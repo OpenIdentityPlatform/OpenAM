@@ -41,10 +41,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             "keyup  #addCondition:not(.disabled)": "addCondition",
             "click  #addOperator:not(.disabled)": "addOperator",
             "keyup  #addOperator:not(.disabled)": "addOperator",
-            "click  #clear:not(.disabled)": "onClear",
-            "keyup  #clear:not(.disabled)": "onClear",
-            "click  .operator > .item-button-panel > .fa-trash-o": "onDelete",
-            "keyup  .operator > .item-button-panel > .fa-trash-o": "onDelete"
+            "click  .operator > .item-button-panel > .fa-times": "onDelete",
+            "keyup  .operator > .item-button-panel > .fa-times": "onDelete"
         },
         types: {
             ENVIRONMENT: "environmentType",
@@ -52,7 +50,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             LEGACY: "Policy"
         },
 
-        pickUpItem: null,
         localEntity: {},
         groupCounter: 0,
 
@@ -91,10 +88,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             var self = this,
                 newRule = null,
                 operators = _.pluck(this.data.operators, "title"),
-                buildListItem = null,
                 properties = null;
 
-            buildListItem = function (data, container, parent) {
+            function buildListItem(data, container, parent) {
                 if (_.isArray(data) === false) {
                     data = [data];
                 }
@@ -103,18 +99,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     if (item && _.contains(operators, item.type)) {
 
                         newRule = new OperatorRulesView();
-                        newRule.render(self.data, null, container, self.idPrefix + self.idCount, (self.idCount === 0));
+                        newRule.render(self.data, container, self.idPrefix + self.idCount, (self.idCount === 0));
                         newRule.setValue(item.type);
                         self.idCount++;
 
                     } else if (!_.isEmpty(item)) {
                         if (item.type === Constants.LEGACY) {
                             newRule = new LegacyListItemView();
-                            newRule.render(item, null, container, self.idCount);
+                            newRule.render(item, container, self.idCount);
                         } else {
                             newRule = self.getNewRule();
                             properties = self.getProperties();
-                            newRule.render(properties, null, container, self.idCount, item);
+                            newRule.render(properties, container, self.idCount, item);
                             newRule.createListItem(properties, newRule.$el);
                         }
 
@@ -127,7 +123,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                         buildListItem(item[self.property], newRule.dropbox, item);
                     }
                 });
-            };
+            }
 
             /*
              * This view will detect if the preserved rule begins with a logical. If it doesn't, an AND logical will be
@@ -166,10 +162,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                         top: pointer.top - offset.top
                     };
 
-                    self.setInactive(self.buttons.clearBtn, true);
                     self.setInactive(self.buttons.addCondition, false);
                     self.setInactive(self.buttons.addOperator, false);
-                    self.showHint(false);
 
                     item.focus();
                     item.css({width: item.width()}).addClass("dragged");
@@ -191,52 +185,30 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 onDrop: function (item, container, _super, event) {
                     var rule = null, clonedItem, newHeight, animeAttrs;
 
-                    if (container.options.drop) {
-                        clonedItem = $("<li/>").css({
-                            height: 0,
-                            backgroundColor: "transparent",
-                            borderColor: "transparent"
-                        });
-                        item.before(clonedItem);
-                        newHeight = item.height();
-                        animeAttrs = clonedItem.position();
-                        animeAttrs.width = clonedItem.outerWidth() - 10;
-                        item.addClass("dropped");
-                        clonedItem.animate({"height": newHeight }, 300, "linear");
-                        item.animate(animeAttrs, 300, function () {
+                    clonedItem = $("<li/>").css({
+                        height: 0,
+                        backgroundColor: "transparent",
+                        borderColor: "transparent"
+                    });
+                    item.before(clonedItem);
+                    newHeight = item.height();
+                    animeAttrs = clonedItem.position();
+                    animeAttrs.width = clonedItem.outerWidth() - 10;
+                    item.addClass("dropped");
+                    clonedItem.animate({"height": newHeight }, 300, "linear");
+                    item.animate(animeAttrs, 300, function () {
 
-                            clonedItem.detach();
-                            item.removeClass("dropped");
+                        clonedItem.detach();
+                        item.removeClass("dropped");
 
-                            if (item.data().logical === true) {
-                                rule = $.extend(false, item, new OperatorRulesView());
-                                rule.rebindElement();
-                            }
-                            item.focus();
-                            _super(item, container);
-                            self.save();
-                        });
-                    } else {
-                        if (item.data().logical === undefined) {
-                            rule = self.getNewRule();
-                            rule.render(self.getProperties(), null, self.pickUpItem, self.idCount, item.data().itemData);
-                            self.idCount++;
-                            item.remove();
-                            self.setInactive(self.buttons.addCondition, true);
-                            self.setInactive(self.buttons.addOperator, false);
-
-                        } else {
-                            item.focus();
-                            _super(item, container);
-                            self.setInactive(self.buttons.addCondition, false);
-                            self.setInactive(self.buttons.addOperator, true);
+                        if (item.data().logical === true) {
+                            rule = $.extend(false, item, new OperatorRulesView());
+                            rule.rebindElement();
                         }
-
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "ruleErrorFullLogical");
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "ruleHelperTryAndOr");
-                        self.setInactive(self.buttons.clearBtn, false);
+                        item.focus();
+                        _super(item, container);
                         self.save();
-                    }
+                    });
 
                     $("body").removeClass("dragging");
 
@@ -273,27 +245,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 }
             });
 
-            self.pickUpItem.nestingSortable({
-                group: self.element + "rule-creation-group" + self.groupCounter,
-                drop: false
-            });
-
             this.sortingInitialised = true;
         },
 
         editStart: function (item) {
             $("body").addClass("editing");
+
             var self = this,
                 editRuleView = self.getNewRule(),
                 properties = self.getProperties(),
                 disabledConditions;
-            editRuleView.render(properties, null, self.pickUpItem, self.idCount, item.data().itemData);
+            editRuleView.render(properties, item.parent(), self.idCount, item.data().itemData);
 
             self.idCount++;
 
             editRuleView.$el.addClass("editing");
             item.before(editRuleView.$el);
-            self.onClear();
 
             this.setInactive(this.buttons.addCondition, true);
             this.setInactive(this.buttons.addOperator, true);
@@ -317,10 +284,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             item.next().remove();
             this.save();
 
-            this.setInactive(this.buttons.clearBtn, false);
-            this.setInactive(this.buttons.addCondition, false);
-            this.setInactive(this.buttons.addOperator, false);
-
             disabledConditions = this.$el.find(".rule, .operator").not(".editing");
             disabledConditions.removeClass("editing-disabled");
             disabledConditions.find("> select").prop("disabled", false);
@@ -330,26 +293,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             button.toggleClass("disabled", state);
         },
 
-        showHint: function (state) {
-            this.$el.find("#condition-management").toggleClass("show-hint", state);
-        },
-
-        onClear: function (e) {
-            if (e) {
-                e.preventDefault();
-
-                if (e.type === "keyup" && e.keyCode !== 13) {
-                    return;
-                }
-            }
-
-            this.pickUpItem.children().remove();
-            this.setInactive(this.buttons.clearBtn, true);
-            this.setInactive(this.buttons.addCondition, false);
-            this.setInactive(this.buttons.addOperator, false);
-            this.showHint(false);
-        },
-
         addOperator: function (e) {
             e.preventDefault();
 
@@ -357,15 +300,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 return;
             }
 
-            this.pickUpItem.children().remove();
-            this.setInactive(this.buttons.clearBtn, false);
-            this.setInactive(this.buttons.addCondition, false);
-            this.setInactive(this.buttons.addOperator, true);
-
             var operatorRules = new OperatorRulesView();
-            operatorRules.render(this.data, null, this.pickUpItem, this.idPrefix + this.idCount);
+            operatorRules.render(this.data, this.droppableParent, this.idPrefix + this.idCount);
 
-            this.showHint(true);
             this.idCount++;
         },
 
@@ -376,15 +313,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 return;
             }
 
-            this.pickUpItem.children().remove();
-            this.setInactive(this.buttons.clearBtn, false);
-            this.setInactive(this.buttons.addCondition, true);
-            this.setInactive(this.buttons.addOperator, false);
+            var editRuleView = this.getNewRule(),
+                self = this;
 
-            var editRuleView = this.getNewRule();
-            editRuleView.render(this.getProperties(), null, this.pickUpItem, this.idCount);
+            editRuleView.render(this.getProperties(), this.droppableParent, this.idCount, null, function onRuleRender() {
+                self.editStart(editRuleView.$el);
+                self.$el.find("ol#dropbox").nestingSortable("refresh");
+            });
 
-            this.showHint(true);
             this.idCount++;
         },
 
@@ -395,11 +331,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
         onDelete: function (e) {
             e.stopPropagation();
+
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }
-            var self = this, item = $(e.currentTarget).closest("li");
-            item.animate({height: 0, paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, opacity: 0}, function () {
+
+            var self = this,
+                item = $(e.currentTarget).closest("li");
+
+            item.animate({
+                height: 0, paddingTop: 0, paddingBottom: 0,
+                marginTop: 0, marginBottom: 0, opacity: 0
+            }, function () {
                 item.remove();
                 self.save();
             });
@@ -471,6 +414,68 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
 
             console.log("\n" + this.property + ":", JSON.stringify(this.data.entity[this.property], null, 2));
+
+            this.identifyDroppableLogical();
+        },
+
+        /**
+         * Searches for the most outer possible dropabble logical container that will be used as a drop target. If such
+         * container was not found, disables "Add" buttons and displays corresponding message.
+         */
+        identifyDroppableLogical: function () {
+            var rootLogical = this.$el.find("#operator" + this.idPrefix + "0"),
+                nestedItems ,
+                nestedLogicals ,
+                nestedLogicalsLength ,
+                nestedRules ,
+                logical,
+                canHaveMultiple,
+                notIsEmpty,
+                i = 0;
+
+            this.droppableParent = null;
+
+            if (rootLogical.hasClass("not")) {
+                nestedItems = rootLogical.find("li");
+                nestedLogicals = nestedItems.filter(".operator").get();
+                nestedLogicalsLength = nestedLogicals.length;
+                nestedRules = nestedItems.filter(".rule").get();
+
+                if (nestedLogicalsLength) {
+                    // loop through nested logicals and return first one which is either an "AND"/"OR"
+                    // or "NOT" without children
+                    for (; i < nestedLogicalsLength; i++) {
+                        logical = $(nestedLogicals[i]);
+
+                        // "AND" or "OR" can have multiple children
+                        canHaveMultiple = logical.hasClass("and") || logical.hasClass("or");
+                        // "NOT" can have just one child
+                        notIsEmpty = logical.hasClass("not") &&
+                            logical.children(".dropbox").children("li").length === 0;
+
+                        if (canHaveMultiple || notIsEmpty) {
+                            this.droppableParent = logical.children(".dropbox");
+                            break;
+                        }
+                    }
+                } else if (nestedRules.length === 0) {
+                    // "NOT" is empty
+                    this.droppableParent = rootLogical.children(".dropbox");
+                }
+            } else {
+                // root logical is either "AND" or "OR"
+                this.droppableParent = rootLogical.children(".dropbox");
+            }
+
+            if (this.droppableParent) {
+                this.setInactive(this.buttons.addCondition, false);
+                this.setInactive(this.buttons.addOperator, false);
+                this.$el.find("#oneChildOnly").hide();
+            } else {
+                this.setInactive(this.buttons.addCondition, true);
+                this.setInactive(this.buttons.addOperator, true);
+                this.$el.find("#oneChildOnly").show();
+            }
         }
     });
 });

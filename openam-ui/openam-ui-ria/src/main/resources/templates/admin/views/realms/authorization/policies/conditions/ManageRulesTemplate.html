@@ -1,28 +1,21 @@
 <div id="condition-management">
     <ol id="dropOffArea" class="condition-management-group environment-area"></ol>
 
-    <div id="outter-arrow-up"></div>
+    <a class="btn btn-default" role="button" id="addCondition" tabindex="0">
+        <span class="fa fa-plus"></span> {{conditionName}}
+    </a>
+    <a class="btn btn-default" role="button" id="addOperator" tabindex="0">
+        <span class="fa fa-plus"></span> {{t "console.authorization.policies.edit.addLogical"}}
+    </a>
 
-    <div id="pickUpArea" class="clearfix">
-        <div class="clearfix">
-            <ol class="condition-management-group clearfix" id="pickUpItem"></ol>
-
-            <div class="clearfix">
-                <div class="pull-left">
-                    <a class="btn fr-btn-secondary" role="button" id="addCondition" tabindex="0">
-                        <span class="fa fa-plus"></span> {{conditionName}}
-                    </a>
-                    <a class="btn fr-btn-secondary" role="button" id="addOperator" tabindex="0">
-                        <span class="fa fa-plus"></span> {{t "console.authorization.policies.edit.logical"}}
-                    </a>
-                </div>
-
-                <a class="btn fr-btn-secondary disabled pull-right" role="button" id="clear" tabindex="0">
-                    <span class="fa fa-ban"></span> {{t "common.form.clear"}}
-                </a>
+    <div class="alert alert-info" id="oneChildOnly">
+        <div class="media">
+            <div class="media-left">
+                <i class="fa fa-info-circle"></i>
             </div>
-
-            <p class="rules-help">{{t "console.authorization.policies.edit.manageRulesDescription"}}</p>
+            <div class="media-body">
+                {{t "console.authorization.policies.edit.canAcceptOneChild"}}
+            </div>
         </div>
     </div>
 </div>

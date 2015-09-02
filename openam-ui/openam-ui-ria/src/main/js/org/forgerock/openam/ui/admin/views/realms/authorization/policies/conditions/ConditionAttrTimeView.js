@@ -19,7 +19,8 @@
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrTimeView", [
     "jquery",
     "underscore",
-    "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView"
+    "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
+    "clockPicker"
 ], function ($, _, ConditionAttrBaseView) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrTime.html",

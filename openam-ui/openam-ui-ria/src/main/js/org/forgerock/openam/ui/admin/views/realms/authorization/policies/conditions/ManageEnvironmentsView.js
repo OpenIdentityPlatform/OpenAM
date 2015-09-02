@@ -25,12 +25,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     var ManageEnvironmentsView = ManageRulesView.extend({
         element: "#environmentContainer",
         envEvents: {
-            "change .environment-area .operator select": "onSelect",
+            "change .environment-area .operator > select": "onSelect",
             "mousedown #operatorEnv_0 li.rule:not(.editing)": "setFocus",
             "mousedown #operatorEnv_0 li.operator:not(.editing)": "setFocus",
 
-            "click    #operatorEnv_0 .rule > .item-button-panel > .fa-trash-o": "onDelete",
-            "keyup    #operatorEnv_0 .rule > .item-button-panel > .fa-trash-o": "onDelete",
+            "click    #operatorEnv_0 .rule > .item-button-panel > .fa-times": "onDelete",
+            "keyup    #operatorEnv_0 .rule > .item-button-panel > .fa-times": "onDelete",
             "click    #operatorEnv_0 .rule > .item-button-panel > .fa-pencil": "toggleEditing",
             "keyup    #operatorEnv_0 .rule > .item-button-panel > .fa-pencil": "toggleEditing",
             "click    #operatorEnv_0 .rule > .item-button-panel > .fa-check": "toggleEditing",
@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             this.idPrefix = "Env_";
             this.property = "condition";
             this.properties = "conditions";
-            this.data.conditionName = "Environment Condition";
+            this.data.conditionName = $.t("console.authorization.policies.edit.addEnvironmentCondition");
             this.data.entity = args.entity;
             this.data.options = args.options;
             this.data.conditions = [];
@@ -89,18 +89,16 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             this.idCount = 0;
 
             this.parentRender(function () {
-                this.buttons.clearBtn = this.$el.find("a#clear");
                 this.buttons.addCondition = this.$el.find("a#addCondition");
                 this.buttons.addOperator = this.$el.find("a#addOperator");
-                this.pickUpItem = this.$el.find("ol#pickUpItem");
 
                 if (self.data.operators.length === 0) {
                     this.buttons.addOperator.hide();
                 }
 
                 this.buildList();
-                this.onClear();
                 this.initSorting();
+                this.identifyDroppableLogical();
 
                 if (callback) {
                     callback();
