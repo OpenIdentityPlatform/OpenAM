@@ -409,3 +409,38 @@ body, .modal-open {
         }
     }
 }
+
+.cell-model-icon {
+    display: table-cell;
+    vertical-align: top;
+    padding-right: 10px;
+
+    span {
+        background-color: @base-theme-color;
+        color: #fff;
+        margin: 0 auto;
+        .icon-circle(24px);
+    }
+}
+
+.cell-model-name {
+    display: table-cell;
+    vertical-align: middle;
+
+    &:hover, &:focus {
+      color: @base-theme-color;
+    }
+}
+
+.row-actions {
+    .btn-group .btn-link {
+        padding: 1px 6px;
+        color: #777;
+        border: none;
+        line-height: 1;
+
+        &:hover, &:focus {
+          color: @base-theme-color;
+        }
+    }
+}

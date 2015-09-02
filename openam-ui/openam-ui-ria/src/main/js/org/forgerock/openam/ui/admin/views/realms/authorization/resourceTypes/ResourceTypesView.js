@@ -25,14 +25,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     "backgrid.filter",
     "backgrid.paginator",
     "backgrid.selectall",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
     "org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel",
     "org/forgerock/openam/ui/common/util/BackgridUtils"
 ], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
-             Router, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) {
+             Messages, EventManager, Router, Constants, UIUtils, URLHelper, AbstractListView, ResourceTypeModel,
+             BackgridUtils) {
 
     return AbstractListView.extend({
         template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesTemplate.html",
@@ -48,8 +52,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 ClickableRow;
 
             this.realmPath = args[0];
-            // selectedItems are used in parent class AbstractListView
-            this.data.selectedItems = [];
 
             _.extend(this.events, {
                 "click #addNewRes": "addNewResourceType"
@@ -74,7 +76,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 callback: function (e) {
                     var $target = $(e.target);
 
-                    if ($target.is("input") || $target.is(".select-row-cell")) {
+                    if ($target.parents().hasClass("row-actions")) {
                         return;
                     }
 
@@ -87,37 +89,57 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
 
             columns = [
                 {
-                    name: "",
-                    cell: "select-row",
-                    headerCell: "select-all"
-                },
-                {
                     name: "name",
                     label: $.t("console.authorization.resourceTypes.list.grid.0"),
-                    cell: "string",
+                    cell: BackgridUtils.TemplateCell.extend({
+                        iconClass: "fa-cube",
+                        template: "templates/admin/backgrid/cell/IconAndNameCell.html",
+                        rendered: function () {
+                            this.$el.find("i.fa").addClass(this.iconClass);
+                        }
+                    }),
                     headerCell: BackgridUtils.FilterHeaderCell,
                     sortType: "toggle",
                     editable: false
                 },
                 {
-                    name: "description",
-                    label: $.t("console.authorization.resourceTypes.list.grid.1"),
-                    cell: "string",
-                    headerCell: BackgridUtils.FilterHeaderCell,
-                    sortable: false,
-                    editable: false
-                },
-                {
-                    name: "patterns",
-                    label: $.t("console.authorization.resourceTypes.list.grid.2"),
-                    cell: BackgridUtils.ArrayCell,
-                    sortable: false,
-                    editable: false
-                },
-                {
-                    name: "actions",
-                    label: $.t("console.authorization.resourceTypes.list.grid.3"),
-                    cell: BackgridUtils.ObjectCell,
+                    name: "",
+                    cell: BackgridUtils.TemplateCell.extend({
+                        className: "row-actions",
+                        template: "templates/admin/backgrid/cell/RowActionsCell.html",
+                        events: {
+                            "click .edit": "editItem",
+                            "click .delete": "deleteItem"
+                        },
+                        editItem: function (e) {
+                            e.stopPropagation();
+                            Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
+                                args: [encodeURIComponent(self.realmPath), encodeURIComponent(this.model.id)],
+                                trigger: true
+                            });
+                        },
+                        deleteItem: function (e) {
+                            var item = self.data.items.get(this.model.id),
+                                onSuccess = function (model, response, options) {
+                                    self.data.items.fetch({reset: true});
+                                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                                },
+                                onError = function (model, response, options) {
+                                    self.data.items.fetch({reset: true});
+                                    Messages.messages.addMessage({
+                                        message: response.responseJSON.message,
+                                        type: Messages.TYPE_DANGER
+                                    });
+                                };
+
+                            e.stopPropagation();
+
+                            item.destroy({
+                                success: onSuccess,
+                                error: onError
+                            });
+                        }
+                    }),
                     sortable: false,
                     editable: false
                 }
@@ -151,11 +173,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                         callback();
                     }
                 }).fail(function () {
-                    Router.routeTo(Router.configuration.routes.realms, {
-                        args: [],
-                        trigger: true
+                        Router.routeTo(Router.configuration.routes.realms, {
+                            args: [],
+                            trigger: true
+                        });
                     });
-                });
             });
         },
 
