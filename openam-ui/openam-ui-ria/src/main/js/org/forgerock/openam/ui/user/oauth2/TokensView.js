@@ -70,7 +70,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                         var data = {aaData: tokens}, i, cleanScope, cleanDate;
 
                         for(i = 0; i < data.aaData.length; i++) {
-                            data.aaData[i].selector = '<input name="selector" id="' + data.aaData[i].id +  '" type="checkbox" />';
+                            data.aaData[i].selector = '<input name="selector" id="' + data.aaData[i].id + '" type="checkbox" />';
 
                             if (typeof data.aaData[i].scope !== 'undefined'){
                                 cleanScope = data.aaData[i].scope;

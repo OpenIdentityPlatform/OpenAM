@@ -246,6 +246,14 @@
          */
         "no-loop-func": 2,
         /**
+         * Multiple spaces not allowed.
+         *
+         * var fruit···=··"apples" # bad
+         *
+         * var fruit·=·"apples" # good
+         */
+        "no-multi-spaces": 2,
+        /**
          * Disallow new for side effects.
          *
          * new Person(); # bad
@@ -522,14 +530,6 @@
          * Maximum line length of 120 characters.
          */
         "max-len": [1, 120, 4],
-        /**
-         * Multiple spaces not allowed.
-         *
-         * var fruit···=··"apples" # bad
-         *
-         * var fruit·=·"apples" # good
-         */
-        "no-multi-spaces": 1,
         /**
          * Spaces inside of curly braces.
          *

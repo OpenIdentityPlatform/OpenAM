@@ -241,7 +241,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
 
         exportPolicies: function () {
             var realm = this.realmPath === "/" ? "" : this.realmPath;
-            this.$el.find("#exportPolicies").attr("href", Constants.host + "/" + Constants.context + "/xacml" +  realm + "/policies");
+            this.$el.find("#exportPolicies").attr("href", Constants.host + "/" + Constants.context + "/xacml" + realm + "/policies");
         },
 
         addNewApplication: function (e) {

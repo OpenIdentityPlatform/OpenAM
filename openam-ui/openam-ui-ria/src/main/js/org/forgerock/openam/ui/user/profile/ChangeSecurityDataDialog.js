@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
                             if (ValidatorsManager.formValidated(dialog.$modalBody.find("#passwordChange"))) {
                                 data.username = form2js("content", '.', false).uid;
                                 data.currentpassword = dialog.$modalBody.find("#currentPassword").val();
-                                data.userpassword =  dialog.$modalBody.find("#password").val();
+                                data.userpassword = dialog.$modalBody.find("#password").val();
                                 UserDelegate.changePassword(Configuration.loggedUser, data, _.bind(function() {
                                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "securityDataChanged");
                                     dialog.close();

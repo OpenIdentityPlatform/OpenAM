@@ -105,11 +105,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     $("body").addClass("dragging");
                 },
 
-                onDrop: function  (item, container, _super, event) {
+                onDrop: function (item, container, _super, event) {
                     var clonedItem = $("<li/>").css({height: item.height() + 6, backgroundColor: "transparent", borderColor: "transparent"});
                     self.sortChainData( self.originalIndex, item.index());
                     item.before(clonedItem);
-                    item.animate( clonedItem.position(), 300, function  () {
+                    item.animate( clonedItem.position(), 300, function () {
                         clonedItem.detach();
                         _super(item, container);
                         self.setArrows();
@@ -139,7 +139,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     },{
                         SUFFICIENT : $.t("console.authentication.editChains.criteria.3")
                     }],
-                    form : {  chainData: data.chainData }
+                    form : { chainData: data.chainData }
                 };
 
                 self.parentRender(function(){
