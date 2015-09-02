@@ -75,7 +75,6 @@ public class CoreRestRouteProvider implements RestRouteProvider {
 
         realmRouter.route("agents")
                 .auditAs(POLICY_AGENT)
-                .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .forVersion(1, 2)
                 .toCollection(Key.get(IdentityResourceV1.class, Names.named("AgentsResource")))
                 .forVersion(2, 1)
