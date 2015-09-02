@@ -17,12 +17,10 @@
 package org.forgerock.openam.forgerockrest;
 
 import static com.sun.identity.sm.SMSException.STATUS_NO_PERMISSION;
-import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.security.AccessController;
@@ -53,6 +51,7 @@ import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
@@ -165,54 +164,54 @@ public class RealmResource implements CollectionResourceProvider {
 
             try {
                 configureErrorMessage(smse);
-                return newExceptionPromise(newBadRequestException(smse.getMessage(), smse));
+                return new BadRequestException(smse.getMessage(), smse).asPromise();
             } catch (NotFoundException nf) {
                 debug.error("RealmResource.createInstance() : Cannot find "
                         + realm, nf);
-                return newExceptionPromise(adapt(nf));
+                return nf.asPromise();
             } catch (ForbiddenException fe) {
                 // User does not have authorization
                 debug.error("RealmResource.createInstance() : Cannot CREATE "
                         + realm, fe);
-                return newExceptionPromise(adapt(fe));
+                return fe.asPromise();
             } catch (PermanentException pe) {
                 debug.error("RealmResource.createInstance() : Cannot CREATE "
                         + realm, pe);
                 // Cannot recover from this exception
-                return newExceptionPromise(adapt(pe));
+                return pe.asPromise();
             } catch (ConflictException ce) {
                 debug.error("RealmResource.createInstance() : Cannot CREATE "
                         + realm, ce);
-                return newExceptionPromise(adapt(ce));
+                return ce.asPromise();
             } catch (BadRequestException be) {
                 debug.error("RealmResource.createInstance() : Cannot CREATE "
                         + realm, be);
-                return newExceptionPromise(adapt(be));
+                return be.asPromise();
             } catch (Exception e) {
                 debug.error("RealmResource.createInstance() : Cannot CREATE "
                         + realm, e);
-                return newExceptionPromise(newBadRequestException(e.getMessage(), e));
+                return new BadRequestException(e.getMessage(), e).asPromise();
             }
         } catch (SSOException sso){
             debug.error("RealmResource.createInstance() : Cannot CREATE "
                     + realm, sso);
-            return newExceptionPromise(adapt(new PermanentException(401, "Access Denied", null)));
+            return new PermanentException(401, "Access Denied", null).asPromise();
         } catch (ForbiddenException fe){
             debug.error("RealmResource.createInstance() : Cannot CREATE "
                     + realm, fe);
-            return newExceptionPromise(adapt(fe));
+            return fe.asPromise();
         } catch (BadRequestException be){
             debug.error("RealmResource.createInstance() : Cannot CREATE "
                     + realm, be);
-            return newExceptionPromise(adapt(be));
+            return be.asPromise();
         } catch (PermanentException pe) {
             debug.error("RealmResource.createInstance() : Cannot CREATE "
                     + realm, pe);
             // Cannot recover from this exception
-            return newExceptionPromise(adapt(pe));
+            return pe.asPromise();
         } catch (Exception e) {
             debug.error("RealmResource.createInstance()" + realm + ":" + e);
-            return newExceptionPromise(newBadRequestException(e.getMessage(), e));
+            return new BadRequestException(e.getMessage(), e).asPromise();
         }
     }
 
@@ -289,42 +288,42 @@ public class RealmResource implements CollectionResourceProvider {
         } catch (SMSException smse) {
             try {
                 configureErrorMessage(smse);
-                return newExceptionPromise(newBadRequestException(smse.getMessage(), smse));
+                return new BadRequestException(smse.getMessage(), smse).asPromise();
             } catch (NotFoundException nf) {
                 debug.error("RealmResource.deleteInstance() : Cannot find "
                         + resourceId + ":" + smse);
-                return newExceptionPromise(adapt(nf));
+                return nf.asPromise();
             } catch (ForbiddenException fe) {
                 // User does not have authorization
                 debug.error("RealmResource.deleteInstance() : Cannot DELETE "
                         + resourceId + ":" + smse);
-                return newExceptionPromise(adapt(fe));
+                return fe.asPromise();
             } catch (PermanentException pe) {
                 debug.error("RealmResource.deleteInstance() : Cannot DELETE "
                         + resourceId + ":" + smse);
                 // Cannot recover from this exception
-                return newExceptionPromise(adapt(pe));
+                return pe.asPromise();
             } catch (ConflictException ce) {
                 debug.error("RealmResource.deleteInstance() : Cannot DELETE "
                         + resourceId + ":" + smse);
-                return newExceptionPromise(adapt(ce));
+                return ce.asPromise();
             } catch (BadRequestException be) {
                 debug.error("RealmResource.deleteInstance() : Cannot DELETE "
                         + resourceId + ":" + smse);
-                return newExceptionPromise(adapt(be));
+                return be.asPromise();
             } catch (Exception e) {
-                return newExceptionPromise(newBadRequestException(e.getMessage(), e));
+                return new BadRequestException(e.getMessage(), e).asPromise();
             }
         } catch (SSOException sso){
             debug.error("RealmResource.updateInstance() : Cannot DELETE "
                     + resourceId + ":" + sso);
-            return newExceptionPromise(adapt(new PermanentException(401, "Access Denied", null)));
+            return new PermanentException(401, "Access Denied", null).asPromise();
         } catch (ForbiddenException fe){
             debug.error("RealmResource.updateInstance() : Cannot DELETE "
                     + resourceId + ":" + fe);
-            return newExceptionPromise(adapt(fe));
+            return fe.asPromise();
         } catch (Exception e) {
-            return newExceptionPromise(newBadRequestException(e.getMessage(), e));
+            return new BadRequestException(e.getMessage(), e).asPromise();
         }
     }
 
@@ -382,15 +381,15 @@ public class RealmResource implements CollectionResourceProvider {
 
         } catch (SSOException ex) {
             debug.error("RealmResource :: QUERY by " + principalName + " failed : " + ex);
-            return newExceptionPromise(ResourceException.getException(ResourceException.FORBIDDEN));
+            return new ForbiddenException().asPromise();
         } catch (SMSException ex) {
             debug.error("RealmResource :: QUERY by " + principalName + " failed :" + ex);
             switch (ex.getExceptionCode()) {
                 case STATUS_NO_PERMISSION:
                     // This exception will be thrown if permission to read realms from SMS has not been delegated
-                    return newExceptionPromise(ResourceException.getException(ResourceException.FORBIDDEN));
+                    return new ForbiddenException().asPromise();
                 default:
-                    return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+                    return new InternalServerErrorException().asPromise();
             }
         }
     }
@@ -434,11 +433,11 @@ public class RealmResource implements CollectionResourceProvider {
         } catch (SSOException sso){
             debug.error("RealmResource.updateInstance() : Cannot READ "
                     + resourceId, sso);
-            return newExceptionPromise(adapt(new PermanentException(401, "Access Denied", null)));
+            return new PermanentException(401, "Access Denied", null).asPromise();
         } catch (ForbiddenException fe){
             debug.error("RealmResource.readInstance() : Cannot READ "
                     + resourceId + ":" + fe);
-            return newExceptionPromise(adapt(fe));
+            return fe.asPromise();
         }  catch (SMSException smse) {
 
             debug.error("RealmResource.readInstance() : Cannot READ "
@@ -446,36 +445,36 @@ public class RealmResource implements CollectionResourceProvider {
 
             try {
                 configureErrorMessage(smse);
-                return newExceptionPromise(newBadRequestException(smse.getMessage(), smse));
+                return new BadRequestException(smse.getMessage(), smse).asPromise();
             } catch (NotFoundException nf) {
                 debug.error("RealmResource.readInstance() : Cannot READ "
                         + resourceId, nf);
-                return newExceptionPromise(adapt(nf));
+                return nf.asPromise();
             } catch (ForbiddenException fe) {
                 // User does not have authorization
                 debug.error("RealmResource.readInstance() : Cannot READ "
                         + resourceId, fe);
-                return newExceptionPromise(adapt(fe));
+                return fe.asPromise();
             } catch (PermanentException pe) {
                 debug.error("RealmResource.readInstance() : Cannot READ "
                         + resourceId, pe);
                 // Cannot recover from this exception
-                return newExceptionPromise(adapt(pe));
+                return pe.asPromise();
             } catch (ConflictException ce) {
                 debug.error("RealmResource.readInstance() : Cannot READ "
                         + resourceId, ce);
-                return newExceptionPromise(adapt(ce));
+                return ce.asPromise();
             } catch (BadRequestException be) {
                 debug.error("RealmResource.readInstance() : Cannot READ "
                         + resourceId, be);
-                return newExceptionPromise(adapt(be));
+                return be.asPromise();
             } catch (Exception e) {
                 debug.error("RealmResource.readInstance() : Cannot READ "
                         + resourceId, e);
-                return newExceptionPromise(newBadRequestException(e.getMessage(), e));
+                return new BadRequestException(e.getMessage(), e).asPromise();
             }
         } catch (Exception e) {
-            return newExceptionPromise(newBadRequestException(e.getMessage(), e));
+            return new BadRequestException(e.getMessage(), e).asPromise();
         }
     }
 
@@ -732,47 +731,47 @@ public class RealmResource implements CollectionResourceProvider {
         } catch (SMSException e) {
             try {
                 configureErrorMessage(e);
-                return newExceptionPromise(newNotFoundException(e.getMessage(), e));
+                return new NotFoundException(e.getMessage(), e).asPromise();
             } catch (ForbiddenException fe) {
                 // User does not have authorization
                 debug.error("RealmResource.updateInstance() : Cannot UPDATE "
                         + resourceId, fe);
-                return newExceptionPromise(adapt(fe));
+                return fe.asPromise();
             } catch (PermanentException pe) {
                 debug.error("RealmResource.updateInstance() : Cannot UPDATE "
                         + resourceId, pe);
                 // Cannot recover from this exception
-                return newExceptionPromise(adapt(pe));
+                return pe.asPromise();
             } catch (ConflictException ce) {
                 debug.error("RealmResource.updateInstance() : Cannot UPDATE "
                         + resourceId, ce);
-                return newExceptionPromise(adapt(ce));
+                return ce.asPromise();
             } catch (BadRequestException be) {
                 debug.error("RealmResource.updateInstance() : Cannot UPDATE "
                         + resourceId, be);
-                return newExceptionPromise(adapt(be));
+                return be.asPromise();
             } catch (Exception ex) {
                 debug.error("RealmResource.updateInstance() : Cannot UPDATE "
                         + resourceId, ex);
-                return newExceptionPromise(newNotFoundException("Cannot update realm.", ex));
+                return new NotFoundException("Cannot update realm.", ex).asPromise();
             }
         } catch (SSOException sso){
             debug.error("RealmResource.updateInstance() : Cannot UPDATE "
                     + resourceId, sso);
-            return newExceptionPromise(adapt(new PermanentException(401, "Access Denied", null)));
+            return new PermanentException(401, "Access Denied", null).asPromise();
         } catch (ForbiddenException fe){
             debug.error("RealmResource.updateInstance() : Cannot UPDATE "
                     + resourceId, fe);
-            return newExceptionPromise(adapt(fe));
+            return fe.asPromise();
         } catch (PermanentException pe) {
             debug.error("RealmResource.Instance() : Cannot UPDATE "
                     + resourceId, pe);
             // Cannot recover from this exception
-            return newExceptionPromise(adapt(pe));
+            return pe.asPromise();
         } catch (Exception ex) {
             debug.error("RealmResource.updateInstance() : Cannot UPDATE "
                     + resourceId, ex);
-            return newExceptionPromise(newNotFoundException("Cannot update realm.", ex));
+            return new NotFoundException("Cannot update realm.", ex).asPromise();
         }
     }
 }

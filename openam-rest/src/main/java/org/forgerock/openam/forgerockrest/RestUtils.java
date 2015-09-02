@@ -16,9 +16,6 @@
 
 package org.forgerock.openam.forgerockrest;
 
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-
 import javax.mail.internet.MimeUtility;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -45,9 +42,10 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
-import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.Context;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.dashboard.ServerContextHelper;
 import org.forgerock.openam.rest.RealmContext;
@@ -141,7 +139,7 @@ final public class RestUtils {
      * Signals to the handler that the current operation is unsupported.
      */
     public static <T> Promise<T, ResourceException> generateUnsupportedOperation() {
-        return newExceptionPromise(newNotSupportedException("Operation is not supported."));
+        return new NotSupportedException("Operation is not supported.").asPromise();
     }
 
     /**

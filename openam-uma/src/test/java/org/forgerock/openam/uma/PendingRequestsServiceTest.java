@@ -22,6 +22,7 @@ import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -32,9 +33,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.Context;
 import org.forgerock.openam.services.baseurl.BaseURLProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -317,8 +318,7 @@ public class PendingRequestsServiceTest {
     }
 
     private void mockSuccessfulPolicyCreationForPendingRequest() {
-        Promise<UmaPolicy, ResourceException> readPromise =
-                Promises.newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
+        Promise<UmaPolicy, ResourceException> readPromise = new org.forgerock.json.resource.NotFoundException().asPromise();
         given(policyService.readPolicy(any(Context.class), anyString())).willReturn(readPromise);
         Promise<UmaPolicy, ResourceException> createPromise = Promises.newResultPromise(null);
         given(policyService.createPolicy(any(Context.class), any(JsonValue.class))).willReturn(createPromise);

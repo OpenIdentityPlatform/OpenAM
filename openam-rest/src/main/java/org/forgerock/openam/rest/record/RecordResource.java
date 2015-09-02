@@ -16,8 +16,9 @@
 package org.forgerock.openam.rest.record;
 
 import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
@@ -25,6 +26,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -40,8 +42,6 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.utils.JsonObject;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.promise.Promise;
-
-import javax.inject.Inject;
 
 /**
  * Rest endpoint for the record feature.
@@ -89,12 +89,10 @@ public class RecordResource implements CollectionResourceProvider {
             return actionStatus();
         } catch (JsonValueException e) {
             debug.message("Record json '{}' can't be parsed", jsonValue, e);
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST, "Record json '" +
-                    jsonValue + "' can't be parsed", e));
+            return new BadRequestException("Record json '" + jsonValue + "' can't be parsed", e).asPromise();
         } catch (RecordException e) {
             debug.message("Record can't be start.", e);
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST,
-                    "Record can't be start.", e));
+            return new BadRequestException("Record can't be start.", e).asPromise();
         }
     }
 
@@ -125,8 +123,7 @@ public class RecordResource implements CollectionResourceProvider {
         try {
             Record record = debugRecorder.stopRecording();
             if (record == null) {
-                return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST,
-                        "No record or it's already stopped."));
+                return new BadRequestException("No record or it's already stopped.").asPromise();
             } else {
                 JsonObject result = JsonValueBuilder.jsonValue();
                 result.put(STATUS_LABEL, false);
@@ -135,8 +132,7 @@ public class RecordResource implements CollectionResourceProvider {
             }
         } catch (RecordException e) {
             debug.message("Record can't be stopped.", e);
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST,
-                    "Record can't be stopped.", e));
+            return new BadRequestException("Record can't be stopped.", e).asPromise();
         }
     }
 

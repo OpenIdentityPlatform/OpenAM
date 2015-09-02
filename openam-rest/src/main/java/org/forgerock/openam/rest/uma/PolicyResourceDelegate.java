@@ -17,6 +17,7 @@
 package org.forgerock.openam.rest.uma;
 
 import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -212,7 +213,7 @@ public class PolicyResourceDelegate {
                         @Override
                         public Promise<List<ResourceResponse>, ResourceException> apply(List<ResourceResponse> value) {
                             //If we succeed in deleting then return the original error
-                            return Promises.newExceptionPromise(error);
+                            return newExceptionPromise(error);
                         }
                     });
             return promise;

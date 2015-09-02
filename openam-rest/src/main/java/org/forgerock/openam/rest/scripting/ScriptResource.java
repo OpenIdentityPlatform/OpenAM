@@ -16,10 +16,19 @@
 package org.forgerock.openam.rest.scripting;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
-import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.encode.Base64;
@@ -30,6 +39,7 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -52,13 +62,6 @@ import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.slf4j.Logger;
-
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A REST endpoint for managing scripts in OpenAM.
@@ -115,23 +118,23 @@ public class ScriptResource extends RealmAwareResource {
                 }
                 return newResultPromise(newActionResponse(json(object(field("success", false), field("errors", errors)))));
             } catch (ScriptException se) {
-                return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
+                return exceptionMappingHandler.handleError(context, request, se).asPromise();
             }
         } else {
-            return newExceptionPromise(newNotSupportedException());
+            return new NotSupportedException().asPromise();
         }
     }
 
     @Override
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
@@ -142,7 +145,7 @@ public class ScriptResource extends RealmAwareResource {
                     .create(fromJson(request.getContent()));
             return newResultPromise(newResourceResponse(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));
         } catch (ScriptException se) {
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
+            return exceptionMappingHandler.handleError(context, request, se).asPromise();
         }
     }
 
@@ -154,7 +157,7 @@ public class ScriptResource extends RealmAwareResource {
             serviceFactory.create(getContextSubject(context), getRealm(context)).delete(resourceId);
             return newResultPromise(newResourceResponse(resourceId, null, json(object())));
         } catch (ScriptException se) {
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
+            return exceptionMappingHandler.handleError(context, request, se).asPromise();
         }
     }
 
@@ -180,7 +183,7 @@ public class ScriptResource extends RealmAwareResource {
             QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
             return QueryResponsePresentation.perform(resultHandler, request, results, new JsonPointer(JSON_UUID));
         } catch (ScriptException se) {
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
+            return exceptionMappingHandler.handleError(context, request, se).asPromise();
         }
     }
 
@@ -191,7 +194,7 @@ public class ScriptResource extends RealmAwareResource {
             return newResultPromise(newResourceResponse(resourceId, null, asJson(
                     serviceFactory.create(getContextSubject(context), getRealm(context)).get(resourceId))));
         } catch (ScriptException se) {
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
+            return exceptionMappingHandler.handleError(context, request, se).asPromise();
         }
     }
 
@@ -203,7 +206,7 @@ public class ScriptResource extends RealmAwareResource {
                     .create(getContextSubject(context), getRealm(context))
                     .update(fromJson(request.getContent(), resourceId)))));
         } catch (ScriptException se) {
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
+            return exceptionMappingHandler.handleError(context, request, se).asPromise();
         }
     }
 

@@ -16,9 +16,6 @@
 
 package org.forgerock.openam.rest.sms;
 
-import static org.forgerock.json.resource.ResourceException.newInternalServerErrorException;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,6 +36,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
@@ -80,10 +78,10 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
                 organizationSchema.setAttributeDefaults(defaults);
             } catch (SMSException e) {
                 debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-                return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+                return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
             } catch (SSOException e) {
                 debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-                return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+                return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
             }
         }
         return super.handleUpdate(serverContext, updateRequest);

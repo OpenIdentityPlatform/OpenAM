@@ -23,10 +23,7 @@
  */
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.json.resource.ResourceException.adapt;
-import static org.forgerock.json.resource.ResourceException.newInternalServerErrorException;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Named;
@@ -246,7 +243,7 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: CREATE by " + principal + ": Unable to create client due to " +
                         "IdRepo exception.", e);
             }
-            return newExceptionPromise(newInternalServerErrorException("Unable to create client", e));
+            return new InternalServerErrorException("Unable to create client", e).asPromise();
         } catch (SSOException e){
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
@@ -257,7 +254,7 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: CREATE by " + principal + ": Unable to create client due to " +
                         "SSO exception.", e);
             }
-            return newExceptionPromise(newInternalServerErrorException("Unable to create client", e));
+            return new InternalServerErrorException("Unable to create client", e).asPromise();
         } catch (PermanentException e){
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
@@ -268,7 +265,7 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: CREATE by " + principal +
                         ": Unable to create client due to exception.", e);
             }
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         } catch (org.forgerock.json.resource.BadRequestException e) {
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
@@ -276,7 +273,7 @@ public class ClientResource implements CollectionResourceProvider {
                 auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
             debug.error("ClientResource :: CREATE : Unable to create client due to Bad Request.", e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -350,7 +347,7 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: DELETE by " + principal +
                         ": Unable to delete client with ID, " + resourceId, e);
             }
-            return newExceptionPromise(newInternalServerErrorException("Unable to delete client", e));
+            return new InternalServerErrorException("Unable to delete client", e).asPromise();
         } catch (SSOException e) {
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
@@ -361,7 +358,7 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: DELETE by " + principal +
                         ": Unable to delete client with ID, " + resourceId, e);
             }
-            return newExceptionPromise(newInternalServerErrorException("Unable to delete client", e));
+            return new InternalServerErrorException("Unable to delete client", e).asPromise();
         } catch (InternalServerErrorException e) {
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
@@ -372,7 +369,7 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: DELETE by " + principal +
                         ": Unable to delete client with ID, " + resourceId, e);
             }
-            return newExceptionPromise(newInternalServerErrorException("Unable to delete client", e));
+            return new InternalServerErrorException("Unable to delete client", e).asPromise();
         }
     }
 

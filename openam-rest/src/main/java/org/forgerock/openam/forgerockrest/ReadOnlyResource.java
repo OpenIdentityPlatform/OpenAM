@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.forgerockrest;
 
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
@@ -50,7 +48,7 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      * {@inheritDoc}
      */
     public final Promise<ResourceResponse, ResourceException> createInstance(Context ctx, CreateRequest request) {
-        return newExceptionPromise(generateException("Creates"));
+        return generateException("Creates").asPromise();
     }
 
     /**
@@ -60,7 +58,7 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      */
     public final Promise<ResourceResponse, ResourceException> deleteInstance(Context ctx, String resId,
             DeleteRequest request) {
-        return newExceptionPromise(generateException("Deletes"));
+        return generateException("Deletes").asPromise();
     }
 
     /**
@@ -70,7 +68,7 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      */
     public final Promise<ResourceResponse, ResourceException> patchInstance(Context ctx, String resId,
             PatchRequest request) {
-        return newExceptionPromise(generateException("Patches"));
+        return generateException("Patches").asPromise();
     }
 
     /**
@@ -80,6 +78,6 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      */
     public final Promise<ResourceResponse, ResourceException> updateInstance(Context ctx, String resId,
             UpdateRequest request) {
-        return newExceptionPromise(generateException("Updates"));
+        return generateException("Updates").asPromise();
     }
 }

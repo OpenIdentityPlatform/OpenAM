@@ -17,11 +17,9 @@ package org.forgerock.openam.rest.sms;
 
 import static com.sun.identity.sm.SMSException.STATUS_NO_PERMISSION;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.security.AccessController;
@@ -52,7 +50,9 @@ import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.QueryRequest;
@@ -133,7 +133,7 @@ public class SmsRealmProvider implements RequestHandler {
             case SmsResourceProvider.SCHEMA:
                 return newResultPromise(newActionResponse(getSchema()));
             default:
-                return newExceptionPromise(newNotSupportedException("Action not supported: " + request.getAction()));
+            return new NotSupportedException("Action not supported: " + request.getAction()).asPromise();
         }
     }
 
@@ -223,13 +223,13 @@ public class SmsRealmProvider implements RequestHandler {
             JsonValue jsonValue = getJsonValue(path, parentRealm);
             return newResultPromise(getResource(jsonValue));
         } catch (SMSException e) {
-            return newExceptionPromise(configureErrorMessage(e));
+            return configureErrorMessage(e).asPromise();
         } catch (SSOException sso) {
             debug.error("RealmResource.createInstance() : Cannot CREATE " + realmName, sso);
-            return newExceptionPromise(adapt(new PermanentException(401, "Access Denied", null)));
+            return new PermanentException(401, "Access Denied", null).asPromise();
         } catch (BadRequestException fe) {
             debug.error("RealmResource.createInstance() : Cannot CREATE " + realmName, fe);
-            return newExceptionPromise(adapt(fe));
+            return fe.asPromise();
         }
     }
 
@@ -277,33 +277,33 @@ public class SmsRealmProvider implements RequestHandler {
             ResourceException exception = configureErrorMessage(smse);
             if (exception instanceof NotFoundException) {
                 debug.warning("RealmResource.deleteInstance() : Cannot find {}", realmPath, smse);
-                return newExceptionPromise(adapt(exception));
+                return exception.asPromise();
             } else if (exception instanceof ForbiddenException || exception instanceof PermanentException
                     || exception instanceof ConflictException || exception instanceof BadRequestException) {
                 debug.warning("RealmResource.deleteInstance() : Cannot DELETE {}", realmPath, smse);
-                return newExceptionPromise(adapt(exception));
+                return exception.asPromise();
             } else {
-                return newExceptionPromise(newBadRequestException(exception.getMessage(), exception));
+                return new BadRequestException(exception.getMessage(), exception).asPromise();
             }
         } catch (Exception e) {
-            return newExceptionPromise(newBadRequestException(e.getMessage(), e));
+            return new BadRequestException(e.getMessage(), e).asPromise();
         }
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException("Method not supported."));
+        return new NotSupportedException("Method not supported.").asPromise();
     }
 
     @Override
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
-            return newExceptionPromise(newNotSupportedException("Query not supported: " + request.getQueryFilter()));
+            return new NotSupportedException("Query not supported: " + request.getQueryFilter()).asPromise();
         }
         if (request.getPagedResultsCookie() != null || request.getPagedResultsOffset() > 0 ||
                 request.getPageSize() > 0) {
-            return newExceptionPromise(newNotSupportedException("Query paging not currently supported"));
+            return new NotSupportedException("Query paging not currently supported").asPromise();
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
@@ -329,15 +329,15 @@ public class SmsRealmProvider implements RequestHandler {
             return newResultPromise(newQueryResponse());
         } catch (SSOException ex) {
             debug.error("RealmResource :: QUERY by " + principalName + " failed : " + ex);
-            return newExceptionPromise(ResourceException.getException(ResourceException.FORBIDDEN));
+            return new ForbiddenException().asPromise();
         } catch (SMSException ex) {
             debug.error("RealmResource :: QUERY by " + principalName + " failed :" + ex);
             switch (ex.getExceptionCode()) {
                 case STATUS_NO_PERMISSION:
                     // This exception will be thrown if permission to read realms from SMS has not been delegated
-                    return newExceptionPromise(ResourceException.getException(ResourceException.FORBIDDEN));
+                    return new ForbiddenException().asPromise();
                 default:
-                    return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+                    return new InternalServerErrorException().asPromise();
             }
         }
     }
@@ -358,16 +358,16 @@ public class SmsRealmProvider implements RequestHandler {
             ResourceException exception = configureErrorMessage(smse);
             if (exception instanceof NotFoundException) {
                 debug.warning("RealmResource.readInstance() : Cannot find {}", realmPath, smse);
-                return newExceptionPromise(adapt(exception));
+                return exception.asPromise();
             } else if (exception instanceof ForbiddenException || exception instanceof PermanentException
                     || exception instanceof ConflictException || exception instanceof BadRequestException) {
                 debug.warning("RealmResource.readInstance() : Cannot READ {}", realmPath, smse);
-                return newExceptionPromise(adapt(exception));
+                return exception.asPromise();
             } else {
-                return newExceptionPromise(newBadRequestException(exception.getMessage(), exception));
+                return new BadRequestException(exception.getMessage(), exception).asPromise();
             }
         } catch (Exception e) {
-            return newExceptionPromise(newBadRequestException(e.getMessage(), e));
+            return new BadRequestException(e.getMessage(), e).asPromise();
         }
     }
 
@@ -436,7 +436,7 @@ public class SmsRealmProvider implements RequestHandler {
             checkValues(request.getContent());
         } catch (BadRequestException e) {
             debug.error("RealmResource.updateInstance() : Cannot UPDATE " + realmPath, e);
-            return newExceptionPromise(newBadRequestException("Invalid attribute values"));
+            return new BadRequestException("Invalid attribute values").asPromise();
         }
 
         final JsonValue realmDetails = request.getContent();
@@ -458,10 +458,10 @@ public class SmsRealmProvider implements RequestHandler {
             return newResultPromise(getResource(getJsonValue(realmPath)));
         } catch (SMSException e) {
             debug.error("RealmResource.updateInstance() : Cannot UPDATE " + realmPath, e);
-            return newExceptionPromise(configureErrorMessage(e));
+            return configureErrorMessage(e).asPromise();
         } catch (SSOException | ForbiddenException | IdRepoException e) {
             debug.error("RealmResource.updateInstance() : Cannot UPDATE " + realmPath, e);
-            return newExceptionPromise(adapt(new PermanentException(401, "Access Denied", null)));
+            return new PermanentException(401, "Access Denied", null).asPromise();
         }
     }
 

@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.util.promise.Promises.*;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -34,6 +35,8 @@ import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -204,7 +207,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
                 debug.error("SubjectTypesResource :: READ by " + principalName +
                         "Requested subject short name not found: " + resourceId);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
+            return new NotFoundException().asPromise();
         }
 
         final JsonValue json = jsonify(subjectClass, resourceId,

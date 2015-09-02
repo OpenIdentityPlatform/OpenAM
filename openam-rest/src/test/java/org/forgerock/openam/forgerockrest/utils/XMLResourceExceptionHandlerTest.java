@@ -15,21 +15,22 @@
  */
 package org.forgerock.openam.forgerockrest.utils;
 
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ResourceException;
-import org.testng.annotations.Test;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.util.AbstractMap;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.caf.authentication.api.AuthenticationException;
 import org.forgerock.caf.authentication.api.MessageContext;
 import org.forgerock.caf.authentication.framework.AuditTrail;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.ResourceException;
+import org.testng.annotations.Test;
 
 public class XMLResourceExceptionHandlerTest {
 
@@ -45,7 +46,7 @@ public class XMLResourceExceptionHandlerTest {
         doReturn(response).when(context).getResponse();
 
         String message = "I don't know where it is";
-        ResourceException ex = ResourceException.getException(404, message);
+        ResourceException ex = new NotFoundException(message);
         AuthenticationException ex2 = new AuthenticationException(ex);
 
         //when
@@ -62,7 +63,7 @@ public class XMLResourceExceptionHandlerTest {
     @Test
     public void testAsXMLDOM() throws Exception {
         //given
-        ResourceException ex = ResourceException.getException(404, "I don't know where it is");
+        ResourceException ex = new NotFoundException("I don't know where it is");
         AbstractMap.SimpleEntry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>("a", 1);
         ex.setDetail(new JsonValue(JsonValue.array(new JsonValue(JsonValue.object(entry)))));
 

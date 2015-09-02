@@ -248,8 +248,7 @@ public class ResourceSetService {
 
                             return Promises.newResultPromise((Collection<ResourceSetDescription>) filteredResourceSets);
                         } catch (EntitlementException e) {
-                            return Promises.newExceptionPromise(
-                                    (ResourceException) new InternalServerErrorException(e));
+                            return new InternalServerErrorException(e).asPromise();
                         }
                     }
                 });
@@ -291,7 +290,7 @@ public class ResourceSetService {
                     query.getResourceSetQuery(),
                     equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, resourceOwnerId)));
         } catch (ServerException e) {
-            return Promises.newExceptionPromise((ResourceException) new InternalServerErrorException(e));
+            return new InternalServerErrorException(e).asPromise();
         }
 
         QueryRequest policyQuery = Requests.newQueryRequest("").setQueryId("searchAll");
@@ -311,11 +310,9 @@ public class ResourceSetService {
                                                 return Promises.newResultPromise(combine(context, query, filteredResourceSets,
                                                         result.getSecond(), augmentWithPolicies, resourceOwnerId));
                                             } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
-                                                return Promises.newExceptionPromise(
-                                                        (ResourceException) new InternalServerErrorException(e));
+                                                return new InternalServerErrorException(e).asPromise();
                                             } catch (ServerException e) {
-                                                return Promises.newExceptionPromise(
-                                                        (ResourceException) new InternalServerErrorException(e));
+                                                return new InternalServerErrorException(e).asPromise();
                                             }
                                         }
                                     });
@@ -394,11 +391,10 @@ public class ResourceSetService {
                     .read(resourceSetId);
             return Promises.newResultPromise(resourceSet);
         } catch (NotFoundException e) {
-            return Promises.newExceptionPromise(
-                    (ResourceException) new org.forgerock.json.resource.NotFoundException(
-                            "No resource set with id, " + resourceSetId + ", found."));
+            return new org.forgerock.json.resource.NotFoundException("No resource set with id, " + resourceSetId
+                    + ", found.").asPromise();
         } catch (ServerException e) {
-            return Promises.newExceptionPromise((ResourceException) new InternalServerErrorException(e));
+            return new InternalServerErrorException(e).asPromise();
         }
     }
 

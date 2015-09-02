@@ -16,16 +16,6 @@
 
 package org.forgerock.openam.sts.soap.bootstrap;
 
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.HttpURLConnectionWrapper;
-import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
-import org.forgerock.openam.sts.STSPublishException;
-import org.forgerock.openam.sts.soap.config.SoapSTSModule;
-import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.forgerock.openam.utils.JsonValueBuilder;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
@@ -34,6 +24,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
+import org.forgerock.openam.sts.STSPublishException;
+import org.forgerock.openam.sts.soap.config.SoapSTSModule;
+import org.forgerock.openam.sts.token.UrlConstituentCatenator;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 /**
  * @see org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentConfigAccess
@@ -89,7 +90,7 @@ public class SoapSTSAgentConfigAccessImpl implements SoapSTSAgentConfigAccess {
                                 " : " + connectionResult.getResult());
             }
         } catch (IOException e) {
-            throw ResourceException.getException(ResourceException.INTERNAL_ERROR,
+            throw new InternalServerErrorException(
                     "Exception caught obtaining agent config state from: " + agentProfileUrl + "; Exception: " + e);
         } finally {
             if (sessionId != null) {

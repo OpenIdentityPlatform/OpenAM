@@ -15,6 +15,7 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.util.promise.Promises.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -28,8 +29,10 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -147,7 +150,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (callingSubject == null) {
             debug.error("ApplicationsResource :: CREATE : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final String realm = getRealm(context);
@@ -207,7 +210,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application creation failed. ", e);
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
+            return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
 
@@ -286,7 +289,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (callingSubject == null) {
             debug.error("ApplicationsResource :: DELETE : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final String realm = getRealm(context);
@@ -309,7 +312,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: DELETE by " + principalName +
                         ": Application failed to delete the resource specified. ", e);
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
+            return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
 
@@ -342,7 +345,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         //select
@@ -371,7 +374,7 @@ public class ApplicationsResource extends RealmAwareResource {
                         ": Failed to query resource.", e);
 
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
+            return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
 
@@ -390,7 +393,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: READ : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final String realm = getRealm(context);
@@ -413,7 +416,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: READ by " + principalName +
                         ": Application failed to retrieve the resource specified.", e);
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
+            return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
 
@@ -435,7 +438,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
@@ -473,7 +476,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Error performing update operation.", e);
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
+            return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
 

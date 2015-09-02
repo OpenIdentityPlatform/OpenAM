@@ -265,18 +265,15 @@ public abstract class AbstractAuditFilterTest {
     }
 
     private static Promise<ResourceResponse, ResourceException> mockResourceResponseExceptionPromise() {
-        return Promises.<ResourceResponse, ResourceException>newExceptionPromise(
-                new InternalServerErrorException("expected exception"));
+        return new InternalServerErrorException("expected exception").asPromise();
     }
 
     private static Promise<ActionResponse, ResourceException> mockActionResponseExceptionPromise() {
-        return Promises.<ActionResponse, ResourceException>newExceptionPromise(
-                new InternalServerErrorException("expected exception"));
+        return new InternalServerErrorException("expected exception").asPromise();
     }
 
     private static Promise<QueryResponse, ResourceException> mockQueryResponseExceptionPromise() {
-        return Promises.<QueryResponse, ResourceException>newExceptionPromise(
-                new InternalServerErrorException("expected exception"));
+        return new InternalServerErrorException("expected exception").asPromise();
     }
 
     private void verifyPublishAccessEvent(AuditConstants.EventName eventName) throws AuditException {

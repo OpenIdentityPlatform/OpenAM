@@ -18,10 +18,8 @@ package org.forgerock.openam.rest.sms;
 
 import static com.sun.identity.sm.AttributeSchema.Syntax.*;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.openam.rest.sms.SmsJsonSchema.*;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.io.BufferedReader;
@@ -58,6 +56,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -221,7 +220,7 @@ abstract class SmsResourceProvider {
         } else if (SCHEMA.equals(request.getAction())) {
             return newResultPromise(newActionResponse(createSchema(context)));
         } else {
-            return newExceptionPromise(newNotSupportedException("Action not supported: " + request.getAction()));
+            return new NotSupportedException("Action not supported: " + request.getAction()).asPromise();
         }
     }
 

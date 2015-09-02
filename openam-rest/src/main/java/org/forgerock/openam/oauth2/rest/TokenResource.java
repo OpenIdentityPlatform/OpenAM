@@ -25,7 +25,6 @@
 package org.forgerock.openam.oauth2.rest;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.adapt;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
@@ -224,18 +223,18 @@ public class TokenResource implements CollectionResourceProvider {
             return newResultPromise(null);
 
         } catch (CoreTokenException e) {
-            return newExceptionPromise(adapt(new ServiceUnavailableException(e.getMessage(), e)));
+            return new ServiceUnavailableException(e.getMessage(), e).asPromise();
         } catch (ResourceException e) {
-            return newExceptionPromise(e);
+            return e.asPromise();
         } catch (SSOException e) {
             debug.error("TokenResource :: DELETE : Unable to retrieve identity of the requesting user. Unauthorized.");
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
+            return new PermanentException(401, "Unauthorized", e).asPromise();
         } catch (IdRepoException e) {
             debug.error("TokenResource :: DELETE : Unable to retrieve identity of the requesting user. Unauthorized.");
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
+            return new PermanentException(401, "Unauthorized", e).asPromise();
         } catch (UnauthorizedClientException e) {
             debug.error("TokenResource :: DELETE : Requesting user is unauthorized.");
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
+            return new PermanentException(401, "Unauthorized", e).asPromise();
         }
     }
 
@@ -323,7 +322,7 @@ public class TokenResource implements CollectionResourceProvider {
                     debug.error("TokenResource :: QUERY : Unable to query collection as no UID discovered " +
                             "for requesting user.");
                 }
-                return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
+                return new PermanentException(401, "Unauthorized", e).asPromise();
             }
 
             String id = queryRequest.getQueryId();
@@ -348,16 +347,16 @@ public class TokenResource implements CollectionResourceProvider {
 
         } catch (UnauthorizedClientException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as the client is not authorized.", e);
-            return newExceptionPromise(adapt(new PermanentException(401, e.getMessage(), e)));
+            return new PermanentException(401, e.getMessage(), e).asPromise();
         } catch (CoreTokenException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as the token store is not available.", e);
-            return newExceptionPromise(adapt(new ServiceUnavailableException(e.getMessage(), e)));
+            return new ServiceUnavailableException(e.getMessage(), e).asPromise();
         } catch (InternalServerErrorException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as writing the response failed.", e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         } catch (NotFoundException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as realm does not have OAuth 2 provider.", e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -576,18 +575,18 @@ public class TokenResource implements CollectionResourceProvider {
                 }
             }
         } catch (ResourceException e) {
-            return newExceptionPromise(e);
+            return e.asPromise();
         } catch (SSOException e) {
             debug.error("TokenResource :: READ : Unable to query collection as the IdRepo " +
                     "failed to return a valid user.", e);
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
+            return new PermanentException(401, "Unauthorized", e).asPromise();
         } catch (IdRepoException e) {
             debug.error("TokenResource :: READ : Unable to query collection as the IdRepo " +
                     "failed to return a valid user.", e);
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
+            return new PermanentException(401, "Unauthorized", e).asPromise();
         } catch (UnauthorizedClientException e) {
             debug.error("TokenResource :: READ : Unable to query collection as the client is not authorized.", e);
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
+            return new PermanentException(401, "Unauthorized", e).asPromise();
         }
     }
 

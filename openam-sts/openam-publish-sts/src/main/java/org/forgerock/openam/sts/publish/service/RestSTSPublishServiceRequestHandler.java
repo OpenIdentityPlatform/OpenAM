@@ -17,7 +17,6 @@
 package org.forgerock.openam.sts.publish.service;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -34,6 +33,8 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -86,7 +87,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
     }
 
      public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     /*
@@ -102,18 +103,18 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         try {
             instanceConfig = marshalInstanceConfigFromInvocation(request.getContent());
         } catch (BadRequestException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
         if (!realmValidator.isRealm(instanceConfig.getDeploymentConfig().getRealm())) {
             logger.warn("Publish of Rest STS instance " + instanceConfig.getDeploymentSubPath() + " to realm "
                     + instanceConfig.getDeploymentConfig().getRealm() + " rejected because realm does not exist.");
-            return newExceptionPromise(newNotFoundException("The specified realm does not exist."));
+            return new NotFoundException("The specified realm does not exist.").asPromise();
         }
         Injector instanceInjector;
         try {
             instanceInjector = createInjector(instanceConfig);
         } catch (ResourceException e) {
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
         return publishInstance(instanceConfig, instanceInjector);
     }
@@ -138,21 +139,21 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         } catch (STSPublishException e) {
             String message = "Exception caught removing instance: " + stsId + " from realm " + realm + ". Exception:" + e;
             logger.error(message, e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         } catch (Exception e) {
             String message = "Exception caught removing instance: " + stsId + " from realm " + realm + ". Exception:" + e;
             logger.error(message, e);
-            return newExceptionPromise(newInternalServerErrorException(message, e));
+            return new InternalServerErrorException(message, e).asPromise();
         }
     }
 
     public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
@@ -174,7 +175,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                 if (!realmValidator.isRealm(realm)) {
                     logger.warn("Read of rest STS instance state for instance " + request.getResourcePath() +
                             " in realm " + realm + " rejected because realm does not exist");
-                    return newExceptionPromise(newNotFoundException("The specified realm does not exist."));
+                    return new NotFoundException("The specified realm does not exist.").asPromise();
                 }
                 RestSTSInstanceConfig instanceConfig =
                         publisher.getPublishedInstance(request.getResourcePath(), realm);
@@ -186,7 +187,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
             String message = "Exception caught obtaining rest sts instance corresponding to id: " +
                     request.getResourcePath() + "; Exception: " + e;
             logger.error(message, e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -201,7 +202,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         if (!realmValidator.isRealm(realm)) {
             logger.warn("Update of rest STS instance state for instance " + stsId +
                     " in realm " + realm + " rejected because realm does not exist");
-            return newExceptionPromise(newNotFoundException("The specified realm does not exist."));
+            return new NotFoundException("The specified realm does not exist.").asPromise();
         }
         /*
         Insure that the instance is published before performing an update.
@@ -212,7 +213,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         } catch (STSPublishException e) {
             logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught determining whether " +
                     "instance persisted in SMS. Instance not updated. Exception: " + e, e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
         final boolean publishedToCrest = publisher.isInstanceExposedInCrest(stsId);
 
@@ -235,7 +236,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                 logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught marshalling " +
                         "invocation state to RestSTSInstanceConfig. Instance not updated. The state: "
                         + request.getContent() + "Exception: " + e, e);
-                return newExceptionPromise(adapt(e));
+                return e.asPromise();
             }
             Injector instanceInjector;
             try {
@@ -244,7 +245,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                 logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught creating an " +
                         "Injector using the RestSTSInstanceConfig. The instance: " + instanceConfig.toJson() +
                         "; Exception: " + e, e);
-                return newExceptionPromise(e);
+                return e.asPromise();
             }
             try {
                 publisher.updateInstanceInSMS(stsId, realm, instanceConfig, instanceInjector.getInstance(RestSTS.class));
@@ -255,11 +256,11 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                         "rest sts instance " + instanceConfig.getDeploymentSubPath() + ". This means instance is" +
                         "in indeterminate state, and has not been updated. The instance config: " + instanceConfig
                         + "; Exception: " + e, e);
-                return newExceptionPromise(adapt(e));
+                return e.asPromise();
             }
         } else {
             //404 - realm and id not found in SMS
-            return newExceptionPromise(newNotFoundException("No rest sts instance with id " + stsId + " in realm " + realm));
+            return new NotFoundException("No rest sts instance with id " + stsId + " in realm " + realm).asPromise();
         }
     }
 
@@ -332,11 +333,11 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         } catch (STSPublishException e) {
             String message = "Exception caught publishing instance: " + instanceConfig.getDeploymentSubPath() + ". Exception" + e;
             logger.error(message, e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         } catch (Exception e) {
             String message = "Exception caught publishing instance: " + instanceConfig.getDeploymentSubPath() + ". Exception" + e;
             logger.error(message, e);
-            return newExceptionPromise(newInternalServerErrorException(message, e));
+            return new InternalServerErrorException(message, e).asPromise();
         }
     }
 }

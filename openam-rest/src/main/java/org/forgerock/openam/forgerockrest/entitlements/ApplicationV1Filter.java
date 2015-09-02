@@ -15,26 +15,27 @@
  */
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
+
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
@@ -120,18 +121,16 @@ public class ApplicationV1Filter implements Filter {
         final String pathRealm = contextHelper.getRealm(context);
 
         if (actions == null) {
-            return newExceptionPromise(ResourceException
-                    .getException(ResourceException.BAD_REQUEST, "Invalid actions defined in request"));
+            return new BadRequestException("Invalid actions defined in request").asPromise();
         }
 
         if (resources == null) {
-            return newExceptionPromise(ResourceException
-                    .getException(ResourceException.BAD_REQUEST, "Invalid resources defined in request"));
+            return new BadRequestException("Invalid resources defined in request").asPromise();
         }
 
         if (!pathRealm.equals(bodyRealm)) {
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, new EntitlementException(
-                    EntitlementException.INVALID_APP_REALM, new String[] { bodyRealm, pathRealm })));
+            return resourceErrorHandler.handleError(context, request, new EntitlementException(
+                    EntitlementException.INVALID_APP_REALM, new String[] { bodyRealm, pathRealm })).asPromise();
         }
 
         try {
@@ -143,7 +142,7 @@ public class ApplicationV1Filter implements Filter {
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering application create CREST request", eE);
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
+            return resourceErrorHandler.handleError(context, request, eE).asPromise();
         }
     }
 
@@ -251,18 +250,16 @@ public class ApplicationV1Filter implements Filter {
         final String pathRealm = contextHelper.getRealm(context);
 
         if (actions == null) {
-            return newExceptionPromise(ResourceException
-                    .getException(ResourceException.BAD_REQUEST, "Invalid actions defined in request"));
+            return new BadRequestException("Invalid actions defined in request").asPromise();
         }
 
         if (resources == null) {
-            return newExceptionPromise(ResourceException
-                    .getException(ResourceException.BAD_REQUEST, "Invalid resources defined in request"));
+            return new BadRequestException("Invalid resources defined in request").asPromise();
         }
 
         if (!pathRealm.equals(bodyRealm)) {
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, new EntitlementException
-                    (EntitlementException.INVALID_APP_REALM, new String[]{bodyRealm, pathRealm})));
+            return resourceErrorHandler.handleError(context, request, new EntitlementException
+                    (EntitlementException.INVALID_APP_REALM, new String[]{bodyRealm, pathRealm})).asPromise();
         }
 
         final Subject callingSubject = contextHelper.getSubject(context);
@@ -273,15 +270,12 @@ public class ApplicationV1Filter implements Filter {
             final Application application = applicationService.getApplication(applicationName);
 
             if (application == null) {
-                return newExceptionPromise(ResourceException
-                        .getException(ResourceException.BAD_REQUEST, "Unable to find application " + applicationName));
+                return new BadRequestException("Unable to find application " + applicationName).asPromise();
             }
 
             if (application.getResourceTypeUuids().size() != 1) {
-                return newExceptionPromise(ResourceException
-                        .getException(ResourceException.BAD_REQUEST,
-                                "Cannot modify application with more than one " +
-                                        "resource type using version 1.0 of this endpoint"));
+                return new BadRequestException("Cannot modify application with more than one "
+                        + "resource type using version 1.0 of this endpoint").asPromise();
             }
 
             // Retrieve the resource type from the applications single resource type.
@@ -315,7 +309,7 @@ public class ApplicationV1Filter implements Filter {
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering application update CREST request", eE);
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
+            return resourceErrorHandler.handleError(context, request, eE).asPromise();
         }
 
         // Forward onto next handler.

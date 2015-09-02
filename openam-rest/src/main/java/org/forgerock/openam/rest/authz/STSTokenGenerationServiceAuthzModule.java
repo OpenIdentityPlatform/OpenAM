@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.rest.authz;
 
+import static org.forgerock.json.resource.ResourceException.*;
+
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -115,8 +117,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialAndAdminUserOnl
             if (debug.messageEnabled()) {
                 debug.message("TokenGenerationServiceAuthzModule :: Unable to obtain SSOToken or principal", e);
             }
-            return Promises.newExceptionPromise(ResourceException
-                    .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
+            return getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e).asPromise();
         }
 
         if (agentIdentity.isSoapSTSAgent(token)) {

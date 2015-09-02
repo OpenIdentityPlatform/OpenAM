@@ -16,9 +16,13 @@
 
 package org.forgerock.openam.forgerockrest;
 
-import static org.forgerock.json.resource.ResourceException.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
+
 import com.google.inject.Inject;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
@@ -32,6 +36,7 @@ import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -46,10 +51,6 @@ import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
 import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.util.promise.Promise;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
 
 public class AuditHistory implements CollectionResourceProvider {
 
@@ -66,7 +67,7 @@ public class AuditHistory implements CollectionResourceProvider {
         try {
             return newResultPromise(newActionResponse(new JsonValue(auditLogger.getHistory(identity, null))));
         } catch (ServerException e) {
-            return newExceptionPromise((ResourceException) new InternalServerErrorException(e));
+            return new InternalServerErrorException(e).asPromise();
         }
     }
 
@@ -83,7 +84,7 @@ public class AuditHistory implements CollectionResourceProvider {
                 history = auditLogger.getHistory(identity, request);
             }
         } catch (ServerException e) {
-            return newExceptionPromise((ResourceException) new InternalServerErrorException(e));
+            return new InternalServerErrorException(e).asPromise();
         }
 
         Collection<JsonValue> results = new ArrayList<>();
@@ -104,35 +105,35 @@ public class AuditHistory implements CollectionResourceProvider {
     @Override
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 }

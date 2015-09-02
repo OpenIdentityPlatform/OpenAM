@@ -16,8 +16,20 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
+import static org.forgerock.json.resource.ResourceException.getException;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
@@ -27,6 +39,8 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -42,15 +56,6 @@ import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeM
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.util.promise.Promise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Allows for CREST-handling of stored {@link ApplicationType}s.
@@ -149,7 +154,7 @@ public class ApplicationTypesResource extends SubjectAwareResource {
 
         if (mySubject == null) {
             debug.error("ApplicationsTypesResource :: QUERY : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
@@ -220,7 +225,7 @@ public class ApplicationTypesResource extends SubjectAwareResource {
 
         if (mySubject == null) {
             debug.error("ApplicationsTypesResource :: READ : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
@@ -233,7 +238,7 @@ public class ApplicationTypesResource extends SubjectAwareResource {
                 debug.error("ApplicationTypesResource :: READ by " + principalName +
                         ": Requested application type short name not found: " + resourceId);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
+            return new NotFoundException().asPromise();
         }
 
         try {
@@ -245,7 +250,7 @@ public class ApplicationTypesResource extends SubjectAwareResource {
                 debug.error("ApplicationTypesResource :: READ by " + principalName +
                         ": Could not jsonify class associated with defined Type: " + resourceId, e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
     }
 }

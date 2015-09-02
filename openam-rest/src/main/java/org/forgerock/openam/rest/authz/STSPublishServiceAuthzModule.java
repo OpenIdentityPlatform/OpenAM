@@ -108,8 +108,7 @@ public class STSPublishServiceAuthzModule extends AdminOnlyAuthzModule {
                 return authorizeAdmin(context);
             }
         } catch (ResourceException e) {
-            return Promises.newExceptionPromise(ResourceException
-                    .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
+            return ResourceException.getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e).asPromise();
         }
     }
 

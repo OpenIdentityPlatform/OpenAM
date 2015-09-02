@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.forgerockrest.server;
 
-import static org.forgerock.json.resource.ResourceException.newNotFoundException;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -27,7 +26,9 @@ import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -45,22 +46,13 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.net.URI;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.inject.Inject;
-import javax.inject.Named;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -121,7 +113,7 @@ public class ServerInfoResource extends RealmAwareResource {
             return newResultPromise(resource);
         } catch (Exception e) {
             debug.error("ServerInfoResource.getCookieDomains : Cannot retrieve cookie domains.", e);
-            return newExceptionPromise(newNotFoundException(e.getMessage()));
+            return new NotFoundException(e.getMessage()).asPromise();
         }
     }
 
@@ -178,7 +170,7 @@ public class ServerInfoResource extends RealmAwareResource {
             return newResultPromise(resource);
         } catch (Exception e) {
             debug.error("ServerInfoResource.getAllServerInfo : Cannot retrieve all server info domains.", e);
-            return newExceptionPromise(newNotFoundException(e.getMessage()));
+            return new NotFoundException(e.getMessage()).asPromise();
         }
     }
 
@@ -328,7 +320,7 @@ public class ServerInfoResource extends RealmAwareResource {
                 debug.error("ServerInfoResource :: READ : in realm: " + realm +
                         ": Cannot receive information on requested resource: " + resourceId, e);
             }
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 

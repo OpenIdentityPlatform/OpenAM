@@ -215,10 +215,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
         } catch (SSOException e) {
             debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
-            return newExceptionPromise(adapt(new ForbiddenException("SSO Token cannot be retrieved.", e)));
+            return new ForbiddenException("SSO Token cannot be retrieved.", e).asPromise();
         } catch (IdRepoException ex) {
             debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
-            return newExceptionPromise(adapt(new ForbiddenException("Cannot retrieve id from session.", ex)));
+            return new ForbiddenException("Cannot retrieve id from session.", ex).asPromise();
         }
     }
 
@@ -341,14 +341,14 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         } catch (BadRequestException | NotFoundException be) {
             debug.warning("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
                     + be.getMessage());
-            return newExceptionPromise(adapt(be));
+            return be.asPromise();
         } catch (NotSupportedException nse) {
             debug.error("IdentityResource.createRegistrationEmail: Operation not enabled " + nse.getMessage());
-            return newExceptionPromise(adapt(nse));
+            return nse.asPromise();
         } catch (Exception e) {
             debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
                     + e.getMessage());
-            return newExceptionPromise(newNotFoundException("Email not sent"));
+            return new NotFoundException("Email not sent").asPromise();
         }
     }
 
@@ -505,10 +505,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
         } catch (BadRequestException be) {
             debug.warning(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, be);
-            return newExceptionPromise(adapt(be));
+            return be.asPromise();
         } catch (Exception e) {
             debug.error(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, e);
-            return newExceptionPromise(newNotFoundException(e.getMessage()));
+            return new NotFoundException(e.getMessage()).asPromise();
         }
     }
 
@@ -584,7 +584,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         } else if (action.equalsIgnoreCase("forgotPasswordReset")) {
             return anonymousUpdate(context, request, realm);
         } else { // for now this is the only case coming in, so fail if otherwise
-            return newExceptionPromise(newNotSupportedException("Actions are not supported for resource instances"));
+            return new NotSupportedException("Actions are not supported for resource instances").asPromise();
         }
     }
 
@@ -648,13 +648,13 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 if (debug.warningEnabled()) {
                     debug.warning("Rest Security not created. restSecurity = " + restSecurity);
                 }
-                throw ResourceException.getException(ResourceException.UNAVAILABLE, "Rest Security Service not created");
+                throw getException(UNAVAILABLE, "Rest Security Service not created");
             }
             if (!restSecurity.isForgotPassword()) {
                 if (debug.warningEnabled()) {
                     debug.warning("Forgot Password set to : " + restSecurity.isForgotPassword());
                 }
-                throw ResourceException.getException(ResourceException.UNAVAILABLE, "Forgot password is not accessible.");
+                throw getException(UNAVAILABLE, "Forgot password is not accessible.");
             }
 
             // Generate Admin Token
@@ -753,15 +753,15 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             return newResultPromise(newActionResponse(result));
         } catch (NotFoundException e) {
             debug.warning("Could not find user", e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         } catch (ResourceException re) {
             // Service not available, Neither or both Username/Email provided, User inactive
             debug.warning(re.getMessage(), re);
-            return newExceptionPromise(re);
+            return re.asPromise();
         } catch (Exception e) {
             // Intentional - all other errors are considered Internal Error.
             debug.error("Internal error", e);
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR, "Failed to send mail", e));
+            return new InternalServerErrorException("Failed to send mail", e).asPromise();
         }
     }
 
@@ -841,20 +841,20 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                                 }
                             } catch (CoreTokenException cte) { // For any unexpected CTS error
                                 debug.error("Error performing anonymousUpdate", cte);
-                                return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR, cte.getMessage(), cte));
+                                return new InternalServerErrorException(cte.getMessage(), cte).asPromise();
                             }
                             return newResultPromise(response);
                         }
                     });
         } catch (BadRequestException bre) { // For any malformed request.
             debug.warning("Bad request received for anonymousUpdate " + bre.getMessage());
-            return newExceptionPromise(adapt(bre));
+            return bre.asPromise();
         } catch (CoreTokenException cte) { // For any unexpected CTS error
             debug.error("Error performing anonymousUpdate", cte);
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR, cte.getMessage(), cte));
+            return new InternalServerErrorException(cte.getMessage(), cte).asPromise();
         } catch (NotFoundException nfe) {
             debug.message("Unable to find token for anonymousUpdate " + nfe.getMessage());
-            return newExceptionPromise(ResourceException.getException(HttpURLConnection.HTTP_GONE, nfe.getMessage(), nfe));
+            return getException(HttpURLConnection.HTTP_GONE, nfe.getMessage(), nfe).asPromise();
         }
     }
 
@@ -890,10 +890,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             return newResultPromise(newActionResponse(identityDetailsToJsonValue(checkIdent)));
         }  catch (ResourceException e) {
             debug.warning("IdentityResource.updateInstance() :: Cannot UPDATE! " + e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         } catch (final Exception exception) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " + exception);
-            return newExceptionPromise(newNotFoundException(exception.getMessage(), exception));
+            return new NotFoundException(exception.getMessage(), exception).asPromise();
         }
     }
 
@@ -954,24 +954,24 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                                 }
                             } catch (CoreTokenException cte) { // For any unexpected CTS error
                                 debug.error("IdentityResource.anonymousCreate(): CTS Error : " + cte.getMessage());
-                                return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR, cte.getMessage(), cte));
+                                return new InternalServerErrorException(cte.getMessage(), cte).asPromise();
                             }
                             return newResultPromise(response);
                         }
                     });
         } catch (BadRequestException be){
             debug.warning("IdentityResource.anonymousCreate() :: Invalid Parameter " + be);
-            return newExceptionPromise(adapt(be));
+            return be.asPromise();
         } catch (NotFoundException nfe){
             debug.warning("IdentityResource.anonymousCreate(): Invalid tokenID : " + tokenID);
-            return newExceptionPromise(adapt(nfe));
+            return nfe.asPromise();
         } catch (CoreTokenException cte){ // For any unexpected CTS error
             debug.error("IdentityResource.anonymousCreate(): CTS Error : " + cte.getMessage());
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR, cte.getMessage(), cte));
+            return new InternalServerErrorException(cte.getMessage(), cte).asPromise();
         } catch (ServiceNotFoundException e) {
             // Failure from RestSecurity
             debug.error("Internal error", e);
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage(), e));
+            return new InternalServerErrorException(e.getMessage(), e).asPromise();
         }
     }
 
@@ -981,7 +981,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     @Override
     public Promise<ActionResponse, ResourceException> actionInstance(final Context context,
             final String resourceId, final ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException("Actions are not supported for resource instances"));
+        return new NotSupportedException("Actions are not supported for resource instances").asPromise();
     }
 
     /**
@@ -1007,7 +1007,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
                             return newResultPromise(newActionResponse(identityDetailsToJsonValue(dtls)));
                         } else {
-                            return newExceptionPromise(newNotFoundException(resourceId + " not found"));
+                            return new NotFoundException(resourceId + " not found").asPromise();
                         }
                     }
                 });
@@ -1038,7 +1038,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                     if (!resourceId.equalsIgnoreCase(identity.getName())) {
                         ResourceException be = new BadRequestException("id in path does not match id in request body");
                         debug.error("IdentityResource.createInstance() :: Cannot CREATE ", be);
-                        return newExceptionPromise(be);
+                        return be.asPromise();
                     }
                 }
                 identity.setName(resourceId);
@@ -1058,13 +1058,13 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
                                 return newResultPromise(newResourceResponse(id, "0", identityDetailsToJsonValue(dtls)));
                             } else {
-                                return newExceptionPromise(newNotFoundException("Identity not found"));
+                                return new NotFoundException("Identity not found").asPromise();
                             }
                         }
                     });
         } catch (SSOException e) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE! " + e);
-            return newExceptionPromise(newNotFoundException(e.getMessage(), e));
+            return new NotFoundException(e.getMessage(), e).asPromise();
         }
     }
 
@@ -1082,22 +1082,22 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         } catch (final ObjectNotFound notFound) {
             debug.error("IdentityResource.createInstance() :: Cannot READ " +
                     resourceId + ": Resource cannot be found." + notFound);
-            return newExceptionPromise(newNotFoundException("Resource not found.", notFound));
+            return new NotFoundException("Resource not found.", notFound).asPromise();
         } catch (final TokenExpired tokenExpired) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     resourceId + ":" + tokenExpired);
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", null)));
+            return new PermanentException(401, "Unauthorized", null).asPromise();
         } catch (final NeedMoreCredentials needMoreCredentials) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     needMoreCredentials);
-            return newExceptionPromise(adapt(new ForbiddenException("Token is not authorized", needMoreCredentials)));
+            return new ForbiddenException("Token is not authorized", needMoreCredentials).asPromise();
         } catch (ResourceException e) {
             debug.warning("IdentityResource.createInstance() :: Cannot CREATE! " + e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         } catch (final Exception exception) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE! " +
                     exception);
-            return newExceptionPromise(newNotFoundException(exception.getMessage(), exception));
+            return new NotFoundException(exception.getMessage(), exception).asPromise();
         }
         return newResultPromise(dtls);
     }
@@ -1136,30 +1136,30 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         } catch (final NeedMoreCredentials ex) {
             debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     resourceId + ": User does not have enough privileges.");
-            return newExceptionPromise(adapt(new ForbiddenException(resourceId, ex)));
+            return new ForbiddenException(resourceId, ex).asPromise();
         } catch (final ObjectNotFound notFound) {
             debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     resourceId + ":" + notFound);
-            return newExceptionPromise(newNotFoundException("Resource cannot be found.", notFound));
+            return new NotFoundException("Resource cannot be found.", notFound).asPromise();
         } catch (final TokenExpired tokenExpired) {
             debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     resourceId + ":" + tokenExpired);
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", null)));
+            return new PermanentException(401, "Unauthorized", null).asPromise();
         } catch (final AccessDenied accessDenied) {
             debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     resourceId + ":" + accessDenied);
-            return newExceptionPromise(adapt(new ForbiddenException(accessDenied.getMessage(), accessDenied)));
+            return new ForbiddenException(accessDenied.getMessage(), accessDenied).asPromise();
         } catch (final GeneralFailure generalFailure) {
             debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     generalFailure.getMessage());
-            return newExceptionPromise(newBadRequestException(generalFailure.getMessage(), generalFailure));
+            return new BadRequestException(generalFailure.getMessage(), generalFailure).asPromise();
         } catch (ForbiddenException ex) {
             debug.warning("IdentityResource.deleteInstance() :: Cannot DELETE " + resourceId
                     + ": User does not have enough privileges.");
-            return newExceptionPromise(adapt(new ForbiddenException(resourceId, ex)));
+            return new ForbiddenException(resourceId, ex).asPromise();
         } catch (NotFoundException notFound) {
             debug.warning("IdentityResource.deleteInstance() :: Cannot DELETE " + resourceId + ":" + notFound);
-            return newExceptionPromise(adapt(new NotFoundException("Resource cannot be found.", notFound)));
+            return new NotFoundException("Resource cannot be found.", notFound).asPromise();
         } catch (ResourceException exception) {
             debug.warning("IdentityResource.deleteInstance() :: Cannot DELETE! " + exception.getMessage());
             result.put("success", "false");
@@ -1241,7 +1241,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(final Context context,
             final String resourceId, final PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException("Patch operations are not supported"));
+        return new NotSupportedException("Patch operations are not supported").asPromise();
     }
 
     /**
@@ -1305,27 +1305,27 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         } catch (final NeedMoreCredentials needMoreCredentials) {
             debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     resourceId + ":" + needMoreCredentials);
-            return newExceptionPromise(adapt(new ForbiddenException("User does not have enough privileges.", needMoreCredentials)));
+            return new ForbiddenException("User does not have enough privileges.", needMoreCredentials).asPromise();
         } catch (final ObjectNotFound objectNotFound) {
             debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     resourceId + ":" + objectNotFound);
-            return newExceptionPromise(newNotFoundException("Resource cannot be found.", objectNotFound));
+            return new NotFoundException("Resource cannot be found.", objectNotFound).asPromise();
         } catch (final TokenExpired tokenExpired) {
             debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     resourceId + ":" + tokenExpired);
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", null)));
+            return new PermanentException(401, "Unauthorized", null).asPromise();
         } catch (final AccessDenied accessDenied) {
             debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     resourceId + ":" + accessDenied);
-            return newExceptionPromise(adapt(new ForbiddenException(accessDenied.getMessage(), accessDenied)));
+            return new ForbiddenException(accessDenied.getMessage(), accessDenied).asPromise();
         } catch (final GeneralFailure generalFailure) {
             debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     generalFailure);
-            return newExceptionPromise(newBadRequestException(generalFailure.getMessage(), generalFailure));
+            return new BadRequestException(generalFailure.getMessage(), generalFailure).asPromise();
         } catch (final Exception exception) {
             debug.error("IdentityResource.readInstance() :: Cannot READ! " +
                     exception);
-            return newExceptionPromise(newNotFoundException(exception.getMessage(), exception));
+            return new NotFoundException(exception.getMessage(), exception).asPromise();
         }
     }
 
@@ -1403,38 +1403,38 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         } catch (final ObjectNotFound onf) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     onf);
-            return newExceptionPromise(newNotFoundException("Could not find the resource [ " + resourceId + " ] to update", onf));
+            return new NotFoundException("Could not find the resource [ " + resourceId + " ] to update", onf)
+                    .asPromise();
         } catch (final NeedMoreCredentials needMoreCredentials) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + needMoreCredentials);
-            return newExceptionPromise(adapt(new ForbiddenException("Token is not authorized", needMoreCredentials)));
+            return new ForbiddenException("Token is not authorized", needMoreCredentials).asPromise();
         } catch (final TokenExpired tokenExpired) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + tokenExpired);
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", null)));
+            return new PermanentException(401, "Unauthorized", null).asPromise();
         } catch (final AccessDenied accessDenied) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + accessDenied);
-            return newExceptionPromise(adapt(new ForbiddenException(accessDenied.getMessage(), accessDenied)));
+            return new ForbiddenException(accessDenied.getMessage(), accessDenied).asPromise();
         } catch (final GeneralFailure generalFailure) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);
-            return newExceptionPromise(newBadRequestException(generalFailure.getMessage(), generalFailure));
+            return new BadRequestException(generalFailure.getMessage(), generalFailure).asPromise();
         }  catch (NotFoundException e) {
             debug.warning("IdentityResource.updateInstance() :: Cannot UPDATE! " + e);
-            return newExceptionPromise(newNotFoundException("Could not find the resource [ " + resourceId + " ] to update",
-                    e));
+            return new NotFoundException("Could not find the resource [ " + resourceId + " ] to update", e).asPromise();
         } catch (ResourceException re) {
             debug.warning("IdentityResource.updateInstance() :: Cannot UPDATE! " + resourceId + ":" + re);
-            return newExceptionPromise(re);
+            return re.asPromise();
         } catch (SSOException e) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + e);
-            return newExceptionPromise(adapt(new ForbiddenException(e.getMessage(), e)));
+            return new ForbiddenException(e.getMessage(), e).asPromise();
         }catch (final Exception exception) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);
-            return newExceptionPromise(newNotFoundException(exception.getMessage(), exception));
+            return new NotFoundException(exception.getMessage(), exception).asPromise();
         }
     }
 

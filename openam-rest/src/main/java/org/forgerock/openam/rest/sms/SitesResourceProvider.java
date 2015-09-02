@@ -17,11 +17,9 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.rest.sms.SmsJsonSchema.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -46,7 +44,9 @@ import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
@@ -118,7 +118,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
                         ))
                 ))))));
             default:
-                return newExceptionPromise(newBadRequestException("Action not supported: " + request.getAction()));
+                return new BadRequestException("Action not supported: " + request.getAction()).asPromise();
         }
     }
 
@@ -129,23 +129,23 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         try {
             id = validWriteOperation(content, id);
         } catch (BadRequestException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
 
         String url = content.get(PRIMARY_URL).asString();
         try {
             SSOToken token = getSsoToken(context);
             if (SiteConfiguration.isSiteExist(token, id)) {
-                return newExceptionPromise(adapt(new ConflictException("Site with id already exists: " + id)));
+                return new ConflictException("Site with id already exists: " + id).asPromise();
             }
             SiteConfiguration.createSite(token, id, url, content.get(SECONDARY_URLS).asSet());
             debug.message("Site created: {}", id);
             return newResultPromise(getSite(token, id));
         } catch (SMSException | SSOException | ConfigurationException e) {
             debug.error("Could not create site", e);
-            return newExceptionPromise(newInternalServerErrorException("Could not create site"));
+            return new InternalServerErrorException("Could not create site").asPromise();
         } catch (NotFoundException e) {
-            return newExceptionPromise(newInternalServerErrorException("Could not read site just created"));
+            return new InternalServerErrorException("Could not read site just created").asPromise();
         }
     }
 
@@ -175,23 +175,23 @@ public class SitesResourceProvider implements CollectionResourceProvider {
             site = getSite(token, id);
         } catch (SMSException | SSOException | ConfigurationException e) {
             debug.error("Could not read site {}", id, e);
-            return newExceptionPromise(newInternalServerErrorException("Could not read site"));
+            return new InternalServerErrorException("Could not read site").asPromise();
         } catch (NotFoundException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
         try {
             if (!site.getRevision().equals(request.getRevision())) {
-                return newExceptionPromise(adapt(new PreconditionFailedException("Revision did not match")));
+                return new PreconditionFailedException("Revision did not match").asPromise();
             } else if (!SiteConfiguration.listServers(token, id).isEmpty()) {
-                return newExceptionPromise(adapt(new PreconditionFailedException("Site still has servers attached to it")));
+                return new PreconditionFailedException("Site still has servers attached to it").asPromise();
             } else if (!SiteConfiguration.deleteSite(token, id)) {
-                return newExceptionPromise(newInternalServerErrorException("Could not delete site: " + id));
+                return new InternalServerErrorException("Could not delete site: " + id).asPromise();
             } else {
                 return newResultPromise(site);
             }
         } catch (SSOException | SMSException | ConfigurationException e) {
             debug.error("Could not delete site {}", id, e);
-            return newExceptionPromise(newInternalServerErrorException("Could not delete site"));
+            return new InternalServerErrorException("Could not delete site").asPromise();
         }
     }
 
@@ -199,7 +199,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
-            return newExceptionPromise(newBadRequestException("Query only supports 'true' filter"));
+            return new BadRequestException("Query only supports 'true' filter").asPromise();
         }
         try {
             SSOToken token = getSsoToken(context);
@@ -212,10 +212,10 @@ public class SitesResourceProvider implements CollectionResourceProvider {
             return newResultPromise(newQueryResponse());
         } catch (SSOException | SMSException | ConfigurationException e) {
             debug.error("Could not read sites", e);
-            return newExceptionPromise(newInternalServerErrorException("Could not read sites"));
+            return new InternalServerErrorException("Could not read sites").asPromise();
         } catch (NotFoundException e) {
             debug.error("Could not read site", e);
-            return newExceptionPromise(newInternalServerErrorException("Could not read site we've just got name for"));
+            return new InternalServerErrorException("Could not read site we've just got name for").asPromise();
         }
     }
 
@@ -250,9 +250,9 @@ public class SitesResourceProvider implements CollectionResourceProvider {
             return newResultPromise(site);
         } catch (SMSException | SSOException | ConfigurationException e) {
             debug.error("Could not read site {}", id, e);
-            return newExceptionPromise(newInternalServerErrorException("Could not read site"));
+            return new InternalServerErrorException("Could not read site").asPromise();
         } catch (NotFoundException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -263,7 +263,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         try {
             validWriteOperation(content, id);
         } catch (BadRequestException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
 
         ResourceResponse site;
@@ -273,34 +273,34 @@ public class SitesResourceProvider implements CollectionResourceProvider {
             site = getSite(token, id);
         } catch (SMSException | SSOException | ConfigurationException e) {
             debug.error("Could not read site {}", id, e);
-            return newExceptionPromise(newInternalServerErrorException("Could not read site"));
+            return new InternalServerErrorException("Could not read site").asPromise();
         } catch (NotFoundException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
         try {
             if (!site.getRevision().equals(request.getRevision())) {
-                return newExceptionPromise(adapt(new PreconditionFailedException("Revision did not match")));
+                return new PreconditionFailedException("Revision did not match").asPromise();
             }
             SiteConfiguration.setSitePrimaryURL(token, id, content.get("url").asString());
             SiteConfiguration.setSiteSecondaryURLs(token, id, content.get("secondaryURLs").asSet());
             return newResultPromise(getSite(token, id));
         } catch (SSOException | SMSException | ConfigurationException e) {
             debug.error("Could not update site {}", id, e);
-            return newExceptionPromise(newInternalServerErrorException("Could not update site"));
+            return new InternalServerErrorException("Could not update site").asPromise();
         } catch (NotFoundException e) {
-            return newExceptionPromise(newInternalServerErrorException("Could not read site after just updating it", e));
+            return new InternalServerErrorException("Could not read site after just updating it", e).asPromise();
         }
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String id,
             PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String id,
             ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException("Action not supported on instance"));
+        return new NotSupportedException("Action not supported on instance").asPromise();
     }
 }

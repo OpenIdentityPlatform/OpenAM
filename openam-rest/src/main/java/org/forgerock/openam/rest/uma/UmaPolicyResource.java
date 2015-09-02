@@ -16,10 +16,15 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -28,6 +33,7 @@ import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -43,10 +49,6 @@ import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * REST endpoint for UMA policy management.
@@ -133,7 +135,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     /**
@@ -141,7 +143,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      */
     @Override
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     /**
@@ -150,7 +152,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     @Override
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     /**

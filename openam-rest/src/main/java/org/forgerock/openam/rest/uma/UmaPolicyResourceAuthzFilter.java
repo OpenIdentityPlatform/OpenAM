@@ -69,7 +69,7 @@ public class UmaPolicyResourceAuthzFilter extends ResourceOwnerOrSuperUserAuthzM
                 return authorize(context);
             }
         } catch (ResourceException e) {
-            return Promises.newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 }

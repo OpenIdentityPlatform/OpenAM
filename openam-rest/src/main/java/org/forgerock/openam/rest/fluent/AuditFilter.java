@@ -15,11 +15,11 @@
  */
 package org.forgerock.openam.rest.fluent;
 
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
+import static org.forgerock.json.resource.ResourceException.getException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
@@ -29,6 +29,7 @@ import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -91,7 +92,7 @@ public class AuditFilter implements Filter {
         try {
             auditor.auditAccessAttempt();
         } catch (AuditException e) {
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         return auditResponse(next.handleAction(context, request), auditor);
@@ -116,7 +117,7 @@ public class AuditFilter implements Filter {
         try {
             auditor.auditAccessAttempt();
         } catch (AuditException e) {
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         return auditResponse(next.handleCreate(context, request), auditor);
@@ -141,7 +142,7 @@ public class AuditFilter implements Filter {
         try {
             auditor.auditAccessAttempt();
         } catch (AuditException e) {
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         return auditResponse(next.handleDelete(context, request), auditor);
@@ -166,7 +167,7 @@ public class AuditFilter implements Filter {
         try {
             auditor.auditAccessAttempt();
         } catch (AuditException e) {
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         return auditResponse(next.handlePatch(context, request), auditor);
@@ -192,7 +193,7 @@ public class AuditFilter implements Filter {
         try {
             auditor.auditAccessAttempt();
         } catch (AuditException e) {
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         return auditResponse(next.handleQuery(context, request, handler), auditor);
@@ -217,7 +218,7 @@ public class AuditFilter implements Filter {
         try {
             auditor.auditAccessAttempt();
         } catch (AuditException e) {
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         return auditResponse(next.handleRead(context, request), auditor);
@@ -242,7 +243,7 @@ public class AuditFilter implements Filter {
         try {
             auditor.auditAccessAttempt();
         } catch (AuditException e) {
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         return auditResponse(next.handleUpdate(context, request), auditor);

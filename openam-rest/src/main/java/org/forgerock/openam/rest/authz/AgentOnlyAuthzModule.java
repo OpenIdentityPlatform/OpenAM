@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.rest.authz;
 
+import static org.forgerock.json.resource.ResourceException.*;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
@@ -117,8 +119,7 @@ public class AgentOnlyAuthzModule implements CrestAuthorizationModule {
             if (debug.messageEnabled()) {
                 debug.message("AgentOnlyAuthzModule :: Unable to authorize as Agent user using SSO Token.", e);
             }
-            return Promises.newExceptionPromise(ResourceException
-                    .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
+            return getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e).asPromise();
         }
     }
 }

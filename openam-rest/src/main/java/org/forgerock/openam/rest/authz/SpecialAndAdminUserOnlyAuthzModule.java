@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.rest.authz;
 
+import static org.forgerock.json.resource.ResourceException.*;
+
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -117,8 +119,7 @@ public class SpecialAndAdminUserOnlyAuthzModule extends AdminOnlyAuthzModule {
             if (debug.messageEnabled()) {
                 debug.message("SpecialAndAdminUserOnlyAuthzModule :: Unable to authorize as Special user using SSO Token.", e);
             }
-            return Promises.newExceptionPromise(ResourceException
-                    .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
+            return getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e).asPromise();
         }
     }
 }

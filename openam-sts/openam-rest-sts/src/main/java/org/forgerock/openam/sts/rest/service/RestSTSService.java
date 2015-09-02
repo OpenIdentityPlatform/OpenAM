@@ -16,15 +16,15 @@
 
 package org.forgerock.openam.sts.rest.service;
 
-import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
@@ -68,7 +68,7 @@ public class RestSTSService implements SingletonResourceProvider {
             case CANCEL:
                 return handleCancel(context, request);
             default:
-                return newExceptionPromise(newNotSupportedException("The specified _action parameter is not supported."));
+            return new NotSupportedException("The specified _action parameter is not supported.").asPromise();
         }
     }
 
@@ -79,7 +79,7 @@ public class RestSTSService implements SingletonResourceProvider {
         try {
             invocationState = RestSTSTokenTranslationInvocationState.fromJson(request.getContent());
         } catch (TokenMarshalException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
         try {
             final JsonValue result = restSts.translateToken(invocationState, httpContext, servletContext);
@@ -89,10 +89,10 @@ public class RestSTSService implements SingletonResourceProvider {
             This block entered for TokenMarshalException, TokenValidationException and TokenCreationException instances
              */
             logger.error("Exception caught in translateToken call: " + e, e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         } catch (Exception e) {
             logger.error("Unexpected: Exception caught in the RestSTSService invoking translateToken: " + e, e);
-            return newExceptionPromise(newInternalServerErrorException(e.getMessage()));
+            return new InternalServerErrorException(e.getMessage()).asPromise();
         }
     }
 
@@ -101,7 +101,7 @@ public class RestSTSService implements SingletonResourceProvider {
         try {
             invocationState = RestSTSTokenValidationInvocationState.fromJson(request.getContent());
         } catch (TokenMarshalException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
         try {
             final JsonValue result = restSts.validateToken(invocationState);
@@ -111,10 +111,10 @@ public class RestSTSService implements SingletonResourceProvider {
             This block entered for both TokenValidationException and TokenMarshalException instances
              */
             logger.error("Exception caught in ValidateToken call: " + e, e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         } catch (Exception e) {
             logger.error("Unexpected: Exception caught in the RestSTSService invoking validateToken: " + e, e);
-            return newExceptionPromise(newInternalServerErrorException(e.getMessage()));
+            return new InternalServerErrorException(e.getMessage()).asPromise();
         }
     }
 
@@ -123,7 +123,7 @@ public class RestSTSService implements SingletonResourceProvider {
         try {
             invocationState = RestSTSTokenCancellationInvocationState.fromJson(request.getContent());
         } catch (TokenMarshalException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
         try {
             final JsonValue result = restSts.cancelToken(invocationState);
@@ -133,22 +133,22 @@ public class RestSTSService implements SingletonResourceProvider {
             This block entered for both TokenValidationException and TokenMarshalException instances
              */
             logger.error("Exception caught in CancelToken call: " + e, e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         } catch (Exception e) {
             logger.error("Unexpected: Exception caught in the RestSTSService invoking cancelToken: " + e, e);
-            return newExceptionPromise(newInternalServerErrorException(e.getMessage()));
+            return new InternalServerErrorException(e.getMessage()).asPromise();
         }
     }
 
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, UpdateRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 }

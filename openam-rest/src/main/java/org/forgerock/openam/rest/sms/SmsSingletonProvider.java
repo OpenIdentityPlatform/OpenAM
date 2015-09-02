@@ -48,7 +48,9 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -100,12 +102,12 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (NotFoundException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -149,13 +151,13 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
                 updateDynamicAttributes(serverContext, updateRequest.getContent());
             } catch (SMSException e) {
                 debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-                return newExceptionPromise(newInternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+                return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
             } catch (SSOException e) {
                 debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-                return newExceptionPromise(newInternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+                return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
             } catch (IdRepoException e) {
                 debug.warning("::SmsCollectionProvider:: IdRepoException on create", e);
-                return newExceptionPromise(newInternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+                return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
             }
         }
         try {
@@ -165,12 +167,12 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (NotFoundException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -196,10 +198,10 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
             return newResultPromise(newResourceResponse(resourceId(), "0", json(object(field("success", true)))));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         }
     }
 
@@ -229,10 +231,10 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
             return newResultPromise(newResourceResponse(resourceId(), String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         }
     }
 
@@ -349,12 +351,12 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     @Override
     public Promise<QueryResponse, ResourceException> handleQuery(Context serverContext, QueryRequest queryRequest,
             QueryResourceHandler handler) {
-        return newExceptionPromise(newNotSupportedException("query operation not supported"));
+        return new NotSupportedException("query operation not supported").asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handlePatch(Context serverContext,
             PatchRequest patchRequest) {
-        return newExceptionPromise(newNotSupportedException("patch operation not supported"));
+        return new NotSupportedException("patch operation not supported").asPromise();
     }
 }

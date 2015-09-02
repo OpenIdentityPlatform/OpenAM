@@ -16,6 +16,13 @@
 
 package org.forgerock.openam.rest.authz;
 
+import static org.forgerock.openam.utils.CollectionUtils.transformSet;
+
+import javax.inject.Inject;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationException;
@@ -23,15 +30,16 @@ import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPermissionFactory;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
+import org.forgerock.http.Context;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -39,13 +47,6 @@ import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
-
-import javax.inject.Inject;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
-import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
 /**
  * This authorisation module ties the calling subject back into the delegation privilege framework to
@@ -171,11 +172,9 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
                 return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             }
         } catch (DelegationException dE) {
-            return Promises.newExceptionPromise(
-                    ResourceException.getException(500, "Attempt to authorise the user has failed", dE));
+            return new InternalServerErrorException("Attempt to authorise the user has failed", dE).asPromise();
         } catch (SSOException ssoE) {
-            return Promises.newExceptionPromise(
-                    ResourceException.getException(500, "Attempt to authorise the user has failed", ssoE));
+            return new InternalServerErrorException("Attempt to authorise the user has failed", ssoE).asPromise();
         }
 
         return Promises.newResultPromise(AuthorizationResult.accessDenied("The user has insufficient privileges"));

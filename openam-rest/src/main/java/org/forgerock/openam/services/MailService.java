@@ -16,16 +16,16 @@
 package org.forgerock.openam.services;
 
 import static org.apache.commons.collections.MapUtils.isEmpty;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.ResourceException.newBadRequestException;
-import static org.forgerock.json.resource.ResourceException.newInternalServerErrorException;
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.mail.MessagingException;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
@@ -36,6 +36,9 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.AbstractRequestHandler;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
@@ -43,11 +46,6 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.util.promise.Promise;
-
-import javax.inject.Inject;
-import javax.mail.MessagingException;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This CREST resource represents a service as opposed to some resource, hence it only
@@ -84,10 +82,10 @@ public final class MailService extends AbstractRequestHandler {
                 JsonValue response = sendEmail(RealmContext.getRealm(context), request.getContent());
                 return newResultPromise(newActionResponse(response));
             } catch (ResourceException rE) {
-                return newExceptionPromise(rE);
+                return rE.asPromise();
             }
         default:
-            return newExceptionPromise(newNotSupportedException());
+            return new NotSupportedException().asPromise();
         }
     }
 
@@ -96,7 +94,7 @@ public final class MailService extends AbstractRequestHandler {
         String to = jsonValue.get("to").asString();
 
         if (isBlank(to)) {
-            throw newBadRequestException("to field is missing");
+            throw new BadRequestException("to field is missing");
         }
 
         String subject = jsonValue.get("subject").asString();
@@ -111,11 +109,11 @@ public final class MailService extends AbstractRequestHandler {
             mailConfigAttributes = mailConfig.getAttributes();
 
         } catch (SMSException | SSOException e) {
-            throw newInternalServerErrorException("Cannot create the service " + MailServerImpl.SERVICE_NAME, e);
+            throw new InternalServerErrorException("Cannot create the service " + MailServerImpl.SERVICE_NAME, e);
         }
 
         if (isEmpty(mailConfigAttributes)) {
-            throw newInternalServerErrorException("No service mail config found for realm " + realm);
+            throw new InternalServerErrorException("No service mail config found for realm " + realm);
         }
 
         MailServer mailServer;
@@ -124,7 +122,7 @@ public final class MailService extends AbstractRequestHandler {
             String attr = mailConfigAttributes.get(MAIL_SERVER_CLASS).iterator().next();
             mailServer = mailServerLoader.load(attr, realm);
         } catch (IllegalStateException e) {
-            throw newInternalServerErrorException("Failed to create mail server", e);
+            throw new InternalServerErrorException("Failed to create mail server", e);
         }
 
         if (isBlank(subject)) {
@@ -138,7 +136,7 @@ public final class MailService extends AbstractRequestHandler {
         try {
             mailServer.sendEmail(to, subject, message);
         } catch (MessagingException e) {
-            throw newInternalServerErrorException("Failed to send email", e);
+            throw new InternalServerErrorException("Failed to send email", e);
         }
 
         return json(object(field("success", "true")));

@@ -16,8 +16,20 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
+import static org.forgerock.json.resource.ResourceException.getException;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
@@ -26,6 +38,7 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -50,15 +63,6 @@ import org.forgerock.openam.rest.query.QueryException;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Allows for CREST-handling of stored {@link org.forgerock.openam.entitlement.ResourceType}s which know about realms.
@@ -125,7 +129,7 @@ public class ResourceTypesResource extends RealmAwareResource {
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
 
         if (METHOD_PUT.equalsIgnoreCase(context.asContext(HttpContext.class).getMethod())) {
-            return newExceptionPromise(ResourceException.getException(METHOD_NOT_ALLOWED));
+            return getException(METHOD_NOT_ALLOWED).asPromise();
         }
 
         String principalName = "unknown";
@@ -160,7 +164,7 @@ public class ResourceTypesResource extends RealmAwareResource {
                              + ": Resource Type creation failed. ",
                              e);
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
+            return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
 
@@ -193,7 +197,7 @@ public class ResourceTypesResource extends RealmAwareResource {
                         + principalName
                         + ": Application failed to delete the resource specified. ", e);
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
+            return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
 
@@ -252,7 +256,7 @@ public class ResourceTypesResource extends RealmAwareResource {
                              + principalName
                              + ": Resource Type update failed. ", e);
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
+            return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
 
@@ -301,10 +305,10 @@ public class ResourceTypesResource extends RealmAwareResource {
                              + ": Caused EntitlementException: ",
                              ee);
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, ee));
+            return exceptionMappingHandler.handleError(context, request, ee).asPromise();
         } catch (QueryException e) {
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST,
-                    e.getL10NMessage(ServerContextUtils.getLocaleFromContext(context))));
+            return new BadRequestException(e.getL10NMessage(ServerContextUtils.getLocaleFromContext(context)))
+                    .asPromise();
         }
     }
 
@@ -346,7 +350,7 @@ public class ResourceTypesResource extends RealmAwareResource {
                         + principalName
                         + ": Could not jsonify class associated with defined Type: " + resourceId, ee);
             }
-            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, ee));
+            return exceptionMappingHandler.handleError(context, request, ee).asPromise();
         }
     }
 
@@ -390,7 +394,7 @@ public class ResourceTypesResource extends RealmAwareResource {
     private Subject getSubject(Context context) throws EntitlementException {
         Subject result = getContextSubject(context);
         if (result == null) {
-            throw new EntitlementException(INTERNAL_ERROR, "Cannot retrieve subject");
+            throw new EntitlementException(EntitlementException.INTERNAL_ERROR, "Cannot retrieve subject");
         }
         return result;
     }

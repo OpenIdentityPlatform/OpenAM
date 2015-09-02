@@ -90,7 +90,7 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
                         + ", not authorized."));
             }
         } catch (ResourceException e) {
-            return Promises.newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 

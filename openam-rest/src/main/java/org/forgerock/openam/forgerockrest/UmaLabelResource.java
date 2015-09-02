@@ -40,6 +40,7 @@ import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -86,13 +87,13 @@ public class UmaLabelResource implements CollectionResourceProvider {
     @Override
     public Promise<ActionResponse, ResourceException> actionCollection(Context serverContext,
             ActionRequest actionRequest) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     @Override
     public Promise<ActionResponse, ResourceException> actionInstance(Context serverContext, String s,
             ActionRequest actionRequest) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     @Override
@@ -103,7 +104,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
         try {
             validate(umaLabel);
         } catch (BadRequestException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
 
         final String realm = getRealm(serverContext);
@@ -116,7 +117,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
             label = labelStore.create(realm, userName, new ResourceSetLabel(null, labelName, LabelType.valueOf(labelType), Collections.EMPTY_SET));
             return newResultPromise(newResourceResponse(label.getId(), String.valueOf(label.hashCode()), label.asJson()));
         } catch (ResourceException e) {
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 
@@ -144,7 +145,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
             labelStore.delete(getRealm(serverContext), getUserName(serverContext), labelId);
             return newResultPromise(newResourceResponse(labelId, null, resourceSetLabel.asJson()));
         } catch (ResourceException e) {
-            return newExceptionPromise(newBadRequestException("Error deleting label."));
+            return new BadRequestException("Error deleting label.").asPromise();
         }
     }
 
@@ -161,21 +162,21 @@ public class UmaLabelResource implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext, String s,
             PatchRequest patchRequest) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context serverContext,
             QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
         if (!queryRequest.getQueryFilter().toString().equals("true")) {
-            return newExceptionPromise(newBadRequestException("Invalid query"));
+            return new BadRequestException("Invalid query").asPromise();
         }
 
         Set<ResourceSetLabel> labels;
         try {
             labels = labelStore.list(getRealm(serverContext), getUserName(serverContext));
         } catch (ResourceException e) {
-            return newExceptionPromise(newBadRequestException("Error retrieving labels."));
+            return new BadRequestException("Error retrieving labels.").asPromise();
         }
 
         LocaleContext localeContext = localeContextProvider.get();
@@ -243,13 +244,13 @@ public class UmaLabelResource implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext, String s,
             ReadRequest readRequest) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext, String s,
             UpdateRequest updateRequest) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     private String getRealm(Context context) {

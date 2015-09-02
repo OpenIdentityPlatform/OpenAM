@@ -28,6 +28,7 @@ import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
@@ -122,10 +123,10 @@ public class PolicyV1Filter implements Filter {
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering policy create CREST request", eE);
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
+            return resourceErrorHandler.handleError(context, request, eE).asPromise();
         } catch (ResourceException rE) {
             debug.error("Error filtering policy create CREST request", rE);
-            return newExceptionPromise(rE);
+            return rE.asPromise();
         }
 
         return transform(next.handleCreate(context, request));
@@ -154,10 +155,10 @@ public class PolicyV1Filter implements Filter {
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering policy create CREST request", eE);
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
+            return resourceErrorHandler.handleError(context, request, eE).asPromise();
         } catch (ResourceException rE) {
             debug.error("Error filtering policy create CREST request", rE);
-            return newExceptionPromise(rE);
+            return rE.asPromise();
         }
 
         return transform(next.handleUpdate(context, request));
@@ -184,22 +185,18 @@ public class PolicyV1Filter implements Filter {
         final String applicationName = jsonValue.get("applicationName").asString();
 
         if (applicationName == null) {
-            throw ResourceException
-                    .getException(ResourceException.BAD_REQUEST, "Invalid application name defined in request");
+            throw new BadRequestException("Invalid application name defined in request");
         }
 
         final ApplicationService applicationService = applicationServiceFactory.create(callingSubject, realm);
         final Application application = applicationService.getApplication(applicationName);
 
         if (application == null) {
-            throw ResourceException
-                    .getException(ResourceException.BAD_REQUEST, "Unable to find application " + applicationName);
+            throw new BadRequestException("Unable to find application " + applicationName);
         }
 
         if (application.getResourceTypeUuids().size() != 1) {
-            throw ResourceException
-                    .getException(ResourceException.BAD_REQUEST,
-                            "Cannot create policy under an application with more than " +
+            throw new BadRequestException("Cannot create policy under an application with more than " +
                                     "one resource type using version 1.0 of this endpoint");
         }
 

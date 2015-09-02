@@ -16,18 +16,32 @@
 
 package org.forgerock.openam.rest.oauth2;
 
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -49,15 +63,6 @@ import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * <p>Resource Set resource to expose registered Resource Sets for a given user.</p>
@@ -100,7 +105,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
      */
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     /**
@@ -121,7 +126,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                             content = getResourceSetJson(result, resourceOwnerId);
                             return newResultPromise(newResource(result.getId(), content));
                         } catch (ResourceException e) {
-                            return newExceptionPromise(e);
+                            return e.asPromise();
                         }
                     }
                 });
@@ -147,7 +152,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                         }
                     });
         } else {
-            return newExceptionPromise(newNotSupportedException("Action " + request.getAction() + " not supported"));
+            return new NotSupportedException("Action " + request.getAction() + " not supported").asPromise();
         }
     }
 
@@ -169,10 +174,10 @@ public class ResourceSetResource implements CollectionResourceProvider {
             } else if (request.getQueryFilter() != null) {
                 query = request.getQueryFilter().accept(new ResourceSetQueryFilter(context), new ResourceSetWithPolicyQuery());
             } else {
-                return newExceptionPromise(newBadRequestException("Invalid query"));
+                return new BadRequestException("Invalid query").asPromise();
             }
         } catch (UnsupportedOperationException e) {
-            return newExceptionPromise(newNotSupportedException(e.getMessage()));
+            return new NotSupportedException(e.getMessage()).asPromise();
         }
 
         boolean augmentWithPolicies = augmentWithPolicies(request);
@@ -190,7 +195,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                             QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
                             return QueryResponsePresentation.perform(handler, request, values, new JsonPointer(ID));
                         } catch (ResourceException e) {
-                            return newExceptionPromise(e);
+                            return e.asPromise();
                         }
                     }
                 });
@@ -528,14 +533,14 @@ public class ResourceSetResource implements CollectionResourceProvider {
                                 content = getResourceSetJson(result, userId);
                                 return newResultPromise(newResource(result.getId(), content));
                             } catch (ResourceException e) {
-                                return newExceptionPromise(e);
+                                return e.asPromise();
                             }
                         }
                     });
         } catch (ResourceException e) {
-            return newExceptionPromise(e);
+            return e.asPromise();
         } catch (org.forgerock.oauth2.core.exceptions.BadRequestException e) {
-            return newExceptionPromise(newBadRequestException("Error retrieving labels.", e));
+            return new BadRequestException("Error retrieving labels.", e).asPromise();
         }
     }
 
@@ -552,7 +557,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     /**
@@ -564,7 +569,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     /**
@@ -576,7 +581,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
     @Override
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     /**

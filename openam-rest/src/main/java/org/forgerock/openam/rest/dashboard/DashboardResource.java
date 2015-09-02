@@ -16,9 +16,7 @@
 
 package org.forgerock.openam.rest.dashboard;
 
-import static org.forgerock.json.resource.ResourceException.adapt;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -156,7 +154,7 @@ public final class DashboardResource implements CollectionResourceProvider {
             return newResultPromise(resource);
         } catch (SSOException ex) {
             debug.error("DashboardResource :: READ : SSOToken was not found.");
-            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", null)));
+            return new PermanentException(401, "Unauthorized", null).asPromise();
         }
 
     }

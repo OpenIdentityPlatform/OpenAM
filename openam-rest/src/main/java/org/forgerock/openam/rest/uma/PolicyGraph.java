@@ -167,7 +167,7 @@ public class PolicyGraph implements QueryResourceHandler, ExceptionHandler<Resou
                             promises, user);
                 }
             } catch (BadRequestException e) {
-                return Promises.newExceptionPromise((ResourceException) e);
+                return e.asPromise();
             }
         }
 

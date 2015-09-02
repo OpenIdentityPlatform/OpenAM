@@ -32,6 +32,8 @@ import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -73,7 +75,7 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
      */
     @Override
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     /**
@@ -82,7 +84,7 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
     @Override
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     /**
@@ -90,7 +92,7 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
      */
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     /**
@@ -114,7 +116,7 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
             }
 
             if (toDelete == null) {
-                return newExceptionPromise(newNotFoundException("User device, " + resourceId + ", not found."));
+                return new NotFoundException("User device, " + resourceId + ", not found.").asPromise();
             }
 
             devices.remove(toDelete);
@@ -123,7 +125,7 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
 
             return newResultPromise(newResourceResponse(resourceId, toDelete.hashCode() + "", toDelete));
         } catch (InternalServerErrorException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -133,7 +135,7 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     /**
@@ -150,9 +152,9 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
             }
             return newResultPromise(newQueryResponse());
         } catch (ParseException e) {
-            return newExceptionPromise(newInternalServerErrorException(e.getMessage()));
+            return new InternalServerErrorException(e.getMessage()).asPromise();
         } catch (InternalServerErrorException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -164,7 +166,7 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
     /**
@@ -173,7 +175,7 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
-        return newExceptionPromise(newNotSupportedException("Not supported."));
+        return new NotSupportedException("Not supported.").asPromise();
     }
 
 }

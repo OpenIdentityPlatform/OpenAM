@@ -387,7 +387,7 @@ public class UmaPolicyServiceImplDelegationTest {
                 .willReturn(createPolicyPromise);
 
         Promise<Pair<QueryResponse, List<ResourceResponse>>, ResourceException> queryPromise =
-                newExceptionPromise((ResourceException) new NotFoundException());
+                new NotFoundException().asPromise();
         given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class)))
                 .willReturn(queryPromise);
         given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class),

@@ -17,9 +17,20 @@
 package org.forgerock.openam.forgerockrest.session;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
@@ -59,17 +70,6 @@ import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.promise.Promise;
-
-import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Represents Sessions that can queried via a REST interface.
@@ -172,7 +172,7 @@ public class SessionResource implements CollectionResourceProvider {
         if (tokenId == null) {
             final BadRequestException e = new BadRequestException("iPlanetDirectoryCookie not set on request");
             LOGGER.message("SessionResource.handleNullSSOToken :: iPlanetDirectoryCookie not set on request", e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
 
         return internalHandleAction(tokenId, context, request);
@@ -241,7 +241,7 @@ public class SessionResource implements CollectionResourceProvider {
             if (LOGGER.messageEnabled()) {
                 LOGGER.message("SessionResource.actionInstance :: " + message, e);
             }
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -478,7 +478,7 @@ public class SessionResource implements CollectionResourceProvider {
                     LOGGER.error("SessionResource.actionInstance :: Error performing logout for token "
                             + tokenId, e);
                 }
-                return newExceptionPromise(adapt(e));
+                return e.asPromise();
             }
         }
 

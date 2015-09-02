@@ -17,11 +17,8 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.newBadRequestException;
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Arrays;
@@ -32,9 +29,11 @@ import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -103,36 +102,36 @@ class CommonTasksResource implements CollectionResourceProvider {
 
     @Override
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request, QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
-            return newExceptionPromise(newNotSupportedException("Query not supported: " + request.getQueryFilter()));
+            return new NotSupportedException("Query not supported: " + request.getQueryFilter()).asPromise();
         }
         //TODO pass in locale
         Locale locale = Locale.ROOT;
@@ -152,7 +151,7 @@ class CommonTasksResource implements CollectionResourceProvider {
         Locale locale = Locale.ROOT;
         JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(locale));
         if (!configuration.isDefined(resourceId)) {
-            return newExceptionPromise(newBadRequestException("Invalid common task"));
+            return new BadRequestException("Invalid common task").asPromise();
         }
         JsonValue resource = configuration.get(resourceId);
         return newResultPromise(newResourceResponse(resourceId, String.valueOf(resource.getObject().hashCode()), resource));
@@ -161,7 +160,7 @@ class CommonTasksResource implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     private ResourceBundle getResourceBundle(Locale locale) {

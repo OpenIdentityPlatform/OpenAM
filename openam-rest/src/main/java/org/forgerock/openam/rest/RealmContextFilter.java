@@ -97,7 +97,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
             return next.handleAction(crest.addRouterContext(context, request), request);
         } catch (ResourceException e) {
             logger.message("Attempting to access invalid realm", e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 
@@ -108,7 +108,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
             return next.handleCreate(crest.addRouterContext(context, request), request);
         } catch (ResourceException e) {
             logger.message("Attempting to access invalid realm", e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 
@@ -119,7 +119,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
             return next.handleDelete(crest.addRouterContext(context, request), request);
         } catch (ResourceException e) {
             logger.message("Attempting to access invalid realm", e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 
@@ -130,7 +130,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
             return next.handlePatch(crest.addRouterContext(context, request), request);
         } catch (ResourceException e) {
             logger.message("Attempting to access invalid realm", e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 
@@ -141,7 +141,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
             return next.handleQuery(crest.addRouterContext(context, request), request, handler);
         } catch (ResourceException e) {
             logger.message("Attempting to access invalid realm", e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 
@@ -152,7 +152,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
             return next.handleRead(crest.addRouterContext(context, request), request);
         } catch (ResourceException e) {
             logger.message("Attempting to access invalid realm", e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 
@@ -163,7 +163,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
             return next.handleUpdate(crest.addRouterContext(context, request), request);
         } catch (ResourceException e) {
             logger.message("Attempting to access invalid realm", e);
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
     }
 

@@ -45,6 +45,7 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -112,20 +113,20 @@ class TokenGenerationService implements CollectionResourceProvider {
             invocationState = TokenGenerationServiceInvocationState.fromJson(request.getContent());
         } catch (Exception e) {
             logger.error("Exception caught marshalling json into TokenGenerationServiceInvocationState instance: " + e);
-            return newExceptionPromise(newBadRequestException(e.getMessage(), e));
+            return new BadRequestException(e.getMessage(), e).asPromise();
         }
         SSOToken subjectToken;
         try {
             subjectToken = validateAssertionSubjectSession(invocationState);
         } catch (ForbiddenException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
 
         STSInstanceState stsInstanceState;
         try {
             stsInstanceState = getSTSInstanceState(invocationState);
         } catch (ResourceException e) {
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
 
         if (TokenType.SAML2.equals(invocationState.getTokenType())) {
@@ -137,10 +138,10 @@ class TokenGenerationService implements CollectionResourceProvider {
                 return newResultPromise(issuedTokenResource(assertion));
             } catch (TokenCreationException e) {
                 logger.error("Exception caught generating saml2 token: " + e, e);
-                return newExceptionPromise(adapt(e));
+                return e.asPromise();
             } catch (Exception e) {
                 logger.error("Exception caught generating saml2 token: " + e, e);
-                return newExceptionPromise(newInternalServerErrorException(e.toString(), e));
+                return new InternalServerErrorException(e.toString(), e).asPromise();
             }
         } else if (TokenType.OPENIDCONNECT.equals(invocationState.getTokenType())) {
             try {
@@ -151,15 +152,15 @@ class TokenGenerationService implements CollectionResourceProvider {
                 return newResultPromise(issuedTokenResource(assertion));
             } catch (TokenCreationException e) {
                 logger.error("Exception caught generating OpenIdConnect token: " + e, e);
-                return newExceptionPromise(adapt(e));
+                return e.asPromise();
             } catch (Exception e) {
                 logger.error("Exception caught generating OpenIdConnect token: " + e, e);
-                return newExceptionPromise(newInternalServerErrorException(e.toString(), e));
+                return new InternalServerErrorException(e.toString(), e).asPromise();
             }
         } else {
             String message = "Bad request: unexpected token type:" + invocationState.getTokenType();
             logger.error(message);
-            return newExceptionPromise(newBadRequestException(message));
+            return new BadRequestException(message).asPromise();
         }
     }
 
@@ -242,11 +243,11 @@ class TokenGenerationService implements CollectionResourceProvider {
             if (token != null) {
                 return newResultPromise(issuedTokenResource(token));
             } else {
-                return newExceptionPromise(newNotFoundException("STS-issued token with id " + resourceId + " not found."));
+                return new NotFoundException("STS-issued token with id " + resourceId + " not found.").asPromise();
             }
         } catch (CTSTokenPersistenceException e) {
             logger.error("Exception caught reading token with id " + resourceId + ": " + e, e);
-            return newExceptionPromise(newInternalServerErrorException(e.toString(), e));
+            return new InternalServerErrorException(e.toString(), e).asPromise();
         }
     }
 
@@ -260,7 +261,7 @@ class TokenGenerationService implements CollectionResourceProvider {
                     (RESULT, "token with id " + resourceId + " successfully removed.")))));
         } catch (CTSTokenPersistenceException e) {
             logger.error("Exception caught deleting token with id " + resourceId + ": " + e, e);
-            return newExceptionPromise(newInternalServerErrorException(e.toString(), e));
+            return new InternalServerErrorException(e.toString(), e).asPromise();
         }
     }
 
@@ -269,7 +270,7 @@ class TokenGenerationService implements CollectionResourceProvider {
             final QueryRequest queryRequest, final QueryResourceHandler queryResultHandler) {
         QueryFilter<JsonPointer> queryFilter = queryRequest.getQueryFilter();
         if (queryFilter == null) {
-            return newExceptionPromise(newBadRequestException(getUsageString()));
+            return new BadRequestException(getUsageString()).asPromise();
         }
         try {
             final QueryFilter<CoreTokenField> coreTokenFieldQueryFilter =
@@ -281,7 +282,7 @@ class TokenGenerationService implements CollectionResourceProvider {
             return newResultPromise(newQueryResponse());
         } catch (CTSTokenPersistenceException e) {
             logger.error("Exception caught obtaining list of sts-issued tokens: " + e, e);
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 

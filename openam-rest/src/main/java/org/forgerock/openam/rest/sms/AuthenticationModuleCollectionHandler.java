@@ -47,8 +47,11 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -93,11 +96,11 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
         try {
             searchForId = request.getQueryFilter().accept(new AuthenticationModuleQueryFilterVisitor(), null);
         } catch (UnsupportedOperationException e) {
-            return newExceptionPromise(newNotSupportedException("Query not supported: " + request.getQueryFilter()));
+            return new NotSupportedException("Query not supported: " + request.getQueryFilter()).asPromise();
         }
         if (request.getPagedResultsCookie() != null || request.getPagedResultsOffset() > 0 ||
                 request.getPageSize() > 0) {
-            return newExceptionPromise(newNotSupportedException("Query paging not currently supported"));
+            return new NotSupportedException("Query paging not currently supported").asPromise();
         }
 
         try {
@@ -134,13 +137,13 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
 
         } catch (AMConfigurationException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: AMConfigurationException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (SSOException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: SSOException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (SMSException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: SMSException on create", e);
-            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         }
     }
 
@@ -168,42 +171,42 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
     @Override
     public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         // TODO: i18n
-        return newExceptionPromise(newBadRequestException(
-                "The resource collection " + request.getResourcePath() + " cannot perform actions"));
+        return new BadRequestException(
+                "The resource collection " + request.getResourcePath() + " cannot perform actions").asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
         // TODO: i18n
-        return newExceptionPromise(newBadRequestException("Authentication modules must be created per type"));
+        return new BadRequestException("Authentication modules must be created per type").asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest request) {
         // TODO: i18n
-        return newExceptionPromise(newBadRequestException(
-                "The resource collection " + request.getResourcePath() + " cannot be deleted"));
+        return new BadRequestException("The resource collection " + request.getResourcePath() + " cannot be deleted")
+                .asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
         // TODO: i18n
-        return newExceptionPromise(newBadRequestException(
-                "The resource collection " + request.getResourcePath() + " cannot be patched"));
+        return new BadRequestException("The resource collection " + request.getResourcePath() + " cannot be patched")
+                .asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         // TODO: i18n
-        return newExceptionPromise(newBadRequestException("The resource collection " + request.getResourcePath()
-                + " cannot be read"));
+        return new BadRequestException("The resource collection " + request.getResourcePath() + " cannot be read")
+                .asPromise();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
         // TODO: i18n
-        return newExceptionPromise(newBadRequestException(
-                "The resource collection " + request.getResourcePath() + " cannot be updated"));
+        return new BadRequestException("The resource collection " + request.getResourcePath() + " cannot be updated")
+                .asPromise();
     }
 
     private static final class AuthenticationModuleQueryFilterVisitor implements QueryFilterVisitor<String, Void, JsonPointer> {

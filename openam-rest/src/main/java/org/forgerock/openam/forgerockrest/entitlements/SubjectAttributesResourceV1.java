@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
@@ -33,9 +34,11 @@ import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -100,7 +103,7 @@ public class SubjectAttributesResourceV1 extends RealmAwareResource {
         final Subject mySubject = getContextSubject(context);
         if (mySubject == null) {
             debug.error("SubjectAttributesResource :: QUERY : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
         final SubjectAttributesManager manager = getSubjectAttributesManager(mySubject, getRealm(context));
@@ -110,7 +113,7 @@ public class SubjectAttributesResourceV1 extends RealmAwareResource {
         } catch (EntitlementException e) {
             debug.error("SubjectAttributesResource :: QUERY by " + principalName + " : Unable to query available " +
                     "subject attribute names.");
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
         for (String attr : attributes) {
             handler.handleResource(newResourceResponse(attr, Long.toString(System.currentTimeMillis()), JsonValue.json(attr)));

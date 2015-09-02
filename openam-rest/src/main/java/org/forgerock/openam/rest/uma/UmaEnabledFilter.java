@@ -27,6 +27,7 @@ import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -64,7 +65,7 @@ public class UmaEnabledFilter implements Filter {
                 return newResultPromise(null);
             }
         } catch (NotFoundException ignore) { }
-        return newExceptionPromise(newNotSupportedException("UMA is not currently supported in this realm"));
+        return new NotSupportedException("UMA is not currently supported in this realm").asPromise();
     }
 
     @Override

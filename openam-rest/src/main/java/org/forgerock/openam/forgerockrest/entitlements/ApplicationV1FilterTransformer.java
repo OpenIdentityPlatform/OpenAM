@@ -120,7 +120,7 @@ public class ApplicationV1FilterTransformer {
                         try {
                             transformJson(jsonValue, callingSubject, realm);
                         } catch (EntitlementException eE) {
-                            return newExceptionPromise(resourceErrorHandler.handleError(eE));
+                            return resourceErrorHandler.handleError(eE).asPromise();
                         }
 
                         return newResultPromise(response);
@@ -155,7 +155,7 @@ public class ApplicationV1FilterTransformer {
                                 handler.handleResource(resource);
                             }
                         } catch (EntitlementException eE) {
-                            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
+                            return resourceErrorHandler.handleError(context, request, eE).asPromise();
                         }
 
                         return newResultPromise(response);

@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.util.promise.Promises.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,6 +36,8 @@ import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -212,7 +215,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
                 debug.error("ConditionTypesResource :: READ by " + principalName +
                         ": Requested condition short name not found: " + resourceId);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
+            return new NotFoundException().asPromise();
         }
 
         final JsonValue json = jsonify(conditionClass, resourceId,

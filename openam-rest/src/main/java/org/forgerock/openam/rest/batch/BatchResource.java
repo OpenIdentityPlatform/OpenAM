@@ -15,10 +15,8 @@
 */
 package org.forgerock.openam.rest.batch;
 
-import static org.forgerock.json.resource.ResourceException.adapt;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.openam.scripting.ScriptConstants.SDK_NAME;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -33,8 +31,10 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -100,7 +100,7 @@ public class BatchResource extends RealmAwareResource {
             final String msg = "Action '" + actionRequest.getAction() + "' not implemented for this resource";
             final NotSupportedException exception = new NotSupportedException(msg);
             debug.error(msg, exception);
-            return newExceptionPromise(adapt(exception));
+            return exception.asPromise();
         }
 
         String scriptId = null;
@@ -112,7 +112,7 @@ public class BatchResource extends RealmAwareResource {
                 if (debug.errorEnabled()) {
                     debug.error("BatchResource :: actionCollection - ScriptId null. Default scripts not implemented.");
                 }
-                return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+                return new BadRequestException().asPromise();
             } else {
                 scriptId = scriptIdValue.asString();
             }
@@ -137,10 +137,10 @@ public class BatchResource extends RealmAwareResource {
 
         } catch (ScriptException e) {
             debug.error("BatchResource :: actionCollection - Error running script : {}", scriptId);
-            return newExceptionPromise(exceptionMappingHandler.handleError(serverContext, actionRequest, e));
+            return exceptionMappingHandler.handleError(serverContext, actionRequest, e).asPromise();
         } catch (javax.script.ScriptException e) {
             debug.error("BatchResource :: actionCollection - Error running script : {}", scriptId);
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
     }
 

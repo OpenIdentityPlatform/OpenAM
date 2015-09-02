@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.sts.soap.bootstrap;
 
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionWrapper;
@@ -121,13 +123,13 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
                 try {
                     return amTokenParser.getSessionFromAuthNResponse(connectionResult.getResult());
                 } catch (TokenValidationException e) {
-                    throw ResourceException.getException(ResourceException.INTERNAL_ERROR, "Exception caught obtaining " +
-                            "the soap-sts-agent token " + e, e);
+                    throw new InternalServerErrorException("Exception caught obtaining the soap-sts-agent token " + e,
+                            e);
                 }
             }
         } catch (IOException ioe) {
-            throw ResourceException.getException(ResourceException.INTERNAL_ERROR,
-                    "IOException caught obtaining the soap-sts-agent token: " + ioe, ioe);
+            throw new InternalServerErrorException("IOException caught obtaining the soap-sts-agent token: " + ioe,
+                    ioe);
         }
     }
 

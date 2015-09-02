@@ -30,6 +30,7 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -107,7 +108,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             final String errorMsg = "Action '" + actionString + "' not implemented for this resource";
             final NotSupportedException nsE = new NotSupportedException(errorMsg);
             DEBUG.error(errorMsg, nsE);
-            return newExceptionPromise(adapt(nsE));
+            return nsE.asPromise();
         }
 
         try {
@@ -134,7 +135,7 @@ public final class PolicyResource implements CollectionResourceProvider {
 
         } catch (final EntitlementException eE) {
             DEBUG.error("Error evaluating policy request", eE);
-            return newExceptionPromise(resourceErrorHandler.handleError(context, actionRequest, eE));
+            return resourceErrorHandler.handleError(context, actionRequest, eE).asPromise();
         }
     }
 
@@ -181,7 +182,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             return newResultPromise(policyResource(policy));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: CREATE : Error performing create for policy, " + providedName, ex);
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, ex));
+            return resourceErrorHandler.handleError(context, request, ex).asPromise();
         }
     }
 
@@ -201,7 +202,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             return newResultPromise(newResourceResponse(resourceId, "0", json(object())));
         } catch (EntitlementException ex) {
             String debug = "PolicyResource :: DELETE : Error performing delete for policy, " + resourceId;
-            return newExceptionPromise(resourceErrorHandler.handleError(context, debug, request, ex));
+            return resourceErrorHandler.handleError(context, debug, request, ex).asPromise();
         }
     }
 
@@ -230,10 +231,10 @@ public final class PolicyResource implements CollectionResourceProvider {
             return QueryResponsePresentation.perform(handler, request, results, new JsonPointer("name"));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: QUERY : Error querying policy collection.", ex);
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, ex));
+            return resourceErrorHandler.handleError(context, request, ex).asPromise();
         } catch (IllegalArgumentException ex) {
             DEBUG.error("PolicyResource :: QUERY : Error querying policy collection due to bad request.", ex);
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST, ex.getMessage()));
+            return new BadRequestException(ex.getMessage()).asPromise();
         }
     }
 
@@ -248,7 +249,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             return newResultPromise(policyResource(policy));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: READ : Error reading policy, " + resourceId + ".", ex);
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, ex));
+            return resourceErrorHandler.handleError(context, request, ex).asPromise();
         }
     }
 
@@ -264,7 +265,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             return newResultPromise(result);
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: UPDATE : Error updating policy, " + resourceId + ".", ex);
-            return newExceptionPromise(resourceErrorHandler.handleError(context, request, ex));
+            return resourceErrorHandler.handleError(context, request, ex).asPromise();
         }
     }
 

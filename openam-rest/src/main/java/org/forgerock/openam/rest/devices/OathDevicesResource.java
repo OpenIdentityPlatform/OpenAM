@@ -16,8 +16,15 @@
 
 package org.forgerock.openam.rest.devices;
 
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
+import static org.forgerock.json.resource.ResourceException.getException;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.Collections;
+import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
@@ -25,15 +32,12 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import java.util.Collections;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.devices.services.AuthenticatorOathService;
@@ -95,7 +99,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
 
                     } catch (SSOException | IdRepoException e) {
                         debug.error("OathDevicesResource :: SKIP action - Unable to set value in user store.", e);
-                        return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+                        return new InternalServerErrorException().asPromise();
                     }
                 case CHECK:
                     try {
@@ -114,7 +118,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
 
                     } catch (SSOException | IdRepoException e) {
                         debug.error("OathDevicesResource :: CHECK action - Unable to read value from user store.", e);
-                        return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+                        return new InternalServerErrorException().asPromise();
                     }
                 case RESET: //sets their 'skippable' selection to default (NOT_SET) and deletes their profiles attribute
                     try {
@@ -128,18 +132,18 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
 
                     } catch (SSOException | IdRepoException e) {
                         debug.error("OathDevicesResource :: Action - Unable to reset identity attributes", e);
-                        return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+                        return new InternalServerErrorException().asPromise();
                     }
                 default:
-                    return newExceptionPromise(ResourceException.getException(ResourceException.NOT_SUPPORTED));
+                    return new NotSupportedException().asPromise();
             }
 
         } catch (SMSException e) {
             debug.error("OathDevicesResource :: Action - Unable to communicate with the SMS.", e);
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         } catch (SSOException | InternalServerErrorException e) {
             debug.error("OathDevicesResource :: Action - Unable to retrieve identity data from request context", e);
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
     }
 
@@ -156,10 +160,10 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
             return promise;
         } catch (InternalServerErrorException | SMSException e) {
             debug.error("OathDevicesResource :: Delete - Unable to communicate with the SMS.", e);
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         } catch (SSOException | IdRepoException e) {
             debug.error("OathDevicesResource :: Delete - Unable to reset identity attributes", e);
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
     }
 

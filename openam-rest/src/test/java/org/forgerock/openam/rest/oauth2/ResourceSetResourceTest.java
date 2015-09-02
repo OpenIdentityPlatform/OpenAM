@@ -255,13 +255,12 @@ public class ResourceSetResourceTest {
         //Given
         Context context = mock(Context.class);
         ActionRequest request = mock(ActionRequest.class);
-//        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         given(contextHelper.getRealm(context)).willReturn("REALM");
         given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
         given(request.getAction()).willReturn("revokeAll");
         given(resourceSetService.revokeAllPolicies(context, "REALM", "RESOURCE_OWNER_ID"))
-                .willReturn(Promises.<Void, ResourceException>newExceptionPromise(new NotFoundException()));
+                .willReturn(new NotFoundException().<Void>asPromise());
 
         //When
         Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);

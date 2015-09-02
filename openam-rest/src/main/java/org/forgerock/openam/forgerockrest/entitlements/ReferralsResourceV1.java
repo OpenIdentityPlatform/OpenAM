@@ -15,10 +15,10 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -47,9 +47,13 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -128,7 +132,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
 
         if (callingSubject == null) {
             debug.error("ReferralsResource :: CREATE : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final String realm = getRealm(serverContext);
@@ -143,7 +147,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Referral failed to create resource from provided JSON. ", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         // This test for null added to avoid test failure in
@@ -162,7 +166,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                             + principalName
                             + ": Referral name \"" + wrapper.getName() + "\" was invalid");
                 }
-                return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+                return new BadRequestException().asPromise();
             }
         }
 
@@ -172,14 +176,14 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                     debug.error("ReferralsResource :: CREATE by " + principalName +
                             ": Referral already exists " + wrapper.getName());
                 }
-                return newExceptionPromise(ResourceException.getException(ResourceException.CONFLICT));
+                return new ConflictException().asPromise();
             }
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Unable to read existing referral for " + wrapper.getName());
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         if (!isRequestRealmsValidPeerOrSubrealms(serverContext, realm, wrapper.getRealms())) {
@@ -187,7 +191,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Referral failed to validate realm list. ");
             } //thrown by referencing invalid application
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final ReferralPrivilege referral = wrapper.getReferral();
@@ -199,7 +203,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Referral failed to return the resource created. ", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         try {
@@ -215,7 +219,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Referral failed to return the resource created. ", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
     }
 
@@ -229,7 +233,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
 
         if (callingSubject == null) {
             debug.error("ReferralsResource :: DELETE : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(callingSubject);
@@ -242,7 +246,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                     debug.error("ReferralsResource :: DELETE by " + principalName +
                             ": Referral does not exist " + resourceId);
                 }
-                return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
+                return new NotFoundException().asPromise();
             }
 
             rpm.remove(resourceId);
@@ -253,7 +257,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: DELETE by " + principalName +
                         ": Referral could not be removed " + resourceId);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
     }
 
@@ -276,7 +280,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
 
         if (callingSubject == null) {
             debug.error("ReferralsResource :: QUERY : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(callingSubject);
@@ -307,7 +311,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: QUERY by " + principalName +
                         ": Unable to convert resource to JSON.", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         int remaining;
@@ -330,7 +334,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                         ": Unable to convert resource to JSON.", e);
 
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
@@ -346,7 +350,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
 
         if (callingSubject == null) {
             debug.error("ReferralResource :: READ : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final String realm = getRealm(serverContext);
@@ -365,13 +369,13 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: READ by " + principalName +
                         ": Referral failed to retrieve the resource specified.", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
+            return new NotFoundException().asPromise();
         } catch (IOException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: READ by " + principalName +
                         ": Error converting resource to JSON format.", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
     }
 
@@ -385,7 +389,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
 
         if (callingSubject == null) {
             debug.error("ReferralResource :: UPDATE : Unknown Subject");
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final String realm = getRealm(serverContext);
@@ -401,7 +405,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to create resource from provided JSON. ", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         final ReferralPrivilege previousPriv;
@@ -413,7 +417,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to query the resource set. ", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
+            return new NotFoundException().asPromise();
         }
 
         if (!isRequestRealmsValidPeerOrSubrealms(serverContext, realm, wrapper.getRealms())) {
@@ -421,7 +425,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to validate new realm list. ");
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return new BadRequestException().asPromise();
         }
 
         //conflict if the name we're changing TO is currently taken, and isn't this one
@@ -431,14 +435,14 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                     debug.error("ReferralsResource :: UPDATE by " + principalName +
                             ": Referral already exists " + wrapper.getName());
                 }
-                return newExceptionPromise(ResourceException.getException(ResourceException.CONFLICT));
+                return new ConflictException().asPromise();
             }
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to query the resource set. ", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
 
         try { //then add - if this fails we try to re-add old
@@ -456,13 +460,13 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to restore the old resource after updating ", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         } catch (IOException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to store the updated resource. ", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return new InternalServerErrorException().asPromise();
         }
     }
 

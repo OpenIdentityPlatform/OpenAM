@@ -17,6 +17,7 @@
 package org.forgerock.openam.rest.uma;
 
 import static java.util.Collections.singleton;
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 import static org.forgerock.util.promise.Promises.*;
@@ -47,6 +48,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CountPolicy;
+import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
@@ -232,12 +234,12 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     userId, resourceSet.getClientId(), realm, resourceSet.getId(),
                     umaPolicy.getScopes());
             if (!canShare) {
-                return newExceptionPromise(ResourceException.getException(403));
+                return new ForbiddenException().asPromise();
             }
             validateScopes(resourceSet, umaPolicy.getScopes());
             verifyPolicyDoesNotAlreadyExist(context, resourceSet);
         } catch (ResourceException e) {
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
         return policyResourceDelegate.createPolicies(context, umaPolicy.asUnderlyingPolicies(userId))
                 .thenAsync(new UpdatePolicyGraphStatesFunction<List<ResourceResponse>>(resourceSet, context))
@@ -300,7 +302,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         UmaAuditType.POLICY_CREATED, userId);
                 return newResultPromise(umaPolicy);
             } catch (ResourceException e) {
-                return newExceptionPromise(e);
+                return e.asPromise();
             }
         }
     }
@@ -346,16 +348,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     public Promise<UmaPolicy, ResourceException> apply(Pair<QueryResponse, List<ResourceResponse>> value) {
                         try {
                             if (value.getSecond().isEmpty()) {
-                                return newExceptionPromise(
-                                        (ResourceException) new NotFoundException("UMA Policy not found, "
-                                                + resourceSetId));
+                                return new NotFoundException("UMA Policy not found, " + resourceSetId).asPromise();
                             } else {
                                 ResourceSetDescription resourceSet = getResourceSet(getRealm(context), resourceSetId);
                                 UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value.getSecond());
                                 return newResultPromise(umaPolicy);
                             }
                         } catch (ResourceException e) {
-                            return newExceptionPromise(e);
+                            return e.asPromise();
                         }
                     }
                 });
@@ -376,11 +376,11 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     contextHelper.getUserId(context), resourceSet.getClientId(), getRealm(context), resourceSet.getId(),
                     updatedUmaPolicy.getScopes());
             if (!canShare) {
-                return newExceptionPromise(ResourceException.getException(403));
+                return new ForbiddenException().asPromise();
             }
             validateScopes(resourceSet, updatedUmaPolicy.getScopes());
         } catch (ResourceException e) {
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
         return internalReadPolicy(context, resourceSetId)
                 .thenOnResult(new ResultHandler<UmaPolicy>() {
@@ -451,7 +451,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                                     return policyResourceDelegate.createPolicies(context, singleton(policy))
                                             .thenAsync(SINGLETON_RESOURCE_FUNCTION);
                                 }
-                                return newExceptionPromise(e);
+                                return e.asPromise();
                             }
                         })
                 );
@@ -467,7 +467,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
                 @Override
                 public Promise<UmaPolicy, ResourceException> apply(ResourceException error) {
-                    return newExceptionPromise(error);
+                    return error.asPromise();
                 }
             });
         }
@@ -492,7 +492,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         try {
             resourceSet = getResourceSet(getRealm(context), resourceSetId);
         } catch (ResourceException e) {
-            return newExceptionPromise(e);
+            return e.asPromise();
         }
         return internalReadPolicy(context, resourceSetId)
                 .thenAsync(new AsyncFunction<UmaPolicy, List<ResourceResponse>, ResourceException>() {
@@ -518,7 +518,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             final QueryRequest umaQueryRequest) {
 
         if (umaQueryRequest.getQueryExpression() != null) {
-            return newExceptionPromise((ResourceException) new BadRequestException("Query expressions not supported"));
+            return new BadRequestException("Query expressions not supported").asPromise();
         }
 
         QueryRequest request = Requests.newQueryRequest("");
@@ -573,7 +573,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                             }
                             return newResultPromise(umaPolicies);
                         } catch (ResourceException e) {
-                            return newExceptionPromise(e);
+                            return e.asPromise();
                         }
                     }
                 })

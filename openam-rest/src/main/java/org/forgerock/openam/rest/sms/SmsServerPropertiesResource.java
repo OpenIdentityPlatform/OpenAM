@@ -17,11 +17,8 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.newBadRequestException;
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -64,6 +61,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
@@ -290,14 +288,14 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
             final String serverName = uriVariables.get("serverName").toLowerCase();
             if (serverName == null) {
-                return newExceptionPromise(newBadRequestException("Server name not specified."));
+                return new BadRequestException("Server name not specified.").asPromise();
             }
 
             try {
                 ServiceConfigManager scm = getServiceConfigManager(serverContext);
                 ServiceConfig serverConfigs = getServerConfigs(scm);
                 if (!serverConfigs.getSubConfigNames().contains(serverName)) {
-                    return newExceptionPromise(newBadRequestException("Unknown server: " + serverName));
+                    return new BadRequestException("Unknown server: " + serverName).asPromise();
                 }
             } catch (SSOException | SMSException e) {
                 logger.error("Error getting server config", e);
@@ -305,7 +303,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
             final String tabName = getTabName(uriVariables);
             if (tabName == null) {
-                return newExceptionPromise(newBadRequestException("Tab name not specified."));
+                return new BadRequestException("Tab name not specified.").asPromise();
             }
 
             JsonValue schema;
@@ -319,12 +317,12 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             }
 
             if (schema == null) {
-                return newExceptionPromise(newBadRequestException("Unknown tab: " + tabName));
+                return new BadRequestException("Unknown tab: " + tabName).asPromise();
             }
 
             return newResultPromise(newActionResponse(schema));
         } else {
-            return newExceptionPromise(newNotSupportedException("Action not supported: " + actionRequest.getAction()));
+            return new NotSupportedException("Action not supported: " + actionRequest.getAction()).asPromise();
         }
     }
 
@@ -456,7 +454,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext,
             PatchRequest patchRequest) {
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
@@ -467,12 +465,12 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         final String tabName = getTabName(uriVariables);
 
         if (tabName == null) {
-            return newExceptionPromise(newBadRequestException("Tab name not specified."));
+            return new BadRequestException("Tab name not specified.").asPromise();
         }
 
         final String serverName = getServerName(uriVariables);
         if (serverName == null) {
-            return newExceptionPromise(newBadRequestException("Server name not specified."));
+            return new BadRequestException("Server name not specified.").asPromise();
         }
 
         try {
@@ -483,7 +481,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             final ServiceConfig serverConfig = serverConfigs.getSubConfig(serverName);
 
             if (serverConfig == null) {
-                return newExceptionPromise(newBadRequestException("Unknown Server " + serverName));
+                return new BadRequestException("Unknown Server " + serverName).asPromise();
             }
 
             Properties serverSpecificAttributes = getAttributes(serverConfig);
@@ -557,7 +555,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             logger.error("Error reading property sheet for tab " + tabName, e);
         }
 
-        return newExceptionPromise(newBadRequestException("Error reading properties file for " + tabName));
+        return new BadRequestException("Error reading properties file for " + tabName).asPromise();
     }
 
     private String getServerConfigXml(ServiceConfig serverConfig) {
@@ -605,12 +603,12 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
         final String tabName = getTabName(uriVariables);
         if (tabName == null) {
-            return newExceptionPromise(newBadRequestException("Tab name not specified."));
+            return new BadRequestException("Tab name not specified.").asPromise();
         }
 
         final String serverName = getServerName(uriVariables);
         if (serverName == null) {
-            return newExceptionPromise(newBadRequestException("Server name not specified."));
+            return new BadRequestException("Server name not specified.").asPromise();
         }
 
         try {
@@ -647,6 +645,6 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             logger.error("Error getting service config manager", e);
         }
 
-        return newExceptionPromise(newBadRequestException("Error updating values for " + tabName));
+        return new BadRequestException("Error updating values for " + tabName).asPromise();
     }
 }

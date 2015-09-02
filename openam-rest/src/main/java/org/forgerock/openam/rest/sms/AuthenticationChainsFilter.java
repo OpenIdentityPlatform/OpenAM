@@ -17,9 +17,6 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.adapt;
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
@@ -38,6 +35,7 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -72,7 +70,7 @@ public class AuthenticationChainsFilter implements Filter {
         try {
             return wrap(next.handleCreate(context, transformRequest(request)));
         } catch (InternalServerErrorException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 
@@ -86,7 +84,7 @@ public class AuthenticationChainsFilter implements Filter {
     public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
         //Not currently handling converting authChainConfiguration for patch
-        return newExceptionPromise(newNotSupportedException());
+        return new NotSupportedException().asPromise();
     }
 
     @Override
@@ -107,7 +105,7 @@ public class AuthenticationChainsFilter implements Filter {
         try {
             return wrap(next.handleUpdate(context, transformRequest(request)));
         } catch (InternalServerErrorException e) {
-            return newExceptionPromise(adapt(e));
+            return e.asPromise();
         }
     }
 

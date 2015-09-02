@@ -15,18 +15,25 @@
  */
 package org.forgerock.openam.forgerockrest.cts;
 
-import static org.forgerock.json.resource.ResourceException.newBadRequestException;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -34,7 +41,6 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -44,10 +50,6 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.promise.Promise;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * CoreTokenResource is responsible for exposing the functions of the CoreTokenService via a REST
@@ -110,10 +112,10 @@ public class CoreTokenResource implements CollectionResourceProvider {
             debug("CREATE by {0}: Stored token with ID: {1}", principal, token.getTokenId());
             return newResultPromise(resource);
         } catch (IllegalArgumentException e) {
-            return newExceptionPromise(newBadRequestException(e.getMessage()));
+            return new BadRequestException(e.getMessage()).asPromise();
         } catch (CoreTokenException e) {
             error(e, "CREATE by {0}: Error creating token resource with ID: {1}", principal, token.getTokenId());
-            return newExceptionPromise(generateException(e));
+            return generateException(e).asPromise();
         }
     }
 
@@ -144,7 +146,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
             return newResultPromise(resource);
         } catch (CoreTokenException e) {
             error(e, "DELETE by {0}: Error deleting token resource with ID: {1}", principal, tokenId);
-            return newExceptionPromise(generateException(e));
+            return generateException(e).asPromise();
         }
     }
 
@@ -166,7 +168,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
             Token token = store.read(tokenId);
             if (token == null) {
                 error("READ by {0}: No token resource to read with ID: {1}", principal, tokenId);
-                return newExceptionPromise(generateNotFoundException(tokenId));
+                return generateNotFoundException(tokenId).asPromise();
             }
 
             String json = serialisation.serialise(token);
@@ -179,7 +181,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
             return newResultPromise(response);
         } catch (CoreTokenException e) {
             error(e, "READ by {0}: Error reading token resource with ID: {1}", principal, tokenId);
-            return newExceptionPromise(generateException(e));
+            return generateException(e).asPromise();
         }
     }
 
@@ -209,7 +211,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
             return newResultPromise(resource);
         } catch (CoreTokenException e) {
             error(e, "UPDATE by {0}: Error updating token resource with ID: {1}", principal, tokenId);
-            return newExceptionPromise(generateException(e));
+            return generateException(e).asPromise();
         }
     }
 
@@ -230,7 +232,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @return Non null ResourceException.
      */
     private ResourceException generateException(CoreTokenException e) {
-        return ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
+        return new InternalServerErrorException(e.getMessage(), e);
     }
 
     /**
@@ -239,7 +241,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @return Non null ResourceException.
      */
     private ResourceException generateNotFoundException(String tokenId) {
-        return ResourceException.getException(ResourceException.NOT_FOUND, "Token " + tokenId + " not found");
+        return new NotFoundException("Token " + tokenId + " not found");
     }
 
     /**
