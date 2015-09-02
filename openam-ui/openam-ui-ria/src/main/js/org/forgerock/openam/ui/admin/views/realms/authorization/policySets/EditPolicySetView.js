@@ -19,7 +19,7 @@
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/EditPolicySetView", [
     "jquery",
     "underscore",
-    "org/forgerock/openam/ui/admin/models/authorization/ApplicationModel",
+    "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/PoliciesView",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants"
-], function ($, _, ApplicationModel, StripedListView, PoliciesView, PoliciesDelegate, Messages, AbstractView,
+], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesDelegate, Messages, AbstractView,
              EventManager, Router, Constants) {
     return AbstractView.extend({
         template: "templates/admin/views/realms/authorization/policySets/EditPolicySetTemplate.html",
@@ -73,11 +73,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             this.resourceTypesPromise = PoliciesDelegate.listResourceTypes();
 
             if (name) {
-                this.model = new ApplicationModel({name: name});
+                this.model = new PolicySetModel({name: name});
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
-                this.model = new ApplicationModel();
+                this.model = new PolicySetModel();
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.renderAfterSyncModel();
             }

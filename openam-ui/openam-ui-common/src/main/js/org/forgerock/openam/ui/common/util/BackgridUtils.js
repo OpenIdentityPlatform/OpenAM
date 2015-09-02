@@ -354,7 +354,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
     obj.getState = function (data) {
         var state = {
-            pageSize: 10,
+            pageSize: 20,
             sortKey: "name"
         };
 

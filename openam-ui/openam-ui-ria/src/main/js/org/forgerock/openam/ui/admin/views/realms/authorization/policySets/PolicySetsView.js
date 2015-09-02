@@ -29,15 +29,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
-    "org/forgerock/openam/ui/admin/models/authorization/ApplicationModel",
+    "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate"
 ], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
-             Configuration, EventManager, Router, Constants, UIUtils, BackgridUtils, URLHelper,
-             ApplicationModel, AbstractListView, PoliciesDelegate) {
+             Configuration, EventManager, Router, Constants, BackgridUtils, URLHelper, PolicySetModel, AbstractListView,
+             PoliciesDelegate) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/authorization/policySets/PolicySetsTemplate.html",
         // Used in AbstractListView
@@ -45,30 +44,28 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
 
         render: function (args, callback) {
             var self = this,
-                Apps,
+                PolicySets,
                 columns,
                 grid,
                 paginator,
-                ClickableRow,
-                resourceTypesPromise = PoliciesDelegate.listResourceTypes();
+                ClickableRow;
 
             this.realmPath = args[0];
             this.data.selectedItems = [];
 
             _.extend(this.events, {
-                "click #addNewApp": "addNewApplication",
+                "click #addNewPolicySet": "addNewPolicySet",
                 "click #importPolicies": "startImportPolicies",
                 "click #exportPolicies": "exportPolicies",
                 "change [name=upload]": "readImportFile"
             });
 
-            Apps = Backbone.PageableCollection.extend({
+            PolicySets = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/applications"),
-                model: ApplicationModel,
+                model: PolicySetModel,
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams({
-                    filterName: "eq",
-                    _queryFilter: self.getDefaultFilter()
+                    filterName: "eq"
                 }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
@@ -88,54 +85,40 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                         return;
                     }
 
-                    Router.routeTo(Router.configuration.routes.realmsApplicationEdit, {
-                        args: [encodeURIComponent(self.realmPath), encodeURIComponent(this.model.id)],
-                        trigger: true
-                    });
+                    self.editRecord(e, this.model.id, Router.configuration.routes.realmsApplicationEdit);
                 }
             });
 
+
             columns = [
-                {
-                    name: "",
-                    cell: "select-row",
-                    headerCell: "select-all"
-                },
                 {
                     name: "name",
                     label: $.t("console.authorization.policySets.list.grid.0"),
-                    cell: "string",
+                    cell: BackgridUtils.TemplateCell.extend({
+                        iconClass: "fa-folder",
+                        template: "templates/admin/backgrid/cell/IconAndNameCell.html",
+                        rendered: function () {
+                            this.$el.find("i.fa").addClass(this.iconClass);
+                        }
+                    }),
                     headerCell: BackgridUtils.FilterHeaderCell,
                     sortType: "toggle",
                     editable: false
                 },
                 {
-                    name: "description",
-                    label: $.t("console.authorization.policySets.list.grid.1"),
-                    cell: "string",
-                    headerCell: BackgridUtils.FilterHeaderCell,
-                    sortable: false,
-                    editable: false
-                },
-                {
-                    name: "resourceTypeUuids",
-                    label: $.t("console.authorization.policySets.list.grid.2"),
-                    cell: BackgridUtils.ArrayCell.extend({
-                        render: function () {
-                            this.$el.empty();
-
-                            var uuids = this.model.get(this.column.attributes.name),
-                                names = [],
-                                i = 0;
-
-                            for (; i < uuids.length; i++) {
-                                names.push(_.findWhere(self.data.resTypes, {uuid: uuids[i]}).name);
-                            }
-
-                            this.$el.append(this.buildHtml(names));
-
-                            this.delegateEvents();
-                            return this;
+                    name: "",
+                    cell: BackgridUtils.TemplateCell.extend({
+                        className: "row-actions",
+                        template: "templates/admin/backgrid/cell/RowActionsCell.html",
+                        events: {
+                            "click .edit-row-item": "editItem",
+                            "click .delete-row-item": "deleteItem"
+                        },
+                        editItem: function (e) {
+                            self.editRecord(e, this.model.id, Router.configuration.routes.realmsApplicationEdit);
+                        },
+                        deleteItem: function (e) {
+                            self.deleteRecord(e, this.model.id);
                         }
                     }),
                     sortable: false,
@@ -143,7 +126,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                 }
             ];
 
-            this.data.items = new Apps();
+            this.data.items = new PolicySets();
 
             grid = new Backgrid.Grid({
                 columns: columns,
@@ -166,43 +149,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                 this.$el.find("#backgridContainer").append(grid.render().el);
                 this.$el.find("#paginationContainer").append(paginator.render().el);
 
-                resourceTypesPromise.done(function (xhr) {
-                    self.data.resTypes = xhr.result;
-
-                    self.data.items.fetch({reset: true}).done(function () {
-                        if (callback) {
-                            callback();
-                        }
-                    }).fail(function () {
-                        Router.routeTo(Router.configuration.routes.realms, {
-                            args: [],
-                            trigger: true
-                        });
+                this.data.items.fetch({reset: true}).done(function () {
+                    if (callback) {
+                        callback();
+                    }
+                }).fail(function () {
+                    Router.routeTo(Router.configuration.routes.realms, {
+                        args: [],
+                        trigger: true
                     });
                 });
             });
-        },
-
-        // TODO: this configuration is not present, need to delete these applications on server
-        getDefaultFilter: function () {
-            var exceptions = "",
-                defaultApplications,
-                returnList = [];
-
-            if (Configuration.globalData.policyEditor) {
-                defaultApplications = Configuration.globalData.policyEditor.defaultApplications;
-                if (defaultApplications.config.hideByDefault) {
-                    exceptions = _.difference(defaultApplications.defaultApplicationList, defaultApplications.config.exceptThese);
-                } else {
-                    exceptions = defaultApplications.config.exceptThese;
-                }
-            }
-
-            _.each(exceptions, function (string) {
-                returnList.push('name+eq+"^(?!' + string + '$).*"');
-            });
-
-            return returnList;
         },
 
         startImportPolicies: function () {
@@ -216,7 +173,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                 })
                 .fail(function (e) {
                     var applicationNotFoundInRealm = " application not found in realm",
-                        responseText = e ? e.responseText : '',
+                        responseText = e ? e.responseText : "",
                         messages = $($.parseXML(responseText)).find("message"),
                         message = messages.length ? messages[0].textContent : "",
                         index = message ? message.indexOf(applicationNotFoundInRealm) : -1;
@@ -241,10 +198,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
 
         exportPolicies: function () {
             var realm = this.realmPath === "/" ? "" : this.realmPath;
-            this.$el.find("#exportPolicies").attr("href", Constants.host + "/" + Constants.context + "/xacml" + realm + "/policies");
+            this.$el.find("#exportPolicies").attr("href",
+                Constants.host + "/" + Constants.context + "/xacml" + realm + "/policies");
         },
 
-        addNewApplication: function (e) {
+        addNewPolicySet: function (e) {
             Router.routeTo(Router.configuration.routes.realmsApplicationEdit, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true

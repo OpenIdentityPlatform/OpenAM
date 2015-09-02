@@ -821,8 +821,8 @@
                     "addNew": "New Policy Set",
                     "importPolicies": "Import Policies",
                     "exportPolicies": "Export Policies",
-                    "title": "Policy Sets",
-                    "grid": ["Name", "Description", "Resource Types"]
+                    "title": "Policies",
+                    "grid": ["Name"]
                 }
             },
 
@@ -1024,7 +1024,7 @@
                 "list": {
                     "add": "New Resource Type",
                     "title": "Resource Types",
-                    "grid": ["Name", "Description", "Patterns", "Actions"]
+                    "grid": ["Name"]
                 },
                 "edit": {
                     "resourceType": "Resource Type",

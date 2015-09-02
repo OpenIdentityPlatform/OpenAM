@@ -108,36 +108,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                         className: "row-actions",
                         template: "templates/admin/backgrid/cell/RowActionsCell.html",
                         events: {
-                            "click .edit": "editItem",
-                            "click .delete": "deleteItem"
+                            "click .edit-row-item": "editItem",
+                            "click .delete-row-item": "deleteItem"
                         },
                         editItem: function (e) {
-                            e.stopPropagation();
-                            Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
-                                args: [encodeURIComponent(self.realmPath), encodeURIComponent(this.model.id)],
-                                trigger: true
-                            });
+                            self.editRecord(e, this.model.id, Router.configuration.routes.realmsResourceTypeEdit);
                         },
                         deleteItem: function (e) {
-                            var item = self.data.items.get(this.model.id),
-                                onSuccess = function (model, response, options) {
-                                    self.data.items.fetch({reset: true});
-                                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                                },
-                                onError = function (model, response, options) {
-                                    self.data.items.fetch({reset: true});
-                                    Messages.messages.addMessage({
-                                        message: response.responseJSON.message,
-                                        type: Messages.TYPE_DANGER
-                                    });
-                                };
-
-                            e.stopPropagation();
-
-                            item.destroy({
-                                success: onSuccess,
-                                error: onError
-                            });
+                            self.deleteRecord(e, this.model.id);
                         }
                     }),
                     sortable: false,
@@ -173,11 +151,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                         callback();
                     }
                 }).fail(function () {
-                        Router.routeTo(Router.configuration.routes.realms, {
-                            args: [],
-                            trigger: true
-                        });
+                    Router.routeTo(Router.configuration.routes.realms, {
+                        args: [],
+                        trigger: true
                     });
+                });
             });
         },
 

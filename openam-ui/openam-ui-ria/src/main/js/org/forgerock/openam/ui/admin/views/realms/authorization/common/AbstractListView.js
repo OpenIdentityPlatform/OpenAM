@@ -21,10 +21,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, Messages, AbstractView, EventManager, BackgridUtils, Constants, UIUtils) {
+], function ($, _, Messages, AbstractView, EventManager, Router, BackgridUtils, Constants, UIUtils) {
 
     return AbstractView.extend({
         toolbarTemplateID: "#gridToolbar",
@@ -32,11 +33,43 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
         initialize: function () {
             AbstractView.prototype.initialize.call(this);
 
+            // TODO delete once policies view is changed
             this.events = {
                 "click #deleteRecords": "deleteRecords"
             };
         },
 
+        deleteRecord: function (e, id) {
+            var self = this,
+                item = self.data.items.get(id),
+                onSuccess = function (model, response, options) {
+                    self.data.items.fetch({reset: true});
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                },
+                onError = function (model, response, options) {
+                    self.data.items.fetch({reset: true});
+                    Messages.messages.addMessage({
+                        message: response.responseJSON.message,
+                        type: Messages.TYPE_DANGER
+                    });
+                };
+
+            item.destroy({
+                success: onSuccess,
+                error: onError
+            });
+        },
+
+        editRecord: function (e, id, route) {
+            var self = this;
+
+            Router.routeTo(route, {
+                args: [encodeURIComponent(self.realmPath), encodeURIComponent(id)],
+                trigger: true
+            });
+        },
+
+        // TODO delete once policies view is changed
         deleteRecords: function (e) {
             e.preventDefault();
 
@@ -72,6 +105,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
             }
         },
 
+        // TODO delete once policies view is changed
         onRowSelect: function (model, selected) {
             if (selected) {
                 if (!_.contains(this.data.selectedItems, model.id)) {
@@ -87,6 +121,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
         bindDefaultHandlers: function () {
             var self = this;
 
+            // TODO delete once policies view is changed
             this.data.items.on("backgrid:selected", function (model, selected) {
                 self.onRowSelect(model, selected);
             });

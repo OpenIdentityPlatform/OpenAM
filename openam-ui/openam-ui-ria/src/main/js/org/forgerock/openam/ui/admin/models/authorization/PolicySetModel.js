@@ -15,7 +15,7 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/admin/models/authorization/ApplicationModel", [
+define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
     "backbone",
     "org/forgerock/openam/ui/common/util/URLHelper"
 ], function (Backbone, URLHelper) {
