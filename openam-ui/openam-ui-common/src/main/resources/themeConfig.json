@@ -2,7 +2,7 @@
         "themes": [
             {
                 "name": "default",
-                "stylesheets": ["css/styles.css"],
+                "stylesheets": ["css/bootstrap-3.3.5-custom.css", "css/styles.css"],
                 "path": "",
                 "realms": [".*"],
                 "regex": true,
