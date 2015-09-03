@@ -146,7 +146,13 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
 
                 if (theme.name !== "default" && theme.path === "") {
                     defaultTheme = _.reject(obj.data.themes,function (t) { return t.name !== "default";})[0];
-                    theme = $.extend(true,{}, defaultTheme, theme);
+                    theme = _.merge({}, defaultTheme, theme, function (objectValue, sourceValue) {
+                        // We don't want to merge arrays. If a theme has specified an array, it should be used verbatim.
+                        if (_.isArray(sourceValue)) {
+                            return sourceValue;
+                        }
+                        return undefined;
+                    });
                 }
                 if (basePath) {
                     theme.stylesheets = _.map(theme.stylesheets, function (url) {
