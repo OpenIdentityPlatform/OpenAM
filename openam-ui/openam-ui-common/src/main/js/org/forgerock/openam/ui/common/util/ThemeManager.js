@@ -37,7 +37,6 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
     var obj = {},
         promise = null,
         loadThemeCSS = function (theme) {
-
             $("<link/>", {
                 rel: "icon",
                 type: "image/x-icon",
@@ -50,11 +49,13 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                 href: require.toUrl(theme.path + theme.icon)
             }).appendTo("head");
 
-            $("<link/>", {
-                rel: "stylesheet",
-                type: "text/css",
-                href: theme.stylesheet
-            }).appendTo("head");
+            _.each(theme.stylesheets, function(stylesheet) {
+                $("<link/>", {
+                    rel: "stylesheet",
+                    type: "text/css",
+                    href: stylesheet
+                }).appendTo("head");
+            });
         },
 
         /**
@@ -118,6 +119,12 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
             } else {
                 _.each(config.settings, updateSrc);
             }
+        },
+
+        isRelativePath = function (path) {
+            return path.indexOf("http://") !== 0 &&
+                path.indexOf("https://") !== 0 &&
+                path.indexOf("/") !== 0;
         };
 
     obj.getTheme = function (basePath) {
@@ -142,12 +149,13 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                     theme = $.extend(true,{}, defaultTheme, theme);
                 }
                 if (basePath) {
-                    if (basePath.indexOf("http://") === 0 ||
-                        basePath.indexOf("https://") === 0 ||
-                        basePath.indexOf("/") === 0)
-                    {
-                        theme.stylesheet = basePath + theme.stylesheet;
-                    }
+                    theme.stylesheets = _.map(theme.stylesheets, function (url) {
+                        if (isRelativePath(url)) {
+                            return basePath + url;
+                        } else {
+                            return url;
+                        }
+                    });
                 }
 
                 loadThemeCSS(theme);

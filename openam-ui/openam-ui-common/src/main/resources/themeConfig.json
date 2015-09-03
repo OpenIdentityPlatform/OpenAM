@@ -2,7 +2,7 @@
         "themes": [
             {
                 "name": "default",
-                "stylesheet": "css/styles.css",
+                "stylesheets": ["css/styles.css"],
                 "path": "",
                 "realms": [".*"],
                 "regex": true,
