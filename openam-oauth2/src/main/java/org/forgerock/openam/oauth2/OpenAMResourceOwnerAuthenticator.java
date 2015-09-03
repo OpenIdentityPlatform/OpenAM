@@ -46,6 +46,7 @@ import org.forgerock.oauth2.core.ResourceOwnerAuthenticator;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.resource.ResourceException;
@@ -114,7 +115,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         AuthContext lc = null;
         try {
             lc = new AuthContext(realm);
-            lc.login();
+            lc.login(ServletUtils.getRequest(Request.getCurrent()), ServletUtils.getResponse(Response.getCurrent()));
             while (lc.hasMoreRequirements()) {
                 Callback[] callbacks = lc.getRequirements();
                 ArrayList missing = new ArrayList();
