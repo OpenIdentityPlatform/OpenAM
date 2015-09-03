@@ -63,7 +63,7 @@ public class AuthenticatorOathService implements DeviceService {
 
     final static private Debug debug = Debug.getInstance("amAuthAuthenticatorOATH");
 
-    public static final String OATH_ATTRIBUTE_NAME = "iplanet-am-auth-authenticator-oath-attr-name";
+    private static final String OATH_ATTRIBUTE_NAME = "iplanet-am-auth-authenticator-oath-attr-name";
     private static final String OATH_ENCRYPTION_SCHEME = "openam-auth-authenticator-oath-device-settings-encryption-scheme";
     private static final String OATH_KEYSTORE_FILE = "openam-auth-authenticator-oath-device-settings-encryption-keystore";
     private static final String OATH_KEYSTORE_TYPE = "openam-auth-authenticator-oath-device-settings-encryption-keystore-type";

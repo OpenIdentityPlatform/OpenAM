@@ -27,10 +27,10 @@
         i18nFileName="AuthenticatorOATHService"
         revisionNumber="1"
         resourceName="authenticatorOathService"
-        i18nKey="forgerock-authenticator-oath-service-description">
+        i18nKey="forgerock-auth-authenticator-oath-service-description">
         <Organization>
 
-            <AttributeSchema name="iplanet-am-authenticator-oath-attr-name"
+            <AttributeSchema name="iplanet-am-auth-authenticator-oath-attr-name"
                              type="single"
                              syntax="string"
                              i18nKey="a100"
@@ -40,7 +40,7 @@
                 </DefaultValues>
             </AttributeSchema>
 
-            <AttributeSchema name="iplanet-am-authenticator-oath-skippable-name"
+            <AttributeSchema name="iplanet-am-auth-authenticator-oath-skippable-name"
                              type="single"
                              syntax="string"
                              i18nKey="a107"
@@ -50,7 +50,7 @@
                 </DefaultValues>
             </AttributeSchema>
 
-            <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-scheme"
+            <AttributeSchema name="openam-auth-authenticator-oath-device-settings-encryption-scheme"
                 type="single_choice"
                 i18nKey="a101"
                 resourceName="authenticatorOATHDeviceSettingsEncryptionScheme">
@@ -64,7 +64,7 @@
                 </DefaultValues>
             </AttributeSchema>
 
-                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-keystore"
+                <AttributeSchema name="openam-auth-authenticator-oath-device-settings-encryption-keystore"
                     type="single"
                     syntax="string"
                     i18nKey="a102"
@@ -74,7 +74,7 @@
             </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-keystore-type"
+                <AttributeSchema name="openam-auth-authenticator-oath-device-settings-encryption-keystore-type"
                     type="single_choice"
                     i18nKey="a103"
                     resourceName="authenticatorOATHDeviceSettingsEncryptionKeystoreType">
@@ -89,7 +89,7 @@
             </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-keystore-password"
+                <AttributeSchema name="openam-auth-authenticator-oath-device-settings-encryption-keystore-password"
                     type="single"
                     syntax="password"
                     i18nKey="a104"
@@ -99,14 +99,14 @@
             </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-keypair-alias"
+                <AttributeSchema name="openam-auth-authenticator-oath-device-settings-encryption-keypair-alias"
                     type="single"
                     syntax="string"
                     i18nKey="a105"
                     resourceName="authenticatorOATHDeviceSettingsEncryptionKeystoreKeyPairAlias">
                 </AttributeSchema>
 
-                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-privatekey-password"
+                <AttributeSchema name="openam-auth-authenticator-oath-device-settings-encryption-privatekey-password"
                     type="single"
                     syntax="password"
                     i18nKey="a106"

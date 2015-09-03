@@ -206,7 +206,7 @@ public class AuthenticatorOATH extends AMLoginModule {
 
             this.windowSize = CollectionHelper.getIntMapAttr(options, WINDOW_SIZE, 0, debug);
             this.truncationOffset = CollectionHelper.getIntMapAttr(options, TRUNCATION_OFFSET, -1, debug);
-            this.isOptional = !getLoginState("OATH").is2faMandatory();
+            this.isOptional = !getLoginState("authenticatorOATH").is2faMandatory();
             this.totpTimeStep = CollectionHelper.getIntMapAttr(options, TOTP_TIME_STEP, 1, debug);
             this.totpStepsInWindow = CollectionHelper.getIntMapAttr(options, TOTP_STEPS_IN_WINDOW, 1, debug);
             this.checksum = CollectionHelper.getBooleanMapAttr(options, CHECKSUM, false);
