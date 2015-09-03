@@ -31,7 +31,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
 ], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesDelegate, Messages, AbstractView,
              EventManager, Router, Constants) {
     return AbstractView.extend({
-        template: "templates/admin/views/realms/authorization/policySets/EditPolicySetTemplate.html",
         partials: [
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
         ],
@@ -40,7 +39,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
         events: {
             "click #saveChanges": "submitForm",
             "click #revertChanges": "revertChanges",
-            "click #delete": "deleteApplication"
+            "click #delete": "deletePolicySet"
         },
 
         initialize: function (options) {
@@ -73,10 +72,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             this.resourceTypesPromise = PoliciesDelegate.listResourceTypes();
 
             if (name) {
+                this.template = "templates/admin/views/realms/authorization/policySets/EditPolicySetTemplate.html";
                 this.model = new PolicySetModel({name: name});
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
+                this.template = "templates/admin/views/realms/authorization/policySets/NewPolicySetTemplate.html";
                 this.model = new PolicySetModel();
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.renderAfterSyncModel();
@@ -139,8 +140,21 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
         },
 
         buildResourceTypesList: function () {
-            var selected = _.findByValues(this.data.options.allResourceTypes, "uuid", this.data.entity.resourceTypeUuids);
+            var self = this,
+                selected = _.findByValues(this.data.options.allResourceTypes, "uuid", this.data.entity.resourceTypeUuids);
 
+            this.$el.find("#resTypesSelection").selectize({
+                sortField: "name",
+                valueField: "uuid",
+                labelField: "name",
+                searchField: "name",
+                options: this.data.options.allResourceTypes,
+                onChange: function (value) {
+                    self.data.entity.resourceTypeUuids = value;
+                }
+            });
+
+            // TODO remove code below when edit policy set view is changed
             this.availableResourceTypesUUIDS = this.data.entity.resourceTypeUuids;
             this.availableResourceTypesInitial = _.pluck(this.data.options.availableResourceTypes, "name");
             this.selectedResourceTypesInitial = _.pluck(selected, "name").sort();
@@ -223,7 +237,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
 
             var self = this,
                 savePromise,
-                nonModifiedAttributes = _.clone(this.model.attributes);
+                nonModifiedAttributes = _.clone(this.model.attributes),
+                newEntity = $(e.target).data("newEntity");
 
             this.updateFields();
 
@@ -233,6 +248,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             if (savePromise) {
                 savePromise
                     .done(function (response) {
+                        if (newEntity) {
+                            Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {
+                                args: [encodeURIComponent(self.realmPath), self.model.id],
+                                trigger: true
+                            });
+                        }
+
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                     })
                     .fail(function (response) {
@@ -248,7 +270,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             }
         },
 
-        deleteApplication: function (e) {
+        deletePolicySet: function (e) {
             e.preventDefault();
 
             var self = this,

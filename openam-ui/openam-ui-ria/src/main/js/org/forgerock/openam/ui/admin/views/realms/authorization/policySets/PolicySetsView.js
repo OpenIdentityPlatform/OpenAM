@@ -85,7 +85,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                         return;
                     }
 
-                    self.editRecord(e, this.model.id, Router.configuration.routes.realmsApplicationEdit);
+                    self.editRecord(e, this.model.id, Router.configuration.routes.realmsPolicySetEdit);
                 }
             });
 
@@ -115,7 +115,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                             "click .delete-row-item": "deleteItem"
                         },
                         editItem: function (e) {
-                            self.editRecord(e, this.model.id, Router.configuration.routes.realmsApplicationEdit);
+                            self.editRecord(e, this.model.id, Router.configuration.routes.realmsPolicySetEdit);
                         },
                         deleteItem: function (e) {
                             self.deleteRecord(e, this.model.id);
@@ -203,7 +203,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         },
 
         addNewPolicySet: function (e) {
-            Router.routeTo(Router.configuration.routes.realmsApplicationEdit, {
+            Router.routeTo(Router.configuration.routes.realmsPolicySetNew, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });

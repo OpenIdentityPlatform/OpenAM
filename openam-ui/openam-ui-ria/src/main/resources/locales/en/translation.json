@@ -811,7 +811,10 @@
 
             "policySets":{
                 "edit": {
+                    "new": "New Policy Set",
                     "policies": "Policies",
+                    "addResourceTypes": "Add Resource Types...",
+                    "selectResourceTypes": "Select the resource types to be available within this policy set.",
                     "resourceTypes": {
                         "availableResourceTypes": "Available Resource Types",
                         "selectedResourceTypes": "Selected Resource Types"
