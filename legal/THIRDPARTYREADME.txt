@@ -989,17 +989,29 @@ Copyright: Copyright (c) 2001-2011 Oracle and/or its affiliates. All rights rese
 Version: jersey-client-1.1.5.2.jar
 Copyright: Copyright 1997-2007 Sun Microsystems
 
-Version: json-fluent-2.4.2.jar
-Copyright: Copyright 2014 ForgeRock AS.
+Version: chf-http-core-1.0.0.jar
+Copyright: Copyright 2015 ForgeRock AS.
 
-Version: json-resource-2.4.2.jar
-Copyright: Copyright 2014 ForgeRock AS.
+Version: chf-http-servlet-1.0.0.jar
+Copyright: Copyright 2015 ForgeRock AS.
 
-Version: json-resource-servlet-2.4.2.jar
-Copyright: Copyright 2014 ForgeRock AS.
+Version: chf-client-apache-common-1.0.0.jar
+Copyright: Copyright 2015 ForgeRock AS.
 
-Version: json-web-token-2.4.2.jar
-Copyright: Copyright 2014 ForgeRock AS.
+Version: chf-client-apache-sync-1.0.0.jar
+Copyright: Copyright 2015 ForgeRock AS.
+
+Version: json-fluent-3.0.0.jar
+Copyright: Copyright 2015 ForgeRock AS.
+
+Version: json-resource-3.0.0.jar
+Copyright: Copyright 2015 ForgeRock AS.
+
+Version: json-resource-http-3.0.0.jar
+Copyright: Copyright 2015 ForgeRock AS.
+
+Version: json-web-token-3.0.0.jar
+Copyright: Copyright 2015 ForgeRock AS.
 
 Version: jsr311-api-1.1.1.jar
 Copyright: Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -1230,8 +1242,8 @@ Version: openid-connect-restlet-12.0.0.jar
 Copyright: Copyright 2014 ForgeRock AS.,
            Portions Copyrighted 2014 Nomura Research Institute, Ltd
 
-Version: forgerock-util-1.3.5.jar
-Copyright: Copyright 2014 ForgeRock AS.,
+Version: forgerock-util-2.0.0.jar
+Copyright: Copyright 2015 ForgeRock AS.,
            Copyright © 2010 ApexIdentity Inc. All rights reserved.,
            Copyright (c) 2004, Mikael Grev, MiG InfoCom AB.,
            Copyright (c) 2006-2008 Sun Microsystems Inc. All Rights Reserved
