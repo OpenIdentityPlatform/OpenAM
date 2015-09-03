@@ -34,8 +34,6 @@ import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.InvalidRealmNameManager;
 import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
@@ -61,8 +59,6 @@ import org.slf4j.LoggerFactory;
 
 @GuiceModule
 public class RestGuiceModule extends PrivateModule {
-
-    private static final String SSO_TOKEN_COOKIE_NAME_PROPERTY = Constants.AM_COOKIE_NAME;
 
     @Override
     protected void configure() {
@@ -140,8 +136,12 @@ public class RestGuiceModule extends PrivateModule {
     Handler getRestHandler(@Named("ResourceApiVersionFilter") org.forgerock.http.Filter chfResourceApiVersionFilter,
             @Named("ResourceApiVersionFilter") Filter resourceApiVersionFilter,
             @Named("RestRootRouter") org.forgerock.http.routing.Router chfRootRouter,
-            @Named("CrestRootRouter") Router crestRootRouter,  @Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter) {
-        return new RestHandler(Handlers.chainOf(chfRootRouter, chfResourceApiVersionFilter), Handlers.chainOf(newHttpHandler(new FilterChain(crestRootRouter, resourceApiVersionFilter)), authenticationFilter), Collections.singleton("authenticate"));
+            CrestProtocolEnforcementFilter crestProtocolEnforcementFilter,
+            @Named("CrestRootRouter") Router crestRootRouter,
+            @Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter) {
+        return new RestHandler(Handlers.chainOf(chfRootRouter, chfResourceApiVersionFilter),
+                Handlers.chainOf(newHttpHandler(new FilterChain(crestRootRouter, resourceApiVersionFilter)),
+                        crestProtocolEnforcementFilter, authenticationFilter), Collections.singleton("authenticate"));
     }
 
     @Provides
