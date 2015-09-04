@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob;
 
@@ -20,8 +20,6 @@ import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
 import org.forgerock.openam.cts.utils.blob.strategies.CompressionStrategy;
 import org.forgerock.openam.cts.utils.blob.strategies.EncryptionStrategy;
-import org.forgerock.openam.cts.utils.blob.strategies.encryption.DecryptAction;
-import org.forgerock.openam.cts.utils.blob.strategies.encryption.EncryptAction;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -43,7 +41,7 @@ public class TokenStrategyFactoryTest {
     @BeforeMethod
     public void setup() {
         compression = new CompressionStrategy();
-        encryption = new EncryptionStrategy(new EncryptAction(), new DecryptAction(), mock(Debug.class));
+        encryption = new EncryptionStrategy(mock(Debug.class));
         attributeCompression = new AttributeCompressionStrategy(new TokenBlobUtils());
         factory = new TokenStrategyFactory(compression, encryption, attributeCompression);
 

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob.strategies;
 
@@ -34,15 +34,10 @@ import java.security.PrivilegedActionException;
  */
 public class EncryptionStrategy implements BlobStrategy {
     private final Debug debug;
-    private final EncryptAction encyptionAction;
-    private final DecryptAction decyptAction;
 
     @Inject
-    public EncryptionStrategy(EncryptAction encyptionAction, DecryptAction decyptAction,
-                              @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
+    public EncryptionStrategy(@Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.debug = debug;
-        this.encyptionAction = encyptionAction;
-        this.decyptAction = decyptAction;
     }
 
     /**
@@ -57,8 +52,7 @@ public class EncryptionStrategy implements BlobStrategy {
     public byte[] perform(byte[] blob) throws TokenStrategyFailedException {
         Reject.ifTrue(blob == null);
         try {
-            encyptionAction.setBlob(blob);
-            byte[] encryptedBlob = AccessController.doPrivileged(encyptionAction);
+            byte[] encryptedBlob = AccessController.doPrivileged(new EncryptAction(blob));
 
             if (debug.messageEnabled()) {
                 debug.message(CoreTokenConstants.DEBUG_HEADER + "Encrypted Token");
@@ -82,8 +76,7 @@ public class EncryptionStrategy implements BlobStrategy {
     public byte[] reverse(byte[] blob) throws TokenStrategyFailedException {
         Reject.ifTrue(blob == null);
         try {
-            decyptAction.setBlob(blob);
-            byte[] decryptedBlob = AccessController.doPrivileged(decyptAction);
+            byte[] decryptedBlob = AccessController.doPrivileged(new DecryptAction(blob));
 
             if (debug.messageEnabled()) {
                 debug.message(CoreTokenConstants.DEBUG_HEADER + "Decrypted Token");
