@@ -8,7 +8,6 @@
  * (the License). You may not use this file except in
  * compliance with the License.
  *
-<<<<<<< .mine
  * You can obtain a copy of the License at
  * http://forgerock.org/license/CDDLv1.0.html
  * See the License for the specific language governing
@@ -20,10 +19,6 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted 2012-2014 ForgeRock AS"
-=======
- * Portions copyright 2011-2015 ForgeRock AS.
->>>>>>> .r15284
  */
 
 /*
