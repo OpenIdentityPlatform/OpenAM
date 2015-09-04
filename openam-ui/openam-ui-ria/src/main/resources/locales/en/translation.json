@@ -818,7 +818,8 @@
                     "resourceTypes": {
                         "availableResourceTypes": "Available Resource Types",
                         "selectedResourceTypes": "Selected Resource Types"
-                    }
+                    },
+                    "cannotEditPolicySet": "To edit a policy set first delete all policies that it contains."
                 },
                 "list": {
                     "addNew": "New Policy Set",

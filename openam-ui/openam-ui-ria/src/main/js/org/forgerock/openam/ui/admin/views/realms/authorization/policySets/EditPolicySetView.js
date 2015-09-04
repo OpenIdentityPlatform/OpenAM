@@ -27,9 +27,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/Constants"
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesDelegate, Messages, AbstractView,
-             EventManager, Router, Constants) {
+             EventManager, Router, Constants, UIUtils) {
     return AbstractView.extend({
         partials: [
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
@@ -77,6 +78,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
+                this.newEntity = true;
                 this.template = "templates/admin/views/realms/authorization/policySets/NewPolicySetTemplate.html";
                 this.model = new PolicySetModel();
                 this.listenTo(this.model, "sync", this.onModelSync);
@@ -100,13 +102,23 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                     self.parentRender(function () {
                         PoliciesView.render({
                             applicationModel: self.model
+                        }, function (policiesNumber) {
+                            if (policiesNumber > 0) {
+                                self.data.disableSettingsEdit = true;
+                                self.$el.find("#saveChanges, #revertChanges, #delete").attr("disabled", true);
+                            }
+
+                            UIUtils.fillTemplateWithData(
+                                "templates/admin/views/realms/authorization/policySets/PolicySetSettingsTemplate.html",
+                                self.data, function (tpl) {
+                                    self.$el.find("#policySetSettings").append(tpl);
+                                    self.populateResourceTypes();
+
+                                    if (self.renderCallback) {
+                                        self.renderCallback();
+                                    }
+                                });
                         });
-
-                        self.buildResourceTypesList();
-
-                        if (self.renderCallback) {
-                            self.renderCallback();
-                        }
                     });
                 },
                 populateAvailableResourceTypes = function (resourceTypes) {
@@ -116,6 +128,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                     options.availableResourceTypes = _.filter(resourceTypes, function (item) {
                         return !_.contains(self.data.entity.resourceTypeUuids, item.uuid);
                     });
+
+                    options.selectedResourceTypes = _.findByValues(options.allResourceTypes, "uuid",
+                        self.data.entity.resourceTypeUuids);
+
+                    options.selectedResourceTypesInitial = _.clone(options.selectedResourceTypes);
 
                     return options;
                 };
@@ -139,11 +156,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             }
         },
 
-        buildResourceTypesList: function () {
-            var self = this,
-                selected = _.findByValues(this.data.options.allResourceTypes, "uuid", this.data.entity.resourceTypeUuids);
+        populateResourceTypes: function () {
+            var self = this;
 
-            this.$el.find("#resTypesSelection").selectize({
+            this.resTypesSelection = this.$el.find("#resTypesSelection").selectize({
                 sortField: "name",
                 valueField: "uuid",
                 labelField: "name",
@@ -154,55 +170,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                 }
             });
 
-            // TODO remove code below when edit policy set view is changed
-            this.availableResourceTypesUUIDS = this.data.entity.resourceTypeUuids;
-            this.availableResourceTypesInitial = _.pluck(this.data.options.availableResourceTypes, "name");
-            this.selectedResourceTypesInitial = _.pluck(selected, "name").sort();
-
-            this.data.options.selectedResourceTypeNames = this.selectedResourceTypesInitial;
-
-            this.resourceTypesListView = new StripedListView();
-            this.resourceTypesListView.render({
-                items: this.availableResourceTypesInitial,
-                title: $.t("console.authorization.policySets.edit.resourceTypes.availableResourceTypes"),
-                filter: true,
-                clickItem: this.selectResourceType.bind(this)
-            }, "#availableResTypes");
-
-            this.resourceTypesListSelectedView = new StripedListView();
-            this.resourceTypesListSelectedView.render({
-                items: this.data.options.selectedResourceTypeNames,
-                title: $.t("console.authorization.policySets.edit.resourceTypes.selectedResourceTypes"),
-                created: true,
-                clickItem: this.deselectResourceType.bind(this)
-            }, "#selectedResTypes");
-        },
-
-        selectResourceType: function (item) {
-            this.moveSelected(item, this.resourceTypesListView, this.resourceTypesListSelectedView);
-
-            // todo for now two RTs in the same realm are not allowed to have the same name, but the following should be changed to use UUIDs, not names
-            var selected = _.findWhere(this.data.options.allResourceTypes, {name: item});
-            this.data.entity.resourceTypeUuids = this.data.entity.resourceTypeUuids.concat(selected.uuid);
-            this.data.options.selectedResourceTypeNames = this.data.options.selectedResourceTypeNames.concat(selected.name).sort();
-        },
-
-        deselectResourceType: function (item) {
-            this.resourceTypesListView.emptyFilter();
-            this.moveSelected(item, this.resourceTypesListSelectedView, this.resourceTypesListView);
-
-            // todo for now two RTs in the same realm are not allowed to have the same name, but the following should be changed to use UUIDs, not names
-            var selected = _.findWhere(this.data.options.allResourceTypes, {name: item});
-            this.data.entity.resourceTypeUuids = _.without(this.data.entity.resourceTypeUuids, selected.uuid);
-            this.data.options.selectedResourceTypeNames = _.without(this.data.options.selectedResourceTypeNames, selected.name);
-        },
-
-        moveSelected: function (item, fromView, toView) {
-            fromView.removeItem(item);
-            fromView.renderItems();
-
-            toView.addItem(item);
-            toView.renderItems();
+            if (this.data.disableSettingsEdit) {
+                this.resTypesSelection[0].selectize.disable();
+            }
         },
 
         processConditions: function (data, envConditions, subjConditions) {
@@ -221,15 +191,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
         },
 
         revertChanges: function (e) {
-            this.data.entity.resourceTypeUuids = this.availableResourceTypesUUIDS;
-
-            this.resourceTypesListView.emptyFilter();
-            this.resourceTypesListView.setItems(this.availableResourceTypesInitial);
-            this.resourceTypesListView.renderItems();
-
-            this.resourceTypesListSelectedView.emptyFilter();
-            this.resourceTypesListSelectedView.setItems(this.selectedResourceTypesInitial);
-            this.resourceTypesListSelectedView.renderItems();
+            this.resTypesSelection[0].selectize.clear(true);
+            this.resTypesSelection[0].selectize.addItems(
+                _.pluck(this.data.options.selectedResourceTypesInitial, "uuid"));
         },
 
         submitForm: function (e) {
@@ -237,8 +201,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
 
             var self = this,
                 savePromise,
-                nonModifiedAttributes = _.clone(this.model.attributes),
-                newEntity = $(e.target).data("newEntity");
+                nonModifiedAttributes = _.clone(this.model.attributes);
 
             this.updateFields();
 
@@ -248,7 +211,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             if (savePromise) {
                 savePromise
                     .done(function (response) {
-                        if (newEntity) {
+                        if (self.newEntity) {
                             Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {
                                 args: [encodeURIComponent(self.realmPath), self.model.id],
                                 trigger: true

@@ -1,56 +1,27 @@
-{{#if entity.name}}
-    {{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.common.policySet" icon="list-alt" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
-{{else}}
-    {{> headers/_TitleWithSubAndIcon title="common.form.createNew" type="console.authorization.common.policySet" icon="list-alt" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
-{{/if}}
+{{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.common.policySet" icon="folder"
+    buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
+
+<p class="page-description">{{entity.description}}</p>
 
 <div class="tab-menu">
     <ul class="nav nav-tabs" role="tablist">
         <li class="active">
-            <a href="#policies" role="tab" data-toggle="tab" aria-expanded="true">
+            <a href="#policiesPanel" role="tab" data-toggle="tab" aria-expanded="true">
                 {{t "console.authorization.policySets.edit.policies"}}
             </a>
         </li>
         <li>
-            <a href="#appSettings" role="tab" data-toggle="tab" aria-expanded="true">{{t "common.form.settings"}}</a>
+            <a href="#settingsPanel" role="tab" data-toggle="tab" aria-expanded="true">{{t "common.form.settings"}}</a>
         </li>
     </ul>
 </div>
 
 <div class="nav-tab-content">
     <div class="tab-content clearfix">
-        <div role="tabpanel" class="tab-pane active" id="policies"></div>
+        <div role="tabpanel" class="tab-pane active" id="policiesPanel"></div>
 
-        <div role="tabpanel" class="tab-pane" id="appSettings">
-            <div class="block clearfix form-horizontal">
-                <h3 class="block-header">{{t "general"}}</h3>
-
-                <div class="form-group clearfix">
-                    <label class="col-sm-2 control-label">{{t "console.common.name"}}</label>
-
-                    <div class="col-sm-9">
-                        <input type="text" id="appName" class="form-control" value="{{entity.name}}"
-                               data-field="name" autofocus required
-                               placeholder="{{t 'common.form.validation.required'}}" name="entityName">
-                    </div>
-                </div>
-
-                <div class="form-group clearfix">
-                    <label class="col-sm-2 control-label" for="appDescription">{{t "console.common.description"}}</label>
-                    <div class="col-sm-9">
-                        <textarea class="form-control" id="appDescription" data-field="description">{{entity.description}}</textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="block clearfix">
-                <h3 class="block-header">{{t "console.authorization.common.resourceTypes"}}</h3>
-
-                <div class="row">
-                    <div id="availableResTypes" class="col-sm-12 col-md-6"></div>
-                    <div id="selectedResTypes" class="col-sm-12 col-md-6"></div>
-                </div>
-            </div>
+        <div role="tabpanel" class="tab-pane" id="settingsPanel">
+            <div id="policySetSettings"></div>
 
             <div class="tab-pane-footer clearfix">
                 <div class="pull-right">
@@ -58,6 +29,6 @@
                     <button id="saveChanges" class="btn btn-primary" type="button">{{t "common.form.saveChanges"}}</button>
                 </div>
             </div>
-        </div>                                          
+        </div>
     </div>
 </div>

@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
              PolicyModel, AbstractListView, EditPolicyView) {
 
     var PoliciesListView = AbstractListView.extend({
-        element: "#policies",
+        element: "#policiesPanel",
         template: "templates/admin/views/realms/authorization/policies/PoliciesTemplate.html",
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/policies/PoliciesToolbarTemplate.html",
@@ -159,7 +159,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
 
                 this.data.items.fetch({reset: true}).done(function () {
                     if (callback) {
-                        callback();
+                        callback(self.data.items.length);
                     }
                 });
             });
