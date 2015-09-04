@@ -28,7 +28,6 @@ import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.http.routing.Version;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
@@ -60,7 +59,7 @@ public class CrestProtocolEnforcementFilter implements Filter {
         try {
             enforceProtocolVersion(defaultProtocolVersion(request));
             return next.handle(context, request);
-        } catch (ResourceException e) {
+        } catch (BadRequestException e) {
             Response response = new Response()
                     .setStatus(Status.valueOf(e.getCode()))
                     .setEntity(e.toJsonValue().getObject());
@@ -68,14 +67,19 @@ public class CrestProtocolEnforcementFilter implements Filter {
         }
     }
 
-    private Version defaultProtocolVersion(Request request) {
-        AcceptApiVersionHeader apiVersionHeader = AcceptApiVersionHeader.valueOf(request);
+    private Version defaultProtocolVersion(Request request) throws BadRequestException {
+        AcceptApiVersionHeader apiVersionHeader;
+        try {
+            apiVersionHeader = AcceptApiVersionHeader.valueOf(request);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e);
+        }
         apiVersionHeader.withDefaultProtocolVersion(ENFORCE_PROTOCOL_VERSION);
         request.getHeaders().putSingle(apiVersionHeader);
         return apiVersionHeader.getProtocolVersion();
     }
 
-    private void enforceProtocolVersion(Version protocolVersion) throws ResourceException {
+    private void enforceProtocolVersion(Version protocolVersion) throws BadRequestException {
         if (protocolVersion != null && protocolVersion.getMajor() != ENFORCE_PROTOCOL_VERSION.getMajor()) {
             throw new BadRequestException("Unsupported major version: " + protocolVersion);
         } else if (protocolVersion != null && protocolVersion.getMinor() > ENFORCE_PROTOCOL_VERSION.getMinor()) {
