@@ -47,7 +47,6 @@ public final class HttpGuiceModule extends PrivateModule {
         expose(HttpApplication.class);
     }
 
-    //TODO re-implement ServiceLoader to use Guice to construct instances instead of reflection
     @Provides
     @Singleton
     Iterable<HttpRouteProvider> getHttpRouteProviders() {

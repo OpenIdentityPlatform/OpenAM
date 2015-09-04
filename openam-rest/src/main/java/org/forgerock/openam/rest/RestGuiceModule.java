@@ -28,8 +28,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Key;
-import com.google.inject.PrivateModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
@@ -58,7 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @GuiceModule
-public class RestGuiceModule extends PrivateModule {
+public class RestGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
@@ -68,29 +68,11 @@ public class RestGuiceModule extends PrivateModule {
         bind(Key.get(Logger.class, Names.named("RestAuthentication")))
                 .toInstance(LoggerFactory.getLogger("restAuthenticationFilter"));
         bind(AuditApi.class).to(NoopAuditApi.class);
-        bind(Key.get(new TypeLiteral<Set<String>>(){}, Names.named("InvalidRealmNames")))
+        bind(Key.get(new TypeLiteral<Set<String>>() {
+        }, Names.named("InvalidRealmNames")))
                 .toInstance(InvalidRealmNameManager.getInvalidRealmNames());
         bind(AuthenticationEnforcer.class);
 
-        expose(Key.get(Handler.class, Names.named("RestHandler")));
-        expose(Key.get(org.forgerock.http.routing.Router.class, Names.named("RestRootRouter")));
-        expose(Key.get(org.forgerock.http.routing.Router.class, Names.named("RestRealmRouter")));
-        expose(Key.get(Router.class, Names.named("CrestRootRouter")));
-        expose(Key.get(Router.class, Names.named("CrestRealmRouter")));
-        expose(Key.get(Filter.class, Names.named("ResourceApiVersionFilter")));
-        expose(Key.get(org.forgerock.http.Filter.class, Names.named("ResourceApiVersionFilter")));
-        expose(Key.get(Filter.class, Names.named("LoggingFilter")));
-        expose(Key.get(Filter.class, Names.named("ContextFilter")));
-        expose(ResourceApiVersionBehaviourManager.class);
-        expose(AuthenticationEnforcer.class);
-        expose(Key.get(org.forgerock.http.Filter.class, Names.named("AuthenticationFilter")));
-        expose(Key.get(new TypeLiteral<Set<String>>() {}, Names.named("InvalidRealmNames")));
-        expose(Key.get(DynamicRealmRestRouter.class, Names.named("RestRouter")));
-        expose(RestRouter.class);
-
-
-
-        //From AuthFilterGuiceModule
         bind(Key.get(AsyncServerAuthModule.class, Names.named("OptionalSsoTokenSession")))
                 .to(OptionalSSOTokenSessionModule.class).in(Singleton.class);
 
@@ -102,7 +84,8 @@ public class RestGuiceModule extends PrivateModule {
                         return CookieUtils.getAmCookieName();
                     }
                 });
-        bind(new TypeLiteral<Config<String>>() {})
+        bind(new TypeLiteral<Config<String>>() {
+        })
                 .annotatedWith(Names.named(AuthnRequestUtils.ASYNC_SSOTOKEN_COOKIE_NAME))
                 .toInstance(new Config<String>() {
                     @Override
@@ -125,9 +108,6 @@ public class RestGuiceModule extends PrivateModule {
                 return InjectorHolder.getInstance(OpenAMTokenStore.class);
             }
         });
-
-        expose(Key.get(new TypeLiteral<Config<String>>() {
-        }, Names.named(AuthnRequestUtils.ASYNC_SSOTOKEN_COOKIE_NAME)));
     }
 
     @Provides
@@ -146,14 +126,14 @@ public class RestGuiceModule extends PrivateModule {
 
     @Provides
     @Named("ResourceApiVersionFilter")
-    @Singleton //TODO this should be in openam-http
+    @Singleton
     org.forgerock.http.Filter getChfResourceApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
         return RouteMatchers.resourceApiVersionContextFilter(behaviourManager);
     }
 
     @Provides
     @Named("ResourceApiVersionFilter")
-    @Singleton //TODO this should be in openam-http
+    @Singleton
     Filter getCrestResourceApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
         return resourceApiVersionContextFilter(behaviourManager);
     }
@@ -161,7 +141,9 @@ public class RestGuiceModule extends PrivateModule {
     @Provides
     @Named("RestRootRouter")
     @Singleton
-    org.forgerock.http.routing.Router getRestRootRouter(@Named("RestRealmRouter") org.forgerock.http.routing.Router realmRouter, RealmContextFilter realmContextFilter) {
+    org.forgerock.http.routing.Router getRestRootRouter(
+            @Named("RestRealmRouter") org.forgerock.http.routing.Router realmRouter,
+            RealmContextFilter realmContextFilter) {
         org.forgerock.http.routing.Router rootRouter = new org.forgerock.http.routing.Router();
         rootRouter.setDefaultRoute(Handlers.chainOf(realmRouter, realmContextFilter));
         return rootRouter;
@@ -240,7 +222,7 @@ public class RestGuiceModule extends PrivateModule {
 
     @Provides
     @Singleton
-    RestRouter getNewRestRouter( //TODO look at this! where is it used? is it needed? does it work correctly?
+    RestRouter getNewRestRouter(
             final Router rootRouter,
             final Router realmRouter,
             final AuthenticationEnforcer defaultAuthenticationEnforcer,
