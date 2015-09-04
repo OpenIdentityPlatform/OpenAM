@@ -23,7 +23,9 @@ public class SmsJsonSchema {
 
     static final String OBJECT_TYPE = "object";
     static final String TYPE = "type";
+    static final String FORMAT = "format";
     static final String STRING_TYPE = "string";
+    static final String PASSWORD_TYPE = "password";
     static final String PATTERN_PROPERTIES = "patternProperties";
     static final String ARRAY_TYPE = "array";
     static final String ITEMS = "items";

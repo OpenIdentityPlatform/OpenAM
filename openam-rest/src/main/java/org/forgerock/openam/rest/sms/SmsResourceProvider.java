@@ -337,6 +337,9 @@ abstract class SmsResourceProvider {
         if (type != null) {
             result.addPermissive(new JsonPointer(pointer + "/" + TYPE), type);
         }
+        if (AttributeSchema.Syntax.PASSWORD.equals(syntax)) {
+            result.addPermissive(new JsonPointer(pointer + "/" + FORMAT), PASSWORD_TYPE);
+        }
     }
 
     private void addEnumChoices(JsonValue jsonValue, AttributeSchema attribute, ResourceBundle schemaI18n,
