@@ -125,7 +125,7 @@
         <forgerock.guava.version>18.0.1</forgerock.guava.version>
         <forgerock.audit.version>0.3.0-SNAPSHOT</forgerock.audit.version>
         <forgerock.guice.version>1.1.0-SNAPSHOT</forgerock.guice.version>
-        <forgerock.selfservice.version>0.1.0-SNAPSHOT</forgerock.selfservice.version>
+        <forgerock.selfservice.version>0.2.0-SNAPSHOT</forgerock.selfservice.version>
 
         <guice.version>3.0</guice.version>
         <restlet.version>2.3.4</restlet.version>

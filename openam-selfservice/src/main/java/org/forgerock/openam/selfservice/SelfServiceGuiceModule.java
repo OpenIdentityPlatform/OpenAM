@@ -15,6 +15,9 @@
  */
 package org.forgerock.openam.selfservice;
 
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import org.forgerock.guice.core.GuiceModule;
@@ -28,11 +31,9 @@ import org.forgerock.selfservice.core.StageResponse;
 import org.forgerock.selfservice.core.config.StageConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandler;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
-import org.forgerock.selfservice.core.snapshot.SnapshotTokenType;
 import org.forgerock.selfservice.stages.utils.RequirementsBuilder;
 
 import javax.inject.Singleton;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -60,8 +61,8 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Provides
     @Singleton
-    Map<SnapshotTokenType, SnapshotTokenHandler> getTokenHandlers() {
-        Map<SnapshotTokenType, SnapshotTokenHandler> tokenHandlers = new HashMap<>();
+    Map<String, SnapshotTokenHandler> getTokenHandlers() {
+        Map<String, SnapshotTokenHandler> tokenHandlers = new HashMap<>();
         tokenHandlers.put(INTERIM_TYPE, new InterimSnapshotTokenHandler());
         return tokenHandlers;
     }
@@ -74,32 +75,24 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         return stageFactory;
     }
 
-    static final SnapshotTokenType INTERIM_TYPE = new SnapshotTokenType() {
-
-        @Override
-        public String getName() {
-            return "Interim Type";
-        }
-
-    };
+    static final String INTERIM_TYPE = "interimType";
 
     private static final class InterimSnapshotTokenHandler implements SnapshotTokenHandler {
 
         @Override
-        public boolean validate(String snapshotToken) {
-            return true;
-        }
-
-        @Override
-        public String generate(Map<String, String> state) {
+        public String generate(JsonValue jsonValue) throws ResourceException {
             return UUID.randomUUID().toString();
         }
 
         @Override
-        public Map<String, String> parse(String snapshotToken) {
-            return Collections.emptyMap();
+        public void validate(String snapshotToken) throws ResourceException {
+            // Do nothing.
         }
 
+        @Override
+        public JsonValue validateAndExtractState(String s) throws ResourceException {
+            return json(object());
+        }
     }
 
     static final class InterimConfig implements StageConfig {

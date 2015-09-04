@@ -18,8 +18,8 @@ package org.forgerock.openam.selfservice;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
+import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.isA;
 
@@ -90,7 +90,7 @@ public final class ForgottenPasswordRequestHandlerTest {
         Promise<ResourceResponse, ResourceException> promise = forgottenPassword.handleRead(context, request);
 
         // Then
-        assertThat(promise).succeeded().withContent().integerAt("stage").isEqualTo(0);
+        assertThat(promise).succeeded().withContent().stringAt("tag").isEqualTo("initial");
         assertThat(promise).succeeded().withContent().hasObject("requirements").isEmpty();
     }
 
@@ -112,7 +112,7 @@ public final class ForgottenPasswordRequestHandlerTest {
         Promise<ActionResponse, ResourceException> promise = forgottenPassword.handleAction(context, request);
 
         // Then
-        assertThat(promise).succeeded().withContent().stringAt("stage").isEqualTo("end");
+        assertThat(promise).succeeded().withContent().stringAt("tag").isEqualTo("end");
         assertThat(promise).succeeded().withContent().booleanAt("status/success").isTrue();
     }
 

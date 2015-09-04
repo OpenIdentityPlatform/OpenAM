@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.selfservice;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.selfservice.core.ProcessStore;
 
 import java.util.Map;
@@ -28,19 +29,19 @@ import java.util.concurrent.ConcurrentHashMap;
 final class CTSProcessStoreImpl implements ProcessStore {
 
     // This shall be replaced with integration to CTS
-    private final Map<String, Map<String, String>> interimCache;
+    private final Map<String, JsonValue> interimCache;
 
     CTSProcessStoreImpl() {
         interimCache = new ConcurrentHashMap<>();
     }
 
     @Override
-    public void add(String key, Map<String, String> state) {
+    public void add(String key, JsonValue state) {
         interimCache.put(key, state);
     }
 
     @Override
-    public Map<String, String> remove(String key) {
+    public JsonValue remove(String key) {
         return interimCache.remove(key);
     }
 

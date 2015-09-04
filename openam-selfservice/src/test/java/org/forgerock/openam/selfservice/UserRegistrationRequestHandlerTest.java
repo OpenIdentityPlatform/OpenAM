@@ -90,7 +90,7 @@ public final class UserRegistrationRequestHandlerTest {
         Promise<ResourceResponse, ResourceException> promise = userRegistration.handleRead(context, request);
 
         // Then
-        assertThat(promise).succeeded().withContent().integerAt("stage").isEqualTo(0);
+        assertThat(promise).succeeded().withContent().stringAt("tag").isEqualTo("initial");
         assertThat(promise).succeeded().withContent().hasObject("requirements").isEmpty();
     }
 
@@ -112,7 +112,7 @@ public final class UserRegistrationRequestHandlerTest {
         Promise<ActionResponse, ResourceException> promise = userRegistration.handleAction(context, request);
 
         // Then
-        assertThat(promise).succeeded().withContent().stringAt("stage").isEqualTo("end");
+        assertThat(promise).succeeded().withContent().stringAt("tag").isEqualTo("end");
         assertThat(promise).succeeded().withContent().booleanAt("status/success").isTrue();
     }
 

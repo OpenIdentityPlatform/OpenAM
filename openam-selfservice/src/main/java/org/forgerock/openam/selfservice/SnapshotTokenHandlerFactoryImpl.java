@@ -17,7 +17,6 @@ package org.forgerock.openam.selfservice;
 
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandler;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
-import org.forgerock.selfservice.core.snapshot.SnapshotTokenType;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
@@ -30,15 +29,15 @@ import java.util.Map;
  */
 final class SnapshotTokenHandlerFactoryImpl implements SnapshotTokenHandlerFactory {
 
-    private final Map<SnapshotTokenType, SnapshotTokenHandler> tokenHandlers;
+    private final Map<String, SnapshotTokenHandler> tokenHandlers;
 
     @Inject
-    SnapshotTokenHandlerFactoryImpl(Map<SnapshotTokenType, SnapshotTokenHandler> tokenHandlers) {
+    SnapshotTokenHandlerFactoryImpl(Map<String, SnapshotTokenHandler> tokenHandlers) {
         this.tokenHandlers = tokenHandlers;
     }
 
     @Override
-    public SnapshotTokenHandler get(SnapshotTokenType tokenType) {
+    public SnapshotTokenHandler get(String tokenType) {
         Reject.ifFalse(tokenHandlers.containsKey(tokenType), "Unknown snapshot token type");
         return tokenHandlers.get(tokenType);
     }
