@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob.strategies.encryption;
 
@@ -25,14 +25,12 @@ public class EncryptDecryptActionTest {
         // Given
         byte[] source = "blobby blobby blob".getBytes();
 
-        EncryptAction encryptAction = new EncryptAction();
-        DecryptAction decryptAction = new DecryptAction();
-
-        encryptAction.setBlob(source);
+        EncryptAction encryptAction = new EncryptAction(source);
 
         // When
         byte[] encryptedResult = encryptAction.run();
-        decryptAction.setBlob(encryptedResult);
+
+        DecryptAction decryptAction = new DecryptAction(encryptedResult);
         byte[] decryptedResult = decryptAction.run();
 
         // Then
