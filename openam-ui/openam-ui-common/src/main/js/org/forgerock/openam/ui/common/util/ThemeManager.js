@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
      */
     var obj = {},
         promise = null,
-        loadThemeCSS = function (theme) {
+        applyThemeToPage = function (theme) {
             $("<link/>", {
                 rel: "icon",
                 type: "image/x-icon",
@@ -71,37 +71,28 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
         },
 
         /**
-         * Maps each realm to its corresponding object in the configuration
+         * Find the appropriate theme for the current realm.
          * <p>
-         * If a theme is found for that realm, then that theme name will be returned
-         * other wise the default theme name will be returned.
-         * Theme configurations can contain wildcards within regular expressions.
-         * If these are present this method will try to match the pattern with the current realm.
+         * If a theme is found that matches the current realm then its name will be
+         * returned, otherwise the default theme name will be returned.
          * @returns {string} theme The selected theme configuration name.
          */
-        mapRealmToTheme = function () {
-            var returnedTheme = "default",
-                subrealm = Configuration.globalData.auth.subRealm,
-                realmString = subrealm ? subrealm : document.domain;
-
-            _.each(obj.data.themes, function (theme) {
-                _.each(theme.realms, function (realm) {
+        getThemeForCurrentRealm = function () {
+            var matchedTheme = _.find(obj.data.themes, function (theme) {
+                return _.some(theme.realms, function (realm) {
                     if (theme.regex) {
                         var pattern = new RegExp(realm);
-                        if (pattern.test(realmString)) {
-                            returnedTheme = theme.name;
-                            return false;
-                        }
+                        return pattern.test(Configuration.globalData.realm);
                     } else {
-                        if (realm === realmString) {
-                            returnedTheme = theme.name;
-                            return false;
-                        }
+                        return realm === Configuration.globalData.realm;
                     }
                 });
             });
+            if (matchedTheme) {
+                return matchedTheme.name;
+            }
 
-            return returnedTheme;
+            return "default";
         },
 
         updateSrc = function (value) {
@@ -127,25 +118,29 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                 path.indexOf("/") !== 0;
         };
 
+    /**
+     * Determine the theme from the themeConfig and the current realm and setup the theme on the page. This will
+     * clear out any previous theme.
+     * @param {string} [basePath] A URL to which all relative URLs in the theme will be made relative to.
+     * @returns {Promise} a promise that is resolved when the theme has been applied.
+     */
     obj.getTheme = function (basePath) {
         var theme = {},
-            newLessVars = {},
-            realmDefined = typeof Configuration.globalData.auth.subRealm !== "undefined",
             themeName, defaultTheme;
 
         // find out if the theme has changed
-        if (Configuration.globalData.theme && mapRealmToTheme() === Configuration.globalData.theme.name) {
+        if (Configuration.globalData.theme && getThemeForCurrentRealm() === Configuration.globalData.theme.name) {
             //no change so use the existing theme
             return $.Deferred().resolve(Configuration.globalData.theme);
         } else {
             return loadThemeConfig().then(function (themeConfig) {
                 obj.data = themeConfig;
                 Configuration.globalData.themeConfig = updateSrcProperties(themeConfig);
-                themeName = mapRealmToTheme();
-                theme = _.reject(obj.data.themes, function (t) {return t.name !== themeName;})[0];
+                themeName = getThemeForCurrentRealm();
+                theme = _.find(obj.data.themes, { name: themeName });
 
                 if (theme.name !== "default" && theme.path === "") {
-                    defaultTheme = _.reject(obj.data.themes,function (t) { return t.name !== "default";})[0];
+                    defaultTheme = _.find(obj.data.themes, { name: "default" });
                     theme = _.merge({}, defaultTheme, theme, function (objectValue, sourceValue) {
                         // We don't want to merge arrays. If a theme has specified an array, it should be used verbatim.
                         if (_.isArray(sourceValue)) {
@@ -164,7 +159,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                     });
                 }
 
-                loadThemeCSS(theme);
+                applyThemeToPage(theme);
                 Configuration.globalData.theme = theme;
                 return theme;
             });
