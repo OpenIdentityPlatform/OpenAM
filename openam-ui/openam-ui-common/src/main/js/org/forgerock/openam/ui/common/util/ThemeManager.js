@@ -37,6 +37,9 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
     var obj = {},
         promise = null,
         applyThemeToPage = function (theme) {
+            // We might be switching themes (due to a realm change) and so we need to clean up the previous theme.
+            $("link").remove();
+
             $("<link/>", {
                 rel: "icon",
                 type: "image/x-icon",
