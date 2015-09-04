@@ -299,13 +299,5 @@
                 </SubSchema>
             </Organization>
         </Schema>
-        <Configuration>
-            <OrganizationConfiguration name="/">
-                <AttributeValuePair>
-                    <Attribute name="iplanet-am-auth-fr-oath-auth-level"/>
-                    <Value>0</Value>
-                </AttributeValuePair>
-            </OrganizationConfiguration>
-        </Configuration>
     </Service>
 </ServicesConfiguration>

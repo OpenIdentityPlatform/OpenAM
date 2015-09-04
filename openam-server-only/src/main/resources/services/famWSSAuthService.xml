@@ -82,7 +82,7 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-            <SubSchema name="serverconfig" inheritance="multiple">            
+            <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                 <AttributeSchema name="sunWebservicesUserSearchAttribute"
                     type="single"
                     syntax="string"
@@ -124,6 +124,18 @@
         </Schema>
         <Configuration>
             <OrganizationConfiguration name="/">
+                <AttributeValuePair>
+                    <Attribute name="sunWebservicesUserSearchAttribute"/>
+                    <Value>uid</Value>
+                </AttributeValuePair>
+                <AttributeValuePair>
+                    <Attribute name="sunWebServicesUserRealm"/>
+                    <Value>/</Value>
+                </AttributeValuePair>
+                <AttributeValuePair>
+                    <Attribute name="sunWebservicesUserPasswordAttribute"/>
+                    <Value>userPassword</Value>
+                </AttributeValuePair>
                 <AttributeValuePair>
                     <Attribute name="sunWebservicesAuthenticationLevel"/>
                     <Value>0</Value>

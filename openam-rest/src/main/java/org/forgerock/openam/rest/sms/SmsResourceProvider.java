@@ -84,7 +84,7 @@ abstract class SmsResourceProvider {
         AUTO_CREATED_AUTHENTICATION_MODULES.put("ldap", "ldap");
         AUTO_CREATED_AUTHENTICATION_MODULES.put("datastore", "datastore");
         AUTO_CREATED_AUTHENTICATION_MODULES.put("federation", "federation");
-        AUTO_CREATED_AUTHENTICATION_MODULES.put("wssauthmodule", "wssauthmodule");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("wssauthmodule", "wssauth");
     }
 
     public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = Arrays.asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);

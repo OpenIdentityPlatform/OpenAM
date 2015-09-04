@@ -44,17 +44,7 @@ $Id: fmAuthFederation.xml,v 1.2 2008/06/25 05:51:13 qcheng Exp $
             resourceName="federation">
 	    
             <Organization>                  
-		<AttributeSchema name="sunAMAuthFederationAuthLevel"
-                    type="single"
-                    syntax="number"
-                    i18nKey="a500"
-                    resourceName="authenticationLevel">
-                    <DefaultValues>
-                        <Value>0</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-		<SubSchema name="serverconfig" inheritance="multiple">
-    		    <AttributeSchema name="sunAMAuthFederationAuthLevel"
+                <AttributeSchema name="sunAMAuthFederationAuthLevel"
                         type="single"
                         syntax="number"
                         i18nKey="a500"
@@ -62,11 +52,21 @@ $Id: fmAuthFederation.xml,v 1.2 2008/06/25 05:51:13 qcheng Exp $
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>
-                    </AttributeSchema>
-		</SubSchema>
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
+                    <AttributeSchema name="sunAMAuthFederationAuthLevel"
+                            type="single"
+                            syntax="number"
+                            i18nKey="a500"
+                            resourceName="authenticationLevel">
+                            <DefaultValues>
+                                <Value>0</Value>
+                            </DefaultValues>
+                        </AttributeSchema>
+                </SubSchema>
             </Organization>
         </Schema>
-	<Configuration>
+	    <Configuration>
             <OrganizationConfiguration name="/">
                 <AttributeValuePair>
                     <Attribute name="sunAMAuthFederationAuthLevel"/>
