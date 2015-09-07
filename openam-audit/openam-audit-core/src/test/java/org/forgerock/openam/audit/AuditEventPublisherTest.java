@@ -16,17 +16,21 @@
 package org.forgerock.openam.audit;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 import static org.mockito.Mockito.*;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
-import org.forgerock.http.Context;
-import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.util.promise.Promise;
@@ -48,7 +52,8 @@ public class AuditEventPublisherTest {
     private AuditEventPublisher auditEventPublisher;
     private AuditServiceConfigurator mockConfigurator;
     private AMAuditServiceConfiguration configuration;
-    private ArgumentCaptor<CreateRequest> requestCaptor;
+    private ArgumentCaptor<JsonValue> auditEventCaptor;
+    private Promise<ResourceResponse, Exception> dummyPromise;
 
     @BeforeMethod
     protected void setUp() throws AuditException {
@@ -59,12 +64,11 @@ public class AuditEventPublisherTest {
         when(mockConfigurator.getAuditServiceConfiguration()).thenReturn(configuration);
         auditService.register(mockHandler, "handler", asSet("access"));
         auditEventPublisher = new AuditEventPublisher(auditService, mockConfigurator);
-
-        requestCaptor = ArgumentCaptor.forClass(CreateRequest.class);
-        when(mockHandler.createInstance(any(Context.class), requestCaptor.capture())).thenReturn(mock(Promise.class));
+        auditEventCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        dummyPromise = newResultPromise(newResourceResponse("", "", json(object())));
     }
 
-//    @Test
+    @Test
     public void publishesProvidedAuditEventToAuditService() throws Exception {
         // Given
         AuditEvent auditEvent = new AMAccessAuditEventBuilder()
@@ -78,12 +82,13 @@ public class AuditEventPublisherTest {
                 .response("200", 42)
                 .toEvent();
 
+        when(mockHandler.publishEvent(eq("access"), auditEventCaptor.capture())).thenReturn(dummyPromise);
+
         // When
         auditEventPublisher.publish("access", auditEvent);
 
         // Then
-        assertThat(requestCaptor.getValue().getResourcePath()).isEqualTo("access");
-        assertThat(requestCaptor.getValue().getContent()).isEqualTo(auditEvent.getValue());
+        assertThat(auditEventCaptor.getValue()).isEqualTo(auditEvent.getValue());
     }
 
     @Test
