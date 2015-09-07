@@ -24,10 +24,7 @@
  *
  * $Id: IDPSession.java,v 1.6 2009/05/12 22:44:45 madan_ranganath Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
@@ -69,7 +66,7 @@ public class IDPSession {
         nameIDandSPpairs = new ArrayList<NameIDandSPpair>();
         sessionPartners = new ArrayList(); 
     }
-    
+
     /**
      * Returns the session object.
      *
@@ -78,7 +75,16 @@ public class IDPSession {
     public Object getSession() {
         return session;
     }
-    
+
+    /**
+     * Sets the session object.
+     *
+     * @param session The session object.
+     */
+    public void setSession(Object session) {
+        this.session = session;
+    }
+
     /**
      * Returns the list of <code>NameID</code> and 
      *    <code>SPEntityID</code> pair of the session.

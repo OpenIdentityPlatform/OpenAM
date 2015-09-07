@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -97,6 +97,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -108,8 +109,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.guava.common.collect.ImmutableList;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
+import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -395,6 +398,7 @@ public class LoginState {
     
     private static SecureRandom secureRandom = null;
     private static SessionPropertyUpgrader propertyUpgrader = null;
+    private static volatile List<SessionUpgradeHandler> sessionUpgradeHandlers = null;
 
     static {
         
@@ -1228,7 +1232,13 @@ public class LoginState {
             if (messageEnabled) {
 		        debug.message("Activating session: " + session);
             }
-            return session.activate(userDN);
+
+            final boolean isSessionActivated = session.activate(userDN);
+            if (sessionUpgrade && !forceAuth && isSessionActivated) {
+                invokeSessionUpgradeHandlers();
+            }
+
+            return isSessionActivated;
         } catch (AuthException ae) {
             debug.error("Error setting session properties: ", ae);
             throw ae;
@@ -5295,7 +5305,27 @@ public class LoginState {
         }
         propertyUpgrader.populateProperties(oldSession, session, forceAuth);
     }
-    
+
+    private void invokeSessionUpgradeHandlers() {
+        if (sessionUpgradeHandlers == null) {
+            loadSessionUpgradeHandlers();
+        }
+        for (SessionUpgradeHandler sessionUpgradeHandler : sessionUpgradeHandlers) {
+            sessionUpgradeHandler.handleSessionUpgrade(oldSession, session);
+        }
+    }
+
+    private static synchronized void loadSessionUpgradeHandlers() {
+        if (sessionUpgradeHandlers == null) {
+            List<SessionUpgradeHandler> instances = new ArrayList<SessionUpgradeHandler>(1);
+            final ServiceLoader<SessionUpgradeHandler> impls = ServiceLoader.load(SessionUpgradeHandler.class);
+            for (SessionUpgradeHandler sessionUpgradeHandler : impls) {
+                instances.add(sessionUpgradeHandler);
+            }
+            sessionUpgradeHandlers = ImmutableList.copyOf(instances);
+        }
+    }
+
     void setCookieSet(boolean flag) {
         cookieSet = flag;
     }
