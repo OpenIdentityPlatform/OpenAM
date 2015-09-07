@@ -57,6 +57,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -107,8 +108,10 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.guava.common.collect.ImmutableList;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
+import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.opendj.ldap.DN;
@@ -136,6 +139,7 @@ public class LoginState {
     private static final Debug DEBUG = AuthD.debug;
     private static final List<String> SHARED_STATE_ATTRIBUTES = 
             Arrays.asList(ISAuthConstants.SHARED_STATE_PASSWORD, ISAuthConstants.SHARED_STATE_USERNAME);
+    private static volatile List<SessionUpgradeHandler> sessionUpgradeHandlers = null;
 
     /**
      * Lazy initialisation holder to allow unit testing without loading the world.
@@ -1116,8 +1120,13 @@ public class LoginState {
 
             setSuccessLoginURL(indexType, indexName);
 
-            return getSessionActivator().activateSession(this, AuthD.getSessionService(), session, subject,
-                    loginContext);
+            final boolean isSessionActivated = getSessionActivator().activateSession(this, AuthD.getSessionService(),
+                    session, subject, loginContext);
+            if (sessionUpgrade && !forceAuth && isSessionActivated) {
+                invokeSessionUpgradeHandlers();
+            }
+
+            return isSessionActivated;
         } catch (AuthException ae) {
             DEBUG.error("Error setting session properties: ", ae);
             throw ae;
@@ -4764,6 +4773,26 @@ public class LoginState {
             DEBUG.message("LoginState::upgradeAllProperties() : Calling SessionPropertyUpgrader");
         }
         LazyConfig.SESSION_PROPERTY_UPGRADER.populateProperties(oldSession, session, forceAuth);
+    }
+
+    private void invokeSessionUpgradeHandlers() {
+        if (sessionUpgradeHandlers == null) {
+            loadSessionUpgradeHandlers();
+        }
+        for (SessionUpgradeHandler sessionUpgradeHandler : sessionUpgradeHandlers) {
+            sessionUpgradeHandler.handleSessionUpgrade(oldSession, session);
+        }
+    }
+
+    private static synchronized void loadSessionUpgradeHandlers() {
+        if (sessionUpgradeHandlers == null) {
+            List<SessionUpgradeHandler> instances = new ArrayList<>(1);
+            final ServiceLoader<SessionUpgradeHandler> impls = ServiceLoader.load(SessionUpgradeHandler.class);
+            for (SessionUpgradeHandler sessionUpgradeHandler : impls) {
+                instances.add(sessionUpgradeHandler);
+            }
+            sessionUpgradeHandlers = ImmutableList.copyOf(instances);
+        }
     }
 
     boolean isCookieSet() {
