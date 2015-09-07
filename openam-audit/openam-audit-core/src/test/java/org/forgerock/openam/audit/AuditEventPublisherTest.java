@@ -29,7 +29,9 @@ import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
-import org.forgerock.json.JsonValue;
+import org.forgerock.http.Context;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
@@ -52,8 +54,8 @@ public class AuditEventPublisherTest {
     private AuditEventPublisher auditEventPublisher;
     private AuditServiceConfigurator mockConfigurator;
     private AMAuditServiceConfiguration configuration;
-    private ArgumentCaptor<JsonValue> auditEventCaptor;
-    private Promise<ResourceResponse, Exception> dummyPromise;
+    private ArgumentCaptor<CreateRequest> requestCaptor;
+    private Promise<ResourceResponse, ResourceException> dummyPromise;
 
     @BeforeMethod
     protected void setUp() throws AuditException {
@@ -64,7 +66,7 @@ public class AuditEventPublisherTest {
         when(mockConfigurator.getAuditServiceConfiguration()).thenReturn(configuration);
         auditService.register(mockHandler, "handler", asSet("access"));
         auditEventPublisher = new AuditEventPublisher(auditService, mockConfigurator);
-        auditEventCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        requestCaptor = ArgumentCaptor.forClass(CreateRequest.class);
         dummyPromise = newResultPromise(newResourceResponse("", "", json(object())));
     }
 
@@ -82,13 +84,14 @@ public class AuditEventPublisherTest {
                 .response("200", 42)
                 .toEvent();
 
-        when(mockHandler.publishEvent(eq("access"), auditEventCaptor.capture())).thenReturn(dummyPromise);
+        when(mockHandler.createInstance(any(Context.class), requestCaptor.capture())).thenReturn(dummyPromise);
 
         // When
         auditEventPublisher.publish("access", auditEvent);
 
         // Then
-        assertThat(auditEventCaptor.getValue()).isEqualTo(auditEvent.getValue());
+        assertThat(requestCaptor.getValue().getResourcePath()).isEqualTo("access");
+        assertThat(requestCaptor.getValue().getContent()).isEqualTo(auditEvent.getValue());
     }
 
     @Test
