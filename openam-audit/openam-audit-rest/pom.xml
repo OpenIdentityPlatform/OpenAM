@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ The contents of this file are subject to the terms of the Common Development and
+  ~ Distribution License (the License). You may not use this file except in compliance with the
+  ~ License.
+  ~
+  ~ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  ~ specific language governing permission and limitations under the License.
+  ~
+  ~ When distributing Covered Software, include this CDDL Header Notice in each file and include
+  ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
+  ~ information: "Portions copyright [year] [name of copyright owner]".
+  ~
+  ~ Copyright 2015 ForgeRock AS.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>openam-audit</artifactId>
+        <groupId>org.forgerock.openam</groupId>
+        <version>13.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>OpenAM Audit REST</name>
+    <artifactId>openam-audit-rest</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-audit-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-rest</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>module-precommit</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- Enforce Checkstyle during compilation -->
+
+                        <!-- Strictly speaking Checkstyle should be invoked as a
+                             report during site generation. However, we want
+                             to fail the build if source code does not comply with
+                             our coding guidelines, and not at a later stage when
+                             the site is generated (which may never occur for some
+                             projects).
+                        -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>check-src-and-tests</id>
+                                <configuration>
+                                    <configLocation>${checkstyleSourceConfigLocation}</configLocation>
+                                    <headerLocation>${checkstyleHeaderLocation}</headerLocation>
+                                    <suppressionsLocation>${checkstyleUnitTestSuppressionsLocation}</suppressionsLocation>
+                                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                                    <!-- Only output errors if we're not expecting any -->
+                                    <consoleOutput>${checkstyleFailOnError}</consoleOutput>
+                                    <failsOnError>${checkstyleFailOnError}</failsOnError>
+                                </configuration>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>checkstyle</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

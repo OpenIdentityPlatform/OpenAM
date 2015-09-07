@@ -14,12 +14,14 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest;
+package org.forgerock.openam.audit.rest;
 
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUDIT;
 
 import org.forgerock.audit.AuditService;
+import org.forgerock.openam.rest.RestRouteProvider;
+import org.forgerock.openam.rest.RestRouter;
 import org.forgerock.openam.rest.authz.AgentOnlyAuthzModule;
 import org.forgerock.openam.rest.fluent.AuditEndpointAuditFilter;
 

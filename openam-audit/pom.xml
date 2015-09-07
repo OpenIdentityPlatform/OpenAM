@@ -33,6 +33,7 @@
         <module>openam-audit-context</module>
         <module>openam-audit-core</module>
         <module>openam-audit-configuration</module>
+        <module>openam-audit-rest</module>
     </modules>
 
 </project>
