@@ -51,6 +51,10 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>oauth2-restlet</artifactId>
         </dependency>
         <dependency>
@@ -76,6 +80,11 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-guice-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource</artifactId>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 </project>

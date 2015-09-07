@@ -18,12 +18,10 @@ package org.forgerock.openam.forgerockrest.guice;
 
 import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
 import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
-import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.security.auth.Subject;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -36,7 +34,6 @@ import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
@@ -44,20 +41,15 @@ import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
-import com.sun.identity.idm.IdRepoCreationListener;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.Resources;
-import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
@@ -71,7 +63,6 @@ import org.forgerock.openam.forgerockrest.entitlements.EntitlementsExceptionMapp
 import org.forgerock.openam.forgerockrest.entitlements.JsonPolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluatorFactory;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyParser;
-import org.forgerock.openam.forgerockrest.entitlements.PolicyResource;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
@@ -81,7 +72,6 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentityImpl;
-import org.forgerock.openam.rest.RestEndpoints;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeDefinition;
 import org.forgerock.openam.rest.record.DebugRecorder;
@@ -97,18 +87,12 @@ import org.forgerock.openam.rest.sms.SmsRequestHandler;
 import org.forgerock.openam.rest.sms.SmsRequestHandlerFactory;
 import org.forgerock.openam.rest.sms.SmsSingletonProvider;
 import org.forgerock.openam.rest.sms.SmsSingletonProviderFactory;
-import org.forgerock.openam.rest.uma.UmaIdRepoCreationListener;
-import org.forgerock.openam.rest.uma.UmaPolicyEvaluatorFactory;
-import org.forgerock.openam.rest.uma.UmaPolicyServiceImpl;
-import org.forgerock.openam.rest.uma.UmaResourceSetRegistrationListener;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
-import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.SignatureUtil;
-import org.restlet.routing.Router;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -149,7 +133,8 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         errorCodeOverrides.put(RequestType.CREATE,
                 Collections.singletonMap(ResourceException.NOT_FOUND, ResourceException.BAD_REQUEST));
 
-        bind(new TypeLiteral<Map<RequestType, Map<Integer, Integer>>>() {})
+        bind(new TypeLiteral<Map<RequestType, Map<Integer, Integer>>>() {
+        })
                 .annotatedWith(Names.named(EntitlementsExceptionMappingHandler.REQUEST_TYPE_ERROR_OVERRIDES))
                 .toInstance(errorCodeOverrides);
 
@@ -174,15 +159,8 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         bind(DelegationEvaluator.class).to(DelegationEvaluatorProxy.class).in(Singleton.class);
 
         bind(DebugRecorder.class).to(DefaultDebugRecorder.class);
-        bind(UmaPolicyService.class).to(UmaPolicyServiceImpl.class);
         bind(SpecialUserIdentity.class).to(SpecialUserIdentityImpl.class);
         bind(AgentIdentity.class).to(AgentIdentityImpl.class);
-
-        Multibinder.newSetBinder(binder(), IdRepoCreationListener.class)
-                .addBinding().to(UmaIdRepoCreationListener.class);
-
-        Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class)
-                .addBinding().to(UmaResourceSetRegistrationListener.class);
 
         // Scripting configuration
         bind(new TypeLiteral<ExceptionMappingHandler<ScriptException, ResourceException>>() {})
@@ -203,32 +181,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(SmsGlobalSingletonProvider.class, SmsGlobalSingletonProvider.class)
                 .build(SmsGlobalSingletonProviderFactory.class));
-    }
-
-    @Provides
-    UmaPolicyEvaluatorFactory getUmaPolicyEvaluatorFactory() {
-        return new UmaPolicyEvaluatorFactory() {
-            @Override
-            public Evaluator getEvaluator(Subject subject, String application) throws EntitlementException {
-                return new Evaluator(subject, application);
-            }
-        };
-    }
-
-    @Provides
-    @Inject
-    @Singleton
-    @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER)
-    RequestHandler getPolicyResource(PolicyResource policyResource) {
-        return Resources.newCollection(policyResource);
-    }
-
-    @Inject
-    @Provides
-    @Named("OAuth2Router")
-    @Singleton
-    public Router getOAuth2Router(RestEndpoints restEndpoints) {
-        return restEndpoints.getOAuth2ServiceRouter();
     }
 
     @Provides

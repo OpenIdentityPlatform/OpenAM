@@ -17,6 +17,4 @@ org.forgerock.openam.rest.CoreRestRouteProvider
 org.forgerock.openam.rest.SmsRestRouteProvider
 org.forgerock.openam.rest.AuditRestRouteProvider
 org.forgerock.openam.rest.EntitlementsRestRouteProvider
-org.forgerock.openam.rest.OAuth2RestRouteProvider
 org.forgerock.openam.rest.ScriptingRestRouteProvider
-org.forgerock.openam.rest.UmaRestRouteProvider

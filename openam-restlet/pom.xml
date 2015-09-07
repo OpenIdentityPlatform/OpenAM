@@ -96,6 +96,11 @@
             <artifactId>org.restlet.ext.servlet</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet.ext.jackson</artifactId>
+        </dependency>
+
         <!-- OpenAM Shared -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>

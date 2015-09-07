@@ -26,7 +26,7 @@ import java.util.List;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.saml2.idpdiscovery.Debug;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;

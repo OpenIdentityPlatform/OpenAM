@@ -13,4 +13,4 @@
 #
 # Copyright 2015 ForgeRock AS.
 #
-org.forgerock.openam.rest.RestHttpRouteProvider
+org.forgerock.openam.uma.rest.UmaRestRouteProvider

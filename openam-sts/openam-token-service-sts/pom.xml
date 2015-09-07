@@ -90,5 +90,11 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-jaspi-openid-connect-module</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

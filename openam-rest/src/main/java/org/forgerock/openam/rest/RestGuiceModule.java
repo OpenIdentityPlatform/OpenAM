@@ -40,7 +40,6 @@ import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
 import org.forgerock.caf.authentication.framework.AuditApi;
 import org.forgerock.caf.authentication.framework.AuthenticationFilter;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Handler;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
@@ -48,8 +47,6 @@ import org.forgerock.http.routing.RouteMatchers;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.Router;
-import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.rest.Routers.Route;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
@@ -98,16 +95,6 @@ public class RestGuiceModule extends AbstractModule {
                         return CookieUtils.getAmCookieName();
                     }
                 });
-        bind(new TypeLiteral<Config<TokenStore>>() {
-        }).toInstance(new Config<TokenStore>() {
-            public boolean isReady() {
-                return true;
-            }
-
-            public TokenStore get() {
-                return InjectorHolder.getInstance(OpenAMTokenStore.class);
-            }
-        });
     }
 
     @Provides

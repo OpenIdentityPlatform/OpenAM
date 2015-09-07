@@ -16,16 +16,15 @@
 
 package org.forgerock.openam.rest.service;
 
+import java.util.Map;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.service.StatusService;
-
-import java.util.Map;
 
 /**
  * Service to handle error statuses. If an exception is thrown then the status is pulled from the response and the
