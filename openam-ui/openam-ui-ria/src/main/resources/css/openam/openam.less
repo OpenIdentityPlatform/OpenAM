@@ -444,3 +444,60 @@ body, .modal-open {
         }
     }
 }
+
+.multiple-panels {
+    border: 1px solid #ddd;
+
+    .panel-default {
+        margin-bottom: 0;
+        border: none;
+        border-radius: 0;
+        border-bottom: 1px solid #ddd;
+        border-collapse: collapse;
+
+        &:first-of-type {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        &:last-of-type {
+            border-bottom: none;
+        }
+    }
+
+    .panel-footer {
+      border-top: none;
+    }
+}
+
+.tab-content-with-border {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-content .tab-pane-body {
+    padding: 30px;
+    margin-bottom: 0;
+    background-color: #fff;
+}
+
+/* Candidate for Commons, copied from OpenIDM */
+.panel-collapse {
+    h4.panel-title {
+        font-size: 18px;
+        text-transform: none;
+        letter-spacing: 0;
+        font-weight: 600;
+    }
+
+    .panel-title > a {
+        color: @base-theme-color;
+
+        &.no-caret {
+            &:before, &:after {
+                display:none;
+            }
+        }
+    }
+}

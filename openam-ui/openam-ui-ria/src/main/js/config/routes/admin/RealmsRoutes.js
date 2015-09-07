@@ -125,14 +125,24 @@ define("config/routes/admin/RealmsRoutes", function () {
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypesView",
                 url: scopedByRealm("resourceTypes\/list"),
                 pattern: "realms/?/resourceTypes/list",
-                role: "ui-admin"
+                role: "ui-admin",
+                forceUpdate: true
             },
             "realmsResourceTypeEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/EditResourceTypeView",
                 url: scopedByRealm("resourceTypes\/edit\/([^\/]*)"),
                 pattern: "realms/?/resourceTypes/edit/?",
-                role: "ui-admin"
+                role: "ui-admin",
+                forceUpdate: true
+            },
+            "realmsResourceTypeNew": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/EditResourceTypeView",
+                url: scopedByRealm("resourceTypes\/new"),
+                pattern: "realms/?/resourceTypes/new",
+                role: "ui-admin",
+                forceUpdate: true
             },
             "realmsSubjects": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",

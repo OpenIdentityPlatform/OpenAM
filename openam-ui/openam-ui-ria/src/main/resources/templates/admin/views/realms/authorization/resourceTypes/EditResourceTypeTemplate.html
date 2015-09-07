@@ -1,41 +1,33 @@
 {{#if entity.name}}
     {{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.resourceTypes.edit.resourceType" icon="list" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
-{{else}}
-    {{> headers/_TitleWithSubAndIcon title="common.form.createNew" type="console.authorization.resourceTypes.edit.resourceType" icon="list" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
 {{/if}}
 
-<div class="panel panel-default panel-content">
-    <div class="panel-body">
-        <div class="block clearfix form-horizontal">
-            <h3 class="block-header">{{t "general"}}</h3>
+<p class="panel-description">{{entity.description}}</p>
 
-            <div class="form-group clearfix">
-                <label class="col-sm-2 control-label" for="resTypeName">{{t "console.common.name"}}</label>
+<div class="tab-menu">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#patterns" role="tab" data-toggle="tab" aria-expanded="false">{{t "console.authorization.common.patterns"}}</a></li>
+        <li><a href="#actions" role="tab" data-toggle="tab" aria-expanded="false">{{t "console.authorization.common.actions"}}</a></li>
+        <li><a href="#settings" role="tab" data-toggle="tab" aria-expanded="false">{{t "common.form.settings"}}</a></li>
+    </ul>
+</div>
 
-                <div class="col-sm-9">
-                    <input type="text" id="resTypeName" class="form-control" value="{{entity.name}}"
-                           data-field="name" autofocus required
-                           placeholder="{{t 'common.form.validation.required'}}" name="entityName">
-                </div>
-            </div>
-
-            <div class="form-group clearfix">
-                <label class="col-sm-2 control-label" for="resTypeDescription">{{t "console.common.description"}}</label>
-                <div class="col-sm-9">
-                    <textarea class="form-control" id="resTypeDescription" data-field="description">{{entity.description}}</textarea>
-                </div>
-            </div>
-        </div>
-        <div class="block clearfix">
-            <h3 class="block-header">{{t "console.authorization.resourceTypes.edit.patternsAndActions"}}</h3>
-
-            <div class="row">
-                <div class="col-sm-6" id="resTypePatterns"></div>
-                <div class="col-sm-6" id="resTypeActions"></div>
-            </div>
+<div class="tab-content tab-content-with-border clearfix">
+    <div role="tabpanel" class="tab-pane active" id="patterns">
+        <div class="panel-body tab-pane-body form-inline">
+            <p class="panel-description">{{t "console.authorization.resourceTypes.edit.patternsDescription"}}</p>
+            <div id="resTypePatterns"></div>
         </div>
     </div>
-
+    <div role="tabpanel" class="tab-pane" id="actions">
+        <div class="panel-body tab-pane-body form-inline">
+            <p class="panel-description">{{t "console.authorization.resourceTypes.edit.actionsDescription"}}</p>
+            <div id="resTypeActions"></div>
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="settings">
+        <div class="panel-body tab-pane-body form-horizontal" id="resTypeSetting"></div>
+    </div>
     <div class="panel-footer clearfix">
         <div class="pull-right">
             <button id="revertChanges" class="btn btn-default" type="reset">{{t "common.form.revert"}}</button>

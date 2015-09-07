@@ -26,6 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     function ResourceTypeActionsView() {
     }
 
+    // TODO: Rename StripedListEditingView or rewrite to bootstrap table
     ResourceTypeActionsView.prototype = new StripedListEditingView();
 
     ResourceTypeActionsView.prototype.render = function (entity, actions, el, callback) {

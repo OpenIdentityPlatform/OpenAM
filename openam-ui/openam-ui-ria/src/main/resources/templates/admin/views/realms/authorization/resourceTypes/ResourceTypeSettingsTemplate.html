@@ -1,0 +1,16 @@
+<div class="form-group clearfix">
+    <label class="col-sm-2 control-label" for="resTypeName">{{t "console.common.name"}}</label>
+
+    <div class="col-sm-9">
+        <input type="text" id="resTypeName" class="form-control" value="{{entity.name}}"
+               data-field="name" autofocus required
+               placeholder="{{t 'common.form.validation.required'}}" name="entityName">
+    </div>
+</div>
+
+<div class="form-group clearfix">
+    <label class="col-sm-2 control-label" for="resTypeDescription">{{t "console.common.description"}}</label>
+    <div class="col-sm-9">
+        <textarea class="form-control" id="resTypeDescription" data-field="description">{{entity.description}}</textarea>
+    </div>
+</div>

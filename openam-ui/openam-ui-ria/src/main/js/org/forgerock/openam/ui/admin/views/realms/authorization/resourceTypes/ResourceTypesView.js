@@ -160,7 +160,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
         },
 
         addNewResourceType: function (e) {
-            Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
+            Router.routeTo(Router.configuration.routes.realmsResourceTypeNew, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });

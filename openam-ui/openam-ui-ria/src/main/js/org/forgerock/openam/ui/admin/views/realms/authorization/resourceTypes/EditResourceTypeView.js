@@ -23,14 +23,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypePatternsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypeActionsView"
-], function ($, _, Messages, AbstractView, EventManager, Router, Constants, ResourceTypeModel, ResourceTypePatternsView,
-             ResourceTypeActionsView) {
+], function ($, _, Messages, AbstractView, EventManager, Router, Constants, UIUtils, ResourceTypeModel,
+             ResourceTypePatternsView, ResourceTypeActionsView) {
 
     return AbstractView.extend({
-        template: "templates/admin/views/realms/authorization/resourceTypes/EditResourceTypeTemplate.html",
         partials: [
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
         ],
@@ -39,6 +39,20 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             "click #revertChanges": "revertChanges",
             "click #delete": "deleteResourceType"
         },
+        tabs: [
+            {
+                name: "patterns",
+                attr: ["patterns"]
+            },
+            {
+                name: "actions",
+                attr: ["actions"]
+            },
+            {
+                name: "settings",
+                attr: ["name", "description"]
+            }
+        ],
 
         initialize: function (options) {
             AbstractView.prototype.initialize.call(this);
@@ -52,7 +66,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
         render: function (args, callback) {
             var uuid;
 
-            this.realmPath = args[0];
+            this.data.realmPath = args[0];
             if (callback) {
                 this.renderCallback = callback;
             }
@@ -63,10 +77,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             }
 
             if (uuid) {
+                this.template = "templates/admin/views/realms/authorization/resourceTypes/EditResourceTypeTemplate.html";
                 this.model = new ResourceTypeModel({uuid: uuid});
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
+                this.template = "templates/admin/views/realms/authorization/resourceTypes/NewResourceTypeTemplate.html";
+                this.newEntity = true;
                 this.model = new ResourceTypeModel();
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.renderAfterSyncModel();
@@ -76,7 +93,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
         renderAfterSyncModel: function () {
             var self = this,
                 data = this.data;
-            this.data.entity = this.model.attributes;
+            this.data.entity = _.cloneDeep(this.model.attributes);
 
             data.actions = [];
             _.each(this.data.entity.actions, function (v, k) {
@@ -91,6 +108,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 var promises = [], resolve = function () { return (promises[promises.length] = $.Deferred()).resolve;},
                     data = self.data;
 
+                self.renderSettings();
+
                 self.patternsView = new ResourceTypePatternsView();
                 self.patternsView.render(data.entity, data.entity.patterns, "#resTypePatterns", resolve());
 
@@ -103,9 +122,31 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             });
         },
 
+        renderSettings: function () {
+            var self = this;
+            UIUtils.fillTemplateWithData(
+                "templates/admin/views/realms/authorization/resourceTypes/ResourceTypeSettingsTemplate.html",
+                this.data, function (tpl) {
+                    self.$el.find("#resTypeSetting").html(tpl);
+                });
+        },
+
         revertChanges: function (e) {
-            this.patternsView.render(this.data.entity, this.initialPatterns, "#resTypePatterns");
-            this.actionsList.render(this.data.entity, this.initialActions, "#resTypeActions");
+            var activeTab = this.$el.find(".tab-pane.active"),
+                activeTabName = this.tabs[activeTab.index()].name;
+
+            switch (activeTabName) {
+                case "actions":
+                    this.actionsList.render(this.data.entity, this.initialActions, "#resTypeActions");
+                    break;
+                case "patterns":
+                    this.patternsView.render(this.data.entity, this.initialPatterns, "#resTypePatterns");
+                    break;
+                case "settings":
+                    _.extend(this.data.entity, _.pick(this.model, this.tabs[activeTab.index()].attr));
+                    this.renderSettings();
+                    break;
+            }
         },
 
         updateFields: function () {
@@ -131,16 +172,31 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
 
             var self = this,
                 savePromise,
-                nonModifiedAttributes = _.clone(this.model.attributes);
+                nonModifiedAttributes = _.clone(this.model.attributes),
+                activeTab = this.$el.find(".tab-pane.active"),
+                activeTabProperties;
 
             this.updateFields();
 
-            _.extend(this.model.attributes, this.data.entity);
+            if (this.newEntity) {
+                _.extend(this.model.attributes, this.data.entity);
+            } else {
+                activeTabProperties = _.pick(this.data.entity, this.tabs[activeTab.index()].attr);
+                _.extend(this.model.attributes, activeTabProperties);
+            }
+
             savePromise = this.model.save();
 
             if (savePromise) {
                 savePromise
                     .done(function (response) {
+                        if (self.newEntity) {
+                            Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
+                                args: [encodeURIComponent(self.data.realmPath), self.model.id],
+                                trigger: true
+                            });
+                        }
+
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                     })
                     .fail(function (response) {
@@ -162,7 +218,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             var self = this,
                 onSuccess = function (model, response, options) {
                     Router.routeTo(Router.configuration.routes.realmsResourceTypes, {
-                        args: [encodeURIComponent(self.realmPath)],
+                        args: [encodeURIComponent(self.data.realmPath)],
                         trigger: true
                     });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");

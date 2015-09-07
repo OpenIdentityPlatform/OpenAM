@@ -1032,9 +1032,16 @@
                 },
                 "edit": {
                     "resourceType": "Resource Type",
-                    "patternsAndActions": "Patterns and Actions",
-                    "newAction": "New action",
-                    "newPattern": "New pattern"
+                    "newResourceType" : "New Resource Type",
+                    "createResourceType" : "Create Resource Type",
+                    "actionsDescription" : "Define the actions that policies using this resource type can allow or deny.",
+                    "specifyActions" : "Specify Actions",
+                    "addAction": "Add Action",
+                    "addNewActionPlaceholder": "Add a new action...",
+                    "patternsDescription" : "Define resource patterns that policies using this resource type can expand upon.",
+                    "specifyPatterns" : "Specify Patterns",
+                    "addPattern": "Add Pattern",
+                    "addNewPatternPlaceholder": "Add a new pattern..."
                 }
             }
         }

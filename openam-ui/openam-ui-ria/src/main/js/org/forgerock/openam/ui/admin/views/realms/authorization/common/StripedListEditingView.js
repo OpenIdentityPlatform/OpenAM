@@ -31,6 +31,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
             "click .fa-plus": "addItem",
             "keyup .fa-plus": "addItem",
             "keyup .editing input": "addItem",
+            "click .editing button": "addItem",
+            "keyup .editing button": "addItem",
             "click .fa-close ": "deleteItem",
             "keyup .fa-close ": "deleteItem"
         },

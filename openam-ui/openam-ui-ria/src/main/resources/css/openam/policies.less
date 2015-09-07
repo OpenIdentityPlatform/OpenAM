@@ -74,10 +74,6 @@
                 border-bottom: 0;
             }
 
-            &:nth-child(odd) {
-                background-color: @background-color;
-            }
-
             &.list-no-items {
                 border: 0;
             }
@@ -89,7 +85,7 @@
             .fa {
                 opacity: 0;
                 transition: all 300ms ease-in-out;
-                color: #999;
+                color: #777;
                 cursor: pointer;
                 margin-top: 4px;
 
@@ -154,7 +150,7 @@
                 }
 
                 .fa {
-                    opacity: 0.4;
+                    opacity: 1;
 
                     &:focus, &:hover {
                         opacity: 1;
@@ -163,7 +159,7 @@
 
                 .fa-close {
                     &:focus, &:hover {
-                        color: @failure-color;
+                        color: @base-theme-color;
                     }
                 }
 
