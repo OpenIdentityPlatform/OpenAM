@@ -101,6 +101,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                 parentRenderCallback = function () {
                     self.parentRender(function () {
                         PoliciesView.render({
+                            realmPath: self.realmPath,
                             applicationModel: self.model
                         }, function (policiesNumber) {
                             if (policiesNumber > 0) {

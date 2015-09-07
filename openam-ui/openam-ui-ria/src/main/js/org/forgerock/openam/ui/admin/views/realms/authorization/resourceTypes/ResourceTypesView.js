@@ -42,7 +42,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
         template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesTemplate.html",
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesToolbarTemplate.html",
-
+        events: {
+            "click #addNewRes": "addNewResourceType"
+        },
         render: function (args, callback) {
             var self = this,
                 ResourceTypes,
@@ -52,10 +54,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 ClickableRow;
 
             this.realmPath = args[0];
-
-            _.extend(this.events, {
-                "click #addNewRes": "addNewResourceType"
-            });
 
             ResourceTypes = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/resourcetypes"),

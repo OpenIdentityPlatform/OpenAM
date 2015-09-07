@@ -23,7 +23,7 @@ define("config/process/AMConfig", [
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, Constants, EventManager, Router, SMSGlobalDelegate, UIUtils) {
-    var obj = [
+    return [
         {
             startEvent: Constants.EVENT_LOGOUT,
             description: "used to override common logout event",
@@ -175,5 +175,4 @@ define("config/process/AMConfig", [
             }
         }
     ];
-    return obj;
 });

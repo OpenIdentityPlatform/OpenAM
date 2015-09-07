@@ -41,7 +41,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         template: "templates/admin/views/realms/authorization/policySets/PolicySetsTemplate.html",
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/policySets/PolicySetsToolbarTemplate.html",
-
+        events: {
+            "click #addNewPolicySet": "addNewPolicySet",
+            "click #importPolicies": "startImportPolicies",
+            "click #exportPolicies": "exportPolicies",
+            "change [name=upload]": "readImportFile"
+        },
         render: function (args, callback) {
             var self = this,
                 PolicySets,
@@ -52,13 +57,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
 
             this.realmPath = args[0];
             this.data.selectedItems = [];
-
-            _.extend(this.events, {
-                "click #addNewPolicySet": "addNewPolicySet",
-                "click #importPolicies": "startImportPolicies",
-                "click #exportPolicies": "exportPolicies",
-                "change [name=upload]": "readImportFile"
-            });
 
             PolicySets = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/applications"),
@@ -81,14 +79,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                 callback: function (e) {
                     var $target = $(e.target);
 
-                    if ($target.is("input") || $target.is(".select-row-cell")) {
+                    if ($target.parents().hasClass("row-actions")) {
                         return;
                     }
 
                     self.editRecord(e, this.model.id, Router.configuration.routes.realmsPolicySetEdit);
                 }
             });
-
 
             columns = [
                 {

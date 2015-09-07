@@ -32,19 +32,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
 
         initialize: function () {
             AbstractView.prototype.initialize.call(this);
-
-            // TODO delete once policies view is changed
-            this.events = {
-                "click #deleteRecords": "deleteRecords"
-            };
         },
 
-        deleteRecord: function (e, id) {
+        deleteRecord: function (e, id, callback) {
             var self = this,
                 item = self.data.items.get(id),
                 onSuccess = function (model, response, options) {
                     self.data.items.fetch({reset: true});
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+
+                    if (callback) {
+                        callback();
+                    }
                 },
                 onError = function (model, response, options) {
                     self.data.items.fetch({reset: true});
@@ -69,63 +68,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
             });
         },
 
-        // TODO delete once policies view is changed
-        deleteRecords: function (e) {
-            e.preventDefault();
-
-            if ($(e.target).hasClass("inactive")) {
-                return;
-            }
-
-            var self = this,
-                i = 0,
-                item,
-                onDestroy = function () {
-                    self.data.selectedItems = [];
-                    self.data.items.fetch({reset: true});
-
-                    self.renderToolbar();
-                },
-                onSuccess = function (model, response, options) {
-                    onDestroy();
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                },
-                onError = function (model, response, options) {
-                    onDestroy();
-                    Messages.messages.addMessage({message: response.responseJSON.message, type: "error"});
-                };
-
-            for (; i < this.data.selectedItems.length; i++) {
-                item = this.data.items.get(this.data.selectedItems[i]);
-
-                item.destroy({
-                    success: onSuccess,
-                    error: onError
-                });
-            }
-        },
-
-        // TODO delete once policies view is changed
-        onRowSelect: function (model, selected) {
-            if (selected) {
-                if (!_.contains(this.data.selectedItems, model.id)) {
-                    this.data.selectedItems.push(model.id);
-                }
-            } else {
-                this.data.selectedItems = _.without(this.data.selectedItems, model.id);
-            }
-
-            this.renderToolbar();
-        },
-
         bindDefaultHandlers: function () {
-            var self = this;
-
-            // TODO delete once policies view is changed
-            this.data.items.on("backgrid:selected", function (model, selected) {
-                self.onRowSelect(model, selected);
-            });
-
             this.data.items.on("backgrid:sort", BackgridUtils.doubleSortFix);
         },
 

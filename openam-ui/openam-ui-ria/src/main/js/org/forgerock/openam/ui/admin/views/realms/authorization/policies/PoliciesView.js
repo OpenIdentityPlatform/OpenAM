@@ -26,24 +26,28 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "backgrid.paginator",
     "backgrid.selectall",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
-    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPolicyView"
 ], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
-             Configuration, Router, BackgridUtils, UIUtils, URLHelper, PoliciesDelegate,
-             PolicyModel, AbstractListView, EditPolicyView) {
+             Configuration, EventManager, Router, Constants, BackgridUtils, URLHelper, PoliciesDelegate, PolicyModel,
+             AbstractListView,
+             EditPolicyView) {
 
-    var PoliciesListView = AbstractListView.extend({
+    var PoliciesView = AbstractListView.extend({
         element: "#policiesPanel",
         template: "templates/admin/views/realms/authorization/policies/PoliciesTemplate.html",
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/policies/PoliciesToolbarTemplate.html",
-
+        events: {
+            "click #addNewPolicy": "addNewPolicy"
+        },
         render: function (data, callback) {
             var self = this,
                 Policies,
@@ -53,12 +57,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                 ClickableRow;
 
             _.extend(this.data, data);
-
-            this.data.selectedItems = [];
-
-            _.extend(this.events, {
-                "click #addNewPolicy": "addNewPolicy"
-            });
 
             Policies = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/policies"),
@@ -82,7 +80,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                 callback: function (e) {
                     var $target = $(e.target);
 
-                    if ($target.is("input") || $target.is(".select-row-cell")) {
+                    if ($target.parents().hasClass("row-actions")) {
                         return;
                     }
 
@@ -90,7 +88,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                         applicationModel: self.data.applicationModel,
                         policyModel: this.model,
                         savePolicyCallback: function () {
-                            self.data.items.fetch({reset: true});
+                            EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                                route: Router.currentRoute,
+                                args:[encodeURIComponent(self.data.realmPath), self.data.applicationModel.id]
+                            });
                         }
                     });
                 }
@@ -98,37 +99,49 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
 
             columns = [
                 {
-                    name: "",
-                    cell: "select-row",
-                    headerCell: "select-all"
-                },
-                {
                     name: "name",
                     label: $.t("console.authorization.policies.list.grid.0"),
-                    cell: "string",
+                    cell: BackgridUtils.TemplateCell.extend({
+                        iconClass: "fa-gavel",
+                        template: "templates/admin/backgrid/cell/IconAndNameCell.html",
+                        rendered: function () {
+                            this.$el.find("i.fa").addClass(this.iconClass);
+                        }
+                    }),
                     headerCell: BackgridUtils.FilterHeaderCell,
                     sortType: "toggle",
                     editable: false
                 },
                 {
-                    name: "description",
-                    label: $.t("console.authorization.policies.list.grid.1"),
-                    cell: "string",
-                    headerCell: BackgridUtils.FilterHeaderCell,
-                    sortable: false,
-                    editable: false
-                },
-                {
-                    name: "resources",
-                    label: $.t("console.authorization.policies.list.grid.2"),
-                    cell: BackgridUtils.ArrayCell,
-                    sortable: false,
-                    editable: false
-                },
-                {
-                    name: "actionValues",
-                    label: $.t("console.authorization.policies.list.grid.3"),
-                    cell: BackgridUtils.ObjectCell,
+                    name: "",
+                    cell: BackgridUtils.TemplateCell.extend({
+                        className: "row-actions",
+                        template: "templates/admin/backgrid/cell/RowActionsCell.html",
+                        events: {
+                            "click .edit-row-item": "editItem",
+                            "click .delete-row-item": "deleteItem"
+                        },
+                        editItem: function (e) {
+                            EditPolicyView.render({
+                                applicationModel: self.data.applicationModel,
+                                policyModel: this.model,
+                                savePolicyCallback: function () {
+                                    EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                                        route: Router.currentRoute,
+                                        args:[encodeURIComponent(self.data.realmPath), self.data.applicationModel.id]
+                                    });
+                                }
+                            });
+                        },
+                        deleteItem: function (e) {
+                            self.deleteRecord(e, this.model.id, function () {
+                                EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                                    route: Router.currentRoute,
+                                    args:[encodeURIComponent(self.data.realmPath), self.data.applicationModel.id]
+                                });
+                            });
+                        }
+                    }),
                     sortable: false,
                     editable: false
                 }
@@ -151,13 +164,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
 
             this.bindDefaultHandlers();
 
-            this.parentRender(function () {
-                this.renderToolbar();
+            this.data.items.fetch({reset: true}).done(function () {
+                self.parentRender(function () {
 
-                this.$el.find("#backgridContainer").append(grid.render().el);
-                this.$el.find("#paginationContainer").append(paginator.render().el);
+                    if (self.data.items.length) {
+                        self.renderToolbar();
+                        self.$el.find("#backgridContainer").append(grid.render().el);
+                        self.$el.find("#paginationContainer").append(paginator.render().el);
+                    }
 
-                this.data.items.fetch({reset: true}).done(function () {
                     if (callback) {
                         callback(self.data.items.length);
                     }
@@ -169,15 +184,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
             var self = this;
             EditPolicyView.render({
                     savePolicyCallback: function () {
-                        self.data.items.fetch({reset: true});
+                        EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                            route: Router.currentRoute,
+                            args:[encodeURIComponent(self.data.realmPath), self.data.applicationModel.id]
+                        });
                     },
                     applicationModel: this.data.applicationModel
-                },
-                function () {
-                    self.data.items.fetch({reset: true});
                 });
         }
     });
 
-    return new PoliciesListView();
+    return new PoliciesView();
 });
