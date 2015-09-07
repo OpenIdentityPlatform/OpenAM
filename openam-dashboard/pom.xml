@@ -34,7 +34,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Rest</name>
+    <name>OpenAM Dashboard</name>
     <description>OpenAM Dashboard Services</description>
     <artifactId>openam-dashboard</artifactId>
     <packaging>jar</packaging>

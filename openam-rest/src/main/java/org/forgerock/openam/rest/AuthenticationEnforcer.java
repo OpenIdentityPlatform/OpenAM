@@ -40,7 +40,6 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Response;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.dashboard.ServerContextHelper;
 import org.forgerock.util.promise.Promise;
 
 /**

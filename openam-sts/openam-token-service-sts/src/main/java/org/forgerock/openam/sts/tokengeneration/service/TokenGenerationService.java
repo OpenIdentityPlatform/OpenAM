@@ -17,10 +17,8 @@
 package org.forgerock.openam.sts.tokengeneration.service;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
@@ -54,7 +52,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.CTSTokenPersistenceException;
 import org.forgerock.openam.sts.STSPublishException;

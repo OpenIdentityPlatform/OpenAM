@@ -81,7 +81,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-rest</artifactId>
+            <artifactId>openam-core-rest</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

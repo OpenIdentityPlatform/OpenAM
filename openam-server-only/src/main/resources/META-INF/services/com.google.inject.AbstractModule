@@ -17,6 +17,7 @@ org.forgerock.openam.entitlement.guice.EntitlementGuiceModule
 org.forgerock.openam.entitlement.guice.EntitlementRestGuiceModule
 com.sun.identity.entitlement.rest.EntitlementLegacyRestGuiceModule
 org.forgerock.openam.core.guice.CoreGuiceModule
+org.forgerock.openam.core.rest.CoreRestGuiceModule
 org.forgerock.openam.core.guice.DataLayerGuiceModule
 org.forgerock.openam.scripting.guice.ScriptingGuiceModule
 org.forgerock.openam.scripting.guice.ScriptingRestGuiceModule

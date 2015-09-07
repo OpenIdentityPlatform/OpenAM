@@ -16,51 +16,44 @@
 
 package org.forgerock.openam.rest;
 
-import static org.forgerock.http.handler.Handlers.*;
-import static org.forgerock.http.routing.RoutingMode.*;
-import static org.forgerock.http.routing.Version.*;
-import static org.forgerock.openam.audit.AuditConstants.Component.*;
-import static org.forgerock.openam.http.HttpRoute.*;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.ServiceLoader;
-import java.util.Set;
+import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.openam.http.HttpRoute.newHttpRoute;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.forgerock.http.Handler;
-import org.forgerock.http.routing.RouteMatchers;
-import org.forgerock.http.routing.Router;
-import org.forgerock.openam.forgerockrest.authn.http.AuthenticationServiceV1;
-import org.forgerock.openam.forgerockrest.authn.http.AuthenticationServiceV2;
-import org.forgerock.openam.http.HttpRoute;
-import org.forgerock.openam.http.HttpRouteProvider;
-import org.forgerock.openam.http.annotations.Endpoints;
-import org.forgerock.openam.rest.audit.HttpAccessAuditFilterFactory;
+import java.util.Collections;
+import java.util.ServiceLoader;
+import java.util.Set;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import org.forgerock.http.Handler;
+import org.forgerock.openam.http.HttpRoute;
+import org.forgerock.openam.http.HttpRouteProvider;
 
+/**
+ * HTTP route provider for the REST ({@literal /json}) endpoints.
+ *
+ * To add new REST endpoints the {@link RestRouteProvider} interface must be
+ * implemented and an entry into the Service loader file created.
+ *
+ * @since 13.0.0
+ */
 public class RestHttpRouteProvider implements HttpRouteProvider {
 
-    private Set<String> invalidRealms = new HashSet<>();
     private RestRouter rootRouter;
     private RestRouter realmRouter;
-    private Router chfRealmRouter;
     private Injector injector;
-    private HttpAccessAuditFilterFactory httpAuditFactory;
 
-    @Inject
-    public void setInvalidRealms(@Named("InvalidRealmNames") Set<String> invalidRealms) {
-        this.invalidRealms = invalidRealms;
-    }
-
-    @Inject
-    public void setRealmRouter(@Named("RestRealmRouter") Router realmRouter) {
-        this.chfRealmRouter = realmRouter;
+    @Override
+    public Set<HttpRoute> get() {
+        for (RestRouteProvider routeProvider : ServiceLoader.load(RestRouteProvider.class)) {
+            injector.injectMembers(routeProvider);
+            routeProvider.addRoutes(rootRouter, realmRouter);
+        }
+        return Collections.singleton(
+                newHttpRoute(STARTS_WITH, "json", Key.get(Handler.class, Names.named("RestHandler"))));
     }
 
     @Inject
@@ -70,54 +63,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     }
 
     @Inject
-    public void setHttpAuditFactory(HttpAccessAuditFilterFactory httpAuditFactory) {
-        this.httpAuditFactory = httpAuditFactory;
-    }
-
-    @Inject
     public void setInjector(Injector injector) {
         this.injector = injector;
-    }
-
-    @Override
-    public Set<HttpRoute> get() {
-        addJsonRoutes(invalidRealms);
-        return Collections.singleton(
-                newHttpRoute(STARTS_WITH, "json", Key.get(Handler.class, Names.named("RestHandler"))));
-    }
-
-    private Handler createAuthenticateHandler() {
-        Router authenticateVersionRouter = new Router();
-        Handler authenticateHandlerV1 = Endpoints.from(AuthenticationServiceV1.class);
-        Handler authenticateHandlerV2 = Endpoints.from(AuthenticationServiceV2.class);
-        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(1, 1)), authenticateHandlerV1);
-        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(2)), authenticateHandlerV2);
-        return chainOf(authenticateVersionRouter, httpAuditFactory.createFilter(AUTHENTICATION));
-    }
-
-    private void addJsonRoutes(final Set<String> invalidRealmNames) {
-        chfRealmRouter.addRoute(RouteMatchers.requestUriMatcher(EQUALS, "authenticate"), createAuthenticateHandler());
-        invalidRealmNames.add(firstPathSegment("authenticate"));
-
-        for (RestRouteProvider routeProvider : ServiceLoader.load(RestRouteProvider.class)) {
-            injector.injectMembers(routeProvider);
-            routeProvider.addRoutes(rootRouter, realmRouter);
-        }
-    }
-
-    /**
-     * Returns the first path segment from a uri template. For example {@code /foo/bar} becomes {@code foo}.
-     *
-     * @param path the full uri template path.
-     * @return the first non-empty path segment.
-     * @throws IllegalArgumentException if the path contains no non-empty segments.
-     */
-    private static String firstPathSegment(final String path) {
-        for (String part : path.split("/")) {
-            if (!part.isEmpty()) {
-                return part;
-            }
-        }
-        throw new IllegalArgumentException("uriTemplate " + path + " is invalid");
     }
 }

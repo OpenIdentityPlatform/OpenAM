@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.rest.devices.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.OathDeviceSettings;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -25,7 +25,7 @@ import com.sun.identity.entitlement.opensso.SubjectUtils;
 import org.forgerock.http.Context;
 import org.forgerock.http.context.AbstractContext;
 import org.forgerock.json.resource.SecurityContext;
-import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.util.Reject;
 
 /**

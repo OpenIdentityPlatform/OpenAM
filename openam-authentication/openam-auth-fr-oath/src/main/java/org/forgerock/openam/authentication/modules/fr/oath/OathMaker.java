@@ -18,9 +18,8 @@ package org.forgerock.openam.authentication.modules.fr.oath;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.openam.rest.devices.OathDeviceSettings;
-import org.forgerock.openam.rest.devices.OathDevicesDao;
+import org.forgerock.openam.core.rest.devices.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.OathDevicesDao;
 import org.forgerock.util.Reject;
 
 import javax.annotation.Nonnull;

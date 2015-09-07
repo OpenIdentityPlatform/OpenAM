@@ -321,6 +321,7 @@
 
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
+        <module>openam-core-rest</module>
 
         <!-- OpenAM CLI Module -->
         <module>openam-cli</module>
@@ -511,6 +512,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-core-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -1591,21 +1597,6 @@
             <dependency>
                 <groupId>org.restlet.jee</groupId>
                 <artifactId>org.restlet.ext.xml</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.restlet.jee</groupId>
-                <artifactId>org.restlet.ext.json</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.restlet.jee</groupId>
-                <artifactId>org.restlet</artifactId>
-                <version>${restlet.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.restlet.jee</groupId>
-                <artifactId>org.restlet.ext.jackson</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>

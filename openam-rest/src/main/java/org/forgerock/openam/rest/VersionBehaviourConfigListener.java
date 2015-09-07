@@ -25,7 +25,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.http.routing.DefaultVersionBehaviour;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
-import org.forgerock.openam.forgerockrest.ServiceConfigUtils;
 
 /**
  * A {@code ServiceListener} to listen for changes to the default version behaviour configuration and update a

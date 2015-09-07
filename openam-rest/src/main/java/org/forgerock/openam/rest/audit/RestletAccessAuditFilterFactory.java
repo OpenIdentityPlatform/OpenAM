@@ -17,17 +17,16 @@ package org.forgerock.openam.rest.audit;
 
 import static org.forgerock.openam.audit.AuditConstants.Component;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-import org.forgerock.openam.forgerockrest.authn.UMAAccessAuditFilter;
 import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.routing.Filter;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * Factory to assist with the creation of audit filters for restlet access.

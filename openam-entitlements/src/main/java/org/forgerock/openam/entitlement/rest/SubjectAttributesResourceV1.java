@@ -45,9 +45,9 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmAwareResource;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.util.promise.Promise;
 
 /**

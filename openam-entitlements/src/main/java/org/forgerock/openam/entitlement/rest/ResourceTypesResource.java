@@ -52,7 +52,7 @@ import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
-import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.entitlement.rest.wrappers.JsonResourceType;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;

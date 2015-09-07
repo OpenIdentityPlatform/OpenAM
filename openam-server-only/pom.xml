@@ -512,6 +512,10 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core-rest</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.forgerock.http</groupId>

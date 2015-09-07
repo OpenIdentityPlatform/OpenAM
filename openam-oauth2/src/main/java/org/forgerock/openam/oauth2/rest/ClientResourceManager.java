@@ -35,7 +35,7 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.http.Context;
-import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.rest.RestUtils;
 
 import java.security.AccessController;
 import java.util.Collections;

@@ -28,7 +28,7 @@ import com.sun.identity.cli.rest.RestCommand;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.openam.rest.record.RecordConstants;
+import org.forgerock.openam.core.rest.record.RecordConstants;
 
 import java.io.IOException;
 import java.net.URL;

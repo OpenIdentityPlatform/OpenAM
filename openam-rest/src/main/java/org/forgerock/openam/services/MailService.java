@@ -19,7 +19,6 @@ import static org.apache.commons.collections.MapUtils.isEmpty;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -40,9 +39,9 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.util.promise.Promise;

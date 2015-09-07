@@ -13,6 +13,4 @@
 #
 # Copyright 2015 ForgeRock AS.
 #
-org.forgerock.openam.rest.CoreRestRouteProvider
-org.forgerock.openam.rest.SmsRestRouteProvider
 org.forgerock.openam.rest.AuditRestRouteProvider

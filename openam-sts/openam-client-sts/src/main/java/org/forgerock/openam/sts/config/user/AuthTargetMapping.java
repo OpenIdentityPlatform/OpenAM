@@ -38,7 +38,7 @@ import static org.forgerock.json.JsonValue.object;
  * against which a particular token type will be validated.
  * An instance of this class will be harvested from the UI elements configuring STS instances.
  *
- * See the org.forgerock.openam.forgerockrest.authn.core.AuthIndexType class for valid values for the authIndexType
+ * See the org.forgerock.openam.core.rest.authn.core.AuthIndexType class for valid values for the authIndexType
  * below. The authIndexValue is the actual name of the service, module, etc. (for an authIndexType of "service" the
  * authIndexValue could be "ldapService").
  *

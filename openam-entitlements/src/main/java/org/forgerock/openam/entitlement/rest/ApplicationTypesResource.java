@@ -49,7 +49,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeWrapper;

@@ -67,9 +67,9 @@ import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.oauth2.OAuth2AuditLogger;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.util.promise.Promise;
 
 public class ClientResource implements CollectionResourceProvider {

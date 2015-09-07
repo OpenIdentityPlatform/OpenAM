@@ -15,8 +15,6 @@
  */
 package org.forgerock.openam.entitlement.rest;
 
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
@@ -44,7 +42,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
-import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.ResultHandler;

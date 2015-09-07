@@ -1,0 +1,181 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015 ForgeRock AS.
+ */
+
+package org.forgerock.openam.core.rest;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.io.IOException;
+import java.util.Properties;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.rest.cts.CoreTokenResource;
+import org.forgerock.openam.core.rest.cts.CoreTokenResourceAuthzModule;
+import org.forgerock.openam.core.rest.record.DebugRecorder;
+import org.forgerock.openam.core.rest.record.DefaultDebugRecorder;
+import org.forgerock.openam.core.rest.sms.SmsCollectionProvider;
+import org.forgerock.openam.core.rest.sms.SmsCollectionProviderFactory;
+import org.forgerock.openam.core.rest.sms.SmsGlobalSingletonProvider;
+import org.forgerock.openam.core.rest.sms.SmsGlobalSingletonProviderFactory;
+import org.forgerock.openam.core.rest.sms.SmsRequestHandler;
+import org.forgerock.openam.core.rest.sms.SmsRequestHandlerFactory;
+import org.forgerock.openam.core.rest.sms.SmsSingletonProvider;
+import org.forgerock.openam.core.rest.sms.SmsSingletonProviderFactory;
+import org.forgerock.openam.cts.utils.JSONSerialisation;
+import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
+import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
+import org.forgerock.openam.services.RestSecurityProvider;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.utils.Config;
+
+/**
+ * Guice module for binding the core REST endpoints.
+ *
+ * @since 13.0.0
+ */
+@GuiceModule
+public class CoreRestGuiceModule extends AbstractModule {
+
+    @Override
+    protected void configure() {
+        install(new FactoryModuleBuilder()
+                .implement(SmsRequestHandler.class, SmsRequestHandler.class)
+                .build(SmsRequestHandlerFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(SmsCollectionProvider.class, SmsCollectionProvider.class)
+                .build(SmsCollectionProviderFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(SmsSingletonProvider.class, SmsSingletonProvider.class)
+                .build(SmsSingletonProviderFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(SmsGlobalSingletonProvider.class, SmsGlobalSingletonProvider.class)
+                .build(SmsGlobalSingletonProviderFactory.class));
+
+        bind(DebugRecorder.class).to(DefaultDebugRecorder.class);
+    }
+
+    @Provides
+    @Named("UsersResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV1 getUsersResourceV1(MailServerLoader mailServerLoader,
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider);
+    }
+
+    @Provides
+    @Named("GroupsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader,
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider);
+    }
+
+    @Provides
+    @Named("AgentsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader,
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider);
+    }
+
+    @Provides
+    @Named("UsersResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV2 getUsersResource(MailServerLoader mailServerLoader,
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
+            restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider, baseURLProviderFactory);
+    }
+
+    @Provides
+    @Named("GroupsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV2 getGroupsResource(MailServerLoader mailServerLoader,
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
+            restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider, baseURLProviderFactory);
+    }
+
+    @Provides
+    @Named("AgentsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV2 getAgentsResource(MailServerLoader mailServerLoader,
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
+            restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider, baseURLProviderFactory);
+    }
+
+    @Provides
+    @Inject
+    @Singleton
+    public CoreTokenResource getCoreTokenResource(JSONSerialisation jsonSerialisation,
+            CTSPersistentStoreProxy ctsPersistentStore, @Named("frRest") Debug debug) {
+        return new CoreTokenResource(jsonSerialisation, ctsPersistentStore, debug);
+    }
+
+    @Provides
+    @Inject
+    @Singleton
+    public CoreTokenResourceAuthzModule getCoreTokenResourceAuthzModule(
+            Config<SessionService> sessionService, @Named("frRest") Debug debug) {
+        boolean coreTokenResourceEnabled = SystemProperties.getAsBoolean(Constants.CORE_TOKEN_RESOURCE_ENABLED);
+        return new CoreTokenResourceAuthzModule(sessionService, debug, coreTokenResourceEnabled);
+    }
+
+    @Provides
+    @Singleton
+    @Named("ServerAttributeSyntax")
+    public Properties getServerAttributeSyntax() throws IOException {
+        Properties syntaxProperties = new Properties();
+        syntaxProperties.load(getClass().getClassLoader().getResourceAsStream("validserverconfig.properties"));
+        return syntaxProperties;
+    }
+
+    @Provides
+    @Singleton
+    @Named("ServerAttributeTitles")
+    public Properties getServerAttributeTitles() throws IOException {
+        Properties titleProperties = new Properties();
+        titleProperties.load(getClass().getClassLoader().getResourceAsStream("amConsole.properties"));
+        return titleProperties;
+    }
+}
