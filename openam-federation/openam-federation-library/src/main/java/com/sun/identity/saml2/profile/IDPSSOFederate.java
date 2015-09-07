@@ -1397,12 +1397,15 @@ public class IDPSSOFederate {
             int sessionAuthnLevel = 0;
 
             try {
-                sessionAuthnLevel = Integer.parseInt(
-                        SessionManager.getProvider().getProperty(
-                        session, SAML2Constants.AUTH_LEVEL)[0]);
-                SAML2Utils.debug.message(classMethod +
-                        "Current session Authentication Level: " +
-                        sessionAuthnLevel);
+                final String strAuthLevel = SessionManager.getProvider().getProperty(session,
+                        SAML2Constants.AUTH_LEVEL)[0];
+                if (strAuthLevel.contains(":")) {
+                    String[] realmAuthLevel = strAuthLevel.split(":");
+                    sessionAuthnLevel = Integer.parseInt(realmAuthLevel[1]);
+                } else {
+                    sessionAuthnLevel = Integer.parseInt(strAuthLevel);
+                }
+                SAML2Utils.debug.message(classMethod + "Current session Authentication Level: " + sessionAuthnLevel);
             } catch (SessionException sex) {
                 SAML2Utils.debug.error(classMethod +
                         " Couldn't get the session Auth Level", sex);
