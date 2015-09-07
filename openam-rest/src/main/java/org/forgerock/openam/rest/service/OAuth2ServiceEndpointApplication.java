@@ -19,7 +19,6 @@ package org.forgerock.openam.rest.service;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.rest.RestEndpoints;
 import org.restlet.data.MediaType;
 import org.restlet.routing.Router;
 
@@ -39,10 +38,9 @@ public class OAuth2ServiceEndpointApplication extends ServiceEndpointApplication
 
     /**
      * Returns the XACML router.
-     * @param restEndpoints Registry of routers.
      * @return
      */
-    protected Router getRouter(RestEndpoints restEndpoints) {
+    protected Router getRouter() {
         return InjectorHolder.getInstance(Key.get(Router.class, Names.named("OAuth2Router")));
     }
 }

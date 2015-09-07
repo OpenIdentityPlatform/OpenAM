@@ -30,7 +30,6 @@ import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
-import org.forgerock.openam.rest.batch.BatchResource;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.devices.OathDevicesResource;
 import org.forgerock.openam.rest.devices.TrustedDevicesResource;
@@ -88,11 +87,6 @@ public class CoreRestRouteProvider implements RestRouteProvider {
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .toCollection(OathDevicesResource.class);
-
-        realmRouter.route("batch")
-                .auditAs(BATCH)
-                .authorizeWith(AdminOnlyAuthzModule.class)
-                .toCollection(BatchResource.class);
 
         realmRouter.route("sessions")
                 .authenticateWith(ssoToken().exceptActions("validate"))

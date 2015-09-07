@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.rest.service;
 
-import org.forgerock.openam.rest.RestEndpoints;
 import org.restlet.Restlet;
 import org.restlet.service.StatusService;
 import org.testng.annotations.BeforeMethod;
@@ -194,7 +193,7 @@ public class RestletServiceServletTest {
         }
 
         @Override
-        protected Restlet getRouter(final RestEndpoints restEndpoints) {
+        protected Restlet getRouter() {
             return null;
         }
     }

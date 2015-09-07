@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.rest;
 
-import org.forgerock.guice.core.InjectorHolder;
-
 import com.sun.identity.setup.SetupListener;
 
 /**
@@ -27,6 +25,6 @@ import com.sun.identity.setup.SetupListener;
 public class RestStartupTrigger implements SetupListener {
     @Override
     public void setupComplete() {
-        InjectorHolder.getInstance(RestEndpoints.class);
+//        InjectorHolder.getInstance(RestEndpoints.class); //TODO what to do here?...
     }
 }

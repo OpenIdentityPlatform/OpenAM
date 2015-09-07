@@ -16,10 +16,8 @@
 
 package org.forgerock.openam.rest.devices;
 
-import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.text.ParseException;
@@ -42,7 +40,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
+import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.util.promise.Promise;
 

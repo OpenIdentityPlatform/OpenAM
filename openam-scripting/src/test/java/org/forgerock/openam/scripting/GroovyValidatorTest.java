@@ -11,21 +11,48 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting;
 
+import com.google.inject.Module;
+import org.forgerock.guice.core.GuiceModuleLoader;
+import org.forgerock.guice.core.GuiceModules;
+import org.forgerock.guice.core.GuiceTestCase;
+import org.forgerock.guice.core.InjectorConfiguration;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.scripting.guice.ScriptingGuiceModule;
+import org.forgerock.openam.shared.guice.SharedGuiceModule;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * Groovy validation tests.
  */
-public class GroovyValidatorTest {
+@GuiceModules({SharedGuiceModule.class, ScriptingGuiceModule.class})
+public class GroovyValidatorTest extends GuiceTestCase {
+
+    @BeforeMethod
+    @Override
+    public void setupGuiceModules() throws Exception {
+        //This ensures that the other Guice modules on the classpath don't get
+        //loaded as Guice will balk.
+        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
+            @Override
+            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> aClass) {
+                return new HashSet<>();
+            }
+        });
+        super.setupGuiceModules();
+    }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullScript() {

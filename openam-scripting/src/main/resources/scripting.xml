@@ -380,9 +380,9 @@
                             <Value>java.util.LinkedHashMap$LinkedEntrySet</Value>
                             <Value>java.util.HashMap$Node</Value>
                             <Value>org.forgerock.json.JsonValue</Value>
-                            <Value>org.forgerock.openam.rest.batch.helpers.Requester</Value>
+                            <Value>org.forgerock.openam.scripting.rest.batch.helpers.Requester</Value>
                             <Value>org.forgerock.json.resource.UriRouterContext</Value>
-                            <Value>org.forgerock.openam.rest.batch.helpers.ScriptResponse</Value>
+                            <Value>org.forgerock.openam.scripting.rest.batch.helpers.ScriptResponse</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>

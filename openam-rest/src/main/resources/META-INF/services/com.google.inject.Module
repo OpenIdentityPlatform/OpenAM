@@ -15,3 +15,4 @@
 #
 org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule
 org.forgerock.openam.rest.RestGuiceModule
+com.sun.identity.rest.LegacyRestGuiceModule

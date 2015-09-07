@@ -42,10 +42,10 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
-import org.forgerock.openam.forgerockrest.entitlements.PolicyStore;
-import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
-import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
+import org.forgerock.openam.entitlement.rest.PolicyStore;
+import org.forgerock.openam.entitlement.rest.PolicyStoreProvider;
+import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
+import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
 
 import javax.security.auth.Subject;
 import java.security.AccessController;

@@ -41,6 +41,7 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.entitlement.rest.model.json.JsonPolicy;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyUtils;
 import org.forgerock.util.promise.ExceptionHandler;
@@ -60,7 +61,7 @@ import org.jgrapht.graph.DirectedMultigraph;
 public class PolicyGraph implements QueryResourceHandler, ExceptionHandler<ResourceException>,
         ResultHandler<QueryResponse> {
     /**
-     * @see org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPolicy
+     * @see JsonPolicy
      */
     static final String OWNER_KEY = "createdBy";
     static final String ACTIVE_KEY = "active";

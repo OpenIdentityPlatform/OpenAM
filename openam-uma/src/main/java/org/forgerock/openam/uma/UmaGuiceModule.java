@@ -48,7 +48,7 @@ import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
-import org.forgerock.openam.forgerockrest.entitlements.PolicyResource;
+import org.forgerock.openam.entitlement.rest.PolicyResource;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
 import org.forgerock.openam.oauth2.rest.OAuth2RouterProvider;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;

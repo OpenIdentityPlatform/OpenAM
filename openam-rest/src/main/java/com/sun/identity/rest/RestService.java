@@ -29,17 +29,23 @@
 
 package com.sun.identity.rest;
 
+import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
-import javax.ws.rs.core.Application;
+
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import org.forgerock.guice.core.InjectorHolder;
 
 public class RestService extends Application {
     @Override
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> s = new HashSet<Class<?>>();
-        s.add(PrivilegeResource.class);
-        s.add(ListenerResource.class);
-        s.add(CoreTokenResource.class);
+        Set<LegacyRestEndpoint> endpoints = InjectorHolder.getInstance(
+                Key.get(new TypeLiteral<Set<LegacyRestEndpoint>>() {}));
+        Set<Class<?>> s = new HashSet<>();
+        for (LegacyRestEndpoint endpoint : endpoints) {
+            s.add(endpoint.getEndpointClass());
+        }
         return s;
     }
 }

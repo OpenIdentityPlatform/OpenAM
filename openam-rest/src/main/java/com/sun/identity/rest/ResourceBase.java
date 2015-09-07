@@ -41,12 +41,11 @@ import java.util.Set;
 
 import com.sun.identity.coretoken.CoreTokenException;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.util.AuthSPrincipal;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class ResourceBase {
+
     public static final String STATUS_CODE = "statusCode";
     public static final String STATUS_MESSAGE = "statusMessage";
     public static final String BODY = "body";
@@ -217,9 +216,9 @@ public abstract class ResourceBase {
             }
             return jo.toString();
         } catch (JSONException je) {
-            PrivilegeManager.debug.error(
-                "ResourceBase.createeResponseJSONString(): hit JSONException",
-                je);
+            RestServiceManager.DEBUG.error(
+                    "ResourceBase.createeResponseJSONString(): hit JSONException",
+                    je);
         }
         return "{}";
     }
@@ -236,7 +235,7 @@ public abstract class ResourceBase {
             }
             return jo.toString();
         } catch (JSONException je) {
-            PrivilegeManager.debug.error(
+            RestServiceManager.DEBUG.error(
                 "ResourceBase.createeResponseJSONString(): hit JSONException",
                 je);
         }

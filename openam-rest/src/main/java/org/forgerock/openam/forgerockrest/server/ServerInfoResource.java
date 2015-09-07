@@ -16,7 +16,6 @@
 package org.forgerock.openam.forgerockrest.server;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -65,7 +64,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.ServiceConfigUtils;
-import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
+import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.util.promise.Promise;

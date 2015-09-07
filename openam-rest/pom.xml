@@ -125,10 +125,6 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-scripting</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-http</artifactId>
         </dependency>
         <dependency><!-- TODO required until Restlet endpoints are moved to CHF -->
@@ -217,11 +213,6 @@
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-servlet-tester</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-entitlements</artifactId>
         </dependency>
 
         <dependency>

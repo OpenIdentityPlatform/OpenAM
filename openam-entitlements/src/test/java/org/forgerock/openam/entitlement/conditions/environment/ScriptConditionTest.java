@@ -27,7 +27,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.util.AuthSPrincipal;
+import com.sun.identity.rest.AuthSPrincipal;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.guice.core.GuiceTestCase;

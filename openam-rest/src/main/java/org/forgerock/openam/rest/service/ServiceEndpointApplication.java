@@ -11,19 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.service;
 
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.rest.RestEndpoints;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.service.StatusService;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Restlet Application for REST Service Endpoints.
@@ -40,15 +38,12 @@ public abstract class ServiceEndpointApplication extends Application {
         logger.setLevel(Level.OFF);
     }
 
-    private final RestEndpoints restEndpoints;
-
     /**
      * Constructs a new ServiceEndpointApplication.
      * <br/>
      * Sets the StatusService to {@link RestStatusService}.
      */
     protected ServiceEndpointApplication(StatusService statusService) {
-        this.restEndpoints = InjectorHolder.getInstance(RestEndpoints.class);
         setStatusService(statusService);
     }
 
@@ -59,15 +54,14 @@ public abstract class ServiceEndpointApplication extends Application {
      */
     @Override
     public Restlet createInboundRoot() {
-        Restlet router = getRouter(restEndpoints);
+        Restlet router = getRouter();
         router.setContext(getContext());
         return router;
     }
 
     /**
      * Obtain the router for this application from the RestEndpoints.
-     * @param restEndpoints Registry of routers.
      * @return The required router.
      */
-    protected abstract Restlet getRouter(RestEndpoints restEndpoints);
+    protected abstract Restlet getRouter();
 }

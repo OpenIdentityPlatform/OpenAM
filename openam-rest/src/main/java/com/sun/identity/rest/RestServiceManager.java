@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,20 +23,23 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: RestServiceManager.java,v 1.1 2009/11/12 18:37:35 veiming Exp $
+ *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.rest;
 
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.rest.spi.IAuthentication;
-import com.sun.identity.rest.spi.IAuthorization;
+import javax.security.auth.Subject;
+import javax.servlet.FilterConfig;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.StringTokenizer;
-import javax.security.auth.Subject;
-import javax.servlet.FilterConfig;
-import javax.servlet.http.HttpServletRequest;
+
+import com.sun.identity.rest.spi.IAuthentication;
+import com.sun.identity.rest.spi.IAuthorization;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  *
@@ -44,6 +47,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RestServiceManager {
     private static RestServiceManager serviceManager = new RestServiceManager();
+
+    static final Debug DEBUG = Debug.getInstance("Entitlement");
 
     // TOFIX: make DEFAULT_AUTHN_SCHEME configurable
     public static final String DEFAULT_AUTHN_SCHEME = "sstoken";
@@ -76,7 +81,7 @@ public class RestServiceManager {
             } catch (Exception e) {
                 // catch all exception, so that all auth filters have
                 // the chance to shutdown.
-                PrivilegeManager.debug.error("AuthNFilter.destroy", e);
+                DEBUG.error("AuthNFilter.destroy", e);
             }
         }
         authNServices.clear();
@@ -87,7 +92,7 @@ public class RestServiceManager {
             } catch (Exception e) {
                 // catch all exception, so that all auth filters have
                 // the chance to shutdown.
-                PrivilegeManager.debug.error("AuthZFilter.destroy", e);
+                DEBUG.error("AuthZFilter.destroy", e);
             }
         }
         authZServices.clear();
@@ -106,7 +111,7 @@ public class RestServiceManager {
             } catch (Exception e) {
                 // catch all exception, so that all auth filters have
                 // the chance to registered
-                PrivilegeManager.debug.error("ServiceManager.initAuthN", e);
+                DEBUG.error("ServiceManager.initAuthN", e);
             }
         }
     }
@@ -124,7 +129,7 @@ public class RestServiceManager {
             } catch (Exception e) {
                 // catch all exception, so that all auth filters have
                 // the chance to registered
-                PrivilegeManager.debug.error("AuthZFilter.init", e);
+                DEBUG.error("AuthZFilter.init", e);
             }
         }
 

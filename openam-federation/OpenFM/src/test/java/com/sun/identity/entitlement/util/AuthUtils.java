@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,12 +23,16 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AuthUtils.java,v 1.1 2009/11/12 18:37:36 veiming Exp $
+ *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.util;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.rest.AuthSPrincipal;
+
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
