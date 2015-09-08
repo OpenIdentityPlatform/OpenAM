@@ -159,12 +159,17 @@ public class SoapSamlTokenProvider extends SoapTokenProviderBase {
         try {
             final TokenProviderResponse tokenProviderResponse = new TokenProviderResponse();
             final SAML2SubjectConfirmation subjectConfirmation = determineSubjectConfirmation(tokenProviderParameters);
-            final SoapTokenProviderBase.AuthenticationContextState authenticationContextState =
-                    getAuthenticationContextState(tokenProviderParameters);
 
-            final String authNContextClassRef = authnContextMapper.getAuthnContext(
-                                                        authenticationContextState.getAuthenticatedTokenType(),
-                                                        authenticationContextState.getAuthenticatedToken());
+            final SoapTokenProviderBase.AuthenticationContextMapperState mapperState =
+                    getAuthenticationContextMapperState(tokenProviderParameters);
+            String authNContextClassRef;
+            if (mapperState.isDelegatedContext()) {
+                authNContextClassRef = authnContextMapper.getAuthnContextForDelegatedToken(
+                        mapperState.getSecurityPolicyBindingTraversalYield(), mapperState.getDelegatedToken());
+            } else {
+                authNContextClassRef = authnContextMapper.getAuthnContext(mapperState.getSecurityPolicyBindingTraversalYield());
+            }
+
             ProofTokenState proofTokenState = null;
             if (SAML2SubjectConfirmation.HOLDER_OF_KEY.equals(subjectConfirmation)) {
                 proofTokenState = getProofTokenState(tokenProviderParameters);

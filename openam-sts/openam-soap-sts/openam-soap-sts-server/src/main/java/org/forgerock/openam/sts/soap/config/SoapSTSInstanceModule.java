@@ -55,8 +55,8 @@ import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnec
 import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
 import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
+import org.forgerock.openam.sts.soap.token.provider.saml2.DefaultSaml2XmlTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapper;
-import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactory;
 import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactoryImpl;
 import org.forgerock.openam.sts.token.AMTokenParser;
@@ -353,7 +353,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
                     return Class.forName(customMapperClassName).asSubclass(Saml2XmlTokenAuthnContextMapper.class).newInstance();
                 } catch (Exception e) {
                     logger.error("Exception caught implementing custom Saml2XmlTokenAuthnContextMapper class " + customMapperClassName
-                            + "; Returning default Saml2XmlTokenAuthnContextMapperImpl. The exception: " + e);
+                            + "; Returning default DefaultSaml2XmlTokenAuthnContextMapper. The exception: " + e);
                 }
             }
         }
@@ -366,7 +366,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
         would NPE when obtaining the mapping. Thus the default mapper is a better choice. Token creation will be rejected
         at the token service if the invoking sts has no config corresponding to the desired token type.
          */
-        return new Saml2XmlTokenAuthnContextMapperImpl(logger);
+        return new DefaultSaml2XmlTokenAuthnContextMapper(logger);
     }
 
     @Provides

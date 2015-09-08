@@ -16,7 +16,10 @@
 
 package org.forgerock.openam.sts.soap.token.provider.oidc;
 
-import org.forgerock.openam.sts.TokenTypeId;
+import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.ws.security.handler.WSHandlerResult;
+
+import java.util.List;
 
 /**
  * @see SoapOpenIdConnectTokenAuthnContextMapper
@@ -24,7 +27,12 @@ import org.forgerock.openam.sts.TokenTypeId;
  */
 public class DefaultSoapOpenIdConnectTokenAuthnContextMapper implements SoapOpenIdConnectTokenAuthnContextMapper {
     @Override
-    public String getAuthnContextClassReference(TokenTypeId inputTokenType, Object inputToken) {
+    public String getAuthnContext(List<WSHandlerResult> securityPolicyBindingTraversalYield) {
+        return null;
+    }
+
+    @Override
+    public String getAuthnContextForDelegatedToken(List<WSHandlerResult> securityPolicyBindingTraversalYield, ReceivedToken delegatedToken) {
         return null;
     }
 }

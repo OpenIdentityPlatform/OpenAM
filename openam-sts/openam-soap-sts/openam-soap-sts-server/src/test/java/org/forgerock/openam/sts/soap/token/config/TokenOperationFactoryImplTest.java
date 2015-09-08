@@ -41,8 +41,8 @@ import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnec
 import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
 import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
+import org.forgerock.openam.sts.soap.token.provider.saml2.DefaultSaml2XmlTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapper;
-import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.soap.token.provider.saml2.SoapSamlTokenProvider;
 import org.forgerock.openam.sts.soap.token.validator.SimpleOpenIdConnectTokenValidator;
 import org.forgerock.openam.sts.soap.token.validator.SimpleSAML2TokenValidator;
@@ -104,7 +104,7 @@ public class TokenOperationFactoryImplTest {
             bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
             bind(TokenServiceConsumer.class).to(TokenServiceConsumerImpl.class);
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
-            bind(Saml2XmlTokenAuthnContextMapper.class).to(Saml2XmlTokenAuthnContextMapperImpl.class);
+            bind(Saml2XmlTokenAuthnContextMapper.class).to(DefaultSaml2XmlTokenAuthnContextMapper.class);
             bind(SoapSTSAccessTokenProvider.class).toInstance(mock(SoapSTSAccessTokenProvider.class));
             bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
             bind(HttpURLConnectionWrapperFactory.class);

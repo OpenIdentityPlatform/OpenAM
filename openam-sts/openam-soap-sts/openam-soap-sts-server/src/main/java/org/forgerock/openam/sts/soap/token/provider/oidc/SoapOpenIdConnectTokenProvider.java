@@ -17,8 +17,10 @@
 package org.forgerock.openam.sts.soap.token.provider.oidc;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
+import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.jose.common.JwtReconstruction;
@@ -39,6 +41,7 @@ import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -179,14 +182,22 @@ public class SoapOpenIdConnectTokenProvider extends SoapTokenProviderBase {
     public TokenProviderResponse createToken(TokenProviderParameters tokenProviderParameters) {
         try {
             final TokenProviderResponse tokenProviderResponse = new TokenProviderResponse();
-            final SoapTokenProviderBase.AuthenticationContextState authenticationContextState =
-                    getAuthenticationContextState(tokenProviderParameters);
-            final String authNContextClassRef = authnContextMapper.getAuthnContextClassReference(
-                                                    authenticationContextState.getAuthenticatedTokenType(),
-                                                    authenticationContextState.getAuthenticatedToken());
-            final Set<String> authNMethodsReferences = methodsReferencesMapper.getAuthnMethodsReferences(
-                                                    authenticationContextState.getAuthenticatedTokenType(),
-                                                    authenticationContextState.getAuthenticatedToken());
+            final SoapTokenProviderBase.AuthenticationContextMapperState mapperState =
+                    getAuthenticationContextMapperState(tokenProviderParameters);
+            String authNContextClassRef;
+            Set<String> authNMethodsReferences;
+            final List<WSHandlerResult> securityPolicyBindingTraversalYield = mapperState.getSecurityPolicyBindingTraversalYield();
+            if (mapperState.isDelegatedContext()) {
+                final ReceivedToken delegatedToken = mapperState.getDelegatedToken();
+                authNContextClassRef = authnContextMapper.getAuthnContextForDelegatedToken(
+                        securityPolicyBindingTraversalYield, delegatedToken);
+                authNMethodsReferences = methodsReferencesMapper.getAuthnMethodsReferencesForDelegatedToken(
+                        securityPolicyBindingTraversalYield, delegatedToken);
+            } else {
+                authNContextClassRef = authnContextMapper.getAuthnContext(securityPolicyBindingTraversalYield);
+                authNMethodsReferences = methodsReferencesMapper.getAuthnMethodsReferences(securityPolicyBindingTraversalYield);
+            }
+
             String token;
             try {
                 token = getAssertion(getValidationInvocationContext(tokenProviderParameters), authNContextClassRef,
