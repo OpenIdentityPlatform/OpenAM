@@ -62,14 +62,17 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.OpenIdPrompt;
+import org.forgerock.util.annotations.VisibleForTesting;
 import org.owasp.esapi.errors.EncodingException;
 import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
 
 /**
  * Validates whether a resource owner has a current authenticated session.
@@ -84,9 +87,11 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final OpenAMClientDAO clientDAO;
     private final ClientCredentialsReader clientCredentialsReader;
+    private RealmNormaliser realmNormaliser = new RealmNormaliser();
+    private DNWrapper dnWrapper;
 
     @Inject
-    public OpenAMResourceOwnerSessionValidator(SSOTokenManager ssoTokenManager,
+    public OpenAMResourceOwnerSessionValidator(DNWrapper dnWrapper, SSOTokenManager ssoTokenManager,
                                                OAuth2ProviderSettingsFactory providerSettingsFactory,
                                                OpenAMClientDAO clientDAO,
                                                ClientCredentialsReader clientCredentialsReader) {
@@ -94,6 +99,8 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         this.providerSettingsFactory = providerSettingsFactory;
         this.clientDAO = clientDAO;
         this.clientCredentialsReader = clientCredentialsReader;
+        this.dnWrapper = dnWrapper;
+
     }
 
 
@@ -129,6 +136,21 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
 
         try {
             if (token != null) {
+
+                try {
+                    // As the organization in the token is stored in lowercase, we need to lower case the auth2realm
+                    String auth2Realm = dnWrapper.orgNameToDN(
+                            realmNormaliser.normalise((String) request.getParameter("realm"))).toLowerCase();
+                    String tokenRealm = token.getProperty("Organization");
+
+                    // auth2Realm can't be null as we would have an error earlier
+                    if (!auth2Realm.equals(tokenRealm)){
+                        throw authenticationRequired(request);
+                    }
+                } catch (SSOException e) {
+                    throw new AccessDeniedException(e);
+                }
+
                 if (openIdPrompt.containsLogin()) {
                     throw authenticationRequired(request, token);
                 }
@@ -390,6 +412,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     /**
      * Hide static method call behind an instance method that can be overridden by unit tests.
      */
+    @VisibleForTesting
     HttpServletRequest getHttpServletRequest(Request req) {
         return ServletUtils.getRequest(req);
     }

@@ -37,10 +37,23 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
+import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.restlet.Request;
 import org.restlet.data.Reference;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.testng.Assert.*;
 
 /**
  * @since 12.0.0
@@ -59,6 +72,7 @@ public class OpenAMResourceOwnerSessionValidatorTest {
     private HttpServletRequest mockHttpServletRequest;
     private OpenAMClientDAO mockClientDAO;
     private ClientCredentialsReader mockClientCredentialsReader;
+    private CoreGuiceModule.DNWrapper dnWrapper;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -68,6 +82,7 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         mockOAuth2Request = mock(OAuth2Request.class);
         restletRequest = new Request();
         mockHttpServletRequest = mock(HttpServletRequest.class);
+        dnWrapper = mock(CoreGuiceModule.DNWrapper.class);
         mockClientDAO = mock(OpenAMClientDAO.class);
         mockClientCredentialsReader = mock(ClientCredentialsReader.class);
 
@@ -81,15 +96,18 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         given(mockHttpServletRequest.getScheme()).willReturn("http");
         given(mockHttpServletRequest.getServerName()).willReturn("openam.example.com");
         given(mockHttpServletRequest.getServerPort()).willReturn(8080);
+        given(ACTIVE_SESSION_TOKEN.getProperty("Organization")).willReturn("/");
 
         resourceOwnerSessionValidator =
-                new OpenAMResourceOwnerSessionValidator(mockSSOTokenManager, mockProviderSettingsFactory,
+                new OpenAMResourceOwnerSessionValidator(dnWrapper, mockSSOTokenManager, mockProviderSettingsFactory,
                         mockClientDAO, mockClientCredentialsReader) {
             @Override
             HttpServletRequest getHttpServletRequest(Request req) {
                 return mockHttpServletRequest;
             }
         };
+
+        when(dnWrapper.orgNameToDN("/")).thenReturn("/");
 
     }
 
