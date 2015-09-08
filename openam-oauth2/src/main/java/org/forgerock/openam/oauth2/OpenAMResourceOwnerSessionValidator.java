@@ -40,12 +40,14 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openidconnect.OpenIdPrompt;
+import org.forgerock.util.annotations.VisibleForTesting;
 import org.owasp.esapi.errors.EncodingException;
 import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -68,11 +70,14 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     private static final Debug logger = Debug.getInstance("OAuth2Provider");
     private final SSOTokenManager ssoTokenManager;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private RealmNormaliser realmNormaliser = new RealmNormaliser();
+    private DNWrapper dnWrapper;
 
     @Inject
-    public OpenAMResourceOwnerSessionValidator(SSOTokenManager ssoTokenManager,
+    public OpenAMResourceOwnerSessionValidator(DNWrapper dnWrapper, SSOTokenManager ssoTokenManager,
                                                OAuth2ProviderSettingsFactory providerSettingsFactory) {
 
+        this.dnWrapper = dnWrapper;
         this.ssoTokenManager = ssoTokenManager;
         this.providerSettingsFactory = providerSettingsFactory;
     }
@@ -102,6 +107,21 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
 
         try {
             if (token != null) {
+
+                try {
+                    // As the organization in the token is stored in lowercase, we need to lower case the auth2realm
+                    String auth2Realm = dnWrapper.orgNameToDN(
+                            realmNormaliser.normalise((String) request.getParameter("realm"))).toLowerCase();
+                    String tokenRealm = token.getProperty("Organization");
+
+                    // auth2Realm can't be null as we would have an error earlier
+                    if (!auth2Realm.equals(tokenRealm)){
+                        throw authenticationRequired(request);
+                    }
+                } catch (SSOException e) {
+                    throw new AccessDeniedException(e);
+                }
+
                 if (openIdPrompt.containsLogin()) {
                     try {
                         ssoTokenManager.destroyToken(token);
@@ -266,6 +286,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     /**
      * Hide static method call behind an instance method that can be overridden by unit tests.
      */
+    @VisibleForTesting
     HttpServletRequest getHttpServletRequest(Request req) {
         return ServletUtils.getRequest(req);
     }

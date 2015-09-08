@@ -27,6 +27,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
+import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.restlet.Request;
 import org.restlet.data.Reference;
 import org.testng.annotations.BeforeMethod;
@@ -41,6 +42,7 @@ import java.util.Map;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.testng.Assert.*;
 
 /**
@@ -58,6 +60,7 @@ public class OpenAMResourceOwnerSessionValidatorTest {
     private OAuth2Request mockOAuth2Request;
     private Request restletRequest;
     private HttpServletRequest mockHttpServletRequest;
+    private CoreGuiceModule.DNWrapper dnWrapper;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -67,6 +70,7 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         mockOAuth2Request = mock(OAuth2Request.class);
         restletRequest = new Request();
         mockHttpServletRequest = mock(HttpServletRequest.class);
+        dnWrapper = mock(CoreGuiceModule.DNWrapper.class);
 
         given(mockOAuth2Request.getParameter("realm")).willReturn("");
         given(mockOAuth2Request.getParameter("locale")).willReturn("");
@@ -78,14 +82,18 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         given(mockHttpServletRequest.getScheme()).willReturn("http");
         given(mockHttpServletRequest.getServerName()).willReturn("openam.example.com");
         given(mockHttpServletRequest.getServerPort()).willReturn(8080);
+        given(ACTIVE_SESSION_TOKEN.getProperty("Organization")).willReturn("/");
 
         resourceOwnerSessionValidator =
-                new OpenAMResourceOwnerSessionValidator(mockSSOTokenManager, mockProviderSettingsFactory) {
-            @Override
-            HttpServletRequest getHttpServletRequest(Request req) {
-                return mockHttpServletRequest;
-            }
+                new OpenAMResourceOwnerSessionValidator(dnWrapper, mockSSOTokenManager, mockProviderSettingsFactory) {
+                     @Override
+                    HttpServletRequest getHttpServletRequest(Request req) {
+                        return mockHttpServletRequest;
+                     }
+
         };
+
+        when(dnWrapper.orgNameToDN("/")).thenReturn("/");
 
     }
 
