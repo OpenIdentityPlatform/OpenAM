@@ -31,7 +31,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenCancellationInvocationState;
@@ -44,9 +43,9 @@ import org.slf4j.Logger;
  * The CREST entry point into the Rest STS
  */
 public class RestSTSService implements SingletonResourceProvider {
-    private static final String TRANSLATE = "translate";
-    private static final String VALIDATE = "validate";
-    private static final String CANCEL = "cancel";
+    static final String TRANSLATE = "translate";
+    static final String VALIDATE = "validate";
+    static final String CANCEL = "cancel";
     private final RestSTS restSts;
     private final Logger logger;
 
@@ -73,8 +72,6 @@ public class RestSTSService implements SingletonResourceProvider {
     }
 
     private Promise<ActionResponse, ResourceException> handleTranslate(Context context, ActionRequest request) {
-        RestSTSServiceHttpServletContext servletContext = context.asContext(RestSTSServiceHttpServletContext.class);
-        HttpContext httpContext = context.asContext(HttpContext.class);
         RestSTSTokenTranslationInvocationState invocationState;
         try {
             invocationState = RestSTSTokenTranslationInvocationState.fromJson(request.getContent());
@@ -82,7 +79,7 @@ public class RestSTSService implements SingletonResourceProvider {
             return e.asPromise();
         }
         try {
-            final JsonValue result = restSts.translateToken(invocationState, httpContext, servletContext);
+            final JsonValue result = restSts.translateToken(invocationState, context);
             return newResultPromise(newActionResponse(result));
         } catch (ResourceException e) {
             /*

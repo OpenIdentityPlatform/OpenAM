@@ -139,7 +139,7 @@ public class TokenTranslateOperationImplTest {
         TokenTranslateOperation tokenTranslateOperation = injector.getInstance(TokenTranslateOperation.class);
         TokenTransform mockTokenTransform = injector.getInstance(TokenTransform.class);
         when(mockTokenTransform.isTransformSupported(any(TokenType.class), any(TokenType.class))).thenReturn(Boolean.FALSE);
-        tokenTranslateOperation.translateToken(buildInvocationState(TokenType.SAML2), null, null);
+        tokenTranslateOperation.translateToken(buildInvocationState(TokenType.SAML2), null);
     }
 
     @Test(expectedExceptions = TokenValidationException.class)
@@ -148,7 +148,7 @@ public class TokenTranslateOperationImplTest {
         JsonValue bunkTokenState = json(object(field("token_type", "nonsense")));
         RestSTSTokenTranslationInvocationState invocationState =
                 RestSTSTokenTranslationInvocationState.builder().inputTokenState(bunkTokenState).outputTokenState(bunkTokenState).build();
-        tokenTranslateOperation.translateToken(invocationState, null, null);
+        tokenTranslateOperation.translateToken(invocationState, null);
     }
 
     private RestSTSTokenTranslationInvocationState buildInvocationState(TokenType desiredTokenType) throws Exception {

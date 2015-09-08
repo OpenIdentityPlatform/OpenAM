@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.sts.rest.operation.translate;
 
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
@@ -30,7 +30,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.openam.sts.rest.operation.TokenRequestMarshaller;
-import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.rest.token.validator.RestTokenTransformValidatorParameters;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenTranslationInvocationState;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
@@ -76,8 +75,7 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
 
     @Override
     @SuppressWarnings("unchecked")
-    public JsonValue translateToken(RestSTSTokenTranslationInvocationState invocationState, HttpContext httpContext,
-                                    RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
+    public JsonValue translateToken(RestSTSTokenTranslationInvocationState invocationState, Context context)
             throws TokenMarshalException, TokenValidationException, TokenCreationException {
         TokenTypeId inputTokenType = tokenRequestMarshaller.getTokenType(invocationState.getInputTokenState());
         TokenTypeId outputTokenType = tokenRequestMarshaller.getTokenType(invocationState.getOutputTokenState());
@@ -95,7 +93,7 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
             throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
         }
         RestTokenTransformValidatorParameters<?> validatorParameters = tokenRequestMarshaller.buildTokenTransformValidatorParameters(
-                invocationState.getInputTokenState(), httpContext, restSTSServiceHttpServletContext);
+                invocationState.getInputTokenState(), context);
         RestTokenProviderParameters<?> providerParameters =
                 tokenRequestMarshaller.buildTokenProviderParameters(inputTokenType,
                     invocationState.getInputTokenState(), outputTokenType, invocationState.getOutputTokenState());

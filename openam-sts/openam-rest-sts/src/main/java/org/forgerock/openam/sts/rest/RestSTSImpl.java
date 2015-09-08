@@ -18,8 +18,8 @@ package org.forgerock.openam.sts.rest;
 
 import javax.inject.Inject;
 
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.sts.TokenCancellationException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
@@ -27,7 +27,6 @@ import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.rest.operation.cancel.IssuedTokenCancelOperation;
 import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidateOperation;
 import org.forgerock.openam.sts.rest.operation.translate.TokenTranslateOperation;
-import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenCancellationInvocationState;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenTranslationInvocationState;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -54,11 +53,10 @@ public class RestSTSImpl implements RestSTS {
     }
 
     @Override
-    public JsonValue translateToken(RestSTSTokenTranslationInvocationState invocationState, HttpContext httpContext,
-                                    RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
+    public JsonValue translateToken(RestSTSTokenTranslationInvocationState invocationState, Context context)
             throws TokenMarshalException, TokenValidationException, TokenCreationException {
         try {
-            return translateOperation.translateToken(invocationState, httpContext, restSTSServiceHttpServletContext);
+            return translateOperation.translateToken(invocationState, context);
         } finally {
             threadLocalAMTokenCache.clearCachedSessions();
         }

@@ -41,7 +41,7 @@ public enum STSPublishInjectorHolder {
     /**
      * Returns the appropriate instance for the given injection key.
      * Avoid using this method, in favor of having Guice inject your dependencies ahead of time.
-     * Is only called by the RestSTSServiceConnectionFactoryProvider, and by the RestSTSInstanceModule. The
+     * Is only called by the RestSTSServiceHttpRouteProvider, and by the RestSTSInstanceModule. The
      * RestSTSInstanceModule uses it to obtain the global url elements which allow each Rest STS instance
      * to integrate with OpenAM -e.g. /authenticate, /sessions?_action=logout, /users/?_action=idFromSession, etc).
      *

@@ -16,11 +16,10 @@
 
 package org.forgerock.openam.sts.rest.operation;
 
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenTypeId;
-import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.rest.token.canceller.RestIssuedTokenCancellerParameters;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.validator.RestIssuedTokenValidatorParameters;
@@ -34,16 +33,12 @@ public interface TokenRequestMarshaller {
     /**
      * Marshals state from a token translate invocation into the RestTokenTransformValidatorParameters necessary to validate this token.
      * @param token the json representation of a token
-     * @param httpContext The HttpContext, which is necessary to obtain the client's x509 cert
+     * @param context The Context, which is necessary to obtain the client's x509 cert
      *                    presented via two-way-tls for token transformations with x509 certs as input token types.
-     * @param restSTSServiceHttpServletContext Provides direct access to the HttpServletRequest so that
-     *                                                            client certificate state, presented via two-way-tls, can
-     *                                                            be obtained
      * @return a RestTokenTransformValidatorParameters instance for a particular token type
      * @throws org.forgerock.openam.sts.TokenMarshalException if the json string cannot be marshaled into a recognized token.
      */
-    RestTokenTransformValidatorParameters<?> buildTokenTransformValidatorParameters(JsonValue token, HttpContext httpContext, RestSTSServiceHttpServletContext
-            restSTSServiceHttpServletContext) throws TokenMarshalException;
+    RestTokenTransformValidatorParameters<?> buildTokenTransformValidatorParameters(JsonValue token, Context context) throws TokenMarshalException;
 
     /**
      * Marshals state from a token validate invocation into the RestIssuedTokenValidatorParameters necessary to validate this token

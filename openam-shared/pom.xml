@@ -107,6 +107,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource-http</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>external</groupId>
             <artifactId>jss4</artifactId>
         </dependency>

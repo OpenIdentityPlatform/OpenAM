@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.sts.rest;
 
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.sts.TokenCancellationException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
@@ -25,7 +25,6 @@ import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.rest.operation.cancel.IssuedTokenCancelOperation;
 import org.forgerock.openam.sts.rest.operation.translate.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidateOperation;
-import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenCancellationInvocationState;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenTranslationInvocationState;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenValidationInvocationState;
@@ -38,10 +37,7 @@ public interface RestSTS extends TokenTranslateOperation, IssuedTokenValidateOpe
     /**
      *
      * @param invocationState An object encapsulating the input and output token state specifications
-     * @param httpContext The HttpContext
-     * @param restSTSServiceHttpServletContext The RestSTSServiceHttpServletContext, which can be consulted to
-     *                                         obtain the X509Certificate[] set by the container following a two-way-tls
-     *                                         handshake
+     * @param context The Context
      * @return A JsonValue with a 'issued_token' key and the value corresponding to the issued token
      * @throws TokenValidationException if the input token could not be validated
      * @throws TokenCreationException if the desired token could not be produced
@@ -49,8 +45,7 @@ public interface RestSTS extends TokenTranslateOperation, IssuedTokenValidateOpe
      */
     @Override
     JsonValue translateToken(RestSTSTokenTranslationInvocationState invocationState,
-                                    HttpContext httpContext,
-                                    RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
+                                    Context context)
                                     throws TokenMarshalException, TokenValidationException, TokenCreationException;
 
     /**

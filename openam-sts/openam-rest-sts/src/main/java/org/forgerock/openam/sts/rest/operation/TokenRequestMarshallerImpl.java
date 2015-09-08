@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.http.Context;
 import org.forgerock.http.context.ClientInfoContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
@@ -43,7 +44,6 @@ import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.operation.translate.CustomRestTokenProviderParametersImpl;
 import org.forgerock.openam.sts.rest.operation.translate.OpenIdConnectRestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.operation.translate.Saml2RestTokenProviderParameters;
-import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.rest.token.canceller.RestIssuedTokenCancellerParameters;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenCreationState;
@@ -91,8 +91,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
 
     @Override
     public RestTokenTransformValidatorParameters<?> buildTokenTransformValidatorParameters(
-            JsonValue receivedToken, HttpContext httpContext,
-            RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
+            JsonValue receivedToken, Context context)
                                                         throws TokenMarshalException {
         if (!receivedToken.get(AMSTSConstants.TOKEN_TYPE_KEY).isString()) {
             String message = "The to-be-translated token does not contain a " + AMSTSConstants.TOKEN_TYPE_KEY +
@@ -107,7 +106,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         } else if (TokenType.OPENIDCONNECT.name().equals(tokenType)) {
             return buildOpenIdConnectIdTokenTransformValidatorParameters(receivedToken);
         } else if (TokenType.X509.name().equals(tokenType)) {
-            return buildX509CertTokenTransformValidatorParameters(httpContext, restSTSServiceHttpServletContext);
+            return buildX509CertTokenTransformValidatorParameters(context);
         } else {
             for (CustomTokenOperation customTokenOperation : customTokenValidators) {
                 if (tokenType.equals(customTokenOperation.getCustomTokenName())) {
@@ -376,19 +375,15 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
      * the javax.servlet.request.X509Certificate key (if the container is deployed with two-way-tls), or from the header
      * referenced by offloadedTlsClientCertKey, in case OpenAM is deployed behind infrastructure which performs tls-offloading.
      * This method will consult header value if configured for this rest-sts instance, and if not configured, the
-     * javax.servlet.request.X509Certificate attribute will be consulted.
+     * ClientInfoContxt will be consulted, which contains the state corresponding to the javax.servlet.request.X509Certificate attribute.
      * An exception will be thrown if the client cert cannot be obtained.
-     * @param httpContext The HttpContext instance corresponding to this invocation
-     * @param restSTSServiceHttpServletContext The AbstractContext instance which provides access to the
-     *                                         ClientInfoContext,
-     *                                         and with it, access to the client cert presented via two-way-tls
+     * @param context The Context instance corresponding to this invocation
      * @throws org.forgerock.openam.sts.TokenMarshalException if the client's X509 token cannot be obtained from the
      * javax.servlet.request.X509Certificate attribute, or from the header referenced by the offloadedTlsClientCertKey value.
      * @return a RestTokenTransformValidatorParameters instance with a X509Certificate[] generic type.
      */
     private RestTokenTransformValidatorParameters<X509Certificate[]> buildX509CertTokenTransformValidatorParameters(
-            HttpContext httpContext, RestSTSServiceHttpServletContext
-            restSTSServiceHttpServletContext) throws TokenMarshalException {
+            Context context) throws TokenMarshalException {
 
         X509Certificate[] certificates;
         /*
@@ -398,7 +393,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         so I will check to insure that this value has indeed been specified.
          */
         if (!"".equals(offloadedTlsClientCertKey)) {
-            String clientIpAddress = ClientUtils.getClientIPAddress(restSTSServiceHttpServletContext, restSTSServiceHttpServletContext.getRequest());
+            String clientIpAddress = ClientUtils.getClientIPAddress(context);
             if (!tlsOffloadEngineHosts.contains(clientIpAddress) && !tlsOffloadEngineHosts.contains(ANY_HOST)) {
                 logger.error("A x509-based token transformation is being rejected because the client cert was to be referenced in " +
                         "the  " + offloadedTlsClientCertKey + " header, but the caller was not in the list of TLS offload engines." +
@@ -408,9 +403,9 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                         " the caller was not among the list of IP addresses corresponding to the TLS offload-engine hosts. " +
                         "Insure that your published rest-sts instance is configured with a complete list of TLS offload-engine hosts.");
             }
-            certificates = pullClientCertFromHeader(httpContext);
+            certificates = pullClientCertFromHeader(context.asContext(HttpContext.class));
         } else {
-            certificates = pullClientCertFromRequestAttribute(restSTSServiceHttpServletContext);
+            certificates = pullClientCertFromRequestAttribute(context.asContext(ClientInfoContext.class));
         }
 
         if (certificates != null) {
@@ -430,11 +425,9 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    private X509Certificate[] pullClientCertFromRequestAttribute(
-            RestSTSServiceHttpServletContext restSTSServiceHttpServletContext) throws TokenMarshalException {
+    private X509Certificate[] pullClientCertFromRequestAttribute(ClientInfoContext context) throws TokenMarshalException {
         // Filter the certs on the request to just the X509 ones and return as an array.
-        return toArray(filter(restSTSServiceHttpServletContext.asContext(ClientInfoContext.class).getCertificates(),
-                        X509Certificate.class), X509Certificate.class);
+        return toArray(filter(context.getCertificates(), X509Certificate.class), X509Certificate.class);
     }
 
     private X509Certificate[] pullClientCertFromHeader(HttpContext httpContext) throws TokenMarshalException {

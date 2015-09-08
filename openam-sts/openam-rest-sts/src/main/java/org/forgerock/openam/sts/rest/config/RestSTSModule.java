@@ -45,16 +45,6 @@ public class RestSTSModule extends AbstractModule {
     }
 
     /*
-    Used to obtain the ConnectionFactory servicing all rest-sts invocations.
-     */
-    @Provides
-    @Named(AMSTSConstants.REST_STS_CONNECTION_FACTORY_NAME)
-    @Singleton
-    ConnectionFactory getConnectionFactory() {
-        return Resources.newInternalConnectionFactory(router);
-    }
-
-    /*
     Used to obtain the router to publish new Rest STS instances. Note that this method will be consumed by the sts-publish
     service (via the RestSTSInjectorHolder) so that the RestSTSInstancePublisherImpl can obtain the router necessary to
     add/remove newly-published rest-sts instances to CREST.

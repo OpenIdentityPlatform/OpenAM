@@ -249,11 +249,6 @@ public class AMSTSConstants {
     public static final String UTF_8_CHARSET_ID = "UTF-8";
 
     /*
-    Used to identify the json-resource ConnectionFactory which will be bound globally to all Rest STS instances.
-     */
-    public static final String REST_STS_CONNECTION_FACTORY_NAME = "rest_sts_connection_factory_name";
-
-    /*
     used to identify the key referencing the OIDC ID Token in both the json representation of the OIDC ID Token.
     This value is also used as the local name in the AM_OPEN_ID_CONNECT_TOKEN_ASSERTION_TYPE, which is the token type
     indicator set by the cxf sts client, and  used by the SoapOpenIdConnectTokenProvider#canHandleToken to
