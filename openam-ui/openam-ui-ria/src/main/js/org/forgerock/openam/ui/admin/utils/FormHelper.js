@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -15,38 +15,54 @@
  */
 
 /*global define */
-
 define("org/forgerock/openam/ui/admin/utils/FormHelper", [
     "jquery",
-    "underscore",
-    "jsonEditor"
-], function($, _, JSONEditor) {
+    "underscore"
+], function ($, _) {
+    /**
+     * @exports org/forgerock/openam/ui/admin/utils/FormHelper
+     */
     var obj = {};
 
-    obj.bindSavePromiseToElement = function(promise, element) {
+    /**
+     * Binds a promise representing a save to a button element, visualising it's state.
+     * <p>
+     * Intented to be used in conjuction with the <code>_JSONSchemaFooter.html</code> partial.
+     * @param  {Promise} promise Save promise. Usually a promise from an AJAX request
+     * @param  {HTMLElement} element The button element visualising the promise's state
+     * @example
+     * clickHandler: function (event) {
+     *   var promise = Service.update(this.data);
+     *
+     *   FormHelper.bindSavePromiseToElement(promise, event.currentTarget);
+     * }
+     */
+    obj.bindSavePromiseToElement = function (promise, element) {
         element = $(element);
+        element.prop("disabled", true);
+        element.width(element.width());
 
-        var originalText = element.text();
+        var span = element.find("span"),
+            text = span.text();
 
-        element.prop('disabled', true)
-        .text('')
-        .prepend($('<span class="fa fa-refresh fa-spin"/>'));
+        span.fadeOut(300, function () {
+            span.empty();
+            span.removeClass().addClass("fa fa-refresh fa-spin");
+            span.fadeIn(300);
 
-        promise.always(function() {
-            element.prop('disabled', false)
-            .text(' ' + originalText);
-        })
-        .done(function() {
-            element.prepend($('<span class="fa fa-check fa-fw"/>'));
-        })
-        .fail(function() {
-            element.prepend($('<span class="fa fa-times fa-fw"/>'));
-        })
-        .always(function() {
-            _.delay(function() {
-                element.empty()
-                .text(originalText);
-            }, 2000);
+            promise.done(function () {
+                span.removeClass().addClass("fa fa-check fa-fw");
+            }).fail(function () {
+                span.removeClass().addClass("fa fa-times fa-fw");
+            }).always(function () {
+                _.delay(function () {
+                    span.fadeOut(300, function () {
+                        span.removeClass().text(text);
+                        element.prop("disabled", false);
+                        span.fadeIn(300);
+                    });
+                }, 1000);
+            });
         });
     };
 

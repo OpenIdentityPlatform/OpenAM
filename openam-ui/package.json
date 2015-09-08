@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "predocs": "rimraf docs",
-    "docs": "jsdoc -P package.json -d docs -r src/main/js"
+    "docs": "jsdoc -P package.json -d docs -r openam-ui-ria/src/main/js"
   },
   "devDependencies": {
     "eslint": "^1.0.0",

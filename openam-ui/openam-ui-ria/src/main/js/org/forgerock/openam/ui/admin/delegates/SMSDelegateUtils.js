@@ -16,117 +16,139 @@
 
  /*global define*/
 define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
-    "jquery",
     "underscore"
-], function ($, _) {
+], function (_) {
     /**
      * @exports org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils
      */
     var obj = {};
 
     /**
+     * Adds a type attribute of <code>object</code> if not present
+     * @param {Object} schema Schema to check
+     */
+    function addSchemaType (schema) {
+        if (!schema.type) {
+            console.warn("JSON schema detected without root type attribute! Defaulting to \"object\" type.");
+            schema.type = "object";
+        }
+    }
+    /**
+     * Determines whether the specified object is of type <code>object</code>
+     * @param   {Object}  object Object to determine the type of
+     * @returns {Boolean}        Whether the object is of type <code>object</code>
+     */
+    function isObjectType (object) {
+        return object.type === "object";
+    }
+    /**
+     * Recursively invokes the specified functions over each object's properties
+     * @param {Object} object   Object with properties
+     * @param {Array} callbacks Array of functions
+     */
+    function eachProperty (object, callbacks) {
+        if (isObjectType(object)) {
+            _.forEach(object.properties, function (property, key) {
+                _.forEach(callbacks, function (callback) {
+                    callback(property, key);
+                });
+
+                if (isObjectType(property)) {
+                    eachProperty(property, callbacks);
+                }
+            });
+        }
+    }
+    /**
+    * Removes schema <code>defaults</code> attribute if present
+    * @param {Object} schema Schema to check
+    */
+    function removeSchemaDefaults (schema) {
+        if (schema.properties.defaults) {
+            console.warn("JSON schema detected with a \"defaults\" section present in it's properties. Removing.");
+            delete schema.properties.defaults;
+        }
+    }
+    /**
+    * Transforms boolean types to checkbox format
+    * FIXME: To fix server side? Visual only?
+    * @param {Object} property Property to transform
+    */
+    function transformBooleanTypeToCheckboxFormat (property) {
+        if (property.hasOwnProperty("type") && property.type === "boolean") {
+            property.format = "checkbox";
+        }
+    }
+    /**
+    * Recursively add string type to enum
+    * FIXME: To fix server side
+    * @param {Object} property Property to transform
+    */
+    function transformEnumTypeToString (property) {
+        if (property.hasOwnProperty("enum")) {
+            property.type = "string";
+        }
+    }
+    /**
+     * Transforms propertyOrder attribute to integer
+     * @param {Object} property Property to transform
+     */
+    function transformPropertyOrderAttributeToInt (property) {
+        if (property.hasOwnProperty("propertyOrder")) {
+            property.propertyOrder = parseInt(property.propertyOrder.slice(1), 10);
+        }
+    }
+    /**
+     * Warns if a property is inferred to be a password and does not have a format of password
+     * @param {Object} property Property to transform
+     * @param {String} name Raw property name
+     */
+    function warnOnInferredPasswordWithoutFormat (property, name) {
+        var possiblePassword = name.toLowerCase().indexOf("password", name.length - 8) !== -1,
+            hasFormat = property.format === "password";
+        if (property.type === "string" && possiblePassword && !hasFormat) {
+            console.warn("JSON schema password property detected (inferred) without format of \"password\"");
+        }
+    }
+
+    /**
      * Sanitizes JSON Schemas.
      * @param  {Object} schema Schema to sanitize
-     * @return {Object}        Sanitized schema
+     * @returns {Object}       Sanitized schema
      */
     obj.sanitizeSchema = function (schema) {
+        var transformedSchema = _.cloneDeep(schema);
+
         /**
          * Missing and superfluous attribute checks
          */
-        schema = obj.rootTypePresent(schema);
-        schema = obj.defaultPropertyPresent(schema);
+        addSchemaType(transformedSchema);
+        removeSchemaDefaults(transformedSchema);
 
         /**
-         * Transforms
+         * Property transforms & warnings
          */
-        // Recursively transforms propertyOrder attribute to int
-        _.forEach(schema.properties, obj.propertyOrderTransform);
-        // Recursively add checkbox format to boolean FIXME: To fix server side? Visual only?
-        _.forEach(schema.properties, obj.addCheckboxFormatToBoolean);
-        // Recursively add string type to enum FIXME: To fix server side
-        _.forEach(schema.properties, obj.addStringTypeToEnum);
+        eachProperty(transformedSchema, [transformPropertyOrderAttributeToInt,
+                                         transformBooleanTypeToCheckboxFormat,
+                                         transformEnumTypeToString,
+                                         warnOnInferredPasswordWithoutFormat]);
 
         /**
          * Additional attributes
          */
         // Adds attribute indicating if all the schema properties are of the type "object" (hence grouped)
-        schema.grouped = _.every(schema.properties, obj.isObjectType);
+        transformedSchema.grouped = _.every(transformedSchema.properties, isObjectType);
         // Create ordered array
-        schema.orderedProperties = _.sortBy(_.map(schema.properties, function (value, key) {
+        transformedSchema.orderedProperties = _.sortBy(_.map(transformedSchema.properties, function (value, key) {
             value._id = key;
             return value;
         }), "propertyOrder");
 
-        return schema;
-    };
-
-    // Not intented for use outside of this module
-
-    obj.addCheckboxFormatToBoolean = function (property) {
-        if (property.hasOwnProperty("type") && property.type === "boolean") {
-            property.format = "checkbox";
-        }
-
-        if (property.type === "object") {
-            _.forEach(property.properties, obj.addCheckboxFormatToBoolean);
-        }
-    };
-
-    obj.addStringTypeToEnum = function (property) {
-        if (property.hasOwnProperty("enum")) {
-            property.type = "string";
-        }
-
-        if (property.type === "object") {
-            _.forEach(property.properties, obj.addStringTypeToEnum);
-        }
-    };
-
-    /**
-     * Checks for the existance of a "defaults" property
-     * @param  {[type]} schema [description]
-     * @return {[type]}        [description]
-     */
-    obj.defaultPropertyPresent = function (schema) {
-        if(schema.properties.defaults) {
-            console.warn("JSON schema detected with a \"defaults\" section present in it's properties. Removing.");
-            delete schema.properties.defaults;
-        }
-
-        return schema;
-    };
-
-    obj.isObjectType = function(schema) {
-        return schema.type === "object";
-    };
-
-    obj.propertyOrderTransform = function (property) {
-        if (property.hasOwnProperty("propertyOrder")) {
-            property.propertyOrder = parseInt(property.propertyOrder.slice(1), 10);
-        }
-
-        if (property.type === "object") {
-            _.forEach(property.properties, obj.propertyOrderTransform);
-        }
-    };
-
-    /**
-     * Checks for the existance of an object type at the root of the schema. Defaults to "object" if attribute is not
-     * found.
-     * @param  {Object} schema Schema to check
-     * @return {Object}        Checked schema
-     */
-    obj.rootTypePresent = function(schema) {
-        if(!schema.type) {
-            console.warn("JSON schema detected without root type attribute! Defaulting to \"object\" type.");
-            schema.type = "object";
-        }
-
-        return schema;
+        return transformedSchema;
     };
 
     obj.sortResultBy = function (attribute) {
-        return function(data) {
+        return function (data) {
             data.result = _.sortBy(data.result, attribute);
         };
     };

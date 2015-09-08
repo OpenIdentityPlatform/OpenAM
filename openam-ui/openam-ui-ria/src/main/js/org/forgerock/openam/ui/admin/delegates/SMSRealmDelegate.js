@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
             return $.when(
                 obj.serviceCall({ url: url + "?_action=schema", type: "POST" }),
                 obj.serviceCall({ url: url })
-            ).then(function(schemaData, valuesData) {
+            ).then(function (schemaData, valuesData) {
                 return {
                     schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
                     values: valuesData[0]
@@ -60,7 +60,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 return $.when(
                     obj.serviceCall({ url: url + "/chains?_queryFilter=true" }),
                     obj.serviceCall({ url: url })
-                ).then(function(chainsData, authenticationData) {
+                ).then(function (chainsData, authenticationData) {
                     _.each(chainsData[0].result, function (chainData) {
                         if (chainData._id === authenticationData[0].adminAuthModule) {
                             chainData.defaultConfig = chainData.defaultConfig || {};
@@ -129,7 +129,11 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 });
             },
             get: function (realm, name, type) {
-                return obj.serviceCall({ url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name) });
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name)
+                }).then(function (data) {
+                    return data;
+                });
             },
             exists: function (realm, name) {
                 var promise = $.Deferred(),

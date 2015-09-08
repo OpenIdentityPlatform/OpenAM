@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
     // jquery dependencies
     "sortable"
-], function($, _, AbstractView, FormHelper, LinkView, PostProcessView, SMSRealmDelegate) {
+], function ($, _, AbstractView, FormHelper, LinkView, PostProcessView, SMSRealmDelegate) {
     var EditChainView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
         events: {
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             "click #addModuleLink":     "addModuleLink"
         },
 
-        addModuleLink: function(e) {
+        addModuleLink: function (e) {
             if (e) {
                 e.preventDefault();
             }
@@ -44,11 +44,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             linkView.render();
         },
 
-        createLinkView: function(li, index){
+        createLinkView: function (li, index) {
             var linkView = new LinkView();
 
-            // A new list item is being dynamically created and added to the current EditChainView as a child View.
-            // In order to do this we must create the element here,  parent and pass it to the child so that it has something to render inside of.
+            /**
+             * A new list item is being dynamically created and added to the current EditChainView as a child View.
+             * In order to do this we must create the element here,  parent and pass it to the child so that it has
+             * something to render inside of.
+             */
             linkView.el = li;
             linkView.element = li;
             linkView.parent = this;
@@ -59,8 +62,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             // Below we add an empty object to the array if there is not already one at authChainConfiguration[index].
             // This will result in an empty module being created, which will trigger the Edit Link dialog to open
             // upon LinkView render.
-            if (this.data.form.chainData.authChainConfiguration.length <= index){
-                this.data.form.chainData.authChainConfiguration.push({ module: '', options: '', criteria: '' });
+            if (this.data.form.chainData.authChainConfiguration.length <= index) {
+                this.data.form.chainData.authChainConfiguration.push({ module: "", options: "", criteria: "" });
             }
 
             linkView.data = {
@@ -76,15 +79,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             return linkView;
         },
 
-        initSortable: function(){
-
+        initSortable: function () {
             var self = this;
 
             this.$el.find("ol#sortable").nestingSortable({
                 exclude:"li:not(.chain-link)",
                 delay: 100,
                 vertical: true,
-                placeholder: "<li class='placeholder'><i class='fa fa-download'></i>"+ $.t("console.authentication.editChains.dropHere") +"</li>",
+                placeholder: "<li class='placeholder'><i class='fa fa-download'></i>" +
+                             $.t("console.authentication.editChains.dropHere") + "</li>",
 
                 onDrag: function (item, position) {
                     item.css({
@@ -106,10 +109,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                 },
 
                 onDrop: function (item, container, _super, event) {
-                    var clonedItem = $("<li/>").css({height: item.height() + 6, backgroundColor: "transparent", borderColor: "transparent"});
-                    self.sortChainData( self.originalIndex, item.index());
+                    var clonedItem = $("<li/>").css({
+                        height: item.height() + 6,
+                        backgroundColor: "transparent",
+                        borderColor: "transparent"
+                    });
+                    self.sortChainData(self.originalIndex, item.index());
                     item.before(clonedItem);
-                    item.animate( clonedItem.position(), 300, function () {
+                    item.animate(clonedItem.position(), 300, function () {
                         clonedItem.detach();
                         _super(item, container);
                         self.setArrows();
@@ -118,7 +125,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             });
         },
 
-        render: function(args, callback) {
+        render: function (args, callback) {
             var self = this;
 
             SMSRealmDelegate.authentication.chains.get(args[0], args[1]).done(function (data) {
@@ -142,10 +149,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     form : { chainData: data.chainData }
                 };
 
-                self.parentRender(function(){
+                self.parentRender(function () {
                     var sortable = self.$el.find("ol#sortable");
 
-                    _.each(self.data.form.chainData.authChainConfiguration, function(linkConfig, index){
+                    _.each(self.data.form.chainData.authChainConfiguration, function (linkConfig, index) {
                         var li = $("<li class='chain-link' />"),
                             linkView = self.createLinkView(li, index);
                         linkView.render();
@@ -166,7 +173,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             });
         },
 
-        saveChanges: function(e){
+        saveChanges: function (e) {
             e.preventDefault();
             var self = this,
                 promise = null,
@@ -175,17 +182,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             chainData.loginSuccessUrl[0] = this.$el.find("#loginSuccessUrl").val();
             chainData.loginFailureUrl[0] = this.$el.find("#loginFailureUrl").val();
 
-            PostProcessView.addClassNameDialog().done(function(){
+            PostProcessView.addClassNameDialog().done(function () {
                 promise = SMSRealmDelegate.authentication.chains.update(self.data.realmPath, chainData._id, chainData);
-                promise.fail(function(e) {
+                promise.fail(function (e) {
                     // TODO: Add failure condition
                     console.error(e);
                 });
-                FormHelper.bindSavePromiseToElement(promise, e.target);
+                FormHelper.bindSavePromiseToElement(promise, e.currentTarget);
             });
         },
 
-        setArrows: function(){
+        setArrows: function () {
             var chainlinks = this.$el.find(".chain-link"),
                 linkView = null,
                 self = this;
@@ -193,14 +200,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             // firstRequiredIndex is used in linkView.setArrows() which renders itself differently
             // if the linkView's index is greater than the first required module's index.
             this.data.firstRequiredIndex = -1;
-            _.each(chainlinks, function(chainlink){
+            _.each(chainlinks, function (chainlink) {
                 linkView = self.data.linkViewMap[$(chainlink).children().data().id];
                 linkView.setArrows();
             });
         },
 
-        sortChainData: function(from, to) {
-            this.data.form.chainData.authChainConfiguration.splice(to, 0, this.data.form.chainData.authChainConfiguration.splice(from, 1)[0]);
+        sortChainData: function (from, to) {
+            var addItem = this.data.form.chainData.authChainConfiguration.splice(from, 1)[0];
+            this.data.form.chainData.authChainConfiguration.splice(to, 0, addItem);
         }
     });
 

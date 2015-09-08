@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -15,16 +15,14 @@
  */
 
 /*global define*/
-define('org/forgerock/openam/ui/admin/models/Form', [
+define("org/forgerock/openam/ui/admin/models/Form", [
     "jquery",
     "underscore",
-    'jsonEditor',
-    'org/forgerock/openam/ui/admin/utils/JSONEditorTheme',
-
-    // jquery dependencies
-    "selectize"
+    "jsonEditor",
+    "org/forgerock/openam/ui/admin/utils/JSONEditorTheme",
+    "selectize" // jquery dependencies
 ], function ($, _, JSONEditor, JSONEditorTheme) {
-    var obj = function Form(element, schema, values) {
+    var obj = function Form (element, schema, values) {
         this.element = element;
         this.schema = schema;
         this.values = values;
@@ -33,26 +31,33 @@ define('org/forgerock/openam/ui/admin/models/Form', [
         JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(6, 4);
 
         this.editor = new JSONEditor(element, {
-            disable_collapse: true,
-            disable_edit_json: true,
-            disable_properties: true,
-            iconlib: "fontawesome4",
-            schema: schema,
-            theme: "openam"
+            "disable_collapse": true,
+            "disable_edit_json": true,
+            "disable_properties": true,
+            "iconlib": "fontawesome4",
+            "remove_empty_properties": true,
+            "schema": schema,
+            "theme": "openam"
         });
 
-        $(element).find('.help-block').addClass("hidden-lg hidden-md").each(function () {
+        /**
+         * Passwords are not delivered to the UI from the server. Thus we set a placeholder informing the user that
+         * the password will remain unchanged if they do nothing
+         */
+        $(element).find("input:password").attr("placeholder", $.t("common.form.unchanged"));
+
+        $(element).find(".help-block").addClass("hidden-lg hidden-md").each(function () {
             var group = $(this).parent(),
-                element = $('<a class="btn info-button visible-lg-inline-block visible-md-inline-block" tabindex="0" data-toggle="popover" data-trigger="focus"><i class="fa fa-info-circle"></i></a>');
+                element = $('<a class="btn info-button visible-lg-inline-block visible-md-inline-block" ' +
+                    'tabindex="0" data-toggle="popover" data-trigger="focus"><i class="fa fa-info-circle"></i></a>');
 
             $(group).append(element);
 
             element.popover({
-                container: '#content',
+                container: "#content",
                 html: true,
-                placement: 'auto top',
-                content: this.innerHTML,
-                title: group.find("label:first-of-type").text()
+                placement: "auto top",
+                content: this.innerHTML
             });
             element.click(function (event) {
                 event.preventDefault();

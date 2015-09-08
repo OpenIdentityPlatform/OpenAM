@@ -29,7 +29,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, AbstractView, Configuration, EventManager, Router, Constants, SMSRealmDelegate, SMSGlobalDelegate, Form, FormHelper) {
+], function ($, AbstractView, Configuration, EventManager, Router, Constants,
+             SMSRealmDelegate, SMSGlobalDelegate, Form, FormHelper) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
@@ -48,11 +49,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
                 SMSGlobalDelegate.authentication.modules.schema(this.data.type),
                 SMSRealmDelegate.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type)
             ).done(function (schemaData, valuesData) {
-                self.data.schema = schemaData[0];
-                self.data.values = valuesData[0];
+                self.data.schema = schemaData;
+                self.data.values = valuesData;
 
                 self.parentRender(function () {
-                    if(!self.data.schema.grouped) {
+                    if (!self.data.schema.grouped) {
                         self.data.form = new Form(self.$el.find("#tabContent")[0], self.data.schema, self.data.values);
                     }
 
@@ -72,7 +73,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
                                                                          this.data.name,
                                                                          this.data.type,
                                                                          this.data.form.data());
-            FormHelper.bindSavePromiseToElement(promise, event.target);
+            FormHelper.bindSavePromiseToElement(promise, event.currentTarget);
         },
         revert: function () {
             this.data.form.reset();
