@@ -31,17 +31,17 @@ define("org/forgerock/openam/ui/common/util/RealmHelperTest", [
                 .store("org/forgerock/commons/ui/common/main/Router")
                 .require(["org/forgerock/openam/ui/common/util/RealmHelper", "mocks"], function (RealmHelper, mocks) {
 
-                    QUnit.module("org/forgerock/openam/ui/common/util/RealmHelper");
+                    QUnit.module("org/forgerock/openam/ui/common/util/RealmHelper", {
+                        setup: function () {
+                            Router = mocks.store["org/forgerock/commons/ui/common/main/Router"];
+                            Configuration = mocks.store["org/forgerock/commons/ui/common/main/Configuration"];
 
-                    QUnit.moduleStart(function () {
-                        Router = mocks.store["org/forgerock/commons/ui/common/main/Router"];
-                        Configuration = mocks.store["org/forgerock/commons/ui/common/main/Configuration"];
-
-                        Configuration.globalData = {
-                            auth: {
-                                subRealm: undefined
-                            }
-                        };
+                            Configuration.globalData = {
+                                auth: {
+                                    subRealm: undefined
+                                }
+                            };
+                        }
                     });
 
                     test("#decorateURLWithOverrideRealm", sinon.test(function () {

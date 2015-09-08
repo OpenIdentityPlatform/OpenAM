@@ -17,12 +17,14 @@
 /*global define */
 
 define("tests/admin/common", [
-    "org/forgerock/openam/ui/common/util/RealmHelperTest"
-], function (RealmHelperTest) {
+    "org/forgerock/openam/ui/common/util/RealmHelperTest",
+    "org/forgerock/openam/ui/common/util/ThemeManagerTest"
+], function (RealmHelperTest, ThemeManagerTest) {
     return {
         executeAll: function () {
             // Individual tests
             RealmHelperTest.executeAll();
+            ThemeManagerTest.executeAll();
 
             // Common tests
             module("Admin Common Tests");
