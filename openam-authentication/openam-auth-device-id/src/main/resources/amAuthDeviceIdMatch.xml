@@ -70,7 +70,7 @@
                         </ChoiceValuesClassName>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>&GlobalClientSideDeviceIdMatchScriptId;</Value>
+                        <Value>@GlobalClientSideDeviceIdMatchScriptId@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-server-script"
@@ -89,7 +89,7 @@
                         </ChoiceValuesClassName>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>&GlobalServerSideDeviceIdMatchScriptId;</Value>
+                        <Value>@GlobalServerSideDeviceIdMatchScriptId@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
@@ -132,7 +132,7 @@
                             </ChoiceValuesClassName>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>&GlobalClientSideDeviceIdMatchScriptId;</Value>
+                            <Value>@GlobalClientSideDeviceIdMatchScriptId@</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-server-script"
@@ -151,7 +151,7 @@
                             </ChoiceValuesClassName>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>&GlobalServerSideDeviceIdMatchScriptId;</Value>
+                            <Value>@GlobalServerSideDeviceIdMatchScriptId@</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-auth-level"

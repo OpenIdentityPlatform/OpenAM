@@ -217,7 +217,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="defaultScript"/>
-                        <Value>&GlobalEntitlementConditionScriptId;</Value>
+                        <Value>@GlobalEntitlementConditionScriptId@</Value>
                     </AttributeValuePair>
                     <SubConfiguration name="engineConfiguration" id="engineConfiguration"/>
                 </SubConfiguration>
@@ -228,7 +228,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="defaultScript"/>
-                        <Value>&GlobalServerSideAuthModuleScriptId;</Value>
+                        <Value>@GlobalServerSideAuthModuleScriptId@</Value>
                     </AttributeValuePair>
                     <SubConfiguration name="engineConfiguration" id="engineConfiguration">
                         <AttributeValuePair>
@@ -280,7 +280,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="defaultScript"/>
-                        <Value>&NoScriptDefined;</Value>
+                        <Value>@NoScriptDefined@</Value>
                     </AttributeValuePair>
                 </SubConfiguration>
                 <SubConfiguration name="OIDC_CLAIMS" id="scriptContext">
@@ -290,7 +290,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="defaultScript"/>
-                        <Value>&GlobalEntitlementConditionScriptId;</Value>
+                        <Value>@GlobalEntitlementConditionScriptId@</Value>
                     </AttributeValuePair>
                     <SubConfiguration name="engineConfiguration" id="engineConfiguration">
                         <AttributeValuePair>
@@ -340,7 +340,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="defaultScript"/>
-                        <Value>&GlobalSdkClaimsScriptId;</Value>
+                        <Value>@GlobalSdkClaimsScriptId@</Value>
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="languages" />
@@ -387,7 +387,7 @@
                     </SubConfiguration>
                 </SubConfiguration>
                 <SubConfiguration name="globalScripts" id="globalScripts">
-                    <SubConfiguration name="&GlobalEntitlementConditionScriptId;" id="globalScript">
+                    <SubConfiguration name="@GlobalEntitlementConditionScriptId@" id="globalScript">
                         <AttributeValuePair>
                             <Attribute name="name"/>
                             <Value>Scripted Policy Condition</Value>
@@ -407,7 +407,7 @@
                             </Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="&GlobalServerSideAuthModuleScriptId;" id="globalScript">
+                    <SubConfiguration name="@GlobalServerSideAuthModuleScriptId@" id="globalScript">
                         <AttributeValuePair>
                             <Attribute name="name"/>
                             <Value>Scripted Module - Server Side</Value>
@@ -427,7 +427,7 @@
                             </Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="&GlobalServerSideDeviceIdMatchScriptId;" id="globalScript">
+                    <SubConfiguration name="@GlobalServerSideDeviceIdMatchScriptId@" id="globalScript">
                         <AttributeValuePair>
                             <Attribute name="name"/>
                             <Value>Device Id (Match) - Server Side</Value>
@@ -447,7 +447,7 @@
                             </Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="&GlobalClientSideDeviceIdMatchScriptId;" id="globalScript">
+                    <SubConfiguration name="@GlobalClientSideDeviceIdMatchScriptId@" id="globalScript">
                         <AttributeValuePair>
                             <Attribute name="name"/>
                             <Value>Device Id (Match) - Client Side</Value>
@@ -468,7 +468,7 @@
                             </Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="&GlobalOidcClaimsScriptId;" id="globalScript">
+                    <SubConfiguration name="@GlobalOidcClaimsScriptId@" id="globalScript">
                         <AttributeValuePair>
                             <Attribute name="name"/>
                             <Value>OIDC Claims Script</Value>
@@ -492,7 +492,7 @@
                             </Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="&GlobalSdkClaimsScriptId;" id="globalScript">
+                    <SubConfiguration name="@GlobalSdkClaimsScriptId@" id="globalScript">
                         <AttributeValuePair>
                             <Attribute name="name"/>
                             <Value>SDK Script</Value>

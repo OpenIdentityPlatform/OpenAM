@@ -58,7 +58,7 @@
                         </ChoiceValuesClassName>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>&NoScriptDefined;</Value>
+                        <Value>@NoScriptDefined@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-server-script"
@@ -77,7 +77,7 @@
                         </ChoiceValuesClassName>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>&GlobalServerSideAuthModuleScriptId;</Value>
+                        <Value>@GlobalServerSideAuthModuleScriptId@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
@@ -120,7 +120,7 @@
                             </ChoiceValuesClassName>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>&NoScriptDefined;</Value>
+                            <Value>@NoScriptDefined@</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-server-script"
@@ -139,7 +139,7 @@
                             </ChoiceValuesClassName>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>&GlobalServerSideAuthModuleScriptId;</Value>
+                            <Value>@GlobalServerSideAuthModuleScriptId@</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-auth-level"

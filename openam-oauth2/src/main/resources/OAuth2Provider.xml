@@ -112,7 +112,7 @@
                         </ChoiceValuesClassName>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>&GlobalOidcClaimsScriptId;</Value>
+                        <Value>@GlobalOidcClaimsScriptId@</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
