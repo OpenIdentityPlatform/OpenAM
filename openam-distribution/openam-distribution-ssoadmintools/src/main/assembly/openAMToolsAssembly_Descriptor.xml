@@ -65,6 +65,7 @@
                 <include>com.google.inject:guice:jar:no_aop</include>
                 <include>com.google.inject.extensions:guice-assistedinject</include>
                 <include>commons-lang:commons-lang</include>
+                <include>commons-collections:commons-collections</include>
                 <include>javax.xml:jaxrpc-api</include>
                 <include>external:jaxrpc-impl</include>
                 <include>com.sun.xml.rpc:jaxrpc-spi</include>
