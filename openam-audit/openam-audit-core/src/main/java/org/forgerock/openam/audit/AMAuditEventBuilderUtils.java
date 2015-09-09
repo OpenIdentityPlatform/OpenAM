@@ -125,7 +125,7 @@ public final class AMAuditEventBuilderUtils {
      *
      * @return All the available {@link AuditConstants.Context} values.
      */
-    public static Map<String,String> getAllAvailableContexts() {
+    public static Map<String, String> getAllAvailableContexts() {
         Map<String, String> map = new HashMap<>();
 
         for (AuditConstants.Context context : AuditConstants.Context.values()) {
