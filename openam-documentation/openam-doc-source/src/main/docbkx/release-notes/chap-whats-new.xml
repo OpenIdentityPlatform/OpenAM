@@ -277,6 +277,24 @@
   <!-- Product Enhancements -->
   <itemizedlist>
 
+   <!-- AME-7894, AME-7896 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Recording troubleshooting information</emphasis>.
+     The new <command>ssoadm start-recording</command> command lets you
+     initiate events that monitor OpenAM, while saving output that is useful
+     when performing troubleshooting. You can also start a recording event
+     from the <literal>/json/records</literal> endpoint.
+    </para>
+    <para>
+     After starting a recording event, you can use the
+     <command>ssoadm get-recording-status</command> command to get the status
+     of the recording event and the
+     <command>ssoadm stop-recording</command> command to terminate the
+     recording event.
+    </para>
+   </listitem>
+
    <!-- OPENAM-816/6211 -->
    <listitem>
     <para>
