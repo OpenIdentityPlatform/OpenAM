@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
   ! CCPL HEADER START
   !
   ! This work is licensed under the Creative Commons
@@ -23,12 +22,13 @@
   !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
-<chapter xml:id='chap-compatibility'
- xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
- xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook
-                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xml:id="chap-compatibility" version="5.0"
+         xml:lang="en"
+         xsi:schemaLocation="http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd">
  <title>OpenAM Changes and Deprecated Functionality</title>
 
  <para>This chapter covers both major changes to existing functionality, and
@@ -37,10 +37,151 @@
  <section xml:id="changes">
   <title>Important Changes to Existing Functionality</title>
 
+  <!-- Changes for 12.0.2 -->
+  <itemizedlist>
+   <para>
+    These changes are new in OpenAM 12.0.2:
+   </para>
+
+   <!-- OPENAM-6021/OPENAM-3470 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Changes to SAML 2.0 NameID Persistence</emphasis>.
+     OpenAM's SAML 2.0 account management and NameID persistence logic has been
+     updated to work better with non-persistent NameID formats.
+    </para>
+
+    <para>
+     The NameID persistence logic is summarized as follows:
+    </para>
+    <literallayout>
+Persistent NameID         -> NameID MUST be stored
+Transient NameID          -> NameID MUST NOT be stored
+Ignored User Profile Mode -> NameID CANNOT be stored (fails if used in combination with persistent NameID-Format)
+For Any Other Case        -> NameID MAY be stored based on customizable logic
+    </literallayout>
+
+    <itemizedlist>
+     <para>
+      The following changes have been made on the Identity Provider-side:
+     </para>
+     <listitem>
+      <para><emphasis role="bold">New Setting: idpDisableNameIDPersistence</emphasis>.
+       OpenAM now provides a new setting, <literal>idpDisableNameIDPersistence</literal>,
+       which disables the storage of the NameID values for all NameIDs issued
+       by that IdP instance, as long as the NameID-Format is anything but
+       <literal>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</literal>.
+      </para>
+     </listitem>
+     <listitem>
+      <para><emphasis role="bold">SP's spDoNotWriteFederationInfo Repurposed</emphasis>.
+       The SP's <literal>spDoNotWriteFederationInfo</literal> setting has been
+       repurposed. It no longer is specific to unspecified NameID-Formats. Now,
+       it affects all non-persistent NameID-Formats, similar to the
+       <literal>idpDisableNameIDPersistence</literal> setting in the IdP
+       configuration.
+      </para>
+     </listitem>
+     <listitem>
+      <para><emphasis role="bold">NameID Lookup Changes</emphasis>.
+       The NameID lookup mechanism has been modified, so that it only tries to
+       look up existing NameID values for the user if the NameID is actually
+       persisted for the corresponding NameID-Format.
+      </para>
+     </listitem>
+     <listitem>
+      <para><emphasis role="bold">New Method in the IDPAccountMapper Interface</emphasis>.
+       The <literal>IDPAccountMapper</literal> interface has been extended with
+       the following new method:
+      </para>
+      <programlisting language="java">
+       /**
+       * Tells whether the provided NameID-Format should be persisted in the user data store or not.
+       *
+       * @param realm The hosted IdP's realm.
+       * @param hostEntityID The hosted IdP's entityID.
+       * @param remoteEntityID The remote SP's entityID.
+       * @param nameIDFormat The non-transient, non-persistent NameID-Format in question.
+       * @return <code>true</code> if the provided NameID-Format should be persisted in the user data store,
+       * <code>false</code> otherwise.
+       */
+       public boolean shouldPersistNameIDFormat(String realm, String hostEntityID, String remoteEntityID,String nameIDFormat);
+      </programlisting>
+      <para>
+       The default implementation of <literal>shouldPersistNameIDFormat</literal>
+       in <literal>DefaultIDPAccountMapper</literal> first checks whether
+       <literal>idpDisableNameIDPersistence</literal> is enabled in the hosted
+       SP configuration. If <literal>idpDisableNameIDPersistence</literal> is disabled,
+       the logic advances and accesses the remote SP's
+       <literal>spDoNotWriteFederationInfo</literal> flag.
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+     <para>
+      The following changes have been made on the Service Provider-side:
+     </para>
+     <listitem>
+      <para><emphasis role="bold">Changes to SPAccountMapper</emphasis>.
+       The <literal>SPAccountMapper</literal> implementations now no longer
+       need to perform reverse lookups using the received NameID value.
+       The <literal>SPACSUtils</literal> now performs the reverse lookup if the
+       NameID-Format should be persisted. This change was made to ensure that
+       NameID values are only persisted in the data store if they have not been
+       stored there previously.
+      </para>
+     </listitem>
+     <listitem>
+      <para><emphasis role="bold">SP's spDoNotWriteFederationInfo Repurposed</emphasis>.
+       The SP's <literal>spDoNotWriteFederationInfo</literal> setting has been
+       repurposed. It no longer is specific to unspecified NameID-Formats.
+       It affects all non-persistent NameID-Formats.
+      </para>
+     </listitem>
+     <listitem>
+      <para><emphasis role="bold">New Method in the SPAccountMapper Interface</emphasis>.
+       The <literal>SPAccountMapper</literal> interface has been extended with
+       the following new method:
+      </para>
+      <programlisting language="java">
+ /**
+ * Tells whether the provided NameID-Format should be persisted in the user data store or not.
+ *
+ * @param realm The hosted SP's realm.
+ * @param hostEntityID The hosted SP's entityID.
+ * @param remoteEntityID The remote IdP's entityID.
+ * @param nameIDFormat The non-transient, non-persistent NameID-Format in question.
+ * @return <code>true</code> if the provided NameID-Format should be persisted in the user data store,
+ * <code>false</code> otherwise.
+ */
+ public boolean shouldPersistNameIDFormat(String realm, String hostEntityID, String remoteEntityID, String nameIDFormat);
+      </programlisting>
+      <para>
+       The default implementation of <literal>shouldPersistNameIDFormat</literal>
+       in <literal>DefaultIDPAccountMapper</literal> first checks whether
+       <literal>idpDisableNameIDPersistence</literal> is enabled in the hosted
+       IdP configuration. If <literal>idpDisableNameIDPersistence</literal> is disabled,
+       the logic advances and accesses the remote SP's
+       <literal>spDoNotWriteFederationInfo</literal> flag.
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+     For more information, see
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3470"
+           xlink:show="new">OPENAM-3470</link>.
+    </para>
+   </listitem>
+
+
+  </itemizedlist>
+
   <!-- Changes for 12.0.1 -->
   <itemizedlist>
    <para>
-    These changes are new in OpenAM ${serverDocTargetVersion}:
+    These changes are new in OpenAM 12.0.1:
    </para>
 
    <!-- OPENAM-718 -->
@@ -65,10 +206,7 @@
     </para>
     <para>
      For more information, see
-     <link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-718"
-      xlink:show="new"
-      >OPENAM-718</link>.
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-718" xlink:show="new">OPENAM-718</link>.
     </para>
    </listitem>
 
@@ -84,33 +222,30 @@
     <para>
      An example <literal>weblogic.xml</literal> file is presented below.
     </para>
-    <programlisting>&lt;?xml version="1.0" encoding="UTF-8"?>
+    <programlisting>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app
-     http://xmlns.oracle.com/weblogic/weblogic-web-app/1.3/weblogic-web-app.xsd">
-      &lt;context-root>/openam&lt;/context-root>
-      &lt;container-descriptor>
-       &lt;prefer-application-packages>
+     http://xmlns.oracle.com/weblogic/weblogic-web-app/1.3/weblogic-web-app.xsd"&gt;
+      &lt;context-root&gt;/openam&lt;/context-root&gt;
+      &lt;container-descriptor&gt;
+       &lt;prefer-application-packages&gt;
 
-        &lt;!-- Use bundled Jersey library -->
-        &lt;package-name>com.sun.jersey.*&lt;/package-name>
-        &lt;package-name>com.sun.research.ws.wadl.*&lt;/package-name>
-        &lt;package-name>com.sun.ws.rs.ext.*&lt;/package-name>
+        &lt;!-- Use bundled Jersey library --&gt;
+        &lt;package-name&gt;com.sun.jersey.*&lt;/package-name&gt;
+        &lt;package-name&gt;com.sun.research.ws.wadl.*&lt;/package-name&gt;
+        &lt;package-name&gt;com.sun.ws.rs.ext.*&lt;/package-name&gt;
 
-        &lt;!-- Rhino -->
-        &lt;package-name>org.mozilla.javascript.*&lt;/package-name>
+        &lt;!-- Rhino --&gt;
+        &lt;package-name&gt;org.mozilla.javascript.*&lt;/package-name&gt;
 
-        &lt;package-name>org.apache.commons.lang.*&lt;/package-name>
-      &lt;/prefer-application-packages>
-     &lt;/container-descriptor>
- &lt;/weblogic-web-app>
+        &lt;package-name&gt;org.apache.commons.lang.*&lt;/package-name&gt;
+      &lt;/prefer-application-packages&gt;
+     &lt;/container-descriptor&gt;
+ &lt;/weblogic-web-app&gt;
     </programlisting>
     <para>
-     For more information see, <link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3333"
-     xlink:show="new"
-     >OPENAM-3333</link>.
+     For more information see, <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3333" xlink:show="new">OPENAM-3333</link>.
     </para>
    </listitem>
 
@@ -176,10 +311,7 @@
     </itemizedlist>
     <para>
      For more information, see
-     <link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3575"
-      xlink:show="new"
-      >OPENAM-3575</link>.
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3575" xlink:show="new">OPENAM-3575</link>.
     </para>
    </listitem>
 
@@ -212,10 +344,7 @@
     </para>
     <para>
      For more information, see
-     <link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3714"
-      xlink:show="new"
-      >OPENAM-3714</link>.
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3714" xlink:show="new">OPENAM-3714</link>.
     </para>
    </listitem>
 
@@ -228,10 +357,7 @@
     </para>
     <para>
      For more information, see
-     <link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4333"
-     xlink:show="new"
-     >OPENAM-4333</link>.
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4333" xlink:show="new">OPENAM-4333</link>.
     </para>
    </listitem>
 
@@ -263,10 +389,7 @@
     </para>
     <para>
      For more information, see
-     <link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5097"
-      xlink:show="new"
-      >OPENAM-5097</link>.
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5097" xlink:show="new">OPENAM-5097</link>.
     </para>
    </listitem>
 
@@ -286,10 +409,7 @@
     </para>
     <para>
      For more information, see
-     <link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5460"
-      xlink:show="new"
-      >OPENAM-5460</link>.
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5460" xlink:show="new">OPENAM-5460</link>.
     </para>
    </listitem>
 
@@ -344,10 +464,7 @@
     </procedure>
     <para>
      For more information, see
-     <link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6109"
-      xlink:show="new"
-      >OPENAM-6109</link>.
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6109" xlink:show="new">OPENAM-6109</link>.
     </para>
    </listitem>
 
@@ -365,9 +482,7 @@
     </para>
     <para>
      For background information, see
-     <link xlink:show="new"
-           xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6319"
-      >OPENAM-6319</link>.
+     <link xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6319">OPENAM-6319</link>.
     </para>
    </listitem>
 
@@ -397,10 +512,7 @@
      OpenAM now directs you to the new policy editor.
      For instructions on using the new policy editor,
      see the <citetitle>Administration Guide</citetitle> chapter,
-     <link
-      xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide/chap-authz-policy"
-      xlink:show="new"
-     ><citetitle>Defining Authorization Policies</citetitle></link>.
+     <link xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide/chap-authz-policy" xlink:show="new"><citetitle>Defining Authorization Policies</citetitle></link>.
      Notice that policies now belong to applications
      as described in that chapter.
     </para>
@@ -462,10 +574,7 @@
       <para>
        To see how to implement a custom policy plugin,
        see the <citetitle>Developer's Guide</citetitle> chapter,
-       <link
-        xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/dev-guide/chap-policy-spi"
-        xlink:show="new"
-       ><citetitle>Customizing Policy Evaluation</citetitle></link>.
+       <link xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/dev-guide/chap-policy-spi" xlink:show="new"><citetitle>Customizing Policy Evaluation</citetitle></link>.
       </para>
      </listitem>
 
@@ -488,7 +597,7 @@
        in policy names. Users running OpenAM servers on Tomcat
        and JBoss web containers will not be able to manipulate policies
        with the forward slash character in their names without setting the
-       <literal>&#x2011;Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</literal>
+       <literal>‑Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</literal>
        argument in the <literal>CATALINA_OPTS</literal> environment variable
        before starting the OpenAM web container.
       </para>
@@ -497,13 +606,9 @@
        the <literal>ALLOW_ENCODED_SLASH=true</literal> setting while running
        OpenAM in production. Using this option introduces a security risk.
        See
-       <link
-        xlink:href="http://tomcat.apache.org/security-6.html#Fixed_in_Apache_Tomcat_6.0.10
-        ">Apache Tomcat 6.x Vulnerabilities</link>
+       <link xlink:href="http://tomcat.apache.org/security-6.html#Fixed_in_Apache_Tomcat_6.0.10         ">Apache Tomcat 6.x Vulnerabilities</link>
        and
-       <link
-        xlink:href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450
-        ">the related CVE</link>
+       <link xlink:href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450         ">the related CVE</link>
        for more information.
       </para>
       <para>
@@ -520,7 +625,7 @@
         <listitem>
          <para>
           Add the
-          <literal>&#x2011;Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</literal>
+          <literal>‑Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</literal>
           setting to the <literal>CATALINA_OPTS</literal> environment variable.
          </para>
         </listitem>
@@ -542,7 +647,7 @@
         <listitem>
          <para>
           Remove the
-          <literal>&#x2011;Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</literal>
+          <literal>‑Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</literal>
           setting from the <literal>CATALINA_OPTS</literal> environment variable.
          </para>
         </listitem>
@@ -566,10 +671,7 @@
       <para>
        The Policy Configuration Service is simplified.
        For details see the <citetitle>Reference</citetitle> section,
-       <link
-        xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/reference/chap-config-ref"
-        xlink:show="new"
-       ><citetitle>Policy Configuration</citetitle></link>.
+       <link xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/reference/chap-config-ref" xlink:show="new"><citetitle>Policy Configuration</citetitle></link>.
       </para>
      </listitem>
 
@@ -584,13 +686,13 @@
 
       <!-- AME-5055 -->
       <note><para>Referrals are not shown by default in the policy
-       editor. To enable them, in the OpenAM console, select Configuration >
-       Global > Policy Configuration, set Activate Referrals to Enabled, and
+       editor. To enable them, in the OpenAM console, select Configuration &gt;
+       Global &gt; Policy Configuration, set Activate Referrals to Enabled, and
        then click Save.</para></note>
 
       <para>
        The web and Java EE policy agent profiles includes the new settings
-       under OpenAM Services > Policy Client Service in OpenAM console.
+       under OpenAM Services &gt; Policy Client Service in OpenAM console.
        These new settings allow you to set the realm and application
        for a policy agent.
        The settings are compatible with existing policy agents,
@@ -601,9 +703,7 @@
     </itemizedlist>
 
     <para>
-     The fix for <link xlink:show="new"
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3509"
-     >OPENAM-3509</link> ensures that OpenAM considers a trailing slash
+     The fix for <link xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3509">OPENAM-3509</link> ensures that OpenAM considers a trailing slash
      as part of the resource name to match.
      This improves compatibility between self and subtree modes,
      and compatibility with older policy agents.
@@ -641,8 +741,7 @@
      to add a progress bar for SSO.
      Instead, customize <filename>saml2/jsp/autosubmitaccessrights.jsp</filename>
      as described in the procedure in the OpenAM Administration Guide,
-     <link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide/chap-federation/show-saml2-sso-login-progress"><citetitle
-     >To Indicate Progress During SSO</citetitle></link> .
+     <link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide/chap-federation/show-saml2-sso-login-progress"><citetitle>To Indicate Progress During SSO</citetitle></link> .
     </para>
    </listitem>
 
@@ -650,8 +749,7 @@
     <para>Changing passwords by using a PUT REST API call is no longer
      supported.</para>
     <para>Use a POST request to
-     <literal>/json/<replaceable>subrealm</replaceable
-      >/users/<replaceable>username</replaceable>?_action=changePassword</literal>
+     <literal>/json/<replaceable>subrealm</replaceable>/users/<replaceable>username</replaceable>?_action=changePassword</literal>
      to change a password.</para>
    </listitem>
 
@@ -712,9 +810,7 @@
    based on the ID Token. The key is the ID Token field name and value is the
    local user profile attribute name.
    The default has been changed as follows: mail=email, uid=sub.
-   (<link xlink:show="new"
-          xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5263"
-   >OPENAM-5263</link>)</para>
+   (<link xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5263">OPENAM-5263</link>)</para>
    </listitem>
 
    <listitem>
@@ -733,10 +829,7 @@
      to RS256 to match the OAuth2 provider algorithm.
      The client agent continues to support HMAC algorithms; only the default
      encryption algorithm has been changed to support out of the box functionality.
-     (<link
-     xlink:show="new"
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5279"
-     >OPENAM-5279</link>)
+     (<link xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5279">OPENAM-5279</link>)
     </para>
    </listitem>
 
@@ -811,7 +904,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
   <title>Deprecated Functionality</title>
   
   <para>The following functionality is deprecated in OpenAM
-  ${serverDocTargetVersion}, and is likely to be removed in a future
+  12.0.1, and is likely to be removed in a future
   release.</para>
 
   <itemizedlist>
@@ -858,10 +951,8 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
 
       <thead>
        <row>
-        <entry><link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide#interface-stability"
-         >Deprecated URIs</link></entry>
-        <entry>Newer <link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide#interface-stability"
-         >Evolving URIs</link></entry>
+        <entry><link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide#interface-stability">Deprecated URIs</link></entry>
+        <entry>Newer <link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide#interface-stability">Evolving URIs</link></entry>
        </row>
       </thead>
 
@@ -968,9 +1059,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
      </tgroup>
     </table>
 
-    <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter <link
-     xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/dev-guide/chap-rest"
-     xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link>.</para>
+    <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter <link xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/dev-guide/chap-rest" xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link>.</para>
 
     <para>Support for the older REST services is likely to be removed in a
      future release in favor of the newer REST services. Older REST services
@@ -1021,8 +1110,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
     </table>
 
     <para>For more information, see the <citetitle>OpenAM
-     Reference</citetitle> section <link xlink:show="new"
-     xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/reference/N101EA/ssoadm-1">
+     Reference</citetitle> section <link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/reference/N101EA/ssoadm-1">
      ssoadm — configure OpenAM core services</link>.</para>
    </listitem>
 
@@ -1054,41 +1142,28 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
    <listitem>
     <para>
      The OAuth 2.0 plugin interface for custom scopes
-     <link
-      xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/Scope.html"
-      xlink:show="new"><literal>Scope</literal></link>
+     <link xlink:href="http://openam.forgerock.org/apidocs/?org/forgerock/openam/oauth2/provider/Scope.html" xlink:show="new"><literal>Scope</literal></link>
      is deprecated and likely to be removed in a future release.
     </para>
 
     <para>
      Custom OAuth 2.0 scopes plugins now implement the
-     <link
-      xlink:href="${javadocBase}?org/forgerock/oauth2/core/ScopeValidator.html"
-      xlink:show="new"
-      ><literal>ScopeValidator</literal></link> interface instead.
+     <link xlink:href="http://openam.forgerock.org/apidocs/?org/forgerock/oauth2/core/ScopeValidator.html" xlink:show="new"><literal>ScopeValidator</literal></link> interface instead.
      For an example, see the <citetitle>Developer's Guide</citetitle> chapter,
-     <link
-      xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/dev-guide/chap-oauth2-scopes"
-      xlink:show="new"
-      ><citetitle>Customizing OAuth 2.0 Scope Handling</citetitle></link>.
+     <link xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/dev-guide/chap-oauth2-scopes" xlink:show="new"><citetitle>Customizing OAuth 2.0 Scope Handling</citetitle></link>.
     </para>
    </listitem>
 
    <listitem>
     <para>
      The OAuth 2.0 plugin interface for custom response types,
-     <link
-      xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/ResponseType.html"
-      xlink:show="new"><literal>ResponseType</literal></link>,
+     <link xlink:href="http://openam.forgerock.org/apidocs/?org/forgerock/openam/oauth2/provider/ResponseType.html" xlink:show="new"><literal>ResponseType</literal></link>,
      is deprecated and likely to be removed in a future release.
     </para>
 
     <para>
      Custom OAuth 2.0 response type plugins now implement the
-     <link
-      xlink:href="${javadocBase}?org/forgerock/oauth2/core/ResponseTypeHandler.html"
-      xlink:show="new"
-      ><literal>ResponseTypeHandler</literal></link> interface instead.
+     <link xlink:href="http://openam.forgerock.org/apidocs/?org/forgerock/oauth2/core/ResponseTypeHandler.html" xlink:show="new"><literal>ResponseTypeHandler</literal></link> interface instead.
     </para>
    </listitem>
   </itemizedlist>
@@ -1189,14 +1264,8 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
     </para>
     <para>
      For details, see the explanation in
-     (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1036"
-     xlink:show="new"
-     >OPENAM-1036</link> and in
-     <link
-      xlink:href="https://forgerock.org/2015/07/openam-security-advisory-201505/#201505-05"
-      xlink:show="new"
-      >OpenAM Security Advisory #201505-05</link>).
+     (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1036" xlink:show="new">OPENAM-1036</link> and in
+     <link xlink:href="https://forgerock.org/2015/07/openam-security-advisory-201505/#201505-05" xlink:show="new">OpenAM Security Advisory #201505-05</link>).
     </para>
    </listitem>
 
@@ -1210,10 +1279,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
     </para>
     <para>
      For more information, see
-     <link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3714"
-      xlink:show="new"
-      >OPENAM-3714</link>.
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3714" xlink:show="new">OPENAM-3714</link>.
     </para>
    </listitem>
 
@@ -1227,10 +1293,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
     </para>
     <para>
      For more information, see
-     <link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5097"
-      xlink:show="new"
-      >OPENAM-5097</link>.
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5097" xlink:show="new">OPENAM-5097</link>.
     </para>
    </listitem>
   </itemizedlist>
