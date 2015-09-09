@@ -16,8 +16,10 @@
 
 package org.forgerock.openam.uma.rest;
 
+import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.util.query.QueryFilter.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -25,6 +27,7 @@ import javax.security.auth.Subject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.sun.identity.entitlement.Entitlement;
@@ -66,7 +69,6 @@ public class ResourceSetServiceTest {
     private ResourceSetStore resourceSetStore;
     private UmaPolicyService policyService;
     private CoreWrapper coreWrapper;
-    private UmaProviderSettingsFactory umaProviderSettingsFactory;
     private UmaProviderSettings umaProviderSettings;
 
     @BeforeMethod
@@ -75,7 +77,7 @@ public class ResourceSetServiceTest {
         resourceSetStore = mock(ResourceSetStore.class);
         policyService = mock(UmaPolicyService.class);
         coreWrapper = mock(CoreWrapper.class);
-        umaProviderSettingsFactory = mock(UmaProviderSettingsFactory.class);
+        UmaProviderSettingsFactory umaProviderSettingsFactory = mock(UmaProviderSettingsFactory.class);
         umaProviderSettings = mock(UmaProviderSettings.class);
 
         service = new ResourceSetService(resourceSetStoreFactory, policyService, coreWrapper, umaProviderSettingsFactory);
@@ -188,8 +190,7 @@ public class ResourceSetServiceTest {
         return realmContext;
     }
 
-    //Will re-look when refactoring Resource Set and UMA Policy resource classes
-    @Test(enabled = false)
+    @Test
     public void getResourceSetsShouldReturnSetWhenResourceSetsExistWithNoPolicyQuery() throws Exception {
 
         //Given
@@ -213,7 +214,7 @@ public class ResourceSetServiceTest {
         queriedResourceSets.add(resourceSetTwo);
         given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
 
         Collection<UmaPolicy> queriedPolicies = new HashSet<UmaPolicy>();
@@ -230,11 +231,9 @@ public class ResourceSetServiceTest {
         assertThat(resourceSets).hasSize(2).contains(resourceSetOne, resourceSetTwo);
         assertThat(resourceSetOne.getPolicy()).isNull();
         assertThat(resourceSetTwo.getPolicy()).isNull();
-        verifyZeroInteractions(policyService);
     }
 
-    //Will re-look when refactoring Resource Set and UMA Policy resource classes
-    @Test(enabled = false)
+    @Test
     public void getResourceSetsShouldReturnSetWhenResourceSetsExistWithNoPolicyQueryWithPolicies() throws Exception {
 
         //Given
@@ -266,7 +265,7 @@ public class ResourceSetServiceTest {
         given(policyTwo.getId()).willReturn("RS_ID_TWO");
         given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
         given(policyService.readPolicy(context, "RS_ID_ONE")).willReturn(policyOnePromise);
         given(policyService.readPolicy(context, "RS_ID_TWO")).willReturn(policyTwoPromise);
@@ -344,7 +343,7 @@ public class ResourceSetServiceTest {
         given(policyTwo.getResourceSet()).willReturn(resourceSetTwo);
         given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
@@ -405,7 +404,7 @@ public class ResourceSetServiceTest {
         given(policyTwo.getResourceSet()).willReturn(resourceSetTwo);
         given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
 
         mockPolicyEvaluator("RS_CLIENT_ID");
@@ -425,8 +424,7 @@ public class ResourceSetServiceTest {
         assertThat(resourceSetThree.getPolicy()).isNull();
     }
 
-    //Will re-look when refactoring Resource Set and UMA Policy resource classes
-    @Test(enabled = false)
+    @Test
     public void shouldGetResourceSetsWhenResourceSetsExistQueryingByOrWithPolicies() throws Exception {
 
         //Given
@@ -436,15 +434,15 @@ public class ResourceSetServiceTest {
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = true;
 
-        QueryFilter<String> resourceSetQuery = mock(QueryFilter.class);
+        QueryFilter<String> resourceSetQuery = QueryFilter.contains("name", "RS_THREE");
         QueryFilter policyQuery = QueryFilter.alwaysFalse();
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<>();
         ResourceSetDescription resourceSetOne = new ResourceSetDescription("RS_ID_ONE", "CLIENT_ID_ONE",
-                "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
+                "RESOURCE_OWNER_ID", singletonMap("name", (Object) "RS_ONE"));
         ResourceSetDescription resourceSetTwo = new ResourceSetDescription("RS_ID_TWO", "CLIENT_ID_TWO",
-                "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
+                "RESOURCE_OWNER_ID", singletonMap("name", (Object) "RS_TWO"));
         ResourceSetDescription resourceSetThree = new ResourceSetDescription("RS_ID_THREE", "CLIENT_ID_TWO",
-                "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
+                "RESOURCE_OWNER_ID", singletonMap("name", (Object) "RS_THREE"));
         Collection<UmaPolicy> queriedPolicies = new HashSet<>();
         UmaPolicy policyOne = mock(UmaPolicy.class);
         UmaPolicy policyTwo = mock(UmaPolicy.class);
@@ -467,29 +465,41 @@ public class ResourceSetServiceTest {
         queriedPolicies.add(policyOne);
         queriedPolicies.add(policyThree);
         given(policyOne.getId()).willReturn("RS_ID_ONE");
+        given(policyOne.getResourceSet()).willReturn(resourceSetOne);
         given(policyTwo.getId()).willReturn("RS_ID_TWO");
+        given(policyTwo.getResourceSet()).willReturn(resourceSetTwo);
         given(policyThree.getId()).willReturn("RS_ID_THREE");
+        given(policyThree.getResourceSet()).willReturn(resourceSetThree);
         given(policyOne.asJson()).willReturn(policyOneJson);
         given(policyTwo.asJson()).willReturn(policyTwoJson);
         given(policyThree.asJson()).willReturn(policyThreeJson);
         given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
+        given(resourceSetStore.read("RS_ID_ONE")).willReturn(resourceSetOne);
         given(resourceSetStore.read("RS_ID_THREE")).willReturn(resourceSetThree);
         given(policyService.readPolicy(context, "RS_ID_ONE")).willReturn(policyOnePromise);
         given(policyService.readPolicy(context, "RS_ID_TWO")).willReturn(policyTwoPromise);
+
+        Evaluator evaluator = mock(Evaluator.class);
+        given(umaProviderSettings.getPolicyEvaluator(any(Subject.class))).willReturn(evaluator);
+        given(evaluator.evaluate(eq(realm), any(Subject.class), eq("RS_ONE"), isNull(Map.class), eq(false)))
+                .willReturn(singletonList(new Entitlement()));
+        given(evaluator.evaluate(eq(realm), any(Subject.class), eq("RS_TWO"), isNull(Map.class), eq(false)))
+                .willReturn(singletonList(new Entitlement()));
+        given(evaluator.evaluate(eq(realm), any(Subject.class), eq("RS_THREE"), isNull(Map.class), eq(false)))
+                .willReturn(Collections.<Entitlement>emptyList());
 
         //When
         Collection<ResourceSetDescription> resourceSets = service.getResourceSets(context, realm, query, resourceOwnerId,
                 augmentWithPolicies).getOrThrowUninterruptibly();
 
         //Then
-        assertThat(resourceSets).hasSize(3).contains(resourceSetOne, resourceSetTwo, resourceSetThree);
+        assertThat(resourceSets).hasSize(2).contains(resourceSetOne, resourceSetThree);
         assertThat(resourceSetOne.getPolicy()).isEqualTo(policyOneJson);
-        assertThat(resourceSetTwo.getPolicy()).isEqualTo(policyTwoJson);
         assertThat(resourceSetThree.getPolicy()).isEqualTo(policyThreeJson);
     }
 
@@ -540,7 +550,7 @@ public class ResourceSetServiceTest {
         given(policyThree.getResourceSet()).willReturn(resourceSetThree);
         given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
@@ -565,8 +575,7 @@ public class ResourceSetServiceTest {
         assertThat(resourceSetThree.getPolicy()).isNull();
     }
 
-    //Will re-look when refactoring Resource Set and UMA Policy resource classes
-    @Test(enabled = false)
+    @Test
     public void shouldRevokeAllResourceSetPolicies() throws Exception {
 
         //Given

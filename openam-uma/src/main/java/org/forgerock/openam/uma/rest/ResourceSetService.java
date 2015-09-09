@@ -61,6 +61,7 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.promise.ResultHandler;
+import org.forgerock.util.query.BaseQueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
 
@@ -145,107 +146,8 @@ public class ResourceSetService {
                                 }
                             }
 
-                            filteredResourceSets.addAll(query.getResourceSetQuery().accept(new QueryFilterVisitor<Set<ResourceSetDescription>, Set<ResourceSetDescription>, String>() {
-                                @Override
-                                public Set<ResourceSetDescription> visitAndFilter(Set<ResourceSetDescription> resourceSetDescriptions, List<QueryFilter<String>> list) {
-                                    for (QueryFilter<String> filter : list) {
-                                        resourceSetDescriptions.retainAll(filter.accept(this, resourceSetDescriptions));
-                                    }
-
-                                    return resourceSetDescriptions;
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitBooleanLiteralFilter(Set<ResourceSetDescription> resourceSetDescriptions, boolean value) {
-                                    if (value) {
-                                        return resourceSetDescriptions;
-                                    } else {
-                                        return Collections.EMPTY_SET;
-                                    }
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitContainsFilter(Set<ResourceSetDescription> resourceSetDescriptions, String fieldName, Object value) {
-                                    Set<ResourceSetDescription> results = new HashSet<>();
-
-                                    for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
-                                        if (fieldName.equals("name")) {
-                                            if (resourceSetDescription.getName().toLowerCase().contains(((String) value).toLowerCase())) {
-                                                results.add(resourceSetDescription);
-                                            }
-                                        }
-                                    }
-
-                                    return results;
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitEqualsFilter(Set<ResourceSetDescription> resourceSetDescriptions, String fieldName, Object value) {
-                                    Set<ResourceSetDescription> results = new HashSet<>();
-
-                                    for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
-                                        if (fieldName.equals(ResourceSetTokenField.RESOURCE_OWNER_ID)) {
-                                            if (resourceSetDescription.getResourceOwnerId().equals(value)) {
-                                                results.add(resourceSetDescription);
-                                            }
-                                        } else if (fieldName.equals(ResourceSetTokenField.RESOURCE_SET_ID)) {
-                                            if (resourceSetDescription.getId().equals(value)) {
-                                                results.add(resourceSetDescription);
-                                            }
-                                        }
-                                    }
-
-                                    return results;
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitExtendedMatchFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, String s2, Object o) {
-                                    throw new UnsupportedOperationException("'Extended Match' not supported");
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitGreaterThanFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
-                                    throw new UnsupportedOperationException("'Greater Than' not supported");
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitGreaterThanOrEqualToFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
-                                    throw new UnsupportedOperationException("'Greater Than or Equal to' not supported");
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitLessThanFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
-                                    throw new UnsupportedOperationException("'Less Than' not supported");
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitLessThanOrEqualToFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
-                                    throw new UnsupportedOperationException("'Less Than Or Equal to' not supported");
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitNotFilter(Set<ResourceSetDescription> resourceSetDescriptions, QueryFilter<String> queryFilter) {
-                                    Set<ResourceSetDescription> excludedResourceSets = queryFilter.accept(this, resourceSetDescriptions);
-                                    resourceSetDescriptions.removeAll(excludedResourceSets);
-
-                                    return resourceSetDescriptions;
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitOrFilter(Set<ResourceSetDescription> resourceSetDescriptions, List<org.forgerock.util.query.QueryFilter<String>> list) {
-                                    throw new UnsupportedOperationException("'Or' not supported");
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitPresentFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s) {
-                                    throw new UnsupportedOperationException("'Present' not supported");
-                                }
-
-                                @Override
-                                public Set<ResourceSetDescription> visitStartsWithFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
-                                    throw new UnsupportedOperationException("'Starts With' not supported");
-                                }
-                            }, resourceSets));
+                            filteredResourceSets.addAll(query.getResourceSetQuery().accept(RESOURCE_SET_QUERY_EVALUATOR,
+                                    resourceSets));
 
                             return Promises.newResultPromise((Collection<ResourceSetDescription>) filteredResourceSets);
                         } catch (EntitlementException e) {
@@ -465,4 +367,73 @@ public class ResourceSetService {
 
         return resourceSetsById.values();
     }
+
+    private static final QueryFilterVisitor<Set<ResourceSetDescription>, Set<ResourceSetDescription>, String>
+            RESOURCE_SET_QUERY_EVALUATOR =
+            new BaseQueryFilterVisitor<Set<ResourceSetDescription>, Set<ResourceSetDescription>, String>() {
+        @Override
+        public Set<ResourceSetDescription> visitAndFilter(Set<ResourceSetDescription> resourceSetDescriptions,
+                List<QueryFilter<String>> list) {
+            for (QueryFilter<String> filter : list) {
+                resourceSetDescriptions.retainAll(filter.accept(this, resourceSetDescriptions));
+            }
+
+            return resourceSetDescriptions;
+        }
+
+        @Override
+        public Set<ResourceSetDescription> visitBooleanLiteralFilter(
+                Set<ResourceSetDescription> resourceSetDescriptions, boolean value) {
+            if (value) {
+                return resourceSetDescriptions;
+            } else {
+                return Collections.emptySet();
+            }
+        }
+
+        @Override
+        public Set<ResourceSetDescription> visitContainsFilter(Set<ResourceSetDescription> resourceSetDescriptions,
+                String fieldName, Object value) {
+            Set<ResourceSetDescription> results = new HashSet<>();
+
+            for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
+                if (fieldName.equals("name")) {
+                    if (resourceSetDescription.getName().toLowerCase().contains(((String) value).toLowerCase())) {
+                        results.add(resourceSetDescription);
+                    }
+                }
+            }
+
+            return results;
+        }
+
+        @Override
+        public Set<ResourceSetDescription> visitEqualsFilter(Set<ResourceSetDescription> resourceSetDescriptions,
+                String fieldName, Object value) {
+            Set<ResourceSetDescription> results = new HashSet<>();
+
+            for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
+                if (fieldName.equals(ResourceSetTokenField.RESOURCE_OWNER_ID)) {
+                    if (resourceSetDescription.getResourceOwnerId().equals(value)) {
+                        results.add(resourceSetDescription);
+                    }
+                } else if (fieldName.equals(ResourceSetTokenField.RESOURCE_SET_ID)) {
+                    if (resourceSetDescription.getId().equals(value)) {
+                        results.add(resourceSetDescription);
+                    }
+                }
+            }
+
+            return results;
+        }
+
+        @Override
+        public Set<ResourceSetDescription> visitNotFilter(Set<ResourceSetDescription> resourceSetDescriptions,
+                QueryFilter<String> queryFilter) {
+            Set<ResourceSetDescription> excludedResourceSets = queryFilter.accept(this, resourceSetDescriptions);
+            resourceSetDescriptions.removeAll(excludedResourceSets);
+
+            return resourceSetDescriptions;
+        }
+    };
 }
