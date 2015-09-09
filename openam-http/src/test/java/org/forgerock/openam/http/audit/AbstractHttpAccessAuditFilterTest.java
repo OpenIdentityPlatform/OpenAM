@@ -18,7 +18,6 @@ package org.forgerock.openam.http.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
-import static org.forgerock.openam.audit.AuditConstants.CONTEXTS;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
 import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_ATTEMPT;
