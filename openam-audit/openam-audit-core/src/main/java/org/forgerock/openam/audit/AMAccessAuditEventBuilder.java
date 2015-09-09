@@ -29,6 +29,7 @@ import org.forgerock.http.protocol.Request;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -53,13 +54,25 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
     }
 
     /**
-     * Provide value for "contextId" audit log field.
+     * Provide value for "contexts" audit log field.
      *
-     * @param value String "contextId" value.
+     * @param contexts Map "contexts" value.
      * @return this builder for method chaining.
      */
-    public AMAccessAuditEventBuilder contextId(String value) {
-        putContextId(jsonValue, value);
+    public AMAccessAuditEventBuilder contexts(Map<String, String> contexts) {
+        putContexts(jsonValue, contexts);
+        return this;
+    }
+
+    /**
+     * Provide single value which will be used in "contexts" audit log field.
+     *
+     * @param context Context key which will be used in the "contexts" audit log field.
+     * @param contextId Context key which will be used in the "contexts" audit log field.
+     * @return this builder for method chaining.
+     */
+    public AMAccessAuditEventBuilder context(AuditConstants.Context context, String contextId) {
+        putContexts(jsonValue, Collections.singletonMap(context.toString(), contextId));
         return this;
     }
 

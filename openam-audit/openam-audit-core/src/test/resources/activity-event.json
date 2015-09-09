@@ -6,7 +6,7 @@
   "authentication": {
     "id": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
   },
-  "contextId": "uniqueSessionAlias",
+  "contexts": {"Session token" : "value"},
   "runAs": "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org",
   "resourceOperation": {
     "uri": "/sessions/uniqueSessionAlias",

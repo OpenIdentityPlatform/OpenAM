@@ -22,20 +22,38 @@ import static org.forgerock.openam.audit.JsonUtils.assertJsonValue;
 import org.forgerock.audit.events.AuditEvent;
 import org.testng.annotations.Test;
 
+import java.util.Collections;
+
 /**
  * @since 13.0.0
  */
 public class AMActivityAuditEventBuilderTest {
 
     @Test
-    public void canBuildAccessAuditEvent() throws Exception {
+    public void canBuildAccessAuditEventWithContexts() throws Exception {
         AuditEvent activityEvent = new AMActivityAuditEventBuilder()
                 .timestamp(1436389263629L)
                 .eventName(AM_SESSION_CREATED)
                 .component(SESSION)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
                 .authentication("id=demo,ou=user,dc=openam,dc=forgerock,dc=org")
-                .contextId("uniqueSessionAlias")
+                .contexts(Collections.singletonMap(AuditConstants.Context.SESSION.toString(), "value"))
+                .runAs("cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org")
+                .resourceOperation("/sessions/uniqueSessionAlias", "wat?", "CREATE")
+                .toEvent();
+
+        assertJsonValue(activityEvent.getValue(), "/activity-event.json");
+    }
+
+    @Test
+    public void canBuildAccessAuditEventWithContext() throws Exception {
+        AuditEvent activityEvent = new AMActivityAuditEventBuilder()
+                .timestamp(1436389263629L)
+                .eventName(AM_SESSION_CREATED)
+                .component(SESSION)
+                .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
+                .authentication("id=demo,ou=user,dc=openam,dc=forgerock,dc=org")
+                .context(AuditConstants.Context.SESSION, "value")
                 .runAs("cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org")
                 .resourceOperation("/sessions/uniqueSessionAlias", "wat?", "CREATE")
                 .toEvent();

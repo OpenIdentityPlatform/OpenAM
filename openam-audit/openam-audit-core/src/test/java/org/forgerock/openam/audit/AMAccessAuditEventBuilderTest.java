@@ -30,14 +30,34 @@ import java.util.List;
 public class AMAccessAuditEventBuilderTest {
 
     @Test
-    public void canBuildAccessAuditEvent() throws Exception {
+    public void canBuildAccessAuditEventWithContexts() throws Exception {
         AuditEvent accessEvent = new AMAccessAuditEventBuilder()
                 .timestamp(1436389263629L)
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.CREST)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
                 .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
-                .contextId("uniqueSessionAlias")
+                .contexts(Collections.singletonMap(Context.SESSION.toString(), "value"))
+                .client("172.16.101.7", 62375)
+                .server("216.58.208.36", 80)
+                .resourceOperation("/some/path", "CREST", "READ")
+                .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
+                .response("200", 42)
+                .extraInfo("extra", "info")
+                .toEvent();
+
+        assertJsonValue(accessEvent.getValue(), "/access-event.json");
+    }
+
+    @Test
+    public void canBuildAccessAuditEventWithContext() throws Exception {
+        AuditEvent accessEvent = new AMAccessAuditEventBuilder()
+                .timestamp(1436389263629L)
+                .eventName(EventName.AM_ACCESS_ATTEMPT)
+                .component(Component.CREST)
+                .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
+                .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
+                .context(Context.SESSION, "value")
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
                 .resourceOperation("/some/path", "CREST", "READ")

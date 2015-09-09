@@ -123,6 +123,34 @@ public final class AuditConstants {
     }
 
     /**
+     * Predefined components for context id keys.
+     */
+    public enum Context {
+        /** Session token context, for use with session tokens. */
+        SESSION("Session token"),
+        /** OAuth2 grant code context, for use with OAuth2, OIDC and UMA. */
+        OAUTH2_GRANT("OAuth2 grant code"),
+        /** OAuth2 refresh code context, for use with OAuth2, OIDC and UMA. */
+        OAUTH2_REFRESH("OAuth2 refresh token"),
+        //TODO Where is this used? (OAUTH2_ACCESS("OAuth2 access token"))
+        /** OAuth2 access code context, for use with OAuth2, OIDC and UMA. */
+        OAUTH2_ACCESS("OAuth2 access token"),
+        /** Auth token context for use during authentication. */
+        AUTH("Auth token");
+
+        private final String name;
+
+        Context(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    /**
      * The topic to which events built using {@link AMAccessAuditEventBuilder} should be routed.
      */
     public static final String ACCESS_TOPIC = "access";
@@ -153,9 +181,19 @@ public final class AuditConstants {
     public static final String USER_ID = AUTHENTICATION + "." + ID;
 
     /**
-     * The Context ID.
+     * The Context IDs.
      */
-    public static final String CONTEXT_ID = "contextId";
+    public static final String CONTEXTS = "contexts";
+
+    /**
+     * The Context IDs.
+     */
+    public static final String USERNAME_AUDIT_CONTEXT_KEY = "username";
+
+    /**
+     * The Context IDs.
+     */
+    public static final String REALM_AUDIT_CONTEXT_KEY = "realm";
 
     private AuditConstants() {
         // Prevent instantiation

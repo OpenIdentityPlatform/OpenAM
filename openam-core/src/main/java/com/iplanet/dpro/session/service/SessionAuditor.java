@@ -17,7 +17,7 @@ package com.iplanet.dpro.session.service;
 
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
 import static org.forgerock.openam.audit.AuditConstants.ACTIVITY_TOPIC;
-import static org.forgerock.openam.audit.AuditConstants.Component.SESSION;
+import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
@@ -68,9 +68,9 @@ public final class SessionAuditor {
             AuditEvent auditEvent = auditEventFactory.activityEvent()
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(eventName)
-                    .component(SESSION)
+                    .component(Component.SESSION)
                     .authentication(session.getProperty(Constants.UNIVERSAL_IDENTIFIER))
-                    .contextId(session.getProperty(Constants.AM_CTX_ID))
+                    .contextId(Context.SESSION, contextId)
                     .runAs(getUserId(getAdminToken()))
                     .resourceOperation(contextId, "", getCrudType(eventName))
                     .toEvent();

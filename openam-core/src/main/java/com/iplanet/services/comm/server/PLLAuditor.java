@@ -17,13 +17,14 @@ package com.iplanet.services.comm.server;
 
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
 
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
-import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
+import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -75,7 +76,7 @@ public class PLLAuditor {
     public void auditAccessAttempt() {
         if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AuditEvent auditEvent = auditEventFactory.accessEvent()
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -83,8 +84,9 @@ public class PLLAuditor {
                     .component(Component.PLL)
                     .authentication(authenticationId)
                     .resourceOperation(service, PLL, method)
-                    .contextId(contextId);
-            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
+                    .context(SESSION, contextId)
+                    .toEvent();
+            auditEventPublisher.tryPublish(ACCESS_TOPIC, auditEvent);
         }
         accessAttemptAudited = true;
     }
@@ -103,7 +105,7 @@ public class PLLAuditor {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AuditEvent auditEvent = auditEventFactory.accessEvent()
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -112,9 +114,10 @@ public class PLLAuditor {
                     .response("SUCCESS", elapsedTime)
                     .authentication(authenticationId)
                     .resourceOperation(service, PLL, method)
-                    .contextId(contextId);
+                    .context(SESSION, contextId)
+                    .toEvent();
 
-            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
+            auditEventPublisher.tryPublish(ACCESS_TOPIC, auditEvent);
             reset();
         }
     }
@@ -148,7 +151,7 @@ public class PLLAuditor {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AuditEvent auditEvent = auditEventFactory.accessEvent()
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -157,9 +160,10 @@ public class PLLAuditor {
                     .responseWithMessage(errorCode == null ? "FAILED" : "FAILED - " + errorCode, elapsedTime, message)
                     .authentication(authenticationId)
                     .resourceOperation(service, PLL, method)
-                    .contextId(contextId);
+                    .context(SESSION, contextId)
+                    .toEvent();
 
-            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
+            auditEventPublisher.tryPublish(ACCESS_TOPIC, auditEvent);
             reset();
         }
     }
@@ -209,7 +213,7 @@ public class PLLAuditor {
      * @param ssoToken SSOToken of the originating client from which the session contextId and realm are obtained.
      */
     public void setSsoToken(SSOToken ssoToken) {
-        this.contextId = getContextIdFromSSOToken(ssoToken);
+        this.contextId = getContextFromSSOToken(ssoToken);
         this.authenticationId = getUserId(ssoToken);
     }
 

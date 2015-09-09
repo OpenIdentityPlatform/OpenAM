@@ -13,7 +13,7 @@
     },
     "message": ""
   },
-  "contextId": "uniqueSessionAlias",
+  "contexts": {"Session token" : "value"},
   "domain": "dc=openam,dc=forgerock,dc=org",
   "extraInfo": [ "Login Success\", \"module_instance\", \"Application\", \"isNoSession=false" ]
 }

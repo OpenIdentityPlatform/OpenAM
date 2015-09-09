@@ -6,7 +6,7 @@
   "authentication": {
     "id": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org"
   },
-  "contextId": "uniqueSessionAlias",
+  "contexts": {"Session token" : "value"},
   "client": {
     "host": null,
     "ip": "172.16.101.7",

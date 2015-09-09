@@ -8,8 +8,8 @@
         "component": {
           "type": "string"
         },
-        "contextId": {
-          "type": "string"
+        "contexts": {
+          "type": "object"
         },
         "domain": {
           "type": "string"
@@ -32,8 +32,8 @@
         "component": {
           "type": "string"
         },
-        "contextId": {
-          "type": "string"
+        "contexts": {
+          "type": "object"
         },
         "domain": {
           "type": "string"
@@ -56,8 +56,8 @@
         "component": {
           "type": "string"
         },
-        "contextId": {
-          "type": "string"
+        "contexts": {
+          "type": "object"
         },
         "domain": {
           "type": "string"
@@ -80,8 +80,8 @@
         "component": {
           "type": "string"
         },
-        "contextId": {
-          "type": "string"
+        "contexts": {
+          "type": "object"
         },
         "domain": {
           "type": "string"

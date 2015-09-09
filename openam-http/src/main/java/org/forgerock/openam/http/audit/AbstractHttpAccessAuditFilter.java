@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.http.audit;
 
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableContexts;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.util.promise.Promises.*;
 
@@ -31,9 +32,13 @@ import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Responsible for logging access audit events for CHF requests.
@@ -90,7 +95,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
                     .authentication(getUserIdForAccessAttempt(request))
-                    .contextId(getContextIdForAccessAttempt(request))
+                    .contexts(getContextsForAccessAttempt(request))
                     .forRequest(request, context);
 
             auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
@@ -107,7 +112,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(response))
-                    .contextId(getContextIdForAccessOutcome(response))
+                    .contexts(getContextsForAccessOutcome(response))
                     .response("SUCCESS", endTime - request.getTime())
                     .forRequest(request, context);
 
@@ -125,7 +130,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(response))
-                    .contextId(getContextIdForAccessOutcome(response))
+                    .contexts(getContextsForAccessOutcome(response))
                     .responseWithMessage("FAILED - " + response.getStatus().getCode(), endTime - request.getTime(),
                             response.getStatus().getReasonPhrase())
                     .forRequest(request, context);
@@ -146,13 +151,13 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
     }
 
     /**
-     * Retrieve the context ID for an access attempt.
+     * Retrieve the context IDs for an access attempt.
      *
      * @param request the restlet request
-     * @return the context ID
+     * @return the context IDs
      */
-    protected String getContextIdForAccessAttempt(Request request) {
-        return AuditRequestContext.getProperty(AuditConstants.CONTEXT_ID);
+    protected Map<String, String> getContextsForAccessAttempt(Request request) {
+        return getAllAvailableContexts();
     }
 
     /**
@@ -167,12 +172,13 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
     }
 
     /**
-     * Retrieve the Context ID for an access outcome.
+     * Retrieve the Context IDs for an access outcome.
      *
      * @param response the restlet response
-     * @return the context ID
+     * @return the context IDs
      */
-    protected String getContextIdForAccessOutcome(Response response) {
-        return AuditRequestContext.getProperty(AuditConstants.CONTEXT_ID);
+    protected Map<String, String> getContextsForAccessOutcome(Response response) {
+        return getAllAvailableContexts();
     }
+
 }

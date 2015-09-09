@@ -20,6 +20,10 @@ import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.ActivityAuditEventBuilder;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Builder for OpenAM audit access events.
  *
@@ -41,11 +45,23 @@ public final class AMActivityAuditEventBuilder extends ActivityAuditEventBuilder
     /**
      * Provide value for "contextId" audit log field.
      *
-     * @param value String "contextId" value.
+     * @param contexts Map "contexts" value.
      * @return this builder for method chaining.
      */
-    public AMActivityAuditEventBuilder contextId(String value) {
-        putContextId(jsonValue, value);
+    public AMActivityAuditEventBuilder contexts(Map<String, String> contexts) {
+        putContexts(jsonValue, contexts);
+        return this;
+    }
+
+    /**
+     * Provide single value which will be used in "contexts" audit log field.
+     *
+     * @param context Context key which will be used in the "contexts" audit log field.
+     * @param contextId Context key which will be used in the "contexts" audit log field.
+     * @return this builder for method chaining.
+     */
+    public AMActivityAuditEventBuilder context(AuditConstants.Context context, String contextId) {
+        putContexts(jsonValue, Collections.singletonMap(context.toString(), contextId));
         return this;
     }
 
@@ -67,7 +83,7 @@ public final class AMActivityAuditEventBuilder extends ActivityAuditEventBuilder
      * @param ssoToken The SSOToken from which the contextId value will be retrieved.
      * @return this builder
      */
-    public AMActivityAuditEventBuilder contextIdFromSSOToken(SSOToken ssoToken) {
+    public AMActivityAuditEventBuilder contextFromSSOToken(SSOToken ssoToken) {
         putContextIdFromSSOToken(jsonValue, ssoToken);
         return this;
     }
