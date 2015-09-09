@@ -31,7 +31,7 @@ import org.forgerock.util.Reject;
  * @see ConnectionType
  */
 public class ConnectionCount {
-    static final int MINIMUM_CONNECTIONS = 11;
+    static final int MINIMUM_CONNECTIONS = 10;
     private final Map<ConnectionType, LdapDataLayerConfiguration> dataLayerConfiguration;
 
     /**
