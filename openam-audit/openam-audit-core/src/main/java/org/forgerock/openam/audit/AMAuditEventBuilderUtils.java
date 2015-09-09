@@ -119,11 +119,11 @@ public final class AMAuditEventBuilderUtils {
         return defaultValue;
     }
 
-    //TODO Javdoc me
-
     /**
+     * Get all available {@link AuditConstants.Context} values from the possible list of
+     * {@link AuditConstants.Context} values, from the {@link AuditRequestContext}.
      *
-     * @return
+     * @return All the available {@link AuditConstants.Context} values.
      */
     public static Map<String,String> getAllAvailableContexts() {
         Map<String, String> map = new HashMap<>();

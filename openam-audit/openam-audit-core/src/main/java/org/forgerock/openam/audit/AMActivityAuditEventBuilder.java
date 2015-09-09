@@ -21,7 +21,6 @@ import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.ActivityAuditEventBuilder;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
