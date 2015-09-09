@@ -26,12 +26,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
-    "org/forgerock/commons/ui/common/util/UIUtils",
     "UserDelegate",
     "org/forgerock/commons/ui/common/main/ViewManager"
 ], function ($, _, AbstractConfigurationAware, AuthNDelegate, CookieHelper, Configuration, Constants, Router,
-            SessionDelegate, UIUtils, UserDelegate, ViewManager) {
-
+            SessionDelegate, UserDelegate, ViewManager) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -120,13 +118,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
 
     obj.getLoginUrlParams = function () {
         var url = Configuration.globalData.auth.fullLoginURL;
-        return UIUtils.convertQueryParametersToJSON(url.substring(url.indexOf("?") + 1));
+        return Router.convertQueryParametersToJSON(url.substring(url.indexOf("?") + 1));
 
     };
 
     obj.setSuccessURL = function (tokenId) {
         var promise = $.Deferred(),
-            urlParams = UIUtils.convertCurrentUrlToJSON().params,
+            urlParams = Router.convertCurrentUrlToJSON().params,
             url = Configuration.globalData.auth.successURL,
             context = "";
         if (urlParams && urlParams.goto) {

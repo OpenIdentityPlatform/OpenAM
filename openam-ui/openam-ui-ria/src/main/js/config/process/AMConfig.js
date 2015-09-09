@@ -35,7 +35,7 @@ define("config/process/AMConfig", [
         ],
         processDescription: function (event, router, conf, sessionManager) {
             var argsURLFragment = event ? (event.args ? event.args[0] : "") : "",
-                urlParams = UIUtils.convertQueryParametersToJSON(argsURLFragment),
+                urlParams = Router.convertQueryParametersToJSON(argsURLFragment),
                 gotoURL = urlParams.goto;
 
             sessionManager.logout(function () {
