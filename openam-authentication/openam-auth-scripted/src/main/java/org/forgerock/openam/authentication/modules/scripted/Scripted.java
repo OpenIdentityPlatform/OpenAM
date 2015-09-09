@@ -210,7 +210,7 @@ public class Scripted extends AMLoginModule {
     }
 
     private HttpClientRequest getHttpRequest() {
-       return httpClientRequestFactory.createRequest();
+        return httpClientRequestFactory.createRequest();
     }
 
     private String getClientSideScript() {

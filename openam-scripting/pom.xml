@@ -86,6 +86,10 @@
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-assistedinject</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.http</groupId>
+            <artifactId>chf-client-apache-sync</artifactId>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>

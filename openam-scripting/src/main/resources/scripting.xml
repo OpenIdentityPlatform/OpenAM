@@ -130,6 +130,14 @@
                                 <Value>java.util.TreeSet</Value>
                                 <Value>com.sun.identity.shared.debug.Debug</Value>
                                 <Value>org.forgerock.http.client.*</Value>
+                                <Value>org.forgerock.http.Client</Value>
+                                <Value>org.forgerock.http.Handler</Value>
+                                <Value>org.forgerock.http.Context</Value>
+                                <Value>org.forgerock.http.context.RootContext</Value>
+                                <Value>org.forgerock.http.protocol.Request</Value>
+                                <Value>org.forgerock.http.protocol.Response</Value>
+                                <Value>org.forgerock.util.promise.NeverThrowsException</Value>
+                                <Value>org.forgerock.util.promise.Promise</Value>
                                 <Value>org.forgerock.openam.scripting.api.http.GroovyHttpClient</Value>
                                 <Value>org.forgerock.openam.scripting.api.http.JavaScriptHttpClient</Value>
                                 <Value>org.forgerock.openam.scripting.api.ScriptedIdentity</Value>

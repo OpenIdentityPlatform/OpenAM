@@ -36,8 +36,10 @@ import java.util.*;
  * {@link org.forgerock.http.client.request.HttpClientRequest} objects and receive {@link org.forgerock.http.client.response.HttpClientResponse} objects.
  *
  * @since 12.0.0
+ * @deprecated Will be replaced in a later release by {@link org.forgerock.http.Client}.
  */
-public class RestletHttpClient {
+@Deprecated
+public abstract class RestletHttpClient {
     final HttpClientRequestFactory httpClientRequestFactory = InjectorHolder.getInstance(HttpClientRequestFactory.class);
 
     protected HttpClientResponse getHttpClientResponse(String uri, String body, Map<String, List<Map<String,String>>> requestData, String method) throws UnsupportedEncodingException {

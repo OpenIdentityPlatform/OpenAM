@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -11,12 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2010-2014 ForgeRock AS.
+ * Copyright 2010-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.scripting.api.http;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.Client;
 import org.forgerock.http.client.RestletHttpClient;
 import org.forgerock.http.client.response.HttpClientResponse;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.http.protocol.Response;
+import org.forgerock.util.promise.NeverThrowsException;
+import org.forgerock.util.promise.Promise;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 
@@ -24,9 +34,21 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
- * A HTTP Rest client for JavaScript auth module
+ * A HTTP Rest client for JavaScript auth module.
+ *
+ * @deprecated Will be replaced in a later release by {@link Client}.
  */
+@Deprecated
 public class JavaScriptHttpClient extends RestletHttpClient {
+
+    private static final Debug DEBUG = Debug.getInstance("amScript");
+
+    private final Client client;
+
+    @Inject
+    public JavaScriptHttpClient(@Named("ScriptingHttpClient") Client client) {
+        this.client = client;
+    }
 
     /**
      * @param uri URI of resource to be accessed
@@ -35,6 +57,7 @@ public class JavaScriptHttpClient extends RestletHttpClient {
      * @throws UnsupportedEncodingException
      */
     public HttpClientResponse get(String uri, NativeObject requestData) throws UnsupportedEncodingException {
+        DEBUG.warning("'get' has been deprecated. Use 'send' instead");
         return getHttpClientResponse(uri, null, convertRequestData(requestData), "GET");
     }
 
@@ -45,8 +68,22 @@ public class JavaScriptHttpClient extends RestletHttpClient {
      * @return The response from the REST call
      * @throws UnsupportedEncodingException
      */
-    public HttpClientResponse post(String uri, String body, NativeObject requestData) throws UnsupportedEncodingException {
+    public HttpClientResponse post(String uri, String body, NativeObject requestData)
+            throws UnsupportedEncodingException {
+        DEBUG.warning("'post' has been deprecated. Use 'send' instead");
         return getHttpClientResponse(uri, body, convertRequestData(requestData), "POST");
+    }
+
+    /**
+     * Sends an HTTP request and returns a {@code Promise} representing the
+     * pending HTTP response.
+     *
+     * @param request
+     *            The HTTP request to send.
+     * @return A promise representing the pending HTTP response.
+     */
+    public Promise<Response, NeverThrowsException> send(final Request request) {
+        return client.send(request);
     }
 
     private Map convertRequestData(NativeObject requestData) {
