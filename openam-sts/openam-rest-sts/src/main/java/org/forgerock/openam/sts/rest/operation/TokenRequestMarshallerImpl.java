@@ -32,7 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.http.Context;
-import org.forgerock.http.context.ClientInfoContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.http.HttpContext;
@@ -405,7 +405,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
             }
             certificates = pullClientCertFromHeader(context.asContext(HttpContext.class));
         } else {
-            certificates = pullClientCertFromRequestAttribute(context.asContext(ClientInfoContext.class));
+            certificates = pullClientCertFromRequestAttribute(context.asContext(ClientContext.class));
         }
 
         if (certificates != null) {
@@ -425,7 +425,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    private X509Certificate[] pullClientCertFromRequestAttribute(ClientInfoContext context) throws TokenMarshalException {
+    private X509Certificate[] pullClientCertFromRequestAttribute(ClientContext context) throws TokenMarshalException {
         // Filter the certs on the request to just the X509 ones and return as an array.
         return toArray(filter(context.getCertificates(), X509Certificate.class), X509Certificate.class);
     }

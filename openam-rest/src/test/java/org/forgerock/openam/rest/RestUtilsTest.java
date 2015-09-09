@@ -16,17 +16,17 @@
 
 package org.forgerock.openam.rest;
 
-import org.forgerock.http.Context;
-import org.forgerock.json.resource.InternalContext;
-import org.forgerock.json.resource.http.HttpContext;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.JsonValue.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.JsonValue.*;
+import org.forgerock.http.Context;
+import org.forgerock.http.context.ClientContext;
+import org.forgerock.json.resource.http.HttpContext;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 public class RestUtilsTest {
     private static final String HEADER = "testHeader";
@@ -59,6 +59,6 @@ public class RestUtilsTest {
         final HttpContext httpContext = new HttpContext(json(object(
                 field(HttpContext.ATTR_HEADERS, Collections.singletonMap(HEADER, Arrays.asList(values))),
                 field(HttpContext.ATTR_PARAMETERS, Collections.emptyMap()))), null);
-        return new InternalContext(httpContext);
+        return ClientContext.newInternalClientContext(httpContext);
     }
 }

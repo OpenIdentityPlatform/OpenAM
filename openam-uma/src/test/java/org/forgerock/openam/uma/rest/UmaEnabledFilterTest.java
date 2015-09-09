@@ -34,7 +34,7 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -84,7 +84,7 @@ public class UmaEnabledFilterTest {
     @BeforeMethod
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        context = new InternalContext(new RealmContext(new RootContext()));
+        context = ClientContext.newInternalClientContext(new RealmContext(new RootContext()));
         requestHandler = mock(RequestHandler.class);
         when(requestHandler.handleAction(any(Context.class), any(ActionRequest.class)))
                 .thenReturn(promise(newActionResponse(null)));

@@ -32,7 +32,7 @@ import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -70,7 +70,7 @@ public class TrustedDevicesResourceTest {
     private Context ctx() {
         SSOTokenContext ssoTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(ssoTokenContext);
-        Context serverContext = new InternalContext(realmContext);
+        Context serverContext = ClientContext.newInternalClientContext(realmContext);
 
         return serverContext;
     }

@@ -16,27 +16,27 @@
 
 package org.forgerock.openam.entitlement.rest;
 
+import static org.forgerock.json.JsonValue.array;
+import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
+import javax.security.auth.Subject;
+import java.util.Arrays;
+import java.util.List;
+
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
+import org.forgerock.http.Context;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.Context;
 import org.forgerock.openam.entitlement.guice.EntitlementRestGuiceModule;
-import org.forgerock.openam.entitlement.rest.EntitlementsExceptionMappingHandler;
-import org.forgerock.openam.entitlement.rest.PolicyAction;
-import org.forgerock.openam.entitlement.rest.PolicyEvaluator;
-import org.forgerock.openam.entitlement.rest.PolicyEvaluatorFactory;
-import org.forgerock.openam.entitlement.rest.PolicyParser;
-import org.forgerock.openam.entitlement.rest.PolicyRequestFactory;
-import org.forgerock.openam.entitlement.rest.PolicyResource;
-import org.forgerock.openam.entitlement.rest.PolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.model.json.PolicyRequest;
-import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.promise.Promise;
@@ -46,15 +46,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import javax.security.auth.Subject;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.forgerock.json.JsonValue.array;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
 
 /**
 * Unit test for the evaluation logic within {@link PolicyResource}.
@@ -220,7 +211,7 @@ public class PolicyResourceEvaluationTest {
      * @return the server context hierarchy
      */
     private Context buildContextStructure(final String realm) {
-        return new InternalContext(new RealmContext(subjectContext));
+        return ClientContext.newInternalClientContext(new RealmContext(subjectContext));
     }
 
     /**

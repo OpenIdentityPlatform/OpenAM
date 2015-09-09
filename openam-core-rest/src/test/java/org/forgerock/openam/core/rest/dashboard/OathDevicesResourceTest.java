@@ -19,15 +19,19 @@ package org.forgerock.openam.core.rest.dashboard;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
-import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.assertThat;
-import static org.mockito.BDDMockito.*;
+import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -35,19 +39,12 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import org.assertj.core.api.Assertions;
 import org.forgerock.http.Context;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -101,7 +98,7 @@ public class OathDevicesResourceTest {
     private Context ctx() throws SSOException {
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         given(mockSubjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
-        return new InternalContext(new RealmContext(mock(SSOTokenContext.class)));
+        return ClientContext.newInternalClientContext(new RealmContext(mock(SSOTokenContext.class)));
     }
 
     @Test

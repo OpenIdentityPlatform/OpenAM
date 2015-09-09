@@ -35,7 +35,7 @@ import java.util.Set;
 import javax.inject.Named;
 
 import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.http.context.ClientInfoContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
@@ -128,7 +128,7 @@ public class TokenRequestMarshallerImplTest {
     @Test
     public void testX509CertificateTokenMarshalling() throws Exception {
         X509Certificate certificate = getCertificate();
-        ClientInfoContext clientInfoContext = ClientInfoContext.builder(null).certificates(certificate).build();
+        ClientContext clientInfoContext = ClientContext.buildExternalClientContext(null).certificates(certificate).build();
 
         @SuppressWarnings("unchecked")
         RestTokenTransformValidatorParameters<X509Certificate[]> params =

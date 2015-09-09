@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.Request;
@@ -136,6 +136,6 @@ public class EntitlementsExceptionMappingHandlerTest {
         final HttpContext httpContext = new HttpContext(json(object(field("headers",
                 Collections.singletonMap("accept-language", Arrays.asList(language))),
                 field("parameters", Collections.emptyMap()))), null);
-        return new InternalContext(httpContext);
+        return ClientContext.newInternalClientContext(httpContext);
     }
 }

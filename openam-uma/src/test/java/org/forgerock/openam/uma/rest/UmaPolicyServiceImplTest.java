@@ -47,7 +47,7 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
@@ -155,7 +155,7 @@ public class UmaPolicyServiceImplTest {
         given(subjectContext.getCallerSSOToken()).willReturn(ssoToken);
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn(userShortName);
-        return new InternalContext(new RealmContext(subjectContext));
+        return ClientContext.newInternalClientContext(new RealmContext(subjectContext));
     }
 
     private static JsonValue createUmaPolicyJson(String resourceSetId, String... subjectTwoScopes) {

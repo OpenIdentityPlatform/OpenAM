@@ -18,10 +18,7 @@ package org.forgerock.openam.scripting.rest.batch.helpers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 import javax.inject.Provider;
 
@@ -63,7 +60,7 @@ public class RequesterTest {
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         realmContext.addSubRealm("REALM", "REALM");
-        mockServerContext = mock(Context.class); // new InternalContext(realmContext);
+        mockServerContext = mock(Context.class);
     }
 
     @BeforeMethod

@@ -16,28 +16,10 @@
 
 package org.forgerock.openam.entitlement.rest.model.json;
 
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.JwtPrincipal;
-import org.fest.assertions.Condition;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.jose.jws.JwsHeader;
-import org.forgerock.json.jose.jws.SignedJwt;
-import org.forgerock.json.jose.jws.handlers.NOPSigningHandler;
-import org.forgerock.json.jose.jws.handlers.SigningHandler;
-import org.forgerock.json.jose.jwt.Jwt;
-import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.Context;
-import org.forgerock.json.resource.InternalContext;
-import org.forgerock.openam.entitlement.rest.PolicyEvaluator;
-import org.forgerock.openam.entitlement.rest.model.json.PolicyRequest;
-import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.resource.SubjectContext;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.json.JsonValue.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 import javax.security.auth.Subject;
 import java.security.Principal;
@@ -49,12 +31,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.json.JsonValue.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.JwtPrincipal;
+import org.fest.assertions.Condition;
+import org.forgerock.http.Context;
+import org.forgerock.http.context.ClientContext;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.jose.jws.JwsHeader;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jws.handlers.NOPSigningHandler;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
+import org.forgerock.json.jose.jwt.Jwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.openam.entitlement.rest.PolicyEvaluator;
+import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.resource.SubjectContext;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Unit test for {@link PolicyRequest}.
@@ -291,7 +288,7 @@ public class PolicyRequestTest {
     private Context buildContextStructure(final String realm) {
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm(realm, realm);
-        return new InternalContext(realmContext);
+        return ClientContext.newInternalClientContext(realmContext);
     }
 
     /**

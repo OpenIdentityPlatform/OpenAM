@@ -29,7 +29,7 @@ import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
@@ -147,7 +147,7 @@ public class ResourceTypesResourceTest {
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("/", "/");
 
-        mockServerContext = new InternalContext(realmContext);
+        mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         resourceTypeService = mock(MockResourceTypeService.class);
 

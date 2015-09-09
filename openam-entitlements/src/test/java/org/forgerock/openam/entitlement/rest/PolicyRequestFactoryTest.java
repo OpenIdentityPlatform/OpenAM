@@ -20,9 +20,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.http.Context;
-import org.forgerock.json.resource.InternalContext;
-import org.forgerock.openam.entitlement.rest.PolicyAction;
-import org.forgerock.openam.entitlement.rest.PolicyRequestFactory;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.openam.entitlement.rest.model.json.BatchPolicyRequest;
 import org.forgerock.openam.entitlement.rest.model.json.PolicyRequest;
 import org.forgerock.openam.entitlement.rest.model.json.TreePolicyRequest;
@@ -132,8 +130,6 @@ public class PolicyRequestFactoryTest {
     private Context buildContextStructure(final String realm) {
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm(realm, realm);
-        return new InternalContext(realmContext);
+        return ClientContext.newInternalClientContext(realmContext);
     }
-
-
 }

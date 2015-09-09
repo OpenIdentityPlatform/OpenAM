@@ -18,14 +18,13 @@ package org.forgerock.openam.scripting.rest;
 import static org.forgerock.json.JsonValue.*;
 import static org.testng.AssertJUnit.*;
 
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode;
 import org.forgerock.openam.scripting.ScriptException;
-import org.forgerock.openam.scripting.rest.ScriptExceptionMappingHandler;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -81,7 +80,7 @@ public class ScriptExceptionMappingHandlerTest {
                 field("headers",
                         Collections.singletonMap(ServerContextUtils.ACCEPT_LANGUAGE, Arrays.asList(language))),
                 field("parameters", Collections.emptyMap()))), null);
-        return new InternalContext(httpContext);
+        return ClientContext.newInternalClientContext(httpContext);
     }
 
 }

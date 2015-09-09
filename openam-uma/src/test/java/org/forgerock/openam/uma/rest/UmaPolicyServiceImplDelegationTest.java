@@ -47,7 +47,7 @@ import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -448,7 +448,7 @@ public class UmaPolicyServiceImplDelegationTest {
         given(subjectContext.getCallerSSOToken()).willReturn(ssoToken);
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn(loggedInUser);
-        return new InternalContext(new RealmContext(subjectContext));
+        return ClientContext.newInternalClientContext(new RealmContext(subjectContext));
     }
 
     @SuppressWarnings("unchecked")

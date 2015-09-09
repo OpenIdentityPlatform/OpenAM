@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 import javax.security.auth.Subject;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ReadRequest;
@@ -70,7 +70,7 @@ public class ApplicationTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject subject = null;
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
@@ -89,7 +89,7 @@ public class ApplicationTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
@@ -110,7 +110,7 @@ public class ApplicationTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);

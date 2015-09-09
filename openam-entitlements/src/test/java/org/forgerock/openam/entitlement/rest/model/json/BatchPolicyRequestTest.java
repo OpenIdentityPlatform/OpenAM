@@ -20,7 +20,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.http.Context;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.openam.entitlement.rest.model.json.BatchPolicyRequest;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -102,7 +102,7 @@ public class BatchPolicyRequestTest {
     }
 
     private Context buildContextStructure(final String realm) {
-        return new InternalContext(new RealmContext(subjectContext));
+        return ClientContext.newInternalClientContext(new RealmContext(subjectContext));
     }
 
 }

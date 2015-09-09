@@ -34,7 +34,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
-import org.forgerock.http.context.ClientInfoContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.json.resource.http.HttpContext;
 
@@ -94,7 +94,7 @@ public final class ClientUtils {
      *
      * @param context the Commons Http-Framework context which will be examined to obtain the client's ip address.
      * @param request the Commons Http-Framework request which will be examined to obtain the client's ip address
-     * @return the client ip address, specified in either a custom header value, or pulled from the request, via the ClientInfoContext
+     * @return the client ip address, specified in either a custom header value, or pulled from the request, via the ClientContext
      * class.
      */
     public static String getClientIPAddress(Context context, Request request) {
@@ -110,7 +110,7 @@ public final class ClientUtils {
                 }
             }
             if (StringUtils.isBlank(result)) {
-                result = context.asContext(ClientInfoContext.class).getRemoteAddress();
+                result = context.asContext(ClientContext.class).getRemoteAddress();
                 if (utilDebug.messageEnabled()) {
                     utilDebug.message("ClientUtils.getClientIPAddress : remoteAddr=[" + result + "]");
                 }
@@ -127,7 +127,7 @@ public final class ClientUtils {
 
     /**
      * @param context the Commons Http-Framework context which will be examined to obtain the client's ip address.
-     * @return the client ip address, specified in either a custom header value, or pulled from the request, via the ClientInfoContext
+     * @return the client ip address, specified in either a custom header value, or pulled from the request, via the ClientContext
      * class. Differs from the method above as this method relies upon the presence of crest context objects, which are not
      * present in the CHF context.
      */
@@ -146,7 +146,7 @@ public final class ClientUtils {
             }
         }
         if (StringUtils.isBlank(result)) {
-            result = context.asContext(ClientInfoContext.class).getRemoteAddress();
+            result = context.asContext(ClientContext.class).getRemoteAddress();
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("ClientUtils.getClientIPAddress : remoteAddr=[" + result + "]");
             }

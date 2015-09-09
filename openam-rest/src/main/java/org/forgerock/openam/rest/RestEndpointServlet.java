@@ -38,7 +38,7 @@ import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplication;
 import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.context.HttpRequestContext;
+import org.forgerock.http.context.AttributesContext;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.io.Buffer;
 import org.forgerock.http.protocol.Request;
@@ -162,7 +162,7 @@ public class RestEndpointServlet extends HttpServlet {
 
         @Override
         public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
-            Map<String, Object> attributes = new HashMap<>(context.asContext(HttpRequestContext.class).getAttributes());
+            Map<String, Object> attributes = new HashMap<>(context.asContext(AttributesContext.class).getAttributes());
             HttpServletRequest httpRequest = (HttpServletRequest) attributes.remove(HttpServletRequest.class.getName());
             HttpServletResponse httpResponse =
                     (HttpServletResponse) attributes.remove(HttpServletResponse.class.getName());

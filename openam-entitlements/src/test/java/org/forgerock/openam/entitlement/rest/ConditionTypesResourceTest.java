@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.security.auth.Subject;
 import org.forgerock.http.Context;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -76,7 +76,7 @@ public class ConditionTypesResourceTest {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(mockSubject);
@@ -99,7 +99,7 @@ public class ConditionTypesResourceTest {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         QueryResourceHandler mockHandler = mock(QueryResourceHandler.class);
 
         Subject mockSubject = new Subject();
@@ -125,7 +125,7 @@ public class ConditionTypesResourceTest {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(mockSubject);
@@ -158,7 +158,7 @@ public class ConditionTypesResourceTest {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(mockSubject);

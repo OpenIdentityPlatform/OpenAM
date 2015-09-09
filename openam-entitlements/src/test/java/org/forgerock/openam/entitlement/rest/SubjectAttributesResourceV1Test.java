@@ -27,7 +27,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -62,7 +62,7 @@ public class SubjectAttributesResourceV1Test {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
@@ -87,7 +87,7 @@ public class SubjectAttributesResourceV1Test {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
@@ -110,7 +110,7 @@ public class SubjectAttributesResourceV1Test {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);

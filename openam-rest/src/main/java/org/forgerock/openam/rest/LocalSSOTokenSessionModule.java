@@ -46,7 +46,7 @@ import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
 import org.forgerock.caf.authentication.api.AuthenticationException;
 import org.forgerock.caf.authentication.api.MessageInfoContext;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.context.HttpRequestContext;
+import org.forgerock.http.context.AttributesContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
@@ -153,7 +153,7 @@ public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
             initDependencies();
         }
 
-        final HttpServletRequest request = (HttpServletRequest) messageInfo.asContext(HttpRequestContext.class).getAttributes().get(HttpServletRequest.class.getName());
+        final HttpServletRequest request = (HttpServletRequest) messageInfo.asContext(AttributesContext.class).getAttributes().get(HttpServletRequest.class.getName());
 
         String requester = request.getParameter(REQUESTER_URL_PARAM);
         if (requester != null) {

@@ -37,7 +37,7 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.AdviceContext;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.InternalContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -153,7 +153,7 @@ public class SessionResourceTest {
     public void actionCollectionShouldFailToValidateSessionWhenSSOTokenIdNotSet() {
         //Given
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
-        final Context context = new InternalContext(tokenContext);
+        final Context context = ClientContext.newInternalClientContext(tokenContext);
         final ActionRequest request = mock(ActionRequest.class);
 
         given(request.getAction()).willReturn(VALIDATE_ACTION_ID);
@@ -170,7 +170,7 @@ public class SessionResourceTest {
         //Given
         cookieResponse = "SSO_TOKEN_ID";
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
-        final Context context = new InternalContext(tokenContext);
+        final Context context = ClientContext.newInternalClientContext(tokenContext);
         final ActionRequest request = mock(ActionRequest.class);
         final SSOToken ssoToken = mock(SSOToken.class);
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
@@ -196,7 +196,7 @@ public class SessionResourceTest {
         //Given
         cookieResponse = "SSO_TOKEN_ID";
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
-        final Context context = new InternalContext(new AdviceContext(tokenContext, Collections.<String>emptySet()));
+        final Context context = ClientContext.newInternalClientContext(new AdviceContext(tokenContext, Collections.<String>emptySet()));
         final ActionRequest request = mock(ActionRequest.class);
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
 

@@ -36,7 +36,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.Locale;
 import org.forgerock.http.Context;
-import org.forgerock.http.context.HttpRequestContext;
+import org.forgerock.http.context.AttributesContext;
 import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.protocol.Form;
 import org.forgerock.http.protocol.Request;
@@ -160,7 +160,7 @@ public class AuthenticationServiceV1 {
     }
 
     private HttpServletResponse getHttpServletResponse(Context context) {
-        HttpRequestContext requestContext = context.asContext(HttpRequestContext.class);
+        AttributesContext requestContext = context.asContext(AttributesContext.class);
         Map<String, Object> requestAttributes = requestContext.getAttributes();
         return (HttpServletResponse) requestAttributes.get(HttpServletResponse.class.getName());
     }
@@ -177,7 +177,7 @@ public class AuthenticationServiceV1 {
      * @return The HttpServletRequest
      */
     private HttpServletRequest getHttpServletRequest(Context context) {
-        HttpRequestContext requestContext = context.asContext(HttpRequestContext.class);
+        AttributesContext requestContext = context.asContext(AttributesContext.class);
         Map<String, Object> requestAttributes = requestContext.getAttributes();
         final HttpServletRequest request = (HttpServletRequest) requestAttributes.get(HttpServletRequest.class.getName());
 

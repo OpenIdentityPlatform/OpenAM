@@ -23,7 +23,7 @@ import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.http.Context;
 import org.forgerock.http.MutableUri;
-import org.forgerock.http.context.ClientInfoContext;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.http.protocol.Headers;
 import org.forgerock.http.protocol.Request;
 
@@ -117,7 +117,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      * @return this builder
      */
     public final AMAccessAuditEventBuilder forRequest(Request request, Context context) {
-        ClientInfoContext clientInfo = context.asContext(ClientInfoContext.class);
+        ClientContext clientInfo = context.asContext(ClientContext.class);
         client(
                 getClientIPAddress(context, request),
                 clientInfo.getRemotePort(),

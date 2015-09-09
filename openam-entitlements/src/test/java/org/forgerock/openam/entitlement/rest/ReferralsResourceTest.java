@@ -16,32 +16,31 @@
 
 package org.forgerock.openam.entitlement.rest;
 
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.testng.AssertJUnit.*;
+import static org.mockito.Mockito.*;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
+
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import javax.security.auth.Subject;
 import org.forgerock.http.Context;
+import org.forgerock.http.context.ClientContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
@@ -51,7 +50,6 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.entitlement.rest.ReferralsResourceV1;
 import org.forgerock.openam.entitlement.rest.wrappers.ReferralWrapper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -100,7 +98,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
 
         given(mockSSOTokenContext.getCallerSubject()).willReturn(null);
@@ -118,7 +116,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
 
@@ -145,7 +143,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
 
@@ -167,7 +165,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
 
@@ -189,7 +187,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
 
@@ -230,7 +228,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
 
@@ -272,7 +270,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
 
@@ -294,7 +292,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         DeleteRequest mockDeleteRequest = mock(DeleteRequest.class);
         Subject subject = new Subject();
 
@@ -315,7 +313,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         DeleteRequest mockDeleteRequest = mock(DeleteRequest.class);
         Subject subject = new Subject();
 
@@ -337,7 +335,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         QueryRequest mockQueryRequest = mock(QueryRequest.class);
         QueryResourceHandler mockQueryResultHandler = mock(QueryResourceHandler.class);
         Subject subject = new Subject();
@@ -359,7 +357,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         QueryRequest mockQueryRequest = mock(QueryRequest.class);
         QueryResourceHandler mockQueryResultHandler = mock(QueryResourceHandler.class);
         Subject subject = new Subject();
@@ -393,7 +391,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
         JsonValue mockJson = mock(JsonValue.class);
@@ -418,7 +416,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         DeleteRequest mockDeleteRequest = mock(DeleteRequest.class);
         Subject subject = new Subject();
 
@@ -440,7 +438,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         ReadRequest mockReadRequest = mock(ReadRequest.class);
         Subject subject = new Subject();
 
@@ -460,7 +458,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         ReadRequest mockReadRequest = mock(ReadRequest.class);
         Subject subject = new Subject();
         ReferralPrivilege mockOne = new ReferralPrivilege("one",
@@ -483,7 +481,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         Subject subject = new Subject();
 
@@ -522,7 +520,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         Subject subject = new Subject();
 
@@ -632,7 +630,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         Subject subject = new Subject();
 
@@ -675,7 +673,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         Subject subject = new Subject();
 
@@ -700,7 +698,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         Subject subject = new Subject();
 
@@ -725,7 +723,7 @@ public class ReferralsResourceTest {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        Context mockServerContext = new InternalContext(realmContext);
+        Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         Subject subject = new Subject();
 

@@ -35,9 +35,10 @@ import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.http.Context;
 import org.forgerock.http.Handler;
 import org.forgerock.http.Session;
-import org.forgerock.http.context.ClientInfoContext;
-import org.forgerock.http.context.HttpRequestContext;
+import org.forgerock.http.context.ClientContext;
+import org.forgerock.http.context.AttributesContext;
 import org.forgerock.http.context.RootContext;
+import org.forgerock.http.context.SessionContext;
 import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -188,15 +189,16 @@ public class AbstractHttpAccessAuditFilterTest {
     }
 
     private Context mockContext() {
-        return new HttpRequestContext(ClientInfoContext.builder(new RootContext())
-                .certificates()
-                .userAgent("USER_AGENT")
-                .remoteAddress("REMOTE_ADDRESS")
-                .remoteHost("REMOTE_HOST")
-                .remotePort(9000)
-                .remoteUser("REMOTE_USER")
-                .build(),
-                mock(Session.class));
+        return new AttributesContext(new SessionContext(
+                ClientContext.buildExternalClientContext(new RootContext())
+                        .certificates()
+                        .userAgent("USER_AGENT")
+                        .remoteAddress("REMOTE_ADDRESS")
+                        .remoteHost("REMOTE_HOST")
+                        .remotePort(9000)
+                        .remoteUser("REMOTE_USER")
+                        .build(),
+                mock(Session.class)));
     }
 
     private void disableAccessTopicAuditing() {
