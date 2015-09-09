@@ -17,7 +17,6 @@ package org.forgerock.openam.core.rest.authn;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getContextIdFromSSOToken;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
@@ -67,7 +66,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
         this.authIdHelper = authIdHelper;
     }
 
-    @Override
+    //@Override
     protected String getContextIdForAccessAttempt(Request request) {
         try {
             String jsonString = request.getEntity().getString();
@@ -77,10 +76,11 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
                     populateContextFromAuthId(jsonValue.get(AUTH_ID).asString());
                 }
             }
-            return super.getContextIdForAccessAttempt(request);
+            //return super.getContextIdForAccessAttempt(request);
         } catch (IOException e) {
             return "";
         }
+        return null;
     }
 
     @Override
@@ -98,12 +98,12 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
         return super.getUserIdForAccessOutcome(response);
     }
 
-    @Override
+    //@Override
     protected String getContextIdForAccessOutcome(Response response) {
-        String contextId = super.getContextIdForAccessOutcome(response);
-        if (isNotEmpty(contextId)) {
-            return contextId;
-        }
+        //String contextId = super.getContextIdForAccessOutcome(response);
+        //if (isNotEmpty(contextId)) {
+            //return contextId;
+        //}
 
         String tokenId = AuditRequestContext.getProperty(TOKEN_ID);
         String sessionId = AuditRequestContext.getProperty(SESSION_ID);
@@ -112,20 +112,21 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
             populateContextFromTokenId(tokenId);
 
         } else if (isNotEmpty(sessionId)) {
-            AuditRequestContext.putProperty(CONTEXT_ID, getContextIdFromSessionId(sessionId));
+            //AuditRequestContext.putProperty(CONTEXT_ID, getContextIdFromSessionId(sessionId));
 
         } else if (isNotEmpty(authId)) {
             populateContextFromAuthId(authId);
         }
 
-        return super.getContextIdForAccessOutcome(response);
+        //return super.getContextIdForAccessOutcome(response);
+        return null;
     }
 
     private void populateContextFromTokenId(String tokenId) {
         try {
             SSOToken token = SSOTokenManager.getInstance().createSSOToken(tokenId);
             AuditRequestContext.putProperty(USER_ID, getUserId(token));
-            AuditRequestContext.putProperty(CONTEXT_ID, getContextIdFromSSOToken(token));
+            //AuditRequestContext.putProperty(CONTEXT_ID, getContextIdFromSSOToken(token));
         } catch (SSOException e) {
             debug.warning("No SSO Token found when trying to audit an authentication request.");
         }
@@ -140,7 +141,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
 
             String contextId = getContextIdFromSessionId(sessionId);
             if (isNotEmpty(contextId)) {
-                AuditRequestContext.putProperty(CONTEXT_ID, contextId);
+                //return null;AuditRequestContext.putProperty(CONTEXT_ID, contextId);
             }
         } catch (RestAuthException e) {
             debug.warning("No session ID found when trying to audit an authentication request.");

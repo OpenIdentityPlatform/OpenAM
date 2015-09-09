@@ -16,7 +16,6 @@
 package org.forgerock.openam.rest.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.openam.audit.AuditConstants.CONTEXT_ID;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
 import static org.forgerock.openam.audit.AuditConstants.USER_ID;
 import static org.mockito.Mockito.*;
@@ -65,7 +64,7 @@ public class AbstractRestletAccessAuditFilterTest {
         when(request.getDate()).thenReturn(new Date());
         when(representation.isTransient()).thenReturn(false);
         AuditRequestContext.putProperty(USER_ID, "User 1");
-        AuditRequestContext.putProperty(CONTEXT_ID, "1234567890");
+        //AuditRequestContext.putProperty(CONTEXT_ID, "1234567890");
         when(eventPublisher.isAuditing(anyString())).thenReturn(true);
         when(eventPublisher.isSuppressExceptions()).thenReturn(false);
         doThrow(AuditException.class).when(eventPublisher).publish(anyString(), any(AuditEvent.class));

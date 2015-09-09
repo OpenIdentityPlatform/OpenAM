@@ -107,19 +107,20 @@ public class UMAAccessAuditFilter extends AbstractRestletAccessAuditFilter {
      */
     @Override
     protected String getContextIdForAccessAttempt(Request request) {
-        String contextId = super.getContextIdForAccessAttempt(request);
-
-        if (contextId != null) {
-            return contextId;
-        }
-
-        AccessToken accessToken = retrieveAccessToken(request);
-
-        contextId = generateContextID(accessToken);
-
-        AuditRequestContext.putProperty(CONTEXT_ID, contextId);
-
-        return contextId;
+//        String contextId = super.getContextIdForAccessAttempt(request);
+//
+//        if (contextId != null) {
+//            return contextId;
+//        }
+//
+//        AccessToken accessToken = retrieveAccessToken(request);
+//
+//        contextId = generateContextID(accessToken);
+//
+//        AuditRequestContext.putProperty(CONTEXT_ID, contextId);
+//
+//        return contextId;
+        return null;
     }
 
     private String generateContextID(AccessToken accessToken) {
