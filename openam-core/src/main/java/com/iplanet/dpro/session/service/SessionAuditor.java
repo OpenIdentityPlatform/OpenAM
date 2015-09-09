@@ -70,7 +70,7 @@ public final class SessionAuditor {
                     .eventName(eventName)
                     .component(Component.SESSION)
                     .authentication(session.getProperty(Constants.UNIVERSAL_IDENTIFIER))
-                    .contextId(Context.SESSION, contextId)
+                    .context(Context.SESSION, contextId)
                     .runAs(getUserId(getAdminToken()))
                     .resourceOperation(contextId, "", getCrudType(eventName))
                     .toEvent();
