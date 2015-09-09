@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.oauth2;
@@ -26,6 +27,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
@@ -60,6 +62,7 @@ import org.forgerock.openam.oauth2.legacy.LegacyResponseTypeHandler;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.encode.Base64url;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
@@ -732,8 +735,25 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         return new JsonValue(Collections.singletonMap("keys", jwks));
     }
 
-    private Map<String, Object> createRSAJWK(RSAPublicKey key, KeyUse use, String alg) {
-        return json(object(field("kty", "RSA"), field("kid", UUID.randomUUID().toString()),
+    private Map<String, Object> createRSAJWK(RSAPublicKey key, KeyUse use, String alg) throws ServerException {
+        String alias = null;
+        try {
+            alias = getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+        if (StringUtils.isBlank(alias)) {
+            logger.error("Alias of ID Token Signing Key not set.");
+            throw new ServerException("Alias of ID Token Signing Key not set.");
+        } else if ("test".equals(alias)) {
+            logger.warning("Alias of ID Token Signing Key should be changed from default, 'test'.");
+        }
+        String kid = Hash.hash(alias + key.getModulus().toString() + key.getPublicExponent().toString());
+        return json(object(field("kty", "RSA"), field(OAuth2Constants.JWTTokenParams.KEY_ID, kid),
                 field("use", use.toString()), field("alg", alg),
                 field("n", Base64url.encode(key.getModulus().toByteArray())),
                 field("e", Base64url.encode(key.getPublicExponent().toByteArray())))).asMap();
