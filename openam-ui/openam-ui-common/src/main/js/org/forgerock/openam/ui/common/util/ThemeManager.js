@@ -36,6 +36,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
      */
     var obj = {},
         promise = null,
+        defaultStyles = ["css/bootstrap-3.3.5-custom.css", "css/styles.css"],
         applyThemeToPage = function (theme) {
             // We might be switching themes (due to a realm change) and so we need to clean up the previous theme.
             $("link").remove();
@@ -52,7 +53,11 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                 href: require.toUrl(theme.path + theme.icon)
             }).appendTo("head");
 
-            _.each(theme.stylesheets, function(stylesheet) {
+            // If a user with the admin role is logged in, use the default theme
+            var useDefault = Configuration.loggedUser && _.contains(Configuration.loggedUser.roles, "ui-admin"),
+                stylesheets = useDefault ? defaultStyles : theme.stylesheets;
+
+            _.each(stylesheets, function (stylesheet) {
                 $("<link/>", {
                     rel: "stylesheet",
                     type: "text/css",
@@ -125,14 +130,15 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
      * Determine the theme from the themeConfig and the current realm and setup the theme on the page. This will
      * clear out any previous theme.
      * @param {string} [basePath] A URL to which all relative URLs in the theme will be made relative to.
+     * @param {boolean} force Perform a forced refresh of the theme
      * @returns {Promise} a promise that is resolved when the theme has been applied.
      */
-    obj.getTheme = function (basePath) {
+    obj.getTheme = function (basePath, force) {
         var theme = {},
             themeName, defaultTheme;
 
         // find out if the theme has changed
-        if (Configuration.globalData.theme && getThemeForCurrentRealm() === Configuration.globalData.theme.name) {
+        if (!force && Configuration.globalData.theme && getThemeForCurrentRealm() === Configuration.globalData.theme.name) {
             //no change so use the existing theme
             return $.Deferred().resolve(Configuration.globalData.theme);
         } else {
