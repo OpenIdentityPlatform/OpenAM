@@ -229,7 +229,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             _.each(reqs.callbacks, function (element) {
 
                 if (element.type === "RedirectCallback") {
-                    window.location.replace(element.output[0].value);
+                    window.location.replace(element.output.object[0].value);
                 }
 
                 if (element.type === "ConfirmationCallback") {

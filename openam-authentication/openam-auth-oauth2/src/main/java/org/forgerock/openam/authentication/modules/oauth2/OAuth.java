@@ -73,6 +73,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
 import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
 import org.forgerock.openam.authentication.modules.oidc.JwtHandler;
@@ -94,7 +95,6 @@ public class OAuth extends AMLoginModule {
 
     public static final String PROFILE_SERVICE_RESPONSE = "ATTRIBUTES";
     public static final String OPENID_TOKEN = "OPENID_TOKEN";
-    public static final String SHA_256_DISPLAY_NAME = "SHA 256";
     private static Debug debug = Debug.getInstance("amLoginModule");
     private String authenticatedUser = null;
     private Map sharedState;
@@ -465,7 +465,7 @@ public class OAuth extends AMLoginModule {
 
     private String getCodeVerifier(String codeChallengeMethod) throws LoginException {
         String codeVerifier = Base64url.encode(RandomStringUtils.randomAlphanumeric(96).getBytes());
-        if (SHA_256_DISPLAY_NAME.equals(codeChallengeMethod)) {
+        if (OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)) {
             try {
                 return Base64url.encode(
                         MessageDigest.getInstance("SHA-256").digest(codeVerifier.getBytes(StandardCharsets.US_ASCII)));

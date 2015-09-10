@@ -245,9 +245,12 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                  type="single_choice" syntax="string" i18nKey="a145"
                                  resourceName="codeChallengeAlgorithm">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="plain">Plain</ChoiceValue>
-                        <ChoiceValue i18nKey="sha256">SHA 256</ChoiceValue>
+                        <ChoiceValue i18nKey="plain">plain</ChoiceValue>
+                        <ChoiceValue i18nKey="s256">s256</ChoiceValue>
                     </ChoiceValues>
+                    <DefaultValues>
+                        <Value>s256</Value>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
                                  type="single" syntax="number_range" rangeStart="0"
@@ -477,9 +480,12 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                      type="single_choice" syntax="string" i18nKey="a145"
                                      resourceName="codeChallengeAlgorithm">
                         <ChoiceValues>
-                            <ChoiceValue>Plain</ChoiceValue>
-                            <ChoiceValue>SHA 256</ChoiceValue>
+                            <ChoiceValue i18nKey="plain">plain</ChoiceValue>
+                            <ChoiceValue i18nKey="s256">s256</ChoiceValue>
                         </ChoiceValues>
+                        <DefaultValues>
+                            <Value>s256</Value>
+                        </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
                                      type="single" syntax="number_range" rangeStart="0"
