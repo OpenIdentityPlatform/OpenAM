@@ -429,6 +429,16 @@
          */
         "one-var": [2, "always"],
         /**
+         * Require quotes around keywords used as property names in object literals.
+         * Quotes may be used even when they are unnecessary.
+         *
+         * { class: 3 } # bad
+         *
+         * { "class": 3 } # good
+         * { "brains": 10 }
+         */
+        "quote-props": [2, "as-needed", {"keywords": true, "unnecessary": false}],
+        /**
          * Require use of second argument for parseInt().
          *
          * var a = parseInt(x); # bad
