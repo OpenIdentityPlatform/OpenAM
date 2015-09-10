@@ -79,6 +79,10 @@
                 {{/each}}
             </div>
 
+            {{#if oauth2Data.userName}}
+            <p>{{t 'form.signedInAs'}} {{oauth2Data.userName}}</p>
+            {{/if}}
+
             <!-- Optional parameters -->
             {{#if oauth2Data.realm}}
             <input type="hidden" name="realm" value="{{oauth2Data.realm}}"/>

@@ -1,6 +1,7 @@
 {
     "form": {
         "description": "This application is requesting the following private information:",
+        "signedInAs": "You are signed in as:",
         "save": "Save Consent",
         "allow": "Allow",
         "deny": "Deny"
