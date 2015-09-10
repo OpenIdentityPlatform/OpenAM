@@ -1,4 +1,9 @@
 {
+    "common": {
+        "form": {
+            "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved."
+        }
+    },
     "form": {
         "description": "This application is requesting the following private information:",
         "signedInAs": "You are signed in as:",
