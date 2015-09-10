@@ -16,9 +16,10 @@
 
 /*global define*/
 define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
+    "underscore",
     "backbone",
     "org/forgerock/openam/ui/common/util/URLHelper"
-], function (Backbone, URLHelper) {
+], function (_, Backbone, URLHelper) {
     return Backbone.Model.extend({
         idAttribute: "name",
         urlRoot: URLHelper.substitute("__api__/applications"),
@@ -42,7 +43,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
                 return "errorCantStartWithHash";
             }
 
-            if (attrs.resourceTypeUuids.length === 0) {
+            if (_.isEmpty(attrs.resourceTypeUuids)) {
                 return "applicationErrorNoResourceTypes";
             }
         },

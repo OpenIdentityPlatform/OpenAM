@@ -5,6 +5,9 @@
 
     <div class="pull-left">
         <h4 class="page-type">{{t type}}</h4>
+        {{#if backLink}}
+            <a class="page-header-link-with-border" href="{{backLink.href}}">{{#if backLink.icon}}<i class="fa {{backLink.icon}}"></i> {{/if}}{{backLink.text}}</a>
+        {{/if}}
         <h1>{{t title}}</h1>
     </div>
 

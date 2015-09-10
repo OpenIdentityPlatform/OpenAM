@@ -1,8 +1,8 @@
-{{#if entity.resourceTypeUuid}}
-<div class="col-sm-6" id="availableActions"></div>
-<div class="col-sm-6" id="selectedActions"></div>
-{{else}}
-<div class="alert alert-info" role="alert">
-    {{t "console.authorization.policies.edit.noResourceTypeNoActions"}}
+<div id="selectedActions"></div>
+
+<div class="editing">
+    <div class="form-group" id="availableActions"></div>
+    <button class="btn btn-default add-item">
+        <i class="fa fa-plus"></i> {{t "console.authorization.policies.edit.addAction"}}
+    </button>
 </div>
-{{/if}}

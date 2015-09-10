@@ -19,15 +19,19 @@
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/PolicyActionsView", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/common/main/AbstractView" ,
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListView"
-], function ($, _, AbstractView, StripedList) {
+], function ($, _, AbstractView, UIUtils, StripedList) {
     var PolicyActionsView = AbstractView.extend({
         element: "#actions",
         template: "templates/admin/views/realms/authorization/policies/PolicyActionsTemplate.html",
         noBaseTemplate: true,
         events: {
-            "click .radio-inline": "changePermission"
+            "click .radio-inline": "changePermission",
+            "click .add-item": "selectAction",
+            "click .fa-close ": "deleteItem",
+            "keyup .fa-close ": "deleteItem"
         },
 
         render: function (data, callback) {
@@ -42,16 +46,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                 selectedActions.push({action: key, value: value});
             });
 
+            this.data.availableActions = availableActions;
+
             this.parentRender(function () {
                 var d1 = $.Deferred(), d2 = $.Deferred();
 
-                this.actionsListView = new StripedList();
-                this.actionsListView.render({
-                    itemTpl: itemTpl,
-                    items: availableActions,
-                    title: $.t("console.authorization.policies.edit.availableActions"),
-                    clickItem: this.selectAction.bind(this)
-                }, "#availableActions", function () {
+                this.renderAvailableActions(function () {
                     d1.resolve();
                 });
 
@@ -59,9 +59,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                 this.actionsListSelectedView.render({
                     itemTpl: itemTpl,
                     items: selectedActions,
-                    title: $.t("console.authorization.policies.edit.selectedActions"),
-                    created: true,
-                    clickItem: this.deselectAction.bind(this)
+                    title: $.t("console.authorization.common.action"),
+                    created: true
                 }, "#selectedActions", function () {
                     d2.resolve();
                 });
@@ -74,54 +73,60 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
             });
         },
 
-        selectAction: function (item) {
-            var action = _.findWhere(this.actionsListView.getAllItems(), {action: item}),
+        renderAvailableActions: function (callback) {
+            var self = this;
+            UIUtils.fillTemplateWithData(
+                "templates/admin/views/realms/authorization/policies/PolicyAvailableActionsTemplate.html",
+                this.data, function (tpl) {
+                    self.$el.find("#availableActions").html(tpl);
+                    if (callback) {
+                        callback();
+                    }
+                });
+        },
+
+        selectAction: function (e) {
+            e.preventDefault();
+
+            var actionName = this.$el.find("select").val(),
+                action = _.findWhere(this.data.options.availableActions, {action: actionName}),
                 cloned = _.clone(action);
 
-            this.removeSelected(action, this.actionsListView);
-            this.addSelected(cloned, this.actionsListSelectedView);
+            this.data.availableActions = _.without(this.data.availableActions,
+                _.findWhere(this.data.availableActions, {action: actionName})
+            );
+            this.renderAvailableActions();
+            this.actionsListSelectedView.addItem(cloned);
+            this.actionsListSelectedView.renderItems();
 
             this.data.entity.actionValues[action.action] = action.value;
         },
 
-        deselectAction: function (item) {
-            var action = _.findWhere(this.actionsListSelectedView.getAllItems(), {action: item}),
-                initialAction = _.clone(_.findWhere(this.data.options.availableActions, {action: item}));
-
-            this.removeSelected(action, this.actionsListSelectedView);
-            this.addSelected(initialAction, this.actionsListView);
-
-            delete this.data.entity.actionValues[item];
-        },
-
-        removeSelected: function (item, fromView) {
-            fromView.removeItem(item);
-            fromView.renderItems();
-        },
-
-        addSelected: function (item, toView) {
-            toView.addItem(item);
-            toView.renderItems();
-        },
-
         changePermission: function (e) {
             var $target = $(e.target),
-                permitted,
-                actionName,
-                itemSelected;
+                permitted = ($target.val() || $target.find("input").val()) === "true",
+                actionName = $target.closest("li").data("listItem");
 
-            permitted = ($target.val() || $target.find("input").val()) === "true";
-            actionName = $target.closest("li").data("listItem");
-            itemSelected = $target.closest("li").data("itemSelected");
+            _.findWhere(this.actionsListSelectedView.getAllItems(), {action: actionName}).value = permitted;
 
-            _.findWhere(itemSelected ? this.actionsListSelectedView.getAllItems() : this.actionsListView.getAllItems(),
-                function (action) {
-                    return action.action === actionName;
-                }).value = permitted;
+            this.data.entity.actionValues[actionName] = permitted;
+        },
 
-            if (itemSelected) {
-                this.data.entity.actionValues[actionName] = permitted;
+        deleteItem: function (e) {
+            if (e.type === "keyup" && e.keyCode !== 13) {
+                return;
             }
+            var $target = $(e.target),
+                actionName = $target.closest("li").data("listItem"),
+                selectedAction = _.findWhere(this.actionsListSelectedView.getAllItems(), {action: actionName});
+
+            this.actionsListSelectedView.removeItem(selectedAction);
+            this.actionsListSelectedView.renderItems();
+
+            delete this.data.entity.actionValues[actionName];
+
+            this.data.availableActions.push(selectedAction);
+            this.renderAvailableActions();
         }
     });
 

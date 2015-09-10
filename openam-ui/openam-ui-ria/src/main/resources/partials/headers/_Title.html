@@ -1,5 +1,8 @@
 <header class="page-header page-header-no-border clearfix">
     <div class="pull-left">
+        {{#if backLink}}
+            <a href="{{backLink.href}}">{{#if backLink.icon}}<i class="fa {{backLink.icon}}"></i> {{/if}}{{backLink.text}}</a>
+        {{/if}}
         <h1>{{t title}}</h1>
     </div>
 

@@ -1,0 +1,6 @@
+<select class="form-control">
+    <option value="" disabled selected>{{t "console.authorization.policies.edit.selectAction"}}</option>
+    {{#each availableActions}}
+    <option value="{{action}}">{{action}}</option>
+    {{/each}}
+</select>

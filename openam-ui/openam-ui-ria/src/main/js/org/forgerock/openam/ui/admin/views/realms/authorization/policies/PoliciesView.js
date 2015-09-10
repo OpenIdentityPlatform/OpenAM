@@ -33,12 +33,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
-    "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
-    "org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPolicyView"
+    "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView"
 ], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
              Configuration, EventManager, Router, Constants, BackgridUtils, URLHelper, PoliciesDelegate, PolicyModel,
-             AbstractListView,
-             EditPolicyView) {
+             AbstractListView) {
 
     var PoliciesView = AbstractListView.extend({
         element: "#policiesPanel",
@@ -64,7 +62,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams({
                     filterName: "eq",
-                    _queryFilter: ['applicationName+eq+"' + this.data.applicationModel.id + '"']
+                    _queryFilter: ['applicationName+eq+"' + this.data.policySetModel.id + '"']
                 }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
@@ -84,15 +82,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                         return;
                     }
 
-                    EditPolicyView.render({
-                        applicationModel: self.data.applicationModel,
-                        policyModel: this.model,
-                        savePolicyCallback: function () {
-                            EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                                route: Router.currentRoute,
-                                args:[encodeURIComponent(self.data.realmPath), self.data.applicationModel.id]
-                            });
-                        }
+                    Router.routeTo(Router.configuration.routes.realmsPolicyEdit, {
+                        args: _.map([self.data.realmPath, self.data.policySetModel.id, this.model.id],
+                            encodeURIComponent),
+                        trigger: true
                     });
                 }
             });
@@ -122,22 +115,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                             "click .delete-row-item": "deleteItem"
                         },
                         editItem: function (e) {
-                            EditPolicyView.render({
-                                applicationModel: self.data.applicationModel,
-                                policyModel: this.model,
-                                savePolicyCallback: function () {
-                                    EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                                        route: Router.currentRoute,
-                                        args:[encodeURIComponent(self.data.realmPath), self.data.applicationModel.id]
-                                    });
-                                }
+                            Router.routeTo(Router.configuration.routes.realmsPolicyEdit, {
+                                args: _.map([self.data.realmPath, self.data.policySetModel.id, this.model.id],
+                                    encodeURIComponent),
+                                trigger: true
                             });
                         },
                         deleteItem: function (e) {
                             self.deleteRecord(e, this.model.id, function () {
                                 EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
                                     route: Router.currentRoute,
-                                    args:[encodeURIComponent(self.data.realmPath), self.data.applicationModel.id]
+                                    args: _.map([self.data.realmPath, self.data.policySetModel.id], encodeURIComponent)
                                 });
                             });
                         }
@@ -181,16 +169,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
         },
 
         addNewPolicy: function () {
-            var self = this;
-            EditPolicyView.render({
-                    savePolicyCallback: function () {
-                        EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                            route: Router.currentRoute,
-                            args:[encodeURIComponent(self.data.realmPath), self.data.applicationModel.id]
-                        });
-                    },
-                    applicationModel: this.data.applicationModel
-                });
+            Router.routeTo(Router.configuration.routes.realmsPolicyNew, {
+                args: _.map([this.data.realmPath, this.data.policySetModel.id], encodeURIComponent),
+                trigger: true
+            });
         }
     });
 

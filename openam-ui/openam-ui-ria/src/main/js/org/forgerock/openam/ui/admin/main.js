@@ -50,10 +50,12 @@ define([
     "./views/realms/dashboard/DashboardTasksView",
     "./views/realms/dataStores/DataStoresView",
 
+    "./views/realms/authorization/common/AbstractListView",
+
+    "./views/realms/authorization/policies/EditPolicyView",
+
     "./views/realms/authorization/policySets/PolicySetsView",
     "./views/realms/authorization/policySets/EditPolicySetView",
-
-    "./views/realms/authorization/common/AbstractListView",
 
     "./views/realms/authorization/resourceTypes/ResourceTypesView",
     "./views/realms/authorization/resourceTypes/EditResourceTypeView",

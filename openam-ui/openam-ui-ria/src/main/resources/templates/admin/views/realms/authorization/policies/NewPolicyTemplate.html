@@ -1,0 +1,56 @@
+{{> headers/_Title title="console.authorization.policies.edit.createNew" backLink=backLink}}
+
+<div class="panel panel-default panel-collapse">
+    <div class="panel-heading">
+        <h4 class="panel-title"><a class="no-caret">{{t "common.form.settings"}}</a></h4>
+    </div>
+
+    <div class="panel-body">
+        <div class="block clearfix form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="policyName">{{t "console.common.name"}}</label>
+
+                <div class="col-sm-9">
+                    <input class="form-control" id="policyName" name="entityName" type="text"
+                           value="{{entity.name}}" data-field="name" autofocus required
+                           placeholder="{{t 'common.form.validation.required'}}"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="policyDescription">{{t "console.common.description"}}</label>
+
+                <div class="col-sm-9">
+                    <textarea class="form-control" id="policyDescription" data-field="description">{{entity.description}}</textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="resTypesSelection">
+                    {{t "console.authorization.common.resourceType"}}
+                </label>
+
+                <div class="col-sm-9">
+                    <select class="selectize" id="resTypesSelection">
+                        <option disabled selected value="">{{t "console.authorization.policies.edit.selectResourceType"}}</option>
+                    </select>
+
+                    <span class="input-helper-text">
+                        {{t "console.authorization.policies.edit.selectResourceTypeHelper"}}
+                    </span>
+                </div>
+            </div>
+
+            <div id="editResources" class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <a class="btn btn-default" href="{{routeTo 'realmsPolicySetEdit' realmPath policySetName}}">
+                {{t "common.form.cancel"}}
+            </a>
+            <input type="button" name="submitForm" value="{{t 'common.form.create'}}" class="btn btn-primary">
+        </div>
+    </div>
+</div>

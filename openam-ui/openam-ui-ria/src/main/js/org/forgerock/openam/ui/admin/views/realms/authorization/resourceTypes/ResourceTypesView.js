@@ -79,7 +79,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                     }
 
                     Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
-                        args: [encodeURIComponent(self.realmPath), encodeURIComponent(this.model.id)],
+                        args: _.map([self.realmPath, this.model.id], encodeURIComponent),
                         trigger: true
                     });
                 }

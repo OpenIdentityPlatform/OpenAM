@@ -3,7 +3,7 @@
     <li {{#unless ../created}}tabindex="0"{{/unless}} class="list-group-item" data-list-item="{{this.action}}" {{#if ../created}}data-item-selected="true"{{/if}}>
         {{this.action}}
 
-        <span  {{#if ../created}}tabindex="0"{{/if}} class="fa {{#if ../created}}fa-close {{else}} fa-chevron-right {{/if}} pull-right"></span>
+        <span {{#if ../created}}tabindex="0"{{/if}} class="fa {{#if ../created}}fa-close{{/if}} pull-right"></span>
 
         <div class="pull-right radio-group action-permissions">
             <label class="radio-inline">
@@ -17,5 +17,5 @@
     </li>
 {{/each}}
 {{else}}
-<li class="list-group-item text-info">{{t "console.authorization.common.stripedList.noItems"}}</li>
+<li class="list-group-item">{{t "console.authorization.common.stripedList.noItems"}}</li>
 {{/if}}

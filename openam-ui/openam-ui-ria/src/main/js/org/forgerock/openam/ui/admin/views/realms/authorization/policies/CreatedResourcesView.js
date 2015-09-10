@@ -22,20 +22,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/Helpers",
     "autosizeInput",
     "doTimeout"
-], function ($, _, AbstractView, EventManager, Constants) {
+], function ($, _, AbstractView, EventManager, Constants, UIUtils) {
     var CreatedResourcesView = AbstractView.extend({
-        element: "#resourcesList",
+        element: "#editResources",
         template: "templates/admin/views/realms/authorization/policies/CreatedResourcesTemplate.html",
         noBaseTemplate: true,
         events: {
-            "click .fa-plus": "addResource",
-            "keyup .fa-plus": "addResource",
-            "keyup .editing input": "addResource",
+            "click #addResource": "addResource",
+            "keyup #addResource": "addResource",
+            "keyup #resourceBuilder input": "addResource",
             "click .fa-close": "deleteResource",
-            "keyup .fa-close": "deleteResource"
+            "keyup .fa-close": "deleteResource",
+            "click #removePendingResource": "removePendingResource"
         },
 
         render: function (args, callback) {
@@ -50,12 +52,29 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
             var self = this;
 
             this.parentRender(function () {
+                this.$el.find(".selectize").selectize({
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    },
+                    onChange: function (value) {
+                        self.data.options.newPattern = value;
+
+                        UIUtils.fillTemplateWithData(
+                            "templates/admin/views/realms/authorization/policies/PopulateResourceTemplate.html",
+                            self.data,
+                            function (content) {
+                                var resources = self.$el.find("#populateResource");
+                                resources.html(content);
+
+                                resources.find("input").autosizeInput({space: 19});
+                                resources.find("input:eq(0)").focus().select();
+                            });
+                    }
+                });
 
                 delete self.data.options.justAdded;
                 self.flashDomItem(self.$el.find(".text-success"), "text-success");
-
-                self.$el.find(".editing").find("input").autosizeInput({space: 19});
-                self.$el.find(".editing").find("input:eq(0)").focus().select();
 
                 if (callback) {
                     callback();
@@ -85,8 +104,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
                 return;
             }
 
-            var resourceStr = this.$el.find(".editing").data().resource.replace("-*-", '̂'),
-                inputs = this.$el.find(".editing").find("input"),
+            var resourceBuilder = this.$el.find("#resourceBuilder"),
+                resourceStr = resourceBuilder.data().resource.replace("-*-", '̂'),
+                inputs = resourceBuilder.find("input"),
                 strLength = resourceStr.length,
                 resource = "",
                 count = 0,
@@ -121,6 +141,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
                 this.data.options.justAdded = resource;
                 this.render(this.data);
             }
+        },
+
+        removePendingResource: function (e) {
+            if (e.type === "keyup" && e.keyCode !== 13) {
+                return;
+            }
+
+            this.data.options.newPattern = null;
+            this.render(this.data);
         },
 
         deleteResource: function (e) {

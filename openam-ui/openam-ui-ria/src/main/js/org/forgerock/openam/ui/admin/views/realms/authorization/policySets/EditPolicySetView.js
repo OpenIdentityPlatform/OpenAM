@@ -28,7 +28,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/UIUtils"
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "selectize"
 ], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesDelegate, Messages, AbstractView,
              EventManager, Router, Constants, UIUtils) {
     return AbstractView.extend({
@@ -39,7 +40,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
         validationFields: ["name", "resourceTypeUuids"],
         events: {
             "click #saveChanges": "submitForm",
-            "click #revertChanges": "revertChanges",
             "click #delete": "deletePolicySet"
         },
 
@@ -53,17 +53,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
         },
 
         render: function (args, callback) {
-            var name = null;
+            var policySetName = args[1];
 
             this.realmPath = args[0];
 
             if (callback) {
                 this.renderCallback = callback;
-            }
-
-            // Realm location is the first argument, second one is the application name
-            if (args.length === 2) {
-                name = args[1];
             }
 
             this.appTypePromise = PoliciesDelegate.getApplicationType(this.APPLICATION_TYPE);
@@ -72,9 +67,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             this.decisionCombinersPromise = PoliciesDelegate.getDecisionCombiners();
             this.resourceTypesPromise = PoliciesDelegate.listResourceTypes();
 
-            if (name) {
+            if (policySetName) {
                 this.template = "templates/admin/views/realms/authorization/policySets/EditPolicySetTemplate.html";
-                this.model = new PolicySetModel({name: name});
+                this.model = new PolicySetModel({name: policySetName});
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
@@ -102,11 +97,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                     self.parentRender(function () {
                         PoliciesView.render({
                             realmPath: self.realmPath,
-                            applicationModel: self.model
+                            policySetModel: self.model
                         }, function (policiesNumber) {
                             if (policiesNumber > 0) {
                                 self.data.disableSettingsEdit = true;
-                                self.$el.find("#saveChanges, #revertChanges, #delete").attr("disabled", true);
+                                self.$el.find("#saveChanges, #delete").attr("disabled", true);
                             }
 
                             UIUtils.fillTemplateWithData(
@@ -191,6 +186,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             return result;
         },
 
+        // TODO this should be removed and common 'pending changes' widget should be used instead
         revertChanges: function (e) {
             this.resTypesSelection[0].selectize.clear(true);
             this.resTypesSelection[0].selectize.addItems(
@@ -214,7 +210,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                     .done(function (response) {
                         if (self.newEntity) {
                             Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {
-                                args: [encodeURIComponent(self.realmPath), self.model.id],
+                                args: _.map([self.realmPath, self.model.id], encodeURIComponent),
                                 trigger: true
                             });
                         }

@@ -63,7 +63,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
             var self = this;
 
             Router.routeTo(route, {
-                args: [encodeURIComponent(self.realmPath), encodeURIComponent(id)],
+                args: _.map([self.realmPath, id], encodeURIComponent),
                 trigger: true
             });
         },

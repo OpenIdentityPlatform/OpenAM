@@ -1,47 +1,45 @@
 {{> headers/_Title title="console.authorization.resourceTypes.edit.newResourceType"}}
 
-<div class="panel multiple-panels panel-content panel-collapse-group">
-    <form>
-        <div class="panel panel-default panel-collapse form-horizontal">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a class="no-caret">{{t "common.form.settings"}}</a>
-                </h4>
-            </div>
-            <div class="panel-body" id="resTypeSetting"></div>
+<div class="panel multiple-panels panel-content">
+    <div class="panel panel-default panel-collapse form-horizontal">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a class="no-caret">{{t "common.form.settings"}}</a>
+            </h4>
         </div>
+        <div class="panel-body" id="resTypeSetting"></div>
+    </div>
 
-        <div class="panel panel-default panel-collapse form-inline">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a class="no-caret">{{t "console.authorization.resourceTypes.edit.specifyPatterns"}}</a>
-                </h4>
-            </div>
-            <div class="panel-body">
-                <p class="panel-description">{{t "console.authorization.resourceTypes.edit.patternsDescription"}}</p>
-                <div id="resTypePatterns"></div>
-            </div>
+    <div class="panel panel-default panel-collapse form-inline">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a class="no-caret">{{t "console.authorization.resourceTypes.edit.specifyPatterns"}}</a>
+            </h4>
         </div>
+        <div class="panel-body">
+            <p class="panel-description">{{t "console.authorization.resourceTypes.edit.patternsDescription"}}</p>
+            <div id="resTypePatterns"></div>
+        </div>
+    </div>
 
-        <div class="panel panel-default panel-collapse form-inline">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a class="no-caret">{{t "console.authorization.resourceTypes.edit.specifyActions"}}</a>
-                </h4>
-            </div>
-            <div class="panel-body">
-                <p class="panel-description">{{t "console.authorization.resourceTypes.edit.actionsDescription"}}</p>
-                <div id="resTypeActions"></div>
-            </div>
+    <div class="panel panel-default panel-collapse form-inline">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a class="no-caret">{{t "console.authorization.resourceTypes.edit.specifyActions"}}</a>
+            </h4>
         </div>
+        <div class="panel-body">
+            <p class="panel-description">{{t "console.authorization.resourceTypes.edit.actionsDescription"}}</p>
+            <div id="resTypeActions"></div>
+        </div>
+    </div>
 
-        <div class="panel-footer clearfix">
-            <div class="pull-right">
-                <a class="btn btn-default" href="{{routeTo 'realmsResourceTypes' realmPath}}">{{t "common.form.cancel"}}</a>
-                <button id="saveChanges" class="btn btn-primary" type="button">
-                    {{t "console.authorization.resourceTypes.edit.createResourceType"}}
-                </button>
-            </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <a class="btn btn-default" href="{{routeTo 'realmsResourceTypes' realmPath}}">{{t "common.form.cancel"}}</a>
+            <button id="saveChanges" class="btn btn-primary" type="button">
+                {{t "console.authorization.resourceTypes.edit.createResourceType"}}
+            </button>
         </div>
-    </form>
+    </div>
 </div>

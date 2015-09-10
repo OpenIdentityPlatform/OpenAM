@@ -36,28 +36,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
         ],
         events: {
             "click #saveChanges": "submitForm",
-            "click #revertChanges": "revertChanges",
             "click #delete": "deleteResourceType"
         },
         tabs: [
-            {
-                name: "patterns",
-                attr: ["patterns"]
-            },
-            {
-                name: "actions",
-                attr: ["actions"]
-            },
-            {
-                name: "settings",
-                attr: ["name", "description"]
-            }
+            {name: "patterns", attr: ["patterns"]},
+            {name: "actions", attr: ["actions"]},
+            {name: "settings", attr: ["name", "description"]}
         ],
-
-        initialize: function (options) {
-            AbstractView.prototype.initialize.call(this);
-            this.model = null;
-        },
 
         onModelSync: function (model, response) {
             this.renderAfterSyncModel();
@@ -131,6 +116,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 });
         },
 
+        // TODO this should be removed and common 'pending changes' widget should be used instead
         revertChanges: function (e) {
             var activeTab = this.$el.find(".tab-pane.active"),
                 activeTabName = this.tabs[activeTab.index()].name;
@@ -192,7 +178,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                     .done(function (response) {
                         if (self.newEntity) {
                             Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
-                                args: [encodeURIComponent(self.data.realmPath), self.model.id],
+                                args: _.map([self.data.realmPath, self.model.id], encodeURIComponent),
                                 trigger: true
                             });
                         }
