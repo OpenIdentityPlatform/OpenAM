@@ -18,8 +18,9 @@ package org.forgerock.openam.entitlement.rest;
 
 import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
 
+import org.forgerock.openam.rest.AbstractRestRouteProvider;
+import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 
 /**
@@ -28,10 +29,10 @@ import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
  *
  * @since 13.0.0
  */
-public class EntitlementsRestRouteProvider implements RestRouteProvider {
+public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
 
     @Override
-    public void addRoutes(RestRouter rootRouter, RestRouter realmRouter) {
+    public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter.route("policies")
                 .auditAs(POLICY)
                 .authorizeWith(PrivilegeAuthzModule.class)

@@ -20,8 +20,9 @@ import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUDIT;
 
 import org.forgerock.audit.AuditService;
+import org.forgerock.openam.rest.AbstractRestRouteProvider;
+import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
 import org.forgerock.openam.rest.authz.AgentOnlyAuthzModule;
 import org.forgerock.openam.rest.fluent.AuditEndpointAuditFilter;
 
@@ -30,10 +31,10 @@ import org.forgerock.openam.rest.fluent.AuditEndpointAuditFilter;
  *
  * @since 13.0.0
  */
-public class AuditRestRouteProvider implements RestRouteProvider {
+public class AuditRestRouteProvider extends AbstractRestRouteProvider {
 
     @Override
-    public void addRoutes(RestRouter rootRouter, RestRouter realmRouter) {
+    public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         rootRouter.route("audit")
                 .auditAs(AUDIT, AuditEndpointAuditFilter.class)
                 .authorizeWith(AgentOnlyAuthzModule.class)

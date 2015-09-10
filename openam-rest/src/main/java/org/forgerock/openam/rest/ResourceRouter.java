@@ -16,15 +16,27 @@
 
 package org.forgerock.openam.rest;
 
-import com.sun.identity.setup.SetupListener;
+import org.forgerock.json.resource.Router;
 
 /**
- * This class makes sure that the Guice configuration for the rest services are computed during container startup
- * rather than during the first request.
+ * A Router which allows for CREST routes to be registered fluently.
+ *
+ * @since 13.0.0
  */
-public class RestStartupTrigger implements SetupListener {
-    @Override
-    public void setupComplete() {
-//        InjectorHolder.getInstance(RestEndpoints.class); //TODO what to do here?...
-    }
+public interface ResourceRouter {
+
+    /**
+     * Starts the fluent route builder.
+     *
+     * @param uriTemplate The uri template of the route.
+     * @return A {@code ResourceRoute}.
+     */
+    Routers.ResourceRoute route(String uriTemplate);
+
+    /**
+     * Gets the CHF root router on which all route registration has happened.
+     *
+     * @return The CHF root router.
+     */
+    Router getRouter();
 }

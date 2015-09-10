@@ -29,7 +29,7 @@ import org.forgerock.http.Filter;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
+import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 
 /**
@@ -39,11 +39,11 @@ import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
  */
 public class OAuth2RestHttpRouteProvider implements HttpRouteProvider {
 
-    private RestRouter rootRouter;
+    private ResourceRouter rootRouter;
     private Filter authenticationFilter;
 
     @Inject
-    public void setRouters(RestRouter router) {
+    public void setRouters(ResourceRouter router) {
         this.rootRouter = router;
     }
 

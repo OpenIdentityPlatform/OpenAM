@@ -23,6 +23,7 @@ import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
 import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +44,7 @@ import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
-import org.forgerock.openam.http.audit.AbstractHttpAccessAuditFilter;
+import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
 
 /**
  * Responsible for logging access audit events for authentication requests.
@@ -63,6 +64,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
      */
+    @Inject
     public AuthenticationAccessAuditFilter(AuthIdHelper authIdHelper,
             AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory) {
         super(Component.AUTHENTICATION, auditEventPublisher, auditEventFactory);

@@ -16,12 +16,11 @@
 
 package org.forgerock.openam.rest;
 
-import static javax.security.auth.message.AuthStatus.SEND_FAILURE;
-import static javax.security.auth.message.AuthStatus.SEND_SUCCESS;
-import static javax.security.auth.message.AuthStatus.SUCCESS;
+import static javax.security.auth.message.AuthStatus.*;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -73,8 +72,9 @@ public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
     /**
      * Default constructor is initialised by the framework.
      */
-    public LocalSSOTokenSessionModule() {
-        authUtilsWrapper = new AuthUtilsWrapper();
+    @Inject
+    public LocalSSOTokenSessionModule(AuthUtilsWrapper authUtilsWrapper) {
+        this.authUtilsWrapper = authUtilsWrapper;
     }
 
     /**

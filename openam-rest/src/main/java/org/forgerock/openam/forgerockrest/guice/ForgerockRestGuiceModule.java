@@ -59,8 +59,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
 
         bind(EntitlementRegistry.class).toInstance(EntitlementRegistry.load());
 
-        bind(Debug.class).annotatedWith(Names.named("frRest")).toInstance(Debug.getInstance("frRest"));
-
         bind(DelegationEvaluatorImpl.class).in(Singleton.class);
         bind(DelegationEvaluator.class).to(DelegationEvaluatorProxy.class).in(Singleton.class);
 

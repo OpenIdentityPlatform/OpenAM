@@ -33,7 +33,7 @@ import org.forgerock.http.handler.Handlers;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
+import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.authz.STSTokenGenerationServiceAuthzModule;
 import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
@@ -51,11 +51,11 @@ import org.slf4j.Logger;
  */
 public class TokenGenerationServiceHttpRouteProvider implements HttpRouteProvider {
 
-    private RestRouter rootRouter;
+    private ResourceRouter rootRouter;
     private org.forgerock.http.Filter authenticationFilter;
 
     @Inject
-    public void setRouters(RestRouter router) {
+    public void setRouters(ResourceRouter router) {
         this.rootRouter = router;
     }
 

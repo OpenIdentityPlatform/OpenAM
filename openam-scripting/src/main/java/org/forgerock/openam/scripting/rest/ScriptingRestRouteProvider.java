@@ -19,8 +19,9 @@ package org.forgerock.openam.scripting.rest;
 import static org.forgerock.openam.audit.AuditConstants.Component.BATCH;
 import static org.forgerock.openam.audit.AuditConstants.Component.SCRIPT;
 
+import org.forgerock.openam.rest.AbstractRestRouteProvider;
+import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.scripting.rest.batch.BatchResource;
 
@@ -29,10 +30,10 @@ import org.forgerock.openam.scripting.rest.batch.BatchResource;
  *
  * @since 13.0.0
  */
-public class ScriptingRestRouteProvider implements RestRouteProvider {
+public class ScriptingRestRouteProvider extends AbstractRestRouteProvider {
 
     @Override
-    public void addRoutes(RestRouter rootRouter, RestRouter realmRouter) {
+    public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
 
         realmRouter.route("scripts")
                 .auditAs(SCRIPT)

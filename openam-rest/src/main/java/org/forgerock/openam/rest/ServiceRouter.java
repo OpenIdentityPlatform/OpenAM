@@ -16,23 +16,23 @@
 
 package org.forgerock.openam.rest;
 
-import org.forgerock.json.resource.Router;
-import org.forgerock.openam.rest.Routers.Route;
+import org.forgerock.http.routing.Router;
+import org.forgerock.openam.rest.Routers.ServiceRoute;
 
 /**
- * A Router which allows for CREST routes to be registered fluently.
+ * A Router which allows for CHF REST routes to be registered fluently.
  *
  * @since 13.0.0
  */
-public interface RestRouter {
+public interface ServiceRouter {
 
     /**
      * Starts the fluent route builder.
      *
      * @param uriTemplate The uri template of the route.
-     * @return A {@code Route}.
+     * @return A {@code ResourceRoute}.
      */
-    Route route(String uriTemplate);
+    ServiceRoute route(String uriTemplate);
 
     /**
      * Gets the CHF root router on which all route registration has happened.

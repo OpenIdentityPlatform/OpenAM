@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.rest;
 
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +41,10 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.util.promise.Promise;
 
 /**
+ * A Filter implementation which can be configured to enforce whether
+ * authentication is required to access the endpoint.
  *
+ * @since 13.0.0
  */
 public class AuthenticationEnforcer implements Filter {
 

@@ -14,11 +14,14 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.http.audit;
+package org.forgerock.openam.audit;
 
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableContexts;
-import static org.forgerock.openam.audit.AuditConstants.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.openam.audit.AuditConstants.Component;
+import static org.forgerock.openam.audit.AuditConstants.EventName;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.util.Map;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.http.Context;
@@ -28,16 +31,10 @@ import org.forgerock.http.context.RequestAuditContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
-import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
-import org.forgerock.openam.audit.AuditConstants;
-import org.forgerock.openam.audit.AuditEventFactory;
-import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
-
-import java.util.Map;
 
 /**
  * Responsible for logging access audit events for CHF requests.

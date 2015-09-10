@@ -17,7 +17,6 @@
 package org.forgerock.openam.rest;
 
 import org.forgerock.http.context.RootContext;
-import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.util.Pair;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -52,13 +51,13 @@ public class RealmContextTest {
         //Given
         RealmContext context = new RealmContext(new RootContext());
         if (dnsRealm != null) {
-            context.addDnsAlias(dnsRealm.getFirst(), dnsRealm.getSecond());
+            context.setDnsAlias(dnsRealm.getFirst(), dnsRealm.getSecond());
         }
         if (uriRealm1 != null) {
-            context.addSubRealm(uriRealm1.getFirst(), uriRealm1.getSecond());
+            context.setSubRealm(uriRealm1.getFirst(), uriRealm1.getSecond());
         }
         if (uriRealm2 != null) {
-            context.addSubRealm(uriRealm2.getFirst(), uriRealm2.getSecond());
+            context.setSubRealm(uriRealm2.getFirst(), uriRealm2.getSecond());
         }
         if (queryParameterRealm != null) {
             context.setOverrideRealm(queryParameterRealm);
@@ -93,13 +92,13 @@ public class RealmContextTest {
         //Given
         RealmContext context = new RealmContext(new RootContext());
         if (dnsRealm != null) {
-            context.addDnsAlias(dnsRealm.getFirst(), dnsRealm.getSecond());
+            context.setDnsAlias(dnsRealm.getFirst(), dnsRealm.getSecond());
         }
         if (uriRealm1 != null) {
-            context.addSubRealm(uriRealm1.getFirst(), uriRealm1.getSecond());
+            context.setSubRealm(uriRealm1.getFirst(), uriRealm1.getSecond());
         }
         if (uriRealm2 != null) {
-            context.addSubRealm(uriRealm2.getFirst(), uriRealm2.getSecond());
+            context.setSubRealm(uriRealm2.getFirst(), uriRealm2.getSecond());
         }
 
         //When
@@ -127,7 +126,7 @@ public class RealmContextTest {
 
         //Given
         RealmContext context = new RealmContext(new RootContext());
-        context.addSubRealm("SUB_REALM_1", "/REALM_1");
+        context.setSubRealm("SUB_REALM_1", "/REALM_1");
 
         //When
         String relativeRealm = context.getRelativeRealm();
@@ -158,13 +157,13 @@ public class RealmContextTest {
         //Given
         RealmContext context = new RealmContext(new RootContext());
         if (dnsRealm != null) {
-            context.addDnsAlias(dnsRealm.getFirst(), dnsRealm.getSecond());
+            context.setDnsAlias(dnsRealm.getFirst(), dnsRealm.getSecond());
         }
         if (uriRealm1 != null) {
-            context.addSubRealm(uriRealm1.getFirst(), uriRealm1.getSecond());
+            context.setSubRealm(uriRealm1.getFirst(), uriRealm1.getSecond());
         }
         if (uriRealm2 != null) {
-            context.addSubRealm(uriRealm2.getFirst(), uriRealm2.getSecond());
+            context.setSubRealm(uriRealm2.getFirst(), uriRealm2.getSecond());
         }
 
         //When
@@ -205,7 +204,7 @@ public class RealmContextTest {
     public void staticHelperMethodReturnsAppropriateRealm() {
         //Given
         RealmContext context = new RealmContext(new RootContext());
-        context.addSubRealm("SUB_REALM", "/some/realm");
+        context.setSubRealm("SUB_REALM", "/some/realm");
 
         //When
         String realm = RealmContext.getRealm(context);

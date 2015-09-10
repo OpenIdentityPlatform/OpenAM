@@ -22,11 +22,18 @@ import org.forgerock.caf.authentication.framework.AuditApi;
 import org.forgerock.json.JsonValue;
 
 /**
+ * A no-op Audit API implementation.
  *
+ * @since 13.0.0
  */
 @Singleton
 class NoopAuditApi implements AuditApi {
 
+    /**
+     * Performs no operation.
+     *
+     * @param jsonValue {@inheritDoc}
+     */
     @Override
     public void audit(JsonValue jsonValue) {
 

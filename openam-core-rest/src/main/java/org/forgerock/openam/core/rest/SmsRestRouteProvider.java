@@ -23,23 +23,24 @@ import static org.forgerock.openam.audit.AuditConstants.Component.REALMS;
 import javax.inject.Inject;
 
 import com.sun.identity.sm.SchemaType;
-import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.core.rest.sms.SmsRequestHandlerFactory;
 import org.forgerock.openam.core.rest.sms.SmsServerPropertiesResource;
+import org.forgerock.openam.rest.AbstractRestRouteProvider;
+import org.forgerock.openam.rest.ResourceRouter;
+import org.forgerock.openam.rest.RestRouteProvider;
+import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 
 /**
  * A {@link RestRouteProvider} that add routes for all the SMS endpoints.
  *
  * @since 13.0.0
  */
-public class SmsRestRouteProvider implements RestRouteProvider {
+public class SmsRestRouteProvider extends AbstractRestRouteProvider {
 
     private SmsRequestHandlerFactory smsRequestHandlerFactory;
 
     @Override
-    public void addRoutes(RestRouter rootRouter, RestRouter realmRouter) {
+    public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
 
         realmRouter.route("realms")
                 .auditAs(REALMS)

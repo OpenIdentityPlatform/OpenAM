@@ -17,9 +17,6 @@
 package org.forgerock.openam.entitlement.rest;
 
 import com.sun.identity.entitlement.PrivilegeManager;
-import org.forgerock.openam.entitlement.rest.PolicyStore;
-import org.forgerock.openam.entitlement.rest.PrivilegePolicyStore;
-import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -58,7 +55,7 @@ public class PrivilegePolicyStoreProviderTest {
         String realm = "/test realm";
         given(subjectContext.getCallerSubject()).willReturn(subject);
         RealmContext context = new RealmContext(subjectContext);
-        context.addSubRealm(realm, realm);
+        context.setSubRealm(realm, realm);
         PrivilegeManager manager = mock(PrivilegeManager.class);
         given(mockFactory.getPrivilegeManager(realm, subject)).willReturn(manager);
 

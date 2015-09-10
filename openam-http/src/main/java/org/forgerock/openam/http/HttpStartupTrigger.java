@@ -14,21 +14,23 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest;
+package org.forgerock.openam.http;
+
+import com.sun.identity.setup.SetupListener;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.HttpApplication;
 
 /**
- * A Router which allows for requests to be routed based on realm information
- * in the request.
+ * This class makes sure that the Guice configuration for the HTTP and REST
+ * services are computed during container startup rather than during the first
+ * request.
  *
  * @since 13.0.0
  */
-public interface DynamicRealmRestRouter extends RestRouter {
+public class HttpStartupTrigger implements SetupListener {
 
-    /**
-     * Returns a {@link RestRouter} which will route requests based on realm
-     * information in the request.
-     *
-     * @return A dynamic realm {@code RestRouter}.
-     */
-    RestRouter dynamically();
+    @Override
+    public void setupComplete() {
+        InjectorHolder.getInstance(HttpApplication.class);
+    }
 }

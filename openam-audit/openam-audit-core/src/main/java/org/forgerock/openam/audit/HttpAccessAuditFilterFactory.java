@@ -13,42 +13,32 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.core.rest.authn;
+package org.forgerock.openam.audit;
 
 import static org.forgerock.openam.audit.AuditConstants.Component;
 
-import org.forgerock.http.Filter;
-import org.forgerock.openam.audit.AuditEventFactory;
-import org.forgerock.openam.audit.AuditEventPublisher;
-
 import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.Map;
+
+import org.forgerock.http.Filter;
 
 /**
  * Factory to assist with the creation of audit filters for restlet access.
  *
  * @since 13.0.0
  */
-@Singleton
 public final class HttpAccessAuditFilterFactory {
 
-    private final AuthIdHelper authIdHelper;
-    private final AuditEventPublisher eventPublisher;
-    private final AuditEventFactory eventFactory;
+    private final Map<Component, AbstractHttpAccessAuditFilter> httpAccessAuditFilters;
 
     /**
      * Guice injected constructor for creating a <code>RestletAccessAuditFilterFactory</code> instance.
      *
-     * @param authIdHelper The helper to use for reading authentication JWTs.
-     * @param eventPublisher The publisher responsible for logging the events.
-     * @param eventFactory The factory that can be used to create the events.
+     * @param httpAccessAuditFilters The map of Component HttpAccessAudit Filters.
      */
     @Inject
-    public HttpAccessAuditFilterFactory(AuthIdHelper authIdHelper, AuditEventPublisher eventPublisher,
-            AuditEventFactory eventFactory) {
-        this.authIdHelper = authIdHelper;
-        this.eventPublisher = eventPublisher;
-        this.eventFactory = eventFactory;
+    public HttpAccessAuditFilterFactory(Map<Component, AbstractHttpAccessAuditFilter> httpAccessAuditFilters) {
+        this.httpAccessAuditFilters = httpAccessAuditFilters;
     }
 
     /**
@@ -58,12 +48,10 @@ public final class HttpAccessAuditFilterFactory {
      * @return an instance of {@link Filter}
      */
     public Filter createFilter(Component component) {
-        switch (component) {
-            case AUTHENTICATION:
-                return new AuthenticationAccessAuditFilter(authIdHelper, eventPublisher, eventFactory);
+        if (!httpAccessAuditFilters.containsKey(component)) {
+            throw new IllegalArgumentException("Filter for " + component + " does not exist.");
         }
-
-        throw new IllegalArgumentException("Filter for " + component + " does not exist.");
+        return httpAccessAuditFilters.get(component);
     }
 
 }

@@ -13,5 +13,4 @@
 #
 # Copyright 2015 ForgeRock AS.
 #
-
-org.forgerock.openam.rest.RestStartupTrigger
+org.forgerock.openam.http.HttpStartupTrigger

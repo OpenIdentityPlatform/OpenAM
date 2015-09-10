@@ -140,7 +140,7 @@ public class PrivilegeAuthzModuleTest {
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
         final RealmContext context = new RealmContext(subjectContext);
         final ReadRequest request = Requests.newReadRequest("/policies/123");
-        context.addSubRealm("abc", "abc");
+        context.setSubRealm("abc", "abc");
         Promise<ResourceResponse, ResourceException> result = router.handleRead(context, request);
 
         // Then...
@@ -170,7 +170,7 @@ public class PrivilegeAuthzModuleTest {
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
         final RealmContext context = new RealmContext(subjectContext);
-        context.addSubRealm("abc", "abc");
+        context.setSubRealm("abc", "abc");
         final QueryRequest request = Requests.newQueryRequest("/policies");
         Promise<QueryResponse, ResourceException> result = router.handleQuery(context, request, handler);
 
@@ -202,7 +202,7 @@ public class PrivilegeAuthzModuleTest {
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
         final RealmContext context = new RealmContext(subjectContext);
-        context.addSubRealm("abc", "abc");
+        context.setSubRealm("abc", "abc");
         final CreateRequest request = Requests.newCreateRequest("/policies", JsonValue.json(new Object()));
         Promise<ResourceResponse, ResourceException> result = router.handleCreate(context, request);
 
@@ -233,7 +233,7 @@ public class PrivilegeAuthzModuleTest {
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
         final RealmContext context = new RealmContext(subjectContext);
-        context.addSubRealm("abc", "abc");
+        context.setSubRealm("abc", "abc");
         final UpdateRequest request = Requests.newUpdateRequest("/policies/123", JsonValue.json(new Object()));
         Promise<ResourceResponse, ResourceException> result = router.handleUpdate(context, request);
 
@@ -264,7 +264,7 @@ public class PrivilegeAuthzModuleTest {
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
         final RealmContext context = new RealmContext(subjectContext);
-        context.addSubRealm("abc", "abc");
+        context.setSubRealm("abc", "abc");
         final DeleteRequest request = Requests.newDeleteRequest("/policies/123");
         Promise<ResourceResponse, ResourceException> result = router.handleDelete(context, request);
 
@@ -295,7 +295,7 @@ public class PrivilegeAuthzModuleTest {
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
         final RealmContext context = new RealmContext(subjectContext);
-        context.addSubRealm("abc", "abc");
+        context.setSubRealm("abc", "abc");
         final PatchRequest request = Requests.newPatchRequest("/policies/123", PatchOperation.add("abc", "123"));
         Promise<ResourceResponse, ResourceException> result = router.handlePatch(context, request);
 
@@ -326,7 +326,7 @@ public class PrivilegeAuthzModuleTest {
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
         final RealmContext context = new RealmContext(subjectContext);
-        context.addSubRealm("abc", "abc");
+        context.setSubRealm("abc", "abc");
         final ActionRequest request = Requests.newActionRequest("/policies", "evaluate");
         Promise<ActionResponse, ResourceException> result = router.handleAction(context, request);
 
@@ -357,7 +357,7 @@ public class PrivilegeAuthzModuleTest {
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
         final RealmContext context = new RealmContext(subjectContext);
-        context.addSubRealm("abc", "abc");
+        context.setSubRealm("abc", "abc");
         final ActionRequest request = Requests.newActionRequest("/policies", "blowup");
         Promise<ActionResponse, ResourceException> result = router.handleAction(context, request);
 
@@ -398,7 +398,7 @@ public class PrivilegeAuthzModuleTest {
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
         final RealmContext context = new RealmContext(subjectContext);
-        context.addSubRealm("abc", "abc");
+        context.setSubRealm("abc", "abc");
         final CreateRequest request = Requests.newCreateRequest("/policies", JsonValue.json(new Object()));
         Promise<ResourceResponse, ResourceException> promise = router.handleCreate(context, request);
 

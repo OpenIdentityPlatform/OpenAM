@@ -16,23 +16,44 @@
 
 package org.forgerock.openam.core.rest;
 
+import static com.google.inject.multibindings.MapBinder.newMapBinder;
+import static org.forgerock.http.handler.Handlers.chainOf;
+import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
+import static org.forgerock.http.routing.RoutingMode.EQUALS;
+import static org.forgerock.http.routing.Version.version;
+import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Set;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.http.Handler;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.http.routing.RouteMatcher;
+import org.forgerock.http.routing.RouteMatchers;
+import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
+import org.forgerock.openam.audit.AuditConstants.Component;
+import org.forgerock.openam.audit.HttpAccessAuditFilterFactory;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.rest.authn.AuthenticationAccessAuditFilter;
+import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
+import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
 import org.forgerock.openam.core.rest.cts.CoreTokenResource;
 import org.forgerock.openam.core.rest.cts.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.core.rest.record.DebugRecorder;
@@ -47,6 +68,7 @@ import org.forgerock.openam.core.rest.sms.SmsSingletonProvider;
 import org.forgerock.openam.core.rest.sms.SmsSingletonProviderFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
+import org.forgerock.openam.http.annotations.Endpoints;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
@@ -79,6 +101,47 @@ public class CoreRestGuiceModule extends AbstractModule {
                 .build(SmsGlobalSingletonProviderFactory.class));
 
         bind(DebugRecorder.class).to(DefaultDebugRecorder.class);
+
+        MapBinder<RouteMatcher<Request>, Handler> chfEndpointHandlers = newMapBinder(binder(),
+                new TypeLiteral<RouteMatcher<Request>>() {}, new TypeLiteral<Handler>() {});
+        chfEndpointHandlers.addBinding(requestUriMatcher(EQUALS, "authenticate"))
+                .to(Key.get(Handler.class, Names.named("AuthenticateHandler")));
+
+        MapBinder<Component, AbstractHttpAccessAuditFilter> httpAccessAuditFilterMapBinder
+                = newMapBinder(binder(), Component.class, AbstractHttpAccessAuditFilter.class);
+        httpAccessAuditFilterMapBinder.addBinding(AUTHENTICATION).to(AuthenticationAccessAuditFilter.class);
+    }
+
+    @Provides
+    @Named("AuthenticateHandler")
+    @Inject
+    Handler getAuthenticateHandler(@Named("InvalidRealmNames") Set<String> invalidRealms,
+            HttpAccessAuditFilterFactory httpAuditFactory) {
+        invalidRealms.add(firstPathSegment("authenticate"));
+        org.forgerock.http.routing.Router authenticateVersionRouter = new org.forgerock.http.routing.Router();
+        Handler authenticateHandlerV1 = Endpoints.from(AuthenticationServiceV1.class);
+        Handler authenticateHandlerV2 = Endpoints.from(AuthenticationServiceV2.class);
+        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(1, 1)),
+                authenticateHandlerV1);
+        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(2)),
+                authenticateHandlerV2);
+        return chainOf(authenticateVersionRouter, httpAuditFactory.createFilter(AUTHENTICATION));
+    }
+
+    /**
+     * Returns the first path segment from a uri template. For example {@code /foo/bar} becomes {@code foo}.
+     *
+     * @param path the full uri template path.
+     * @return the first non-empty path segment.
+     * @throws IllegalArgumentException if the path contains no non-empty segments.
+     */
+    private static String firstPathSegment(final String path) {
+        for (String part : path.split("/")) {
+            if (!part.isEmpty()) {
+                return part;
+            }
+        }
+        throw new IllegalArgumentException("uriTemplate " + path + " is invalid");
     }
 
     @Provides

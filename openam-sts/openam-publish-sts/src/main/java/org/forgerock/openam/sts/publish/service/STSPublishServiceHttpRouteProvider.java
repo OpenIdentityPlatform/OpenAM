@@ -33,7 +33,7 @@ import org.forgerock.http.handler.Handlers;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
+import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.authz.STSPublishServiceAuthzModule;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.InstanceConfigMarshaller;
@@ -42,8 +42,6 @@ import org.forgerock.openam.sts.publish.rest.RestSTSInstancePublisher;
 import org.forgerock.openam.sts.publish.soap.SoapSTSInstancePublisher;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
-import org.forgerock.util.Function;
-import org.forgerock.util.promise.NeverThrowsException;
 import org.slf4j.Logger;
 
 /**
@@ -53,11 +51,11 @@ import org.slf4j.Logger;
  */
 public class STSPublishServiceHttpRouteProvider implements HttpRouteProvider {
 
-    private RestRouter rootRouter;
+    private ResourceRouter rootRouter;
     private org.forgerock.http.Filter authenticationFilter;
 
     @Inject
-    public void setRouters(RestRouter router) {
+    public void setRouters(ResourceRouter router) {
         this.rootRouter = router;
     }
 

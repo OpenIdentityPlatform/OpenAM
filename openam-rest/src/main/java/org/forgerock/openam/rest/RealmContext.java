@@ -77,7 +77,7 @@ public class RealmContext extends AbstractContext {
      * @param dnsAlias The DNS.
      * @param realmPath The resolved realm.
      */
-    public void addDnsAlias(String dnsAlias, String realmPath) {
+    public void setDnsAlias(String dnsAlias, String realmPath) {
         dnsAliasRealm = Pair.of(dnsAlias, realmPath);
     }
 
@@ -88,7 +88,7 @@ public class RealmContext extends AbstractContext {
      * @param realmUri The URI realm path element.
      * @param realm The resolved realm.
      */
-    public void addSubRealm(String realmUri, String realm) {
+    public void setSubRealm(String realmUri, String realm) {
         if ("/".equals(relativeRealmPath.getSecond())) { //Could be a realm alias or a realm path
             realm = getRealm("/", realm);
             relativeRealmPath = Pair.of(realmUri, realm);
@@ -175,7 +175,7 @@ public class RealmContext extends AbstractContext {
      *
      * @return passed realm else defaults to the root realm
      */
-    public static final String getRealm(Context context) {
+    public static String getRealm(Context context) {
         if (!context.containsContext(RealmContext.class)) {
             return ROOT_REALM;
         }

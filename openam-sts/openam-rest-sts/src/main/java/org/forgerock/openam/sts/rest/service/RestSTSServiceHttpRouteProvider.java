@@ -31,7 +31,7 @@ import org.forgerock.http.Handler;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
+import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.Routers;
 import org.forgerock.openam.sts.rest.config.RestSTSInjectorHolder;
 
@@ -41,10 +41,10 @@ import org.forgerock.openam.sts.rest.config.RestSTSInjectorHolder;
  * @since 13.0.0
  */
 public class RestSTSServiceHttpRouteProvider implements HttpRouteProvider {
-    private RestRouter rootRouter;
+    private ResourceRouter rootRouter;
 
     @Inject
-    public void setRouter(RestRouter router) {
+    public void setRouter(ResourceRouter router) {
         this.rootRouter = router;
     }
 

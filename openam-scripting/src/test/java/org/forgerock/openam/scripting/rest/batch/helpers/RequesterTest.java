@@ -59,7 +59,7 @@ public class RequesterTest {
     private void theSetUp() { // you need this
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.addSubRealm("REALM", "REALM");
+        realmContext.setSubRealm("REALM", "REALM");
         mockServerContext = mock(Context.class);
     }
 

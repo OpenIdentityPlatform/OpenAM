@@ -34,6 +34,11 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.util.promise.Promise;
 
+/**
+ * A Filter implementation that injects the required OpenAM contexts into the context hierarchy.
+ *
+ * @since 13.0.0
+ */
 public class ContextFilter implements Filter {
 
     @Override

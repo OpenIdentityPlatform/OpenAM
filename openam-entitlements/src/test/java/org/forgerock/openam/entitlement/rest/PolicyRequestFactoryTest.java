@@ -16,11 +16,20 @@
 
 package org.forgerock.openam.entitlement.rest;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
+import javax.security.auth.Subject;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.sun.identity.entitlement.EntitlementException;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.http.Context;
 import org.forgerock.http.context.ClientContext;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.openam.entitlement.rest.model.json.BatchPolicyRequest;
 import org.forgerock.openam.entitlement.rest.model.json.PolicyRequest;
 import org.forgerock.openam.entitlement.rest.model.json.TreePolicyRequest;
@@ -30,15 +39,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import javax.security.auth.Subject;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit test for {@link PolicyRequestFactory}.
@@ -129,7 +129,7 @@ public class PolicyRequestFactoryTest {
 
     private Context buildContextStructure(final String realm) {
         RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.addSubRealm(realm, realm);
+        realmContext.setSubRealm(realm, realm);
         return ClientContext.newInternalClientContext(realmContext);
     }
 }

@@ -18,7 +18,10 @@ package org.forgerock.openam.rest;
 
 import static javax.security.auth.message.AuthStatus.SUCCESS;
 
+import javax.inject.Inject;
 import javax.security.auth.message.AuthStatus;
+
+import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 
 /**
  * An AuthModule that will validate a SSOToken if it's present, else will allow the request through anyway.
@@ -26,6 +29,11 @@ import javax.security.auth.message.AuthStatus;
  * @since 12.0.0
  */
 public class OptionalSSOTokenSessionModule extends LocalSSOTokenSessionModule {
+
+    @Inject
+    public OptionalSSOTokenSessionModule(AuthUtilsWrapper authUtilsWrapper) {
+        super(authUtilsWrapper);
+    }
 
     @Override
     AuthStatus getInvalidSSOTokenAuthStatus() {

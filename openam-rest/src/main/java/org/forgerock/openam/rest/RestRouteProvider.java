@@ -29,8 +29,11 @@ public interface RestRouteProvider {
     /**
      * Implementations to add route registrations to the provided routers.
      *
-     * @param rootRouter The root REST router.
-     * @param realmRouter The dynamic realm REST router.
+     * @param rootResourceRouter The root CREST router.
+     * @param realmResourceRouter The realm CREST router.
+     * @param rootServiceRouter The root CHF REST router.
+     * @param realmServiceRouter The realm CHF REST router.
      */
-    void addRoutes(RestRouter rootRouter, RestRouter realmRouter);
+    void addRoutes(ResourceRouter rootResourceRouter, ResourceRouter realmResourceRouter,
+            ServiceRouter rootServiceRouter, ServiceRouter realmServiceRouter);
 }

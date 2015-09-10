@@ -42,7 +42,6 @@ import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.guice.EntitlementRestGuiceModule;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
-import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.query.QueryException;
 import org.forgerock.openam.rest.query.QueryResponseHandler;
@@ -145,7 +144,7 @@ public class ResourceTypesResourceTest {
         };
 
         RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.addSubRealm("/", "/");
+        realmContext.setSubRealm("/", "/");
 
         mockServerContext = ClientContext.newInternalClientContext(realmContext);
 

@@ -17,14 +17,11 @@
 package org.forgerock.openam.rest;
 
 import static org.forgerock.caf.authentication.framework.AuthenticationFilter.AuthenticationModuleBuilder.configureModule;
-import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
-import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
-import static org.forgerock.json.resource.RouteMatchers.resourceApiVersionContextFilter;
+import static org.forgerock.http.routing.RouteMatchers.resourceApiVersionContextFilter;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +30,9 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.InvalidRealmNameManager;
 import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
@@ -43,32 +42,35 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
-import org.forgerock.http.routing.RouteMatchers;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Router;
-import org.forgerock.openam.rest.Routers.Route;
+import org.forgerock.openam.audit.HttpAccessAuditFilterFactory;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Guice module for bindings for the REST routers and route registration.
+ *
+ * @since 13.0.0
+ */
 @GuiceModule
 public class RestGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        bind(Debug.class).annotatedWith(Names.named("frRest")).toInstance(Debug.getInstance("frRest"));
         bind(ResourceApiVersionBehaviourManager.class).to(VersionBehaviourConfigListener.class).in(Singleton.class);
-        bind(Key.get(Filter.class, Names.named("ContextFilter"))).to(ContextFilter.class).in(Singleton.class);
         bind(Key.get(Filter.class, Names.named("LoggingFilter"))).to(CrestLoggingFilter.class).in(Singleton.class);
         bind(Key.get(Logger.class, Names.named("RestAuthentication")))
                 .toInstance(LoggerFactory.getLogger("restAuthenticationFilter"));
         bind(AuditApi.class).to(NoopAuditApi.class);
-        bind(Key.get(new TypeLiteral<Set<String>>() {
-        }, Names.named("InvalidRealmNames")))
+        bind(Key.get(new TypeLiteral<Set<String>>() {}, Names.named("InvalidRealmNames")))
                 .toInstance(InvalidRealmNameManager.getInvalidRealmNames());
-        bind(AuthenticationEnforcer.class);
 
         bind(Key.get(AsyncServerAuthModule.class, Names.named("OptionalSsoTokenSession")))
                 .to(OptionalSSOTokenSessionModule.class).in(Singleton.class);
@@ -81,8 +83,7 @@ public class RestGuiceModule extends AbstractModule {
                         return CookieUtils.getAmCookieName();
                     }
                 });
-        bind(new TypeLiteral<Config<String>>() {
-        })
+        bind(new TypeLiteral<Config<String>>() {})
                 .annotatedWith(Names.named(AuthnRequestUtils.ASYNC_SSOTOKEN_COOKIE_NAME))
                 .toInstance(new Config<String>() {
                     @Override
@@ -95,74 +96,18 @@ public class RestGuiceModule extends AbstractModule {
                         return CookieUtils.getAmCookieName();
                     }
                 });
-    }
 
-    @Provides
-    @Named("RestHandler")
-    @Singleton
-    Handler getRestHandler(@Named("ResourceApiVersionFilter") org.forgerock.http.Filter chfResourceApiVersionFilter,
-            @Named("ResourceApiVersionFilter") Filter resourceApiVersionFilter,
-            @Named("RestRootRouter") org.forgerock.http.routing.Router chfRootRouter,
-            CrestProtocolEnforcementFilter crestProtocolEnforcementFilter,
-            @Named("CrestRootRouter") Router crestRootRouter,
-            @Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter) {
-        return new RestHandler(Handlers.chainOf(chfRootRouter, chfResourceApiVersionFilter),
-                Handlers.chainOf(newHttpHandler(new FilterChain(crestRootRouter, resourceApiVersionFilter)),
-                        crestProtocolEnforcementFilter, authenticationFilter), Collections.singleton("authenticate"));
+        MapBinder.newMapBinder(binder(), String.class, Handler.class);
+
+        bind(Key.get(RequestHandler.class, Names.named("CrestRealmHandler")))
+                .to(Key.get(Router.class, Names.named("CrestRealmRouter")));
     }
 
     @Provides
     @Named("ResourceApiVersionFilter")
     @Singleton
     org.forgerock.http.Filter getChfResourceApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
-        return RouteMatchers.resourceApiVersionContextFilter(behaviourManager);
-    }
-
-    @Provides
-    @Named("ResourceApiVersionFilter")
-    @Singleton
-    Filter getCrestResourceApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
         return resourceApiVersionContextFilter(behaviourManager);
-    }
-
-    @Provides
-    @Named("RestRootRouter")
-    @Singleton
-    org.forgerock.http.routing.Router getRestRootRouter(
-            @Named("RestRealmRouter") org.forgerock.http.routing.Router realmRouter,
-            RealmContextFilter realmContextFilter) {
-        org.forgerock.http.routing.Router rootRouter = new org.forgerock.http.routing.Router();
-        rootRouter.setDefaultRoute(Handlers.chainOf(realmRouter, realmContextFilter));
-        return rootRouter;
-    }
-
-    @Provides
-    @Named("RestRealmRouter")
-    @Singleton
-    org.forgerock.http.routing.Router getRestRealmRouter(RealmContextFilter realmContextFilter) {
-        org.forgerock.http.routing.Router realmRouter = new org.forgerock.http.routing.Router();
-        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "{realm}"),
-                Handlers.chainOf(realmRouter, realmContextFilter));
-        return realmRouter;
-    }
-
-    @Provides
-    @Named("CrestRootRouter")
-    @Singleton
-    Router getCrestRootRouter(@Named("CrestRealmRouter") Router realmRouter, RealmContextFilter realmContextFilter) {
-        Router rootRouter = new Router();
-        rootRouter.setDefaultRoute(new FilterChain(realmRouter, realmContextFilter));
-        return rootRouter;
-    }
-
-    @Provides
-    @Named("CrestRealmRouter")
-    @Singleton
-    Router getCrestRealmRouter(RealmContextFilter realmContextFilter) {
-        Router realmRouter = new Router();
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "{realm}"),
-                new FilterChain(realmRouter, realmContextFilter));
-        return realmRouter;
     }
 
     @Provides
@@ -178,60 +123,103 @@ public class RestGuiceModule extends AbstractModule {
     }
 
     @Provides
-    @Named("RestRouter")
+    @Named("RestHandler")
     @Singleton
-    DynamicRealmRestRouter getRestRouter(
-            @Named("CrestRootRouter") final Router rootRouter,
-            @Named("CrestRealmRouter") final Router realmRouter,
-            @Named("InvalidRealmNames") final Set<String> invalidRealms,
-            final AuthenticationEnforcer defaultAuthenticationEnforcer,
-            final AuditFilter auditFilter, @Named("ContextFilter") final Filter contextFilter,
-            @Named("LoggingFilter") final Filter loggingFilter) {
-        return new DynamicRealmRestRouter() {
-            @Override
-            public RestRouter dynamically() {
-                return new Routers.RestRouterImpl(realmRouter, invalidRealms,
-                        defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
-            }
-
-            @Override
-            public Route route(String uriTemplate) {
-                return new Routers.RestRouterImpl(rootRouter, invalidRealms,
-                        defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter).route(uriTemplate);
-            }
-
-            @Override
-            public Router getRouter() {
-                return rootRouter;
-            }
-        };
+    Handler getRestHandler(@Named("ChfRootRouter") org.forgerock.http.routing.Router chfRootRouter,
+            @Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter,
+            @Named("ResourceApiVersionFilter") org.forgerock.http.Filter resourceApiVersionFilter) {
+        return Handlers.chainOf(chfRootRouter, authenticationFilter,
+                resourceApiVersionFilter);
     }
 
     @Provides
+    @Named("RestHandler")
     @Singleton
-    RestRouter getNewRestRouter(
-            final Router rootRouter,
-            final Router realmRouter,
-            final AuthenticationEnforcer defaultAuthenticationEnforcer,
-            final AuditFilter auditFilter, @Named("ContextFilter") final Filter contextFilter,
-            @Named("LoggingFilter") final Filter loggingFilter) {
-        return new DynamicRealmRestRouter() {
-            @Override
-            public RestRouter dynamically() {
-                return new Routers.RestRouterImpl(realmRouter, new HashSet<String>(),
-                        defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
-            }
+    RequestHandler getInternalRestHandler(@Named("CrestRootRouter") Router crestRootRouter,
+            ContextFilter contextFilter) {
+        return new FilterChain(crestRootRouter, contextFilter);
+    }
 
-            @Override
-            public Route route(String uriTemplate) {
-                return new Routers.RestRouterImpl(rootRouter, new HashSet<String>(),
-                        defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter).route(uriTemplate);
-            }
+    @Provides
+    @Named("ChfRootRouter")
+    @Singleton
+    org.forgerock.http.routing.Router getChfRootRouter(
+            @Named("ChfRealmRouter") org.forgerock.http.routing.Router chfRealmRouter,
+            RealmContextFilter realmContextFilter) {
+        org.forgerock.http.routing.Router chfRootRouter = new org.forgerock.http.routing.Router();
+        chfRootRouter.setDefaultRoute(Handlers.chainOf(chfRealmRouter, realmContextFilter));
+        return chfRootRouter;
+    }
 
-            @Override
-            public Router getRouter() {
-                return rootRouter;
-            }
-        };
+    @Provides
+    @Named("ChfRealmRouter")
+    @Singleton
+    org.forgerock.http.routing.Router getChfRealmRouter(@Named("CrestRealmHandler") RequestHandler crestRealmHandler,
+            ContextFilter contextFilter, CrestProtocolEnforcementFilter crestProtocolEnforcementFilter) {
+        org.forgerock.http.routing.Router chfRealmRouter = new org.forgerock.http.routing.Router();
+        chfRealmRouter.setDefaultRoute(Handlers.chainOf(
+                newHttpHandler(new FilterChain(crestRealmHandler, contextFilter)),
+                crestProtocolEnforcementFilter));
+        return chfRealmRouter;
+    }
+
+    @Provides
+    @Named("CrestRootRouter")
+    @Singleton
+    Router getCrestRootRouter(@Named("CrestRealmRouter") Router crestRealmRouter) {
+        Router crestRootRouter = new Router();
+        crestRealmRouter.setDefaultRoute(crestRealmRouter);
+        return crestRealmRouter;
+    }
+
+    @Provides
+    @Named("CrestRealmRouter")
+    @Singleton
+    Router getCrestRealmRouter() {
+        return new Router();
+    }
+
+    @Provides
+    @Named("RootServiceRouter")
+    ServiceRouter getRootServiceRouter(@Named("ChfRootRouter")org.forgerock.http.routing.Router chfRootRouter,
+            @Named("InvalidRealmNames") Set<String> invalidRealms, HttpAccessAuditFilterFactory httpAuditFactory) {
+        return new Routers.ServiceRouterImpl(chfRootRouter, invalidRealms, httpAuditFactory);
+    }
+
+    @Provides
+    @Named("RealmServiceRouter")
+    ServiceRouter getRealmServiceRouter(@Named("ChfRealmRouter")org.forgerock.http.routing.Router chfRealmRouter,
+            @Named("InvalidRealmNames") Set<String> invalidRealms,
+            AuthenticationEnforcer defaultAuthenticationEnforcer, HttpAccessAuditFilterFactory httpAuditFactory) {
+        return new Routers.ServiceRouterImpl(chfRealmRouter, invalidRealms, httpAuditFactory);
+    }
+
+    @Provides
+    @Named("RootResourceRouter")
+    ResourceRouter getRootResourceRouter(@Named("CrestRootRouter") Router crestRootRouter,
+            @Named("ChfRootRouter")org.forgerock.http.routing.Router chfRootRouter,
+            CrestProtocolEnforcementFilter crestProtocolEnforcementFilter,
+            @Named("InvalidRealmNames") Set<String> invalidRealms,
+            AuthenticationEnforcer defaultAuthenticationEnforcer, AuditFilter auditFilter,
+            ContextFilter contextFilter, @Named("LoggingFilter") Filter loggingFilter) {
+        return new Routers.RootResourceRouterImpl(crestRootRouter, chfRootRouter, crestProtocolEnforcementFilter,
+                invalidRealms, defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
+    }
+
+    @Provides
+    @Named("RealmResourceRouter")
+    ResourceRouter getRealmResourceRouter(@Named("CrestRealmRouter") Router crestRealmRouter,
+            @Named("InvalidRealmNames") Set<String> invalidRealms,
+            AuthenticationEnforcer defaultAuthenticationEnforcer, AuditFilter auditFilter,
+            ContextFilter contextFilter, @Named("LoggingFilter") Filter loggingFilter) {
+        return new Routers.ResourceRouterImpl(crestRealmRouter, invalidRealms, defaultAuthenticationEnforcer,
+                auditFilter, contextFilter, loggingFilter);
+    }
+
+    @Provides
+    ResourceRouter getNewRestRouter(Router rootRouter, AuthenticationEnforcer defaultAuthenticationEnforcer,
+            AuditFilter auditFilter, ContextFilter contextFilter, @Named("LoggingFilter") Filter loggingFilter) {
+        return new Routers.ResourceRouterImpl(rootRouter, new HashSet<String>(),
+                defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
     }
 }

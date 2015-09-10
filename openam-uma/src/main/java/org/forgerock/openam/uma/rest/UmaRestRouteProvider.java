@@ -19,8 +19,9 @@ package org.forgerock.openam.uma.rest;
 import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH2;
 import static org.forgerock.openam.audit.AuditConstants.Component.UMA;
 
+import org.forgerock.openam.rest.AbstractRestRouteProvider;
+import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 
 /**
@@ -28,10 +29,10 @@ import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
  *
  * @since 13.0.0
  */
-public class UmaRestRouteProvider implements RestRouteProvider {
+public class UmaRestRouteProvider extends AbstractRestRouteProvider {
 
     @Override
-    public void addRoutes(RestRouter rootRouter, RestRouter realmRouter) {
+    public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
 
         realmRouter.route("serverinfo/uma")
                 .auditAs(UMA)

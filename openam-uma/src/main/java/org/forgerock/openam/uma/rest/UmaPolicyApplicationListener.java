@@ -290,7 +290,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
 
     private void deletePolicies(String realm, String resourceServerId) {
         RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.addDnsAlias("/", realm);
+        realmContext.setDnsAlias("/", realm);
         final Context context = new AdminSubjectContext(realmContext);
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo(new JsonPointer("applicationName"), resourceServerId));

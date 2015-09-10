@@ -17,18 +17,18 @@
 package org.forgerock.openam.selfservice;
 
 import org.forgerock.http.routing.RoutingMode;
-import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.RestRouter;
+import org.forgerock.openam.rest.AbstractRestRouteProvider;
+import org.forgerock.openam.rest.ResourceRouter;
 
 /**
  * Provides routes for the user self service services.
  *
  * @since 13.0.0
  */
-public final class SelfServiceRestRouteProvider implements RestRouteProvider {
+public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvider {
 
     @Override
-    public void addRoutes(RestRouter rootRouter, RestRouter realmRouter) {
+    public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter
                 .route("/forgottenPassword")
                 .toRequestHandler(RoutingMode.STARTS_WITH, ForgottenPasswordRequestHandler.class);

@@ -21,14 +21,17 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
+import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
+import org.forgerock.http.ResourcePath;
+import org.forgerock.http.protocol.Form;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
@@ -38,7 +41,6 @@ import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -55,38 +57,29 @@ import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
-public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
+/**
+ * Filter which will consume the realm part of the request URI and inject a
+ * {@link RealmContext} into the {@link Context} hierarchy.
+ *
+ * @since 13.0.0
+ */
+public class RealmContextFilter implements Filter, org.forgerock.json.resource.Filter {
 
-    private final Debug logger = Debug.getInstance("frRest");
-    private final RestRealmValidator realmValidator;
     private final CoreWrapper coreWrapper;
-    private final ChfRouterContextAdded chf;
-    private final CrestRouterContextAdded crest;
+    private final RestRealmValidator realmValidator;
 
-    /**
-     *
-     *
-     * @param realmValidator An instance of the RestRealmValidator.
-     * @param coreWrapper An instance of the CoreWrapper.
-     */
     @Inject
-    public RealmContextFilter(RestRealmValidator realmValidator, CoreWrapper coreWrapper) {
-        this.realmValidator = realmValidator;
+    public RealmContextFilter(CoreWrapper coreWrapper, RestRealmValidator realmValidator) {
         this.coreWrapper = coreWrapper;
-        this.chf = new ChfRouterContextAdded();
-        this.crest = new CrestRouterContextAdded();
+        this.realmValidator = realmValidator;
     }
 
     @Override
     public Promise<Response, NeverThrowsException> filter(Context context, Request request, Handler next) {
         try {
-            return next.handle(chf.addRouterContext(context, request), request);
-        } catch (BadRequestException e) {
-            logger.message("Attempting to access invalid realm", e);
-            return newResultPromise(new Response(Status.BAD_REQUEST));
-        } catch (InternalServerErrorException e) {
-            logger.message("Failed to determine server name", e);
-            return newResultPromise(new Response(Status.INTERNAL_SERVER_ERROR));
+            return next.handle(evaluate(context, request), request);
+        } catch (ResourceException e) {
+            return newResultPromise(new Response(Status.BAD_REQUEST).setEntity(e.toJsonValue().getObject()));
         }
     }
 
@@ -94,10 +87,9 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
         try {
-            return next.handleAction(crest.addRouterContext(context, request), request);
+            return next.handleAction(evaluate(context, request), request);
         } catch (ResourceException e) {
-            logger.message("Attempting to access invalid realm", e);
-            return e.asPromise();
+            return newExceptionPromise(e);
         }
     }
 
@@ -105,10 +97,9 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterCreate(Context context, CreateRequest request,
             RequestHandler next) {
         try {
-            return next.handleCreate(crest.addRouterContext(context, request), request);
+            return next.handleCreate(evaluate(context, request), request);
         } catch (ResourceException e) {
-            logger.message("Attempting to access invalid realm", e);
-            return e.asPromise();
+            return newExceptionPromise(e);
         }
     }
 
@@ -116,10 +107,9 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterDelete(Context context, DeleteRequest request,
             RequestHandler next) {
         try {
-            return next.handleDelete(crest.addRouterContext(context, request), request);
+            return next.handleDelete(evaluate(context, request), request);
         } catch (ResourceException e) {
-            logger.message("Attempting to access invalid realm", e);
-            return e.asPromise();
+            return newExceptionPromise(e);
         }
     }
 
@@ -127,10 +117,9 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
         try {
-            return next.handlePatch(crest.addRouterContext(context, request), request);
+            return next.handlePatch(evaluate(context, request), request);
         } catch (ResourceException e) {
-            logger.message("Attempting to access invalid realm", e);
-            return e.asPromise();
+            return newExceptionPromise(e);
         }
     }
 
@@ -138,10 +127,9 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<QueryResponse, ResourceException> filterQuery(Context context, QueryRequest request,
             QueryResourceHandler handler, RequestHandler next) {
         try {
-            return next.handleQuery(crest.addRouterContext(context, request), request, handler);
+            return next.handleQuery(evaluate(context, request), request, handler);
         } catch (ResourceException e) {
-            logger.message("Attempting to access invalid realm", e);
-            return e.asPromise();
+            return newExceptionPromise(e);
         }
     }
 
@@ -149,10 +137,9 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterRead(Context context, ReadRequest request,
             RequestHandler next) {
         try {
-            return next.handleRead(crest.addRouterContext(context, request), request);
+            return next.handleRead(evaluate(context, request), request);
         } catch (ResourceException e) {
-            logger.message("Attempting to access invalid realm", e);
-            return e.asPromise();
+            return newExceptionPromise(e);
         }
     }
 
@@ -160,145 +147,99 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterUpdate(Context context, UpdateRequest request,
             RequestHandler next) {
         try {
-            return next.handleUpdate(crest.addRouterContext(context, request), request);
+            return next.handleUpdate(evaluate(context, request), request);
         } catch (ResourceException e) {
-            logger.message("Attempting to access invalid realm", e);
-            return e.asPromise();
+            return newExceptionPromise(e);
         }
     }
 
-    private abstract class RouterContextAdded<T> {
+    private Context evaluate(Context context, Request request) throws ResourceException {
+        String hostname = request.getUri().getHost();
+        ResourcePath requestUri = getRemainingRequestUri(context, request);
+        List<String> realmOverrideParameter = new Form().fromRequestQuery(request).get("realm");
+        return evaluate(context, hostname, requestUri, realmOverrideParameter);
+    }
 
-        Context addRouterContext(Context context, T request) throws BadRequestException, InternalServerErrorException {
+    private Context evaluate(Context context, org.forgerock.json.resource.Request request) throws ResourceException {
+        String hostname = URI.create(context.asContext(HttpContext.class).getPath()).getHost();
+        ResourcePath requestUri = request.getResourcePathObject();
+        List<String> realmOverrideParameter = context.asContext(HttpContext.class).getParameter("realm");
+        return evaluate(context, hostname, requestUri, realmOverrideParameter);
+    }
 
-            RealmContext realmContext;
-            if (context.containsContext(RealmContext.class)) {
-                realmContext = context.asContext(RealmContext.class);
-            } else {
-                realmContext = new RealmContext(context);
-            }
+    private Context evaluate(Context context, String hostname, ResourcePath requestUri,
+            List<String> overrideRealmParameter) throws ResourceException {
 
-            boolean handled = getRealmFromURI(context, realmContext);
-            if (!handled) {
-                getRealmFromServerName(context, realmContext, request);
-            }
+        SSOToken adminToken = coreWrapper.getAdminToken();
 
-            setRealmFromQueryString(context, realmContext, request);
-            return realmContext;
-        }
-
-        private boolean getRealmFromURI(Context context, RealmContext realmContext) throws BadRequestException {
-            if (context.containsContext(UriRouterContext.class)) {
-                String subRealm = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("realm");
-                subRealm = validateRealm(realmContext.getRebasedRealm(), subRealm);
-                if (subRealm != null) {
-                    realmContext.addSubRealm(subRealm, subRealm);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void setRealmFromQueryString(Context context, RealmContext realmContext, T request)
-                throws BadRequestException {
-            if (realmContext.getOverrideRealm() != null) {
-                return;
-            }
-            List<String> realm = getRealmFromQueryString(context, request);
-            if (realm == null || realm.size() != 1) {
-                return;
-            }
-            String validatedRealm = validateRealm("", realm.get(0));
-            if (validatedRealm != null) {
-                realmContext.setOverrideRealm(validatedRealm);
-            } else {
-                throw new BadRequestException("Invalid realm, " + realm.get(0));
-            }
-        }
-
-        abstract List<String> getRealmFromQueryString(Context context, T request);
-
-        private boolean getRealmFromServerName(Context context, RealmContext realmContext, T request)
-                throws InternalServerErrorException, BadRequestException {
-            String serverName = getServerName(context, request);
+        String dnsAliasRealm = cleanRealm(getRealmFromServerName(adminToken, hostname));
+        StringBuilder matchedUriBuilder = new StringBuilder();
+        String currentRealm = dnsAliasRealm;
+        int consumedElementsCount = 0;
+        for (String element : requestUri) {
             try {
-                SSOToken adminToken = coreWrapper.getAdminToken();
-                String orgDN = coreWrapper.getOrganization(adminToken, serverName);
-                String realmPath = validateRealm(coreWrapper.convertOrgNameToRealmName(orgDN));
-                realmContext.addDnsAlias(serverName, realmPath);
-                return true;
-            } catch (IdRepoException | SSOException e) {
-                throw new InternalServerErrorException(e);
+                String subrealm = cleanRealm(element);
+                currentRealm = resolveRealm(adminToken, currentRealm, subrealm);
+                matchedUriBuilder.append(subrealm);
+                consumedElementsCount++;
+            } catch (InternalServerErrorException ignored) {
+                break;
             }
         }
 
-        abstract String getServerName(Context context, T request);
-
-        private String validateRealm(String realmPath) throws BadRequestException {
-            if (!realmValidator.isRealm(realmPath)) {
-                try {
-                    SSOToken adminToken = coreWrapper.getAdminToken();
-                    //Need to strip off leading '/' from realm otherwise just generates a DN based of the realm value,
-                    // which is wrong
-                    String realm = realmPath;
-                    if (realm.startsWith("/")) {
-                        realm = realm.substring(1);
-                    }
-                    String orgDN = coreWrapper.getOrganization(adminToken, realm);
-                    return coreWrapper.convertOrgNameToRealmName(orgDN);
-                } catch (IdRepoException | SSOException ignored) {
-                    logger.message("Failed to validate realm", ignored);
-                }
-                throw new BadRequestException("Invalid realm, " + realmPath);
-            }
-            return realmPath;
+        String overrideRealm = null;
+        if (overrideRealmParameter != null && !overrideRealmParameter.isEmpty()) {
+            overrideRealm = resolveRealm(adminToken, "/", cleanRealm(overrideRealmParameter.get(0)));
         }
 
-        private String validateRealm(String realmPath, String subRealm) throws BadRequestException {
-            if (subRealm == null || subRealm.isEmpty()) {
-                return null;
+        ResourcePath remainingUri = requestUri.subSequence(consumedElementsCount, requestUri.size());
+        String matchedUri = matchedUriBuilder.length() > 1 ? matchedUriBuilder.substring(1) : matchedUriBuilder.toString();
+
+        RealmContext realmContext = new RealmContext(new UriRouterContext(context, matchedUri, remainingUri.toString(), Collections.<String, String>emptyMap()));
+        realmContext.setDnsAlias(hostname, dnsAliasRealm);
+        realmContext.setSubRealm(matchedUri, cleanRealm(currentRealm.substring(dnsAliasRealm.length())));
+        realmContext.setOverrideRealm(overrideRealm);
+        return realmContext;
+    }
+
+    private String cleanRealm(String realm) {
+        if (!realm.startsWith("/")) {
+            realm = "/" + realm;
+        }
+        if (realm.length() > 1 && realm.endsWith("/")) {
+            realm = realm.substring(0, realm.length() - 1);
+        }
+        return realm;
+    }
+
+    private String resolveRealm(SSOToken adminToken, String parentRealm, String subrealm) throws ResourceException {
+        String realm = parentRealm.equals("/") ? subrealm : parentRealm + subrealm;
+        if (!realmValidator.isRealm(realm)) {
+            // Ignoring parentRealm here as a realm alias is only applicable if it is from the root realm
+            return getRealmFromServerName(adminToken, subrealm.substring(1));
+        }
+        return realm;
+    }
+
+    private String getRealmFromServerName(SSOToken adminToken, String hostname) throws ResourceException {
+        try {
+            String orgDN = coreWrapper.getOrganization(adminToken, hostname);
+            String realm = coreWrapper.convertOrgNameToRealmName(orgDN);
+            if (realm == null) {
+                throw new BadRequestException("Invalid realm, " + hostname);
             }
-            if (realmPath.endsWith("/")) {
-                realmPath = realmPath.substring(0, realmPath.length() - 1);
-            }
-            if (!subRealm.startsWith("/")) {
-                subRealm = "/" + subRealm;
-            }
-            if (subRealm.endsWith("/") && (realmPath + subRealm).length() > 1) {
-                subRealm = subRealm.substring(0, subRealm.length() - 1);
-            }
-            String validatedRealm = validateRealm(realmPath + subRealm);
-            if (!realmValidator.isRealm(realmPath + subRealm)) {
-                return validatedRealm;
-            } else {
-                return subRealm;
-            }
+            return realm;
+        } catch (IdRepoException | SSOException e) {
+            throw new InternalServerErrorException(e);
         }
     }
 
-    private final class ChfRouterContextAdded extends RouterContextAdded<Request> {
-
-        @Override
-        List<String> getRealmFromQueryString(Context context, Request request) {
-            return request.getForm().get("realm");
+    private ResourcePath getRemainingRequestUri(Context context, Request request) {
+        ResourcePath path = request.getUri().getResourcePath();
+        if (context.containsContext(UriRouterContext.class)) {
+            ResourcePath matchedUri = ResourcePath.valueOf(context.asContext(UriRouterContext.class).getBaseUri());
+            path = path.tail(matchedUri.size());
         }
-
-        @Override
-        String getServerName(Context context, Request request) {
-            return request.getUri().getHost();
-        }
-    }
-
-    private final class CrestRouterContextAdded extends RouterContextAdded<org.forgerock.json.resource.Request> {
-
-        @Override
-        List<String> getRealmFromQueryString(Context context, org.forgerock.json.resource.Request request) {
-            return context.asContext(HttpContext.class).getParameter("realm");
-        }
-
-        @Override
-        String getServerName(Context context, org.forgerock.json.resource.Request request) {
-            return URI.create(context.asContext(HttpContext.class).getPath()).getHost();
-        }
+        return path;
     }
 }

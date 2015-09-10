@@ -287,7 +287,7 @@ public class PolicyRequestTest {
 
     private Context buildContextStructure(final String realm) {
         RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.addSubRealm(realm, realm);
+        realmContext.setSubRealm(realm, realm);
         return ClientContext.newInternalClientContext(realmContext);
     }
 

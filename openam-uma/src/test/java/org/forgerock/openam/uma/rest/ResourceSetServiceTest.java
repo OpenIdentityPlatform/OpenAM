@@ -186,7 +186,7 @@ public class ResourceSetServiceTest {
 
     private Context createContext() {
         RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.addDnsAlias("/", "REALM");
+        realmContext.setDnsAlias("/", "REALM");
         return realmContext;
     }
 

@@ -42,24 +42,40 @@ import org.forgerock.openam.http.HttpRouteProvider;
  */
 public class RestHttpRouteProvider implements HttpRouteProvider {
 
-    private RestRouter rootRouter;
-    private RestRouter realmRouter;
+    private ResourceRouter rootResourceRouter;
+    private ResourceRouter realmResourceRouter;
+    private ServiceRouter rootServiceRouter;
+    private ServiceRouter realmServiceRouter;
     private Injector injector;
 
     @Override
     public Set<HttpRoute> get() {
         for (RestRouteProvider routeProvider : ServiceLoader.load(RestRouteProvider.class)) {
             injector.injectMembers(routeProvider);
-            routeProvider.addRoutes(rootRouter, realmRouter);
+            routeProvider.addRoutes(rootResourceRouter, realmResourceRouter, rootServiceRouter, realmServiceRouter);
         }
         return Collections.singleton(
                 newHttpRoute(STARTS_WITH, "json", Key.get(Handler.class, Names.named("RestHandler"))));
     }
 
     @Inject
-    public void setRouters(@Named("RestRouter") DynamicRealmRestRouter router) {
-        this.rootRouter = router;
-        this.realmRouter = router.dynamically();
+    public void setRootResourceRouter(@Named("RootResourceRouter") ResourceRouter rootRouter) {
+        this.rootResourceRouter = rootRouter;
+    }
+
+    @Inject
+    public void setRealmResourceRouter(@Named("RealmResourceRouter") ResourceRouter realmRouter) {
+        this.realmResourceRouter = realmRouter;
+    }
+
+    @Inject
+    public void setRootServiceRouter(@Named("RootServiceRouter") ServiceRouter rootRouter) {
+        this.rootServiceRouter = rootRouter;
+    }
+
+    @Inject
+    public void setRealmServiceRouter(@Named("RealmServiceRouter") ServiceRouter realmRouter) {
+        this.realmServiceRouter = realmRouter;
     }
 
     @Inject
