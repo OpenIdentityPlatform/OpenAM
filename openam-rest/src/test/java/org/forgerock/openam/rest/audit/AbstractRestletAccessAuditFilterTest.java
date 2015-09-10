@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
@@ -54,7 +55,7 @@ public class AbstractRestletAccessAuditFilterTest {
         auditFilter = new MockAccessAuditFilter(restlet, eventPublisher, eventFactory);
     }
 
-    //@Test
+    @Test
     public void shouldHandleAuditException() throws AuditException {
         // Given
         Request request = mock(Request.class);
@@ -64,7 +65,6 @@ public class AbstractRestletAccessAuditFilterTest {
         when(request.getDate()).thenReturn(new Date());
         when(representation.isTransient()).thenReturn(false);
         AuditRequestContext.putProperty(USER_ID, "User 1");
-        //AuditRequestContext.putProperty(CONTEXT_ID, "1234567890");
         when(eventPublisher.isAuditing(anyString())).thenReturn(true);
         when(eventPublisher.isSuppressExceptions()).thenReturn(false);
         doThrow(AuditException.class).when(eventPublisher).publish(anyString(), any(AuditEvent.class));

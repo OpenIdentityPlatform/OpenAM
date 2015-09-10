@@ -17,12 +17,15 @@ package org.forgerock.openam.core.rest.authn;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getContextFromSSOToken;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
 import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -66,8 +69,8 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
         this.authIdHelper = authIdHelper;
     }
 
-    //@Override
-    protected String getContextIdForAccessAttempt(Request request) {
+    @Override
+    protected Map<String, String> getContextsForAccessAttempt(Request request) {
         try {
             String jsonString = request.getEntity().getString();
             if (isNotEmpty(jsonString)) {
@@ -76,11 +79,11 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
                     populateContextFromAuthId(jsonValue.get(AUTH_ID).asString());
                 }
             }
-            //return super.getContextIdForAccessAttempt(request);
         } catch (IOException e) {
-            return "";
+            //Do nothing
         }
-        return null;
+
+        return super.getContextsForAccessAttempt(request);
     }
 
     @Override
@@ -98,13 +101,8 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
         return super.getUserIdForAccessOutcome(response);
     }
 
-    //@Override
-    protected String getContextIdForAccessOutcome(Response response) {
-        //String contextId = super.getContextIdForAccessOutcome(response);
-        //if (isNotEmpty(contextId)) {
-            //return contextId;
-        //}
-
+    @Override
+    protected Map<String, String> getContextsForAccessOutcome(Response response) {
         String tokenId = AuditRequestContext.getProperty(TOKEN_ID);
         String sessionId = AuditRequestContext.getProperty(SESSION_ID);
         String authId = AuditRequestContext.getProperty(AUTH_ID);
@@ -112,21 +110,20 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
             populateContextFromTokenId(tokenId);
 
         } else if (isNotEmpty(sessionId)) {
-            //AuditRequestContext.putProperty(CONTEXT_ID, getContextIdFromSessionId(sessionId));
+            AuditRequestContext.putProperty(Context.AUTH.toString(), getContextIdFromSessionId(sessionId));
 
         } else if (isNotEmpty(authId)) {
             populateContextFromAuthId(authId);
         }
 
-        //return super.getContextIdForAccessOutcome(response);
-        return null;
+        return super.getContextsForAccessOutcome(response);
     }
 
     private void populateContextFromTokenId(String tokenId) {
         try {
             SSOToken token = SSOTokenManager.getInstance().createSSOToken(tokenId);
             AuditRequestContext.putProperty(USER_ID, getUserId(token));
-            //AuditRequestContext.putProperty(CONTEXT_ID, getContextIdFromSSOToken(token));
+            AuditRequestContext.putProperty(Context.SESSION.toString(), getContextFromSSOToken(token));
         } catch (SSOException e) {
             debug.warning("No SSO Token found when trying to audit an authentication request.");
         }
@@ -141,7 +138,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
 
             String contextId = getContextIdFromSessionId(sessionId);
             if (isNotEmpty(contextId)) {
-                //return null;AuditRequestContext.putProperty(CONTEXT_ID, contextId);
+                AuditRequestContext.putProperty(Context.AUTH.toString(), contextId);
             }
         } catch (RestAuthException e) {
             debug.warning("No session ID found when trying to audit an authentication request.");

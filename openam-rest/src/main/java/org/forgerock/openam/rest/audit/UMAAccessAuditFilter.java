@@ -30,12 +30,12 @@ import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.rest.audit.AbstractRestletAccessAuditFilter;
 import org.forgerock.openam.utils.StringUtils;
 import org.restlet.Request;
-import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.ChallengeResponse;
+
+import java.util.Map;
 
 /**
  * Responsible for logging access audit events for UMA requests.
@@ -106,21 +106,12 @@ public class UMAAccessAuditFilter extends AbstractRestletAccessAuditFilter {
      * {@inheritDoc}
      */
     @Override
-    protected String getContextIdForAccessAttempt(Request request) {
-//        String contextId = super.getContextIdForAccessAttempt(request);
-//
-//        if (contextId != null) {
-//            return contextId;
-//        }
-//
-//        AccessToken accessToken = retrieveAccessToken(request);
-//
-//        contextId = generateContextID(accessToken);
-//
-//        AuditRequestContext.putProperty(CONTEXT_ID, contextId);
-//
-//        return contextId;
-        return null;
+    protected Map<String, String> getContextsForAccessAttempt(Request request) {
+        AccessToken accessToken = retrieveAccessToken(request);
+        String accessTokenContextId = generateContextID(accessToken);
+        AuditRequestContext.putProperty(Context.OAUTH2_ACCESS.toString(), accessTokenContextId);
+
+        return super.getContextsForAccessAttempt(request);
     }
 
     private String generateContextID(AccessToken accessToken) {

@@ -128,7 +128,7 @@ public class AbstractHttpAccessAuditFilterTest {
         assertThat(response.getCause()).isSameAs(auditException);
     }
 
-    //@Test(dataProvider = "handlerResponses")
+    @Test(dataProvider = "handlerResponses")
     public void shouldAuditAccessAttemptAndResult(Status responseStatus) throws AuditException {
 
         //Given
@@ -241,7 +241,7 @@ public class AbstractHttpAccessAuditFilterTest {
         assertThat(auditEvent).stringAt("transactionId").isNotNull();
         assertThat(auditEvent).stringAt("component").isEqualTo(AUTHENTICATION.toString());
         assertThat(auditEvent).stringAt("authentication/id").isEqualTo("USER_ID");
-        assertThat(auditEvent).stringAt("contexts").isEqualTo("{\"Session token\" : \"value\"}");
+        assertThat(auditEvent).hasObject("contexts").contains(SESSION.toString(), "value");
         assertThat(auditEvent).stringAt("client/host").isEqualTo("");
         assertThat(auditEvent).stringAt("client/ip").isEqualTo("REMOTE_ADDRESS");
         assertThat(auditEvent).integerAt("client/port").isEqualTo(9000);
