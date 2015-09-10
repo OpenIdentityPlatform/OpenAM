@@ -21,6 +21,7 @@ import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.getTok
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
+import org.forgerock.http.context.RequestAuditContext;
 import org.forgerock.json.resource.Request;
 import org.forgerock.http.Context;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
@@ -65,7 +66,7 @@ class CrestAuditor {
         this.auditEventFactory = auditEventFactory;
         this.context = context;
         this.request = request;
-        this.startTime = System.currentTimeMillis();
+        this.startTime = context.asContext(RequestAuditContext.class).getRequestReceivedTime();
     }
 
     /**

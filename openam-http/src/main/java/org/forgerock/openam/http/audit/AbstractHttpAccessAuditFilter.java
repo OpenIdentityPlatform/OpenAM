@@ -24,6 +24,7 @@ import org.forgerock.audit.AuditException;
 import org.forgerock.http.Context;
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
+import org.forgerock.http.context.RequestAuditContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
@@ -88,7 +89,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
         if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
-                    .timestamp(request.getTime())
+                    .timestamp(context.asContext(RequestAuditContext.class).getRequestReceivedTime())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
@@ -104,6 +105,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
         if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
+            final RequestAuditContext requestAuditContext = context.asContext(RequestAuditContext.class);
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -111,7 +113,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(response))
                     .contexts(getContextsForAccessOutcome(response))
-                    .response("SUCCESS", endTime - request.getTime())
+                    .response("SUCCESS", endTime - requestAuditContext.getRequestReceivedTime())
                     .forRequest(request, context);
 
             auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
@@ -129,7 +131,8 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(response))
                     .contexts(getContextsForAccessOutcome(response))
-                    .responseWithMessage("FAILED - " + response.getStatus().getCode(), endTime - request.getTime(),
+                    .responseWithMessage("FAILED - " + response.getStatus().getCode(),
+                            endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime(),
                             response.getStatus().getReasonPhrase())
                     .forRequest(request, context);
 
