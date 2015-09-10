@@ -23,39 +23,32 @@
  */
 
 /*global require, define */
-
 define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "jquery",
     "underscore",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration"
 ], function ($, _, Constants, Configuration) {
-
     /**
      * @exports org/forgerock/openam/ui/common/util/ThemeManager
      */
     var obj = {},
         promise = null,
-        defaultStyles = ["css/bootstrap-3.3.5-custom.css", "css/styles.css"],
-        applyThemeToPage = function (theme) {
+        applyThemeToPage = function (path, icon, stylesheets) {
             // We might be switching themes (due to a realm change) and so we need to clean up the previous theme.
             $("link").remove();
 
             $("<link/>", {
                 rel: "icon",
                 type: "image/x-icon",
-                href: require.toUrl(theme.path + theme.icon)
+                href: require.toUrl(path + icon)
             }).appendTo("head");
 
             $("<link/>", {
                 rel: "shortcut icon",
                 type: "image/x-icon",
-                href: require.toUrl(theme.path + theme.icon)
+                href: require.toUrl(path + icon)
             }).appendTo("head");
-
-            // If a user with the admin role is logged in, use the default theme
-            var useDefault = Configuration.loggedUser && _.contains(Configuration.loggedUser.roles, "ui-admin"),
-                stylesheets = useDefault ? defaultStyles : theme.stylesheets;
 
             _.each(stylesheets, function (stylesheet) {
                 $("<link/>", {
@@ -137,7 +130,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
         var theme = {},
             themeName, defaultTheme;
 
-        // find out if the theme has changed
+        // Determine if the theme has changed
         if (!force && Configuration.globalData.theme && getThemeForCurrentRealm() === Configuration.globalData.theme.name) {
             //no change so use the existing theme
             return $.Deferred().resolve(Configuration.globalData.theme);
@@ -168,7 +161,11 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                     });
                 }
 
-                applyThemeToPage(theme);
+                // If a user with the admin role is logged in, use the default stylesheets
+                var useDefault = Configuration.loggedUser && _.contains(Configuration.loggedUser.roles, "ui-admin"),
+                    stylesheets = useDefault ? Constants.DEFAULT_STYLESHEETS : theme.stylesheets;
+
+                applyThemeToPage(theme.path, theme.icon, stylesheets);
                 Configuration.globalData.theme = theme;
                 return theme;
             });
