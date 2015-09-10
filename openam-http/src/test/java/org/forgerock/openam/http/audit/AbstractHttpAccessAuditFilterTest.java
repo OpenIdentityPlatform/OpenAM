@@ -37,6 +37,7 @@ import org.forgerock.http.Handler;
 import org.forgerock.http.Session;
 import org.forgerock.http.context.ClientContext;
 import org.forgerock.http.context.AttributesContext;
+import org.forgerock.http.context.RequestAuditContext;
 import org.forgerock.http.context.RootContext;
 import org.forgerock.http.context.SessionContext;
 import org.forgerock.http.header.ContentTypeHeader;
@@ -90,9 +91,8 @@ public class AbstractHttpAccessAuditFilterTest {
     public void shouldNotAuditIfAuditingIsNotEnabledForAccessTopic(Status responseStatus) throws AuditException {
 
         //Given
-        Context context = mockContext();
+        Context context = new RequestAuditContext(mockContext());
         Request request = new Request()
-                .setTime(System.currentTimeMillis())
                 .setUri(URI.create("http://example.com"));
 
         disableAccessTopicAuditing();
@@ -109,9 +109,8 @@ public class AbstractHttpAccessAuditFilterTest {
     public void shouldReturnInternalServerErrorResponseWhenAuditingFails() throws AuditException {
 
         //Given
-        Context context = mockContext();
+        Context context = new RequestAuditContext(mockContext());
         Request request = new Request()
-                .setTime(System.currentTimeMillis())
                 .setUri(URI.create("http://example.com"));
 
         enableAccessTopicAuditing();
@@ -133,9 +132,8 @@ public class AbstractHttpAccessAuditFilterTest {
     public void shouldAuditAccessAttemptAndResult(Status responseStatus) throws AuditException {
 
         //Given
-        Context context = mockContext();
+        Context context = new RequestAuditContext(mockContext());
         Request request = new Request()
-                .setTime(System.currentTimeMillis())
                 .setMethod("GET")
                 .setUri(URI.create("http://example.com:8080?query=value"));
         request.getHeaders().putSingle(ContentTypeHeader.valueOf("CONTENT_TYPE"));

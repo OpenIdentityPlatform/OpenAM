@@ -31,6 +31,7 @@ import static org.mockito.Mockito.verify;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.http.Context;
+import org.forgerock.http.context.RequestAuditContext;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
@@ -88,7 +89,7 @@ public abstract class AbstractAuditFilterTest {
     protected void setUp() throws Exception {
         auditEventPublisher = mock(AuditEventPublisher.class);
         auditEventFactory = mockAuditEventFactory();
-        context = fakeContext();
+        context = new RequestAuditContext(fakeContext());
         queryResourceHandler = mock(QueryResourceHandler.class);
         filterChain = mock(RequestHandler.class);
         createRequest = newCreateRequest("mockResource", json(object()));
