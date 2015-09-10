@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.ServerException;
+
 /**
  * Models a OAuth2 resource owner.
  *
@@ -36,4 +38,11 @@ public interface ResourceOwner {
      * @return The authentication time in seconds.
      */
     long getAuthTime();
+
+    /**
+     * Gets the name of the user, if possible.
+     * @param settings The settings for the current realm.
+     * @return The name of the user, or null.
+     */
+    String getName(OAuth2ProviderSettings settings) throws ServerException;
 }

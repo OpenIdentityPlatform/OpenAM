@@ -133,7 +133,8 @@ public class AuthorizeResource extends RouterContextResource {
                     e.getRedirectUri().toString(), null);
         } catch (ResourceOwnerConsentRequired e) {
             return representation.getRepresentation(getContext(), request, "authorize.ftl",
-                    getDataModel(e.getClientName(), e.getClientDescription(), e.getScopeDescriptions(), request));
+                    getDataModel(e.getClientName(), e.getClientDescription(), e.getScopeDescriptions(), request,
+                            e.getUserDisplayName()));
         } catch (InvalidClientException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
@@ -154,9 +155,11 @@ public class AuthorizeResource extends RouterContextResource {
      * @param displayDescription The OAuth2 client's display description.
      * @param displayScope The description of the requested scope.
      * @param request
+     * @param userDisplayName
      * @return The data model.
      */
-    private Map<String, Object> getDataModel(String displayName, String displayDescription, Set<String> displayScope, OAuth2Request request) {
+    private Map<String, Object> getDataModel(String displayName, String displayDescription, Set<String> displayScope,
+            OAuth2Request request, String userDisplayName) {
         Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
         data.putAll(getQuery().getValuesMap());
         Reference resRef = getRequest().getResourceRef();
@@ -169,6 +172,7 @@ public class AuthorizeResource extends RouterContextResource {
         data.put("display_name", ESAPI.encoder().encodeForHTML(displayName));
         data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
         data.put("display_scope", encodeSetForHTML(displayScope));
+        data.put("user_name", userDisplayName);
         data.put("xui", xuiState.isXUIEnabled());
         data.put("baseUrl", baseURLProviderFactory.get(request.<String>getParameter("realm"))
                 .getURL(ServletUtils.getRequest(getRequest())));

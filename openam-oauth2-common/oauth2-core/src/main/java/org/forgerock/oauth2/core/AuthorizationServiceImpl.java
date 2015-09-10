@@ -132,7 +132,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             final String clientDescription = clientRegistration.getDisplayDescription(locale);
             final Set<String> scopeDescriptions = getScopeDescriptions(validatedScope,
                     clientRegistration.getScopeDescriptions(locale));
-            throw new ResourceOwnerConsentRequired(clientName, clientDescription, scopeDescriptions);
+            throw new ResourceOwnerConsentRequired(clientName, clientDescription, scopeDescriptions,
+                    resourceOwner.getName(providerSettings));
         }
 
         return tokenIssuer.issueTokens(request, clientRegistration, resourceOwner, scope, providerSettings);

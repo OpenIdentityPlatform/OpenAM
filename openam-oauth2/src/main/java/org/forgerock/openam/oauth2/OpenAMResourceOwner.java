@@ -16,9 +16,17 @@
 
 package org.forgerock.openam.oauth2;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.ResourceOwner;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Models a OpenAM OAuth2 resource owner.
@@ -33,8 +41,7 @@ public class OpenAMResourceOwner implements ResourceOwner {
 
     /**
      * Constructs a new OpenAMResourceOwner with their authTime set to now.
-     *
-     * @param id The resource owner's id.
+     *  @param id The resource owner's id.
      * @param amIdentity The resource owner's identity.
      */
     OpenAMResourceOwner(String id, AMIdentity amIdentity) {
@@ -43,8 +50,7 @@ public class OpenAMResourceOwner implements ResourceOwner {
 
     /**
      * Constructs a new OpenAMResourceOwner.
-     *
-     * @param id The resource owner's id.
+     *  @param id The resource owner's id.
      * @param amIdentity The resource owner's identity.
      * @param authTime Time the resource owner authenticated, in ms.
      */
@@ -68,6 +74,20 @@ public class OpenAMResourceOwner implements ResourceOwner {
     @Override
     public long getAuthTime() {
         return authTime;
+    }
+
+    @Override
+    public String getName(OAuth2ProviderSettings settings) throws ServerException {
+        try {
+            final String userDisplayNameAttribute = settings.getUserDisplayNameAttribute();
+            if (StringUtils.isNotBlank(userDisplayNameAttribute)) {
+                final Set<String> attribute = amIdentity.getAttribute(userDisplayNameAttribute);
+                return attribute.isEmpty() ? null : attribute.iterator().next();
+            }
+            return null;
+        } catch (IdRepoException | SSOException e) {
+            throw new ServerException(e);
+        }
     }
 
     /**

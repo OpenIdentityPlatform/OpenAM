@@ -44,7 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.guice.core.InjectorHolder;
@@ -834,6 +834,16 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             return getBooleanSetting(realm, OAuth2ProviderService.ALWAYS_ADD_CLAIMS_TO_TOKEN);
         } catch (SSOException | SMSException e) {
             logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public String getUserDisplayNameAttribute() throws ServerException {
+        try {
+            return getStringSetting(realm, OAuth2ProviderService.USER_DISPLAY_NAME_ATTRIBUTE);
+        } catch (SSOException | SMSException e) {
+            logger.error("Could not obtain display name", e);
             throw new ServerException(e);
         }
     }

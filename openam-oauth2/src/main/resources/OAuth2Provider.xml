@@ -149,6 +149,15 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="displayNameAttribute"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a1075">
+                    <DefaultValues>
+                        <Value>cn</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <AttributeSchema
                         name="forgerock-oauth2-provider-supported-scopes"
                         type="list"

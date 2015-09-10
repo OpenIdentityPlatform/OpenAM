@@ -864,6 +864,7 @@ public class OAuth2Constants {
         public static final String CODE_VERIFIER = "forgerock-oauth2-provider-code-verifier-enforced";
 
         public static final String ALWAYS_ADD_CLAIMS_TO_TOKEN = "alwaysAddClaimsToToken";
+        public static final String USER_DISPLAY_NAME_ATTRIBUTE = "displayNameAttribute";
     }
 
     /**

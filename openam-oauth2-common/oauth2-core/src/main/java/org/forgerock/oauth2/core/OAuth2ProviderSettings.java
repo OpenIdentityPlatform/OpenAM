@@ -455,4 +455,9 @@ public interface OAuth2ProviderSettings {
      * @see <a href="http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims">OpenID Connect Specification</a>
      */
     boolean isAlwaysAddClaimsToToken() throws ServerException;
+
+    /**
+     * The attribute that can be used to obtain a UI-displayable name for a user's AMIdentity.
+     */
+    String getUserDisplayNameAttribute() throws ServerException;
 }

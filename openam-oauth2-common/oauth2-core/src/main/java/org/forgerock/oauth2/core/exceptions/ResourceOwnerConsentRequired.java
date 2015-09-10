@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core.exceptions;
@@ -28,6 +28,7 @@ public class ResourceOwnerConsentRequired extends Exception {
     private final String clientName;
     private final String clientDescription;
     private final Set<String> scopeDesciptions;
+    private final String userDisplayName;
 
     /**
      * Constructs a new ResourceOwnerConsentRequired instance with the specified client name, description and scope
@@ -38,10 +39,11 @@ public class ResourceOwnerConsentRequired extends Exception {
      * @param scopeDescriptions The display descriptions of the requested scopes.
      */
     public ResourceOwnerConsentRequired(final String clientName, final String clientDescription,
-            final Set<String> scopeDescriptions) {
+            final Set<String> scopeDescriptions, String userDisplayName) {
         this.clientName = clientName;
         this.clientDescription = clientDescription;
         this.scopeDesciptions = scopeDescriptions;
+        this.userDisplayName = userDisplayName;
     }
 
     /**
@@ -51,6 +53,15 @@ public class ResourceOwnerConsentRequired extends Exception {
      */
     public String getClientName() {
         return clientName;
+    }
+
+    /**
+     * Gets the resource owner's display name.
+     *
+     * @return The name of the resource owner.
+     */
+    public String getUserDisplayName() {
+        return userDisplayName;
     }
 
     /**
