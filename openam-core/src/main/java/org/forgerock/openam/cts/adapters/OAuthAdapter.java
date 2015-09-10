@@ -15,20 +15,19 @@
  */
 package org.forgerock.openam.cts.adapters;
 
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.cts.api.fields.OAuthTokenField;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
-import org.forgerock.openam.cts.utils.JSONSerialisation;
-import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
-
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.cts.api.fields.OAuthTokenField;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
+import org.forgerock.openam.cts.utils.JSONSerialisation;
+import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
+import org.forgerock.openam.tokens.TokenType;
 
 /**
  * OAuth TokenAdapter provides conversion to and from OAuth JsonValue tokens.
@@ -121,8 +120,13 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
                         continue;
                     }
                     if (OAuthTokenField.EXPIRY_TIME.getOAuthField().equals(key)) {
+
                         if (!Collection.class.isAssignableFrom(value.getClass())) {
                             throw new IllegalStateException("Date must be in a collection");
+                        }
+
+                        if (isSetToNeverExpire((Collection<String>) value)) {
+                            continue;
                         }
                         value = oAuthValues.getDateValue((Collection<String>) value);
                     } else if (value instanceof Collection) {
@@ -144,6 +148,10 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
         blobUtils.setBlobFromString(token, serialisedObject);
 
         return token;
+    }
+
+    private boolean isSetToNeverExpire(Collection<String> value) {
+        return Long.parseLong(value.iterator().next()) == -1;
     }
 
     /**

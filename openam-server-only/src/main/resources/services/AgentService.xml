@@ -490,7 +490,7 @@
                     <AttributeSchema
                             name="com.forgerock.openam.oauth2provider.refreshTokenLifeTime"
                             type="single"
-                            syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                            syntax="number_range" rangeStart="-1" rangeEnd="2147483647"
                             i18nKey="a755">
                         <DefaultValues>
                             <Value>0</Value>

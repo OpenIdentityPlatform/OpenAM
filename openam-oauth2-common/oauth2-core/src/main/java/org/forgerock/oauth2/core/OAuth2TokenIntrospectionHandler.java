@@ -74,7 +74,8 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
                 field(OAuth2Constants.Params.CLIENT_ID, token.getClientId()),
                 field(USER_ID, token.getResourceOwnerId()),
                 field(TOKEN_TYPE, token instanceof AccessToken ? ACCESS_TOKEN_TYPE : REFRESH_TOKEN_TYPE),
-                field(OAuth2Constants.JWTTokenParams.EXP, token.getExpiryTime() / 1000),
+                field(OAuth2Constants.JWTTokenParams.EXP, token.getExpiryTime() == -1 ? null : (token.getExpiryTime
+                        () - System.currentTimeMillis()) / 1000),
                 field(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId()),
                 field(OAuth2Constants.JWTTokenParams.ISS, providerSettings.getIssuer())
         ));

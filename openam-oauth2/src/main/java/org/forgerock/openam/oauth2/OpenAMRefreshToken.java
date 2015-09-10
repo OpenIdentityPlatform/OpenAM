@@ -151,7 +151,7 @@ public class OpenAMRefreshToken extends RefreshToken {
         if (value != null && !value.isEmpty()) {
             return Long.parseLong(value.iterator().next());
         }
-        return 0;
+        return -1;
     }
 
     /**

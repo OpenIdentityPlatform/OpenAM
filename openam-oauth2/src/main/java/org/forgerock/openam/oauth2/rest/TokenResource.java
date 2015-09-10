@@ -33,6 +33,10 @@ import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN
 import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.shared.locale.Locale;
+import com.sun.identity.sm.SMSException;
+import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.net.HttpURLConnection;
@@ -56,7 +60,6 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.http.Context;
@@ -91,6 +94,7 @@ import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMOAuth2ProviderSettingsFactory;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.util.AsyncFunction;
@@ -99,11 +103,11 @@ import org.forgerock.util.query.QueryFilter;
 
 public class TokenResource implements CollectionResourceProvider {
 
-    private static final DateFormat DATE_FORMATTER = (new SimpleDateFormat()).getDateTimeInstance(DateFormat.MEDIUM,
-            DateFormat.SHORT);
     public static final String EXPIRE_TIME_KEY = "expireTime";
     public static final CoreTokenField USERNAME_FIELD = OAuthTokenField.USER_NAME.getField();
     public static final CoreTokenField REALM_FIELD = OAuthTokenField.REALM.getField();
+    public static final String INDEFINITELY = "Indefinitely";
+    public static final String INDEFINITE_TOKEN_STRING_PROPERTY_NAME = "indefiniteTokenString";
     private final ClientDAO clientDao;
 
     private final OAuthTokenStore tokenStore;
@@ -112,6 +116,7 @@ public class TokenResource implements CollectionResourceProvider {
     private static SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     private static String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
     private static AMIdentity adminUserId = null;
+    private final OpenAMSettings authServiceSettings;
 
     static {
         if (adminUser != null) {
@@ -124,11 +129,13 @@ public class TokenResource implements CollectionResourceProvider {
 
     @Inject
     public TokenResource(OAuthTokenStore tokenStore, ClientDAO clientDao, IdentityManager identityManager,
-            OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, @Named("frRest") Debug debug) {
+            OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, OpenAMSettings authServiceSettings,
+            @Named("frRest") Debug debug) {
         this.tokenStore = tokenStore;
         this.clientDao = clientDao;
         this.identityManager = identityManager;
         this.oAuth2ProviderSettingsFactory = oAuth2ProviderSettingsFactory;
+        this.authServiceSettings = authServiceSettings;
         this.debug = debug;
     }
 
@@ -384,7 +391,7 @@ public class TokenResource implements CollectionResourceProvider {
                 res = newResourceResponse("result", "1", val);
                 Client client = getClient(val);
 
-                val.put(EXPIRE_TIME_KEY, getExpiryDate(json(entry)));
+                val.put(EXPIRE_TIME_KEY, getExpiryDate(json(entry), context));
                 val.put(OAuth2Constants.ShortClientAttributeNames.DISPLAY_NAME.getType(), getClientName(client));
                 val.put(OAuth2Constants.ShortClientAttributeNames.SCOPES.getType(), getScopes(client, val,
                         acceptLanguage));
@@ -477,12 +484,13 @@ public class TokenResource implements CollectionResourceProvider {
         };
     }
 
-    private String getExpiryDate(JsonValue token) throws CoreTokenException, InternalServerErrorException, NotFoundException {
+    private String getExpiryDate(JsonValue token, Context context) throws CoreTokenException,
+            InternalServerErrorException, NotFoundException {
 
         OAuth2ProviderSettings oAuth2ProviderSettings;
+        final String realm = getAttributeValue(token, "realm");
         try {
-            oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(
-                    getAttributeValue(token, "realm"));
+            oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm, context);
         } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new NotFoundException(e.getMessage());
         }
@@ -490,21 +498,31 @@ public class TokenResource implements CollectionResourceProvider {
         try {
             if (token.isDefined("refreshToken")) {
                 if (oAuth2ProviderSettings.issueRefreshTokensOnRefreshingToken()) {
-                    return "Indefinitely";
+                    return getIndefinitelyString(context);
                 } else {
                     //Use refresh token expiry
                     JsonValue refreshToken = tokenStore.read(getAttributeValue(token, "refreshToken"));
                     long expiryTimeInMilliseconds = Long.parseLong(getAttributeValue(refreshToken, EXPIRE_TIME_KEY));
-                    return DATE_FORMATTER.format(new Date(expiryTimeInMilliseconds));
+
+                    if (expiryTimeInMilliseconds == -1) {
+                        return getIndefinitelyString(context);
+                    }
+
+                    return getDateFormat(context).format(new Date(expiryTimeInMilliseconds));
                 }
             } else {
                 //Use access token expiry
                 long expiryTimeInMilliseconds = Long.parseLong(getAttributeValue(token, EXPIRE_TIME_KEY));
-                return DATE_FORMATTER.format(new Date(expiryTimeInMilliseconds));
+                return getDateFormat(context).format(new Date(expiryTimeInMilliseconds));
             }
-        } catch (ServerException e) {
+        } catch (ServerException | SMSException | SSOException e) {
             throw new InternalServerErrorException(e);
         }
+    }
+
+    private DateFormat getDateFormat(Context context) throws SSOException, SMSException {
+        return (new SimpleDateFormat()).getDateTimeInstance(DateFormat.MEDIUM,
+                        DateFormat.SHORT, getLocale(context));
     }
 
     @Override
@@ -612,4 +630,22 @@ public class TokenResource implements CollectionResourceProvider {
         return identityManager.getResourceOwnerIdentity(token.getProperty("UserToken"), token.getProperty("Organization"));
     }
 
+    public String getIndefinitelyString(Context context) {
+        try {
+            return ResourceBundle.getBundle("TokenResource",
+                    getLocale(context)).getString(
+                    INDEFINITE_TOKEN_STRING_PROPERTY_NAME);
+        } catch (SSOException | SMSException e) {
+            debug.error("Error retrieving resource bundle: TokenResource");
+        }
+        return INDEFINITELY;
+    }
+
+    private java.util.Locale getLocale(Context context) throws SSOException, SMSException {
+        ISLocaleContext locale = new ISLocaleContext();
+        HttpContext httpContext = context.asContext(HttpContext.class);
+        locale.setLocale(httpContext);
+
+        return locale.getLocale();
+    }
 }

@@ -501,12 +501,16 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
         final String id = UUID.randomUUID().toString();
-        long expiryTime = 0;
+
+        final long lifeTime;
         if (clientRegistration == null) {
-            expiryTime = providerSettings.getRefreshTokenLifetime() + System.currentTimeMillis();
+            lifeTime = providerSettings.getRefreshTokenLifetime();
         } else {
-            expiryTime = clientRegistration.getRefreshTokenLifeTime(providerSettings) + System.currentTimeMillis();
+            lifeTime = clientRegistration.getRefreshTokenLifeTime(providerSettings);
         }
+
+        long expiryTime = lifeTime < 0 ? -1 : lifeTime + System.currentTimeMillis();
+
         AuthorizationCode token = request.getToken(AuthorizationCode.class);
         String authModules = null;
         String acr = null;

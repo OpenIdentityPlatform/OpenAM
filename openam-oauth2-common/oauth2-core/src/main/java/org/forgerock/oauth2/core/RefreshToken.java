@@ -235,12 +235,15 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
     }
 
     /**
-     * Determines if the Access Token is expired.
+     * Determines if the Refresh Token has expired.
      *
      * @return {@code true} if current time is greater than the expiry time.
      */
     public final boolean isExpired() {
-        return (System.currentTimeMillis() > getExpiryTime());
+        if (isNeverExpires()) {
+            return false;
+        }
+        return System.currentTimeMillis() > getExpiryTime();
     }
 
     /**
@@ -260,7 +263,16 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
         if (isDefined(OAuth2Constants.CoreTokenParams.EXPIRE_TIME)) {
             return get(OAuth2Constants.CoreTokenParams.EXPIRE_TIME).asLong();
         }
-        return 0;
+        return -1;
+    }
+
+    /**
+     * Get whether or not token expires.
+     *
+     * @return Whether or not token expires.
+     */
+    public boolean isNeverExpires() {
+        return getExpiryTime() == -1;
     }
 
     /**
@@ -318,7 +330,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
         final Map<String, Object> tokenMap = new HashMap<String, Object>();
         tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
         tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
-                (getExpiryTime() - System.currentTimeMillis()) / 1000);
+                getExpiryTime() == -1 ? null : (getExpiryTime() - System.currentTimeMillis()) / 1000);
         return tokenMap;
     }
 
@@ -329,7 +341,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
         final Map<String, Object> tokenInfo = new HashMap<String, Object>();
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
-                (getExpiryTime() - System.currentTimeMillis()) / 1000);
+                getExpiryTime() == -1 ? null : (getExpiryTime() - System.currentTimeMillis()) / 1000);
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
         return tokenInfo;
     }

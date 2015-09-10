@@ -42,7 +42,7 @@
 
                 <AttributeSchema name="forgerock-oauth2-provider-refresh-token-lifetime"
                                  type="single"
-                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 syntax="number_range" rangeStart="-1" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  i18nKey="a101" resourceName="refreshTokenLifetime">
                     <DefaultValues>
