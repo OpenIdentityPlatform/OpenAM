@@ -698,6 +698,8 @@ public final class ApplicationManager {
         readWriteLock.writeLock().lock();
 
         try {
+            newApplication.setCreationDate(oldApplication.getCreationDate());
+            newApplication.setCreatedBy(oldApplication.getCreatedBy());
             deleteApplication(subject, realm, oldApplication.getName());
             saveApplication(subject, realm, newApplication);
         } finally {
