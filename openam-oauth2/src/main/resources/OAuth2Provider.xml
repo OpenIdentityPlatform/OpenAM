@@ -298,7 +298,7 @@
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
                     </BooleanValues>
                     <DefaultValues>
-                        <Value>true</Value>
+                        <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
