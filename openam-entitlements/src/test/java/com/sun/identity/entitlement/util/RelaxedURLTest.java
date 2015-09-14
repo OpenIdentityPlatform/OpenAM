@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013-15 ForgeRock AS.
  */
 package com.sun.identity.entitlement.util;
 
@@ -67,6 +67,14 @@ public class RelaxedURLTest {
         assertEquals("/", url.getPath());
         assertEquals("a=b&c=d&e=f", url.getQuery());
         assertEquals("http://www.test.com:80/?a=b&c=d&e=f", url.toString());
+
+        url = new RelaxedURL("HTTP://WWW.TEST.COM/HELLO/WORLD/");
+        assertEquals("HTTP", url.getProtocol());
+        assertEquals("WWW.TEST.COM", url.getHostname());
+        assertEquals("80", url.getPort());
+        assertEquals("/HELLO/WORLD/", url.getPath());
+        assertEquals("", url.getQuery());
+        assertEquals("HTTP://WWW.TEST.COM:80/HELLO/WORLD/", url.toString());
     }
 
 }

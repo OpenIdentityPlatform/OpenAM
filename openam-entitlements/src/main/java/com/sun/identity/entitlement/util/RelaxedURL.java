@@ -24,7 +24,7 @@
  *
  * $Id: RelaxedURL.java,v 1.2 2009/10/20 18:46:16 veiming Exp $
  *
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement.util;
 
@@ -58,12 +58,12 @@ public class RelaxedURL {
     }
 
     private void parseURL(String url, int begins) {
-        if (protocol.equals(PROTOCOL_HTTP) || protocol.equals(PROTOCOL_HTTPS)) {
+        if (protocol.equalsIgnoreCase(PROTOCOL_HTTP) || protocol.equalsIgnoreCase(PROTOCOL_HTTPS)) {
             int colon = url.indexOf(":", begins);
             if (colon == -1) {
-                if (protocol.equals("http")) {
+                if (protocol.equalsIgnoreCase(PROTOCOL_HTTP)) {
                     port = "80";
-                } else if (protocol.equals("https")) {
+                } else if (protocol.equalsIgnoreCase(PROTOCOL_HTTPS)) {
                     port = "443";
                 }
 
