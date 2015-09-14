@@ -27,7 +27,10 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
 
     obj.deleteDevice = function (uuid) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/" + uuid),
+            url: RealmHelper.decorateURIWithSubRealm("users/" +
+                                                     Configuration.loggedUser.uid +
+                                                     "/devices/2fa/oath/" +
+                                                     uuid),
             method: "DELETE"
         });
     };
@@ -36,22 +39,27 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
         var skipOption = {};
         skipOption.value = statusDevice;
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/?_action=skip"),
+            url: RealmHelper.decorateURIWithRealm("users/" +
+                                                  Configuration.loggedUser.uid +
+                                                  "/devices/2fa/oath/?_action=skip"),
             data: JSON.stringify(skipOption),
             method: "POST"
         });
     };
 
     obj.getDevices = function () {
+        var path = "users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/";
         return $.when(
-            obj.serviceCall({ url: RealmHelper.decorateURIWithSubRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/?_queryFilter=true") }),
             obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/?_action=check"),
+                url: RealmHelper.decorateURIWithSubRealm(path + "?_queryFilter=true")
+            }),
+            obj.serviceCall({
+                url: RealmHelper.decorateURIWithRealm(path + "?_action=check"),
                 method: "POST"
             })
         ).then(function (devicesData, statusData) {
             devicesData[0].result.skipped = statusData[0].result;
-            return devicesData;
+            return devicesData[0];
         });
     };
 
