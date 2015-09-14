@@ -67,21 +67,27 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .forVersion(1, 2)
                 .toCollection(Key.get(IdentityResourceV1.class, Names.named("UsersResource")))
                 .forVersion(2, 1)
-                .toCollection(Key.get(IdentityResourceV2.class, Names.named("UsersResource")));
+                .toCollection(Key.get(IdentityResourceV2.class, Names.named("UsersResource")))
+                .forVersion(3, 0)
+                .toCollection(Key.get(IdentityResourceV3.class, Names.named("UsersResource")));
 
         realmRouter.route("groups")
                 .auditAs(GROUPS)
                 .forVersion(1, 2)
                 .toCollection(Key.get(IdentityResourceV1.class, Names.named("GroupsResource")))
                 .forVersion(2, 1)
-                .toCollection(Key.get(IdentityResourceV2.class, Names.named("GroupsResource")));
+                .toCollection(Key.get(IdentityResourceV2.class, Names.named("GroupsResource")))
+                .forVersion(3, 0)
+                .toCollection(Key.get(IdentityResourceV3.class, Names.named("GroupsResource")));
 
         realmRouter.route("agents")
                 .auditAs(POLICY_AGENT)
                 .forVersion(1, 2)
                 .toCollection(Key.get(IdentityResourceV1.class, Names.named("AgentsResource")))
                 .forVersion(2, 1)
-                .toCollection(Key.get(IdentityResourceV2.class, Names.named("AgentsResource")));
+                .toCollection(Key.get(IdentityResourceV2.class, Names.named("AgentsResource")))
+                .forVersion(3, 0)
+                .toCollection(Key.get(IdentityResourceV3.class, Names.named("AgentsResource")));
 
         realmRouter.route("users/{user}/devices/trusted")
                 .auditAs(DEVICES)

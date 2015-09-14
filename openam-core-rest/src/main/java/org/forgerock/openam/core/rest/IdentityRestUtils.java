@@ -17,11 +17,15 @@ package org.forgerock.openam.core.rest;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
+import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PermanentException;
@@ -29,7 +33,24 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.Context;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asMap;
+
 public final class IdentityRestUtils {
+
+    public static final String USER_TYPE = "user";
+    public static final String GROUP_TYPE = "group";
+    public static final String AGENT_TYPE = "agent";
+
+    public final static String UNIVERSAL_ID = "universalid";
+    public final static String FIELD_MAIL = "mail";
+
+    public static final String USERNAME = "username";
 
     private static final Debug debug = Debug.getInstance("frRest");
 
@@ -56,4 +77,39 @@ public final class IdentityRestUtils {
             }
         }
     }
+
+    public static Map<String, Set<String>> getIdentityServicesAttributes(String realm, String objectType) {
+        Map<String, Set<String>> identityServicesAttributes = new HashMap<>();
+        identityServicesAttributes.put("objecttype", Collections.singleton(objectType));
+        identityServicesAttributes.put("realm", Collections.singleton(realm));
+        return identityServicesAttributes;
+    }
+
+    public static SSOToken getSSOToken(String ssoTokenId) throws SSOException {
+        SSOTokenManager mgr = SSOTokenManager.getInstance();
+        return mgr.createSSOToken(ssoTokenId);
+    }
+
+    /**
+     * Returns a JsonValue containing appropriate identity details.  Package private for IdentityResourceV2.
+     *
+     * @param details The IdentityDetails of a Resource
+     * @return The JsonValue Object
+     */
+    public static JsonValue identityDetailsToJsonValue(IdentityDetails details) {
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+        try {
+            result.put(USERNAME, details.getName());
+            result.put("realm", details.getRealm());
+            Map<String, Set<String>> attrs = asMap(details.getAttributes());
+
+            for (Map.Entry<String, Set<String>>aix : attrs.entrySet()) {
+                result.put(aix.getKey(), aix.getValue());
+            }
+            return result;
+        } catch (final Exception e) {
+            throw new JsonValueException(result);
+        }
+    }
+
 }

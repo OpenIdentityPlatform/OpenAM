@@ -54,6 +54,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.utils.CrestQuery;
 
 /**
  * The class <code> AMIdentityRepository </code> represents an object to access
@@ -62,13 +63,13 @@ import com.sun.identity.sm.SMSException;
  * and delete identities. An instance of this class can be obtained in the
  * following manner:
  * <p>
- * 
+ *
  * <PRE>
- * 
+ *
  * AMIdentityRepository idRepo = new AMIdentityRepository(ssoToken, realmName);
- * 
+ *
  * </PRE>
- * 
+ *
  * @supported.api
  */
 public final class AMIdentityRepository {
@@ -87,7 +88,7 @@ public final class AMIdentityRepository {
      * Constructor for the <code>AMIdentityRepository</code> object. If a null
      * is passed for the organization identifier <code>realmName</code>, then
      * the "root" realm is assumed.
-     * 
+     *
      * @param ssotoken
      *            Single sign on token of the user
      * @param realmName
@@ -147,10 +148,10 @@ public final class AMIdentityRepository {
 
     /**
      * @supported.api
-     * 
+     *
      * Returns the set of supported object types <code>IdType</code> for this
      * deployment. This is not realm specific.
-     * 
+     *
      * @return Set of supported <code> IdType </code> objects.
      * @throws IdRepoException
      *             if there are repository related error conditions.
@@ -166,11 +167,11 @@ public final class AMIdentityRepository {
 
     /**
      * @supported.api
-     * 
+     *
      * Returns the set of Operations for a given <code>IdType</code>,
      * <code>IdOperations</code> that can be performed on an Identity. This
      * varies for each organization (and each plugin?).
-     * 
+     *
      * @param type
      *            Type of identity
      * @return Set of <code>IdOperation</code> objects.
@@ -186,11 +187,11 @@ public final class AMIdentityRepository {
     }
 
     /**
-     * 
+     *
      * Return the special identities for this realm for a given type. These
      * identities cannot be deleted and hence have to be shown in the admin
      * console as non-deletable.
-     * 
+     *
      * @param type
      *            Type of the identity
      * @return IdSearchResult
@@ -202,14 +203,14 @@ public final class AMIdentityRepository {
     public IdSearchResults getSpecialIdentities(IdType type)
             throws IdRepoException, SSOException {
 
-        IdSearchResults results = getSpecialIdentities(token, type, 
+        IdSearchResults results = getSpecialIdentities(token, type,
                 organizationDN);
 
         if (type.equals(IdType.USER)) {
             // Iterating through to get out the names and remove only amadmin
             // anonymous as per AM console requirement.
 
-            IdSearchResults newResults = new IdSearchResults(type, 
+            IdSearchResults newResults = new IdSearchResults(type,
                     organizationDN);
             Set identities = results.getSearchResults();
             if ((identities != null) && !identities.isEmpty()) {
@@ -218,7 +219,7 @@ public final class AMIdentityRepository {
                     String remUser = amid.getName().toLowerCase();
                     if (!remUser.equalsIgnoreCase(IdConstants.AMADMIN_USER)
                             && !remUser.equalsIgnoreCase(
-                                    IdConstants.ANONYMOUS_USER)) 
+                                    IdConstants.ANONYMOUS_USER))
                     {
                         newResults.addResult(amid, Collections.EMPTY_MAP);
                     }
@@ -232,7 +233,7 @@ public final class AMIdentityRepository {
     /**
      * Searches for identities of a certain type. The iterator returns
      * AMIdentity objects for use by the application.
-     * 
+     *
      * @deprecated This method is deprecated. Use
      *             {@link #searchIdentities(IdType type,String pattern,
      *             IdSearchControl ctrl)}
@@ -266,6 +267,7 @@ public final class AMIdentityRepository {
             Map avPairs, boolean recursive, int maxResults, int maxTime,
             Set returnAttributes, boolean returnAllAttributes)
             throws IdRepoException, SSOException {
+
         IdSearchControl crtl = new IdSearchControl();
         crtl.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
         crtl.setRecursive(recursive);
@@ -273,17 +275,18 @@ public final class AMIdentityRepository {
         crtl.setTimeOut(maxTime);
         crtl.setReturnAttributes(returnAttributes);
         crtl.setAllReturnAttributes(returnAllAttributes);
-        
+
         // Call search method that takes IdSearchControl
-        return searchIdentities(type, pattern, crtl);
+        CrestQuery crestQuery = new CrestQuery(pattern);
+        return searchIdentities(type, crestQuery, crtl);
     }
 
     /**
      * @supported.api
-     * 
+     *
      * Searches for identities of certain types from each plugin and returns a
-     * combined result
-     * 
+     * combined result.
+     *
      * <b>Note:</b> The AMIdentity objects representing IdType.REALM can be
      * used for services related operations only. The realm <code>AMIdentity
      * </code> object can be used to assign and unassign services containing
@@ -304,26 +307,65 @@ public final class AMIdentityRepository {
      * @throws SSOException
      *             if user's single sign on token is invalid.
      */
-    public IdSearchResults searchIdentities(IdType type, String pattern,
-            IdSearchControl ctrl) throws IdRepoException, SSOException {
+    public IdSearchResults searchIdentities(IdType type, String pattern, IdSearchControl ctrl)
+            throws IdRepoException, SSOException {
+
+        CrestQuery crestQuery = new CrestQuery(pattern);
+        return searchIdentities(type, crestQuery, ctrl);
+    }
+
+    /**
+     * Searches for identities of certain types from each plugin and returns a
+     * combined result
+     *
+     * <b>Note:</b> The AMIdentity objects representing IdType.REALM can be
+     * used for services related operations only. The realm <code>AMIdentity
+     * </code> object can be used to assign and unassign services containing
+     * dynamic attributes to this realm.
+     *
+     * @param type
+     *            Type of identity being searched for.
+     * @param crestQuery
+     *            Basically just an object which supports both _queryId and _queryFilter
+     * @param ctrl
+     *            IdSearchControl which can be used to set up various search
+     *            controls on the search to be performed.
+     * @return Returns the combined results in an object IdSearchResults.
+     * @see com.sun.identity.idm.IdSearchControl
+     * @see com.sun.identity.idm.IdSearchResults
+     * @throws IdRepoException
+     *             if there are repository related error conditions.
+     * @throws SSOException
+     *             if user's single sign on token is invalid.
+     */
+    public IdSearchResults searchIdentities(IdType type, CrestQuery crestQuery, IdSearchControl ctrl)
+            throws IdRepoException, SSOException {
+
         IdSearchResults idSearchResults = null;
 
         if (type.equals(IdType.REALM)) {
+
+            if (crestQuery.hasQueryFilter()) {
+                throw new IdRepoException("realm searchIdentities does not support query filters");
+            }
+
             try {
                 idSearchResults = new IdSearchResults(type, idRealmName);
                 OrganizationConfigManager orgMgr =
                     new OrganizationConfigManager(token, idRealmName);
+
+                // Realm searches only support _queryId
+                String pattern = crestQuery.getQueryId();
+
                 Set realmNames = orgMgr.getSubOrganizationNames(pattern, false);
                 if (realmNames != null) {
-                    Iterator iter = realmNames.iterator();
-                    while (iter.hasNext()) {
-                        String realmName = (String) iter.next();
+                    Iterator iterator = realmNames.iterator();
+                    while (iterator.hasNext()) {
+                        String realmName = (String) iterator.next();
 
-                        AMIdentity realmIdentity = getSubRealmIdentity(
-                                realmName);
+                        AMIdentity realmIdentity = getSubRealmIdentity(realmName);
                         Map attributes = new HashMap();
-                        // TODO: To add attribute support to realms.
-                        // Un comment this part once the support is added.
+
                         idSearchResults.addResult(realmIdentity, attributes);
                         idSearchResults.setErrorCode(IdSearchResults.SUCCESS);
                     }
@@ -335,25 +377,21 @@ public final class AMIdentityRepository {
                 throw new IdRepoException(sme.getMessage());
             }
         } else {
-            IdServices idServices =
-                IdServicesFactory.getDataStoreServices();
+            IdServices idServices = IdServicesFactory.getDataStoreServices();
 
-            idSearchResults = idServices.search(token, type, pattern, ctrl,
-                    organizationDN);
+            idSearchResults = idServices.search(token, type, ctrl, organizationDN, crestQuery);
         }
-
         return idSearchResults;
-
     }
 
     /**
      * @supported.api
-     * 
+     *
      * Returns a handle of the Identity object representing this
      * realm for services related operations only. This <code> AMIdentity
      * </code> object can be used to assign and unassign services containing
      * dynamic attributes to this realm
-     * 
+     *
      * @return a handle of the Identity object.
      * @throws IdRepoException
      *             if there are repository related error conditions.
@@ -390,7 +428,7 @@ public final class AMIdentityRepository {
      *
      * Creates a single object of a type. The object is
      * created in all the plugins that support creation of this type of object.
-     * 
+     *
      * This method is only valid for:
      *
      * <ol>
@@ -407,7 +445,7 @@ public final class AMIdentityRepository {
      * </code> object can be used to assign and unassign services containing
      * dynamic attributes to this realm
      *
-     * 
+     *
      * @param type
      *            <code>IdType</code> of object to be created.
      * @param idName
@@ -429,10 +467,10 @@ public final class AMIdentityRepository {
 
     /**
      * @supported.api
-     * 
+     *
      * Creates multiple objects of the same type. The objects are created in all
      * the <code>IdRepo</code> plugins that support creation of these objects.
-     * 
+     *
      * This method is only valid for:
      *
      * <ol>
@@ -448,7 +486,7 @@ public final class AMIdentityRepository {
      * used for services related operations only. This <code> AMIdentity
      * </code> object can be used to assign and unassign services containing
      * dynamic attributes to this realm.
-     * 
+     *
      * @param type
      *            Type of object to be created
      * @param identityNamesAndAttrs
@@ -481,17 +519,17 @@ public final class AMIdentityRepository {
 
     /**
      * @supported.api
-     * 
+     *
      * Deletes identities. The Set passed is a set of <code>AMIdentity</code>
      * objects.
-     * 
+     *
      * This method is only valid for:
      * <ol>
      * <li> {@link IdType#AGENT IdType.AGENT} </li>
      * <li> {@link IdType#REALM IdType.REALM} </li>
      * <li> (@link IdType#USER IdType.USER} </li>
      * </ol>
-     * 
+     *
      * @param type Type of Identity to be deleted.
      * @param identities Set of <code>AMIdentity</code> objects to be deleted.
      * @throws IdRepoException if there are repository related error conditions.
@@ -506,17 +544,17 @@ public final class AMIdentityRepository {
 
     /**
      * @supported.api
-     * 
+     *
      * Deletes identities. The Set passed is a set of <code>AMIdentity</code>
      * objects.
-     * 
+     *
      * This method is only valid for:
      * <ol>
      * <li> {@link IdType#AGENT IdType.AGENT} </li>
      * <li> {@link IdType#REALM IdType.REALM} </li>
      * <li> (@link IdType#USER  IdType.USER}  </li>
      * </ol>
-     * 
+     *
      * @param identities Set of <code>AMIdentity</code> objects to be deleted
      * @throws IdRepoException if there are repository related error conditions.
      * @throws SSOException if user's single sign on token is invalid.
@@ -541,11 +579,11 @@ public final class AMIdentityRepository {
      * store has successfully authenticated the identity with the provided
      * credentials. In case the data store requires additional credentials, the
      * list would be returned via the <code>IdRepoException</code> exception.
-     * 
+     *
      * @param credentials
      *            Array of callback objects containing information such as
      *            username and password.
-     * 
+     *
      * @return <code>true</code> if data store authenticates the identity;
      *         else <code>false</code>
      */
@@ -557,12 +595,12 @@ public final class AMIdentityRepository {
 
     /**
      * @supported.api
-     * 
+     *
      * Adds a listener, which should receive notifications for all changes that
      * occurred in this organization.
-     * 
+     *
      * This method is only valid for IdType User and Agent.
-     * 
+     *
      * @param listener
      *            The callback which implements <code>AMEventListener</code>.
      * @return Integer identifier for this listener.
@@ -581,10 +619,10 @@ public final class AMIdentityRepository {
 
     /**
      * @supported.api
-     * 
+     *
      * Removes listener as the application is no longer interested in receiving
      * notifications.
-     * 
+     *
      * @param identifier
      *            Integer identifying the listener.
      */
@@ -599,7 +637,7 @@ public final class AMIdentityRepository {
 
     /**
      * @supported.api
-     * 
+     *
      * Clears the cache.
      */
     public static void clearCache() {
@@ -614,7 +652,7 @@ public final class AMIdentityRepository {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
         return idServices.getSpecialIdentities(token, type, orgName);
     }
-    
+
     /**
      * Return String representation of the <code>AMIdentityRepository
      * </code> object. It returns realm name.
@@ -663,7 +701,7 @@ public final class AMIdentityRepository {
         Map resultsMap = new CaseInsensitiveHashMap();
         int errorCode = IdSearchResults.SUCCESS;
         if (amsdkIncluded) {
-            RepoSearchResults amsdkRepoRes = (RepoSearchResults) 
+            RepoSearchResults amsdkRepoRes = (RepoSearchResults)
                 amsdkResults[0][0];
             Set results = amsdkRepoRes.getSearchResults();
             Map attrResults = amsdkRepoRes.getResultAttributes();
@@ -752,7 +790,7 @@ public final class AMIdentityRepository {
                              * create a new Set so that we do not alter the set
                              * that is referenced in setOfMaps
                              */
-                            resultSet = new HashSet((Set) 
+                            resultSet = new HashSet((Set)
                                     currMap.get(thisAttr));
                             resultMap.put(thisAttr, resultSet);
                         }

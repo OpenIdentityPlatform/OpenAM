@@ -23,6 +23,8 @@ import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.rest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.rest.RestUtils.isAdmin;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.getSSOToken;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.identityDetailsToJsonValue;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
@@ -99,6 +101,7 @@ import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.AsyncFunction;
@@ -614,11 +617,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
-    SSOToken getSSOToken(String ssoTokenId) throws SSOException {
-        SSOTokenManager mgr = SSOTokenManager.getInstance();
-        return mgr.createSSOToken(ssoTokenId);
-    }
-
     /**
      * Generates the e-mail contents based on the incoming request.
      *
@@ -661,7 +659,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             Map<String, Set<String>> searchAttributes = getIdentityServicesAttributes(realm);
             searchAttributes.putAll(getAttributeFromRequest(jsonBody));
 
-            List searchResults = identityServices.search(null, searchAttributes, adminToken);
+            List searchResults = identityServices.search(new CrestQuery(""), searchAttributes, adminToken);
 
             if (searchResults.isEmpty()) {
                 throw new NotFoundException("User not found");
@@ -1176,28 +1174,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     }
 
     /**
-     * Returns a JsonValue containing appropriate identity details
-     *
-     * @param details The IdentityDetails of a Resource
-     * @return The JsonValue Object
-     */
-    private JsonValue identityDetailsToJsonValue(IdentityDetails details) {
-        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-        try {
-            result.put(USERNAME, details.getName());
-            result.put("realm", details.getRealm());
-            Map<String, Set<String>> attrs = asMap(details.getAttributes());
-
-            for (Map.Entry<String, Set<String>>aix : attrs.entrySet()) {
-                result.put(aix.getKey(), aix.getValue());
-            }
-            return result;
-        } catch (final Exception e) {
-            throw new JsonValueException(result);
-        }
-    }
-
-    /**
      * Returns an IdentityDetails from a JsonValue
      *
      * @param jVal The JsonValue Object to be converted
@@ -1257,17 +1233,16 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
 
-        String queryFilter;
-
         try {
             SSOToken admin = getSSOToken(getCookieFromServerContext(context));
             // This will only return 1 user..
             // getQueryFilter() is not implemented yet..returns dummy false value
-            queryFilter = request.getQueryId();
-            if (queryFilter == null || queryFilter.isEmpty()) {
-                queryFilter = "*";
+            String queryId = request.getQueryId();
+            if (queryId == null || queryId.isEmpty()) {
+                queryId = "*";
             }
-            List<String> users = identityServices.search(queryFilter, getIdentityServicesAttributes(realm), admin);
+            List<String> users = identityServices.search(new CrestQuery(queryId),
+                                                         getIdentityServicesAttributes(realm), admin);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.queryCollection :: QUERY performed on realm={}  by principalName={}", realm,
                     principalName);
@@ -1330,7 +1305,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
-    private JsonValue addRoleInformation(Context context, String resourceId, JsonValue value) {
+    /*
+     * package private for visibility to IdentityResourceV2.
+     */
+    JsonValue addRoleInformation(Context context, String resourceId, JsonValue value) {
         if (isAdmin(context) && authenticatedUserMatchesUserProfile(context, resourceId)) {
             value.put("roles", array("ui-admin"));
         }

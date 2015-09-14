@@ -59,7 +59,9 @@ import org.forgerock.openam.idrepo.ldap.helpers.DirectoryHelper;
 import org.forgerock.openam.idrepo.ldap.psearch.DJLDAPv3PersistentSearch;
 import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdapFromJsonQueryFilterVisitor;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
@@ -166,7 +168,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
     private Cache dnCache;
     // provides a switch to enable/disable the dnCache
     private boolean dnCacheEnabled = false;
-    
+
     private boolean isSecure = false;
     private boolean useStartTLS = false;
 
@@ -1077,10 +1079,11 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
      * Performs a search in the directory based on the provided parameters.
      * Using the pattern and avPairs parameters an example search filter would look something like:
      * <code>(&(|(attr1=value1)(attr2=value2))(searchAttr=pattern)(objectclassfilter))</code>.
-     * 
+     *
      * @param token Not used.
      * @param type The type of the identity.
-     * @param pattern The pattern to be used in the search filter as the search attribute value.
+     * @param crestQuery Either a string, coming from something like the CREST endpoint _queryId or a fully
+     *                        fledged query filter, coming from a CREST endpoint's _queryFilter
      * @param maxTime The time limit for this search (in seconds). When maxTime &lt; 1, the default time limit will
      * be used.
      * @param maxResults The number of maximum results we should receive for this search. When maxResults &lt; 1 the
@@ -1095,23 +1098,38 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
      * @throws IdRepoException Shouldn't be thrown as the returned RepoSearchResults will contain the error code.
      */
     @Override
-    public RepoSearchResults search(SSOToken token, IdType type, String pattern, int maxTime, int maxResults,
-            Set<String> returnAttrs, boolean returnAllAttrs, int filterOp, Map<String, Set<String>> avPairs, boolean recursive)
+    public RepoSearchResults search(SSOToken token, IdType type, CrestQuery crestQuery, int maxTime,
+                                    int maxResults, Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
+                                    Map<String, Set<String>> avPairs, boolean recursive)
             throws IdRepoException {
+
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("search invoked with type: " + type + " pattern: " + pattern + " avPairs: " + avPairs
-                    + " maxTime: " + maxTime + " maxResults: " + maxResults + " returnAttrs: " + returnAttrs
-                    + " returnAllAttrs: " + returnAllAttrs + " filterOp: " + filterOp + " recursive: " + recursive);
+            DEBUG.message("search invoked with type: " + type
+                    + " crestQuery: " + crestQuery
+                    + " avPairs: " + avPairs
+                    + " maxTime: " + maxTime
+                    + " maxResults: " + maxResults
+                    + " returnAttrs: " + returnAttrs
+                    + " returnAllAttrs: " + returnAllAttrs
+                    + " filterOp: " + filterOp
+                    + " recursive: " + recursive);
         }
         DN baseDN = getBaseDN(type);
-        //Recursive is a deprecated setting on IdSearchControl, hence we should use the searchscope defined in the
-        //datastore configuration.
+        // Recursive is a deprecated setting on IdSearchControl, hence we should use the searchscope defined in the
+        // datastore configuration.
         SearchScope scope = defaultScope;
 
         String searchAttr = getSearchAttribute(type);
         String[] attrs;
+        Filter first;
 
-        Filter filter = Filter.and(Filter.valueOf(searchAttr + "=" + pattern), getObjectClassFilter(type));
+        if (crestQuery.hasQueryId()) {
+            first = Filter.valueOf(searchAttr + "=" + crestQuery.getQueryId());
+        } else {
+            first = crestQuery.getQueryFilter().accept(new LdapFromJsonQueryFilterVisitor(), null);
+        }
+
+        Filter filter = Filter.and(first, getObjectClassFilter(type));
         Filter tempFilter = constructFilter(filterOp, avPairs);
         if (tempFilter != null) {
             filter = Filter.and(tempFilter, filter);
@@ -1916,7 +1934,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
      * @param serviceName The name of the service that needs to be modified.
      * @param sType The type of the service schema.
      * @param attrMap The attributes that needs to be set for the service.
-     * @throws IdRepoException If the type was invalid, or if there was an error while setting the service attributes. 
+     * @throws IdRepoException If the type was invalid, or if there was an error while setting the service attributes.
      */
     @Override
     public void modifyService(SSOToken token, IdType type, String name, String serviceName,

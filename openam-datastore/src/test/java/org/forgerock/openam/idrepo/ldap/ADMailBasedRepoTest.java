@@ -20,6 +20,7 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
 import static org.fest.assertions.Assertions.*;
 
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.MapHelper;
 import org.forgerock.opendj.ldap.MemoryBackend;
 import org.forgerock.opendj.ldap.RequestContext;
@@ -57,8 +58,9 @@ public class ADMailBasedRepoTest extends IdRepoTestBase {
     public void canAuthenticateWithMailAttribute() throws Exception {
         assertThat(idrepo.authenticate(getCredentials(DEMO_MAIL, "changeit"))).isTrue();
         //simulate profile lookup
+        CrestQuery crestQuery = new CrestQuery(DEMO_MAIL);
         RepoSearchResults results =
-                idrepo.search(null, IdType.USER, DEMO_MAIL, 0, 0, null, true, IdRepo.OR_MOD, null, true);
+                idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.OR_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
         assertThat(results.getType()).isEqualTo(IdType.USER);
         assertThat(results.getSearchResults()).isNotEmpty().hasSize(1).containsOnly(DEMO_MAIL);
@@ -66,8 +68,9 @@ public class ADMailBasedRepoTest extends IdRepoTestBase {
 
     @Test(description = "OPENAM-3428")
     public void searchReturnsSearchAttributeValues() throws Exception {
+        CrestQuery crestQuery = new CrestQuery(DEMO_MAIL);
         RepoSearchResults results =
-                idrepo.search(null, IdType.USER, DEMO_MAIL, 0, 0, null, true, IdRepo.OR_MOD, null, true);
+                idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.OR_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
         assertThat(results.getType()).isEqualTo(IdType.USER);
         assertThat(results.getSearchResults()).isNotEmpty().hasSize(1).containsOnly(DEMO_MAIL);

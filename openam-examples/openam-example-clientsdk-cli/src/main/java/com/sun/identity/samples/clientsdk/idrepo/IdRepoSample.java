@@ -44,10 +44,10 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdType;
 
 /**
- * This class 
+ * This class
  *
  *
- * @author 
+ * @author
  */
 public class IdRepoSample {
     static final String DEF_USERNAME = "amAdmin";
@@ -114,8 +114,7 @@ public class IdRepoSample {
 
         System.out.println ("getting subrealms");
         try {
-            currentSubRealms = (idRepo.searchIdentities(IdType.REALM,
-                "*", new IdSearchControl())).getSearchResults();
+            currentSubRealms = (idRepo.searchIdentities(IdType.REALM, "*", new IdSearchControl())).getSearchResults();
         } catch (SSOException ssoe) {
             System.err.println (
                 "doCurrentRealm: SSOException getting subrealms for '" +

@@ -57,62 +57,63 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SchemaType;
+import org.forgerock.openam.utils.CrestQuery;
 
 /**
  * This class stores identity information in a database
  */
 public class DatabaseRepo extends IdRepo {
-    
+
     //??can change later to another logfile but in merge list so keep for now ??
     private static Debug debug = Debug.getInstance("amIdRepoDatabase");
-    
+
        // Class name used in exception messages
-    private static final String PLUGIN_CLASS_NAME = 
+    private static final String PLUGIN_CLASS_NAME =
         "com.sun.identity.idm.plugins.database.DatabaseRepo";
-            
-    // SMS Configurations, names of schema elements in idRepoService.xml. 
+
+    // SMS Configurations, names of schema elements in idRepoService.xml.
     // Each of these schema element names is the element that holds the actual
     // value for some configuration info, such as DB connection info.
-    
+
     // idRepoService.xml schema element name for list of IdTypes and the
-    //opeartions each is allowed to do    
+    //opeartions each is allowed to do
      private static final String SUPPORTED_OPERATIONS_SCHEMA_NAME =
             "sun-opensso-database-sunIdRepoSupportedOperations";
-    
+
     // idRepoService.xml schema element name for user data access object DAO
     // class name. Used by factory method to bind to a DAO implementation
-    private static final String DAO_PLUGIN_CLASS_NAME_SCHEMA_NAME = 
+    private static final String DAO_PLUGIN_CLASS_NAME_SCHEMA_NAME =
             "sun-opensso-database-dao-class-name";
-    
+
     // idRepoService.xml schema element name for database data source name
     //determines whether to use JNDI of JBDC to get connetcions to datasoure
-    private static final String JDBC_CONNECTION_TYPE_SCHEMA_NAME = 
+    private static final String JDBC_CONNECTION_TYPE_SCHEMA_NAME =
             "sun-opensso-database-dao-JDBCConnectionType";
-    
+
     // idRepoService.xml schema element name for database data source name
     //this code uses a DataSource so does not need the DB username and password
     //in code for connections, since it is in config of appserver env in web.xml
-    private static final String DATASOURCE_SCHEMA_NAME = 
+    private static final String DATASOURCE_SCHEMA_NAME =
             "sun-opensso-database-DataSourceJndiName";
-    
-    // idRepoService.xml schema element name for JDBC class to use to get 
+
+    // idRepoService.xml schema element name for JDBC class to use to get
     // connections to the db
-    private static final String JDBC_DRIVER_SCHEMA_NAME = 
+    private static final String JDBC_DRIVER_SCHEMA_NAME =
             "sun-opensso-database-JDBCDriver";
-    
-    // idRepoService.xml schema element name for url of JDBC driver 
-    private static final String JDBC__DRIVER_URL_SCHEMA_NAME = 
+
+    // idRepoService.xml schema element name for url of JDBC driver
+    private static final String JDBC__DRIVER_URL_SCHEMA_NAME =
             "sun-opensso-database-JDBCUrl";
-    
-    // idRepoService.xml schema element name for username for JDBC driver 
-    private static final String JDBC_USER_NAME_SCHEMA_NAME = 
+
+    // idRepoService.xml schema element name for username for JDBC driver
+    private static final String JDBC_USER_NAME_SCHEMA_NAME =
             "sun-opensso-database-JDBCDbuser";
-    
-    // idRepoService.xml schema element name for password for JDBC driver 
-    private static final String JDBC__DRIVER_PASSWORD_SCHEMA_NAME = 
+
+    // idRepoService.xml schema element name for password for JDBC driver
+    private static final String JDBC__DRIVER_PASSWORD_SCHEMA_NAME =
             "sun-opensso-database-JDBCDbpassword";
-      
- 
+
+
     //wont use for now
     //idRepoService.xml schema element name for list of attributes to be hashed
     //private static final String ATTRIBUTES_TO_BE_HASHED_SCHEMA_NAME = "sun-opensso-database-HashAttrs";
@@ -120,116 +121,116 @@ public class DatabaseRepo extends IdRepo {
     //wont use for now
     // idRepoService.xml schema element name for list of attributes to be encrypted
     //private static final String ATTRIBUTES_TO_BE_ENCRYPTED_SCHEMA_NAME = "sun-opensso-database-EncryptAttrs";
-    
+
      // idRepoService.xml schema element name for user database table name
-    private static final String USER_DB_TABLE_NAME_SCHEMA_NAME = 
+    private static final String USER_DB_TABLE_NAME_SCHEMA_NAME =
             "sun-opensso-database-UserTableName";
     // idRepoService.xml schema element name for password attribute
-    private static final String USER_PASSWORD_SCHEMA_NAME = 
+    private static final String USER_PASSWORD_SCHEMA_NAME =
             "sun-opensso-database-UserPasswordAttr";
     // idRepoService.xml schema element name for userID attribute
-    private static final String USER_ID_SCHEMA_NAME = 
+    private static final String USER_ID_SCHEMA_NAME =
             "sun-opensso-database-UserIDAttr";
-       
-        // ???? Status attribute   ??? is this status used for users, roles, groups,    
+
+        // ???? Status attribute   ??? is this status used for users, roles, groups,
     private static final String USER_STATUS_SCHEMA_NAME =
-            "sun-opensso-database-UserStatusAttr";  
+            "sun-opensso-database-UserStatusAttr";
     // idRepoService.xml schema element name for user status active value
     //for example the value could be "Active" or whatever is specified in
     //idReposervices.xml under this attribute
     private static final String USER_STATUS_ACTIVE_VALUE_SCHEMA_NAME =
-            "sun-opensso-database-activeValue";  
+            "sun-opensso-database-activeValue";
     // idRepoService.xml schema element name for user status in-active value
     //for example the value could be "Inactive"
     private static final String USER_STATUS_INACTIVE_VALUE_SCHEMA_NAME =
             "sun-opensso-database-inactiveValue";
-    
+
     // idRepoService.xml schema element name for max search results value
     private static final String SEARCH_MAX_RESULT =
             "sun-opensso-database-config-max-result";
-    
+
     // idRepoService.xml schema element name for user db attr name to use
     //  when doing search queries
     private static final String USERS_SEARCH_ATTRIBUTE_SCHEMA_NAME =
             "sun-opensso-database-config-users-search-attribute";
-    
+
      // idRepoService.xml schema element name for set of user attribute names
      private static final String SET_OF_USER_ATTRIBUTES_SCHEMA_NAME =
              "sun-opensso-database-UserAttrs";
-     
-     // idRepoService.xml schema element name of the table in the DB for 
+
+     // idRepoService.xml schema element name of the table in the DB for
      // membership info, like a groups table which holds group info
-     private static final String MEMBERSHIP_TABLE_NAME_SCHEMA_NAME = 
+     private static final String MEMBERSHIP_TABLE_NAME_SCHEMA_NAME =
              "sun-opensso-database-MembershipTableName";
-     
+
      // idRepoService.xml schema element name of the column in the DB within the
      // membership table which is  the unique column identifying the membership
      // id, like a group_name column which holds a name that uniquely identifies
      // a group
      private static final String MEMBERSHIP_ID_ATTRIBUTE_NAME_SCHEMA_NAME =
              "sun-opensso-database-MembershipIDAttr";
-     
-     // idRepoService.xml schema element name of the column in the DB within the 
+
+     // idRepoService.xml schema element name of the column in the DB within the
      // membership table and that column name is used for searches
      private static final String MEMBERSHIP_SEARCH_ATTRIBUTE_NAME_SCHEMA_NAME =
              "sun-opensso-database-membership-search-attribute";
-             
-    // Fields that represent the actual values that were retrieved from 
+
+    // Fields that represent the actual values that were retrieved from
     // idRepoService.xml schema element names
-     
+
     //Used by factory method to bind to a DAO implementation. Value is
     //obtained from idRepoService.xml but a default is assigned.
-    // example value com.sun.identity.idm.plugins.jdbc.JdbcSimpleUserDao  
+    // example value com.sun.identity.idm.plugins.jdbc.JdbcSimpleUserDao
     private String daoClassName;
-    
+
     //Data Access Object for accessing a DB datastore
     private DaoInterface dao;
-    
+
     private String userDataBaseTableName;
-    
+
     // Password attribute used in authenticate method
     private String passwordAttributeName;
-    
+
     //attribute name of the userid column/attr in DB, passed into DAO calls
     private String userIDAttributeName;
-    
+
     //list of IdTpes and associated operations each is allowd to do
     private static Map supportedOps = new CaseInsensitiveHashMap();
-    
+
     //list of attribute/column names for users
     private Set<String> userAtttributesAllowed;
-    
+
     //name of user status attribute column
-    private String statusAttributeName;  
-    
+    private String statusAttributeName;
+
     //in some conditions, like there is no statusAttributeName available in
     //idRepoService.xml, then may set the users status as always active
     //since there is no attribute column to check for a user's status value
     private boolean alwaysActive = false;
-    
-    //these values are used to compare with values retreived from user db table 
+
+    //these values are used to compare with values retreived from user db table
     //status attribute column to see if user is active or not
     private static final String DEFAULT_USER_STATUS_ACTIVE_COMPARISON_VALUE = "Active";
-    private static final String DEFAULT_USER_STATUS_INACTIVE_COMPARISON_VALUE = "Inactive";    
-    private String statusActiveComparisonValue = 
+    private static final String DEFAULT_USER_STATUS_INACTIVE_COMPARISON_VALUE = "Inactive";
+    private String statusActiveComparisonValue =
             DEFAULT_USER_STATUS_ACTIVE_COMPARISON_VALUE;
     private String statusInActiveComparisonValue =
             DEFAULT_USER_STATUS_INACTIVE_COMPARISON_VALUE;
-    
+
     //determine the deafult for number of search results to fetch
     private int defaultSearchMaxResults = 100;
-    
+
     //attribute column name to be used in searches fro users
     private String userSearchNamingAttr = null;
-    
+
     // name of the table in the DB for membership info, like a groups table
     private String membershipTableName = null;
-     
+
     // name of the column in the DB within the membership table which is the
     // unique column identifying the membership id, like a group_name column
     // which holds a name that uniquely identifies a group
     private String membershipIdAttributeName = null;
-     
+
      // name of the column in the DB within the membership table and that
     // column name is used for searches
     private String membershipSearchAttributeName = null;
@@ -248,7 +249,7 @@ public class DatabaseRepo extends IdRepo {
 
     /*
      * Initialization of parameters as configured for a given plugin.
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#initialize(java.util.Map)
      */
     public void initialize(Map configParams) throws IdRepoException {
@@ -256,49 +257,49 @@ public class DatabaseRepo extends IdRepo {
             debug.message("DatabaseRepo.initialize called.");
         }
         super.initialize(configParams);
-        
+
         //helper for parsing config info
         RepoConfigHelper configHelper=
                 new RepoConfigHelper(debug);
-        
+
         daoClassName = configHelper.getPropertyStringValue(configParams,
-                DAO_PLUGIN_CLASS_NAME_SCHEMA_NAME);        
+                DAO_PLUGIN_CLASS_NAME_SCHEMA_NAME);
         try {
             //validate
             if(daoClassName == null || daoClassName.trim().length()== 0) {
                 String badDaoMsg = "DatabaseRepo.initialize: daoClassName obtained"
                         + " from IdRepoService.xml can not be null or empty."
-                        + " daoClassName=" + daoClassName;               
-                initializationException = new IdRepoException(badDaoMsg);               
+                        + " daoClassName=" + daoClassName;
+                initializationException = new IdRepoException(badDaoMsg);
                 debug.error(badDaoMsg);
                  return;
-            } else { 
+            } else {
                 dao = (DaoInterface) Class.forName(daoClassName).newInstance();
             }
-        } catch (ClassNotFoundException cnfe) {            
-            initializationException = new IdRepoException(cnfe.getMessage());               
+        } catch (ClassNotFoundException cnfe) {
+            initializationException = new IdRepoException(cnfe.getMessage());
             debug.error("DatabaseRepo.initialize: exception trying to create a new"
                     + " DAO class. Can not configure this datastore", cnfe);
              return;
-        } catch (InstantiationException ie) {           
-            initializationException = new IdRepoException(ie.getMessage());               
+        } catch (InstantiationException ie) {
+            initializationException = new IdRepoException(ie.getMessage());
             debug.error("DatabaseRepo.initialize: exception trying to create a new"
                     + " DAO class. Can not configure this datastore", ie);
              return;
-        } catch (IllegalAccessException iae) {          
-            initializationException = new IdRepoException(iae.getMessage());               
+        } catch (IllegalAccessException iae) {
+            initializationException = new IdRepoException(iae.getMessage());
             debug.error("DatabaseRepo.initialize: exception trying to create a new"
                     + " DAO class. Can not configure this datastore", iae);
              return;
         } catch (Exception noDAOex) {
-            initializationException = new IdRepoException(noDAOex.getMessage());               
+            initializationException = new IdRepoException(noDAOex.getMessage());
             debug.error("DatabaseRepo.initialize: exception trying to create a new"
                     + " DAO class. Can not configure this datastore", noDAOex);
              return;
         }
-        
+
         //determines whether to use JNDI or JDBC driver manager for connections
-        String connectionType = 
+        String connectionType =
                 configHelper.getPropertyStringValue(configParams,
                 JDBC_CONNECTION_TYPE_SCHEMA_NAME);
 
@@ -309,12 +310,12 @@ public class DatabaseRepo extends IdRepo {
             //unless JNDI is specified, then assume JDBC
             useJNDI = false;
         }
-              
+
         //Get the name of the database table for users
-        userDataBaseTableName = 
+        userDataBaseTableName =
                 configHelper.getPropertyStringValue(configParams,
                 USER_DB_TABLE_NAME_SCHEMA_NAME);
-        if (userDataBaseTableName == null 
+        if (userDataBaseTableName == null
                 || userDataBaseTableName.trim().length()==0) {
             String errorMessage = "DatabaseRepo.initialize: validation failed"
                     + " on User DataBase Table Name config info, value must be"
@@ -324,8 +325,8 @@ public class DatabaseRepo extends IdRepo {
                 debug.error(errorMessage);
             }
             initializationException = new IdRepoException(errorMessage);
-            //consider returning and not continuing ??          
-        }       
+            //consider returning and not continuing ??
+        }
 
         //now get membership info, for example to support groups
         membershipTableName = configHelper.getPropertyStringValue(configParams,
@@ -333,7 +334,7 @@ public class DatabaseRepo extends IdRepo {
         membershipIdAttributeName = configHelper.getPropertyStringValue(configParams,
                 MEMBERSHIP_ID_ATTRIBUTE_NAME_SCHEMA_NAME);
         membershipSearchAttributeName = configHelper.getPropertyStringValue(configParams,
-                MEMBERSHIP_SEARCH_ATTRIBUTE_NAME_SCHEMA_NAME);  
+                MEMBERSHIP_SEARCH_ATTRIBUTE_NAME_SCHEMA_NAME);
         //validate membership config info
         if(membershipTableName == null || membershipIdAttributeName==null
                 || membershipSearchAttributeName == null) {
@@ -350,8 +351,8 @@ public class DatabaseRepo extends IdRepo {
                 debug.error(errorMessage);
             }
             initializationException = new IdRepoException(errorMessage);
-            //consider returning and not continuing ??          
-        }        
+            //consider returning and not continuing ??
+        }
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo.initialize: "
                     + " membershipTableName=" + membershipTableName
@@ -359,15 +360,15 @@ public class DatabaseRepo extends IdRepo {
                     + " membershipSearchAttributeName="
                     + membershipSearchAttributeName);
         }
-        
+
         if (useJNDI) {
-            //name to use to lookup DataSource for database connections, 
+            //name to use to lookup DataSource for database connections,
             //for example java:comp/env/jdbc/mysqltest
-            String datasourceName = 
+            String datasourceName =
                     configHelper.getPropertyStringValue(configParams,
                     DATASOURCE_SCHEMA_NAME);
             if (datasourceName != null && !(datasourceName.length()==0)
-                    && userDataBaseTableName != null 
+                    && userDataBaseTableName != null
                     && !(userDataBaseTableName.length()==0) ) {
                 if (debug.messageEnabled()) {
                     debug.message("DatabaseRepo.initialize, about to call"
@@ -377,11 +378,11 @@ public class DatabaseRepo extends IdRepo {
                     dao.initialize(datasourceName, userDataBaseTableName,
                             membershipTableName, debug);
                 } catch (Exception ex) {
-                    //this exception is used as a flag to determine whether this 
+                    //this exception is used as a flag to determine whether this
                     //idRepo has been connected to its data store or not
                     //and sometimes thrown from other methods if error on initialize
-                    initializationException = 
-                            new IdRepoException(ex.getMessage());               
+                    initializationException =
+                            new IdRepoException(ex.getMessage());
                     debug.error("DatabaseRepo.initialize: exception trying to"
                             + " set up DB datasource connection.", ex);
                 }
@@ -396,31 +397,31 @@ public class DatabaseRepo extends IdRepo {
                 //consider returning and not continuing ??
             }
         } else { //use JDBC DriverManager params to initialize DAO
-            
-            //if connection type is JDBC ...    
+
+            //if connection type is JDBC ...
             //if JDBCConnectionType is JDBC then it needs the DriverManager
             //class name, plus the url, dbUserName, dbPassword to get connections
-            String jdbcDriver = 
+            String jdbcDriver =
                     configHelper.getPropertyStringValue(configParams,
                     JDBC_DRIVER_SCHEMA_NAME);
-            //url of JDBC driver 
-            String jdbcDriverUrl = 
+            //url of JDBC driver
+            String jdbcDriverUrl =
                     configHelper.getPropertyStringValue(configParams,
-                    JDBC__DRIVER_URL_SCHEMA_NAME);   
-            // username for JDBC driver 
-            String jdbcDbUser = 
+                    JDBC__DRIVER_URL_SCHEMA_NAME);
+            // username for JDBC driver
+            String jdbcDbUser =
                     configHelper.getPropertyStringValue(configParams,
                     JDBC_USER_NAME_SCHEMA_NAME);
-            // password for JDBC driver 
-            String jdbcDbPassword = 
+            // password for JDBC driver
+            String jdbcDbPassword =
                     configHelper.getPropertyStringValue(configParams,
                     JDBC__DRIVER_PASSWORD_SCHEMA_NAME);
-        
+
             if (jdbcDriver != null && !(jdbcDriver.length()==0)
                 && jdbcDriverUrl != null && !(jdbcDriverUrl.length()==0)
                 && jdbcDbUser != null && !(jdbcDbUser.length()==0)
                 && jdbcDbPassword != null && !(jdbcDbPassword.length()==0)
-                && userDataBaseTableName != null 
+                && userDataBaseTableName != null
                 && !(userDataBaseTableName.length()==0) ) {
                 if (debug.messageEnabled()) {
                     debug.message("DatabaseRepo.initialize, about to call"
@@ -431,16 +432,16 @@ public class DatabaseRepo extends IdRepo {
                             jdbcDbPassword, userDataBaseTableName,
                             membershipTableName, debug);
                 } catch (Exception ex) {
-                    //this exception is used as a flag to determine whether this 
+                    //this exception is used as a flag to determine whether this
                     //idRepo has been connected to its data store or not
                     //and sometimes thrown from other methods if error on initialize
-                    initializationException = 
-                            new IdRepoException(ex.getMessage());              
+                    initializationException =
+                            new IdRepoException(ex.getMessage());
                     debug.error("DatabaseRepo.initialize: exception trying to"
                             + " set up DB datasource connection.", ex);
                 }
             } else {
-                String errorMessage = "DatabaseRepo.initialize: using " 
+                String errorMessage = "DatabaseRepo.initialize: using "
                     + " useJNDI=" + useJNDI + " . The config parameters"
                     + " jdbcDriver, jdbcDriverUrl, jdbcDbUser, jdbcDbPassword,"
                     + " and userDataBaseTableName must be not null and not"
@@ -455,25 +456,25 @@ public class DatabaseRepo extends IdRepo {
                 //consider returning and not continuing ??
             }
         }
-        
-        
+
+
         // Get password attribute name
         passwordAttributeName = configHelper.getPropertyStringValue(configParams,
                 USER_PASSWORD_SCHEMA_NAME);
          // Get userID attribute name
         userIDAttributeName = configHelper.getPropertyStringValue(configParams,
                 USER_ID_SCHEMA_NAME);
-                
+
         //get the set of operations for each IdType allowed
         Set userSpecifiedOpsSet = null;
         userSpecifiedOpsSet = new HashSet((Set) configParams
                 .get(SUPPORTED_OPERATIONS_SCHEMA_NAME));
         supportedOps = configHelper.parsedUserSpecifiedOps(userSpecifiedOpsSet);
-         
+
         //get set of attribute/column names for users
         userAtttributesAllowed = new HashSet((Set) configParams
                 .get(SET_OF_USER_ATTRIBUTES_SCHEMA_NAME));
-        
+
         // Get name of status attribute  from idRepoService.xml config
         statusAttributeName = configHelper.getPropertyStringValue(configParams,
                 USER_STATUS_SCHEMA_NAME);
@@ -481,31 +482,31 @@ public class DatabaseRepo extends IdRepo {
             //if nothing specified then each user is always active
             alwaysActive = true;
         }
-        
+
         // Get value of status attribute  from idRepoService.xml config. This
         //value is used to compare with values retreived from db to test if user
         //status value is set to active, so need to find value that means active.
-        statusActiveComparisonValue = 
+        statusActiveComparisonValue =
                 configHelper.getPropertyStringValue(configParams,
-                USER_STATUS_ACTIVE_VALUE_SCHEMA_NAME, 
+                USER_STATUS_ACTIVE_VALUE_SCHEMA_NAME,
                 DEFAULT_USER_STATUS_ACTIVE_COMPARISON_VALUE);
-        
-        statusInActiveComparisonValue = 
+
+        statusInActiveComparisonValue =
                 configHelper.getPropertyStringValue(configParams,
-                USER_STATUS_INACTIVE_VALUE_SCHEMA_NAME, 
+                USER_STATUS_INACTIVE_VALUE_SCHEMA_NAME,
                 DEFAULT_USER_STATUS_INACTIVE_COMPARISON_VALUE);
 
         defaultSearchMaxResults = configHelper.getPropertyIntValue(configParams,
                 SEARCH_MAX_RESULT, defaultSearchMaxResults);
-        
+
         userSearchNamingAttr = configHelper.getPropertyStringValue(configParams,
                 USERS_SEARCH_ATTRIBUTE_SCHEMA_NAME);
-        
-        
+
+
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo.initialize: "
-                + "\n\t Password Attr name: " + passwordAttributeName 
-                + "\n\t User ID Attr name: " + userIDAttributeName                   
+                + "\n\t Password Attr name: " + passwordAttributeName
+                + "\n\t User ID Attr name: " + userIDAttributeName
                 + "\n\t userAtttributesAllowed: "+ userAtttributesAllowed
                 + "\n\tStatus Attr name: " + statusAttributeName
                 + "\n\t defaultSearchMaxResults:" + defaultSearchMaxResults
@@ -517,7 +518,7 @@ public class DatabaseRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      *  Creates an identity.
      *
      * @param token
@@ -531,7 +532,7 @@ public class DatabaseRepo extends IdRepo {
      *     Map of attribute-values assoicated with this object. The values would
      *     be stored in the database in the corresponding columns for example.
      *     If it contains attribute names which dont correspond to table coulmn
-     *     names the an error coccurs. Similarly if the values are bad for 
+     *     names the an error coccurs. Similarly if the values are bad for
      *     example.
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
@@ -547,7 +548,7 @@ public class DatabaseRepo extends IdRepo {
             throw (initializationException);
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.create called with:" 
+            debug.message("DatabaseRepo.create called with:"
                     + " token=" + token + " IdType=" + type + " name=" + name
                     + "\n\tattrMap=" + attrMap);
         }
@@ -581,10 +582,10 @@ public class DatabaseRepo extends IdRepo {
             if (nameVals == null || nameVals.isEmpty()) {
                 nameVals.add(name);
             }
-        }                
+        }
         //throw exception if this type user not allowed to do this
         isValidType(type, "create");
-        
+
         String createdName = null;
         //FIX: dont use isExists since it is extra query. Plus to be consistent
         //would need the two queries in a transaction
@@ -592,7 +593,7 @@ public class DatabaseRepo extends IdRepo {
                 //put info into DB
                 //FIX: should validate that attrMap is Ok, has required
                 //      attributes, proper types for values etc
-                createdName = dao.createUser(userIDAttributeName, attrMap);    
+                createdName = dao.createUser(userIDAttributeName, attrMap);
         } else {
                 //Name already exists
                 throw IdRepoDuplicateObjectException.nameAlreadyExists(name);
@@ -623,40 +624,40 @@ public class DatabaseRepo extends IdRepo {
      *      com.sun.identity.idm.IdType, java.lang.String)
      */
     public void delete(SSOToken token, IdType type, String name)
-            throws IdRepoException, SSOException {      
+            throws IdRepoException, SSOException {
         if (initializationException != null) {
             debug.error(
                 "DatabaseRepo.delete: throwing initialization exception");
             throw (initializationException);
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.delete called with parameters:" 
+            debug.message("DatabaseRepo.delete called with parameters:"
                     + " token="+ token + " type=" + type
                     + " name=" + name);
         }
         //throw exception if this type user not allowed to do this
         isValidType(type, "delete");
-    
+
         if (name != null && name.length() != 0) {
             if (type.equals(IdType.USER)) {
                 dao.deleteUser(name, userIDAttributeName);
-            } else if (type.equals(IdType.GROUP)) {            
+            } else if (type.equals(IdType.GROUP)) {
                 dao.deleteGroup(name, membershipIdAttributeName);
             }
         } else {
             if (debug.messageEnabled()) {
                 debug.message("DatabaseRepo.delete: parameter name is null or"
                         + "empty so delete will not be executed. name=" + name);
-            }  
-        }        
+            }
+        }
     }
 
     /*
      * Returns just --requested-- attributes and values of name object.
-     * Allows user to provide a set of attributes that should be returned, 
+     * Allows user to provide a set of attributes that should be returned,
      * and this set of attributes to retrieve is provided in parameter
      * Set attrNames.
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getAttributes(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String, java.util.Set)
      */
@@ -684,7 +685,7 @@ public class DatabaseRepo extends IdRepo {
             answer = map;
         } else {
             //make a map that only includes the attributes specified in input
-            //paramater Set attrNames, 
+            //paramater Set attrNames,
             for (Iterator items = attrNames.iterator(); items.hasNext();) {
                 Object key = items.next();
                 Object value = map.get(key);
@@ -692,7 +693,7 @@ public class DatabaseRepo extends IdRepo {
                     answer.put(key, value);
                 }
             }
-        }      
+        }
         return (answer);
     }
 
@@ -700,13 +701,13 @@ public class DatabaseRepo extends IdRepo {
      * Returns --all-- attributes and values of name object
      * so whole row of DB table for this user for example
      *
-     * I think it makes a map where map contains the attribute/column name as 
+     * I think it makes a map where map contains the attribute/column name as
      * a String key and a Set as the value where Set can be the String values
      * for that attribute.  Does the case matter????
      * Should the values to a CaseSenstiveHashMap ???? or all lowercase?
      * should keys be lowercase ???
      * What should I put in the case of when an attribute has no values???
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getAttributes(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String)
      */
@@ -723,7 +724,7 @@ public class DatabaseRepo extends IdRepo {
         }
         //throw exception if this type user not allowed to do this
         isValidType(type, "getAttributes");
-        
+
         Map users = Collections.EMPTY_MAP;
         if (type.equals(IdType.USER)) {
             users = dao.getAttributes(name, userIDAttributeName, userAtttributesAllowed);
@@ -732,15 +733,15 @@ public class DatabaseRepo extends IdRepo {
             //config option in UI  as with userAtttributesAllowed
             Set<String> groupAttrsAllowed = new HashSet<String>();
             groupAttrsAllowed.add(membershipIdAttributeName);
-            users = dao.getGroupAttributes(name, 
+            users = dao.getGroupAttributes(name,
                     membershipIdAttributeName, groupAttrsAllowed);
         }
         //not sure this is how case insensitive map works???
         //are keys insensitive or set of values or ????
-        Map answer = new CaseInsensitiveHashMap(users);       
+        Map answer = new CaseInsensitiveHashMap(users);
         return answer;
     }
-    
+
     /**
      * Set the values of attributes of the identity.
      *
@@ -763,7 +764,7 @@ public class DatabaseRepo extends IdRepo {
      *      boolean)
      */
     public void setAttributes(SSOToken token, IdType type, String name,
-            Map attributes, boolean isAdd) 
+            Map attributes, boolean isAdd)
             throws IdRepoException, SSOException {
         if (initializationException != null) {
             debug.error("DatabaseRepo.setAttributes: throwing"
@@ -771,19 +772,19 @@ public class DatabaseRepo extends IdRepo {
             throw (initializationException);
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.setAttributes called with:" 
-                    + " token=" + token + " type="+ type.getName() 
-                    + " name=" + name + " isAdd=" + isAdd 
+            debug.message("DatabaseRepo.setAttributes called with:"
+                    + " token=" + token + " type="+ type.getName()
+                    + " name=" + name + " isAdd=" + isAdd
                     + "\n\tAttributes=" + attributes);
         }
         //throw exception if this type user not allowed to do this
         isValidType(type, "getAttributes");
-               
-        //for now set isAdd to false since I will just replace the 
+
+        //for now set isAdd to false since I will just replace the
         //current values with the new values
         //FIX: later add support for multi-valued attributes
         isAdd = false;
-        
+
         if (name != null && name.length() != 0) {
             dao.updateUser(name, userIDAttributeName, attributes);
         } else {
@@ -791,10 +792,10 @@ public class DatabaseRepo extends IdRepo {
                 debug.message("DatabaseRepo.setAttributes: input parameter"
                         + "  name is null or empty so delete will not be"
                         + " executed. name=" + name);
-            }  
-        }         
+            }
+        }
     }
-    
+
     /*
      * Removes the attributes from the identity.
      *
@@ -810,8 +811,8 @@ public class DatabaseRepo extends IdRepo {
             throw (initializationException);
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.removeAttributes called with:" 
-                    + " token=" + token + " type="+ type.getName() 
+            debug.message("DatabaseRepo.removeAttributes called with:"
+                    + " token=" + token + " type="+ type.getName()
                     + " name=" + name + "\n\t attrNames=" + attrNames);
         }
         //throw exception if this type user not allowed to do this
@@ -821,21 +822,21 @@ public class DatabaseRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getBinaryAttributes(
      *      com.iplanet.sso.SSOToken, com.sun.identity.idm.IdType,
      *      java.lang.String, java.util.Set)
      */
     public Map getBinaryAttributes(SSOToken token, IdType type, String name,
-            Set attrNames) throws IdRepoException, SSOException {        
+            Set attrNames) throws IdRepoException, SSOException {
         if (initializationException != null) {
             debug.error("DatabaseRepo.getBinaryAttributes: throwing"
                     + " initialization exception");
             throw (initializationException);
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.getBinaryAttributes called with:" 
-                    + " token=" + token + " type="+ type.getName() 
+            debug.message("DatabaseRepo.getBinaryAttributes called with:"
+                    + " token=" + token + " type="+ type.getName()
                     + " name=" + name + "\n\t attrNames=" + attrNames);
         }
         //throw exception if this type user not allowed to do this
@@ -848,7 +849,7 @@ public class DatabaseRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * Set the values of binary attributes the identity.
      *
      * @see com.sun.identity.idm.IdRepo#setBinaryAttributes(
@@ -871,7 +872,7 @@ public class DatabaseRepo extends IdRepo {
         }
         //throw exception if this type user not allowed to do this
         isValidType(type, "setBinaryAttributes");
-        
+
         //TODO LATER
     }
 
@@ -891,19 +892,19 @@ public class DatabaseRepo extends IdRepo {
         }
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo.getMembers: "
-                    + "token=" + token + "IdType=" + type 
+                    + "token=" + token + "IdType=" + type
                     + ": name=" + name + ": membersType=" + membersType);
         }
         if(name==null || type==null || membersType==null) {
             debug.message("DatabaseRepo.getMembers: parameters type, name,"
                     + "membersTypeare can not be null, so returning empty set."
-                    +  "IdType=" + type + ": name=" + name 
+                    + "IdType=" + type + ": name=" + name
                     + ": membersType=" + membersType);
             return Collections.EMPTY_SET;
         }
         if (!membersType.equals(IdType.USER)) {
             debug.error("DatabaseRepo.getMembers: Groups do not support"
-                        + " membership for " + membersType.getName());
+                    + " membership for " + membersType.getName());
              Object[] args = { PLUGIN_CLASS_NAME, membersType.getName(),
                         type.getName() };
              throw new IdRepoException(
@@ -911,13 +912,13 @@ public class DatabaseRepo extends IdRepo {
          }
         //throw exception if this type user not allowed to do this
         //isValidType(type, "getMembers");
-        
+
         Set members = null;
         if (type.equals(IdType.USER)) {
             debug.error("DatabaseRepo.getMembers: Membership operation is not"
                     + " supported for Users");
             throw new IdRepoException(IdRepoBundle.getString("203"), "203");
-        } else if (type.equals(IdType.GROUP)) {           
+        } else if (type.equals(IdType.GROUP)) {
             members = dao.getMembers(name, membershipIdAttributeName);
         } else {
             Object[] args = { PLUGIN_CLASS_NAME, IdOperation.READ.getName(),
@@ -929,7 +930,7 @@ public class DatabaseRepo extends IdRepo {
             members = Collections.EMPTY_SET;
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.getMembers: returning members=" 
+            debug.message("DatabaseRepo.getMembers: returning members="
                     + members);
         }
         return members;
@@ -937,7 +938,7 @@ public class DatabaseRepo extends IdRepo {
 
     /*
      * Receive a name and the idType of that name, plus the type of memberships
-     * that you are interested in. For example, for a "user" named "chris" 
+     * that you are interested in. For example, for a "user" named "chris"
      * get all the groups that he is a member of.
      *
      * @return  Set of objects that <code>name</code> is a member of.
@@ -954,21 +955,21 @@ public class DatabaseRepo extends IdRepo {
             throw (initializationException);
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.getMemberships called " 
+            debug.message("DatabaseRepo.getMemberships called "
                     + " token=" + token + " type=" + type
                     + " name=" + name + "membershipType=" + membershipType);
         }
         //throw exception if this type user not allowed to do this
         //isValidType(type, "getMemberships");
-        
+
         if(name==null || type==null || membershipType==null) {
             debug.message("DatabaseRepo.getMemberships: parameters type, name,"
                     + "membersTypeare can not be null, so returning empty set."
-                    +  "IdType=" + type + ": name=" + name 
+                    +  "IdType=" + type + ": name=" + name
                     + ": membershipType=" + membershipType);
             return Collections.EMPTY_SET;
         }
-        
+
         Set groups = null;
         if (!type.equals(IdType.USER)) {
             debug.error("DatabaseRepo.getMemberships: Membership for identities"
@@ -991,7 +992,7 @@ public class DatabaseRepo extends IdRepo {
             groups = Collections.EMPTY_SET;
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.getMemberships: returning groups=" 
+            debug.message("DatabaseRepo.getMemberships: returning groups="
                     + groups);
         }
         return groups;
@@ -1016,30 +1017,30 @@ public class DatabaseRepo extends IdRepo {
             throw (initializationException);
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.modifyMemberShip called: " 
+            debug.message("DatabaseRepo.modifyMemberShip called: "
                 + " token=" + token + " type=" + type +
                 " name=" + name + " members=" + members +
                 " membersType= " + membersType + " operation=" + operation);
         }
         //throw exception if this type user not allowed to do this
-        //isValidType(type, "modifyMemberShip"); 
-        
+        //isValidType(type, "modifyMemberShip");
+
         if (type==null || name==null) {
             if (debug.messageEnabled()) {
-              debug.message("DatabaseRepo.modifyMemberShip: parameters type and" 
+              debug.message("DatabaseRepo.modifyMemberShip: parameters type and"
                 + " name can not be null. type=" + type
                 + " name=" + name );
             }
             return; //maybe should throw exception instead?
         }
-        if( !(operation==ADDMEMBER || operation==REMOVEMEMBER) ) {          
+        if( !(operation==ADDMEMBER || operation==REMOVEMEMBER) ) {
             if (debug.messageEnabled()) {
                 debug.message("DatabaseRepo.modifyMemberShip: parameter"
                         + " operation must have value equivalent to ADD or"
                         + " REMOVE. operation="   + operation);
             }
             return; //maybe should throw exception instead?
-        }  
+        }
         if (members == null || members.isEmpty()) {
             if (debug.messageEnabled()) {
                 debug.message("DatabaseRepo.modifyMemberShip: Members set"
@@ -1082,7 +1083,7 @@ public class DatabaseRepo extends IdRepo {
 
     /*
      *  Search for specific type of identities.
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#search(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String, int, int,
      *      java.util.Set, boolean, int, java.util.Map, boolean)
@@ -1093,35 +1094,35 @@ public class DatabaseRepo extends IdRepo {
      *     Identity type of this object.
      * @param pattern
      *     pattern to search for. The pattern can either be an id, for example
-     *     a user's id. Or pattern can be just a * which means all. Or pattern 
+     *     a user's id. Or pattern can be just a * which means all. Or pattern
      *     can be a string that contains * such as searching for any ids that
-     *     match *ea* like 'sean' , or it could be pattern with just one * in 
-     *     front or back 
+     *     match *ea* like 'sean' , or it could be pattern with just one * in
+     *     front or back
      *     if pattern is NULL or empty or "*" then they all mean pattern = "*"
      *     which is wildcard char. Note, wildcard searches can be modified as
-     *     they are affected by other params like avPairs whxi add other 
+     *     they are affected by other params like avPairs whxi add other
      *     conditions to the seacrhes.
      * @param maxTime
      *     maximum wait time for search. (Not Using)
      * @param maxResults
      *     maximum records to return.
      * @param returnAttrs
-     *     Set of attribute names to return. If this is null, then all 
+     *     Set of attribute names to return. If this is null, then all
      *     atrributes will be fetched and returned. If empty then no attributes
-     *     will be fetched and returned, and just the set of ids will be 
+     *     will be fetched and returned, and just the set of ids will be
      *     returned, and for each id it will have an empty set for values.
      * @param returnAllAttrs
-     *     flag specifies if  should return all attributes for each id 
+     *     flag specifies if  should return all attributes for each id
      *     that matches search. This overrides the setting of returnAttrs, so if
      *     this flag is true then all attributes will be fecthed and returned
      *     no matter what the value of returnAttrs parameter.
      * @param filterOp
-     *     filter condition. For example IdRepo.OR_MOD or IdRepo.AND_MOD and 
+     *     filter condition. For example IdRepo.OR_MOD or IdRepo.AND_MOD and
      *     then the WHERE clause of SQL search will use this operand between
      *     the avPairs comparisons
      * @param avPairs
-     *     additional search conditions. For example, these would be added to 
-     *     the search query WHERE clause, like WHERE last_name = 'Jones' and 
+     *     additional search conditions. For example, these would be added to
+     *     the search query WHERE clause, like WHERE last_name = 'Jones' and
      *     you could use the attribute-value in the map for column last_name
      *     and value 'Jones'.
      * @param recursive
@@ -1131,49 +1132,48 @@ public class DatabaseRepo extends IdRepo {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
      */
-    public RepoSearchResults search(SSOToken token, IdType type,
+    private RepoSearchResults search(SSOToken token, IdType type,
             String pattern, int maxTime, int maxResults, Set returnAttrs,
-            boolean returnAllAttrs, int filterOp, Map avPairs, 
+            boolean returnAllAttrs, int filterOp, Map avPairs,
             boolean recursive) throws IdRepoException, SSOException {
+
         if (initializationException != null) {
             debug.error("DatabaseRepo.search: throwing"
                     + " initialization exception");
             throw (initializationException);
-        }             
+        }
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo:search called with :"
-                + " token=" + token + " IdType=" + type
-                + " pattern=" + pattern + " maxTime=" + maxTime
-                + " maxResults=" + maxResults + " returnAttrs=" + returnAttrs
-                + " filter= " + filterOp + " avPairs= " + avPairs
-                + " recursive=" + recursive);
+                    + " token=" + token + " IdType=" + type
+                    + " pattern=" + pattern + " maxTime=" + maxTime
+                    + " maxResults=" + maxResults + " returnAttrs=" + returnAttrs
+                    + " filter= " + filterOp + " avPairs= " + avPairs
+                    + " recursive=" + recursive);
         }
         //throw exception if this type user not allowed to do this
         isValidType(type, "search");
-        
+
         if (maxResults < 1) {
             maxResults = defaultSearchMaxResults;
             if (debug.messageEnabled()) {
-              debug.message("DatabaseRepo:search changing value of maxResults"
-                      + " to deafult, so now maxResults=" + maxResults);
+                debug.message("DatabaseRepo:search changing value of maxResults to default, so now maxResults="
+                        + maxResults);
             }
         }
-        pattern = pattern.trim();       
-        
+
         //?? SHOULD THE RETURNED LIST BE ORDERED ????
-        
+
         //a set of Maps where each map is a user and their attributes
-        Map<String, Map<String, Set<String>>> users = 
-                              new HashMap<String, Map<String, Set<String>>>();
-        
+        Map<String, Map<String, Set<String>>> users = new HashMap<>();
+
         //determine the set of attributes to fetch from the database
         Set<String> attributesToFetch = null;
-        if (returnAttrs == null){
+        if (returnAttrs == null) {
             //to fetch all user attributes, need to pass in all attr names
             if (type.equals(IdType.USER)) {
                 attributesToFetch = userAtttributesAllowed;
             } else if (type.equals(IdType.GROUP)) {
-                //RFE: treat groupAttrsAllowed in same way as userAtttributesAllowed
+                //RFE: treat groupAttrsAllowed in same way as userAttributesAllowed
                 Set<String> groupAttrsAllowed = new HashSet<String>();
                 groupAttrsAllowed.add(membershipIdAttributeName);
                 attributesToFetch = groupAttrsAllowed;
@@ -1186,75 +1186,78 @@ public class DatabaseRepo extends IdRepo {
             } else if (type.equals(IdType.GROUP)) {
                 attributesToFetch.add(membershipIdAttributeName);
             }
-        } else {       
-                attributesToFetch = returnAttrs;
+        } else {
+            attributesToFetch = returnAttrs;
         }
-        
+
         String filterOpString = "NONE"; //IdRepo.NO_MOD default is NONE
         if (filterOp == IdRepo.OR_MOD) {
             filterOpString = "OR";
         } else if (filterOp == IdRepo.AND_MOD) {
             filterOpString = "AND";
         }
-        
-        //what if pattern or values in avPairs contain wildcard chars of SQL
-        //in SQL % allows you to match any string of any length
-        //in SQL _ allows you to match on a single character
-        //later consider if this case matters?
-        
-        if( (pattern == null || pattern.length()==0 || pattern.equals("*"))
-                      && (avPairs==null || avPairs.isEmpty()) )  { 
-            //get all users
+
+        // what if pattern or values in avPairs contain wildcard chars of SQL
+        // in SQL % allows you to match any string of any length
+        // in SQL _ allows you to match on a single character
+        // later consider if this case matters?
+
+        if ((pattern == null || pattern.length() == 0 || pattern.equals("*"))
+                && (avPairs == null || avPairs.isEmpty())) {
+            // get all users
             if (type.equals(IdType.USER)) {
                 users = dao.search(userIDAttributeName, maxResults, "", attributesToFetch, filterOpString, avPairs);
             } else if (type.equals(IdType.GROUP)) {
-                users = dao.searchForGroups(membershipIdAttributeName, maxResults, "", attributesToFetch, filterOpString, avPairs);
+                users = dao.searchForGroups(membershipIdAttributeName, maxResults, "", attributesToFetch,
+                        filterOpString, avPairs);
             }
         } else {
-            //get users that match with the pattern
-            //not sure if we need to differentiate between case where 
+            // get users that match with the pattern
+            // not sure if we need to differentiate between case where
             // avPairs==null or empty ??? vs when avPairs has attrs and values??
-            //AFAIK the searches on a pattern all include something in avPairs
-            //  and those attrs/vals are used to searh for pattern matches
-            
-            //substitute % for * for sql LIKE query
-            String searchPattern = pattern.replaceAll("\\*","%");
-   
-            //avPairs with values having wilcard chars replaced
-            Map<String, Set<String>> avPairsChanged = 
-                                     new HashMap<String, Set<String>>();         
-            //need to replace % for * in all avPairs too
-            if(avPairs!=null && !avPairs.isEmpty()) {
+            // AFAIK the searches on a pattern all include something in avPairs
+            // and those attrs/values are used to search for pattern matches
+
+            // substitute % for * for sql LIKE query
+            String searchPattern = pattern.replaceAll("\\*", "%");
+
+            //avPairs with values having wildcard chars replaced
+            Map<String, Set<String>> avPairsChanged = new HashMap<>();
+
+            // need to replace % for * in all avPairs too
+            if (avPairs != null && !avPairs.isEmpty()) {
                 Iterator KeysIt = avPairs.keySet().iterator();
-                while(KeysIt.hasNext()) {
-                    String key = (String)KeysIt.next();
+                while (KeysIt.hasNext()) {
+                    String key = (String) KeysIt.next();
                     if (key != null) {
-                      Set<String> values = (Set<String>)avPairs.get(key);
-                      Set<String> changedValues = new HashSet<String>();
-                      if(values!= null && !values.isEmpty()) {                     
-                        Iterator<String> valSetIt = values.iterator();
-                        //modify each value to replace any wildcard chars
-                        while(valSetIt.hasNext()) {
-                          String attrValue = valSetIt.next();
-                          if(attrValue!=null && attrValue.contains("*")) {
-                            attrValue = attrValue.replaceAll("\\*","%");    
-                          }
-                          changedValues.add(attrValue);
+                        Set<String> values = (Set<String>) avPairs.get(key);
+                        Set<String> changedValues = new HashSet<String>();
+                        if (values != null && !values.isEmpty()) {
+                            Iterator<String> valSetIt = values.iterator();
+                            // modify each value to replace any wildcard chars
+                            while (valSetIt.hasNext()) {
+                                String attrValue = valSetIt.next();
+                                if (attrValue != null && attrValue.contains("*")) {
+                                    attrValue = attrValue.replaceAll("\\*", "%");
+                                }
+                                changedValues.add(attrValue);
+                            }
                         }
-                      }
-                      //now that Set values has each value with new wildcard
-                      //replace it in the changed avPairsMap
-                      avPairsChanged.put(key, changedValues);
+                        // now that Set values has each value with new wildcard
+                        // replace it in the changed avPairsMap
+                        avPairsChanged.put(key, changedValues);
                     }
                 }
             }
             if (type.equals(IdType.USER)) {
-                users = dao.search(userIDAttributeName, maxResults, searchPattern, attributesToFetch, filterOpString, avPairsChanged);
+                users = dao.search(userIDAttributeName, maxResults, searchPattern, attributesToFetch,
+                        filterOpString, avPairsChanged);
             } else if (type.equals(IdType.GROUP)) {
-                users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern, attributesToFetch, filterOpString, avPairsChanged);
+                users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern,
+                        attributesToFetch, filterOpString, avPairsChanged);
             }
         }
-        
+
         if (users == null) {
             return new RepoSearchResults(Collections.EMPTY_SET,
                     RepoSearchResults.SUCCESS, Collections.EMPTY_MAP, type);
@@ -1262,36 +1265,192 @@ public class DatabaseRepo extends IdRepo {
         if (users.isEmpty()) {
             return new RepoSearchResults(Collections.EMPTY_SET,
                     RepoSearchResults.SUCCESS, Collections.EMPTY_MAP, type);
-        }       
-        
+        }
+
         Set allUserIds = users.keySet();
-        
-        if(returnAttrs!= null && returnAttrs.isEmpty()){
-            //I believe that is this case, we should only return the userids
-            // and each Map is empty??? 
-            //Or should it be the user id and for 
-            //each user id the Set of just useridattrname=value ????
-            //for now, just return userids and empty map
-            
-            //throw away any fetched attrs for each userid, if any
+
+        if(returnAttrs!= null && returnAttrs.isEmpty()) {
+            // I believe that is this case, we should only return the userids
+            // and each Map is empty???
+            // Or should it be the user id and for
+            // each user id the Set of just useridattrname=value ????
+            // for now, just return userids and empty map
+
+            // throw away any fetched attrs for each userid, if any
             users = new HashMap<String, Map<String, Set<String>>>();
-            //now set each id's value set to an empty set
-            for(Iterator<String> usersIt = allUserIds.iterator(); usersIt.hasNext(); ) {
+            // now set each id's value set to an empty set
+            for (Iterator<String> usersIt = allUserIds.iterator(); usersIt.hasNext(); ) {
                 users.put(usersIt.next(), Collections.EMPTY_MAP);
             }
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo.search: returning users= " + users);
         }
-        return (new RepoSearchResults(allUserIds, RepoSearchResults.SUCCESS,
-                users, type));   
-    
+        return (new RepoSearchResults(allUserIds, RepoSearchResults.SUCCESS, users, type));
+    }
+
+    /*
+     * Search for specific type of identities using a {@link CrestQuery}.
+     *
+     * @see com.sun.identity.idm.IdRepo#search(com.iplanet.sso.SSOToken,
+     *      com.sun.identity.idm.IdType, java.lang.String, int, int,
+     *      java.util.Set, boolean, int, java.util.Map, boolean)
+     *
+     * @param token
+     *     Single sign on token of identity performing the task.  (Not Using)
+     * @param type
+     *     Identity type of this object.
+     * @param crestQuery
+     *     Either a string pattern to search for (possibly from a _queryId CREST endpoint parameter, or an
+     *     _queryFilter from your REST endpoint).  If a string, it can either be an id, for example a user's id.
+     *     Or a * which means all. Or a string that contains *, eg. *ea* matching 'sean'.  Wildcard searches can
+     *     be modified as they are affected by other params like avPairs which add other conditions to the searches.
+     * @param maxTime
+     *     maximum wait time for search. (Not Using)
+     * @param maxResults
+     *     maximum records to return.
+     * @param returnAttrs
+     *     Set of attribute names to return. If this is null, then all
+     *     attributes will be fetched and returned. If empty then no attributes
+     *     will be fetched and returned, and just the set of ids will be
+     *     returned, and for each id it will have an empty set for values.
+     * @param returnAllAttrs
+     *     flag specifies if  should return all attributes for each id
+     *     that matches search. This overrides the setting of returnAttrs, so if
+     *     this flag is true then all attributes will be fetched and returned
+     *     no matter what the value of returnAttrs parameter.
+     * @param filterOp
+     *     filter condition. For example IdRepo.OR_MOD or IdRepo.AND_MOD and
+     *     then the WHERE clause of SQL search will use this operand between
+     *     the avPairs comparisons
+     * @param avPairs
+     *     additional search conditions. For example, these would be added to
+     *     the search query WHERE clause, like WHERE last_name = 'Jones' and
+     *     you could use the attribute-value in the map for column last_name
+     *     and value 'Jones'.
+     * @param recursive
+     *     boolean to indicate recursive search? (Not Using)
+     *
+     * @return RepoSearchResults
+     * @throws IdRepoException If there are repository related error conditions.
+     * @throws SSOException If identity's single sign on token is invalid.
+     */
+    @Override
+    public RepoSearchResults search(SSOToken token, IdType type, CrestQuery crestQuery,
+                                    int maxTime, int maxResults, Set returnAttrs,
+                                    boolean returnAllAttrs, int filterOp, Map avPairs,
+                                    boolean recursive) throws IdRepoException, SSOException {
+
+        if (initializationException != null) {
+            debug.error("DatabaseRepo.search: throwing"
+                    + " initialization exception");
+            throw (initializationException);
+        }
+        if (debug.messageEnabled()) {
+            debug.message("DatabaseRepo:search called with :"
+                + " token=" + token + " IdType=" + type
+                + " crestQuery=" + crestQuery + " maxTime=" + maxTime
+                + " maxResults=" + maxResults + " returnAttrs=" + returnAttrs
+                + " filter= " + filterOp + " avPairs= " + avPairs
+                + " recursive=" + recursive);
+        }
+
+        if (crestQuery.hasQueryId()) {
+            return search(token, type, crestQuery.getQueryId(), maxTime, maxResults, returnAttrs,
+                            returnAllAttrs, filterOp, avPairs, recursive);
+        }
+
+        // throw exception if this type user not allowed to do this
+        isValidType(type, "search");
+
+        if (maxResults < 1) {
+            maxResults = defaultSearchMaxResults;
+            if (debug.messageEnabled()) {
+                debug.message("DatabaseRepo:search changing value of maxResults to default, so now maxResults="
+                            + maxResults);
+            }
+        }
+
+        //?? SHOULD THE RETURNED LIST BE ORDERED ????
+
+        // a set of Maps where each map is a user and their attributes
+        Map<String, Map<String, Set<String>>> users = new HashMap<>();
+
+        // determine the set of attributes to fetch from the database
+        Set<String> attributesToFetch = null;
+        if (returnAttrs == null) {
+            // to fetch all user attributes, need to pass in all attr names
+            if (type.equals(IdType.USER)) {
+                attributesToFetch = userAtttributesAllowed;
+            } else if (type.equals(IdType.GROUP)) {
+                // RFE: treat groupAttrsAllowed in same way as userAttributesAllowed
+                Set<String> groupAttrsAllowed = new HashSet<String>();
+                groupAttrsAllowed.add(membershipIdAttributeName);
+                attributesToFetch = groupAttrsAllowed;
+            }
+        } else if(returnAttrs.isEmpty())  {
+            // fetch just userIDs
+            attributesToFetch = new HashSet<String>();
+            if (type.equals(IdType.USER)) {
+                attributesToFetch.add(userIDAttributeName);
+            } else if (type.equals(IdType.GROUP)) {
+                attributesToFetch.add(membershipIdAttributeName);
+            }
+        } else {
+            attributesToFetch = returnAttrs;
+        }
+
+        String filterOpString = "NONE"; // IdRepo.NO_MOD default is NONE
+        if (filterOp == IdRepo.OR_MOD) {
+            filterOpString = "OR";
+        } else if (filterOp == IdRepo.AND_MOD) {
+            filterOpString = "AND";
+        }
+
+        if (type.equals(IdType.USER)) {
+            users = dao.search(userIDAttributeName, maxResults, crestQuery.getQueryFilter(),
+                                attributesToFetch, filterOpString, avPairs);
+        } else if (type.equals(IdType.GROUP)) {
+            users = dao.searchForGroups(membershipIdAttributeName, maxResults, crestQuery.getQueryId(),
+                                attributesToFetch, filterOpString, avPairs);
+        }
+
+        if (users == null) {
+            return new RepoSearchResults(Collections.EMPTY_SET,
+                    RepoSearchResults.SUCCESS, Collections.EMPTY_MAP, type);
+        }
+        if (users.isEmpty()) {
+            return new RepoSearchResults(Collections.EMPTY_SET,
+                    RepoSearchResults.SUCCESS, Collections.EMPTY_MAP, type);
+        }
+
+        Set allUserIds = users.keySet();
+
+        if(returnAttrs!= null && returnAttrs.isEmpty()) {
+            // I believe that is this case, we should only return the userids
+            // and each Map is empty???
+            // Or should it be the user id and for
+            // each user id the Set of just useridattrname=value ????
+            // for now, just return userids and empty map
+
+            // throw away any fetched attrs for each userid, if any
+            users = new HashMap<String, Map<String, Set<String>>>();
+            // now set each id's value set to an empty set
+            for (Iterator<String> usersIt = allUserIds.iterator(); usersIt.hasNext(); ) {
+                users.put(usersIt.next(), Collections.EMPTY_MAP);
+            }
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("DatabaseRepo.search: returning users= " + users);
+        }
+        return (new RepoSearchResults(allUserIds, RepoSearchResults.SUCCESS, users, type));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getSupportedOperations(
      *      com.sun.identity.idm.IdType)
      */
@@ -1302,11 +1461,11 @@ public class DatabaseRepo extends IdRepo {
         }
         return (Set) supportedOps.get(type);
     }
-    
+
     /*
      * Load some default operations for different id types. This just sets up
      * each IdType with almost all possible opeartions being allowed.
-     * Later they can be made more fine grained and they are changed in 
+     * Later they can be made more fine grained and they are changed in
      * initialize method based on user provided list of types and allowed ops.
      *
      * If nothing is provided in idRepoService.xml so nothing is fetched in and
@@ -1321,7 +1480,7 @@ public class DatabaseRepo extends IdRepo {
         opSet.add(IdOperation.EDIT);
         opSet.add(IdOperation.READ);
         opSet.add(IdOperation.SERVICE);
-        
+
         supportedOps.put(IdType.USER, Collections.unmodifiableSet(opSet));
         //supportedOps.put(IdType.REALM, Collections.unmodifiableSet(opSet));
 
@@ -1329,9 +1488,9 @@ public class DatabaseRepo extends IdRepo {
         op2Set.remove(IdOperation.SERVICE);
         supportedOps.put(IdType.GROUP, Collections.unmodifiableSet(op2Set));
         supportedOps.put(IdType.ROLE, Collections.unmodifiableSet(op2Set));
-        //supportedOps.put(IdType.AGENT, Collections.unmodifiableSet(op2Set));       
+        //supportedOps.put(IdType.AGENT, Collections.unmodifiableSet(op2Set));
         //supportedOps.put(IdType.FILTEREDROLE, Collections.unmodifiableSet(op2Set));
-        
+
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo.loadDefaultSupportedOps: load defaults" +
                 "\n\t supportedOps=" + supportedOps);
@@ -1344,7 +1503,7 @@ public class DatabaseRepo extends IdRepo {
      * returns an empty set.
      *
      * @return a Set of IdTypes supported by this plugin.
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getSupportedTypes()
      */
     public Set getSupportedTypes() {
@@ -1357,7 +1516,7 @@ public class DatabaseRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * Returns true if the <code> name </code> object exists in the data store.
      *
      * @see com.sun.identity.idm.IdRepo#isExists(com.iplanet.sso.SSOToken,
@@ -1376,27 +1535,27 @@ public class DatabaseRepo extends IdRepo {
         }
         //throw exception if this type user not allowed to do this
         isValidType(type, "isExists");
-        
-        boolean entryExists = true;      
-        Map userDetails = getAttributes(token, type, name);            
+
+        boolean entryExists = true;
+        Map userDetails = getAttributes(token, type, name);
         if(userDetails.isEmpty()) {
             entryExists = false;
-        }       
+        }
         return entryExists;
     }
-    
+
     /**
      * Returns true if the <code> name </code> object is active
-     * The convention is that a user is only considered inactive if the user 
-     * active attribute is explicitly set to be inactive. 
+     * The convention is that a user is only considered inactive if the user
+     * active attribute is explicitly set to be inactive.
      * If the user does not exist then also is considered inactive.
      * Otherwise if user exists and is not set to inactive, then user is active.
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#isActive(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String)
      */
     public boolean isActive(SSOToken token, IdType type, String name)
-            throws IdRepoException, SSOException {       
+            throws IdRepoException, SSOException {
         if (initializationException != null) {
             debug.error("DatabaseRepo.isActive: throwing"
                     + " initialization exception");
@@ -1407,14 +1566,14 @@ public class DatabaseRepo extends IdRepo {
                 + " token=" + token +  " IdType=" + type + " name= " + name);
         }
         //throw exception if this type user not allowed to do this
-        isValidType(type, "isActive");       
-        
+        isValidType(type, "isActive");
+
         //get the row of this user's data and pull out their status column value
         Map attrMap = null;
         HashSet attrNameSet = new HashSet();
         attrNameSet.add(statusAttributeName);
         try {
-            attrMap = getAttributes(token, type, name, attrNameSet);           
+            attrMap = getAttributes(token, type, name, attrNameSet);
         } catch (IdRepoException idrepoerr) {
             if (debug.messageEnabled()) {
                 debug.message("DatabaseRepo.isActive calling getAttributes"
@@ -1422,7 +1581,7 @@ public class DatabaseRepo extends IdRepo {
             }
             return false; //can't determine user existence so inactive
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo.isActive: query results fecthed for name="
                     + name + " retrieved attrMap=" + attrMap);
@@ -1430,23 +1589,23 @@ public class DatabaseRepo extends IdRepo {
         if(attrMap == null || attrMap.isEmpty()) {
             if (debug.messageEnabled()) {
                 debug.message("DatabaseRepo.isActive: the fetching of attributes "
-                    + " for user name=" + name 
+                    + " for user name=" + name
                     + " got no results, either null or empty, which indicates"
                     + " user does not exists, so considered inactive.");
             }
             return false;
         }
         //Since user exists, now check if active
-        
-        //if alwaysActive flag is set and user exists then active 
+
+        //if alwaysActive flag is set and user exists then active
         if (alwaysActive) {
             return true;
         }
         //check value of the active attribute for the user
-        Set<String> activeValueSet = (Set<String>)(attrMap.get(statusAttributeName));        
-        if (activeValueSet == null || activeValueSet.isEmpty()) {   
+        Set<String> activeValueSet = (Set<String>)(attrMap.get(statusAttributeName));
+        if (activeValueSet == null || activeValueSet.isEmpty()) {
             return true; //no value specified for active attr, means active
-        }    
+        }
         //in most cases this is not multi-valued, but just in case later it is
         //we will iterate thru values.
         //only if ALL values are INACTIVE, is user considered inactive
@@ -1460,7 +1619,7 @@ public class DatabaseRepo extends IdRepo {
             } else if(!activeVal.equalsIgnoreCase(statusInActiveComparisonValue)) {
                 //if value is anything other than "InActive" then its active
                 allValuesInactive = false; ///
-            }              
+            }
         }
         if (allValuesInactive) {
             return false;
@@ -1468,8 +1627,8 @@ public class DatabaseRepo extends IdRepo {
             return true;
         }
     }
-    
-    /*  
+
+    /*
      * Sets the object's status to <code>active</code>.
      * @see com.sun.identity.idm.IdRepo#setActiveStatus(
      *  com.iplanet.sso.SSOToken, com.sun.identity.idm.IdType,
@@ -1508,13 +1667,13 @@ public class DatabaseRepo extends IdRepo {
         setAttributes(token, type, name, attrs, false);
     }
 
-    /* 
+    /*
      * Returns the fully qualified name for the identity. It is expected that
      * the fully qualified name would be unique, hence it is recommended to
      * prefix the name with the data store name or protocol. Used by IdRepo
      * framework to check for equality of two identities
      */
-    public String getFullyQualifiedName(SSOToken token, IdType type, 
+    public String getFullyQualifiedName(SSOToken token, IdType type,
             String name) throws IdRepoException, SSOException {
         if (initializationException != null) {
             debug.error("DatabaseRepo.getFullyQualifiedName: throwing"
@@ -1524,19 +1683,19 @@ public class DatabaseRepo extends IdRepo {
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo:getFullyQualifiedName: "
                     + " token=" + token +" IdType=" + type + " name=" + name);
-        }       
+        }
         if ((name == null) || (name.length() == 0)) {
             Object[] args = { PLUGIN_CLASS_NAME, "" };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, 
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
                 "220", args);
         }
         isValidType(type, "getFullyQualifiedName");
 
         //need to search for name and then make the url of datasource db
-        
-        RepoSearchResults results = search(token, type, name, 0, 2, null, true, 
+
+        RepoSearchResults results = search(token, type, name, 0, 2, null, true,
                 IdRepo.NO_MOD, null, false);
-        
+
         Set dns = results.getSearchResults();
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo:getFullyQualifiedName: " +
@@ -1548,14 +1707,14 @@ public class DatabaseRepo extends IdRepo {
         }
         // example url is jdbc:mysql://localhost:3306/openssousersdb
         String dbURL = dao.getDataSourceURL();
-        String fqdn = dbURL + "/" + type.getName() + "/" 
+        String fqdn = dbURL + "/" + type.getName() + "/"
                 + dns.iterator().next().toString();
         fqdn = fqdn.toLowerCase();
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo:getFullyQualifiedName: " +
                 " about to return fqdn=" + fqdn);
         }
-        return (fqdn);               
+        return (fqdn);
     }
 
     /*
@@ -1588,7 +1747,7 @@ public class DatabaseRepo extends IdRepo {
             debug.message("DatabaseRepo.authenticate method called with " +
                 " credentials=" + credentials);
         }
-              
+
         //Obtain user name and password from credentials and authenticate
         String username = null;
         String password = null;
@@ -1612,7 +1771,7 @@ public class DatabaseRepo extends IdRepo {
         }
 
         // Get user's password attribute
-        Map attrs = searchForAuthN(IdType.USER, username);       
+        Map attrs = searchForAuthN(IdType.USER, username);
         if ((attrs == null) || attrs.isEmpty() ||
                 !attrs.containsKey(passwordAttributeName)) {
             if (debug.messageEnabled()) {
@@ -1638,10 +1797,10 @@ public class DatabaseRepo extends IdRepo {
         }
         return (password.equals(storedPassword));
     }
-    
-    private Map searchForAuthN(IdType type, String userName) 
-        throws IdRepoException 
-    {        
+
+    private Map searchForAuthN(IdType type, String userName)
+        throws IdRepoException
+    {
         Map attributes = null;
         try {
             attributes = getAttributes(null, type, userName);
@@ -1652,19 +1811,19 @@ public class DatabaseRepo extends IdRepo {
                 }
             } else {
                  if (debug.messageEnabled()) {
-                    debug.message("DatabaseRepo.searchForAuthN: did not find " + 
+                    debug.message("DatabaseRepo.searchForAuthN: did not find " +
                         type.getName() + " entry: " + userName);
-                } 
-            }          
+                }
+            }
         } catch (SSOException ssoe) {
             // Can ignore this as this won't happen. No token was passed.
-        }      
+        }
         return attributes;
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#addListener(com.iplanet.sso.SSOToken,
      *      com.iplanet.am.sdk.IdRepoListener)
      */
@@ -1672,14 +1831,14 @@ public class DatabaseRepo extends IdRepo {
             throws IdRepoException, SSOException {
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo.addListener called");
-        }       
-        //TO DO LATER   
+        }
+        //TO DO LATER
         return 0;
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#removeListener()
      */
     public void removeListener() {
@@ -1688,10 +1847,10 @@ public class DatabaseRepo extends IdRepo {
         }
         //TO DO LATER
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#assignService(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String, java.lang.String,
      *      com.sun.identity.sm.SchemaType, java.util.Map)
@@ -1705,22 +1864,22 @@ public class DatabaseRepo extends IdRepo {
             throw (initializationException);
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.assignService called with: " 
+            debug.message("DatabaseRepo.assignService called with: "
                     + " token=" + token + " type=" + type.getName()
                     + " name=" + name +  " serviceName=" + serviceName
                     + "\n\tSchema Type stype=" + stype
                     + "\n\t attrMap="  + "=" + attrMap);
         }
         //throw exception if this type user not allowed to do this
-        isValidType(type, "assignService");               
-        //TO DO LATER      
+        isValidType(type, "assignService");
+        //TO DO LATER
     }
 
     /*
      * If the service is already assigned to the identity then
      * this method unassigns the service and removes the related
      * attributes from the entry.
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#unassignService(
      *      com.iplanet.sso.SSOToken, com.sun.identity.idm.IdType,
      *      java.lang.String, java.lang.String, java.util.Map)
@@ -1734,7 +1893,7 @@ public class DatabaseRepo extends IdRepo {
             throw (initializationException);
         }
         if (debug.messageEnabled()) {
-            debug.message("DatabaseRepo.unassignService called with: " 
+            debug.message("DatabaseRepo.unassignService called with: "
                     + " token=" + token + " type=" + type.getName()
                     + " name=" + name +  " serviceName=" + serviceName
                     + "\n\t attrMap="  + "=" + attrMap);
@@ -1743,10 +1902,10 @@ public class DatabaseRepo extends IdRepo {
         isValidType(type, "unassignService");
         //TO DO LATER
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getAssignedServices(
      *      com.iplanet.sso.SSOToken, com.sun.identity.idm.IdType,
      *      java.lang.String, java.util.Map)
@@ -1766,14 +1925,14 @@ public class DatabaseRepo extends IdRepo {
         }
         //throw exception if this type user not allowed to do this
         isValidType(type, "getAssignedServices");
-        
+
         //TO DO LATER
         return Collections.EMPTY_SET;
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * Modifies the attribute values of the service attributes.
      *
      * @see com.sun.identity.idm.IdRepo#modifyService(com.iplanet.sso.SSOToken,
@@ -1791,15 +1950,15 @@ public class DatabaseRepo extends IdRepo {
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo.modifyService called with:"
                     + " token=" + token + " IdType=" + type
-                    + " name=" + name + " serviceName=" + serviceName 
+                    + " name=" + name + " serviceName=" + serviceName
                     + " SchemaType stype=" + sType + "\n\t attrMap=" + attrMap);
         }
         //throw exception if this type user not allowed to do this
         isValidType(type, "modifyService");
-        //TO DO LATER       
+        //TO DO LATER
     }
-    
-    /* 
+
+    /*
      * (non-Javadoc)
      *
      * @see com.sun.identity.idm.IdRepo#getServiceAttributes(
@@ -1822,10 +1981,10 @@ public class DatabaseRepo extends IdRepo {
                     + " attrNames=" + attrNames);
         }
         //throw exception if this type user not allowed to do this
-        isValidType(type, "getServiceAttributes");        
-        //TO DO LATER     
+        isValidType(type, "getServiceAttributes");
+        //TO DO LATER
         return Collections.EMPTY_MAP;
-        
+
     }
 
     /*
@@ -1851,11 +2010,11 @@ public class DatabaseRepo extends IdRepo {
                     + " attrNames=" + attrNames);
         }
         //throw exception if this type user not allowed to do this
-        isValidType(type, "getBinaryServiceAttributes");        
+        isValidType(type, "getBinaryServiceAttributes");
         //TO DO LATER
         return Collections.EMPTY_MAP;
     }
-    
+
     //throw exception if this type user not allowed to do this
     //@param methodName may be used if need to log any debug messages
     private void isValidType(IdType type, String methodName)
@@ -1865,10 +2024,10 @@ public class DatabaseRepo extends IdRepo {
         if (type==null || !supportedOps.keySet().contains(type)) {
             if (debug.messageEnabled()) {
                 debug.message("DatabaseRepo.isValidType: method " + methodName
-                  + " was called with type=" 
+                  + " was called with type="
                   + ( type ==null ? null: type.getName() )
-                  + " but this is an unsupported operation for this type of"                        
-                  + " user. So operation cannot be executed. Exception will be" 
+                  + " but this is an unsupported operation for this type of"
+                  + " user. So operation cannot be executed. Exception will be"
                   + " thrown.");
             }
             Object args[] = { PLUGIN_CLASS_NAME, IdOperation.SERVICE.getName(),

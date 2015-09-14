@@ -25,6 +25,9 @@ import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.rest.RestUtils.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.getIdentityServicesAttributes;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.getSSOToken;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.identityDetailsToJsonValue;
 
 import javax.mail.MessagingException;
 import javax.security.auth.callback.Callback;
@@ -69,7 +72,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -108,6 +110,7 @@ import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.AsyncFunction;
@@ -134,7 +137,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
     // TODO: filters, sorting, paged results.
 
-    private final String userType;
+    private final String objectType;
     private final RestSecurityProvider restSecurityProvider;
 
     private ServiceConfigManager mailmgr;
@@ -191,7 +194,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     IdentityResourceV2(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
             MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
             RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
-        this.userType = userType;
+        this.objectType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
@@ -200,6 +203,17 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 restSecurityProvider);
         this.identityServices = identityServices;
         this.baseURLProviderFactory = baseURLProviderFactory;
+    }
+
+    private IdentityServicesImpl getIdentityServices() {
+        return identityServices;
+    }
+
+    /*
+     * package private for access by UserIdentityResourceV3
+     */
+    JsonValue addRoleInformation(Context context, String resourceId, JsonValue value) {
+        return identityResourceV1.addRoleInformation(context, resourceId, value);
     }
 
     /**
@@ -297,6 +311,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         ctsToken.setExpiryTimestamp(ttl);
         return ctsToken;
     }
+
     /**
      * This method will create a confirmation email that contains a {@link org.forgerock.openam.cts.api.tokens.Token},
      * confirmationId and email that was provided in the request.
@@ -489,7 +504,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * @param context Current Server Context
      * @param request Request from client to confirm registration
      */
-    private Promise<ActionResponse, ResourceException> validateGoto(final Context context,
+    /* package private for access by UserIdentityResourceV3
+     */
+    Promise<ActionResponse, ResourceException> validateGoto(final Context context,
             final ActionRequest request) {
 
         final JsonValue jVal = request.getContent();
@@ -673,7 +690,10 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * @return true is the user is active;false otherwise
      * @throws NotFoundException invalid SSOToken, invalid UID
      */
-    private boolean isUserActive(String uid) throws NotFoundException {
+    /*
+     * package private scope to allow invocation from IdentityResourceV3
+     */
+    boolean isUserActive(String uid) throws NotFoundException {
         try {
             AMIdentity userIdentity = new AMIdentity(RestUtils.getToken(), uid);
             if (debug.messageEnabled()) {
@@ -708,8 +728,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * @param realm Used as part of user lookup.
      * @param restSecurity Non null.
      */
-    private Promise<ActionResponse, ResourceException> generateNewPasswordEmail(final Context context, final ActionRequest request, final String realm,
-            final RestSecurity restSecurity) {
+    private Promise<ActionResponse, ResourceException> generateNewPasswordEmail(final Context context,
+                         final ActionRequest request, final String realm, final RestSecurity restSecurity) {
+
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         final JsonValue jsonBody = request.getContent();
 
@@ -730,12 +751,12 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             }
 
             // Generate Admin Token
-            SSOToken adminToken = identityResourceV1.getSSOToken(RestUtils.getToken().getTokenID().toString());
+            SSOToken adminToken = getSSOToken(RestUtils.getToken().getTokenID().toString());
 
-            Map<String, Set<String>> searchAttributes = getIdentityServicesAttributes(realm);
+            Map<String, Set<String>> searchAttributes = getIdentityServicesAttributes(realm, objectType);
             searchAttributes.putAll(getAttributeFromRequest(jsonBody));
 
-            List<String> searchResults = identityServices.search(null, searchAttributes, adminToken);
+            List<String> searchResults = identityServices.search(new CrestQuery(""), searchAttributes, adminToken);
 
             if (searchResults.isEmpty()) {
                 throw new NotFoundException("User not found");
@@ -747,7 +768,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 String username = searchResults.get(0);
 
                 IdentityDetails identityDetails = identityServices.read(username,
-                        getIdentityServicesAttributes(realm), adminToken);
+                        getIdentityServicesAttributes(realm, objectType), adminToken);
 
                 String email = null;
                 String uid = null;
@@ -958,7 +979,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             debug.message("IdentityResource.updateInstance :: Anonymous UPDATE in realm={} for resourceId={}",
                     realm, resourceId);
             // read updated identity back to client
-            IdentityDetails checkIdent = identityServices.read(resourceId, getIdentityServicesAttributes(realm),
+            IdentityDetails checkIdent = identityServices.read(resourceId,
+                    getIdentityServicesAttributes(realm, objectType),
                     admin);
             // handle updated resource
             return newResultPromise(newActionResponse(identityDetailsToJsonValue(checkIdent)));
@@ -1130,7 +1152,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
         try {
             // anyone can create an account add
-            SSOToken admin = identityResourceV1.getSSOToken(getCookieFromServerContext(context));
+            SSOToken admin = getSSOToken(getCookieFromServerContext(context));
 
             final JsonValue jVal = request.getContent();
             String resourceId = request.getNewResourceId();
@@ -1184,7 +1206,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             // Create the resource
             identityServices.create(identity, admin);
             // Read created resource
-            dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm, objectType), admin);
             if (debug.messageEnabled()) {
                 debug.message("IdentityResource.createInstance() :: Created resourceId={} in realm={} by AdminID={}",
                         resourceId, realm, admin.getTokenID());
@@ -1233,28 +1255,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     }
 
     /**
-     * Returns a JsonValue containing appropriate identity details
-     *
-     * @param details The IdentityDetails of a Resource
-     * @return The JsonValue Object
-     */
-    private JsonValue identityDetailsToJsonValue(IdentityDetails details) {
-        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-        try {
-            result.put(USERNAME, details.getName());
-            result.put("realm", details.getRealm());
-            Map<String, Set<String>> attrs = asMap(details.getAttributes());
-
-            for (Map.Entry<String, Set<String>> aix : attrs.entrySet()) {
-                result.put(aix.getKey(), aix.getValue());
-            }
-            return result;
-        } catch (final Exception e) {
-            throw new JsonValueException(result);
-        }
-    }
-
-    /**
      * Returns an IdentityDetails from a JsonValue
      *
      * @param jVal The JsonValue Object to be converted
@@ -1266,7 +1266,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         Map<String, Set<String>> identityAttrList = new HashMap<>();
 
         try {
-            identity.setType(userType); //set type ex. user
+            identity.setType(objectType); //set type ex. user
             identity.setRealm(realm); //set realm
             identity.setName(jVal.get(USERNAME).asString());//set name from JsonValue object
 
@@ -1358,9 +1358,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         IdentityDetails dtls, newDtls;
         ResourceResponse resource;
         try {
-            SSOToken admin = identityResourceV1.getSSOToken(getCookieFromServerContext(context));
+            SSOToken admin = getSSOToken(getCookieFromServerContext(context));
             // Retrieve details about user to be updated
-            dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm, objectType), admin);
             // Continue modifying the identity if read success
 
             for (String key : jVal.keys()) {
@@ -1428,7 +1428,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                     "by principalName={}", resourceId, realm, principalName);
             // read updated identity back to client
             IdentityDetails checkIdent = identityServices.read(dtls.getName(),
-                    getIdentityServicesAttributes(realm), admin);
+                    getIdentityServicesAttributes(realm, objectType), admin);
             // handle updated resource
             resource = newResourceResponse(resourceId, "0", identityDetailsToJsonValue(checkIdent));
             return newResultPromise(resource);
@@ -1469,18 +1469,18 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         }
     }
 
-    private Map<String, Set<String>> getIdentityServicesAttributes(String realm) {
-        Map<String, Set<String>> identityServicesAttributes = new HashMap<>();
-        identityServicesAttributes.put("objecttype", Collections.singleton(userType));
-        identityServicesAttributes.put("realm", Collections.singleton(realm));
-        return identityServicesAttributes;
-    }
-
     private String requestParamEncode(String toEncode) throws UnsupportedEncodingException {
         if (toEncode != null && !toEncode.isEmpty()) {
             return URLEncoder.encode(toEncode, "UTF-8").replace("+", "%20");
         } else {
             return toEncode;
         }
+    }
+
+    /**
+     * @return the object type
+     */
+    private String getObjectType() {
+        return objectType;
     }
 }

@@ -72,6 +72,8 @@ import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.SchemaType;
+import org.forgerock.openam.utils.CrestQuery;
+
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -86,26 +88,26 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * notifications changes for polling clients.
  */
 public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
-    
+
     protected static Debug idRepoDebug = Debug.getInstance("amIdmJAXRPCServer");
-    
+
     protected static SSOTokenManager tokenManager;
-        
+
     protected static IdServices idServices;
-    
+
     protected static final String IDREPO_SERVICE = "IdRepoServiceIF";
-    
+
     // Cache of modifications for last 30 minutes & notification URLs
     protected static int cacheSize = -1;
 
     private static final ConcurrentSkipListMap<Long, Set<String>> idrepoCache =
             new ConcurrentSkipListMap<Long, Set<String>>();
-    
+
     protected static final Map<String, URL> idRepoNotificationURLs = new ConcurrentHashMap<String, URL>();
-    
+
     protected static String serverURL ;
     protected static URL urlServer;
-    
+
     protected static String serverPort;
 
     protected static void initializeCacheSize() {
@@ -147,7 +149,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             idRepoDebug.message("IdRepoJAXRPCObjectImpl.static server URL " +
                 serverURL);
         }
-        
+
         // Initialize IdRepo Service Factory
         if (idServices == null) {
             idServices = IdServicesFactory.getDataStoreServices();
@@ -158,7 +160,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         // Check URL is not the local server
 
         boolean success = true;
-        
+
         URL urlClient = null;
         try {
             urlClient = new URL(clientURL);
@@ -173,12 +175,12 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             }
             success = false;
         }
-        
+
         if (success) { // check if it is the same server
             int port = urlClient.getPort();
-            if (port == -1) { 
+            if (port == -1) {
                 // If it is Port 80, and is not explicilty in the URL
-                port = urlClient.getDefaultPort();              
+                port = urlClient.getDefaultPort();
             }
             String clientPort = Integer.toString(port);
 
@@ -187,18 +189,18 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
                     urlClient.getHost())) && serverPort.equals(clientPort));
 
             idRepoDebug.message("IdRepoJAXRPCObjectImpl:" +
-                    "checkIfClientOnSameServer() "                     
-                    + "Received registerNotification request from client: " 
-                    + clientURL + " Server URL " + serverURL 
-                    + " Port determined as: " + clientPort + " Check is: " 
+                    "checkIfClientOnSameServer() "
+                    + "Received registerNotification request from client: "
+                    + clientURL + " Server URL " + serverURL
+                    + " Port determined as: " + clientPort + " Check is: "
                     + sameServer);
-            
+
             return sameServer;
-        } else { 
+        } else {
             return false;
         }
     }
-    
+
     public void assignService_idrepo(
         String token,
         String type,
@@ -214,9 +216,9 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         SchemaType schemaType = new SchemaType(stype);
         idServices.assignService(ssoToken, idtype, name, serviceName,
             schemaType, attrMap, amOrgName, amsdkDN);
-        
+
     }
-    
+
     public String create_idrepo(
         String token,
         String type,
@@ -229,7 +231,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         return IdUtils.getUniversalId(idServices.create(ssoToken, idtype, name,
             attrMap, amOrgName));
     }
-    
+
     public void delete_idrepo(
         String token,
         String type,
@@ -240,9 +242,9 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         SSOToken ssoToken = getSSOToken(token);
         IdType idtype = IdUtils.getType(type);
         idServices.delete(ssoToken, idtype, name, orgName, amsdkDN);
-        
+
     }
-    
+
     public Set getAssignedServices_idrepo(
         String token,
         String type,
@@ -257,7 +259,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         return idServices.getAssignedServices(ssoToken, idtype, name,
             mapOfServiceNamesAndOCs, amOrgName, amsdkDN);
     }
-    
+
     public Map getAttributes1_idrepo(
         String token,
         String type,
@@ -283,7 +285,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         }
         return res;
     }
-    
+
     public Map getAttributes2_idrepo(
         String token,
         String type,
@@ -295,7 +297,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         IdType idtype = IdUtils.getType(type);
         Map res = idServices.getAttributes(ssoToken, idtype, name, amOrgName,
             amsdkDN);
-        
+
         if (res != null && res instanceof CaseInsensitiveHashMap) {
             Map res2 = new HashMap();
             Iterator it = res.keySet().iterator();
@@ -356,7 +358,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         }
         return results;
     }
-    
+
     public Set getMemberships_idrepo(
         String token,
         String type,
@@ -380,7 +382,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         }
         return results;
     }
-    
+
     public Map getServiceAttributes_idrepo(
         String token,
         String type,
@@ -398,9 +400,9 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
 
     public Map getBinaryServiceAttributes_idrepo(
         String token, String type,
-        String name, 
-        String serviceName, 
-        Set attrNames, 
+        String name,
+        String serviceName,
+        Set attrNames,
         String amOrgName,
         String amsdkDN
     ) throws RemoteException, IdRepoException, SSOException {
@@ -424,7 +426,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         return idServices.getServiceAttributesAscending(ssoToken, idtype,
             name, serviceName, attrNames, amOrgName, amsdkDN);
     }
-    
+
     public Set getSupportedOperations_idrepo(
         String token,
         String type,
@@ -445,7 +447,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         }
         return resSet;
     }
-    
+
     public Set getSupportedTypes_idrepo(String token, String amOrgName)
         throws RemoteException, IdRepoException, SSOException {
         SSOToken ssoToken = getSSOToken(token);
@@ -491,9 +493,9 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         SSOToken ssoToken = getSSOToken(token);
         IdType idtype = IdUtils.getType(type);
         return idServices.isExists(ssoToken, idtype, name, amOrgName);
-        
+
     }
-    
+
     public boolean isActive_idrepo(
         String token,
         String type,
@@ -536,7 +538,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         idServices.modifyMemberShip(ssoToken, idtype, name, members, mtype,
             operation, amOrgName);
     }
-    
+
     public void modifyService_idrepo(
         String token,
         String type,
@@ -553,7 +555,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         idServices.modifyService(ssoToken, idtype, name, serviceName,
             schematype, attrMap, amOrgName, amsdkDN);
     }
-    
+
     public void removeAttributes_idrepo(
         String token,
         String type,
@@ -567,7 +569,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         idServices.removeAttributes(ssoToken, idtype, name, attrNames,
             amOrgName, amsdkDN);
     }
-    
+
     public Map search1_idrepo(
         String token,
         String type,
@@ -585,7 +587,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             returnAttrs, (returnAttrs == null), 0, avPairs, recursive,
             amOrgName);
     }
-    
+
     public Map search2_idrepo(
         String token,
         String type,
@@ -609,11 +611,10 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         IdSearchOpModifier modifier = (filterOp == IdRepo.OR_MOD) ?
             IdSearchOpModifier.OR : IdSearchOpModifier.AND;
         ctrl.setSearchModifiers(modifier, avPairs);
-        IdSearchResults idres = idServices.search(ssoToken, idtype, pattern,
-            ctrl, amOrgName);
-        return IdSearchResultsToMap(idres);
+        CrestQuery crestQuery = new CrestQuery(pattern);
+        return IdSearchResultsToMap(idServices.search(ssoToken, idtype, ctrl, amOrgName, crestQuery));
     }
-    
+
     public void setAttributes_idrepo(
         String token,
         String type,
@@ -628,7 +629,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         idServices.setAttributes(ssoToken, idtype, name, attributes, isAdd,
             amOrgName, amsdkDN, true);
     }
-    
+
     public void setAttributes2_idrepo(
         String token,
         String type,
@@ -657,7 +658,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         idServices.setAttributes(ssoToken, idtype, name, attributes, isAdd,
             amOrgName, amsdkDN, isString);
     }
-    
+
     public void changePassword_idrepo(
         String token,
         String type,
@@ -686,9 +687,9 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         IdType idtype = IdUtils.getType(type);
         idServices.unassignService(ssoToken, idtype, name, serviceName,
             attrMap, amOrgName, amsdkDN);
-        
+
     }
-    
+
     public void deRegisterNotificationURL_idrepo(String notificationID) throws RemoteException {
         synchronized (idRepoNotificationURLs) {
             URL url = idRepoNotificationURLs.remove(notificationID);
@@ -817,7 +818,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
          return IdSearchResultsToMap(result);
      }
 
-    
+
     // Implementation to process entry changed events
     protected static void processEntryChanged_idrepo(
         String method, String name, int type, Set attrNames) {
@@ -837,7 +838,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             }
             return;
         }
-        
+
          // Construct the XML document for the event change
         StringBuilder sb = new StringBuilder(100);
         sb.append("<EventNotification><AttributeValuePair>")
@@ -846,7 +847,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             .append("<AttributeValuePair><Attribute name=\"entityName\" />")
             .append("<Value>").append(XMLUtils.escapeSpecialCharacters(name))
             .append("</Value></AttributeValuePair>");
-            
+
         if (method.equalsIgnoreCase("objectChanged") ||
             method.equalsIgnoreCase("objectsChanged")) {
             sb.append("<AttributeValuePair><Attribute name=\"eventType\" />")
@@ -863,7 +864,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             }
         }
         sb.append("</EventNotification>");
-        
+
         // Update cache for polling by remote clients
         if (cacheSize > 0) {
             Set<String> modDNs = getCachedValues(idrepoCache);
@@ -875,7 +876,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
                     "entry change:" + sb.toString());
             }
         }
-        
+
         // If notification URLs are present, send notifications
         if (idRepoDebug.messageEnabled()) {
             idRepoDebug.message("IdRepoJAXRPCObjectImpl.processEntryChaged =" +
@@ -886,10 +887,10 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             for (Map.Entry<String, URL> entry : idRepoNotificationURLs.entrySet()) {
                 String id = entry.getKey();
                 URL url = entry.getValue();
-            
+
                 // Construct NotificationSet
                 if (ns == null) {
-                    Notification notification = 
+                    Notification notification =
                         new Notification(sb.toString());
                     ns = new NotificationSet(IDREPO_SERVICE);
                     ns.addNotification(notification);
@@ -987,7 +988,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     protected SSOToken getSSOToken(String token) throws SSOException {
         // Initalize the class variables
         initialize_idrepo();
-        
+
         int index = token.indexOf(" ");
         if (tokenManager == null) {
             tokenManager = SSOTokenManager.getInstance();
@@ -1000,7 +1001,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         String agentTokenStr = token.substring(index +1);
         String tokenStr = token.substring(0,index);
         final String ftoken = tokenStr;
-        
+
         try {
             /*
              * for 7.0 patch-4 agent, IP address maybe send back to server.
@@ -1015,7 +1016,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
                 }
             } else {
                 context = tokenManager.createSSOToken(agentTokenStr);
-            } 
+            }
             stoken = (SSOToken)RestrictedTokenContext.doUsing(context,
                 new RestrictedTokenAction() {
                     public Object run() throws Exception {

@@ -28,21 +28,21 @@
 
 package com.sun.identity.idm;
 
-import java.util.Map;
-import java.util.Set;
-
-import javax.security.auth.callback.Callback;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.sm.SchemaType;
+import org.forgerock.openam.utils.CrestQuery;
+
+import javax.security.auth.callback.Callback;
+import java.util.Map;
+import java.util.Set;
 
 public interface IdServices {
-    
+
     public boolean authenticate(String orgName, Callback[] credentials)
         throws IdRepoException, AuthLoginException;
-    
+
     public AMIdentity create(SSOToken token, IdType type, String name,
             Map attrMap, String amOrgName) throws IdRepoException, SSOException;
 
@@ -85,12 +85,23 @@ public interface IdServices {
             Set attrNames, String amOrgName, String amsdkDN)
             throws IdRepoException, SSOException;
 
-    public IdSearchResults search(SSOToken token, IdType type, String pattern,
-            IdSearchControl ctrl, String amOrgName) throws IdRepoException,
-            SSOException;
+    /**
+     * By passing in a CrestQuery object, we now support searching by id (via _queryId) or by filter (_queryFilter).
+     *
+     * @param token is the sso token of the person performing this operation.
+     * @param type is the identity type of the name parameter.
+     * @param ctrl the search control
+     * @param amOrgName is the orgname.
+     * @param crestQuery encapsulates _queryId or _queryFilter from the CREST endpoint.
+     * @throws IdRepoException if there are repository related error conditions.
+     * @throws SSOException if user's single sign on token is invalid.
+     */
+    public IdSearchResults search(SSOToken token, IdType type,
+            IdSearchControl ctrl, String amOrgName, CrestQuery crestQuery)
+            throws IdRepoException, SSOException;
 
     public void setAttributes(SSOToken token, IdType type, String name,
-            Map attributes, boolean isAdd, String amOrgName, String amsdkDN, 
+            Map attributes, boolean isAdd, String amOrgName, String amsdkDN,
             boolean isString) throws IdRepoException, SSOException;
 
     public void changePassword(SSOToken token, IdType type, String name,
@@ -148,14 +159,14 @@ public interface IdServices {
 
     public Set getSupportedOperations(SSOToken token, IdType type,
             String amOrgName) throws IdRepoException, SSOException;
-    
+
     public void clearIdRepoPlugins();
-    
+
     public void clearIdRepoPlugins(String orgName, String serviceComponent,
             int type);
-    
+
     public void reloadIdRepoServiceSchema();
-    
+
     public void reinitialize();
 
     public Set getFullyQualifiedNames(SSOToken token, IdType type,

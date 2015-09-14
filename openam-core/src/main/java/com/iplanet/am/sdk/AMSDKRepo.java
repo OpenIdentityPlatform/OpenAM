@@ -40,7 +40,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
-import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
@@ -57,7 +56,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.Locale;
-import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
@@ -77,7 +75,7 @@ import org.forgerock.openam.ldap.LDAPAuthUtils;
 import org.forgerock.openam.ldap.LDAPUtilException;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.ModuleState;
-import org.forgerock.opendj.ldap.DN;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchScope;
 
@@ -121,7 +119,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#addListener(com.iplanet.sso.SSOToken,
      *      com.iplanet.am.sdk.AMObjectListener, java.util.Map)
      */
@@ -137,7 +135,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#removeListener()
      */
     public void removeListener() {
@@ -148,7 +146,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#create(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String, java.util.Map)
      */
@@ -166,7 +164,7 @@ public class AMSDKRepo extends IdRepo {
             if (orgType != AMObject.ORGANIZATION) {
                 debug.error("AMSDKRepo.create(): Incorrectly configured "
                         + " plugin: Org DN is wrong = " + orgDN);
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "303", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "303",
                         null);
             }
         } catch (AMException ame) {
@@ -218,7 +216,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#delete(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String)
      */
@@ -257,7 +255,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getAttributes(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String, java.util.Set)
      */
@@ -285,7 +283,7 @@ public class AMSDKRepo extends IdRepo {
                         false, profileType);
             } else {
                 Object[] args = { name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202",
                         args);
             }
         } catch (AMException ame) {
@@ -296,7 +294,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getAttributes(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String)
      */
@@ -325,7 +323,7 @@ public class AMSDKRepo extends IdRepo {
                         profileType);
             } else {
                 Object[] args = { name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202",
                         args);
             }
         } catch (AMException ame) {
@@ -336,7 +334,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getBinaryAttributes(
      *      com.iplanet.sso.SSOToken, com.sun.identity.idm.IdType,
      *      java.lang.String, java.util.Set)
@@ -364,7 +362,7 @@ public class AMSDKRepo extends IdRepo {
                         profileType);
             } else {
                 Object[] args = { name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202",
                         args);
             }
         } catch (AMException ame) {
@@ -376,7 +374,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getConfiguration()
      */
     public Map getConfiguration() {
@@ -385,7 +383,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#getMembers(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String,
      *      com.sun.identity.idm.IdType)
@@ -426,7 +424,7 @@ public class AMSDKRepo extends IdRepo {
                         + "for " + membersType.getName());
                 Object[] args = { CLASS_NAME, membersType.getName(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "204", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "204",
                         args);
             }
 
@@ -444,7 +442,7 @@ public class AMSDKRepo extends IdRepo {
             } else {
                 Object[] args = { CLASS_NAME, membersType.getName(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "204", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "204",
                         args);
             }
 
@@ -463,7 +461,7 @@ public class AMSDKRepo extends IdRepo {
             } else {
                 Object[] args = { CLASS_NAME, membersType.getName(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "204", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "204",
                         args);
             }
 
@@ -531,7 +529,7 @@ public class AMSDKRepo extends IdRepo {
                         + "entities " + " not supported for Users");
                 Object args[] = { CLASS_NAME, type.getName(),
                         membershipType.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "204", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "204",
                         args);
             }
         }
@@ -549,7 +547,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#initialize(java.util.Map)
      */
     public void initialize(Map configParams) throws IdRepoException {
@@ -743,7 +741,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#removeAttributes(
      *      com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String, java.util.Set)
@@ -763,9 +761,30 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#search(com.iplanet.sso.SSOToken,
-     *      com.sun.identity.idm.IdType, java.lang.String, java.util.Map, 
+     *      com.sun.identity.idm.IdType, org.forgerock.openam.utils.CrestQuery, java.util.Map,
+     *      boolean, int, int, java.util.Set)
+     */
+    @Override
+    public RepoSearchResults search(SSOToken token, IdType type,
+                                             CrestQuery crestQuery, int maxTime, int maxResults,
+                                             Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
+                                             Map<String, Set<String>> avPairs, boolean recursive)
+            throws IdRepoException, SSOException {
+
+        if (crestQuery.hasQueryId()) {
+            return search(token, type, crestQuery.getQueryId(), avPairs, recursive, maxResults,
+                                                                                            maxTime, returnAttrs);
+        }
+        throw new IdRepoException("AMSDKRepo.search does not support search by query filter");
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see com.sun.identity.idm.IdRepo#search(com.iplanet.sso.SSOToken,
+     *      com.sun.identity.idm.IdType, java.lang.String, java.util.Map,
      *      boolean, int, int, java.util.Set)
      */
     public RepoSearchResults search(SSOToken token, IdType type,
@@ -853,7 +872,7 @@ public class AMSDKRepo extends IdRepo {
                 break;
             default:
                 Object[] args = { CLASS_NAME, type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "210", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "210",
                         args);
             }
         } catch (AMException ame) {
@@ -868,14 +887,14 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#search(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String, int, int,
      *      java.util.Set, boolean, int, java.util.Map)
      */
     public RepoSearchResults search(SSOToken token, IdType type,
             String pattern, int maxTime, int maxResults, Set returnAttrs,
-            boolean returnAllAttrs, int filterOp, Map avPairs, 
+            boolean returnAllAttrs, int filterOp, Map avPairs,
             boolean recursive)
             throws IdRepoException, SSOException {
 
@@ -901,7 +920,7 @@ public class AMSDKRepo extends IdRepo {
         }
         AMSearchResults results;
         try {
-            AMStoreConnection amsc = 
+            AMStoreConnection amsc =
                 (sc == null) ? new AMStoreConnection(token) : sc;
             switch (profileType) {
             case AMObject.USER:
@@ -972,7 +991,7 @@ public class AMSDKRepo extends IdRepo {
                 break;
             default:
                 Object[] args = { CLASS_NAME, type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "210", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "210",
                         args);
             }
         } catch (AMException ame) {
@@ -997,14 +1016,14 @@ public class AMSDKRepo extends IdRepo {
     /**
      * Sets the Attributes of the named identity. the single sign on
      * token must have the necessary permission to set the attributes.
-     * 
+     *
      * @param token
      *            single sign on token for this operation.
-     * @param type 
+     * @param type
      *            type of the identity
-     * @param name 
+     * @param name
      *            name of the identity
-     * @param attributes 
+     * @param attributes
      *            attributes to set.
      * @param isAdd
      *            should attributes values be added to existing values.
@@ -1014,7 +1033,7 @@ public class AMSDKRepo extends IdRepo {
      *             if user's single sign on token is invalid.
      */
     public void setAttributes(SSOToken token, IdType type, String name,
-            Map attributes, boolean isAdd) 
+            Map attributes, boolean isAdd)
         throws IdRepoException, SSOException {
 
         if (debug.messageEnabled()) {
@@ -1052,7 +1071,7 @@ public class AMSDKRepo extends IdRepo {
             String errorMessage = ame.getMessage();
             int errCode = Integer.parseInt(ldapError);
             if (ResultCode.CONSTRAINT_VIOLATION.equals(ResultCode.valueOf(errCode))) {
-                Object args[] = 
+                Object args[] =
                     { this.getClass().getName(), ldapError, errorMessage };
                 //Throw Fatal exception for errCode 19(eg.,Password too short)
                 //as it breaks password policy for password length.
@@ -1068,9 +1087,9 @@ public class AMSDKRepo extends IdRepo {
     }
 
     public void setBinaryAttributes(SSOToken token, IdType type, String name,
-            Map attributes, boolean isAdd) 
+            Map attributes, boolean isAdd)
         throws IdRepoException, SSOException {
-        
+
         if (debug.messageEnabled()) {
             debug.message("AMSDKRepo: setBinaryAttributes called" + type + ": "
                     + name + ": " + attributes);
@@ -1288,7 +1307,7 @@ public class AMSDKRepo extends IdRepo {
             Set removeOCs = (Set) attrMap.get("objectclass");
             Set attrNameSet = new HashSet();
             attrNameSet.add("objectclass");
-            Map objectClassesMap = getAttributes(token, type, name, 
+            Map objectClassesMap = getAttributes(token, type, name,
                     attrNameSet);
             Set OCValues = (Set) objectClassesMap.get("objectclass");
             removeOCs = AMCommonUtils.updateAndGetRemovableOCs(OCValues,
@@ -1418,7 +1437,7 @@ public class AMSDKRepo extends IdRepo {
             while (iter.hasNext()) {
                 String serviceName = (String) iter.next();
                 try {
-                    AMStoreConnection amsc = (sc == null) ? 
+                    AMStoreConnection amsc = (sc == null) ?
                             new AMStoreConnection(token)
                             : sc;
                     String roleDN = getDN(type, name);
@@ -1442,7 +1461,7 @@ public class AMSDKRepo extends IdRepo {
             while (iter.hasNext()) {
                 String serviceName = (String) iter.next();
                 try {
-                    AMStoreConnection amsc = (sc == null) ? 
+                    AMStoreConnection amsc = (sc == null) ?
                             new AMStoreConnection(token)
                             : sc;
                     String roleDN = getDN(type, name);
@@ -1575,7 +1594,7 @@ public class AMSDKRepo extends IdRepo {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sun.identity.idm.IdRepo#modifyService(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String, java.lang.String,
      *      java.util.Map)
@@ -1592,7 +1611,7 @@ public class AMSDKRepo extends IdRepo {
             if (sType.equals(SchemaType.DYNAMIC)) {
                 Object args[] = { this.getClass().getName(), sType.toString(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "214", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "214",
                         args);
             } else {
                 setMixAttributes(token, type, name, attrMap, false);
@@ -1602,7 +1621,7 @@ public class AMSDKRepo extends IdRepo {
             if (sType.equals(SchemaType.USER)) {
                 Object args[] = { this.getClass().getName(), sType.toString(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "214", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "214",
                         args);
             }
             try {
@@ -1629,7 +1648,7 @@ public class AMSDKRepo extends IdRepo {
             if (sType.equals(SchemaType.USER)) {
                 Object args[] = { this.getClass().getName(), sType.toString(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "214", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "214",
                         args);
             }
             try {
@@ -1655,12 +1674,12 @@ public class AMSDKRepo extends IdRepo {
 
     public static void notifyObjectChangedEvent(String normalizedDN,
             int eventType) {
-        
+
         if (debug.messageEnabled()) {
             debug.message("AMSDKRepo.notifyObjectChangedEvent - Sending "
                     + "event to listeners.");
         }
-        
+
         if (adminToken == null) {
             adminToken = (SSOToken) AccessController
                 .doPrivileged(AdminTokenAction.getInstance());
@@ -1688,8 +1707,8 @@ public class AMSDKRepo extends IdRepo {
 
         IdType idType = null;
         switch (type) {
-        case AMObject.GROUP: 
-        case AMObject.STATIC_GROUP: 
+        case AMObject.GROUP:
+        case AMObject.STATIC_GROUP:
         case AMObject.ASSIGNABLE_DYNAMIC_GROUP:
         case AMObject.DYNAMIC_GROUP:
             idType = IdType.GROUP;
@@ -1697,17 +1716,17 @@ public class AMSDKRepo extends IdRepo {
         case AMObject.USER:
             idType = IdType.USER;
             break;
-        case AMObject.ORGANIZATION: 
+        case AMObject.ORGANIZATION:
         case AMObject.ORGANIZATIONAL_UNIT:
             idType = IdType.REALM;
             break;
-        case AMObject.ROLE: 
+        case AMObject.ROLE:
         case AMObject.MANAGED_ROLE:
             idType = IdType.ROLE;
             break;
         case AMObject.FILTERED_ROLE:
             idType = IdType.FILTEREDROLE;
-            break;                
+            break;
         default:
             if (debug.messageEnabled()) {
                 debug.message("AMSDKRepo:notifyObjectChangedEvent. " +
@@ -1739,12 +1758,12 @@ public class AMSDKRepo extends IdRepo {
     }
 
     public static void notifyAllObjectsChangedEvent() {
-        
+
         if (debug.messageEnabled()) {
             debug.message("AMSDKRepo.notifyAllObjectsChangedEvent -  Sending "
                     + "event to listeners.");
         }
-        
+
         synchronized (listeners) {
             Iterator it = listeners.iterator();
             while (it.hasNext()) {
@@ -1871,7 +1890,7 @@ public class AMSDKRepo extends IdRepo {
             if (orgType != AMObject.ORGANIZATION) {
                 debug.error("AMSDKRepo.create(): Incorrectly configured "
                         + " plugin: Org DN is wrong = " + orgDN);
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "303", 
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "303",
                         null);
             }
         } catch (AMException ame) {
@@ -2086,7 +2105,7 @@ public class AMSDKRepo extends IdRepo {
      * the fully qualified name would be unique, hence it is recommended to
      * prefix the name with the data store name or protocol. Used by IdRepo
      * framework to check for equality of two identities
-     * 
+     *
      * @param token
      *            administrator SSOToken that can be used by the datastore to
      *            determine the fully qualified name
@@ -2094,7 +2113,7 @@ public class AMSDKRepo extends IdRepo {
      *            type of the identity
      * @param name
      *            name of the identity
-     * 
+     *
      * @return fully qualified name for the identity within the data store
      */
     public String getFullyQualifiedName(SSOToken token,
@@ -2124,7 +2143,7 @@ public class AMSDKRepo extends IdRepo {
     /**
      * Returns <code>true</code> if the data store supports authentication of
      * identities. Used by IdRepo framework to authenticate identities.
-     * 
+     *
      * @return <code>true</code> if data store supports authentication of of
      *         identities; else <code>false</code>
      */
@@ -2136,7 +2155,7 @@ public class AMSDKRepo extends IdRepo {
         return (true);
     }
 
-    public boolean authenticate(Callback[] credentials) throws 
+    public boolean authenticate(Callback[] credentials) throws
             IdRepoException, AuthLoginException {
         debug.message("AMSDKRepo: authenticate. ");
 
@@ -2206,7 +2225,7 @@ public class AMSDKRepo extends IdRepo {
     }
 
     private boolean authenticateIt(LDAPAuthUtils ldapAuthUtil, IdType type,
-            String username, String password) 
+            String username, String password)
         throws IdRepoException, AuthLoginException {
 
         String baseDN = null;

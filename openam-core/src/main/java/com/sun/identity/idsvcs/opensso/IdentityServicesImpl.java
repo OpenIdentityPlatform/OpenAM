@@ -76,6 +76,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.ForbiddenException;
@@ -85,8 +86,10 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.errors.IdentityServicesExceptionMappingHandler;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * Web Service to provide security based on authentication and authorization support.
@@ -402,17 +405,17 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
     }
 
     /**
-     * Searches the identity repository to find all {@code AMIdentity}s that
-     * match the provided search criteria.
+     * Searches the identity repository to find all identities that match the search criteria.
      *
-     * @param filter The search filter.
-     * @param searchModifiers The search attributes.
-     * @param admin The admin token.
-     * @return A {@code List} of identity names.
-     * @throws ResourceException If a problem occurs.
+     * @param crestQuery A CREST Query object which will contain either a _queryId or a _queryFilter.
+     * @param searchModifiers The search modifiers
+     * @param admin Your SSO token.
+     * @return a list of matching identifiers.
+     * @throws ResourceException
      */
-    public List<String> search(String filter, Map<String, Set<String>> searchModifiers, SSOToken admin)
+    public List<String> search(CrestQuery crestQuery, Map<String, Set<String>> searchModifiers, SSOToken admin)
             throws ResourceException {
+
         List<String> rv = new ArrayList<>();
 
         try {
@@ -427,11 +430,8 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             IdType idType = getIdType(objectType);
 
             if (idType != null) {
-                if (StringUtils.isEmpty(filter)) {
-                    filter = "*";
-                }
+                List<AMIdentity> objList = fetchAMIdentities(idType, crestQuery, false, repo, searchModifiers);
 
-                List<AMIdentity> objList = fetchAMIdentities(idType, filter, false, repo, searchModifiers);
                 if (objList != null && !objList.isEmpty()) {
                     List<String> names = getNames(realm, idType, objList);
                     if (!names.isEmpty()) {
@@ -456,6 +456,54 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
         }
 
         return rv;
+    }
+
+    /**
+     * Searches the identity repository to find all identities that match the search criteria and returns them as a
+     * list of identities.
+     *
+     * @param crestQuery A CREST Query object which will contain either a _queryId or a _queryFilter.
+     * @param searchModifiers The search modifiers
+     * @param admin Your SSO token.
+     * @return a list of matching identities.
+     * @throws ResourceException
+     */
+    public List<IdentityDetails> searchIdentityDetails(CrestQuery crestQuery,
+                                                       Map<String, Set<String>> searchModifiers,
+                                                       SSOToken admin)
+            throws ResourceException {
+
+        try {
+            String realm = "/";
+            String objectType = "User";
+            if (searchModifiers != null) {
+                realm = attractValues("realm", searchModifiers, "/");
+                objectType = attractValues("objecttype", searchModifiers, "User");
+            }
+            AMIdentityRepository repo = getRepo(admin, realm);
+            IdType idType = getIdType(objectType);
+
+            if (idType != null) {
+                List<AMIdentity> identities = fetchAMIdentities(idType, crestQuery, true, repo, searchModifiers);
+                List<IdentityDetails> result = new ArrayList<>();
+                for (AMIdentity identity : identities) {
+                    result.add(convertToIdentityDetails(identity, null));
+                }
+                return result;
+            }
+            debug.error("IdentityServicesImpl.searchIdentities unsupported IdType " + objectType);
+            throw new BadRequestException("searchIdentities: unsupported IdType " + objectType);
+
+        } catch (IdRepoException e) {
+            debug.error("IdentityServicesImpl.searchIdentities", e);
+            throw new InternalServerErrorException(e.getMessage());
+        } catch (SSOException e) {
+            debug.error("IdentityServicesImpl.searchIdentities", e);
+            throw new InternalServerErrorException(e.getMessage());
+        } catch (ObjectNotFound e) {
+            debug.error("IdentityServicesImpl.searchIdentities", e);
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     private ResourceException convertToResourceException(IdServicesException exception) {
@@ -629,7 +677,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
     @Override
     public IdentityDetails read(String name, Attribute[] attributes, Token admin) throws IdServicesException {
         List<Attribute> attrList = null;
-        
+
         if (name == null ||  name.isEmpty() || name.equals("null")) {
             debug.error("IdentityServicesImpl:read identity not found");
             throw new ObjectNotFound(name);
@@ -915,8 +963,20 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
         return rv;
     }
 
-    private List<AMIdentity> fetchAMIdentities(IdType type, String identity, boolean fetchAllAttrs,
-            AMIdentityRepository repo, Map searchModifiers) throws IdRepoException, ObjectNotFound, SSOException {
+    private AMIdentity fetchAMIdentity(AMIdentityRepository repo, IdType type, String identity, boolean fetchAllAttrs)
+            throws IdRepoException, ObjectNotFound, SSOException {
+        AMIdentity rv = null;
+        List<AMIdentity> identities = fetchAMIdentities(type, new CrestQuery(identity), fetchAllAttrs, repo, null);
+        if (identities != null && !identities.isEmpty()) {
+            rv = identities.get(0);
+        }
+        return rv;
+    }
+
+    private List<AMIdentity> fetchAMIdentities(IdType type, CrestQuery crestQuery,
+                                            boolean fetchAllAttrs, AMIdentityRepository repo, Map searchModifiers)
+            throws IdRepoException, ObjectNotFound, SSOException {
+
         IdSearchControl searchControl = new IdSearchControl();
         IdSearchResults searchResults;
         List<AMIdentity> identities;
@@ -931,35 +991,24 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             }
 
             if (searchModifiers != null) {
-                searchControl.setSearchModifiers(IdSearchOpModifier.AND,
-                        searchModifiers);
+                searchControl.setSearchModifiers(IdSearchOpModifier.AND, searchModifiers);
             }
 
-            searchResults = repo.searchIdentities(type, identity, searchControl);
+            searchResults = repo.searchIdentities(type, crestQuery, searchControl);
             resultSet = searchResults.getSearchResults();
             identities = new ArrayList<>(resultSet);
         } else {
             // A list is expected back
-        	/*
-        	 * TODO: throw an exception instead of returning an empty list
-        	 */
+            /*
+             * TODO: throw an exception instead of returning an empty list
+             */
             identities = new ArrayList<>();
         }
 
         return identities;
     }
 
-    private AMIdentity fetchAMIdentity(AMIdentityRepository repo, IdType type, String identity, boolean fetchAllAttrs)
-            throws IdRepoException, ObjectNotFound, SSOException {
-        AMIdentity rv = null;
-        List<AMIdentity> identities = fetchAMIdentities(type, identity, fetchAllAttrs, repo, null);
-        if (identities != null && !identities.isEmpty()) {
-            rv = identities.get(0);
-        }
-        return rv;
-    }
-
-    private AMIdentity getAMIdentity(SSOToken ssoToken, AMIdentityRepository repo, String guid, IdType idType)
+   private AMIdentity getAMIdentity(SSOToken ssoToken, AMIdentityRepository repo, String guid, IdType idType)
             throws IdRepoException, SSOException {
         if (isOperationSupported(repo, idType, IdOperation.READ)) {
             try {
@@ -1302,5 +1351,20 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             }
         }
         return attributesArray.toArray(new Attribute[0]);
+    }
+
+    /**
+     * Take a map and capture the keys in a list.
+     * @param map The map whose keys you wish to capture.
+     * @return an ArrayList of the keys of the map.
+     */
+    public static List<String> asListOfKeys(Map<String, Set<String>> map) {
+        List<String> result = new ArrayList<>();
+        if (map != null) {
+            for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
+                result.add(entry.getKey());
+            }
+        }
+        return result;
     }
 }

@@ -149,28 +149,8 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getUsersResourceV1(MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+                                                 IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
         return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
-    }
-
-    @Provides
-    @Named("GroupsResource")
-    @Inject
-    @Singleton
-    public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
-        return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
-    }
-
-    @Provides
-    @Named("AgentsResource")
-    @Inject
-    @Singleton
-    public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
-        return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
                 restSecurityProvider);
     }
 
@@ -178,10 +158,21 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Named("UsersResource")
     @Inject
     @Singleton
-    public IdentityResourceV2 getUsersResource(MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
-            restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+    public IdentityResourceV2 getUsersResourceV2(MailServerLoader mailServerLoader,
+                                                 IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
+                                                         restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
         return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider, baseURLProviderFactory);
+    }
+
+    @Provides
+    @Named("UsersResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV3 getUsersResource(MailServerLoader mailServerLoader,
+                                               IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+                                               BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV3(IdentityResourceV2.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
                 restSecurityProvider, baseURLProviderFactory);
     }
 
@@ -189,10 +180,52 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Named("GroupsResource")
     @Inject
     @Singleton
-    public IdentityResourceV2 getGroupsResource(MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
-            restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+    public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader,
+                                                  IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider);
+    }
+
+    @Provides
+    @Named("GroupsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV2 getGroupsResourceV2(MailServerLoader mailServerLoader,
+                                                  IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
+                                                  RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
         return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider, baseURLProviderFactory);
+    }
+
+    @Provides
+    @Named("GroupsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV3 getGroupsResource(MailServerLoader mailServerLoader,
+                                                IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
+                                                RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV3(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityServices,
+                coreWrapper, restSecurityProvider, baseURLProviderFactory);
+    }
+
+    @Provides
+    @Named("AgentsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader,
+                                                  IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
+                restSecurityProvider);
+    }
+
+    @Provides
+    @Named("AgentsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV2 getAgentsResourceV2(MailServerLoader mailServerLoader,
+                                                  IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
+                                                  RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
                 restSecurityProvider, baseURLProviderFactory);
     }
 
@@ -200,11 +233,11 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Named("AgentsResource")
     @Inject
     @Singleton
-    public IdentityResourceV2 getAgentsResource(MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
-            restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
-        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory);
+    public IdentityResourceV3 getAgentsResource(MailServerLoader mailServerLoader,
+                                                IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
+                                                RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV3(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityServices,
+                coreWrapper, restSecurityProvider, baseURLProviderFactory);
     }
 
     @Provides

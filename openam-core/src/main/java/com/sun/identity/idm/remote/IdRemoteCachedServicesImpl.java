@@ -59,6 +59,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
+import org.forgerock.openam.utils.CrestQuery;
 
 /*
  * Class which provides caching on top of available IdRepoLDAPServices.
@@ -67,11 +68,11 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         IdCachedServices {
 
     static final String CACHE_MAX_SIZE_KEY = "com.iplanet.am.sdk.cache.maxSize";
-    
+
     static final String CACHE_MAX_SIZE = "10000";
-    
+
     static final int CACHE_MAX_SIZE_INT = 10000;
-    
+
     private static int maxSize;
 
     private static IdServices instance;
@@ -89,7 +90,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         super();
         initializeParams();
         initializeCache();
-        
+
         // Register for notification or polling as configured
         IdRemoteEventListener.getInstance();
         stats = Stats.getInstance(getClass().getName());
@@ -102,7 +103,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                 Agent.getIdrepoSvcMBean();
         }
     }
-    
+
     /**
      * Method to check if caching is enabled or disabled and configure the size
      * of the cache accordingly.
@@ -134,10 +135,10 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
     private void initializeCache() {
         idRepoCache = new Cache(maxSize);
     }
-    
+
     /**
      * Method to get the current cache size
-     * 
+     *
      * @return the size of the SDK LRU cache
      */
     public int getSize() {
@@ -207,7 +208,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
      * This method is used to clear the entire SDK cache in the event that
      * EventService notifies that all entries have been modified (or should be
      * marked dirty).
-     * 
+     *
      */
     public synchronized void clearCache() {
         idRepoCache.clear();
@@ -219,11 +220,11 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
      * method will update the cache by removing all the entires which are
      * affected as a result of an event notification caused because of
      * changes/deletions/renaming of entries with and without aci's.
-     * 
+     *
      * <p>
      * NOTE: The event could have been caused either by changes to an aci entry
      * or a costemplate or a cosdefinition or changes to a normal entry
-     * 
+     *
      * @param dn
      *            name of entity being modified
      * @param eventType
@@ -291,7 +292,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                     + cosType + ", aciChange: " + aciChange
                     + ", fullDN: " + originalDN + "; rfcDN =" + dn
                     + "; cachedID=" + cachedID);
-        }   
+        }
     }
 
     /**
@@ -346,7 +347,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
     public Map getAttributes(SSOToken token, IdType type, String name,
         Set attrNames, String amOrgName, String amsdkDN,
         boolean isStringValues) throws IdRepoException, SSOException {
-        
+
         // If requested attributes is null or empty, call the
         // other interface to get all the attributes
         // TODO: Need to provide means to get all binary attributes too!
@@ -354,7 +355,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         if ((attrNames == null) || attrNames.isEmpty()) {
             return (getAttributes(token, type, name, amOrgName, amsdkDN));
         }
-        
+
         cacheStats.incrementGetRequestCount(getSize());
         if (SystemProperties.isServerMode() &&
             MonitoringUtil.isRunning() &&
@@ -371,7 +372,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         // Get the principal DN
         AMIdentity tokenId = IdUtils.getIdentity(token);
         String principalDN = tokenId.getUniversalId();
-        
+
         if (DEBUG.messageEnabled()) {
             DEBUG.message("In IdRemoteCachedServicesImpl." +
                 "getAttributes(SSOToken type, name, attrNames, " +
@@ -382,7 +383,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
 
         // Attributes to be returned
         AMHashMap attributes;
-        
+
         IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
         if (cb == null) { // Entry not present in cache
             if (DEBUG.messageEnabled()) {
@@ -390,7 +391,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                         + "getAttributes(): NO entry found in Cachefor key = "
                         + dn + ". Getting all these attributes from DS: "
                         + attrNames);
-            }   
+            }
 
             // If the attributes returned here have an empty set as value, then
             // such attributes do not have a value or invalid attributes.
@@ -413,7 +414,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
             // Find the missing attributes that need to be obtained from DS
             // Only find the missing keys as the ones with empty sets are not
             // found in DS
-            Set missAttrNames = attributes.getMissingKeys(attrNames); 
+            Set missAttrNames = attributes.getMissingKeys(attrNames);
             if (!missAttrNames.isEmpty()) {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("IdRemoteCachedServicesImpl."
@@ -425,7 +426,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                         type, name, attrNames, amOrgName, amsdkDN,
                         isStringValues);
                 attributes.putAll(dsAttributes);
-                
+
                 // Add these attributes, just mark to hem as
                 // invalid (Attribute level Negative caching)
                 Set newMissAttrNames = dsAttributes
@@ -444,10 +445,10 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("IdRemoteCachedServicesImpl." +
                             "getAttributes(): found all attributes in Cache.");
-                }   
+                }
             }
         }
-        
+
         return attributes;
     }
 
@@ -455,7 +456,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
     public Map getAttributes(SSOToken token, IdType type, String name,
         String amOrgName, String amsdkDN)
         throws IdRepoException, SSOException {
-        
+
         cacheStats.incrementGetRequestCount(getSize());
         if (SystemProperties.isServerMode() &&
             MonitoringUtil.isRunning() &&
@@ -508,9 +509,9 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                     + "getAttributes(): attributes NOT found in cache. "
                     + "Fetched from DS.");
             }
-        
+
         }
-        
+
         return attributes;
     }
 
@@ -532,7 +533,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         // Update the attributes in datastore
         super.setAttributes(token, type, name, attributes, isAdd, amOrgName,
                 amsdkDN, isString);
-        
+
         // Get identity DN
         AMIdentity id = new AMIdentity(token, name, type, amOrgName, amsdkDN);
         String dn = id.getUniversalId();
@@ -554,41 +555,41 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         String orgName, String amsdkDN) throws IdRepoException,
         SSOException {
         // Call parent to delete the entry
-        super.delete (token, type, name, orgName, amsdkDN);
-        
+        super.delete(token, type, name, orgName, amsdkDN);
+
         // Clear the cache, get identity DN
         AMIdentity id = new AMIdentity (token, name, type, orgName, amsdkDN);
         String dn = id.getUniversalId().toLowerCase();
-        idRepoCache.remove (dn);
+        idRepoCache.remove(dn);
     }
-    
+
     // @Override
     public void removeAttributes (SSOToken token, IdType type, String name,
         Set attrNames, String orgName, String amsdkDN)
         throws IdRepoException, SSOException {
         // Call parent to remove the attributes
-        super.removeAttributes (token, type, name, attrNames, orgName, amsdkDN);
-        
+        super.removeAttributes(token, type, name, attrNames, orgName, amsdkDN);
+
         // Update the cache
         AMIdentity id = new AMIdentity (token, name, type, orgName, amsdkDN);
         String dn = id.getUniversalId ().toLowerCase();
         IdCacheBlock cb = (IdCacheBlock) idRepoCache.get (dn);
         if ((cb != null) && !cb.hasExpiredAndUpdated () && cb.isExists ()) {
             // Remove the attributes
-            cb.removeAttributes (attrNames);
+            cb.removeAttributes(attrNames);
         }
     }
-    
-    // @Override
-    public IdSearchResults search (SSOToken token, IdType type, String pattern,
-        IdSearchControl ctrl, String orgName)
-        throws IdRepoException, SSOException {
+
+    @Override
+    public IdSearchResults search (SSOToken token, IdType type, IdSearchControl ctrl, String orgName,
+                                                                                CrestQuery crestQuery)
+            throws IdRepoException, SSOException {
 
         IdSearchResults answer = new IdSearchResults(type, orgName);
         // in legacy mode we must do search in order
         // to get the AMSDKDN component added to AMIdentity's uvid.
         // otherwise unix and anonymous login will fail.
-        
+
         cacheStats.incrementSearchRequestCount(getSize());
         if (SystemProperties.isServerMode() && MonitoringUtil.isRunning() &&
             ((monIdRepo = Agent.getIdrepoSvcMBean()) != null))
@@ -596,57 +597,61 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
             long li = (long)getSize();
             monIdRepo.incSearchRqts(li);
         }
-        if ((pattern.indexOf('*') == -1) &&
-            ServiceManager.isRealmEnabled()) {
-            // First check if the specific identity is in cache.
-            // If yes, get Attributes from cache.
-            // If not search in server.
-            AMIdentity uvid = new AMIdentity(token, pattern, type,
-                orgName, null);
-            String universalID = uvid.getUniversalId().toLowerCase();
-            IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(universalID);
-            if ((cb != null) && !cb.hasExpiredAndUpdated() &&
-                cb.isExists() &&
-                (ctrl.getSearchModifierMap() == null)) {
-                // Check if search is for a specific identity
-                // Search is for a specific user, look in the cache
-                Map attributes;
-                try {
-                    cacheStats.updateSearchHitCount(getSize());
-                    if (SystemProperties.isServerMode() &&
-                        MonitoringUtil.isRunning() && ((monIdRepo = Agent.getIdrepoSvcMBean()) !=
-                             null))
-                    {
-                        long li = (long)getSize();
-                        monIdRepo.incSearchCacheHits(li);
-                    }
-                    if (ctrl.isGetAllReturnAttributesEnabled()) {
-                        attributes = getAttributes(token, type, pattern,
-                            orgName, null);
-                    } else {
-                        Set attrNames = ctrl.getReturnAttributes();
-                        attributes = getAttributes(token, type, pattern,
-                            attrNames, orgName, null, true);
-                    }
-                    // Construct IdSearchResults
-                    AMIdentity id = new AMIdentity(token, pattern,
-                        type, orgName, null);
-                    answer.addResult(id, attributes);
-                } catch (IdRepoException ide) {
-                    // Check if the exception is name not found
-                    if (!ide.getErrorCode().equals("220")) {
-                        // Throw the exception
-                        throw (ide);
+
+        boolean isCached = false;
+        if (crestQuery.hasQueryId()) {
+            String pattern = crestQuery.getQueryId();
+
+            if ((pattern.indexOf('*') == -1) &&
+                    ServiceManager.isRealmEnabled()) {
+                // First check if the specific identity is in cache.
+                // If yes, get Attributes from cache.
+                // If not search in server.
+                AMIdentity uvid = new AMIdentity(token, pattern, type,
+                        orgName, null);
+                String universalID = uvid.getUniversalId().toLowerCase();
+                IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(universalID);
+                if ((cb != null) && !cb.hasExpiredAndUpdated() &&
+                        cb.isExists() &&
+                        (ctrl.getSearchModifierMap() == null)) {
+                    // Check if search is for a specific identity
+                    // Search is for a specific user, look in the cache
+                    Map attributes;
+                    try {
+                        cacheStats.updateSearchHitCount(getSize());
+                        if (SystemProperties.isServerMode() &&
+                                MonitoringUtil.isRunning() && ((monIdRepo = Agent.getIdrepoSvcMBean()) !=
+                                null)) {
+                            long li = (long) getSize();
+                            monIdRepo.incSearchCacheHits(li);
+                        }
+                        if (ctrl.isGetAllReturnAttributesEnabled()) {
+                            attributes = getAttributes(token, type, pattern,
+                                    orgName, null);
+                        } else {
+                            Set attrNames = ctrl.getReturnAttributes();
+                            attributes = getAttributes(token, type, pattern,
+                                    attrNames, orgName, null, true);
+                        }
+                        // Construct IdSearchResults
+                        AMIdentity id = new AMIdentity(token, pattern,
+                                type, orgName, null);
+                        answer.addResult(id, attributes);
+                        isCached = true;
+                    } catch (IdRepoException ide) {
+                        // Check if the exception is name not found
+                        if (!ide.getErrorCode().equals("220")) {
+                            // Throw the exception
+                            throw (ide);
+                        }
                     }
                 }
-            } else {
-                // Not in Cache.
-                // Do a search is server.
-                answer = super.search(token, type, pattern, ctrl, orgName);
             }
-        } else {
-            // Pattern contains "*", need a search in server.
-            answer = super.search(token, type, pattern, ctrl, orgName);
+        }
+
+        if (!isCached) {
+            // Not in Cache.  Do a search in server.
+            answer = super.search(token, type, ctrl, orgName, crestQuery);
         }
         return (answer);
     }

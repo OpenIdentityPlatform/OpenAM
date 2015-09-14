@@ -26,17 +26,21 @@
  */
 package com.sun.identity.idm.plugins.database;
 
+import com.sun.identity.idm.IdRepoUnsupportedOpException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.util.query.QueryFilter;
+
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Classes that implement this interface are expected to conatin code that
- * accesses a datastore, such as JBDC code to access a database, and 
+ * accesses a datastore, such as JBDC code to access a database, and
  * create, read, update, delete, and search users and user related attributes.
  *
  * No matter what technology is used to access the datastore or what format
- * or type the data may be, it should be converted to Strings before being 
+ * or type the data may be, it should be converted to Strings before being
  * returned to the opensso layer and calling code, as indicated
  * in the method interfaces.
  * An IdRepo.java implementatiuon class like JDBCSimpleUserDao.java is an
@@ -44,34 +48,39 @@ import java.util.Set;
  */
 public interface DaoInterface {
     public void initialize(String jndiName,
-            String userDataBaseTableName, 
+            String userDataBaseTableName,
             String membershipDataBaseTableName,
             Debug idRepoDebugLog)
             throws java.lang.InstantiationException;
-    
+
     public void initialize(String jdbcDriver, String jdbcDriverUrl,
-            String jdbcDbUser,String jdbcDbPassword, 
-            String userDataBaseTableName, 
+            String jdbcDbUser,String jdbcDbPassword,
+            String userDataBaseTableName,
             String membershipDataBaseTableName, Debug idRepoDebugLog)
             throws java.lang.InstantiationException;
-    
+
     public void updateUser(String userID, String userIDAttributeName,
             Map<String, Set<String> > attrMap);
-    
+
     public void deleteUser(String userID, String userIDAttributeName);
-    
-    public String createUser(String userIDAttributeName, 
+
+    public String createUser(String userIDAttributeName,
                                     Map<String, Set<String> > attrMap);
-    
-    public Map<String, Set<String>> getAttributes(String userID, 
+
+    public Map<String, Set<String>> getAttributes(String userID,
             String userIDAttributeName,
             Set<String> attributesToFetch);
-    
+
     public Map<String, Map<String, Set<String>>>  search(
-            String userIDAttributeName, int limit, String idPattern, 
-            Set<String> attributesToFetch, String filterOperand, 
+            String userIDAttributeName, int limit, String idPattern,
+            Set<String> attributesToFetch, String filterOperand,
             Map<String, Set<String>> avPairs);
-    
+
+    public Map<String, Map<String, Set<String>>>  search(
+            String userIDAttributeName, int limit, QueryFilter<JsonPointer> queryFilter,
+            Set<String> attributesToFetch, String filterOperand,
+            Map<String, Set<String>> avPairs) throws IdRepoUnsupportedOpException;
+
     /**
      * get the url of the current database.
      * @return a url of the current db connection, should be of the form
@@ -80,31 +89,36 @@ public interface DaoInterface {
      * domain name for users, and this value serves as sort of the prefix.
      */
     public String getDataSourceURL();
-    
-    public Set<String> getMembers(String groupName, 
+
+    public Set<String> getMembers(String groupName,
             String membershipIdAttributeName);
-     
-    public Set<String> getMemberships(String userName, 
+
+    public Set<String> getMemberships(String userName,
             String membershipIdAttributeName);
-    
+
     public void deleteGroup(String groupName,
             String membershipIdAttributeName);
-    
+
     public void createGroup(String groupName,
             String membershipIdAttributeName);
-    
+
     public void deleteMembersFromGroup(Set<String> members, String groupName,
             String membershipIdAttributeName);
-    
+
     public void addMembersToGroup(Set<String> members, String groupName,
             String membershipIdAttributeName);
-    
+
     public Map<String, Map<String, Set<String>>>  searchForGroups(
             String membershipIdAttributeName, int limit, String idPattern,
-            Set<String> attributesToFetch, String filterOperand, 
+            Set<String> attributesToFetch, String filterOperand,
             Map<String, Set<String>> avPairs);
-    
-    public Map<String, Set<String>> getGroupAttributes(String groupName, 
+
+    public Map<String, Map<String, Set<String>>>  searchForGroups(
+            String membershipIdAttributeName, int limit, QueryFilter<JsonPointer> queryFilter,
+            Set<String> attributesToFetch, String filterOperand,
+            Map<String, Set<String>> avPairs);
+
+    public Map<String, Set<String>> getGroupAttributes(String groupName,
             String membershipIdAttributeName, Set<String> attributesToFetch);
-    
+
 }

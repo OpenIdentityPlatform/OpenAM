@@ -50,6 +50,8 @@ public final class DecoratorTestUtils {
                 args[i++] = 0.0f;
             } else if (type == Character.TYPE) {
                 args[i++] = ' ';
+            } else if (type == String.class) {
+                args[i++] = "";
             } else {
                 args[i++] = null;
             }

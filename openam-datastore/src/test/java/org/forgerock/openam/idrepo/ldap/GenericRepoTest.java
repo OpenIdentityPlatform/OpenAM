@@ -33,6 +33,7 @@ import java.util.Set;
 import static org.fest.assertions.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.MapHelper;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ResultCode;
@@ -331,8 +332,9 @@ public class GenericRepoTest extends IdRepoTestBase {
 
     @Test
     public void searchReturnsEmptyResultsIfNoMatch() throws Exception {
+        CrestQuery crestQuery = new CrestQuery("invalid");
         RepoSearchResults results =
-                idrepo.search(null, IdType.USER, "invalid", 0, 0, null, true, IdRepo.AND_MOD, null, true);
+                idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.AND_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
         assertThat(results.getType()).isEqualTo(IdType.USER);
         assertThat(results.getSearchResults()).isEmpty();
@@ -341,8 +343,9 @@ public class GenericRepoTest extends IdRepoTestBase {
 
     @Test
     public void searchReturnsMatchesForSearchAttribute() throws Exception {
+        CrestQuery crestQuery = new CrestQuery("searchTester*");
         RepoSearchResults results =
-                idrepo.search(null, IdType.USER, "searchTester*", 0, 0, null, true, IdRepo.AND_MOD, null, true);
+                idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.AND_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
         assertThat(results.getType()).isEqualTo(IdType.USER);
         assertThat(results.getSearchResults()).hasSize(4).containsOnly("searchTester1", "searchTester2",
@@ -351,8 +354,9 @@ public class GenericRepoTest extends IdRepoTestBase {
 
     @Test
     public void searchReturnsRequestedAttributes() throws Exception {
+        CrestQuery crestQuery = new CrestQuery("searchTester1");
         RepoSearchResults results =
-                idrepo.search(null, IdType.USER, "searchTester1", 0, 0, asSet("sn"), false, IdRepo.AND_MOD, null, true);
+                idrepo.search(null, IdType.USER, crestQuery, 0, 0, asSet("sn"), false, IdRepo.AND_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
         assertThat(results.getType()).isEqualTo(IdType.USER);
         assertThat(results.getSearchResults()).hasSize(1).containsOnly("searchTester1");
@@ -369,12 +373,13 @@ public class GenericRepoTest extends IdRepoTestBase {
         Map<String, Set<String>> avPairs = new HashMap<String, Set<String>>();
         avPairs.put("objectclass", asSet("inetorgperson"));
         avPairs.put("sn", asSet("hellNo"));
+        CrestQuery crestQuery = new CrestQuery("*");
         RepoSearchResults results =
-                idrepo.search(null, IdType.USER, "*", 0, 0, null, true, IdRepo.AND_MOD, avPairs, true);
+                idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.AND_MOD, avPairs, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
         assertThat(results.getType()).isEqualTo(IdType.USER);
         assertThat(results.getSearchResults()).containsOnly("searchTester3");
-        results = idrepo.search(null, IdType.USER, "*", 0, 0, null, true, IdRepo.OR_MOD, avPairs, true);
+        results = idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.OR_MOD, avPairs, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
         assertThat(results.getType()).isEqualTo(IdType.USER);
         assertThat(results.getSearchResults()).containsOnly(DEMO, "searchTester1", "searchTester2", "searchTester3",
@@ -383,7 +388,9 @@ public class GenericRepoTest extends IdRepoTestBase {
 
     @Test(enabled = false)
     public void searchReturnsEarlyIfMaxResultsReached() throws Exception {
-        RepoSearchResults results = idrepo.search(null, IdType.USER, "*", 0, 2, null, true, IdRepo.AND_MOD, null, true);
+        CrestQuery crestQuery = new CrestQuery("*");
+        RepoSearchResults results = idrepo.search(null, IdType.USER, crestQuery, 0, 2, null, true,
+                                                                                    IdRepo.AND_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(RepoSearchResults.SIZE_LIMIT_EXCEEDED);
         assertThat(results.getSearchResults()).hasSize(2);
     }

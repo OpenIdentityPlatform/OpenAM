@@ -26,6 +26,7 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdServices;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.sm.SchemaType;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.util.Reject;
 
 import javax.security.auth.callback.Callback;
@@ -168,9 +169,11 @@ public class IdServicesDecorator implements IdServices {
      * {@inheritDoc}
      */
     @Override
-    public IdSearchResults search(SSOToken token, IdType type, String pattern, IdSearchControl ctrl, String amOrgName)
+    public IdSearchResults search(SSOToken token, IdType type, IdSearchControl ctrl, String amOrgName,
+                                  CrestQuery crestQuery)
             throws IdRepoException, SSOException {
-        return delegate.search(token, type, pattern, ctrl, amOrgName);
+
+        return delegate.search(token, type, ctrl, amOrgName, crestQuery);
     }
 
     /**
