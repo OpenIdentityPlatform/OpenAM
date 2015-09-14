@@ -168,7 +168,7 @@ public class RestGuiceModule extends AbstractModule {
     @Singleton
     Router getCrestRootRouter(@Named("CrestRealmRouter") Router crestRealmRouter) {
         Router crestRootRouter = new Router();
-        crestRealmRouter.setDefaultRoute(crestRealmRouter);
+        crestRootRouter.setDefaultRoute(crestRealmRouter);
         return crestRealmRouter;
     }
 

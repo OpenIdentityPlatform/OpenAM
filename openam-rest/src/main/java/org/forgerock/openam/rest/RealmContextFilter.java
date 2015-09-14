@@ -78,8 +78,10 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
     public Promise<Response, NeverThrowsException> filter(Context context, Request request, Handler next) {
         try {
             return next.handle(evaluate(context, request), request);
-        } catch (ResourceException e) {
+        } catch (BadRequestException e ) {
             return newResultPromise(new Response(Status.BAD_REQUEST).setEntity(e.toJsonValue().getObject()));
+        } catch (ResourceException e) {
+            return newResultPromise(new Response(Status.INTERNAL_SERVER_ERROR).setEntity(e.toJsonValue().getObject()));
         }
     }
 
@@ -172,7 +174,7 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
 
         SSOToken adminToken = coreWrapper.getAdminToken();
 
-        String dnsAliasRealm = cleanRealm(getRealmFromServerName(adminToken, hostname));
+        String dnsAliasRealm = cleanRealm(getRealmFromAlias(adminToken, hostname));
         StringBuilder matchedUriBuilder = new StringBuilder();
         String currentRealm = dnsAliasRealm;
         int consumedElementsCount = 0;
@@ -188,18 +190,25 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
         }
 
         String overrideRealm = null;
-        if (overrideRealmParameter != null && !overrideRealmParameter.isEmpty()) {
-            overrideRealm = resolveRealm(adminToken, "/", cleanRealm(overrideRealmParameter.get(0)));
+        try {
+            if (overrideRealmParameter != null && !overrideRealmParameter.isEmpty()) {
+                overrideRealm = resolveRealm(adminToken, "/", cleanRealm(overrideRealmParameter.get(0)));
+            }
+        } catch (InternalServerErrorException e) {
+            throw new BadRequestException("Invalid realm, " + overrideRealmParameter.get(0), e);
         }
 
         ResourcePath remainingUri = requestUri.subSequence(consumedElementsCount, requestUri.size());
-        String matchedUri = matchedUriBuilder.length() > 1 ? matchedUriBuilder.substring(1) : matchedUriBuilder.toString();
+        String matchedUri = matchedUriBuilder.length() > 1 ? matchedUriBuilder.substring(1) :
+                matchedUriBuilder.toString();
 
-        RealmContext realmContext = new RealmContext(new UriRouterContext(context, matchedUri, remainingUri.toString(), Collections.<String, String>emptyMap()));
+        RealmContext realmContext = new RealmContext(new UriRouterContext(context, matchedUri,
+                remainingUri.toString(), Collections.<String, String>emptyMap()));
         realmContext.setDnsAlias(hostname, dnsAliasRealm);
         realmContext.setSubRealm(matchedUri, cleanRealm(currentRealm.substring(dnsAliasRealm.length())));
         realmContext.setOverrideRealm(overrideRealm);
         return realmContext;
+
     }
 
     private String cleanRealm(String realm) {
@@ -212,23 +221,24 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
         return realm;
     }
 
-    private String resolveRealm(SSOToken adminToken, String parentRealm, String subrealm) throws ResourceException {
-        String realm = parentRealm.equals("/") ? subrealm : parentRealm + subrealm;
+    private String resolveRealm(SSOToken adminToken, String parentRealm, String subrealm)
+            throws InternalServerErrorException {
+        String realm = concatenateRealmPath(parentRealm, subrealm);
         if (!realmValidator.isRealm(realm)) {
             // Ignoring parentRealm here as a realm alias is only applicable if it is from the root realm
-            return getRealmFromServerName(adminToken, subrealm.substring(1));
+            return getRealmFromAlias(adminToken, subrealm.substring(1));
         }
         return realm;
     }
 
-    private String getRealmFromServerName(SSOToken adminToken, String hostname) throws ResourceException {
+    private String concatenateRealmPath(String parentRealm, String subrealm) {
+        return parentRealm.equals("/") ? subrealm : parentRealm + subrealm;
+    }
+
+    private String getRealmFromAlias(SSOToken adminToken, String realmAlias) throws InternalServerErrorException {
         try {
-            String orgDN = coreWrapper.getOrganization(adminToken, hostname);
-            String realm = coreWrapper.convertOrgNameToRealmName(orgDN);
-            if (realm == null) {
-                throw new BadRequestException("Invalid realm, " + hostname);
-            }
-            return realm;
+            String orgDN = coreWrapper.getOrganization(adminToken, realmAlias);
+            return coreWrapper.convertOrgNameToRealmName(orgDN);
         } catch (IdRepoException | SSOException e) {
             throw new InternalServerErrorException(e);
         }

@@ -126,11 +126,13 @@ public class RealmContextFilterTest {
         Context context = mockContext(ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(INVALID_DNS_ALIAS_HOSTNAME, ENDPOINT_PATH_ELEMENT);
 
+        mockInvalidDnsAlias(INVALID_DNS_ALIAS_HOSTNAME);
+
         //When
         Response response = filter.filter(context, request, handler).getOrThrowUninterruptibly();
 
         //Then
-        verifyInvalidRealmResponse(response, INVALID_DNS_ALIAS_HOSTNAME);
+        assertThat(response.getStatus()).isSameAs(Status.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -181,12 +183,15 @@ public class RealmContextFilterTest {
         Request request = createRequest(HOSTNAME, INVALID_SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
 
         mockDnsAlias(HOSTNAME, "/");
+        mockInvalidRealmAlias(INVALID_SUB_REALM);
 
         //When
-        Response response = filter.filter(context, request, handler).getOrThrowUninterruptibly();
+        filter.filter(context, request, handler);
 
         //Then
-        verifyInvalidRealmResponse(response, INVALID_SUB_REALM);
+        ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
+        verify(handler).handle(contextCaptor.capture(), eq(request));
+        verifyUriRouterContextForInvalidRealm(contextCaptor.getValue());
     }
 
     @Test
@@ -218,12 +223,15 @@ public class RealmContextFilterTest {
 
         mockDnsAlias(DNS_ALIAS_HOSTNAME, "/" + DNS_ALIS_SUB_REALM);
         mockRealmAlias("/" + DNS_ALIS_SUB_REALM + "/" + SUB_REALM_ALIAS, "/" + DNS_ALIS_SUB_REALM + "/" + SUB_REALM);
+        mockInvalidRealmAlias(SUB_REALM_ALIAS);
 
         //When
-        Response response = filter.filter(context, request, handler).getOrThrowUninterruptibly();
+        filter.filter(context, request, handler);
 
         //Then
-        verifyInvalidRealmResponse(response, SUB_REALM_ALIAS);
+        ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
+        verify(handler).handle(contextCaptor.capture(), eq(request));
+        verifyUriRouterContextForInvalidRealm(contextCaptor.getValue());
     }
 
     @Test
@@ -274,6 +282,7 @@ public class RealmContextFilterTest {
         Request request = createRequest(HOSTNAME, ENDPOINT_PATH_ELEMENT + "?realm=" + INVALID_OVERRIDE_REALM);
 
         mockDnsAlias(HOSTNAME, "/");
+        mockInvalidRealmAlias(INVALID_OVERRIDE_REALM);
 
         //When
         Response response = filter.filter(context, request, handler).getOrThrowUninterruptibly();
@@ -381,7 +390,7 @@ public class RealmContextFilterTest {
         Response response = filter.filter(context, request, handler).getOrThrowUninterruptibly();
 
         //Then
-        assertThat(response.getStatus()).isSameAs(Status.BAD_REQUEST);
+        assertThat(response.getStatus()).isSameAs(Status.INTERNAL_SERVER_ERROR);
         assertThat(response.getEntity().getJson()).isEqualTo(
                 new InternalServerErrorException("EXCEPTION_MESSAGE").toJsonValue().getObject());
     }
@@ -398,10 +407,18 @@ public class RealmContextFilterTest {
         mockRealmAlias(alias, realm);
     }
 
+    private void mockInvalidDnsAlias(String alias) throws Exception {
+        mockInvalidRealmAlias(alias);
+    }
+
     private void mockRealmAlias(String alias, String realm) throws Exception {
         given(coreWrapper.getOrganization(any(SSOToken.class), eq(alias))).willReturn(realm);
         given(coreWrapper.convertOrgNameToRealmName(realm)).willReturn(realm);
         given(realmValidator.isRealm(realm)).willReturn(true);
+    }
+
+    private void mockInvalidRealmAlias(String alias) throws Exception {
+        doThrow(IdRepoException.class).when(coreWrapper).getOrganization(any(SSOToken.class), eq(alias));
     }
 
     private void verifyRealmContext(Context context, String expectedDnsAliasRealm,
@@ -430,6 +447,12 @@ public class RealmContextFilterTest {
         }
         assertThat(routerContext.getMatchedUri()).isEqualTo(matchedUri);
         assertThat(routerContext.getRemainingUri()).isEqualTo(ENDPOINT_PATH_ELEMENT);
+    }
+
+    private void verifyUriRouterContextForInvalidRealm(Context context) {
+        UriRouterContext routerContext = context.asContext(UriRouterContext.class);
+        assertThat(routerContext.getBaseUri()).isEqualTo(JSON_PATH_ELEMENT);
+        assertThat(routerContext.getMatchedUri()).isEmpty();
     }
 
     private void verifyInvalidRealmResponse(Response response, String expectedInvalidRealm) throws IOException {
