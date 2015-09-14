@@ -27,13 +27,13 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "jquery",
     "underscore",
     "org/forgerock/openam/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Configuration"
-], function ($, _, Constants, Configuration) {
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "config/ThemeConfiguration"
+], function ($, _, Constants, Configuration, ThemeConfiguration) {
     /**
      * @exports org/forgerock/openam/ui/common/util/ThemeManager
      */
-    var obj = {},
-        promise = null,
+    var defaultThemeName = "default",
         applyThemeToPage = function (path, icon, stylesheets) {
             // We might be switching themes (due to a realm change) and so we need to clean up the previous theme.
             $("link").remove();
@@ -54,123 +54,117 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                 $("<link/>", {
                     rel: "stylesheet",
                     type: "text/css",
-                    href: stylesheet
+                    href: require.toUrl(stylesheet)
                 }).appendTo("head");
             });
         },
 
         /**
-         * Loads the theme configuration json.
-         * <p> Returns promise of theme configuration if it has not already been requested.
-         * @returns {object} promise containing the theme configuration object
+         * Determine if a mapping specification matches the current environment. Mappings are of the form:
+         * { theme: "theme-name", realms: ["/a", "/b"] }.
+         *
+         * @param {string} realm The full realm path to match the themes against.
+         * @param {object} mapping the mapping specification provided by the theme configuration.
+         * @returns {boolean} true if mapping matches the current environment.
          */
-        loadThemeConfig = function () {
-            if (promise === null) {
-                promise = $.getJSON(require.toUrl(Constants.THEME_CONFIG_PATH));
-            }
-            return promise;
+        isMatchingThemeMapping = function (realm, mapping) {
+            return _.some(mapping.realms, function (mappingRealm) {
+                if (_.isRegExp(mappingRealm)) {
+                    return mappingRealm.test(realm);
+                } else {
+                    return mappingRealm === realm;
+                }
+            });
         },
 
         /**
-         * Find the appropriate theme for the current realm.
+         * Find the appropriate theme for the current environment by using the theme configuration mappings.
          * <p>
-         * If a theme is found that matches the current realm then its name will be
+         * If a theme is found that matches the current environment then its name will be
          * returned, otherwise the default theme name will be returned.
+         * @param {string} realm The full realm path to match the themes against.
          * @returns {string} theme The selected theme configuration name.
          */
-        getThemeForCurrentRealm = function () {
-            var matchedTheme = _.find(obj.data.themes, function (theme) {
-                return _.some(theme.realms, function (realm) {
-                    if (theme.regex) {
-                        var pattern = new RegExp(realm);
-                        return pattern.test(Configuration.globalData.realm);
-                    } else {
-                        return realm === Configuration.globalData.realm;
-                    }
-                });
-            });
-            if (matchedTheme) {
-                return matchedTheme.name;
+        findMatchingTheme = function (realm) {
+            if (!_.isArray(ThemeConfiguration.mappings)) {
+                return defaultThemeName;
             }
-
-            return "default";
+            var matchedThemeMapping = _.find(ThemeConfiguration.mappings, _.partial(isMatchingThemeMapping, realm));
+            if (matchedThemeMapping) {
+                return matchedThemeMapping.theme;
+            }
+            return defaultThemeName;
         },
 
-        updateSrc = function (value) {
-            if (_.has(value, "src")) {
-                value.src = require.toUrl(value.src);
-            }
-        },
-
-        updateSrcProperties = function (config) {
-            var i;
-            if (config.themes && _.isArray(config.themes)) {
-                for (i = 0; i < config.themes.length; i++) {
-                    _.each(config.themes[i].settings, updateSrc);
+        makeUrlsRelativeToEntryPoint = function (theme) {
+            theme = _.clone(theme, true);
+            if (theme.settings) {
+                if (theme.settings.logo) {
+                    theme.settings.logo.src = require.toUrl(theme.settings.logo.src);
                 }
-            } else {
-                _.each(config.settings, updateSrc);
+                if (theme.settings.loginLogo) {
+                    theme.settings.loginLogo.src = require.toUrl(theme.settings.loginLogo.src);
+                }
             }
+            return theme;
         },
 
-        isRelativePath = function (path) {
-            return path.indexOf("http://") !== 0 &&
-                path.indexOf("https://") !== 0 &&
-                path.indexOf("/") !== 0;
+        extendTheme = function (theme, parentTheme) {
+            return _.merge({}, parentTheme, theme, function (objectValue, sourceValue) {
+                // We don't want to merge arrays. If a theme has specified an array, it should be used verbatim.
+                if (_.isArray(sourceValue)) {
+                    return sourceValue;
+                }
+                return undefined;
+            });
+        },
+
+        validateConfig = function () {
+            if (!_.isObject(ThemeConfiguration)) {
+                throw "Theme configuration must return an object";
+            }
+
+            if (!_.isObject(ThemeConfiguration.themes)) {
+                throw "Theme configuration must specify a themes object";
+            }
+
+            if (!_.isObject(ThemeConfiguration.themes[defaultThemeName])) {
+                throw "Theme configuration must specify a default theme";
+            }
         };
 
-    /**
-     * Determine the theme from the themeConfig and the current realm and setup the theme on the page. This will
-     * clear out any previous theme.
-     * @param {string} [basePath] A URL to which all relative URLs in the theme will be made relative to.
-     * @param {boolean} force Perform a forced refresh of the theme
-     * @returns {Promise} a promise that is resolved when the theme has been applied.
-     */
-    obj.getTheme = function (basePath, force) {
-        var theme = {},
-            themeName, defaultTheme;
+    return {
+        /**
+         * Determine the theme from the current realm and setup the theme on the page. This will
+         * clear out any previous theme.
+         * @param {boolean} [force] Perform a forced refresh of the theme
+         * @returns {Promise} a promise that is resolved when the theme has been applied.
+         */
+        getTheme: function (force) {
+            validateConfig();
 
-        // Determine if the theme has changed
-        if (!force && Configuration.globalData.theme && getThemeForCurrentRealm() === Configuration.globalData.theme.name) {
-            //no change so use the existing theme
-            return $.Deferred().resolve(Configuration.globalData.theme);
-        } else {
-            return loadThemeConfig().then(function (themeConfig) {
-                obj.data = themeConfig;
-                Configuration.globalData.themeConfig = updateSrcProperties(themeConfig);
-                themeName = getThemeForCurrentRealm();
-                theme = _.find(obj.data.themes, { name: themeName });
+            var themeName = findMatchingTheme(Configuration.globalData.realm),
+                defaultTheme = ThemeConfiguration.themes[defaultThemeName],
+                isSameTheme = Configuration.globalData.themeName && themeName === Configuration.globalData.themeName,
+                isAdminUser = Configuration.loggedUser && _.contains(Configuration.loggedUser.roles, "ui-admin"),
+                theme, stylesheets;
 
-                if (theme.name !== "default" && theme.path === "") {
-                    defaultTheme = _.find(obj.data.themes, { name: "default" });
-                    theme = _.merge({}, defaultTheme, theme, function (objectValue, sourceValue) {
-                        // We don't want to merge arrays. If a theme has specified an array, it should be used verbatim.
-                        if (_.isArray(sourceValue)) {
-                            return sourceValue;
-                        }
-                        return undefined;
-                    });
-                }
-                if (basePath) {
-                    theme.stylesheets = _.map(theme.stylesheets, function (url) {
-                        if (isRelativePath(url)) {
-                            return basePath + url;
-                        } else {
-                            return url;
-                        }
-                    });
-                }
+            if (!force && isSameTheme) {
+                return $.Deferred().resolve(Configuration.globalData.theme);
+            }
 
-                // If a user with the admin role is logged in, use the default stylesheets
-                var useDefault = Configuration.loggedUser && _.contains(Configuration.loggedUser.roles, "ui-admin"),
-                    stylesheets = useDefault ? Constants.DEFAULT_STYLESHEETS : theme.stylesheets;
+            theme = ThemeConfiguration.themes[themeName];
+            theme = extendTheme(theme, defaultTheme);
+            theme = makeUrlsRelativeToEntryPoint(theme);
 
-                applyThemeToPage(theme.path, theme.icon, stylesheets);
-                Configuration.globalData.theme = theme;
-                return theme;
-            });
+            // We don't apply themes to the admin interface because it would take significant effort to make the UI
+            // themeable.
+            stylesheets = isAdminUser ? Constants.DEFAULT_STYLESHEETS : theme.stylesheets;
+
+            applyThemeToPage(theme.path, theme.icon, stylesheets);
+            Configuration.globalData.theme = theme;
+            Configuration.globalData.themeName = themeName;
+            return $.Deferred().resolve(theme);
         }
     };
-
-    return obj;
 });

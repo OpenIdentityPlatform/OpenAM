@@ -49,7 +49,7 @@ define("config/process/AMConfig", [
                         route: router.configuration.routes.loggedOut
                     });
                 }
-                ThemeManager.getTheme(null, true);
+                ThemeManager.getTheme(true);
             }, function () {
                 conf.setProperty("loggedUser", null);
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
@@ -138,7 +138,7 @@ define("config/process/AMConfig", [
             "org/forgerock/commons/ui/common/components/Navigation"
         ],
         processDescription: function (event, _, Configuration, Navigation) {
-            ThemeManager.getTheme(null, true);
+            ThemeManager.getTheme(true);
             if (_.contains(Configuration.loggedUser.roles, "ui-admin")) {
                 Navigation.addLink({
                     "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,

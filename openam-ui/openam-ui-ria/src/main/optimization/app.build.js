@@ -29,8 +29,9 @@
      preserveLicenseComments: false,
      generateSourceMaps: true,
      optimize: "uglify2",
+     // These files are excluded from optimization so that the UI can be customized without having to repackage it.
      excludeShallow: [
-         // This file is excluded from optimization so that the UI can be customized without having to repackage it.
-         "config/AppConfiguration"
+         "config/AppConfiguration",
+         "config/ThemeConfiguration"
      ]
  })

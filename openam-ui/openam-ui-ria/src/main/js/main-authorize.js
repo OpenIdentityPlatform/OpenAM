@@ -74,8 +74,7 @@ require([
     var formTemplate,
         baseTemplate,
         footerTemplate,
-        data = window.pageData,
-        basePath = "/" + Constants.context.substring(0, Constants.context.indexOf("/oauth2")) + "/XUI/";
+        data = window.pageData;
 
     i18nManager.init({
         // serverLang: TODO - As part of AME-7893,
@@ -84,10 +83,10 @@ require([
         nameSpace: "authorize"
     });
 
-    Configuration.globalData = { auth: { subRealm : data.realm } };
+    Configuration.globalData = { realm : data.realm };
 
-    ThemeManager.getTheme(basePath).always(function () {
-        data.theme = Configuration.globalData.theme;
+    ThemeManager.getTheme().always(function (theme) {
+        data.theme = theme;
         baseTemplate = HandleBars.compile(LoginBaseTemplate);
         formTemplate = HandleBars.compile(AuthorizeTemplate);
         footerTemplate = HandleBars.compile(FooterTemplate);

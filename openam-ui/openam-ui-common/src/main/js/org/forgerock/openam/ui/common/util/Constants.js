@@ -31,7 +31,6 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     path.splice(-1);
 
     Constants.context = path.join("/");
-    Constants.THEME_CONFIG_PATH = "themeConfig.json";
     Constants.CONSOLE_PATH = "/" + Constants.context + "/console";
     Constants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
 
