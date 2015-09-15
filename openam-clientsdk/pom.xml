@@ -316,7 +316,6 @@
                         <filter>
                             <artifact>org.forgerock.openam:OpenFM</artifact>
                             <includes>
-                                <include>META-INF/services/com.sun.xml.ws.api.pipe.TransportPipeFactory</include>
                                 <include>famSTS.properties</include>
                                 <include>fmConfigurationService.properties</include>
                                 <include>fmLibertySecurity.properties</include>
