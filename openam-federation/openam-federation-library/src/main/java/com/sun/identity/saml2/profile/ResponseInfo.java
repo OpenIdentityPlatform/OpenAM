@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,8 @@
  *
  * $Id: ResponseInfo.java,v 1.6 2009/06/17 03:09:13 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.profile;
 
 import java.util.Map;
@@ -46,6 +45,7 @@ public class ResponseInfo extends CacheObject {
     private Map attrMap = null;
     private NameID nameId = null;
     private String sessionIndex = null;
+    private boolean isLocalLogin = false;
 
     /**
      * Constructor creates the ResponseInfo.
@@ -165,5 +165,23 @@ public class ResponseInfo extends CacheObject {
      */
     public String getSessionIndex() {
         return sessionIndex;
+    }
+
+    /**
+     * Tells whether the user has been redirected to perform local login.
+     *
+     * @return <code>true</code> if the user was sent to perform local login.
+     */
+    public boolean isLocalLogin() {
+        return isLocalLogin;
+    }
+
+    /**
+     * Sets the isLocalLogin flag.
+     *
+     * @param isLocalLogin The isLocalLogin flag.
+     */
+    public void setIsLocalLogin(boolean isLocalLogin) {
+        this.isLocalLogin = isLocalLogin;
     }
 }
