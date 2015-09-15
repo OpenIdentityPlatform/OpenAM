@@ -15,6 +15,7 @@
  */
 package com.iplanet.dpro.session.utils;
 
+import static org.forgerock.openam.session.SessionConstants.*;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionTimedOutException;
@@ -26,15 +27,14 @@ import com.iplanet.dpro.session.share.SessionInfo;
 
 import java.text.MessageFormat;
 
-import static org.forgerock.openam.session.SessionConstants.TOKEN_RESTRICTION_PROP;
-import static org.forgerock.openam.session.SessionConstants.VALID;
-
 /**
  * Responsible for providing a collection of utility functions for
  * manipulating InternalSessions.
  */
 public class SessionInfoFactory {
 
+    public static final String INVALID_SESSION_STATE = "invalidSessionState";
+    public static final String SESSION_TIMED_OUT = "sessionTimedOut";
     private static final String ERROR_FORMAT = "{0} {1}";
 
     /**
@@ -76,11 +76,11 @@ public class SessionInfoFactory {
         if (internalSession.getState() != VALID) {
             if (internalSession.getTimeLeftBeforePurge() > 0) {
                 throw new SessionTimedOutException(MessageFormat.format(ERROR_FORMAT,
-                        SessionBundle.getString("sessionTimedOut"),
+                        SessionBundle.getString(SESSION_TIMED_OUT),
                         sid));
             } else {
                 throw new SessionException(MessageFormat.format(ERROR_FORMAT,
-                        SessionBundle.getString("invalidSessionState"),
+                        SessionBundle.getString(INVALID_SESSION_STATE),
                         sid));
             }
         }

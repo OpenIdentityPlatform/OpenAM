@@ -20,15 +20,16 @@ import static org.forgerock.openam.session.SessionConstants.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
-import java.util.Hashtable;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.Hashtable;
 
 public class SessionInfoFactoryTest {
 
@@ -54,7 +55,7 @@ public class SessionInfoFactoryTest {
         try {
             factory.getSessionInfo(mockSession, mockSessionID);
         } catch (SessionException e) {
-            assertThat(e.getMessage()).containsIgnoringCase("invalid");
+            assertThat(e.getMessage()).containsIgnoringCase(getLocalisedMessage(SessionInfoFactory.INVALID_SESSION_STATE));
         }
     }
 
@@ -71,7 +72,7 @@ public class SessionInfoFactoryTest {
         try {
             factory.getSessionInfo(mockSession, mockSessionID);
         } catch (SessionException e) {
-            assertThat(e.getMessage()).containsIgnoringCase("timed out");
+            assertThat(e.getMessage()).containsIgnoringCase(getLocalisedMessage(SessionInfoFactory.SESSION_TIMED_OUT));
         }
     }
 
@@ -109,5 +110,9 @@ public class SessionInfoFactoryTest {
         public boolean isSatisfied(Object context) throws Exception {
             return false;
         }
+    }
+
+    private static String getLocalisedMessage(String key) {
+        return SessionBundle.getString(key);
     }
 }
