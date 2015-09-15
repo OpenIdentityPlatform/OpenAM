@@ -33,7 +33,7 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>${project.build.directory}/www</directory>
+            <directory>target/compiled</directory>
             <outputDirectory>/</outputDirectory>
         </fileSet>
     </fileSets>

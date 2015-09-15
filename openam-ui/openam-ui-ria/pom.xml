@@ -30,6 +30,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codemirror.version>4.10</codemirror.version>
         <handlebars.version>3.0.3</handlebars.version>
+        <node.install.directory>${project.basedir}</node.install.directory>
     </properties>
 
     <dependencies>
@@ -141,20 +142,6 @@
 
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
-            <artifactId>less</artifactId>
-            <version>1.5.1</version>
-            <classifier>rhino</classifier>
-            <type>js</type>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
-            <artifactId>r</artifactId>
-            <version>2.1.10</version>
-            <type>js</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
             <artifactId>sinon</artifactId>
             <version>1.15.4</version>
             <type>js</type>
@@ -205,30 +192,10 @@
 
         <plugins>
             <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>jslint-maven-plugin</artifactId>
-               <configuration>
-                   <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
-                   <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
-                   <excludes>
-                       <exclude>**/libs/*.js</exclude>
-                   </excludes>
-               </configuration>
-               <executions>
-                   <execution>
-                       <phase>validate</phase>
-                       <goals>
-                           <goal>jslint</goal>
-                       </goals>
-                   </execution>
-               </executions>
-           </plugin>
-
-            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>prepare-package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>resources</goal>
                             <goal>testResources</goal>
@@ -242,12 +209,13 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack</id>
-                        <phase>prepare-package</phase>
+                        <id>unpack-forgerock-ui-user</id>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <outputDirectory>target/dependencies-expanded/forgerock-ui-user</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.forgerock.commons.ui</groupId>
@@ -256,6 +224,18 @@
                                     <type>zip</type>
                                     <classifier>www</classifier>
                                 </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-openam-ui-common</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/dependencies-expanded/openam-ui-common</outputDirectory>
+                            <artifactItems>
                                 <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
                                     <artifactId>openam-ui-common</artifactId>
@@ -268,7 +248,7 @@
                     </execution>
                     <execution>
                         <id>unpack-codemirror</id>
-                        <phase>prepare-package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -285,40 +265,8 @@
                     </execution>
 
                     <execution>
-                        <id>copy-dependencies-less</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>less</includeArtifactIds>
-                            <includeTypes>js</includeTypes>
-                            <outputDirectory>${project.build.directory}/less</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>copy-dependencies-r</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>r</includeArtifactIds>
-                            <includeTypes>js</includeTypes>
-                            <outputDirectory>${project.build.directory}/optimization</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-
-                    <execution>
                         <id>copy-dependencies-test</id>
-                        <phase>prepare-package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
@@ -333,16 +281,59 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>0.0.25</version>
+                <configuration>
+                    <installDirectory>${node.install.directory}</installDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-node-and-npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <nodeVersion>v0.12.7</nodeVersion>
+                            <npmVersion>2.11.3</npmVersion>
+                            <nodeDownloadRoot>https://nodejs.org/dist/</nodeDownloadRoot>
+                            <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm-install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>grunt</id>
+                        <goals>
+                            <goal>grunt</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <arguments>prod --target-version=${version}</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>prepare-working-dir</id>
-                        <phase>prepare-package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>www</finalName>
+                            <finalName>dependencies</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
                                 <descriptor>src/main/assembly/dir.xml</descriptor>
@@ -363,93 +354,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>compile-less-to-css</id>
-                        <phase>prepare-package</phase>
-
-                        <configuration>
-                            <target name="compileLess">
-
-                                <java classname="org.mozilla.javascript.tools.shell.Main" fork="true">
-                                    <classpath refid="maven.compile.classpath" />
-                                    <arg value="${project.build.directory}/less/less-1.5.1-rhino.js" />
-                                    <arg value="${project.build.directory}/www/css/styles.less" />
-                                    <arg value="${project.build.directory}/www/css/styles.css" />
-                                </java>
-
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
     </build>
-
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>js/css optimization</id>
-                                <phase>prepare-package</phase>
-
-                                <configuration>
-                                  <target name="optimize">
-
-                                      <property name="requirejs.dir" value="${project.build.directory}/optimization" />
-
-                                      <java classname="org.mozilla.javascript.tools.shell.Main" failonerror="true">
-                                          <classpath refid="maven.compile.classpath" />
-                                          <arg value="${requirejs.dir}/r-2.1.10.js" />
-                                          <arg value="-o" />
-                                          <arg value="${basedir}/src/main/optimization/app.build.js" />
-                                      </java>
-<!--
-                                      <concat destfile="${minified.dir}/main_with_licenses.js">
-                                          <fileset file="${requirejs.dir}/license" />
-                                          <fileset file="${minified.dir}/main.js" />
-                                      </concat>
-
-                                      <move file="${minified.dir}/main_with_licenses.js" tofile="${minified.dir}/main.js" />
--->
-                                      <java classname="org.mozilla.javascript.tools.shell.Main">
-                                          <classpath refid="maven.compile.classpath" />
-                                          <arg value="${requirejs.dir}/r-2.1.10.js" />
-                                          <arg value="-o" />
-                                          <arg value="cssIn=${project.build.directory}/www/css/styles.css" />
-                                          <arg value="out=${project.build.directory}/www/css/styles_min.css" />
-                                          <arg value="optimizeCss=standard" />
-                                          <arg value="cssImportIgnore=bootstrap-3.3.5-custom.css" />
-                                      </java>
-
-                                      <move file="${project.build.directory}/www/css/styles_min.css" tofile="${project.build.directory}/www/css/styles.css" />
-
-                                  </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 </project>
