@@ -110,6 +110,7 @@ import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.Status;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -1191,14 +1192,12 @@ public class SPACSUtils {
         }
         if (session != null) {
             try {
-                existUserName = sessionProvider.
-                    getPrincipalName(session);
+                existUserName = sessionProvider.getPrincipalName(session);
             } catch (SessionException se) {
                 // invoke SPAdapter for failure
                 SAML2Exception se2 = new SAML2Exception(se);
-                invokeSPAdapterForSSOFailure(hostEntityId, realm,
-                    request, response, smap, respInfo, 
-                    SAML2ServiceProviderAdapter.SSO_FAILED_SESSION_ERROR, se2);
+                invokeSPAdapterForSSOFailure(hostEntityId, realm, request, response, smap, respInfo,
+                        SAML2ServiceProviderAdapter.SSO_FAILED_SESSION_ERROR, se2);
                 throw se2;
             }
         }
@@ -1234,7 +1233,10 @@ public class SPACSUtils {
                     SAML2ServiceProviderAdapter.SSO_FAILED_NO_USER_MAPPING, se);
             throw se;
         }
-        if (userName == null) {
+
+        if (userName == null && respInfo.isLocalLogin()) {
+            // In case we just got authenticated locally, we should accept the freshly authenticated session's principal
+            // as the username corresponding to the received assertion.
             userName = existUserName;
         }
         if (SAML2Utils.debug.messageEnabled()) {
@@ -1277,9 +1279,17 @@ public class SPACSUtils {
         respInfo.setAttributeMap(attrMap);
 
         // return error code for local user login
-        if ((userName == null) || (userName.length() == 0)) {
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("noUserMapping"));
+        if (StringUtils.isEmpty(userName)) {
+            // If we couldn't determine the username based on the incoming assertion, then we shouldn't automatically
+            // map the user to the existing session.
+            if (session != null) {
+                try {
+                    sessionProvider.invalidateSession(session, request, response);
+                } catch (SessionException se) {
+                    SAML2Utils.debug.error("An error occurred while trying to invalidate session", se);
+                }
+            }
+            throw new SAML2Exception(SAML2Utils.bundle.getString("noUserMapping"));
         }
 
         boolean writeFedInfo = isNewAccountLink && shouldPersistNameID;
@@ -1839,6 +1849,8 @@ public class SPACSUtils {
                         + orgName;
             }
         }
+
+        respInfo.setIsLocalLogin(true);
         synchronized (SPCache.responseHash) {
            SPCache.responseHash.put(respInfo.getResponse().getID(), 
                respInfo);
