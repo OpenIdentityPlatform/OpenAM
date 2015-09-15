@@ -43,7 +43,7 @@
             i18nKey="iplanet-am-auth-config-service-description"
             revisionNumber="20"
             propertiesViewBeanURL="@CONSOLE_URI@/auth/ACServiceInstanceList"
-            resourceName="">
+            resourceName="EMPTY">
             <Global>
                 <AttributeSchema name="serviceObjectClasses"
                     type="list"

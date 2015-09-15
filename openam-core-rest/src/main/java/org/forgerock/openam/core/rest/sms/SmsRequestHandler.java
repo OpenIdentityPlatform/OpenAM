@@ -18,7 +18,6 @@ package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
-import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
 import static org.forgerock.openam.core.rest.sms.SmsRouteTree.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
@@ -157,6 +156,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             Arrays.asList(Pattern.compile("^platform/sites(/.*)?$"), Pattern.compile("^platform/servers(/.*)?$"));
     private static final String DEFAULT_VERSION = "1.0";
     private static final String USE_PARENT_PATH = "USE-PARENT";
+    private static final String EMPTY_PATH = "EMPTY";
     private final SmsCollectionProviderFactory collectionProviderFactory;
     private final SmsSingletonProviderFactory singletonProviderFactory;
     private final SmsGlobalSingletonProviderFactory globalSingletonProviderFactory;
@@ -397,7 +397,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         }
 
         ServiceSchemaManager ssm = sm.getSchemaManager(serviceName, serviceVersion);
-        String resourceName = ssm.getResourceName();
+        String resourceName = EMPTY_PATH.equals(ssm.getResourceName()) ? "" : ssm.getResourceName();
         Map<SmsRouteTree, Set<RouteMatcher<Request>>> routes = new HashMap<>();
 
         ServiceSchema organizationSchema = ssm.getOrganizationSchema();

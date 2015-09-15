@@ -40,7 +40,7 @@
                 i18nFileName="amAuth"
                 revisionNumber="60"
                 i18nKey="iplanet-am-auth-service-description"
-                resourceName="">
+                resourceName="EMPTY">
             <Global>
                 <AttributeSchema name="iplanet-am-auth-authenticators"
                                  type="list"
