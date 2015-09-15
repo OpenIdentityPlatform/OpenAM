@@ -26,6 +26,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "org/forgerock/openam/ui/uma/views/share/CommonShare",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils",
@@ -35,7 +36,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     // jquery dependencies
     "selectize"
 ], function ($, _, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare,
-             Constants, EventManager, Messages, Router, UIUtils, UMADelegate, UMAResourceSetWithPolicy) {
+             Constants, EventManager, LabelTreeNavigationView, Messages, Router, UIUtils, UMADelegate, UMAResourceSetWithPolicy) {
     function isUserLabel (label) {
         return label.type === "USER";
     }
@@ -443,6 +444,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 self.enableLabelControls();
                 self.stopEditingLabels();
                 self.updateLabelOptions();
+                LabelTreeNavigationView.addUserLabels(_.filter(self.allLabels, isUserLabel));
             }, function () {
                 self.enableLabelControls();
             });

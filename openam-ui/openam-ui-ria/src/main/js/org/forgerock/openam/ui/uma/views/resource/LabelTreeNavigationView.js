@@ -49,7 +49,12 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
             this.nextRenderPage = true;
         },
         render: function (args, callback) {
-            var self = this;
+            var self = this,
+                userLabels,
+                sortedUserLabels;
+
+            this.args = args;
+            this.callback = callback;
 
             UMADelegate.labels.all().done(function (data) {
                 if (!_.any(data.result, function (label) {
@@ -58,39 +63,56 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
                     UMADelegate.labels.create("starred", "STAR");
                 }
 
+                userLabels = _.filter(data.result, function (label) { return label.type.toLowerCase() === "user"; });
+                sortedUserLabels = _.sortBy(userLabels, function (label) { return label.name; });
+
                 self.data.labels = {
                     starred: _.filter(data.result, function (label) { return label.type.toLowerCase() === "starred"; }),
                     system: _.filter(data.result, function (label) { return label.type.toLowerCase() === "system"; }),
-                    user: _.filter(data.result, function (label) { return label.type.toLowerCase() === "user"; })
+                    user: sortedUserLabels
                 };
                 self.data.nestedLabels = [];
 
-                function addToParent (collection, label) {
-                    if (label.name.indexOf("/") === -1) {
-                        label.title = label.name;
-                        label.children = [];
-                        label.viewId = _.uniqueId("viewId_");
-                        collection.push(label);
-                    } else {
-                        var shift = label.name.split("/"),
-                            parentName = shift.shift(),
-                            parent;
-                        label.name = shift.join("/");
-                        parent = _.findWhere(collection, { title: parentName });
-                        if (!parent) {
-                            parent = { title: parentName, children: [], viewId: _.uniqueId("viewId_") };
-                            collection.push(parent);
-                        }
-                        addToParent(parent.children, label);
-                    }
-                }
-
                 _.each(self.data.labels.user, function (label) {
-                    addToParent(self.data.nestedLabels, label);
+                    self.addToParent(self.data.nestedLabels, label);
                 });
 
                 TreeNavigation.prototype.render.call(self, args, callback);
             });
+        },
+
+        addToParent: function (collection, label) {
+            if (label.name.indexOf("/") === -1) {
+                label.title = label.name;
+                label.children = [];
+                label.viewId = _.uniqueId("viewId_");
+                collection.push(label);
+            } else {
+                var shift = label.name.split("/"),
+                    parentName = shift.shift(),
+                    parent;
+                label.name = shift.join("/");
+                parent = _.findWhere(collection, { title: parentName });
+                if (!parent) {
+                    parent = { title: parentName, children: [], viewId: _.uniqueId("viewId_") };
+                    collection.push(parent);
+                }
+                this.addToParent(parent.children, label);
+            }
+        },
+
+        addUserLabels: function (userLabels) {
+            var self = this;
+
+            this.data.nestedLabels = [];
+            this.data.labels.user = _.sortBy(userLabels, function (label) { return label.name; });
+
+            _.each(this.data.labels.user, function (label) {
+                self.addToParent(self.data.nestedLabels, label);
+            });
+
+            this.nextRenderPage = true;
+            TreeNavigation.prototype.render.call(this, this.args, this.callback);
         }
     });
 
