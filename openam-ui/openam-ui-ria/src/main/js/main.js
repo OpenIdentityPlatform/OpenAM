@@ -52,7 +52,7 @@ require.config({
         "i18next"     : "libs/i18next-1.7.3-min",
         "jquery"      : "libs/jquery-2.1.1-min",
         "js2form"     : "libs/js2form-2.0",
-        "jsonEditor"  : "libs/jsoneditor-custom.min",
+        "jsonEditor"  : "libs/jsoneditor-0.7.22-custom",
         "moment"      : "libs/moment-2.8.1-min",
         "qrcode"      : "libs/qrcode-1.0.0-min",
         "sortable"    : "libs/jquery-nestingSortable-0.9.12",
