@@ -201,10 +201,7 @@ class TokenGenerationService implements CollectionResourceProvider {
                         + subjectSessionRealm + " invocation realm: " + invocationRealm);
                 throw new ForbiddenException("SSO token subject realm does not match invocation realm");
             }
-        } catch (SSOException e) {
-            logger.error("TokenGenerationService:validateAssertionSubjectSession error while validating identity : " + e);
-            throw new ForbiddenException(e.toString(), e);
-        } catch (IdRepoException e) {
+        } catch (SSOException | IdRepoException e) {
             logger.error("TokenGenerationService:validateAssertionSubjectSession error while validating identity : " + e);
             throw new ForbiddenException(e.toString(), e);
         }
@@ -296,7 +293,7 @@ class TokenGenerationService implements CollectionResourceProvider {
     private static final QueryFilterVisitor<QueryFilter<CoreTokenField>, Void, JsonPointer> CORE_TOKEN_FIELD_QUERY_FILTER_VISITOR =
         new QueryFilterVisitor<QueryFilter<CoreTokenField>, Void, JsonPointer>() {
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitAndFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
+            public QueryFilter<CoreTokenField> visitAndFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
                 List<QueryFilter<CoreTokenField>> subCoreTokenFieldFilters = new ArrayList<>(subFilters.size());
                 for (QueryFilter<JsonPointer> filter : subFilters) {
                     subCoreTokenFieldFilters.add(filter.accept(this, aVoid));
@@ -305,7 +302,7 @@ class TokenGenerationService implements CollectionResourceProvider {
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitEqualsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            public QueryFilter<CoreTokenField> visitEqualsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
                 final String fieldString = field.toString().substring(1);
                 if (STSIssuedTokenState.STS_ID_QUERY_ATTRIBUTE.equals(fieldString)) {
                     return QueryFilter.equalTo(CTSTokenPersistence.CTS_TOKEN_FIELD_STS_ID, valueAssertion);
@@ -318,72 +315,72 @@ class TokenGenerationService implements CollectionResourceProvider {
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitBooleanLiteralFilter(Void aVoid, boolean value) {
+            public QueryFilter<CoreTokenField> visitBooleanLiteralFilter(Void aVoid, boolean value) {
                 throw new IllegalArgumentException("Querying STS issued tokens via boolean literal unsupported. Query format: "
                         + getUsageString());
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitContainsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            public QueryFilter<CoreTokenField> visitContainsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
                 throw new IllegalArgumentException("Querying STS issued token via contains relationship unsupported. Query format: "
                         + getUsageString());
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitExtendedMatchFilter(Void aVoid, JsonPointer field, String operator, Object valueAssertion) {
+            public QueryFilter<CoreTokenField> visitExtendedMatchFilter(Void aVoid, JsonPointer field, String operator, Object valueAssertion) {
                 throw new IllegalArgumentException("Querying STS issued token via extended match filter unsupported. Query format: "
                         + getUsageString());
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitGreaterThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            public QueryFilter<CoreTokenField> visitGreaterThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
                 throw new IllegalArgumentException("Querying STS issued token via greater-than filter unsupported. Query format: "
                         + getUsageString());
 
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitGreaterThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            public QueryFilter<CoreTokenField> visitGreaterThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
                 throw new IllegalArgumentException("Querying STS issued token via greater-than-or-equal-to filter unsupported. Query format:"
                         + getUsageString());
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitLessThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            public QueryFilter<CoreTokenField> visitLessThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
                 throw new IllegalArgumentException("Querying STS issued token via less-than filter unsupported. Query format: "
                         + getUsageString());
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitLessThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            public QueryFilter<CoreTokenField> visitLessThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
                 throw new IllegalArgumentException("Querying STS issued token via less-than-or-equal-to filter unsupported. Query format: "
                     + getUsageString());
 
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitNotFilter(Void aVoid, QueryFilter<JsonPointer> subFilter) {
+            public QueryFilter<CoreTokenField> visitNotFilter(Void aVoid, QueryFilter<JsonPointer> subFilter) {
                 throw new IllegalArgumentException("Querying STS issued token via not filter unsupported. Query format: "
                     + getUsageString());
 
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitOrFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
+            public QueryFilter<CoreTokenField> visitOrFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
                 throw new IllegalArgumentException("Querying STS issued token via or filter unsupported. Query format: "
                     + getUsageString());
 
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitPresentFilter(Void aVoid, JsonPointer field) {
+            public QueryFilter<CoreTokenField> visitPresentFilter(Void aVoid, JsonPointer field) {
                 throw new IllegalArgumentException("Querying STS issued token via present filter unsupported. Query format: "
                     + getUsageString());
 
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitStartsWithFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            public QueryFilter<CoreTokenField> visitStartsWithFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
                 throw new IllegalArgumentException("Querying STS issued token via starts-with filter unsupported. Query format: "
                     + getUsageString());
 
@@ -391,9 +388,9 @@ class TokenGenerationService implements CollectionResourceProvider {
        };
 
     private static String getUsageString() {
-        return "Url must have a query param of format: _queryFilter=/" + STSIssuedTokenState.STS_ID_QUERY_ATTRIBUTE +
-                "+eq+\"sts_instance_id\" or _queryFilter=/" + STSIssuedTokenState.STS_ID_QUERY_ATTRIBUTE +
-                "+eq+\"sts_instance_id\"+and+/" + STSIssuedTokenState.STS_TOKEN_PRINCIPAL_QUERY_ATTRIBUTE + "+eq+\"token_principal_id\"";
+        return "Url must have a url-encoded query param of format: _queryFilter=/" + STSIssuedTokenState.STS_ID_QUERY_ATTRIBUTE +
+                " eq \"sts_instance_id\" or _queryFilter=/" + STSIssuedTokenState.STS_ID_QUERY_ATTRIBUTE +
+                " eq \"sts_instance_id\" and /" + STSIssuedTokenState.STS_TOKEN_PRINCIPAL_QUERY_ATTRIBUTE + " eq \"token_principal_id\"";
     }
 
     @Override

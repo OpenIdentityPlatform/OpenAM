@@ -109,6 +109,10 @@ public class STSPublishServiceAuthzModuleTest {
         result = testModule.authorizeRead(mockSSOTokenContext, mockReadRequest);
         //then
         assertTrue(result.get().isAuthorized());
+        //when
+        result = testModule.authorizeQuery(mockSSOTokenContext, mockQueryRequest);
+        //then
+        assertTrue(result.get().isAuthorized());
     }
 
     @Test
@@ -118,6 +122,10 @@ public class STSPublishServiceAuthzModuleTest {
         given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorizeRead(mockSSOTokenContext, mockReadRequest);
+        //then
+        assertTrue(result.get().isAuthorized());
+        //when
+        result = testModule.authorizeQuery(mockSSOTokenContext, mockQueryRequest);
         //then
         assertTrue(result.get().isAuthorized());
     }
@@ -151,10 +159,6 @@ public class STSPublishServiceAuthzModuleTest {
         //then
         assertFalse(result.get().isAuthorized());
         //when
-        result = testModule.authorizeQuery(mockSSOTokenContext, mockQueryRequest);
-        //then
-        assertFalse(result.get().isAuthorized());
-        //when
         result = testModule.authorizeUpdate(mockSSOTokenContext, mockUpdateRequest);
         //then
         assertFalse(result.get().isAuthorized());
@@ -171,10 +175,6 @@ public class STSPublishServiceAuthzModuleTest {
         given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorizePatch(mockSSOTokenContext, mockPatchRequest);
-        //then
-        assertFalse(result.get().isAuthorized());
-        //when
-        result = testModule.authorizeQuery(mockSSOTokenContext, mockQueryRequest);
         //then
         assertFalse(result.get().isAuthorized());
         //when

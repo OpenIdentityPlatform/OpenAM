@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.publish.soap;
@@ -55,6 +55,15 @@ public interface SoapSTSInstancePublisher {
      * @throws STSPublishException if exception encountered obtaining persisted instance state
      */
     List<SoapSTSInstanceConfig> getPublishedInstances() throws STSPublishException;
+
+    /**
+     * Called to obtain the configuration elements corresponding to previously-published STS instances.
+     * @param realm The realm for which published sts instances should be obtained.
+     * @return The SoapSTSInstanceConfig instances corresponding
+     * to published STS instances in the specified realm.
+     * @throws STSPublishException if exception encountered obtaining persisted instance state
+     */
+    List<SoapSTSInstanceConfig> getPublishedInstances(String realm) throws STSPublishException;
 
     /**
      * Called to return the config state corresponding to a specified Soap STS instance

@@ -191,6 +191,7 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
      * @throws STSPublishException if no instance could be found, or if the SMS encountered an error during the lookup.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public T getSTSInstanceConfig(String stsInstanceId, String realm) throws STSPublishException {
         try {
             /*
@@ -229,63 +230,69 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
     public List<T> getAllPublishedInstances() throws STSPublishException {
         List<T> instances = new ArrayList<>();
         for (String realm : getAllRealmNames()) {
-            ServiceConfig baseService;
             try {
-                baseService = new ServiceConfigManager(serviceName,
-                        getAdminToken()).getOrganizationConfig(realm, null);
-            } catch (SMSException e) {
-                logger.error("Could not obtain ServiceConfig instance for realm " + realm +
-                        "." + restOrSoap() + " sts instances for this realm cannot be returned from getAllPublishedInstances. "
-                        + "Exception: " + e);
+                instances.addAll(getPublishedInstances(realm));
+            } catch (STSPublishException e) {
+                logger.error("Could not obtain " + restOrSoap() + " sts instances for realm " + realm +
+                        ". Instances for this realm cannot be returned from getAllPublishedInstances. "
+                        + "Exception: " + e, e);
                 continue;
-            } catch (SSOException e) {
-                logger.error("Could not obtain ServiceConfig instance for realm " + realm +
-                        "." + restOrSoap() + " sts instances for this realm cannot be returned from getAllPublishedInstances. "
-                        + "Exception: " + e);
-                continue;
-            }
-            if (baseService != null) {
-                Set<String> subConfigNames;
-                try {
-                    subConfigNames = baseService.getSubConfigNames();
-                } catch (SMSException e) {
-                    logger.error("Could not get list of " + restOrSoap() + "sts in realm " + realm + ". Exception: " + e);
-                    continue;
-                }
-                for (String stsInstanceId : subConfigNames) {
-                    ServiceConfig instanceService;
-                    try {
-                        instanceService = baseService.getSubConfig(stsInstanceId);
-                    } catch (SSOException e) {
-                        logger.error("Could not get " + restOrSoap() + " sts state for id " + stsInstanceId + " in realm "
-                                + realm + ". Exception: " + e);
-                        continue;
-                    } catch (SMSException e) {
-                        logger.error("Could not get " + restOrSoap() + " sts state for id " + stsInstanceId + " in realm "
-                                + realm + ". Exception: " + e);
-                        continue;
-                    }
-                    if (instanceService != null) {
-                        Map<String, Set<String>> instanceAttrs = instanceService.getAttributes();
-                        try {
-                            instances.add(instanceConfigMarshaller.fromMapAttributes(instanceAttrs));
-                        } catch (STSPublishException e) {
-                            logger.error("Exception caught in getAllPublishedInstances marshalling attributes " +
-                                    "corresponding to sts " + stsInstanceId +"; Exception: " + e, e);
-                        }
-                    } else {
-                        logger.error("Could not obtain the " + restOrSoap() + " sts state for instance with id " + stsInstanceId
-                                + " in realm " + realm);
-                    }
-                }
-            } else {
-                logger.error("Could not obtain ServiceConfig instance for realm " + realm +
-                        "." + restOrSoap() + " sts instances for this realm cannot be returned from getAllPublishedInstances.");
             }
         }
         return instances;
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<T> getPublishedInstances(String realm) throws STSPublishException {
+        List<T> instances = new ArrayList<>();
+        ServiceConfig baseService;
+        try {
+            baseService = new ServiceConfigManager(serviceName,
+                    getAdminToken()).getOrganizationConfig(realm, null);
+        } catch (SMSException | SSOException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR, "Could not obtain ServiceConfig instance for realm " + realm +
+                    "." + restOrSoap() + " sts instances for this realm cannot be returned from getAllPublishedInstances(String realm). "
+                    + "Exception: " + e, e);
+        }
+        if (baseService != null) {
+            Set<String> subConfigNames;
+            try {
+                subConfigNames = baseService.getSubConfigNames();
+            } catch (SMSException e) {
+                throw new STSPublishException(ResourceException.INTERNAL_ERROR, "Could not get list of " + restOrSoap() +
+                        "sts instances in realm " + realm + ". Exception: " + e, e);
+            }
+            for (String stsInstanceId : subConfigNames) {
+                ServiceConfig instanceService;
+                try {
+                    instanceService = baseService.getSubConfig(stsInstanceId);
+                } catch (SSOException | SMSException e) {
+                    logger.error("Could not get " + restOrSoap() + " sts state for id " + stsInstanceId + " in realm "
+                            + realm + ". Exception: " + e);
+                    continue;
+                }
+                if (instanceService != null) {
+                    Map<String, Set<String>> instanceAttrs = instanceService.getAttributes();
+                    try {
+                        instances.add(instanceConfigMarshaller.fromMapAttributes(instanceAttrs));
+                    } catch (STSPublishException e) {
+                        logger.error("Exception caught in getAllPublishedInstances(String realm) marshalling attributes " +
+                                "corresponding to sts " + stsInstanceId +" in realm + " + realm + "; Exception: " + e, e);
+                    }
+                } else {
+                    logger.error("Could not obtain the " + restOrSoap() + " sts state for instance with id " + stsInstanceId
+                            + " in realm " + realm);
+                }
+            }
+        } else {
+            logger.error("Could not obtain ServiceConfig instance for realm " + realm +
+                    "." + restOrSoap() + " sts instances for this realm cannot be returned from getAllPublishedInstances.");
+        }
+        return instances;
+    }
+
+    @Override
     public boolean isInstancePresent(String stsId, String realm) throws STSPublishException {
         try {
             ServiceConfig baseService = new ServiceConfigManager(serviceName,
@@ -327,6 +334,7 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
 
     }
 
+    @SuppressWarnings("unchecked")
     private Set<String> getSubrealms(Set<String> currentRealms) throws SMSException {
         Set<String> subrealms = new HashSet<>();
         for (String realm : currentRealms) {

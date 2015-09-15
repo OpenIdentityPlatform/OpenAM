@@ -82,6 +82,16 @@ public interface STSInstanceConfigStore<T extends STSInstanceConfig> {
     List<T> getAllPublishedInstances() throws STSPublishException;
 
     /**
+     * This method will be called by some startup context in the remotely deployed SOAP STS context
+     * to obtain all of the previously-published soap STS instances for a given realm, as a soap-sts deployment is specific
+     * to a given realm.
+     *
+     * @return The List of STSInstanceConfig instances (possibly empty) corresponding to the set of previously-published
+     * instances in the specified realm.
+     */
+    List<T> getPublishedInstances(String realm) throws STSPublishException;
+
+    /**
      * This method returns whether STS instance config referenced by the realm and id is present in the SMS. It is called
      * by RestSTSPublishServiceRequestHandler#handleUpdate to determine whether the referenced sts id actually corresponds
      * to a previously-published instance

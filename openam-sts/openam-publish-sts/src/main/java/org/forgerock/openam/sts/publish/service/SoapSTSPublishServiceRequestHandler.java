@@ -17,14 +17,14 @@
 package org.forgerock.openam.sts.publish.service;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.List;
 
 import org.forgerock.http.Context;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -52,6 +52,8 @@ import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.utils.JsonObject;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.slf4j.Logger;
 
 /**
@@ -66,6 +68,7 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
     private static final String RESULT = "result";
     private static final String SUCCESS = "success";
     private static final String EMPTY_STRING = "";
+    private static final String REALM = "realm";
 
     private final SoapSTSInstancePublisher publisher;
     private final RestRealmValidator realmValidator;
@@ -149,7 +152,35 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
 
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
-        return new NotSupportedException().asPromise();
+        QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
+        if (queryFilter == null) {
+            return new BadRequestException(getQueryUsageString()).asPromise();
+        }
+        String realm;
+        try {
+            realm = getRealmFromQueryFilter(queryFilter);
+        } catch (STSPublishException e) {
+            return e.asPromise();
+        }
+        try {
+            if (!realmValidator.isRealm(realm)) {
+                return new BadRequestException("The specified realm does not exist.").asPromise();
+            }
+            final List<SoapSTSInstanceConfig> publishedInstances = publisher.getPublishedInstances(realm);
+            for (SoapSTSInstanceConfig instanceConfig : publishedInstances) {
+                /*
+                Although instanceConfig.toJson() will yield the JsonValue which the handleResource invocation requires,
+                the SoapSTSInstanceConfig is a complicated nesting of JsonValue objects, which should be 'homogenized'
+                into a json format prior to inclusion in the response.
+                 */
+                handler.handleResource(newResourceResponse(instanceConfig.getDeploymentSubPath(), EMPTY_STRING,
+                        new JsonValue(instanceConfig.toJson().toString())));
+            }
+            return newResultPromise(newQueryResponse());
+        } catch (STSPublishException e) {
+            logger.error("Exception caught obtaining soap sts instances for realm " + (realm != null ? realm : "null realm" ) + "; Exception: " + e);
+            return e.asPromise();
+        }
     }
 
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
@@ -312,5 +343,110 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
             logger.error(message, e);
             throw new InternalServerErrorException(message, e);
         }
+    }
+
+    private String getRealmFromQueryFilter(QueryFilter<JsonPointer> queryFilter) throws STSPublishException {
+        try {
+            return queryFilter.accept(REALM_QUERY_FILTER_VISITOR, null);
+        } catch (IllegalArgumentException e) {
+            throw new STSPublishException(ResourceException.BAD_REQUEST, e.getMessage(), e);
+        }
+    }
+
+    private static final QueryFilterVisitor<String, Void, JsonPointer> REALM_QUERY_FILTER_VISITOR =
+        new QueryFilterVisitor<String, Void, JsonPointer>() {
+            @Override
+            public String visitAndFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
+                throw new IllegalArgumentException("Querying published soap STS instances via multiple clauses " +
+                        "joined by an add relationship unsupported. Usage:" + getQueryUsageString());
+            }
+
+            @Override
+            public String visitEqualsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+                final String fieldString = field.toString().substring(1);
+                if (REALM.equals(fieldString)) {
+                    return (String)valueAssertion;
+                } else {
+                    throw new IllegalArgumentException("Querying for published soap STS instances on field " + fieldString +
+                            " not supported. Usage: " + getQueryUsageString());
+                }
+            }
+
+            @Override
+            public String visitBooleanLiteralFilter(Void aVoid, boolean value) {
+                throw new IllegalArgumentException("Querying published soap STS instances via boolean literal " +
+                        "unsupported. Usage: " + getQueryUsageString());
+            }
+
+            @Override
+            public String visitContainsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+                throw new IllegalArgumentException("Querying published soap STS instances via contains relationship " +
+                        "unsupported. Usage: " + getQueryUsageString());
+            }
+
+            @Override
+            public String visitExtendedMatchFilter(Void aVoid, JsonPointer field, String operator, Object valueAssertion) {
+                throw new IllegalArgumentException("Querying published soap STS instances via extended match filter " +
+                        "unsupported. Usage: " + getQueryUsageString());
+            }
+
+            @Override
+            public String visitGreaterThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+                throw new IllegalArgumentException("Querying published soap STS instances via greater-than filter " +
+                        "unsupported. Usage: " + getQueryUsageString());
+
+            }
+
+            @Override
+            public String visitGreaterThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+                throw new IllegalArgumentException("Querying published soap STS instances via greater-than-or-equal-to " +
+                        "filter unsupported. Usage: " + getQueryUsageString());
+            }
+
+            @Override
+            public String visitLessThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+                throw new IllegalArgumentException("Querying published soap STS instances via less-than filter " +
+                        "unsupported. Usage: " + getQueryUsageString());
+            }
+
+            @Override
+            public String visitLessThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+                throw new IllegalArgumentException("Querying published soap STS instances via less-than-or-equal-to filter " +
+                        "unsupported. Usage: " + getQueryUsageString());
+
+            }
+
+            @Override
+            public String visitNotFilter(Void aVoid, QueryFilter<JsonPointer> subFilter) {
+                throw new IllegalArgumentException("Querying published soap STS instances via not filter unsupported. " +
+                        "Usage: " + getQueryUsageString());
+
+            }
+
+            @Override
+            public String visitOrFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
+                throw new IllegalArgumentException("Querying published soap STS instances via or filter unsupported. " +
+                        "Usage: " + getQueryUsageString());
+
+            }
+
+            @Override
+            public String visitPresentFilter(Void aVoid, JsonPointer field) {
+                throw new IllegalArgumentException("Querying published soap STS instances via present filter unsupported. " +
+                        "Usage: " + getQueryUsageString());
+
+            }
+
+            @Override
+            public String visitStartsWithFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+                throw new IllegalArgumentException("Querying published soap STS instances via starts-with filter unsupported. " +
+                        "Usage: " + getQueryUsageString());
+
+            }
+        };
+
+    private static String getQueryUsageString() {
+        return "Url must have a url-encoded query param of format: _queryFilter=/" + REALM +
+                " eq \"OpenAM-realm\"";
     }
 }

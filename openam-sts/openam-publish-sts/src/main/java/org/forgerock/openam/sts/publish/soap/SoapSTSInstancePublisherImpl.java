@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.publish.soap;
@@ -58,6 +58,11 @@ public class SoapSTSInstancePublisherImpl implements SoapSTSInstancePublisher {
     @Override
     public List<SoapSTSInstanceConfig> getPublishedInstances() throws STSPublishException {
         return persistentStore.getAllPublishedInstances();
+    }
+
+    @Override
+    public List<SoapSTSInstanceConfig> getPublishedInstances(String realm) throws STSPublishException {
+        return persistentStore.getPublishedInstances(realm);
     }
 
     @Override

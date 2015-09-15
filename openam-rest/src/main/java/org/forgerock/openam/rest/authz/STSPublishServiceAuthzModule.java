@@ -92,7 +92,7 @@ public class STSPublishServiceAuthzModule extends AdminOnlyAuthzModule {
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeQuery(Context context, QueryRequest request) {
-        return rejectConsumption();
+        return authorizeSoapSTSAgentOrAdmin(context);
     }
 
     private Promise<AuthorizationResult, ResourceException> rejectConsumption() {

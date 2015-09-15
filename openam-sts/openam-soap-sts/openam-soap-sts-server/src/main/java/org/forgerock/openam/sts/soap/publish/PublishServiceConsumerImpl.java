@@ -33,9 +33,12 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,6 +48,14 @@ import java.util.Set;
  * @see org.forgerock.openam.sts.soap.publish.PublishServiceConsumer
  */
 public class PublishServiceConsumerImpl implements PublishServiceConsumer {
+    private static final String QUERY_FILTER = "?_queryFilter=";
+    private static final String EQ = " eq ";
+    private static final String FORWARD_SLASH="/";
+    private static final String QUOTE = "\"";
+    private static final String REALM = "realm";
+    private static final String RESULT = "result";
+
+
     private final String openamUrl;
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
     private final UrlConstituentCatenator urlConstituentCatenator;
@@ -52,6 +63,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
     private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
     private final String amSessionCookieName;
     private final String publishServiceUriElement;
+    private final String realm;
     private final Logger logger;
 
     @Inject
@@ -62,6 +74,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
                                SoapSTSAccessTokenProvider soapSTSAccessTokenProvider,
                                @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,
                                @Named(AMSTSConstants.SOAP_STS_PUBLISH_SERVICE_URI_ELEMENT) String publishServiceUriElement,
+                               @Named (AMSTSConstants.REALM) String realm,
                                Logger logger) {
         this.openamUrl = openamUrl;
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
@@ -70,12 +83,14 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
         this.soapSTSAccessTokenProvider = soapSTSAccessTokenProvider;
         this.amSessionCookieName = amSessionCookieName;
         this.publishServiceUriElement = publishServiceUriElement;
+        this.realm = realm;
         this.logger = logger;
     }
 
     @Override
     public Set<SoapSTSInstanceConfig> getPublishedInstances() throws ResourceException {
         String sessionId = null;
+        HttpURLConnectionWrapper.ConnectionResult connectionResult;
         try {
             sessionId = soapSTSAccessTokenProvider.getAccessToken();
             Map<String, String> headerMap = new HashMap<>();
@@ -83,64 +98,78 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, soapSTSPublishServiceVersion);
             headerMap.put(AMSTSConstants.COOKIE, createAMSessionCookie(sessionId));
 
-            HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
+            connectionResult =  httpURLConnectionWrapperFactory
                     .httpURLConnectionWrapper(buildPublishServiceUrl())
                     .setRequestHeaders(headerMap)
                     .setRequestMethod(AMSTSConstants.GET)
                     .makeInvocation();
-
-            final int responseCode = connectionResult.getStatusCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                return parseResponse(connectionResult.getResult());
-            } else {
-                throw new STSPublishException(responseCode,
-                        "Returning empty list from PublishServiceConsumerImpl#getPublishedInstances - non 200 " +
-                                "response from sts-publish service: " + connectionResult.getResult());
-            }
         } catch (IOException e) {
             throw new STSPublishException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
-                    "Exception caught invoking obtaining published soap sts instance state from publish service: " + e);
+                    "Exception caught invoking obtaining published soap sts instance state from publish service: " + e, e);
         } finally {
             if (sessionId != null) {
                 soapSTSAccessTokenProvider.invalidateAccessToken(sessionId);
             }
         }
+        final int responseCode = connectionResult.getStatusCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            return parseResponse(connectionResult.getResult());
+        } else {
+            throw new STSPublishException(responseCode,
+                    "Returning empty list from PublishServiceConsumerImpl#getPublishedInstances - non 200 " +
+                            "response from sts-publish service: " + connectionResult.getResult());
+        }
     }
 
-    private URL buildPublishServiceUrl() throws MalformedURLException {
-        return new URL(urlConstituentCatenator.catenateUrlConstituents(openamUrl, publishServiceUriElement));
+    private URL buildPublishServiceUrl() throws MalformedURLException, UnsupportedEncodingException {
+        return new URL(urlConstituentCatenator.catenateUrlConstituents(openamUrl, publishServiceUriElement, QUERY_FILTER,
+                getUrlEncodedRealmQueryFilterParam()));
+    }
+
+    private String getUrlEncodedRealmQueryFilterParam() throws UnsupportedEncodingException {
+        final String queryContents = FORWARD_SLASH + REALM + EQ + QUOTE + realm + QUOTE;
+        return URLEncoder.encode(queryContents, StandardCharsets.UTF_8.name());
     }
 
     private String createAMSessionCookie(String sessionId) throws STSPublishException {
         return amSessionCookieName + AMSTSConstants.EQUALS + sessionId;
     }
 
+    /*
+    The response is created in SoapSTSPublishServiceRequestHandler#handleQuery.
+     */
     private Set<SoapSTSInstanceConfig> parseResponse(String response) throws STSPublishException {
         Set<SoapSTSInstanceConfig> instanceConfigs = new HashSet<>();
         JsonValue json;
         try {
             json = JsonValueBuilder.toJsonValue(response);
         } catch (JsonException e) {
-            throw new STSPublishException(ResourceException.INTERNAL_ERROR, e.getMessage());
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
         }
-        for (String key : json.asMap().keySet()) {
-            JsonValue value = json.get(key);
-            JsonValue jsonInstanceConfig;
-            try {
-                jsonInstanceConfig = JsonValueBuilder.toJsonValue(value.asString());
-            } catch (JsonException e) {
-                throw new STSPublishException(ResourceException.INTERNAL_ERROR, e.getMessage());
+        JsonValue queryResult = json.get(RESULT);
+        if (queryResult.isCollection()) {
+            int size = queryResult.asCollection().size();
+            for (int ndx = 0; ndx < size; ndx++) {
+                JsonValue jsonInstanceConfig;
+                try {
+                    jsonInstanceConfig = JsonValueBuilder.toJsonValue(queryResult.get(ndx).asString());
+                } catch (JsonException e) {
+                    throw new STSPublishException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
+                }
+                final SoapSTSInstanceConfig soapSTSInstanceConfig = SoapSTSInstanceConfig.fromJson(jsonInstanceConfig);
+                /*
+                check for duplicates: duplicates cannot really be present because the combination of realm and deployment
+                uri constitutes the identity of the soap-sts instance, and duplicate entries will result in LDAP errors
+                when the instance is persisted in the SMS, but paranoia pays...
+                 */
+                if (!instanceConfigs.add(soapSTSInstanceConfig)) {
+                    logger.error("The set of published soap-sts instances contains a duplicate!! The duplicate instance: " + queryResult.get(ndx));
+                }
             }
-            SoapSTSInstanceConfig instanceConfig = SoapSTSInstanceConfig.fromJson(jsonInstanceConfig);
-            /*
-            check for duplicates: duplicates cannot really be present because the combination of realm and deployment
-            uri constitutes the identity of the soap-sts instance, and duplicate entries will result in LDAP errors
-            when the instance is persisted in the SMS, but paranoia pays...
-             */
-            if (!instanceConfigs.add(instanceConfig)) {
-                logger.error("The set of published soap-sts instances contains a duplicate!! The duplicate instance: " + instanceConfig);
-            }
+            return instanceConfigs;
+        } else {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR, "Unexpected state: the query result is not " +
+                    "a collection. The query result: " + queryResult.toString());
         }
-        return instanceConfigs;
     }
 }
