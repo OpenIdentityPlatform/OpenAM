@@ -171,12 +171,12 @@ public class ApplicationsResource extends RealmAwareResource {
 
             String wrappName = wrapp.getName();
             String newResourceId = request.getNewResourceId();
-            if (wrappName == null) {
-                wrapp.setName(newResourceId);
-            }
-            if (isNotBlank(newResourceId) && !newResourceId.equals(wrappName)) {
-                debug.error("ApplicationsResource :: CREATE : Resource name and JSON body name do not match.");
-                throw new EntitlementException(EntitlementException.APPLICATION_NAME_MISMATCH);
+
+            if (wrappName != null && newResourceId != null) {
+                if (!wrappName.equals(newResourceId)) {
+                    debug.error("ApplicationsResource :: CREATE : Resource name and JSON body name do not match.");
+                    throw new EntitlementException(EntitlementException.APPLICATION_NAME_MISMATCH);
+                }
             }
 
             // OPENAM-5031
@@ -184,6 +184,9 @@ public class ApplicationsResource extends RealmAwareResource {
             // name that when encoded differs from the original.  So, for instance "+" becomes "\+".
             // What we should do is to encode the name for storage purposes, and decode it before presentation to the
             // user.
+            if (wrappName == null) {
+                wrapp.setName(newResourceId);
+            }
             String appName = wrapp.getApplication().getName();
             if (!appName.equals(DN.escapeAttributeValue(appName))) {
                 throw new EntitlementException(EntitlementException.INVALID_VALUE,
