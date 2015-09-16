@@ -157,7 +157,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
 
             var loginUrlParams = CookieHelper.getCookie("loginUrlParams"),
                 // In "Stage One" realm is specified via #getSubRealm, in "Stage Two" it's via #getOverrideRealm
-                realm = RealmHelper.getSubRealm() || RealmHelper.getOverrideRealm().substr(1);
+                realm = RealmHelper.getSubRealm() || (RealmHelper.getOverrideRealm() ? RealmHelper.getOverrideRealm().substr(1) : "");
             CookieHelper.deleteCookie("loginUrlParams");
 
             location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "/" + realm);
