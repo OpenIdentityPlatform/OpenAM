@@ -24,7 +24,7 @@
  *
  * $Id: SAMLv2Base.java,v 1.8 2008/06/25 05:49:37 qcheng Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.federation;
@@ -196,9 +196,14 @@ public abstract class SAMLv2Base extends EntityPropertiesBase {
         if (authContextObj == null) {
             tblAuthContextsModel.setValue(TBL_DATA_SUPPORTED, "");
             tblAuthContextsModel.setValue(TBL_DATA_LEVEL, "0");
+            tblAuthContextsModel.setValue(TBL_DATA_KEY, "none");
+            tblAuthContextsModel.setValue(TBL_DATA_VALUE, "");
+
         } else {
             tblAuthContextsModel.setValue(TBL_DATA_SUPPORTED, authContextObj.supported);
             tblAuthContextsModel.setValue(TBL_DATA_LEVEL, authContextObj.level);
+            tblAuthContextsModel.setValue(TBL_DATA_KEY, authContextObj.key);
+            tblAuthContextsModel.setValue(TBL_DATA_VALUE, authContextObj.value);
             if (authContextObj.isDefault) {
                 setDisplayFieldValue(dropdownContextRef, authContextObj.name);
             }
