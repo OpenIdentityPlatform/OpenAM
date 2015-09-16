@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.scripting.rest;
 
-import static org.forgerock.http.util.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;

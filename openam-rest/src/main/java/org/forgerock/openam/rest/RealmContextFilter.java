@@ -27,15 +27,18 @@ import java.util.List;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
+
+import org.forgerock.guava.common.collect.Iterables;
+import org.forgerock.guava.common.collect.Lists;
 import org.forgerock.http.Context;
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
-import org.forgerock.http.ResourcePath;
 import org.forgerock.http.protocol.Form;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.http.util.Paths;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -49,6 +52,7 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
@@ -157,19 +161,19 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
 
     private Context evaluate(Context context, Request request) throws ResourceException {
         String hostname = request.getUri().getHost();
-        ResourcePath requestUri = getRemainingRequestUri(context, request);
+        List<String> requestUri = getRemainingRequestUri(context, request);
         List<String> realmOverrideParameter = new Form().fromRequestQuery(request).get("realm");
         return evaluate(context, hostname, requestUri, realmOverrideParameter);
     }
 
     private Context evaluate(Context context, org.forgerock.json.resource.Request request) throws ResourceException {
         String hostname = URI.create(context.asContext(HttpContext.class).getPath()).getHost();
-        ResourcePath requestUri = request.getResourcePathObject();
+        List<String> requestUri = Lists.newArrayList(request.getResourcePathObject());
         List<String> realmOverrideParameter = context.asContext(HttpContext.class).getParameter("realm");
         return evaluate(context, hostname, requestUri, realmOverrideParameter);
     }
 
-    private Context evaluate(Context context, String hostname, ResourcePath requestUri,
+    private Context evaluate(Context context, String hostname, List<String> requestUri,
             List<String> overrideRealmParameter) throws ResourceException {
 
         SSOToken adminToken = coreWrapper.getAdminToken();
@@ -198,12 +202,12 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
             throw new BadRequestException("Invalid realm, " + overrideRealmParameter.get(0), e);
         }
 
-        ResourcePath remainingUri = requestUri.subSequence(consumedElementsCount, requestUri.size());
+        List<String> remainingUri = requestUri.subList(consumedElementsCount, requestUri.size());
         String matchedUri = matchedUriBuilder.length() > 1 ? matchedUriBuilder.substring(1) :
                 matchedUriBuilder.toString();
 
         RealmContext realmContext = new RealmContext(new UriRouterContext(context, matchedUri,
-                remainingUri.toString(), Collections.<String, String>emptyMap()));
+                Paths.joinPath(remainingUri), Collections.<String, String>emptyMap()));
         realmContext.setDnsAlias(hostname, dnsAliasRealm);
         realmContext.setSubRealm(matchedUri, cleanRealm(currentRealm.substring(dnsAliasRealm.length())));
         realmContext.setOverrideRealm(overrideRealm);
@@ -244,11 +248,11 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
         }
     }
 
-    private ResourcePath getRemainingRequestUri(Context context, Request request) {
-        ResourcePath path = request.getUri().getResourcePath();
+    private List<String> getRemainingRequestUri(Context context, Request request) {
+        List<String> path = request.getUri().getPathElements();
         if (context.containsContext(UriRouterContext.class)) {
-            ResourcePath matchedUri = ResourcePath.valueOf(context.asContext(UriRouterContext.class).getBaseUri());
-            path = path.tail(matchedUri.size());
+            List<String> matchedUri = Paths.getPathElements(context.asContext(UriRouterContext.class).getBaseUri());
+            path = path.subList(matchedUri.size(), path.size());
         }
         return path;
     }
