@@ -171,7 +171,7 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
         if (!subRealm.startsWith("/")) {
             subRealm = "/" + subRealm;
         }
-        if (subRealm.endsWith("/")) {
+        if (subRealm.endsWith("/") && (realmPath + subRealm).length() > 1) {
             subRealm = subRealm.substring(0, subRealm.length() - 1);
         }
         String validatedRealm = validateRealm(realmPath + subRealm);
