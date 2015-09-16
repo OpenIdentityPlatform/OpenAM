@@ -149,6 +149,9 @@ public class CrestRealmRouterTest {
                 {"alias.example.com", "nextRealm", "overrideRealm", "/overrideRealm"},
                 //http://alias.example.com:8080/openam/json/nextRealm/users/demo?realm=/
                 {"alias.example.com", "nextRealm", "/", "/"},
+
+                //http://unmapped.example.com:8080/openam/json/nextRealm/users/demo?realm=/
+                {"unmapped.example.com", "sub", null, "/sub"},
         };
     }
 
@@ -220,6 +223,8 @@ public class CrestRealmRouterTest {
 
         given(coreWrapper.getOrganization(adminToken, "openam.example.com")).willReturn("ROOT_REALM_DN");
         given(coreWrapper.getOrganization(adminToken, "alias.example.com")).willReturn("REALM_ALIAS_DN");
+        given(coreWrapper.getOrganization(adminToken, "unmapped.example.com"))
+                .willThrow(new IdRepoException("MESSAGE", "401"));
         given(coreWrapper.convertOrgNameToRealmName("ROOT_REALM_DN")).willReturn("/");
         given(coreWrapper.convertOrgNameToRealmName("REALM_ALIAS_DN")).willReturn("/otherRealm");
 
