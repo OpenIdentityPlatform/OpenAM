@@ -7,6 +7,7 @@
     "docs": "jsdoc -P package.json -d docs -r src/main/js"
   },
   "devDependencies": {
+    "eslint-config-forgerock": "^1.0.0",
     "eslint-formatter-warning-summary": "^1.0.0",
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",

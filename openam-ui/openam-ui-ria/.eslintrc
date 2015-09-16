@@ -1,0 +1,200 @@
+{
+    "root": true,
+    "extends": "eslint-config-forgerock",
+    "env": {
+        /**
+         * AMD is commented out as this will hide the error of forgetting to add a global directive
+         */
+        // "amd": true,
+        "browser": true
+    },
+    "rules": {
+        /*
+         * --------------------------------------------------------------------------------
+         * ERROR RULES
+         *
+         * These are rules we're sure about. They will cause the build to fail.
+         * --------------------------------------------------------------------------------
+         */
+
+        /**
+         * Require a capital letter for constructors.
+         *
+         * var f = Foo(); # bad
+         *
+         * var f = new Foo(); # good
+         */
+        "new-cap": [2, {
+            "capIsNew": false
+        }],
+        /**
+         * Multiple spaces not allowed.
+         *
+         * var fruit···=··"apples" # bad
+         *
+         * var fruit·=·"apples" # good
+         */
+        "no-multi-spaces": 2,
+
+        /*
+         * --------------------------------------------------------------------------------
+         * WARNING RULES
+         *
+         * These are rules that we want to turn into errors but can't yet because there are
+         * too many violations. As we fix the violations, we will transition them into
+         * error rules.
+         * --------------------------------------------------------------------------------
+         */
+
+        /**
+         * Camel cased variable names.
+         *
+         * var apples_and_pears # bad
+         * var fruit {
+         *     apple_and_pears: true
+         * }
+         *
+         * var applesAndPears # good
+         * var fruit {
+         *     appleAndPears: true
+         * }
+         */
+        "camelcase": [1, {
+            "properties": "always"
+        }],
+        /**
+         * 4 space indent.
+         *
+         * function() { # bad
+         * ··var apples
+         *
+         * function() { # good
+         * ····var apples
+         */
+        "indent": [1, 4, {
+            /**
+             * One level indent on switch cases.
+             *
+             * switch(value) { # bad
+             * case "apples":
+             *
+             * switch(value) { # good
+             * ····case "apples":
+             */
+            "SwitchCase": 1,
+            /**
+             * One level indent on variable declarations.
+             *
+             * var apples, { # bad
+             * pears
+             *
+             * var apples, { # good
+             * ····pears
+             */
+            "VariableDeclarator": 1
+        }],
+        /**
+         * Maximum line length of 120 characters.
+         */
+        "max-len": [1, 120, 4],
+        /**
+         * Spaces inside of curly braces.
+         *
+         * {apples: true} # bad
+         *
+         * { apples: true } # good
+         */
+        "object-curly-spacing": [1, "always"],
+        /**
+         * Double quotes for string literals. Single quotes allowed to avoid escaping
+         *
+         * var string = 'this is a string' # bad
+         *
+         * var string = "this is a string" # good
+         * var string = 'this is a "string"' # good
+         */
+        "quotes": [1, "double", "avoid-escape"],
+        /**
+         * Space required after keywords.
+         *
+         * if(fruit) { # bad
+         * }else{
+         *
+         * if (fruit) { # good. Space before else is not enforced but recommended
+         * } else {
+         */
+        "space-after-keywords": [1, "always"],
+        /**
+         * Space required before opening block curly brace.
+         *
+         * if (fruit){ # bad
+         *     function fruit(){}
+         *
+         * if (fruit) { # good
+         *     function fruit() {}
+         */
+        "space-before-blocks": [1, "always"],
+        /**
+         * Space required before function parenthesis.
+         *
+         * function() { # bad
+         *
+         * function () { # good
+         */
+        "space-before-function-paren": [1, "always"],
+        /**
+         * Spaces not allowed in parentheses.
+         *
+         * fruit( "apple" ) # bad
+         *
+         * fruit("apple") # good
+         */
+        "space-in-parens": [1, "never"],
+        /**
+         * Spaces required around infix operators
+         *
+         * var numOfApples = 1+2-3 # bad
+         *
+         * var numOfApples = 1 + 2 - 3 # good
+         */
+        "space-infix-ops": [1, {
+            "int32Hint": false
+        }],
+        /**
+         * Validates that JSDoc is syntactically correct.
+         */
+        "valid-jsdoc": [1, {
+            "prefer": {
+                /**
+                 * Prefer using returns over return
+                 *
+                 * @return {int} The number of apples. # bad
+                 *
+                 * @returns {int} The number of apples. # good
+                 */
+                "return": "returns"
+            },
+            /**
+             * If there is no return statement, a @returns annotation is not required.
+             */
+            "requireReturn": false
+        }]
+
+        /*
+         * --------------------------------------------------------------------------------
+         * DISABLED RULES
+         *
+         * These are rules we want to evaluate and promote to warnings.
+         * --------------------------------------------------------------------------------
+         */
+        /**
+         * no-alert
+         * no-unused-vars
+         * array-bracket-spacing (no space)
+         * brace-style (else on the same line)
+         * comma-spacing "one, two"
+         * no-mixed-spaces-and-tabs
+         * no-multiple-empty-lines (max=2)
+         */
+    }
+}
