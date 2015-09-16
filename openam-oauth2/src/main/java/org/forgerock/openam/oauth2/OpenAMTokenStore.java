@@ -519,6 +519,12 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             acr = token.getAuthenticationContextClassReference();
         }
 
+        RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
+        if (currentRefreshToken != null) {
+            authModules = currentRefreshToken.getAuthModules();
+            acr = currentRefreshToken.getAuthenticationContextClassReference();
+        }
+
         RefreshToken refreshToken = new OpenAMRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
                 expiryTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType,
                 realm, authModules, acr);

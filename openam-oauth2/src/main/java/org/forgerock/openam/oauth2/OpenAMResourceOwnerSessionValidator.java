@@ -16,13 +16,6 @@
 
 package org.forgerock.openam.oauth2;
 
-import static com.sun.identity.shared.DateUtils.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
-import static org.forgerock.oauth2.core.Utils.*;
-import static org.forgerock.openidconnect.Client.*;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -48,6 +41,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.Utils;
@@ -62,7 +56,9 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
 import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.OpenIdPrompt;
 import org.forgerock.util.annotations.VisibleForTesting;
@@ -72,7 +68,16 @@ import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.ext.servlet.ServletUtils;
-import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
+
+import static com.sun.identity.shared.DateUtils.stringToDate;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.FRAGMENT;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.QUERY;
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.oauth2.core.Utils.splitResponseType;
+import static org.forgerock.openidconnect.Client.CONFIRMED_MAX_AGE;
+import static org.forgerock.openidconnect.Client.MIN_DEFAULT_MAX_AGE;
 
 /**
  * Validates whether a resource owner has a current authenticated session.
@@ -136,7 +141,6 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
 
         try {
             if (token != null) {
-
                 try {
                     // As the organization in the token is stored in lowercase, we need to lower case the auth2realm
                     String auth2Realm = dnWrapper.orgNameToDN(
@@ -183,13 +187,18 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                     logger.error("Not pre-authenticated and prompt parameter equals none.");
                     if (request.getParameter(OAuth2Constants.Params.RESPONSE_TYPE) != null) {
                         throw new InteractionRequiredException(Utils.isOpenIdConnectFragmentErrorType(splitResponseType(
-                                        request.<String>getParameter(RESPONSE_TYPE))) ? FRAGMENT : QUERY);
+                                request.<String>getParameter(RESPONSE_TYPE))) ? FRAGMENT : QUERY);
 
                     } else {
                         throw new InteractionRequiredException();
                     }
-                } else {
+                } else if (!isRefreshToken(request)) {
                     throw authenticationRequired(request);
+                } else {
+                    RefreshToken refreshToken = request.getToken(RefreshToken.class);
+                    return new OpenAMResourceOwner(
+                            refreshToken.getResourceOwnerId(), IdUtils.getIdentity(refreshToken.getResourceOwnerId(),
+                            refreshToken.getRealm()));
                 }
             }
         } catch (EncodingException e) {
@@ -197,6 +206,10 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         } catch (URISyntaxException e) {
             throw new AccessDeniedException(e);
         }
+    }
+
+    private boolean isRefreshToken(OAuth2Request request) {
+        return StringUtils.isEqualTo(request.<String>getParameter(OAuth2Constants.Params.GRANT_TYPE), OAuth2Constants.Params.REFRESH_TOKEN);
     }
 
     /**
