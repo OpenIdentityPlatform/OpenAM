@@ -37,7 +37,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
             "keyup #resourceBuilder input": "addResource",
             "click .fa-close": "deleteResource",
             "keyup .fa-close": "deleteResource",
-            "click #removePendingResource": "removePendingResource"
+            "click #removePendingResource": "removePendingResource",
+            "click #addResourceEditBtn" : "showEditingResources"
         },
 
         render: function (args, callback) {
@@ -159,6 +160,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
             var resource = $(e.currentTarget).parent().data().resource;
             this.data.entity.resources = _.without(this.data.entity.resources, resource);
             this.render(this.data);
+        },
+
+        showEditingResources: function() {
+            this.$el.find("li.editing").removeClass("hidden");
         },
 
         flashDomItem: function (item, className) {

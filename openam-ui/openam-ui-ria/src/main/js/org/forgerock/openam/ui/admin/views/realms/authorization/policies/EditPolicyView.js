@@ -42,7 +42,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
         partials: [
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
         ],
-        reviewTemplate: "templates/admin/views/realms/authorization/policies/ReviewPolicyStepTemplate.html",
         validationFields: ["name", "resources"],
         events: {
             "click input[name=submitForm]": "submitForm",
@@ -108,8 +107,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             };
 
             this.data.entity = _.cloneDeep(this.model.attributes);
+            // this line is needed for the correctly saving policy
             this.data.entity.applicationName = self.data.policySetName;
-
             this.data.options = {};
 
             if (self.newEntity) {
