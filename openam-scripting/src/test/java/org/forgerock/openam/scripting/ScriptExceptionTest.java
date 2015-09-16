@@ -165,11 +165,6 @@ public class ScriptExceptionTest {
         se = new ScriptException(FILTER_PRESENT);
         //then
         assertEquals(se.getMessage(), "The 'present' filter is not supported");
-
-        // when
-        se = new ScriptException(SCRIPT_ENCODING_FAILED, "UTF-8");
-        //then
-        assertEquals(se.getMessage(), MessageFormat.format("Failed to encode script as {0}", "UTF-8"));
     }
 
     @Test
@@ -309,10 +304,5 @@ public class ScriptExceptionTest {
         se = new ScriptException(FILTER_PRESENT);
         //then
         assertEquals(se.getL10NMessage(locale), "Die 'present' filter word nie geondersteun nie");
-
-        // when
-        se = new ScriptException(SCRIPT_ENCODING_FAILED, "UTF-8");
-        //then
-        assertEquals(se.getL10NMessage(locale), MessageFormat.format("Kodering van skrip as {0} het misluk", "UTF-8"));
     }
 }

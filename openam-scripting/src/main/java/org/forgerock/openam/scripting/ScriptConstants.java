@@ -146,8 +146,8 @@ public final class ScriptConstants {
         FILTER_LESS_THAN_OR_EQUAL("22"),
         FILTER_NOT("23"),
         FILTER_PRESENT("24"),
-        SCRIPT_ENCODING_FAILED("25"),
-        RESOURCE_FILTER_NOT_SUPPORTED("26");
+        RESOURCE_FILTER_NOT_SUPPORTED("26"),
+        SCRIPT_DECODING_FAILED("27");
 
         private final String code;
 

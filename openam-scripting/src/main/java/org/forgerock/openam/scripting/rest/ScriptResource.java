@@ -15,13 +15,14 @@
  */
 package org.forgerock.openam.scripting.rest;
 
+import static org.forgerock.http.util.StandardCharsets.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -99,11 +100,11 @@ public class ScriptResource extends RealmAwareResource {
                 SupportedScriptingLanguage language = getLanguageFromString(json.get(SCRIPT_LANGUAGE).asString());
                 String script = json.get(SCRIPT_TEXT).asString();
                 if (script == null) {
-                    throw new ScriptException(ScriptErrorCode.MISSING_SCRIPT);
+                    throw new ScriptException(MISSING_SCRIPT);
                 }
 
                 List<ScriptError> scriptErrorList = scriptValidator.validateScript(new ScriptObject(EMPTY,
-                        Base64.decodeAsUTF8String(script), language, null));
+                        decodeScript(script), language, null));
                 if (scriptErrorList.isEmpty()) {
                     return newResultPromise(newActionResponse(json(object(field("success", true)))));
                 }
@@ -215,20 +216,16 @@ public class ScriptResource extends RealmAwareResource {
      * @return The {@code JsonValue}.
      */
     private JsonValue asJson(ScriptConfiguration scriptConfig) throws ScriptException {
-        try {
-            return json(object(field(JSON_UUID, scriptConfig.getId()),
-                    field(SCRIPT_NAME, scriptConfig.getName()),
-                    field(SCRIPT_DESCRIPTION, scriptConfig.getDescription()),
-                    field(SCRIPT_TEXT, Base64.encode(scriptConfig.getScript().getBytes("UTF-8"))),
-                    field(SCRIPT_LANGUAGE, scriptConfig.getLanguage().name()),
-                    field(SCRIPT_CONTEXT, scriptConfig.getContext().name()),
-                    field(SCRIPT_CREATED_BY, scriptConfig.getCreatedBy()),
-                    field(SCRIPT_CREATION_DATE, scriptConfig.getCreationDate()),
-                    field(SCRIPT_LAST_MODIFIED_BY, scriptConfig.getLastModifiedBy()),
-                    field(SCRIPT_LAST_MODIFIED_DATE, scriptConfig.getLastModifiedDate())));
-        } catch (UnsupportedEncodingException e) {
-            throw ScriptException.createAndLogError(logger, ScriptErrorCode.SCRIPT_ENCODING_FAILED, e, "UTF-8");
-        }
+        return json(object(field(JSON_UUID, scriptConfig.getId()),
+                field(SCRIPT_NAME, scriptConfig.getName()),
+                field(SCRIPT_DESCRIPTION, scriptConfig.getDescription()),
+                field(SCRIPT_TEXT, Base64.encode(scriptConfig.getScript().getBytes(UTF_8))),
+                field(SCRIPT_LANGUAGE, scriptConfig.getLanguage().name()),
+                field(SCRIPT_CONTEXT, scriptConfig.getContext().name()),
+                field(SCRIPT_CREATED_BY, scriptConfig.getCreatedBy()),
+                field(SCRIPT_CREATION_DATE, scriptConfig.getCreationDate()),
+                field(SCRIPT_LAST_MODIFIED_BY, scriptConfig.getLastModifiedBy()),
+                field(SCRIPT_LAST_MODIFIED_DATE, scriptConfig.getLastModifiedDate())));
     }
 
     /**
@@ -242,12 +239,11 @@ public class ScriptResource extends RealmAwareResource {
     private ScriptConfiguration fromJson(JsonValue jsonValue, String uuid) throws ScriptException {
         final String language = jsonValue.get(SCRIPT_LANGUAGE).asString();
         final String context = jsonValue.get(SCRIPT_CONTEXT).asString();
-        final String script = jsonValue.get(SCRIPT_TEXT).asString();
         final ScriptConfiguration.Builder builder = ScriptConfiguration.builder()
                 .setId(uuid)
                 .setName(jsonValue.get(SCRIPT_NAME).asString())
                 .setDescription(jsonValue.get(SCRIPT_DESCRIPTION).asString())
-                .setScript(script == null ? null : Base64.decodeAsUTF8String(script))
+                .setScript(decodeScript(jsonValue.get(SCRIPT_TEXT).asString()))
                 .setLanguage(language == null ? null : getLanguageFromString(language))
                 .setContext(context == null ? null : getContextFromString(context));
         if (uuid == null) {
@@ -265,5 +261,19 @@ public class ScriptResource extends RealmAwareResource {
      */
     private ScriptConfiguration fromJson(JsonValue jsonValue) throws ScriptException {
         return fromJson(jsonValue, null);
+    }
+
+    private String decodeScript(String encodedScript) throws ScriptException {
+        if (encodedScript == null) {
+            return null;
+        }
+
+        byte[] decodedScript = Base64.decode(encodedScript);
+
+        if (decodedScript == null) {
+            throw ScriptException.createAndLogError(logger, SCRIPT_DECODING_FAILED);
+        }
+
+        return new String(decodedScript, UTF_8);
     }
 }

@@ -116,8 +116,8 @@ public class ScriptExceptionMappingHandler implements ExceptionMappingHandler<Sc
             ERROR_CODE_MAP.put(FILTER_LESS_THAN_OR_EQUAL, BAD_REQUEST);
             ERROR_CODE_MAP.put(FILTER_NOT, BAD_REQUEST);
             ERROR_CODE_MAP.put(FILTER_PRESENT, BAD_REQUEST);
-            ERROR_CODE_MAP.put(SCRIPT_ENCODING_FAILED, INTERNAL_ERROR);
             ERROR_CODE_MAP.put(RESOURCE_FILTER_NOT_SUPPORTED, BAD_REQUEST);
+            ERROR_CODE_MAP.put(SCRIPT_DECODING_FAILED, BAD_REQUEST);
         }
         return ERROR_CODE_MAP.containsKey(scriptErrorCode) ? ERROR_CODE_MAP.get(scriptErrorCode) : INTERNAL_ERROR;
     }
