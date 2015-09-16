@@ -25,6 +25,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -95,17 +96,18 @@ public class CTSOperations implements SessionOperations {
      * @throws SessionException If there was a problem locating the Session in the CTS.
      */
     public SessionInfo refresh(Session session, boolean reset) throws SessionException {
-        SessionID sessionID = session.getID();
-        try {
-            InternalSession internalSession = readToken(sessionID);
-            // Modifies the Session if required.
-            if (reset) {
-                internalSession.setLatestAccessTime();
-            }
-
-            return sessionInfoFactory.getSessionInfo(internalSession, sessionID);
-        } catch (ReadFailedSessionException e) {
+        if (reset) {
+            // all write operations should be delegated to the home server
             return remote.refresh(session, reset);
+        } else {
+            // handle read operations via CTS if possible
+            SessionID sessionID = session.getID();
+            try {
+                InternalSession internalSession = readToken(sessionID);
+                return sessionInfoFactory.getSessionInfo(internalSession, sessionID);
+            } catch (ReadFailedSessionException e) {
+                return remote.refresh(session, reset);
+            }
         }
     }
 
@@ -168,6 +170,9 @@ public class CTSOperations implements SessionOperations {
         String tokenID = idFactory.toSessionTokenId(sessionID);
         try {
             Token token = cts.read(tokenID);
+            if (token == null) {
+                throw new ReadFailedSessionException("Failed to read token : " + tokenID);
+            }
             return adapter.fromToken(token);
         } catch (ReadFailedException e) {
             throw new ReadFailedSessionException(e);
@@ -180,6 +185,10 @@ public class CTSOperations implements SessionOperations {
     private static class ReadFailedSessionException extends SessionException {
         ReadFailedSessionException(ReadFailedException e) {
             super(e);
+        }
+        
+        ReadFailedSessionException(String msg) {
+            super(msg);
         }
     }
 }
