@@ -24,6 +24,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -169,6 +170,9 @@ public class CTSOperations implements SessionOperations {
         String tokenID = idFactory.toSessionTokenId(sessionID);
         try {
             Token token = cts.read(tokenID);
+            if (token == null) {
+                throw new ReadFailedSessionException("Failed to read token : " + tokenID);
+            }
             return adapter.fromToken(token);
         } catch (ReadFailedException e) {
             throw new ReadFailedSessionException(e);
@@ -181,6 +185,11 @@ public class CTSOperations implements SessionOperations {
     private static class ReadFailedSessionException extends SessionException {
         ReadFailedSessionException(ReadFailedException e) {
             super(e);
+        }
+        
+
+        ReadFailedSessionException(String msg) {
+            super(msg);
         }
     }
 }
