@@ -56,7 +56,11 @@ module.exports = function (grunt) {
             // This must come last so that it overwrites any conflicting files!
             mavenProjectSource(".")
         ]),
-        testInputDirectory = _.flatten([
+        testWatchDirs = _.flatten([
+            mavenProjectTestSource("."),
+            mavenProjectTestSource(amCommonsDirectory)
+        ]),
+        testInputDirs = _.flatten([
             compiledDirectory,
             mavenProjectTestSource("."),
             mavenProjectTestSource(amCommonsDirectory),
@@ -231,7 +235,7 @@ module.exports = function (grunt) {
              * directory.
              */
             testServer: {
-                files: testInputDirectory.map(function (inputDirectory) {
+                files: testInputDirs.map(function (inputDirectory) {
                     return {
                         cwd: inputDirectory,
                         src: ["**"],
@@ -256,7 +260,7 @@ module.exports = function (grunt) {
              * Deploy and run the tests whenever any source files change.
              */
             test: {
-                files: watchCompositionDirs.map(function (dir) {
+                files: watchCompositionDirs.concat(testWatchDirs).map(function (dir) {
                     return dir + "/**";
                 }),
                 tasks: ["test"]
