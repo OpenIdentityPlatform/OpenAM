@@ -75,7 +75,6 @@
   </listitem>
  </itemizedlist>
 
-
  <section xml:id="security-advisories">
   <title>Security Advisories</title>
 
@@ -523,6 +522,48 @@
       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5534"
       xlink:show="new"
       >OPENAM-5534</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-6542/OPENAM-5925 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">New <literal>openam.deserialisation.classes.whitelist</literal> Property</emphasis>.
+     OpenAM uses the JATO framework for some console pages and for legacy login pages.
+     The JATO framework uses serialized Java objects to maintain state during
+     the console session.
+    </para>
+    <para>
+     To ensure that the serialized objects have not been
+     exploited by a malicious user, OpenAM now provides a new
+     <literal>openam.deserialisation.classes.whitelist</literal> property that
+     lists valid classes when OpenAM performs object deserialization.
+     The default should work for most deployments.
+    </para>
+    <para>
+     You can access and update the property in the OpenAM console by navigating to
+     Configuration &gt; Servers and Sites &gt; Default Server Settings &gt;
+     Security &gt; Object Deserialisation Class Whitelist.
+    </para>
+
+    <!-- not sure if I need this graphic -->
+    <figure xml:id="object-deserialisation-class-whitelist">
+     <title>Object Deserialisation Class Whitelist</title>
+     <mediaobject>
+      <alt>The Object Deserialisation Class Whitelist</alt>
+      <imageobject>
+       <imagedata fileref="images/object-deserialisation-class-whitelist.png" format="PNG" />
+      </imageobject>
+      <textobject><para>The OpenAM administrator sees all capabilities of the console.</para></textobject>
+     </mediaobject>
+    </figure>
+
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5925"
+      xlink:show="new"
+      >OPENAM-5925</link>.
     </para>
    </listitem>
 
