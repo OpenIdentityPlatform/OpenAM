@@ -369,118 +369,85 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     });
 
     Handlebars.registerHelper("callbackRender", function () {
-        // FIXME: This all needs to move to partials.
-        var result = "",
-            cb = this,
-            prompt = "",
-            options,
-            hideButton,
-            defaultOption,
-            btnClass = "",
-            callbackType = {
-                PasswordCallback : "PasswordCallback",
-                TextInputCallback : "TextInputCallback",
-                TextOutputCallback: "TextOutputCallback",
-                ConfirmationCallback : "ConfirmationCallback",
-                ChoiceCallback : "ChoiceCallback",
-                HiddenValueCallback : "HiddenValueCallback",
-                RedirectCallback : "RedirectCallback",
-                ScriptTextOutputCallback : "4"
-                // Magic number 4 is for a <script>, taken from ScriptTextOutputCallback.java
+        var result = "", self = this, prompt = "", options, defaultOption, btnClass = "",
+            renderContext = {
+                index: this.input.index,
+                value: this.input.value,
+                prompt: prompt
             };
 
-        _.find(cb.output, function (obj) {
+        _.find(this.output, function (obj) {
             if (obj.name === "prompt" && obj.value !== undefined && obj.value.length) {
                 prompt = obj.value.replace(/:$/, "");
             }
         });
 
-        switch (cb.type) {
-            case callbackType.PasswordCallback :
-                result += '<label for="callback_' + cb.input.index + '" class="aria-label sr-only">' + prompt
-                    + '</label><input type="password" id="callback_' + cb.input.index + '" name="callback_'
-                    + cb.input.index + '" class="form-control input-lg" placeholder="' + prompt + '" value="'
-                    + cb.input.value + '" data-validator="required" required data-validator-event="keyup">';
-                break;
+        function renderPartial (name, context) {
+            return Handlebars.partials["login/_" + name](_.merge(renderContext, context));
+        }
 
-            case callbackType.TextInputCallback :
-                result += '<textarea name="callback_' + cb.input.index
-                    + '" data-validator="required" required data-validator-event="keyup">'
-                    + cb.input.value + "</textarea>";
-                break;
+        switch (this.type) {
+            case "PasswordCallback": result += renderPartial("Password"); break;
+            case "TextInputCallback": result += renderPartial("TextInput"); break;
+            case "TextOutputCallback":
+                options = {
+                    message: _.find(this.output, { name: "message" }),
+                    type: _.find(this.output, { name: "messageType" })
+                };
 
-            case callbackType.TextOutputCallback :
-                options = [];
-                options.message = _.find(cb.output, function (o) { return o.name === "message"; });
-                options.type = _.find(cb.output, function (o) { return o.name === "messageType"; });
-
-                if (options.type.value === callbackType.ScriptTextOutputCallback) {
-                    // FIXME: Why do we have this hideButton variable?
-                    hideButton = "if(document.getElementsByClassName('button')[0] != undefined){document"
-                        + ".getElementsByClassName"
-                        + "('button')[0].style.visibility = 'hidden';}";
-                    result += "<script type='text/javascript'>" + "\n" + hideButton + "\n"
-                        + options.message.value + "\n</script>\n"
-                        + "<div id='callback_" + cb.input.index + "'></div>";
+                // Magic number 4 is for a <script>, taken from ScriptTextOutputCallback.java
+                if (options.type.value === "4") {
+                    result += renderPartial("ScriptTextOutput", {
+                        messageValue: options.message.value
+                    });
                 } else {
-                    result += '<div id="callback_' + cb.input.index + '" class="textOutputCallback '
-                         + options.type.value + '">' + options.message.value + "</div>";
+                    result += renderPartial("TextOutput", {
+                        typeValue: options.type.value,
+                        messageValue: options.message.value
+                    });
                 }
-
                 break;
-
-            case callbackType.ConfirmationCallback :
-                options = _.find(cb.output, function (o) { return o.name === "options"; });
+            case "ConfirmationCallback":
+                options = _.find(this.output, { name: "options" });
 
                 if (options && options.value !== undefined) {
                     // if there is only one option then mark it as default.
-                    defaultOption = options.value.length > 1 ? _.find(cb.output, function (o) {
-                        return o.name === "defaultOption";
-                    }) : { "value": 0 };
-
+                    defaultOption = options.value.length > 1 ?
+                        _.find(this.output, { name: "defaultOption" }) : { "value": 0 };
 
                     _.each(options.value, function (option, key) {
                         btnClass = (defaultOption && defaultOption.value === key) ? "btn-primary" : "btn-default";
-                        result += '<input name="callback_' + cb.input.index
-                            + '" type="submit" class="btn btn-lg btn-block btn-uppercase '
-                            + btnClass + '" index="' + key + '" value="' + option + '">';
+                        result += renderPartial("Confirmation", {
+                            btnClass: btnClass,
+                            key: key,
+                            option: option
+                        });
                     });
                 }
                 break;
-            case callbackType.ChoiceCallback :
-                options = _.find(cb.output, function (o) { return o.name === "choices"; });
-                defaultOption = cb.input.value;
-                // FIX ME: If more than two then maybe a vertical radio list.
+            case "ChoiceCallback":
+                options = _.find(this.output, { name: "choices" });
+
+                // FIXME: If more than two then maybe a vertical radio list.
                 if (options && options.value !== undefined) {
-                    result += '<label class="choice-callback">' + prompt + "</label>"
-                        + '<div class="btn-group btn-group-justified" data-toggle="buttons">';
-                    _.each(options.value, function (option, key) {
-                        var checked = (defaultOption === key) ? "checked" : "",
-                            active = checked ? "active" : "";
+                    result += renderPartial("Choice", {
+                        values: _.map(options.value, function (option, key) {
+                            var checked = (self.input.value === key) ? "checked" : "", // Default option
+                                active = checked ? "active" : "";
 
-                        result += '<label class="btn btn-default ' + active + '">' +
-                                    ' <input type="radio" name="callback_' + cb.input.index
-                                    + '" id="callback_' + cb.input.index + "_" + key
-                                    + '" autocomplete="off" ' + checked + ' value="'
-                                    + key + '">' + option +
-                                "</label>";
+                            return {
+                                active: active,
+                                checked: checked,
+                                key: key,
+                                value: option
+                            };
+                        })
                     });
-                    result += "</div>";
                 }
-
                 break;
-            case callbackType.HiddenValueCallback :
-                result += '<input type="hidden" id="' + cb.input.value + '" name="callback_' + cb.input.index
-                    + '" value="" />';
-                break;
-            case callbackType.RedirectCallback:
-                result += '<p class="text-center">Redirecting...</p>'; // FIXME: i18n
-                break;
-            default:
-                result += '<input type="text" name="callback_' + cb.input.index + '" value="' + cb.input.value
-                    + '" data-validator="required" required data-validator-event="keyup"'
-                    + ' class="form-control input-lg" placeholder="' + prompt + '">';
-                break;
+            case "HiddenValueCallback": result += renderPartial("HiddenValue"); break;
+            case "RedirectCallback": result += renderPartial("Redirect"); break;
+            default: result += renderPartial("Default"); break;
         }
 
         return new Handlebars.SafeString(result);

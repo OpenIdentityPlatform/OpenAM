@@ -19,188 +19,186 @@ define("config/AppConfiguration", [
     "org/forgerock/openam/ui/common/util/Constants"
 ], function (Constants) {
     var obj = {
-            moduleDefinition: [
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/main/SessionManager",
-                    configuration: {
-                        loginHelperClass: "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-                    }
+        moduleDefinition: [{
+            moduleClass: "org/forgerock/commons/ui/common/main/SessionManager",
+            configuration: {
+                loginHelperClass: "org/forgerock/openam/ui/user/login/RESTLoginHelper"
+            }
+        }, {
+            moduleClass: "org/forgerock/commons/ui/common/main/Router",
+            configuration: {
+                routes: {},
+                loader: [
+                    { "routes": "config/routes/AMRoutesConfig" },
+                    { "routes": "config/routes/CommonRoutesConfig" },
+                    { "routes": "config/routes/UserRoutesConfig" },
+                    { "routes": "config/routes/admin/AdminRoutes" },
+                    { "routes": "config/routes/admin/RealmsRoutes" },
+                    { "routes": "config/routes/user/UMARoutes" }
+                ]
+            }
+        }, {
+            moduleClass: "org/forgerock/commons/ui/common/SiteConfigurator",
+            configuration: {
+                selfRegistration: false,
+                enterprise: false,
+                remoteConfig: true,
+                delegate: "org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate"
+            }
+        }, {
+            moduleClass: "org/forgerock/commons/ui/common/main/ProcessConfiguration",
+            configuration: {
+                processConfigurationFiles: [
+                    "config/process/AMConfig",
+                    "config/process/UserConfig",
+                    "config/process/CommonConfig"
+                ]
+            }
+        }, {
+            moduleClass: "org/forgerock/commons/ui/common/main/ServiceInvoker",
+            configuration: {
+                defaultHeaders: {
+                }
+            }
+        }, {
+            moduleClass: "org/forgerock/commons/ui/common/main/ErrorsHandler",
+            configuration: {
+                defaultHandlers: {
                 },
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/main/Router",
-                    configuration: {
-                        routes: { },
-                        loader: [
-                            { "routes": "config/routes/AMRoutesConfig" },
-                            { "routes": "config/routes/CommonRoutesConfig" },
-                            { "routes": "config/routes/UserRoutesConfig" },
-                            { "routes": "config/routes/admin/AdminRoutes" },
-                            { "routes": "config/routes/admin/RealmsRoutes" },
-                            { "routes": "config/routes/user/UMARoutes" }
-                        ]
-                    }
+                loader: [
+                        { "defaultHandlers": "config/errorhandlers/CommonErrorHandlers" }
+                ]
+            }
+        }, {
+            moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
+            configuration: {
+                templateUrls: [
+                ],
+                partialUrls: [
+                    "partials/form/_JSONSchemaFooter.html",
+                    "partials/headers/_Title.html",
+                    "partials/headers/_TitleWithSubAndIcon.html",
+                    "partials/login/_Choice.html",
+                    "partials/login/_Confirmation.html",
+                    "partials/login/_Default.html",
+                    "partials/login/_HiddenValue.html",
+                    "partials/login/_Password.html",
+                    "partials/login/_Redirect.html",
+                    "partials/login/_ScriptTextOutput.html",
+                    "partials/login/_TextInput.html",
+                    "partials/login/_TextOutput.html"
+                ]
+            }
+        }, {
+            moduleClass: "org/forgerock/commons/ui/common/components/Messages",
+            configuration: {
+                messages: {
                 },
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/SiteConfigurator",
-                    configuration: {
-                        selfRegistration: false,
-                        enterprise: false,
-                        remoteConfig: true,
-                        delegate: "org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate"
+                loader: [
+                    { "messages": "config/messages/CommonMessages" },
+                    { "messages": "config/messages/UserMessages" },
+                    { "messages": "config/AppMessages" }
+                ]
+            }
+        }, {
+            moduleClass: "org/forgerock/commons/ui/common/main/ValidatorsManager",
+            configuration: {
+                policyDelegate: "org/forgerock/openam/ui/common/delegates/PolicyDelegate",
+                validators: { },
+                loader: [
+                     { "validators": "config/validators/UserValidators" },
+                     { "validators": "config/validators/CommonValidators" }
+                ]
+            }
+        }, {
+            moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
+            configuration: {
+                userBar: [
+                    {
+                        "id": "profileLink",
+                        "href": "#profile/",
+                        "i18nKey": "common.user.profile"
+                    }, {
+                        "id": "changePasswordLink",
+                        "event" : Constants.EVENT_SHOW_CHANGE_SECURITY_DIALOG,
+                        "i18nKey": "common.user.changePassword"
+                    }, {
+                        "id": "logoutLink",
+                        "href": "#logout/",
+                        "i18nKey": "common.form.logout"
                     }
-                },
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/main/ProcessConfiguration",
-                    configuration: {
-                        processConfigurationFiles: [
-                            "config/process/AMConfig",
-                            "config/process/UserConfig",
-                            "config/process/CommonConfig"
-                        ]
-                    }
-                },
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/main/ServiceInvoker",
-                    configuration: {
-                        defaultHeaders: {
-                        }
-                    }
-                },
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/main/ErrorsHandler",
-                    configuration: {
-                        defaultHandlers: {
-                        },
-                        loader: [
-                                { "defaultHandlers": "config/errorhandlers/CommonErrorHandlers" }
-                        ]
-                    }
-                },
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
-                    configuration: {
-                        templateUrls: [
-                        ],
-                        partialUrls: [
-                            "partials/form/_JSONSchemaFooter.html",
-                            "partials/headers/_Title.html",
-                            "partials/headers/_TitleWithSubAndIcon.html"
-                        ]
-                    }
-                },
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/components/Messages",
-                    configuration: {
-                        messages: {
-                        },
-                        loader: [
-                            { "messages": "config/messages/CommonMessages" },
-                            { "messages": "config/messages/UserMessages" },
-                            { "messages": "config/AppMessages" }
-                        ]
-                    }
-                },
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/main/ValidatorsManager",
-                    configuration: {
-                        policyDelegate: "org/forgerock/openam/ui/common/delegates/PolicyDelegate",
-                        validators: { },
-                        loader: [
-                             {"validators": "config/validators/UserValidators"},
-                             {"validators": "config/validators/CommonValidators"}
-                         ]
-                    }
-                },
-                {
-                    moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
-                    configuration: {
-                        userBar: [
-                            {
-                                "id": "profileLink",
-                                "href": "#profile/",
-                                "i18nKey": "common.user.profile"
-                            }, {
-                                "id": "changePasswordLink",
-                                "event" : Constants.EVENT_SHOW_CHANGE_SECURITY_DIALOG,
-                                "i18nKey": "common.user.changePassword"
-                            }, {
-                                "id": "logoutLink",
-                                "href": "#logout/",
-                                "i18nKey": "common.form.logout"
-                            }
-                        ],
-                        links: {
-                            "admin": {
-                                "role": "ui-admin",
-                                "urls": {
-                                    "realms": {
-                                        "url": "#realms",
-                                        "name": "config.AppConfiguration.Navigation.links.realms.title",
-                                        "icon": "fa fa-cloud",
-                                        "dropdown" : true,
-                                        "urls": [{
-                                            "url": "#realms",
-                                            "name": "config.AppConfiguration.Navigation.links.realms.showAll",
-                                            "icon": "fa fa-th"
-                                        }, {
-                                            "event": Constants.EVENT_ADD_NEW_REALM_DIALOG,
-                                            "name": "config.AppConfiguration.Navigation.links.realms.newRealm",
-                                            "icon": "fa fa-plus"
-                                        }, {
-                                            divider: true
-                                        }]
-                                    },
-                                    "federation": {
-                                        "url": "#federation",
-                                        "name": "config.AppConfiguration.Navigation.links.federation",
-                                        "icon": "fa fa-building-o"
-                                    },
-                                    "configuration": {
-                                        "url": "#configuration",
-                                        "name": "config.AppConfiguration.Navigation.links.configuration",
-                                        "icon": "fa fa-cog"
-                                    },
-                                    "sessions": {
-                                        "url": "#sessions",
-                                        "name": "config.AppConfiguration.Navigation.links.sessions",
-                                        "icon": "fa fa-users"
-                                    }
-                                }
+                ],
+                links: {
+                    "admin": {
+                        "role": "ui-admin",
+                        "urls": {
+                            "realms": {
+                                "url": "#realms",
+                                "name": "config.AppConfiguration.Navigation.links.realms.title",
+                                "icon": "fa fa-cloud",
+                                "dropdown" : true,
+                                "urls": [{
+                                    "url": "#realms",
+                                    "name": "config.AppConfiguration.Navigation.links.realms.showAll",
+                                    "icon": "fa fa-th"
+                                }, {
+                                    "event": Constants.EVENT_ADD_NEW_REALM_DIALOG,
+                                    "name": "config.AppConfiguration.Navigation.links.realms.newRealm",
+                                    "icon": "fa fa-plus"
+                                }, {
+                                    divider: true
+                                }]
                             },
-                            "user" : {
+                            "federation": {
+                                "url": "#federation",
+                                "name": "config.AppConfiguration.Navigation.links.federation",
+                                "icon": "fa fa-building-o"
+                            },
+                            "configuration": {
+                                "url": "#configuration",
+                                "name": "config.AppConfiguration.Navigation.links.configuration",
+                                "icon": "fa fa-cog"
+                            },
+                            "sessions": {
+                                "url": "#sessions",
+                                "name": "config.AppConfiguration.Navigation.links.sessions",
+                                "icon": "fa fa-users"
+                            }
+                        }
+                    },
+                    "user" : {
+                        "urls": {
+                            "dashboard": {
+                                "url": "#dashboard/",
+                                "name": "config.AppConfiguration.Navigation.links.dashboard",
+                                "icon": "fa fa-dashboard",
+                                "inactive": false
+                            },
+                            "uma": {
+                                "icon": "fa fa-user",
+                                "name": "config.AppConfiguration.Navigation.links.uma",
+                                "dropdown" : true,
                                 "urls": {
-                                    "dashboard": {
-                                        "url": "#dashboard/",
-                                        "name": "config.AppConfiguration.Navigation.links.dashboard",
-                                        "icon": "fa fa-dashboard",
-                                        "inactive": false
+                                    "listResource": {
+                                        "url": "#uma/resources/",
+                                        "name": "config.AppConfiguration.Navigation.links.umaLinks.resources"
                                     },
-                                    "uma": {
-                                        "icon": "fa fa-user",
-                                        "name": "config.AppConfiguration.Navigation.links.uma",
-                                        "dropdown" : true,
-                                        "urls": {
-                                            "listResource": {
-                                                "url": "#uma/resources/",
-                                                "name": "config.AppConfiguration.Navigation.links.umaLinks.resources"
-                                            },
-                                            "listHistory": {
-                                                "url": "#uma/history/",
-                                                "name": "config.AppConfiguration.Navigation.links.umaLinks.history"
-                                            },
-                                            "listRequests": {
-                                                "url": "#uma/requests/",
-                                                "name": "config.AppConfiguration.Navigation.links.umaLinks.requests"
-                                            }
-                                        }
+                                    "listHistory": {
+                                        "url": "#uma/history/",
+                                        "name": "config.AppConfiguration.Navigation.links.umaLinks.history"
+                                    },
+                                    "listRequests": {
+                                        "url": "#uma/requests/",
+                                        "name": "config.AppConfiguration.Navigation.links.umaLinks.requests"
                                     }
                                 }
                             }
                         }
                     }
                 }
-            ],
-            loggerLevel: "debug"
-        };
+            }
+        }],
+        loggerLevel: "debug"
+    };
     return obj;
 });

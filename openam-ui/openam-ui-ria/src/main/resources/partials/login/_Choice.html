@@ -1,0 +1,8 @@
+<label class="choice-callback">{{prompt}}</label>
+<div class="btn-group btn-group-justified" data-toggle="buttons">
+{{#each values}}
+    <label class="btn btn-default {{this.active}}">
+        <input type="radio" name="callback_{{../index}}" id="callback_{{../index}}_{{key}}" autocomplete="off" {{checked}} value="{{key}}">{{value}}
+    </label>
+{{/each}}
+</div>

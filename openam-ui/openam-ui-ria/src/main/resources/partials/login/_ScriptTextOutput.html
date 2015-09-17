@@ -1,0 +1,8 @@
+{{!-- FIXME: Why do we hide the first button? --}}
+<script type="text/javascript">
+if (document.getElementsByClassName("button")[0] != undefined) {
+    document.getElementsByClassName("button")[0].style.visibility = "hidden";
+}
+{{messageValue}}
+</script>
+<div id="callback_{{index}}"></div>
