@@ -55,7 +55,8 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
      * @param auditEventFactory The factory that can be used to create the events.
      */
     public AbstractRestletAccessAuditFilter(Component component, Restlet restlet,
-                                            AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory) {
+                                            AuditEventPublisher auditEventPublisher,
+                                            AuditEventFactory auditEventFactory) {
         setNext(restlet);
         this.auditEventPublisher = auditEventPublisher;
         this.auditEventFactory = auditEventFactory;
@@ -116,8 +117,8 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .authentication(getUserIdForAccessOutcome(response))
-                    .contexts(getContextsForAccessOutcome(response))
+                    .authentication(getUserIdForAccessOutcome(request, response))
+                    .contexts(getContextsForAccessOutcome(request, response))
                     .response("SUCCESS", endTime - request.getDate().getTime());
 
             addHttpData(request, builder);
@@ -135,8 +136,8 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .authentication(getUserIdForAccessOutcome(response))
-                    .contexts(getContextsForAccessOutcome(response))
+                    .authentication(getUserIdForAccessOutcome(request, response))
+                    .contexts(getContextsForAccessOutcome(request, response))
                     .responseWithMessage("FAILED - " + response.getStatus().getCode(), endTime - request.getDate()
                             .getTime(), response.getStatus().getDescription());
 
@@ -180,7 +181,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
      * @param response the restlet response
      * @return the user ID
      */
-    protected String getUserIdForAccessOutcome(Response response) {
+    protected String getUserIdForAccessOutcome(Request request, Response response) {
         String userId = AuditRequestContext.getProperty(USER_ID);
         return userId == null ? "" : userId;
     }
@@ -191,7 +192,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
      * @param response the restlet response
      * @return the context IDs
      */
-    protected Map<String, String> getContextsForAccessOutcome(Response response) {
+    protected Map<String, String> getContextsForAccessOutcome(Request request, Response response) {
         return getAllAvailableContexts();
     }
 }

@@ -16,17 +16,18 @@
 package org.forgerock.openam.rest.audit;
 
 import static org.forgerock.openam.audit.AuditConstants.Component;
+import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.routing.Filter;
+
+import java.util.Set;
 
 /**
  * Factory to assist with the creation of audit filters for restlet access.
@@ -38,25 +39,23 @@ public final class RestletAccessAuditFilterFactory {
 
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
-    private final TokenStore tokenStore;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final Set<OAuth2AuditContextProvider> providers;
 
     /**
      * Guice injected constructor for creating a <code>RestletAccessAuditFilterFactory</code> instance.
      *
      * @param eventPublisher The publisher responsible for logging the events.
      * @param eventFactory The factory that can be used to create the events.
-     * @param tokenStore The helper to use for reading authentication JWTs.
-     * @param requestFactory The factory for creating OAuth2Request instances.
+     * @param providers The OAuth2 audit context providers, responsible for finding details which can be audit
+     *                  logged from various tokens which may be attached to requests and/or responses.
      */
     @Inject
-    public RestletAccessAuditFilterFactory(AuditEventPublisher eventPublisher,
-                                           AuditEventFactory eventFactory, TokenStore tokenStore,
-                                           OAuth2RequestFactory<Request> requestFactory) {
+    public RestletAccessAuditFilterFactory(AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
+                                           @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS)
+                                           Set<OAuth2AuditContextProvider> providers) {
         this.eventPublisher = eventPublisher;
         this.eventFactory = eventFactory;
-        this.tokenStore = tokenStore;
-        this.requestFactory = requestFactory;
+        this.providers = providers;
     }
 
     /**
@@ -68,9 +67,10 @@ public final class RestletAccessAuditFilterFactory {
      */
     public Filter createFilter(Component component, Restlet restlet) {
         switch (component) {
-            case UMA:
-                return new UMAAccessAuditFilter(restlet, eventPublisher, eventFactory, tokenStore, requestFactory);
-
+            /*case UMA:
+                return new UMAAccessAuditFilter(restlet, eventPublisher, eventFactory, providers);*/
+            case OAUTH2:
+                return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, providers);
         }
 
         throw new IllegalArgumentException("Filter for " + component + " does not exist.");

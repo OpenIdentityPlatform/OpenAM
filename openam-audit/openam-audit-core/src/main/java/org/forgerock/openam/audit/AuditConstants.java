@@ -132,7 +132,6 @@ public final class AuditConstants {
         OAUTH2_GRANT("OAuth2 grant code"),
         /** OAuth2 refresh code context, for use with OAuth2, OIDC and UMA. */
         OAUTH2_REFRESH("OAuth2 refresh token"),
-        //TODO Where is this used? (OAUTH2_ACCESS("OAuth2 access token"))
         /** OAuth2 access code context, for use with OAuth2, OIDC and UMA. */
         OAUTH2_ACCESS("OAuth2 access token"),
         /** Auth token context for use during authentication. */
@@ -194,6 +193,12 @@ public final class AuditConstants {
      * The Context IDs.
      */
     public static final String REALM_AUDIT_CONTEXT_KEY = "realm";
+
+    /**
+     * The OAuth2 audit context providers, responsible for finding details which can be audit logged from various
+     * tokens which may be attached to requests and/or responses.
+     */
+    public static final String OAUTH2_AUDIT_CONTEXT_PROVIDERS = "oauth2AuditContextProviders";
 
     private AuditConstants() {
         // Prevent instantiation

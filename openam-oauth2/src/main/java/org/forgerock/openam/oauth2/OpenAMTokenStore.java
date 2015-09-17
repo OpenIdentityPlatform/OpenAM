@@ -450,6 +450,10 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String id = UUID.randomUUID().toString();
+        final String auditId = UUID.randomUUID().toString();
+
+        String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+
         long expiryTime = 0;
         if (clientRegistration == null) {
             expiryTime = providerSettings.getAccessTokenLifetime() + System.currentTimeMillis();
@@ -461,11 +465,11 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         if (refreshToken == null) {
             accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri,
                     scope, expiryTime, null, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType, nonce,
-                    realmNormaliser.normalise(request.<String>getParameter(REALM)), claims);
+                    realm, claims, auditId);
         } else {
             accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri,
                     scope, expiryTime, refreshToken.getTokenId(), OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType,
-                    nonce, realmNormaliser.normalise(request.<String>getParameter(REALM)), claims);
+                    nonce, realm, claims, auditId);
         }
         try {
             tokenStore.create(accessToken);
@@ -501,6 +505,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
         final String id = UUID.randomUUID().toString();
+        final String auditId = UUID.randomUUID().toString();
 
         final long lifeTime;
         if (clientRegistration == null) {
@@ -527,7 +532,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         RefreshToken refreshToken = new OpenAMRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
                 expiryTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType,
-                realm, authModules, acr);
+                realm, authModules, acr, auditId);
 
         try {
             tokenStore.create(refreshToken);

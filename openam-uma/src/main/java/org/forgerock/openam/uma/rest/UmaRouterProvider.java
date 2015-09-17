@@ -65,14 +65,19 @@ public class UmaRouterProvider implements Provider<Router> {
     @Override
     public Router get() {
         Router router = new RestletRealmRouter(realmValidator, coreWrapper);
-        router.attach("/permission_request",
-                restletAuditFactory.createFilter(UMA, getRestlet(PERMISSION_REQUEST_ENDPOINT)));
-        router.attach("/authz_request",
-                restletAuditFactory.createFilter(UMA, getRestlet(AUTHORIZATION_REQUEST_ENDPOINT)));
+        router.attach("/permission_request", getRestlet(PERMISSION_REQUEST_ENDPOINT));
+        router.attach("/authz_request", getRestlet(AUTHORIZATION_REQUEST_ENDPOINT));
         // Well-Known Discovery
         router.attach("/.well-known/uma-configuration",
-                restletAuditFactory.createFilter(UMA,
-                        new UmaExceptionFilter(wrap(UmaWellKnownConfigurationEndpoint.class))));
+                new UmaExceptionFilter(wrap(UmaWellKnownConfigurationEndpoint.class)));
+//        router.attach("/permission_request",
+//                restletAuditFactory.createFilter(UMA, getRestlet(PERMISSION_REQUEST_ENDPOINT)));
+//        router.attach("/authz_request",
+//                restletAuditFactory.createFilter(UMA, getRestlet(AUTHORIZATION_REQUEST_ENDPOINT)));
+//        // Well-Known Discovery
+//        router.attach("/.well-known/uma-configuration",
+//                restletAuditFactory.createFilter(UMA,
+//                        new UmaExceptionFilter(wrap(UmaWellKnownConfigurationEndpoint.class))));
         return router;
     }
 

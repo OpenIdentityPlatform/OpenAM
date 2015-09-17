@@ -229,6 +229,7 @@ public class OAuth2Constants {
         public static final String CLIENT_ID = "clientID";
         public static final String TOKEN_NAME = "tokenName";
         public static final String AUTH_MODULES = "authModules";
+        public static final String AUDIT_ID = "auditId";
 
         public static final String OAUTH_TOKEN_ADAPTER = "oauthTokenAdapter";
         public static final String RESOURCE_SET_TOKEN_ADAPTER = "resourceSetTokenAdapter";

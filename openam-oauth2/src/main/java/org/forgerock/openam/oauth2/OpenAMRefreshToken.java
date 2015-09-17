@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUDIT_ID;
 import static org.forgerock.oauth2.core.Utils.*;
 
 import java.util.Collections;
@@ -59,13 +60,15 @@ public class OpenAMRefreshToken extends RefreshToken {
      * @param grantType The grant type.
      * @param authModules The pipe-separated list of auth modules.
      * @param realm The realm.
+     * @param auditId The audit id, used for tracking tokens throughout the audit logs.
      */
     public OpenAMRefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
             long expiryTime, String tokenType, String tokenName, String grantType, String realm,
-            String authModules, String acr) {
+            String authModules, String acr, String auditId) {
         super(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, tokenType, tokenName, grantType,
                 authModules, acr);
         setRealm(realm);
+        setAuditId(auditId);
     }
 
     /**
@@ -184,5 +187,23 @@ public class OpenAMRefreshToken extends RefreshToken {
             return (Set<String>) param.getObject();
         }
         return null;
+    }
+
+    /**
+     * Sets the audit id.
+     *
+     * @param auditId The audit id.
+     */
+    protected void setAuditId(String auditId) {
+        setStringProperty(AUDIT_ID, auditId);
+    }
+
+    /**
+     * Gets the audit id.
+     *
+     * @return The audit id.
+     */
+    public String getAuditId() {
+        return getStringProperty(AUDIT_ID);
     }
 }

@@ -15,163 +15,60 @@
  */
 package org.forgerock.openam.rest.audit;
 
-import static org.forgerock.openam.audit.AuditConstants.*;
-
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.utils.StringUtils;
 import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.data.ChallengeResponse;
 
 import java.util.Map;
+import java.util.Set;
+
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableContexts;
+import static org.forgerock.openam.audit.AuditConstants.Component;
+import static org.forgerock.openam.audit.AuditConstants.USER_ID;
 
 /**
  * Responsible for logging access audit events for UMA requests.
  *
  * @since 13.0.0
  */
-public class UMAAccessAuditFilter extends AbstractRestletAccessAuditFilter {
-
-    private static final Debug debug = Debug.getInstance("amAudit");
-    private final OAuth2RequestFactory<Request> requestFactory;
-    private final TokenStore tokenStore;
+public class UMAAccessAuditFilter extends OAuth2AbstractAccessAuditFilter {
 
     /**
-     * Create a new filter for the given component and restlet.
+     * Create a new {@link UMAAccessAuditFilter} filter for the given restlet.
      *
      * @param restlet The restlet for which events will be logged.
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
-     * @param tokenStore The helper to use for reading authentication JWTs.
-     * @param requestFactory The factory for creating OAuth2Request instances.
+     * @param providers The OAuth2 audit context providers, responsible for finding details which can be audit
      */
     public UMAAccessAuditFilter(Restlet restlet, AuditEventPublisher auditEventPublisher,
-                                AuditEventFactory auditEventFactory, TokenStore tokenStore,
-                                OAuth2RequestFactory<Request> requestFactory) {
-        super(Component.UMA, restlet, auditEventPublisher, auditEventFactory);
-        this.tokenStore = tokenStore;
-        this.requestFactory = requestFactory;
+                                AuditEventFactory auditEventFactory, Set<OAuth2AuditContextProvider> providers) {
+        super(Component.UMA, restlet, auditEventPublisher, auditEventFactory, providers);
     }
 
     /**
      * {@inheritDoc}
+     *
+     * We are not expecting any user id information on an UMA response, and so just return anything already in the
+     * {@link AuditRequestContext}.
      */
     @Override
-    protected String getUserIdForAccessAttempt(Request request) {
-        String userId = super.getUserIdForAccessAttempt(request);
-
-        if (StringUtils.isNotEmpty(userId)) {
-            return userId;
-        }
-
-        AccessToken accessToken = retrieveAccessToken(request);
-
-        if (accessToken == null) {
-            //No token, therefore UMA endpoint with no need for auth, failure to send bearer token in header, or
-            //something went wrong during retrieval. Can't get user id, bail out.
-            debug.message("org.forgerock.openam.core.rest.authn.UMAAccessAuditFilter.getUserIdForAccessAttempt: " +
-                    "Unable to retrieve user id from access token.");
-            return "";
-        }
-
-        String username = getAccessTokenProperty("userName", accessToken);
-        String realm = getAccessTokenProperty("realm", accessToken);
-
-        if (username == null || realm == null) {
-            return "";
-        }
-
-        CoreWrapper cw = new CoreWrapper();
-        AMIdentity identity = cw.getIdentity(username, realm);
-        userId = identity.getUniversalId();
-
-        AuditRequestContext.putProperty(USER_ID, userId);
-
-        return userId;
+    protected String getUserIdForAccessOutcome(Request request, Response response) {
+        String userId = AuditRequestContext.getProperty(USER_ID);
+        return userId == null ? "" : userId;
     }
 
     /**
      * {@inheritDoc}
+     *
+     * We are not expecting any context id information on an UMA response, and so just return anything already in the
+     * {@link AuditRequestContext}.
      */
     @Override
-    protected Map<String, String> getContextsForAccessAttempt(Request request) {
-        AccessToken accessToken = retrieveAccessToken(request);
-        String accessTokenContextId = generateContextID(accessToken);
-        AuditRequestContext.putProperty(Context.OAUTH2_ACCESS.toString(), accessTokenContextId);
-
-        return super.getContextsForAccessAttempt(request);
+    protected Map<String, String> getContextsForAccessOutcome(Request request, Response response) {
+        return getAllAvailableContexts();
     }
-
-    private String generateContextID(AccessToken accessToken) {
-
-        String contextId = null;
-
-        if (accessToken != null) {
-            contextId = getAccessTokenProperty("id", accessToken);
-        }
-
-        return contextId;
-    }
-
-    // Currently only handles the type of properties I know to be in there, and which are of interest.
-    private String getAccessTokenProperty(String propertyName, AccessToken accessToken) {
-        if (!accessToken.isDefined(propertyName)) {
-            debug.message("org.forgerock.openam.core.rest.authn.UMAAccessAuditFilter.getAccessTokenProperty: " +
-                    "Property {} not present in access token.", propertyName);
-            return null;
-        }
-
-        if (accessToken.get(propertyName).isCollection()) {
-            return (String) accessToken.get(propertyName).asList().get(0);
-        }
-
-        debug.message("org.forgerock.openam.core.rest.authn.UMAAccessAuditFilter.getAccessTokenProperty: " +
-                "Property {} is not a JSON collection and therefore cannot be read.", propertyName);
-
-        return null;
-    }
-
-    private AccessToken retrieveAccessToken(Request request) {
-        AccessToken token;
-
-        ChallengeResponse challengeResponse = request.getChallengeResponse();
-
-        if (challengeResponse == null) {
-            debug.message("org.forgerock.openam.core.rest.authn.UMAAccessAuditFilter.retrieveAccessToken: " +
-                    "Authorization header not found");
-            return null;
-        }
-
-        String bearerToken = challengeResponse.getRawValue();
-
-        if ("undefined".equals(bearerToken)) {
-            debug.message("org.forgerock.openam.core.rest.authn.UMAAccessAuditFilter.retrieveAccessToken: " +
-                    "Bearer token not found in Authorization header");
-            return null;
-        }
-
-        OAuth2Request oAuth2Request = requestFactory.create(request);
-        try {
-            token = tokenStore.readAccessToken(oAuth2Request, bearerToken);
-        } catch (ServerException | InvalidGrantException | NotFoundException e) {
-            debug.message("org.forgerock.openam.core.rest.authn.UMAAccessAuditFilter.retrieveAccessToken: " +
-                    "Failure to fetch access token.");
-            return null;
-        }
-
-        return token;
-    }
-
 }

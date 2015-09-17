@@ -19,6 +19,7 @@ import static com.google.inject.name.Names.named;
 import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.*;
 import static org.forgerock.oauth2.core.TokenStore.*;
+import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import com.google.inject.AbstractModule;
@@ -100,6 +101,10 @@ import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
 import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdTokenIssuer;
+import org.forgerock.openam.rest.audit.OAuth2AuditAccessTokenContextProvider;
+import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
+import org.forgerock.openam.rest.audit.OAuth2AuditRefreshTokenContextProvider;
+import org.forgerock.openam.rest.audit.OAuth2AuditSSOTokenContextProvider;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.sm.datalayer.utils.ThreadSafeTokenIdGenerator;
 import org.forgerock.openam.utils.OpenAMSettings;
@@ -126,6 +131,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -341,5 +347,20 @@ public class OAuth2GuiceModule extends AbstractModule {
         protected void validateTokenRealm(String tokenRealm, OAuth2Request request) throws InvalidGrantException {
             //No need to validate the realm for the provided token.
         }
+    }
+
+    @Inject
+    @Provides
+    @Singleton
+    @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS)
+    Set<OAuth2AuditContextProvider> getOAuth2AuditContextProviders(TokenStore tokenStore,
+                                                                   OAuth2RequestFactory<Request> requestFactory) {
+        Set<OAuth2AuditContextProvider> set = new HashSet();
+
+        set.add(new OAuth2AuditAccessTokenContextProvider(tokenStore, requestFactory));
+        set.add(new OAuth2AuditRefreshTokenContextProvider(tokenStore, requestFactory));
+        set.add(new OAuth2AuditSSOTokenContextProvider());
+
+        return set;
     }
 }
