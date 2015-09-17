@@ -16,20 +16,25 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -37,23 +42,12 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.restlet.Request;
 import org.restlet.data.Reference;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.testng.Assert.*;
 
 /**
  * @since 12.0.0
@@ -67,29 +61,24 @@ public class OpenAMResourceOwnerSessionValidatorTest {
 
     private SSOTokenManager mockSSOTokenManager;
     private OAuth2ProviderSettingsFactory mockProviderSettingsFactory;
+    private OAuth2ProviderSettings providerSettings;
     private OAuth2Request mockOAuth2Request;
     private Request restletRequest;
     private HttpServletRequest mockHttpServletRequest;
-    private OpenAMClientDAO mockClientDAO;
-    private ClientCredentialsReader mockClientCredentialsReader;
-    private CoreGuiceModule.DNWrapper dnWrapper;
 
     @BeforeMethod
     public void setUp() throws Exception {
 
         mockSSOTokenManager = mock(SSOTokenManager.class);
         mockProviderSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
+        providerSettings = mock(OAuth2ProviderSettings.class);
         mockOAuth2Request = mock(OAuth2Request.class);
         restletRequest = new Request();
         mockHttpServletRequest = mock(HttpServletRequest.class);
-        dnWrapper = mock(CoreGuiceModule.DNWrapper.class);
-        mockClientDAO = mock(OpenAMClientDAO.class);
-        mockClientCredentialsReader = mock(ClientCredentialsReader.class);
+        CoreGuiceModule.DNWrapper dnWrapper = mock(CoreGuiceModule.DNWrapper.class);
+        OpenAMClientDAO mockClientDAO = mock(OpenAMClientDAO.class);
+        ClientCredentialsReader mockClientCredentialsReader = mock(ClientCredentialsReader.class);
 
-        given(mockOAuth2Request.getParameter("realm")).willReturn("");
-        given(mockOAuth2Request.getParameter("locale")).willReturn("");
-        given(mockOAuth2Request.getParameter("module")).willReturn("");
-        given(mockOAuth2Request.getParameter("service")).willReturn("");
         given(mockOAuth2Request.getRequest()).willReturn(restletRequest);
 
         given(mockHttpServletRequest.getRequestURI()).willReturn("/openam/oauth2/authorize");
@@ -97,6 +86,8 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         given(mockHttpServletRequest.getServerName()).willReturn("openam.example.com");
         given(mockHttpServletRequest.getServerPort()).willReturn(8080);
         given(ACTIVE_SESSION_TOKEN.getProperty("Organization")).willReturn("/");
+
+        given(mockProviderSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
 
         resourceOwnerSessionValidator =
                 new OpenAMResourceOwnerSessionValidator(dnWrapper, mockSSOTokenManager, mockProviderSettingsFactory,
@@ -108,7 +99,6 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         };
 
         when(dnWrapper.orgNameToDN("/")).thenReturn("/");
-
     }
 
     @Test (expectedExceptions = BadRequestException.class)
@@ -222,7 +212,7 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         String service = "myAuthService";
         mockPrompt("login");
         mockSSOToken(NO_SESSION_TOKEN);
-        given(mockOAuth2Request.getParameter("acr_values")).willReturn(acrValues);
+        mockRequestAcrValues(acrValues);
         mockAcrValuesMap(Collections.<String, AuthenticationMethod>singletonMap("2",
                 new OpenAMAuthenticationMethod(service, AuthContext.IndexType.SERVICE)));
 
@@ -245,8 +235,8 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         String acrValues = "1 2 3";
         mockPrompt("login");
         mockSSOToken(NO_SESSION_TOKEN);
-        given(mockOAuth2Request.getParameter("acr_values")).willReturn(acrValues);
-        final Map<String, AuthenticationMethod> acrMap = new HashMap<String, AuthenticationMethod>();
+        mockRequestAcrValues(acrValues);
+        final Map<String, AuthenticationMethod> acrMap = new HashMap<>();
         acrMap.put("2", new OpenAMAuthenticationMethod("service2", AuthContext.IndexType.SERVICE));
         acrMap.put("3", new OpenAMAuthenticationMethod("service3", AuthContext.IndexType.SERVICE));
 
@@ -289,7 +279,7 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         // Given
         mockPrompt("login");
         mockSSOToken(NO_SESSION_TOKEN);
-        given(mockOAuth2Request.getParameter("acr_values")).willReturn("not_supported");
+        mockRequestAcrValues("not_supported");
         mockAcrValuesMap(Collections.<String, AuthenticationMethod>emptyMap());
 
         // When
@@ -305,10 +295,79 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         assertFalse(loginUri.getQuery().contains("service="));
     }
 
+    @Test
+    public void shouldRedirectToCustomLoginUrl() throws Exception {
+
+        //Given
+        mockCustomLoginUrlTemplate("http://mylogin.com/login?goto=${goto}"
+                + "<#if acrValues??>&acr_values=${acrValues}</#if><#if realm??>&realm=${realm}</#if>"
+                + "<#if module??>&module=${module}</#if><#if service??>&service=${service}</#if>"
+                + "<#if locale??>&locale=${locale}</#if>");
+
+        mockRequestRef();
+        mockSSOToken(NO_SESSION_TOKEN);
+        mockRequestAcrValues("1 2 3");
+        mockRequestRealm("SUB_REALM");
+        mockRequestLocale("LOCALE");
+        mockRequestModule("AUTHENTICATION_MODULE");
+        mockRequestService("AUTHENTICATION_CHAIN");
+
+        //When
+        try {
+            resourceOwnerSessionValidator.validate(mockOAuth2Request);
+            fail();
+        } catch (ResourceOwnerAuthenticationRequired e) {
+            //Then
+            assertThat(e.getRedirectUri().toString()).isEqualTo("http://mylogin.com/login?goto=http%3A%2F%2Fopenam.example.com%3A8080%2Fopenam%2Foauth2%2Fauthorize&acr_values=1+2+3&realm=SUB_REALM&module=AUTHENTICATION_MODULE&service=AUTHENTICATION_CHAIN&locale=LOCALE");
+        }
+    }
+
+    @Test
+    public void shouldRedirectToCustomLoginUrlWithNoQueryParameters() throws Exception {
+
+        //Given
+        mockCustomLoginUrlTemplate("http://mylogin.com/login?goto=${goto}"
+                + "<#if acrValues??>&acr_values=${acrValues}</#if><#if realm??>&realm=${realm}</#if>"
+                + "<#if module??>&module=${module}</#if><#if service??>&service=${service}</#if>"
+                + "<#if locale??>&locale=${locale}</#if>");
+
+        mockRequestRef();
+        mockSSOToken(NO_SESSION_TOKEN);
+
+        //When
+        try {
+            resourceOwnerSessionValidator.validate(mockOAuth2Request);
+            fail();
+        } catch (ResourceOwnerAuthenticationRequired e) {
+            //Then
+            assertThat(e.getRedirectUri().toString()).isEqualTo("http://mylogin.com/login?goto=http%3A%2F%2Fopenam.example.com%3A8080%2Fopenam%2Foauth2%2Fauthorize");
+        }
+    }
+
+    private void mockRequestRef() {
+        restletRequest.setResourceRef(new Reference("http://openam.example.com:8080/openam/oauth2/authorize"));
+    }
+
     private void mockPrompt(String prompt) {
         restletRequest.setResourceRef(new Reference(
                 "http://openam.example.com:8080/openam/oauth2/authorize?prompt=" + prompt));
         given(mockOAuth2Request.getParameter("prompt")).willReturn(prompt);
+    }
+
+    private void mockRequestRealm(String realm) {
+        given(mockOAuth2Request.getParameter("realm")).willReturn(realm);
+    }
+
+    private void mockRequestLocale(String locale) {
+        given(mockOAuth2Request.getParameter("locale")).willReturn(locale);
+    }
+
+    private void mockRequestModule(String module) {
+        given(mockOAuth2Request.getParameter("module")).willReturn(module);
+    }
+
+    private void mockRequestService(String service) {
+        given(mockOAuth2Request.getParameter("service")).willReturn(service);
     }
 
     private void mockSSOToken(SSOToken ssoToken) throws SSOException {
@@ -319,5 +378,14 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         final OAuth2ProviderSettings mockSettings = mock(OAuth2ProviderSettings.class);
         given(mockProviderSettingsFactory.get(mockOAuth2Request)).willReturn(mockSettings);
         given(mockSettings.getAcrMapping()).willReturn(mapping);
+    }
+
+    private void mockCustomLoginUrlTemplate(String customLoginUrlTemplate) throws ServerException, IOException {
+        Template template = new Template("", new StringReader(customLoginUrlTemplate), new Configuration());
+        given(providerSettings.getCustomLoginUrlTemplate()).willReturn(template);
+    }
+
+    private void mockRequestAcrValues(String acrValues) {
+        given(mockOAuth2Request.getParameter("acr_values")).willReturn(acrValues);
     }
 }

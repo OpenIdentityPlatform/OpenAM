@@ -16,6 +16,34 @@
 
 package org.forgerock.openam.oauth2;
 
+import static com.sun.identity.shared.DateUtils.stringToDate;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.FRAGMENT;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.QUERY;
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.oauth2.core.Utils.splitResponseType;
+import static org.forgerock.openidconnect.Client.CONFIRMED_MAX_AGE;
+import static org.forgerock.openidconnect.Client.MIN_DEFAULT_MAX_AGE;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -25,17 +53,8 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.AccessController;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
@@ -68,16 +87,6 @@ import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.ext.servlet.ServletUtils;
-
-import static com.sun.identity.shared.DateUtils.stringToDate;
-import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.FRAGMENT;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.QUERY;
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-import static org.forgerock.oauth2.core.Utils.splitResponseType;
-import static org.forgerock.openidconnect.Client.CONFIRMED_MAX_AGE;
-import static org.forgerock.openidconnect.Client.MIN_DEFAULT_MAX_AGE;
 
 /**
  * Validates whether a resource owner has a current authenticated session.
@@ -201,9 +210,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                             refreshToken.getRealm()));
                 }
             }
-        } catch (EncodingException e) {
-            throw new AccessDeniedException(e);
-        } catch (URISyntaxException e) {
+        } catch (UnsupportedEncodingException | URISyntaxException e) {
             throw new AccessDeniedException(e);
         }
     }
@@ -273,7 +280,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     private void setCurrentAcr(SSOToken token, OAuth2Request request, String acrValuesStr)
             throws NotFoundException, ServerException, SSOException {
         String serviceUsed = token.getProperty(ISAuthConstants.SERVICE);
-        Set<String> acrValues = new HashSet<String>(Arrays.asList(acrValuesStr.split("\\s+")));
+        Set<String> acrValues = new HashSet<>(Arrays.asList(acrValuesStr.split("\\s+")));
         OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
         Map<String, AuthenticationMethod> acrMap = settings.getAcrMapping();
         for (String acr : acrValues) {
@@ -287,7 +294,8 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     }
 
     private ResourceOwnerAuthenticationRequired authenticationRequired(OAuth2Request request, SSOToken token)
-            throws URISyntaxException, AccessDeniedException, ServerException, NotFoundException, EncodingException {
+            throws URISyntaxException, AccessDeniedException, ServerException, NotFoundException,
+            UnsupportedEncodingException {
         try {
             ssoTokenManager.destroyToken(token);
         } catch (SSOException e) {
@@ -298,18 +306,38 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     }
 
     private ResourceOwnerAuthenticationRequired authenticationRequired(OAuth2Request request)
-            throws AccessDeniedException, EncodingException, URISyntaxException, ServerException, NotFoundException {
+            throws AccessDeniedException, URISyntaxException, ServerException, NotFoundException,
+            UnsupportedEncodingException {
+        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        Template loginUrlTemplate = providerSettings.getCustomLoginUrlTemplate();
+
+        removeLoginPrompt(request.<Request>getRequest());
+
+        String gotoUrl = request.<Request>getRequest().getResourceRef().toString();
+        String acrValues = request.getParameter(ACR_VALUES);
+        String realm = request.getParameter(OAuth2Constants.Custom.REALM);
+        String moduleName = request.getParameter(MODULE);
+        String serviceName = request.getParameter(SERVICE);
+        String locale = request.getParameter(LOCALE);
+
+        URI loginUrl;
+        if (loginUrlTemplate != null) {
+            loginUrl = buildCustomLoginUrl(loginUrlTemplate, gotoUrl, acrValues, realm, moduleName, serviceName,
+                    locale);
+        } else {
+            loginUrl = buildDefaultLoginUrl(request, gotoUrl, acrValues, realm, moduleName, serviceName, locale);
+        }
+        return new ResourceOwnerAuthenticationRequired(loginUrl);
+    }
+
+    private URI buildDefaultLoginUrl(OAuth2Request request, String gotoUrl, String acrValues, String realm,
+            String moduleName, String serviceName, String locale) throws URISyntaxException, ServerException,
+            NotFoundException {
 
         final Request req = request.getRequest();
         final String authURL = getAuthURL(getHttpServletRequest(req));
         final URI authURI = new URI(authURL);
         final Reference loginRef = new Reference(authURI);
-
-        final String acrValuesStr = request.getParameter(ACR_VALUES);
-        final String realm = request.getParameter(OAuth2Constants.Custom.REALM);
-        final String moduleName = request.getParameter(MODULE);
-        final String serviceName = request.getParameter(SERVICE);
-        final String locale = request.getParameter(LOCALE);
 
         if (!isEmpty(realm)) {
             loginRef.addQueryParameter(OAuth2Constants.Custom.REALM, realm);
@@ -319,8 +347,8 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         }
 
         // Prefer standard acr_values, then module, then service
-        if (!isEmpty(acrValuesStr)) {
-            final ACRValue chosen = chooseBestAcrValue(request, acrValuesStr.split("\\s+"));
+        if (!isEmpty(acrValues)) {
+            final ACRValue chosen = chooseBestAcrValue(request, acrValues.split("\\s+"));
             if (chosen != null) {
                 loginRef.addQueryParameter(chosen.method.getIndexType().toString(), chosen.method.getName());
 
@@ -333,11 +361,31 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
             loginRef.addQueryParameter(SERVICE, serviceName);
         }
 
-        removeLoginPrompt(req);
+        loginRef.addQueryParameter(GOTO, gotoUrl);
 
-        loginRef.addQueryParameter(GOTO, req.getResourceRef().toString());
+        return loginRef.toUri();
+    }
 
-        return new ResourceOwnerAuthenticationRequired(loginRef.toUri());
+    private URI buildCustomLoginUrl(Template loginUrlTemplate, String gotoUrl, String acrValues, String realm,
+            String moduleName, String serviceName, String locale) throws ServerException, UnsupportedEncodingException {
+
+        Map<String, String> templateData = new HashMap<>();
+        templateData.put("goto", URLEncoder.encode(gotoUrl, StandardCharsets.UTF_8.toString()));
+        templateData.put("acrValues",
+                acrValues != null ? URLEncoder.encode(acrValues, StandardCharsets.UTF_8.toString()) : null);
+        templateData.put("realm", realm);
+        templateData.put("module", moduleName);
+        templateData.put("service", serviceName);
+        templateData.put("locale", locale);
+
+        try {
+            StringWriter loginUrlWriter = new StringWriter();
+            loginUrlTemplate.process(templateData, loginUrlWriter);
+            return URI.create(loginUrlWriter.toString());
+        } catch (IOException | TemplateException e) {
+            logger.error("Failed to template custom login url", e);
+            throw new ServerException("Failed to template custom login url");
+        }
     }
 
     /**
@@ -350,7 +398,8 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
      * @param acrValues the values of the acr_values parameter, in preference order.
      * @return the matching ACR value, or {@code null} if no match was found.
      */
-    private ACRValue chooseBestAcrValue(final OAuth2Request request, final String...acrValues) throws ServerException, NotFoundException {
+    private ACRValue chooseBestAcrValue(final OAuth2Request request, final String...acrValues) throws ServerException,
+            NotFoundException {
 
         final OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
 
@@ -413,13 +462,8 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         if (secondSlashIndex != -1) {
             deploymentURI = uri.substring(0, secondSlashIndex);
         }
-        final StringBuffer sb = new StringBuffer(100);
-        sb.append(request.getScheme()).append("://")
-                .append(request.getServerName()).append(":")
-                .append(request.getServerPort())
-                .append(deploymentURI)
-                .append("/UI/Login");
-        return sb.toString();
+        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + deploymentURI
+                + "/UI/Login";
     }
 
     /**

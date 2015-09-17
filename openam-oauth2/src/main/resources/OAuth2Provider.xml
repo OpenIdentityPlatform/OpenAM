@@ -86,6 +86,12 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="customLoginUrlTemplate"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a103b">
+                </AttributeSchema>
+
                 <AttributeSchema name="forgerock-oauth2-provider-scope-implementation-class"
                                  type="single"
                                  syntax="string"

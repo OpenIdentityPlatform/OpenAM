@@ -20,6 +20,8 @@ package org.forgerock.oauth2.core;
 import java.security.KeyPair;
 import java.util.Map;
 import java.util.Set;
+
+import freemarker.template.Template;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -460,4 +462,12 @@ public interface OAuth2ProviderSettings {
      * The attribute that can be used to obtain a UI-displayable name for a user's AMIdentity.
      */
     String getUserDisplayNameAttribute() throws ServerException;
+
+    /**
+     * Gets the custom login url template which will create the url to redirect resource owners to for authentication.
+     *
+     * @return The custom login url template.
+     * @throws ServerException If the custom login url template setting could not be retrieved.
+     */
+    Template getCustomLoginUrlTemplate() throws ServerException;
 }

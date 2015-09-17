@@ -866,6 +866,7 @@ public class OAuth2Constants {
 
         public static final String ALWAYS_ADD_CLAIMS_TO_TOKEN = "alwaysAddClaimsToToken";
         public static final String USER_DISPLAY_NAME_ATTRIBUTE = "displayNameAttribute";
+        public static final String RESOURCE_OWNER_CUSTOM_LOGIN_URL_TEMPLATE = "customLoginUrlTemplate";
     }
 
     /**

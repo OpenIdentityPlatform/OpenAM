@@ -31,6 +31,9 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
+
+import java.io.IOException;
+import java.io.StringReader;
 import java.security.AccessController;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -47,6 +50,9 @@ import java.util.Set;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwk.KeyUse;
@@ -99,6 +105,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     private final ResourceSetStore resourceSetStore;
     private final CookieExtractor cookieExtractor;
     private ScopeValidator scopeValidator;
+    private volatile Template loginUrlTemplate;
 
     /**
      * Constructs a new OpenAMOAuth2ProviderSettings.
@@ -1057,6 +1064,21 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         }
     }
 
+    @Override
+    public Template getCustomLoginUrlTemplate() throws ServerException {
+        try {
+            String loginUrlTemplateString = getStringSetting(realm, OAuth2ProviderService.RESOURCE_OWNER_CUSTOM_LOGIN_URL_TEMPLATE);
+            if (loginUrlTemplateString != null) {
+                loginUrlTemplate = new Template("customLoginUrlTemplate", new StringReader(loginUrlTemplateString),
+                        new Configuration());
+            }
+            return loginUrlTemplate;
+        } catch (SSOException | IOException | SMSException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */
@@ -1082,6 +1104,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                 synchronized (attributeCache) {
                     attributeCache.clear();
                     jwks.clear();
+                    loginUrlTemplate = null;
                 }
             } else {
                 if (logger.messageEnabled()) {
