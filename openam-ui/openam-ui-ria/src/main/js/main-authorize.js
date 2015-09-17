@@ -77,8 +77,9 @@ require([
         data = window.pageData;
 
     i18nManager.init({
-        // serverLang: TODO - As part of AME-7893,
-        // paramLang: TODO - As part of AME-7893,
+        paramLang: {
+            locale: data.locale
+        },
         defaultLang: Constants.DEFAULT_LANGUAGE,
         nameSpace: "authorize"
     });

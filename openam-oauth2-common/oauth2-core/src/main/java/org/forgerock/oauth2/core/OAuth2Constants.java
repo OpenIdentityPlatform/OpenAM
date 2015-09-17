@@ -792,6 +792,7 @@ public class OAuth2Constants {
         public static final String MODULE = "module";
         public static final String SERVICE = "service";
         public static final String LOCALE = "locale";
+        public static final String UI_LOCALE = "ui_locale";
         public static final String GOTO = "goto";
 
         public static final String AUDIENCE = "audience";

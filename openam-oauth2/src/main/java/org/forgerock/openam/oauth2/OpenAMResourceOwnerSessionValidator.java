@@ -318,7 +318,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         String realm = request.getParameter(OAuth2Constants.Custom.REALM);
         String moduleName = request.getParameter(MODULE);
         String serviceName = request.getParameter(SERVICE);
-        String locale = request.getParameter(LOCALE);
+        String locale = getRequestLocale(request);
 
         URI loginUrl;
         if (loginUrlTemplate != null) {
@@ -328,6 +328,16 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
             loginUrl = buildDefaultLoginUrl(request, gotoUrl, acrValues, realm, moduleName, serviceName, locale);
         }
         return new ResourceOwnerAuthenticationRequired(loginUrl);
+    }
+
+    private String getRequestLocale(OAuth2Request request) {
+        final String locale = request.getParameter(LOCALE);
+        final String uiLocale = request.getParameter(UI_LOCALE);
+        if (!isEmpty(uiLocale)) {
+            return uiLocale;
+        } else {
+            return locale;
+        }
     }
 
     private URI buildDefaultLoginUrl(OAuth2Request request, String gotoUrl, String acrValues, String realm,

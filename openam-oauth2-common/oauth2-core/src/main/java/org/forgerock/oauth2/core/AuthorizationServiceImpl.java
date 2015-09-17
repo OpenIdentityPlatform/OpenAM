@@ -39,6 +39,7 @@ import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequiredException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.openam.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,18 +116,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         if (!haveConsent) {
             String localeParameter = request.getParameter(LOCALE);
-            Locale locale = null;
-            if (localeParameter == null || localeParameter.isEmpty()) {
+            String uiLocaleParameter = request.getParameter(UI_LOCALE);
+            Locale locale = getLocale(uiLocaleParameter, localeParameter);
+            if (locale == null) {
                 locale = request.getLocale();
-            } else {
-                String[] localeComponents = localeParameter.split("-");
-                if (localeComponents.length == 1) {
-                    locale = new Locale(localeComponents[0]);
-                } else if (localeComponents.length == 2) {
-                    locale = new Locale(localeComponents[0], localeComponents[1]);
-                } else if (localeComponents.length > 2) {
-                    locale = new Locale(localeComponents[0], localeComponents[1], localeComponents[2]);
-                }
             }
             final String clientName = clientRegistration.getDisplayName(locale);
             final String clientDescription = clientRegistration.getDisplayDescription(locale);
@@ -137,6 +130,16 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         }
 
         return tokenIssuer.issueTokens(request, clientRegistration, resourceOwner, scope, providerSettings);
+    }
+
+    private Locale getLocale(String uiLocalParameter, String localeParameter) {
+        if (!StringUtils.isEmpty(uiLocalParameter)) {
+            return Locale.forLanguageTag(uiLocalParameter);
+        } else if (!StringUtils.isEmpty(localeParameter)) {
+            return Locale.forLanguageTag(localeParameter);
+        } else {
+            return null;
+        }
     }
 
     /**
