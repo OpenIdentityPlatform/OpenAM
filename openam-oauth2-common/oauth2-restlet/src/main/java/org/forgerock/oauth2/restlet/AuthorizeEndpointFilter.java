@@ -11,18 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
 
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.representation.EmptyRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +64,7 @@ public class AuthorizeEndpointFilter extends OAuth2Filter {
      */
     @Override
     void validateContentType(Request request) throws InvalidRequestException {
-        if (!(request.getEntity() == null || request.getEntity() instanceof EmptyRepresentation)
+        if (request.getEntity() != null && request.getEntity().getSize() > 0
                 && !MediaType.APPLICATION_WWW_FORM.equals(request.getEntity().getMediaType())) {
             logger.error("Invalid Content Type for token endpoint");
             throw new InvalidRequestException("Invalid Content Type");
