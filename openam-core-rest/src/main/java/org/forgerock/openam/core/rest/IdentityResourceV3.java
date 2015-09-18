@@ -16,20 +16,11 @@
 
 package org.forgerock.openam.core.rest;
 
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
-import static org.forgerock.openam.rest.RestUtils.isAdmin;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.getIdentityServicesAttributes;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.getSSOToken;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.identityDetailsToJsonValue;
-
-
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
-import com.sun.identity.idsvcs.IdentityServices;
 import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
@@ -45,6 +36,7 @@ import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchOperation;
 import org.forgerock.json.resource.PatchRequest;
@@ -56,7 +48,6 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
@@ -65,16 +56,22 @@ import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.CrestQuery;
-import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
+import static org.forgerock.openam.rest.RestUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.util.promise.Promises.*;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -87,8 +84,9 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
 
     private static Debug logger = Debug.getInstance("frRest");
 
-    private static String FIELD_MAIL = "mail";
+    private static String FIELD_USERNAME = "username";
     private static String FIELD_PASSWORD = "userPassword";
+    private static String FIELD_KBA = "kba";
 
     /**
      * Creates a backend
@@ -164,7 +162,8 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
      */
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(final Context context,
-                                                                       final String resourceId, final UpdateRequest request) {
+                                                                       final String resourceId,
+                                                                       final UpdateRequest request) {
         return identityResourceV2.updateInstance(context, resourceId, request);
     }
 
@@ -218,24 +217,132 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                 handler.handleResource(resource);
             }
 
+        } catch (ResourceException resourceException) {
+            logger.warning("UserIdentityResourceV3.queryCollection caught ResourceException", resourceException);
+            return resourceException.asPromise();
         } catch (Exception exception) {
             logger.error("UserIdentityResourceV3.queryCollection caught exception", exception);
+            return new InternalServerErrorException(exception.getMessage(), exception).asPromise();
         }
 
         return newResultPromise(newQueryResponse());
     }
 
-
     /**
+     * Patch the user's password and only the password.  No other value may be patched.  The old value of the
+     * password does not have to be known.  Admin only.  The only patch operation supported is "replace", i.e. not
+     * "add" or "move", etc.
+     *
+     * @param context The context
+     * @param resourceId The username we're patching
+     * @param request The patch request
      */
     @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(final Context context,
                                                                       final String resourceId,
                                                                       final PatchRequest request) {
 
-        return new BadRequestException("Unsupported operation").asPromise();
-    }
+        if (!objectType.equals(IdentityRestUtils.USER_TYPE)) {
+            return new BadRequestException("Cannot patch object type " + objectType).asPromise();
+        }
 
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        final String realm = realmContext.getResolvedRealm();
+
+        try {
+            if (!isAdmin(context)) {
+                return new ForbiddenException("Only admin can patch user values").asPromise();
+            }
+
+            final Set<String> patchableFieldNames = new HashSet<>(Collections.singletonList(FIELD_PASSWORD));
+
+            SSOToken ssoToken = getSSOToken(RestUtils.getToken().getTokenID().toString());
+            IdentityServicesImpl identityServices = getIdentityServices();
+
+            IdentityDetails identityDetails = identityServices.read(resourceId,
+                    getIdentityServicesAttributes(realm, objectType),
+                    ssoToken);
+
+            Attribute[] existingAttributes = identityDetails.getAttributes();
+            Map<String, Set<String>> existingAttributeMap = attributesToMap(existingAttributes);
+            Map<String, Set<String>> newAttributeMap = new HashMap<>();
+
+            if (existingAttributeMap.containsKey(IdentityRestUtils.UNIVERSAL_ID)) {
+                Set<String> values = existingAttributeMap.get(IdentityRestUtils.UNIVERSAL_ID);
+                if (isNotEmpty(values) && !identityResourceV2.isUserActive(values.iterator().next())) {
+                    return new ForbiddenException("User "
+                            + resourceId
+                            + " is not active: Request is forbidden").asPromise();
+                }
+            }
+
+            boolean updateNeeded = false;
+            for (PatchOperation patchOperation : request.getPatchOperations()) {
+                switch (patchOperation.getOperation()) {
+                    case PatchOperation.OPERATION_REPLACE: {
+                        String name = getFieldName(patchOperation.getField());
+                        String value = patchOperation.getValue().asString();
+
+                        if (!patchableFieldNames.contains(name)) {
+                            return new BadRequestException("For the object type "
+                                    + identityResourceV2.USER_TYPE
+                                    + ", field \""
+                                    + name
+                                    + "\" cannot be altered by PATCH").asPromise();
+                        }
+
+                        Set<String> newSet = new HashSet<>();
+                        newSet.add(value);
+                        newAttributeMap.put(name, newSet);
+                        updateNeeded = true;
+                        break;
+                    }
+                    default:
+                        return new BadRequestException("PATCH of "
+                                + IdentityRestUtils.USER_TYPE
+                                + " does not support operation "
+                                + patchOperation.getOperation()).asPromise();
+                }
+            }
+
+            if (updateNeeded) {
+                identityDetails.setAttributes(mapToAttributes(newAttributeMap));
+                identityServices.update(identityDetails, ssoToken);
+
+                // re-read the altered identity details from the repo.
+                identityDetails = identityServices.read(resourceId,
+                        getIdentityServicesAttributes(realm, objectType),
+                        ssoToken);
+            }
+            return newResultPromise(newResourceResponse("result", "1",
+                    identityDetailsToJsonValue(identityDetails)));
+
+        } catch (final ObjectNotFound notFound) {
+            logger.error("UserIdentityResourceV3.patchInstance cannot find resource " + resourceId, notFound);
+            return new NotFoundException("Resource cannot be found.", notFound).asPromise();
+        } catch (final TokenExpired tokenExpired) {
+            logger.error("UserIdentityResourceV3.patchInstance, token expired", tokenExpired);
+            return new PermanentException(401, "Unauthorized", null).asPromise();
+        } catch (final AccessDenied accessDenied) {
+            logger.error("UserIdentityResourceV3.patchInstance, access denied", accessDenied);
+            return new ForbiddenException(accessDenied.getMessage(), accessDenied).asPromise();
+        } catch (final GeneralFailure generalFailure) {
+            logger.error("UserIdentityResourceV3.patchInstance, general failure " + generalFailure.getMessage());
+            return new BadRequestException(generalFailure.getMessage(), generalFailure).asPromise();
+        } catch (ForbiddenException fex) {
+            logger.warning("UserIdentityResourceV3.patchInstance, insufficient privileges.", fex);
+            return fex.asPromise();
+        } catch (NotFoundException notFound) {
+            logger.warning("UserIdentityResourceV3.patchInstance " + resourceId + " not found", notFound);
+            return new NotFoundException("Resource " + resourceId + " cannot be found.", notFound).asPromise();
+        } catch (ResourceException resourceException) {
+            logger.warning("UserIdentityResourceV3.patchInstance caught ResourceException", resourceException);
+            return resourceException.asPromise();
+        } catch (Exception exception) {
+            logger.error("UserIdentityResourceV3.patchInstance caught exception", exception);
+            return new InternalServerErrorException(exception.getMessage(), exception).asPromise();
+        }
+    }
 
     /**
      * Convert attributes into a map.
