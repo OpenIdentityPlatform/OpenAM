@@ -369,18 +369,19 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     });
 
     Handlebars.registerHelper("callbackRender", function () {
-        var result = "", self = this, prompt = "", options, defaultOption, btnClass = "",
-            renderContext = {
-                index: this.input.index,
-                value: this.input.value,
-                prompt: prompt
-            };
+        var result = "", self = this, prompt = "", options, defaultOption, btnClass = "", renderContext;
 
         _.find(this.output, function (obj) {
             if (obj.name === "prompt" && obj.value !== undefined && obj.value.length) {
                 prompt = obj.value.replace(/:$/, "");
             }
         });
+
+        renderContext = {
+            index: this.input.index,
+            value: this.input.value,
+            prompt: prompt
+        };
 
         function renderPartial (name, context) {
             return Handlebars.partials["login/_" + name](_.merge(renderContext, context));
