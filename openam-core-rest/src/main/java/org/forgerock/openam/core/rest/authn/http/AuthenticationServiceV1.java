@@ -168,7 +168,7 @@ public class AuthenticationServiceV1 {
     }
 
     private boolean isSupportedMediaType(Request request) {
-        return !request.getEntity().mayContainData()
+        return request.getEntity().isDecodedContentEmpty()
                 || APPLICATION_JSON_CONTENT_TYPE.getType().equals(ContentTypeHeader.valueOf(request).getType());
     }
 
@@ -246,13 +246,10 @@ public class AuthenticationServiceV1 {
      * @throws IOException If there is a problem parsing the Json entity.
      */
     private JsonValue getJsonContent(Request request) throws IOException {
-
         Entity entity = request.getEntity();
         if (entity == null) {
             return null;
-        }
-
-        if (entity.mayContainData() && entity.getString().isEmpty()) {
+        } else if (!entity.isDecodedContentEmpty()) {
             return json(entity.getJson());
         } else {
             return json(object());
