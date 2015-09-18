@@ -9,7 +9,8 @@
             <nav class="sidenav">
                 <ol class="list-unstyled">
                     <li>
-                        <a data-toggle="collapse"
+                        <a class="text-primary"
+                           data-toggle="collapse"
                            href="{{ routeTo 'umaResourcesMyResources' }}"
                            aria-expanded="true"
                            aria-controls="applications"
@@ -18,16 +19,17 @@
                         </a>
                         <ol class="collapse in list-unstyled sidenav-submenu" id="applications">
                         {{#each labels.system}}
-                            <li><a href="{{routeTo 'umaResourcesMyResources' 'myresources' _id}}">{{name}}</a></li>
+                            <li><a class="text-primary" href="{{routeTo 'umaResourcesMyResources' 'myresources' _id}}">{{name}}</a></li>
                         {{/each}}
                         </ol>
                     </li>
 
-                    <li><a href="{{ routeTo 'umaResourcesSharedWithMe' }}"><i class="fa fa-folder"></i>{{t "uma.resources.sharedWithMe.title"}}</a></li>
-                    <li><a href="{{ routeTo 'umaResourcesStarred' }}"><i class="fa fa-star"></i>{{t "uma.resources.starred.title"}}</a></li>
+                    <li><a class="text-primary" href="{{ routeTo 'umaResourcesSharedWithMe' }}"><i class="fa fa-folder"></i>{{t "uma.resources.sharedWithMe.title"}}</a></li>
+                    <li><a class="text-primary" href="{{ routeTo 'umaResourcesStarred' }}"><i class="fa fa-star"></i>{{t "uma.resources.starred.title"}}</a></li>
 
                     <li>
-                        <a data-toggle="collapse"
+                        <a class="text-primary"
+                           data-toggle="collapse"
                            aria-expanded="false"
                            aria-controls="labels"
                            data-target="#labels">

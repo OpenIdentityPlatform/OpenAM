@@ -8,9 +8,9 @@
     </span>
 
     {{#if _id}}
-    <a href="{{routeTo 'umaResourcesMyLabels' _id}}">{{title}}</a>
+    <a class="text-primary" href="{{routeTo 'umaResourcesMyLabels' _id}}">{{title}}</a>
     {{else}}
-    <a href="{{routeTo 'umaResourcesMyLabels' title}}">{{title}}</a>
+    <a class="text-primary" href="{{routeTo 'umaResourcesMyLabels' title}}">{{title}}</a>
     {{/if}}
 
     <ol class="collapse list-unstyled sidenav-submenu" id="view{{#if _id}}{{_id}}{{else}}{{viewId}}{{/if}}">
@@ -20,6 +20,6 @@
     </ol>
 
 {{else}}
-    <a class="no-arrow" href="{{routeTo 'umaResourcesMyLabels' _id}}">{{title}}</a></li>
+    <a class="no-arrow text-primary" href="{{routeTo 'umaResourcesMyLabels' _id}}">{{title}}</a></li>
 {{/if}}
 </li>

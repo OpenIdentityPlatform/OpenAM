@@ -107,7 +107,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                     sortType: "toggle"
                 }],
                 emptyText: $.t("console.common.noResults"),
-                className:"backgrid table table-striped",
+                className:"backgrid table",
                 collection: collection
             });
 

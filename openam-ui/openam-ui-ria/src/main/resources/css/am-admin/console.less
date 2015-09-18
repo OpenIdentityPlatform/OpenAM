@@ -43,21 +43,25 @@ h3.block-header {
     margin-left: -15px;
 }
 
-.info-button {
+.info-button{
+
     background-color: transparent;
     background-image: none;
     border-color: transparent;
     box-shadow: none;
-    color: #777;
+    color:@base-theme-color;
 
-    &:hover {
+    &:hover{
         background-color:transparent;
         border-color:transparent;
+        color: darken(@base-theme-color, 5%);
     }
 
-    &:focus {
+    &:focus{
         outline:none;
         box-shadow:none;
+        color: darken(@base-theme-color, 5%);
+
         background-color: transparent;
         background-image: none;
         border-color: transparent;
@@ -82,35 +86,6 @@ div[data-schemaid] {
         margin-bottom: -5px;
     }
 
-}
-
-
-
-.page-header-min {
-
-    margin-bottom: 40px;
-
-    h3 {
-        border: none;
-        font-size: 14px;
-        text-transform: uppercase;
-        font-weight: 600;
-        letter-spacing: 1px;
-        color: #666;
-        padding: 30px 0 10px;
-        margin-top: 0;
-        border-bottom: 1px solid #ddd;
-        margin-bottom: 0;
-
-        a {
-            color: #666;
-
-            &:hover, &:focus {
-                color: @base-theme-color;
-                text-decoration: none;
-            }
-        }
-    }
 }
 
 
@@ -363,3 +338,24 @@ div.dropdown-subtitle{
         color: darken(@base-theme-color, 5%);
     }
  }
+
+
+// Popovers
+a[data-toggle="popover"] {
+    &:hover, &:focus{
+        box-shadow:none;
+        text-decoration:none;
+        cursor: pointer;
+        outline:none;
+        color: darken(@base-theme-color,5%);
+    }
+}
+.popover {
+    max-width: 500px;
+    .popover-title {
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+        color: inherit;
+        font-weight: normal;
+    }
+}

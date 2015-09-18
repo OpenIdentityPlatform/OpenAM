@@ -29,13 +29,14 @@
             <div class="panel-group form-horizontal"  aria-multiselectable="true">
 
                 {{#each oauth2Data.displayScopes}}
-                <div class="panel panel-default">
-                    {{#if this.values}}
-                    <div class="panel-heading am-panel-heading-hover" data-toggle="collapse"
+                {{#if this.values}}
+                <div class="panel panel-info">
+                    <div class="panel-heading am-panel-heading" data-toggle="collapse"
                          href="#oauth2Scope{{@index}}" aria-expanded="false" aria-controls="oauth2Scope{{@index}}">
                         {{this.name}}
                         <div class="pull-right"><i class="fa fa-angle-down"></i></div>
                     </div>
+
                     <div id="oauth2Scope{{@index}}" class="panel-collapse collapse" role="tabpanel"  aria-expanded="false">
                         <div class="panel-body">
                             {{#if this.values.length}}
@@ -47,16 +48,18 @@
                             {{/if}}
                         </div>
                     </div>
-                    {{else}}
-                    <div class="panel-heading">{{this.name}}</div>
-                    {{/if}}
                 </div>
+                {{else}}
+                <div class="panel panel-default">
+                    <div class="panel-heading">{{this.name}}</div>
+                </div>
+                {{/if}}
                 {{/each}}
 
                 {{#each oauth2Data.displayClaims}}
-                <div class="panel panel-default">
-                    {{#if this.values}}
-                    <div class="panel-heading am-panel-heading-hover" role="tab" data-toggle="collapse"
+                {{#if this.values}}
+                <div class="panel panel-info">
+                    <div class="panel-heading bg-info am-panel-heading" role="tab" data-toggle="collapse"
                          href="#oauth2Claims{{@index}}" aria-expanded="false" aria-controls="oauth2Claims{{@index}}">
                         {{this.name}}
                         <div class="pull-right"><i class="fa fa-angle-down"></i></div>
@@ -72,10 +75,12 @@
                             {{/if}}
                         </div>
                     </div>
-                    {{else}}
-                    <div class="panel-heading">{{this.name}}</div>
-                    {{/if}}
                 </div>
+                {{else}}
+                <div class="panel panel-default">
+                    <div class="panel-heading">{{this.name}}</div>
+                </div>
+                {{/if}}
                 {{/each}}
             </div>
 

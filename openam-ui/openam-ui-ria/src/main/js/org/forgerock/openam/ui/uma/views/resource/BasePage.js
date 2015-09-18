@@ -131,7 +131,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
 
             grid = new Backgrid.Grid({
                 columns: columns,
-                className: "backgrid table table-striped",
+                className: "backgrid table",
                 collection: this.data.collection,
                 emptyText: $.t("console.common.noResults")
             });

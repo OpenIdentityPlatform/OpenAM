@@ -101,7 +101,7 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
 
             grid = new Backgrid.Grid({
                 columns: columns,
-                className: "backgrid table table-striped",
+                className: "backgrid table",
                 collection: this.data.requests,
                 emptyText: $.t("console.common.noResults")
             });

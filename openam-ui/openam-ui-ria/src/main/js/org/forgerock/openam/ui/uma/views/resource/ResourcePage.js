@@ -348,7 +348,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     }],
                     collection: collection,
                     emptyText: $.t("console.common.noResults"),
-                    className: "backgrid table table-striped"
+                    className: "backgrid table"
                 });
 
                 // FIXME: Re-enable filtering and pagination

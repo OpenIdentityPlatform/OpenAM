@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     Constants.INTEGER_PATTERN = "\\d+";
 
     // Theme
-    Constants.DEFAULT_STYLESHEETS = ["css/bootstrap-3.3.5-custom.css", "css/styles.css"];
+    Constants.DEFAULT_STYLESHEETS = ["css/bootstrap-3.3.5-custom.css", "css/styles-admin.css"];
 
     return Constants;
 });

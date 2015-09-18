@@ -131,8 +131,13 @@ module.exports = function (grunt) {
              * Compile LESS source code into minified CSS files.
              */
             compile: {
-                src: compositionDirectory + "/css/styles.less",
-                dest: compiledDirectory + "/css/styles.css",
+                files: [{
+                    src: compositionDirectory + "/css/styles.less",
+                    dest: compiledDirectory + "/css/styles.css"
+                }, {
+                    src: compositionDirectory + "/css/styles-admin.less",
+                    dest: compiledDirectory + "/css/styles-admin.css"
+                }],
                 options: {
                     compress: true,
                     plugins: [

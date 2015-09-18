@@ -36,25 +36,6 @@
     float:right;
 }
 
- a[data-toggle="popover"] {
-    &:hover, &:focus{
-        box-shadow:none;
-        text-decoration:none;
-        cursor: pointer;
-        outline:none;
-        color: darken(@base-theme-color,5%);
-    }
- }
- .popover{
-    max-width: 500px;
-    .popover-title {
-        background-color: @base-theme-color;
-        border-bottom: 1px solid darken(@base-theme-color,5%);
-        color: white;
-        font-weight: normal;
-    }
- }
-
  .dropdown-menu>li>a {
      padding: 3px 10px;
  }
@@ -92,11 +73,13 @@
 .table > thead > tr > td,
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
+    //FIXME: Needs to go into Bootstrap
     border-color: #eee;
 }
 
 
-.table-striped {
+.table {
+
     th.col-check, td.col-check {
         width: 13px;
         text-align:center;
@@ -120,47 +103,38 @@
         }
     }
 
+    // FIXME- We should be using Bootstrap classes like .success instead of .selected
     > tbody > tr.selected{
         background-color: #d9edf7;
     }
 
-    > tbody > tr:nth-of-type(odd).tr-row{
-        background:transparent;
-    }
 
     .btn-link:hover, .btn-link:focus {
         color: #555;
     }
 
-    a {
-        color: #2a2f32;
-        &:hover{
-            text-decoration:none;
-        }
+    a:hover{
+        text-decoration:none;
     }
 
-    a:hover, a:focus {
-        color: #519387;
+    >tbody>tr.tr-row>td{
+       padding-left:0;
+       border-top: none;
+       &:last-of-type{
+           padding-right:2px;
+       }
     }
-}
 
-.table>tbody>tr.tr-row>td{
-   padding-left:0;
-   border-top: none;
-   &:last-of-type{
-       padding-right:2px;
-   }
-}
+    >tbody>tr>td{
+      vertical-align: middle;
+    }
 
-.table>tbody>tr>td{
-  vertical-align: middle;
 }
-
 
 
 .page-toolbar, .panel-toolbar {
-    border-bottom: 1px solid #ddd;
-    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd; //FIXME: Needs to go into Bootstrap
+    border-top: 1px solid #ddd; //FIXME: Needs to go into Bootstrap
     margin-top: 0;
     margin-bottom: 20px;
     padding: 10px;
@@ -240,63 +214,51 @@ body, .modal-open {
 
 // removes extra space below control
 .selectize-control.multi {
-    font-size:0;
+    font-size: 0;
     .selectize-dropdown, div {
-        font-size:14px;
+        font-size: 14px;
     }
 }
 
-.selectize-div {
-    background: lighten(@base-theme-color, 40%);
-    color: darken(@base-theme-color, 5%);
-    border: 1px solid darken(@base-theme-color, 5%);
-}
+.page-header-min {
 
-.selectize-control.multi .selectize-input {
+    margin-bottom: 40px;
 
-    &.has-items {
-      padding-left: 5px;
-      padding-right: 5px;
-    }
+    h3 {
+        border: none;
+        font-size: 14px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: #666;
+        padding: 30px 0 10px;
+        margin-top: 0;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 0;
 
-    > div {
-        cursor: pointer;
-        margin: 0 2px 2px 0;
-        padding: 1px 5px 0;
-        .selectize-div;
-        border-radius: 2px;
-        .transition(all, 100ms, linear);
+        a {
+            color: #666;
 
-        &:hover, &.active{
-            background: #EFB6BE;
-            border: 1px solid #DD7785;
-            color: #CA3232;
+            &:hover, &:focus {
+                //color: @base-theme-color;
+                text-decoration: none;
+            }
         }
     }
 }
-
-.selectize-dropdown-content > div {
-    border-top: 1px solid #eee;
-
-    &:first-of-type{
-        border-top: none;
-    }
-}
-
 
 .sidenav {
 
     a {
         color: #666;
-        transition: color 0.1s linear;
-        text-decoration:none;
+        //transition: color 0.1s linear;
+        text-decoration: none;
         font-size: 13px;
         cursor: pointer;
     }
 
     li.active > a, a:hover {
-        color: @base-theme-color;
-        .fa{
+        .fa {
             color: #666;
         }
     }
@@ -304,10 +266,8 @@ body, .modal-open {
     ol > li > a {
         padding: 0 0 15px 0;
         display: block;
-
         &:hover {
-            color: @base-theme-color;
-            text-decoration:none;
+            text-decoration: none;
         }
 
         > .fa {
@@ -325,7 +285,7 @@ body, .modal-open {
             }
 
             a.no-arrow {
-                margin-left:15px;
+                margin-left: 15px;
             }
 
             span {
@@ -389,115 +349,23 @@ body, .modal-open {
     border-color: #adadad;
 }
 
-.am-panel-heading-hover {
-    transition: color 0.3s ease-in-out, background 0.3s ease-in-out;
-    .fa-angle-down {
-        transition: color 0.3s ease-in-out;
-    }
+.am-panel-heading {
+
     &:hover{
         cursor:pointer;
-        background-color: lighten(@base-theme-color, 45%);
-        color:@base-theme-color;
+    }
+
+    .fa-angle-down{
+        transition: all 0.3s ease-out;
     }
 
     &[aria-expanded="true"]{
-        background-color: lighten(@base-theme-color, 45%);
-        color:@base-theme-color;
-
         .fa-angle-down {
-            color: lighten(@base-theme-color, 45%);
-        }
-    }
-}
-
-.cell-model-icon {
-    display: table-cell;
-    vertical-align: top;
-    padding-right: 10px;
-
-    span {
-        background-color: @base-theme-color;
-        color: #fff;
-        margin: 0 auto;
-        .icon-circle(24px);
-    }
-}
-
-.cell-model-name {
-    display: table-cell;
-    vertical-align: middle;
-
-    &:hover, &:focus {
-      color: @base-theme-color;
-    }
-}
-
-.row-actions {
-    .btn-group .btn-link {
-        padding: 1px 6px;
-        color: #777;
-        border: none;
-        line-height: 1;
-
-        &:hover, &:focus {
-          color: @base-theme-color;
-        }
-    }
-}
-
-.multiple-panels {
-    border: 1px solid #ddd;
-
-    .panel-default {
-        margin-bottom: 0;
-        border: none;
-        border-radius: 0;
-        border-bottom: 1px solid #ddd;
-        border-collapse: collapse;
-
-        &:first-of-type {
-            border-top-left-radius: 4px;
-            border-top-right-radius: 4px;
-        }
-
-        &:last-of-type {
-            border-bottom: none;
-        }
-    }
-
-    .panel-footer {
-      border-top: none;
-    }
-}
-
-.tab-content-with-border {
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-}
-
-.tab-content .tab-pane-body {
-    padding: 30px;
-    margin-bottom: 0;
-    background-color: #fff;
-}
-
-/* Candidate for Commons, copied from OpenIDM */
-.panel-collapse {
-    h4.panel-title {
-        font-size: 18px;
-        text-transform: none;
-        letter-spacing: 0;
-        font-weight: 600;
-    }
-
-    .panel-title > a {
-        color: @base-theme-color;
-
-        &.no-caret {
-            &:before, &:after {
-                display:none;
-            }
+            -webkit-transform: rotateX(180deg);
+            -moz-transform: rotateX(180deg);
+            -o-transform: rotateX(180deg);
+            -ms-transform: rotateX(180deg);
+            transform: rotateX(180deg);
         }
     }
 }
