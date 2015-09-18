@@ -14,21 +14,13 @@
  * Portions copyright 2014-2015 ForgeRock AS.
  */
 
-@or-color: #FBEBB2;
-@and-color: #E1F2B7;
-@not-color: #E4DBF0;
-
-@grabber-image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAFCAYAAABvsz2cAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACNJREFUeNpiZGBg8AViBhYQ8f///3pGIHEGxAExGFAYAAEGABbSDZWLLysMAAAAAElFTkSuQmCC";
+@or-color: #337ab7;
+@and-color: @base-theme-color;
+@not-color: #f0ad4e;
 
 .webkit-text-rendering-bugfix {
     -webkit-transform: translateZ(0px);
     -webkit-backface-visibility: hidden;
-}
-
-.striped-background(@bgcolor, @stripeColor1, @stripeColor2) {
-    background-color: @bgcolor;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, @stripeColor1 35px, @stripeColor2 70px);
-    .webkit-text-rendering-bugfix;
 }
 
 .focus-state {
@@ -69,21 +61,16 @@
             border-right: 0;
             border-left: 0;
             border-radius: 0;
-            border-color: #eee;
+
+            &:first-child {
+                border-top-width: 2px;
+            }
 
             .list-item-text {
                 float: left;
                 overflow-x: hidden;
                 text-overflow: ellipsis;
                 width: 90%;
-            }
-
-            &:last-of-type {
-                border-bottom: 0;
-            }
-
-            &:nth-child(odd) {
-                background-color: @background-color;
             }
 
             &.list-no-items {
@@ -97,7 +84,7 @@
             .fa {
                 opacity: 0;
                 transition: all 300ms ease-in-out;
-                color: #999;
+                color: #777;
                 cursor: pointer;
                 margin-top: 4px;
 
@@ -156,13 +143,8 @@
     &.created-items {
         .list-group {
             .list-group-item {
-
-                &:last-of-type:not(.editing):not(.list-no-items) {
-                    border-bottom: 1px solid #eee;
-                }
-
                 .fa {
-                    opacity: 0.4;
+                    opacity: 1;
 
                     &:focus, &:hover {
                         opacity: 1;
@@ -171,28 +153,18 @@
 
                 .fa-close {
                     &:focus, &:hover {
-                        color: @failure-color;
-                    }
-                }
-
-                .fa-plus {
-                    margin-top: 12px;
-
-                    &:focus, &:hover {
                         color: @base-theme-color;
                     }
                 }
 
                 &.editing {
+                    border-top-width: 2px;
                     background-color: @background-color;
-                    margin-top: 20px;
-                    border: 1px solid #eee;
-                    border-radius: 4px;
 
                     .form-control {
                         display: inline-block;
                         width: 40%;
-                        margin: 2px 5px;
+                        margin: 0 5px 4px;
                     }
 
                     .radio-group {
@@ -211,169 +183,6 @@
 .edit-policy-dialog {
     .modal-body {
         padding: 0;
-    }
-
-    .accordion {
-        margin-bottom: 0;
-    }
-}
-
-.accordion {
-    > .panel.panel-default {
-        border-radius: 0;
-
-        &:last-of-type {
-            border-bottom-left-radius: 4px;
-            border-bottom-right-radius: 4px;
-        }
-
-        margin: 0 0 -1px 0;
-
-        > .panel-collapse > .panel-body {
-            border-top: 0;
-        }
-
-        > .panel-heading .panel-title {
-            position: relative;
-        }
-    }
-
-    .panel-title {
-        font-size: 16px;
-        letter-spacing: 0;
-
-        > a {
-            color: @base-theme-color;
-            display: block;
-
-            &:hover {
-                color: @panel-hover-color;
-            }
-        }
-    }
-
-    .helper-text {
-        margin-bottom: 30px;
-    }
-
-    .btn-acc-step {
-        margin-top: 15px;
-    }
-
-    .panel-collapse.in {
-        #condition-management #pickUpArea ol#pickUpItem li.operator:not(.dragged),
-        #condition-management #pickUpArea ol#pickUpItem li.rule:not(.dragged) {
-            display: block;
-        }
-    }
-
-    .panel.review-panel {
-        cursor: pointer;
-        overflow-x: auto;
-
-        &:focus {
-            .focus-state;
-        }
-
-        .panel-collapse {
-            margin-bottom: 0;
-        }
-
-        .panel-heading {
-            padding: 15px 0;
-
-            .panel-title {
-                display: inline-block;
-                font-weight: bold;
-            }
-        }
-
-        &:not(.panel-danger) {
-            &:hover, &:focus {
-                background-color: @background-color;
-            }
-
-            .panel-heading {
-                padding: 15px 0;
-
-                .panel-title:after {
-                    content: '';
-                    border-left: 5px solid transparent;
-                    border-right: 5px solid transparent;
-                    border-bottom: 0;
-                    border-top: 7px solid;
-                    position: absolute;
-                    right: 40px;
-                    margin: 5px 0;
-                    color: #777;
-                }
-
-                .empty-msg {
-                    color: #777;
-                    margin-left: 10px;
-                    font-size: 80%;
-                    vertical-align: text-top;
-                    display: none;
-                }
-
-                &.collapsed {
-                    .panel-title:after {
-                        border-left: 7px solid;
-                        border-bottom: 5px solid transparent;
-                        border-top: 5px solid transparent;
-                        border-right: 0;
-                    }
-
-                    .empty-msg {
-                        display: inline;
-                    }
-                }
-            }
-        }
-
-        &.panel-danger {
-            .panel-title {
-                color: @failure-color;
-            }
-
-            &:hover, &:focus {
-                background-color: #f2dede;
-            }
-        }
-
-        .review-text {
-            line-height: 1em;
-            margin: 0 0 20px 10px;
-            background-color: inherit;
-            border: none;
-
-            &:not(.text-danger) {
-                color: #777;
-            }
-        }
-
-        pre.review-text {
-            font-family: monospace;
-        }
-
-        .review-title {
-            margin-top: 0;
-        }
-
-        ul.review-text {
-            list-style-type: none;
-            padding: 0;
-        }
-    }
-
-    .res-type-label {
-        padding-top: 7px;
-    }
-
-    input[type="text"]:invalid:required, input[type="text"].invalid, select:invalid:required, select.invalid {
-        color: @failure-color;
-        border-color: @failure-color;
-        .striped-background(#f7f7f7, rgba(240, 221, 222, 1), rgba(240, 221, 222, 1));
     }
 }
 
@@ -401,11 +210,8 @@ body.editing {
 
     #condition-management #dropOffArea {
         li.editing-disabled {
-            background-color: #f7f7f7;
-            background-image: none;
 
             &:focus {
-                box-shadow: none;
                 cursor: default;
             }
 
@@ -423,8 +229,6 @@ body.editing {
 
     #condition-management ol.condition-management-group {
         li.rule.editing {
-            box-shadow: 0px 0px 9px rgba(119, 119, 119, 0.5);
-
             &:focus {
                 cursor: default;
             }
@@ -433,13 +237,11 @@ body.editing {
                 display: none;
             }
 
-            .fa-pencil, .fa-trash-o {
+            .fa-pencil, .fa-times {
                 display: none;
             }
 
             .fa-check {
-                color: @base-theme-color;
-                font-size: 30px;
                 display: block;
             }
         }
@@ -448,6 +250,7 @@ body.editing {
 
 .condition-management-group {
     padding: 0;
+    margin-bottom: 20px;
 }
 
 #environmentContainer {
@@ -491,14 +294,15 @@ body.editing {
         margin-top: -3px;
     }
 
-    .btn-group {
-        margin-top: 16px;
+    .boolean-condition {
+        padding-left: 0;
+        display: inline;
         position: absolute;
+        top: 15px;
         left: 0;
-        width: 120px;
 
         .btn {
-            padding: 4px 12px;
+            padding: 4px 10px;
         }
     }
 
@@ -511,91 +315,20 @@ body.editing {
     }
 
     ol ol {
-        padding: 1px;
-        background: white;
-        margin: 5px 0 0;
-        min-height: 8px;
-    }
-
-    #outter-arrow-up {
-        width: 0;
-        height: 0;
-        margin: 10px auto 0;
-        transition: all 200ms ease-out;
-
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
-        border-bottom: 0 solid #E3F3FD;
-    }
-
-    #pickUpArea {
-        transition: background-color 200ms ease-out;
-    }
-
-    &.show-hint {
-
-        #pickUpArea {
-            background-color: #E3F3FD;
-        }
-
-        #outter-arrow-up {
-            border-bottom: 15px solid #E3F3FD;
-        }
-    }
-
-    .rules-help {
-        margin-top: 20px;
-    }
-
-    #pickUpArea {
-        padding: 10px 8px;
-        margin: 0 5px 5px 5px;
-        background: #f7f7f7;
-
-        ol#pickUpItem {
-
-            min-height: 77px;
-            background: #fff;
-            margin: 0 0 20px 0;
-            border: 2px dashed #ddd;
-
-            li.operator, li.rule {
-                cursor: move;
-                box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.5);
-                background-image: url(@grabber-image);
-                &:not(.dragged) {
-                    margin-left: 5px;
-                    margin-right: 5px;
-                    /*To stop it appearing over accordion. Overridden later*/
-                    display: none;
-                }
-
-                span.item-button-panel {
-                    display: none;
-                }
-            }
-
-            li.operator:not(.dragged) {
-                margin-top: 10px;
-            }
-        }
+        padding: 0;
     }
 
     ol#dropOffArea li.invalid-rule {
-        color: #a94442;
-        .fa-check {
-            color: #a94442;
+        select {
+            border-color: @failure-color;
         }
-        .striped-background(#f7f7f7, rgba(240, 221, 222, 1), rgba(240, 221, 222, 1));
     }
 
     span.item-button-panel {
         float: right;
-        padding: 8px 3px;
 
         > span {
-            font-size: 22px;
-            padding: 0 5px;
+            padding-left: 5px;
 
             &.tooltips {
                 &:hover span, &:focus span {
@@ -637,15 +370,10 @@ body.editing {
     }
 
     ol.dropbox {
-        .operator > .item-button-panel {
-            margin-top: -26px;
-        }
 
         li.dragged {
-            box-shadow: 1px 2px 1px 0 rgba(0, 0, 0, 0.4);
-            background-image: url(@grabber-image);
             cursor: move;
-            background-color: #ccc;
+            background-color: #eee;
 
             .info-button {
                 display: none;
@@ -655,58 +383,17 @@ body.editing {
 
     ol.condition-management-group {
         .rule, .operator, .placeholder {
+            border-radius: 4px;
+            border: 1px solid #ddd;
             display: block;
-            margin: 5px;
-            padding: 5px;
-            background: 0 0 repeat-y #eee;
-            transition: background 200ms ease-out 0ms, box-shadow 100ms linear 0ms;
+            margin: 15px 0 0;
+            padding: 15px;
         }
 
         li.operator {
             display: block;
-            margin: 5px;
-            padding: 5px;
-            background: 0 0 repeat-y #eee;
-            transition: background 200ms ease-out 0ms, box-shadow 100ms linear 0ms;
-
-            &.or {
-                background-color: @or-color;
-                > span, > select {
-                    color: darken(@or-color, 50%)
-                }
-                &.dragged, &:focus {
-                    background-color: darken(@or-color, 10%)
-                }
-                > ol > .placeholder {
-                    background-color: darken(@or-color, 20%)
-                }
-            }
-
-            &.and {
-                background-color: @and-color;
-                > span, > select {
-                    color: darken(@and-color, 50%)
-                }
-                &.dragged, &:focus {
-                    background-color: darken(@and-color, 10%)
-                }
-                > ol > .placeholder {
-                    background-color: darken(@and-color, 20%)
-                }
-            }
-
-            &.not {
-                background-color: @not-color;
-                > span, > select {
-                    color: darken(@not-color, 50%)
-                }
-                &.dragged, &:focus {
-                    background-color: darken(@not-color, 10%)
-                }
-                > ol > .placeholder {
-                    background-color: darken(@not-color, 20%)
-                }
-            }
+            margin: 15px 0 0;
+            padding: 15px;
 
             &.or, &.and, &.not {
                 cursor: default;
@@ -717,9 +404,38 @@ body.editing {
 
                 &:focus {
                     outline: none;
+                }
+
+                &:not(:first-child):not(.editing-disabled):focus,
+                &:not(:first-child):not(.editing-disabled):hover {
+                    border-top-color: #777;
+                    border-right-color: #777;
+                    border-bottom-color: #777;
                     cursor: move;
-                    box-shadow: 1px 2px 1px 0 rgba(0, 0, 0, 0.4);
-                    background-image: url(@grabber-image);
+                }
+            }
+
+            &.or {
+                border-left: 4px solid @or-color;
+
+                &.editing-disabled {
+                    border-left-color: lighten(@or-color, 25%);
+                }
+            }
+
+            &.and {
+                border-left: 4px solid @and-color;
+
+                &.editing-disabled {
+                    border-left-color: lighten(@and-color, 25%);
+                }
+            }
+
+            &.not {
+                border-left: 4px solid @not-color;
+
+                &.editing-disabled {
+                    border-left-color: lighten(@not-color, 10%);
                 }
             }
         }
@@ -728,15 +444,17 @@ body.editing {
             cursor: default;
 
             &:focus {
-                .focus-state;
+                outline: none;
+            }
+
+            &:not(.editing-disabled):not(.editing):focus,
+            &:not(.editing-disabled):not(.editing):hover {
+                border-color: #777;
                 cursor: move;
-                background-image: url(@grabber-image);
-                background-color: #e6e6e6;
             }
 
             &.legacy-condition {
                 color: #777;
-                .striped-background(#f7f7f7, #ddd, #ddd);
             }
         }
 
@@ -744,23 +462,19 @@ body.editing {
             position: relative;
             margin: 5px;
             padding: 0;
-            border: none;
             height: 10px;
-            .striped-background(inherit, rgba(255, 255, 255, .5), rgba(255, 255, 255, .5));
-            background-size: 100% 100px;
-            box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5) inset;
+            background-color: #eee;
         }
     }
 
     .item-data {
-        padding: 7px 5px 0 5px;
 
         > div {
             font-size: 11px;
             line-height: 11px;
             border-right: 1px solid #ddd;
-            padding-right: 10px;
-            margin-right: 10px;
+            padding-right: 8px;
+            margin-right: 8px;
             float: left;
 
             &:last-of-type {
@@ -797,12 +511,8 @@ body.editing {
             height: 46px;
             min-width: 145px;
             max-width: 588px;
-            margin: 5px 5px 0 5px; // margin-bottom:0; required for clearing
+            margin: 0 5px 5px;
         }
-    }
-
-    li.editing .item-data, ol#pickUpItem li:not(.dragged) .item-data {
-        padding: 0;
     }
 
     li:not(.dragged) .info-button {
@@ -832,7 +542,7 @@ body.editing {
 
     .field-float-pattern, .field-float-select {
         position: relative;
-        margin: 5px;
+        margin: 0 5px 5px;
         float: left;
         min-width: 145px;
 
@@ -977,14 +687,16 @@ body.editing {
     }
 }
 
+.input-helper-text {
+    color: #777;
+    display: inline-block;
+    margin-top: 5px;
+}
+
 .action-permissions {
     position: absolute;
     top: 10px;
     right: 30px;
-}
-
-#editResources {
-    margin-top: 30px;
 }
 
 .bootstrap-datetimepicker-widget table {
@@ -993,4 +705,50 @@ body.editing {
     td span.active {
         background-color: @base-theme-color;
     }
+}
+
+.no-policies-panel {
+    text-align: center;
+    border: solid #ccc;
+    border-width: 1px 0;
+    padding: 70px 0;
+    background-color: @background-color;
+
+    .no-policies-text {
+        font-size: 18px;
+        color: @base-theme-color;
+        font-weight: 600;
+    }
+
+    .btn {
+        display: block;
+        margin: 15px auto 0;
+    }
+}
+
+#populateResource {
+    #resourceBuilder {
+        margin-top: 10px;
+        float: left;
+    }
+
+    .btn {
+        margin-top: 10px;
+    }
+}
+
+.user-attributes-header {
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    font-size: 12px;
+    display: block;
+    padding: 10px 15px 7px 0;
+    margin-bottom: 5px;
+    margin-top: 0;
+}
+
+.add-item-inline {
+    padding: 0;
+    margin-bottom: 15px;
 }
