@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     return AbstractView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/EditEnvironmentTemplate.html",
         events: {
-            "change select#selection": "changeType"
+            "change select.type-selection": "changeType"
         },
         data: {},
         i18n: {
@@ -74,10 +74,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 }
 
                 this.$el.data("itemData", itemData);
-                this.$el.find("select#selection").val(itemData.type).trigger("change");
+                this.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
             }
 
-            this.$el.find("select#selection").focus();
+            this.$el.find("select.type-selection:first").focus();
 
             this.$el.find(".info-button").hide();
 
@@ -342,7 +342,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 .find("label").removeClass("showLabel")
                 .next("input").addClass("placeholderText");
 
-            this.$el.find(".field-float-select select:not(#selection)").addClass("placeholderText")
+            this.$el.find(".field-float-select select:not(.type-selection)").addClass("placeholderText")
                 .prev("label").removeClass("showLabel");
 
             this.$el.removeClass("invalid-rule");
@@ -355,7 +355,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     .find("label").addClass("showLabel")
                     .next("input, div input").removeClass("placeholderText").prop("readonly", false);
 
-                self.$el.find(".field-float-select select:not(#selection)").removeClass("placeholderText")
+                self.$el.find(".field-float-select select:not(.type-selection)").removeClass("placeholderText")
                     .prop("readonly", false).prev("label").addClass("showLabel");
             }, 10);
         }

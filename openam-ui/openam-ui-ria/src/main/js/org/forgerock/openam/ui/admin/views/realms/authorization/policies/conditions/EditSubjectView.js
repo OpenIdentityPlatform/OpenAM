@@ -27,7 +27,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     return AbstractView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/EditSubjectTemplate.html",
         events: {
-            "change select#selection": "changeType"
+            "change select.type-selection": "changeType"
         },
         data: {},
         subjectI18n: { "key": "console.authorization.policies.edit.subjectTypes.", "title": ".title", "props": ".props." },
@@ -57,10 +57,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 }
 
                 this.$el.data("itemData", itemData);
-                this.$el.find("select#selection").val(itemData.type).trigger("change");
+                this.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
             }
 
-            this.$el.find("select#selection").focus();
+            this.$el.find("select.type-selection:first").focus();
 
             if (callback) {
                 callback();

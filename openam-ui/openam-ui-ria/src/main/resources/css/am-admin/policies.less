@@ -862,13 +862,15 @@ body.editing {
             }
         }
 
-        &#typeSelector label {
-            top: 0;
-            opacity: 1;
-        }
+        &.type-selector-panel {
+            label {
+                top: 0;
+                opacity: 1;
+            }
 
-        &#typeSelector select {
-            margin-top: 6px;
+            select {
+                margin-top: 6px;
+            }
         }
 
         select {
@@ -885,7 +887,7 @@ body.editing {
         }
     }
 
-    .field-float-select:not(#typeSelector), .field-float-selectize {
+    .field-float-select:not(.type-selector-panel), .field-float-selectize {
         label {
             top: 10px;
             position: absolute;
@@ -968,6 +970,10 @@ body.editing {
                 overflow-x: hidden;
             }
         }
+    }
+
+    .one-child-only {
+        margin: 20px 0 0;
     }
 }
 

@@ -4,16 +4,16 @@
 	</span>
 
     <div class="item-data">
-        <div class="field-float-select data-obj" id="typeSelector">
+        <div class="field-float-select data-obj type-selector-panel">
             <div>
-                <label for="selection">{{t "console.common.type"}}</label>
+                <label for="envSelection">{{t "console.common.type"}}</label>
 
                 <a class="btn info-button" tabindex="0" data-toggle="popover" data-placement="top">
                     <i class="fa fa-info-circle"></i>
                 </a>
             </div>
 
-            <select id="selection" class="form-control">
+            <select id="envSelection" class="form-control type-selection">
                 <option value="" selected disabled>{{t "common.form.select"}}</option>
                 {{#conditions}}
                 <option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{i18nKey}}</option>

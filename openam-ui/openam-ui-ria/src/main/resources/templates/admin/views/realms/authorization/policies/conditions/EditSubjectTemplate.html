@@ -4,9 +4,9 @@
 	</span>
 
 	<div class="item-data">
-		<div class="field-float-select data-obj" id="typeSelector">
-			<label for="selection" >{{t "console.common.type"}}</label>
-			<select id="selection" class="form-control">
+		<div class="field-float-select data-obj type-selector-panel">
+			<label for="subjSelection" >{{t "console.common.type"}}</label>
+			<select id="subjSelection" class="form-control type-selection">
 				<option value="" selected disabled >{{t "common.form.select"}}</option>
 				{{#subjects}}
                 <option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{i18nKey}}</option>

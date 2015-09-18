@@ -25,7 +25,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         noBaseTemplate: true,
         data: {},
         events: {
-            "change select:not(#selection):not(.selectize)": "changeInput",
+            "change select:not(.type-selection):not(.selectize)": "changeInput",
             "change input": "changeInput",
             "keyup  input": "changeInput",
             "dp.change input": "changeInput"

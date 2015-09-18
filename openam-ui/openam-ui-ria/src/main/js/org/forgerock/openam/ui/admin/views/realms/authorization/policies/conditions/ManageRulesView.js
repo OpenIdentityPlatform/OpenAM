@@ -269,7 +269,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             disabledConditions.addClass("editing-disabled");
             disabledConditions.find("> select").prop("disabled", true);
 
-            editRuleView.$el.find("select#selection").focus();
+            editRuleView.$el.find("select.type-selection:first").focus();
         },
 
         editStop: function (item) {
@@ -470,11 +470,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             if (this.droppableParent) {
                 this.setInactive(this.buttons.addCondition, false);
                 this.setInactive(this.buttons.addOperator, false);
-                this.$el.find("#oneChildOnly").hide();
+                this.$el.find(".one-child-only:first").hide();
             } else {
                 this.setInactive(this.buttons.addCondition, true);
                 this.setInactive(this.buttons.addOperator, true);
-                this.$el.find("#oneChildOnly").show();
+                this.$el.find(".one-child-only:first").show();
             }
         }
     });
