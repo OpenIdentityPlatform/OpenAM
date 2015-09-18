@@ -110,12 +110,12 @@ public interface OAuth2ProviderSettings {
      *
      * @param token The access token.
      * @param request The OAuth2 request.
-     * @return A {@code Map<String, Object>} of the resource owner's information.
+     * @return The claims for the resource owner's information.
      * @throws ServerException If any internal server error occurs.
      * @throws UnauthorizedClientException If the client's authorization fails.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request) throws ServerException,
+    UserInfoClaims getUserInfo(AccessToken token, OAuth2Request request) throws ServerException,
             UnauthorizedClientException, NotFoundException;
 
     /**
@@ -239,12 +239,28 @@ public interface OAuth2ProviderSettings {
     Set<String> getSupportedClaims() throws ServerException;
 
     /**
-     * Gets the supported scopes for this provider.
+     * Gets the supported claims for this provider as strings with pipe-separated translations.
+     *
+     * @return A {@code Set} of the supported claims.
+     * @throws ServerException If any internal server error occurs.
+     */
+    Set<String> getSupportedClaimsWithTranslations() throws ServerException;
+
+    /**
+     * Gets the supported scopes for this provider without translations.
      *
      * @return A {@code Set} of the supported scopes.
      * @throws ServerException If any internal server error occurs.
      */
     Set<String> getSupportedScopes() throws ServerException;
+
+    /**
+     * Gets the supported scopes for this provider.
+     *
+     * @return A {@code Set} of the supported scopes.
+     * @throws ServerException If any internal server error occurs.
+     */
+    Set<String> getSupportedScopesWithTranslations() throws ServerException;
 
     /**
      * Gets the default set of scopes to give a client registering with this provider.

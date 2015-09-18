@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.oauth2.core.exceptions.ServerException;
+
 /**
  * Models a client registration in the OAuth2 provider.
  *
@@ -92,7 +94,15 @@ public interface ClientRegistration {
      * @param locale The locale.
      * @return The descriptions of the allowed and default scopes combined.
      */
-    Map<String, String> getScopeDescriptions(Locale locale);
+    Map<String, String> getScopeDescriptions(Locale locale) throws ServerException;
+
+    /**
+     * Gets the display descriptions for the allowed and default scopes combined, in the specified locale.
+     *
+     * @param locale The locale.
+     * @return The descriptions of the allowed and default scopes combined.
+     */
+    Map<String, String> getClaimDescriptions(Locale locale) throws ServerException;
 
     /**
      * Gets the default scopes configured for the client.

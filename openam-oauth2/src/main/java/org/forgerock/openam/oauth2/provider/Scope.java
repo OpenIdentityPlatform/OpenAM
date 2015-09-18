@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,6 +24,7 @@
 
 package org.forgerock.openam.oauth2.provider;
 
+import org.forgerock.oauth2.core.UserInfoClaims;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -50,7 +51,7 @@ public interface Scope {
      * @param defaultScopes   The set of scopes set in the client registration as default
      * @return The set of scopes to grant the token
      */
-    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScopes,
+    Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScopes,
                                                          Set<String> availableScopes,
                                                          Set<String> defaultScopes) throws ServerException, InvalidScopeException;
 
@@ -62,7 +63,7 @@ public interface Scope {
      * @param defaultScopes   The set of scopes set in the client registration as default
      * @return The set of scopes to grant the token
      */
-    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScopes,
+    Set<String> scopeRequestedForAccessToken(Set<String> requestedScopes,
                                                     Set<String> availableScopes,
                                                     Set<String> defaultScopes) throws ServerException, InvalidScopeException;
 
@@ -76,7 +77,7 @@ public interface Scope {
      * @param defaultScopes   The set of scopes set in the client registration as default
      * @return The set of scopes to grant the new Access Token
      */
-    public Set<String> scopeRequestedForRefreshToken(Set<String> requestedScopes,
+    Set<String> scopeRequestedForRefreshToken(Set<String> requestedScopes,
                                                      Set<String> availableScopes,
                                                      Set<String> allScopes,
                                                      Set<String> defaultScopes) throws ServerException, InvalidScopeException;
@@ -89,7 +90,7 @@ public interface Scope {
      * @return returns a map of data to be added to the token json object that will be returned to the client,
      *         can be null if no information needs to be returned.
      */
-    public Map<String, Object> evaluateScope(CoreToken token);
+    Map<String, Object> evaluateScope(CoreToken token);
 
     /**
      * This method is called before the access_token end point returns an access token. Whatever is returned by this
@@ -100,7 +101,7 @@ public interface Scope {
      * @return
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    public Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters,
+    Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters,
                                                                  CoreToken token) throws NotFoundException;
 
     /**
@@ -111,7 +112,7 @@ public interface Scope {
      * @param tokens     a map of token return names to the token objects. For example "code"=>tokenObject
      * @return the return map should include the key value pair returnType=>Value where value is either FRAGMENT or QUERY
      */
-    public Map<String, String> extraDataToReturnForAuthorizeEndpoint(Map<String, String> parameters,
+    Map<String, String> extraDataToReturnForAuthorizeEndpoint(Map<String, String> parameters,
                                                                      Map<String, CoreToken> tokens);
 
     /**
@@ -121,6 +122,6 @@ public interface Scope {
      * @param token The OAuth2 bearer token containing the user to get the info about
      * @return
      */
-    public Map<String, Object> getUserInfo(CoreToken token);
+    UserInfoClaims getUserInfo(CoreToken token);
 
 }

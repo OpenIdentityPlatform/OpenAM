@@ -34,6 +34,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -54,6 +55,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
     private final RealmNormaliser realmNormaliser;
     private final PEMDecoder pemDecoder;
     private final OpenIdResolverService resolverService;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     /**
      * Constructs a new OpenAMClientRegistrationStore.
@@ -63,10 +65,12 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
      */
     @Inject
     public OpenAMClientRegistrationStore(RealmNormaliser realmNormaliser, PEMDecoder pemDecoder,
-                            @Named(OAuth2Constants.Custom.JWK_RESOLVER) OpenIdResolverService resolverService) {
+            @Named(OAuth2Constants.Custom.JWK_RESOLVER) OpenIdResolverService resolverService,
+            OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.realmNormaliser = realmNormaliser;
         this.pemDecoder = pemDecoder;
         this.resolverService = resolverService;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
@@ -76,7 +80,9 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
             throws InvalidClientException, NotFoundException {
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
-        return new OpenAMClientRegistration(getIdentity(clientId, realm), pemDecoder, resolverService);
+        return new OpenAMClientRegistration(getIdentity(clientId, realm), pemDecoder, resolverService,
+                providerSettingsFactory.get(request));
+
     }
 
     @SuppressWarnings("unchecked")

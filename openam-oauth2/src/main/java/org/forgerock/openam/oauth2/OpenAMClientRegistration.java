@@ -33,6 +33,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -42,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.http.util.MultiValueMap;
 import org.forgerock.jaspi.modules.openid.exceptions.FailedToLoadJWKException;
 import org.forgerock.jaspi.modules.openid.exceptions.OpenIdConnectVerificationException;
 import org.forgerock.jaspi.modules.openid.helpers.JWKSetParser;
@@ -69,12 +75,19 @@ import org.restlet.Request;
 public class OpenAMClientRegistration implements OpenIdConnectClientRegistration {
 
     private static final String DELIMITER = "\\|";
+    private static final Comparator<? super String[]> I18N_SPECIFICITY_COMPARATOR = new Comparator<String[]>() {
+        @Override
+        public int compare(String[] o1, String[] o2) {
+            return o1.length == o2.length ? o2[0].length() - o1[0].length() : o2.length - o1.length;
+        }
+    };
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final AMIdentity amIdentity;
     private final SigningManager signingManager = new SigningManager();
     private final PEMDecoder pemDecoder;
     private final OpenIdResolverService resolverService;
     private final MessageDigest digest;
+    private final OAuth2ProviderSettings providerSettings;
 
 
     /**
@@ -83,11 +96,12 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
      * @param amIdentity The client's identity.
      * @param pemDecoder A {@code PEMDecoder} instance.
      */
-    OpenAMClientRegistration(AMIdentity amIdentity, PEMDecoder pemDecoder, OpenIdResolverService resolverService)
-            throws InvalidClientException {
+    OpenAMClientRegistration(AMIdentity amIdentity, PEMDecoder pemDecoder, OpenIdResolverService resolverService,
+            OAuth2ProviderSettings providerSettings) throws InvalidClientException {
         this.amIdentity = amIdentity;
         this.pemDecoder = pemDecoder;
         this.resolverService = resolverService;
+        this.providerSettings = providerSettings;
         try {
             this.digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
@@ -177,7 +191,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         return "Bearer";
     }
 
-    private Set<String[]> getDisplayName() {
+    private List<String[]> getDisplayName() {
         Set<String> displayName = null;
         try {
             displayName = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.NAME);
@@ -186,18 +200,25 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.NAME +" from repository");
         }
-        return splitPipeDelimited(convertAttributeValues(displayName));
+        return splitPipeDelimited(convertAttributeValues(displayName), "name").get("name");
     }
 
-    @VisibleForTesting Set<String[]> splitPipeDelimited(Set<String> values) {
-        Set<String[]> result = new HashSet<String[]>();
+    @VisibleForTesting
+    MultiValueMap<String, String[]> splitPipeDelimited(Set<String> values, String defaultKey) {
+        MultiValueMap<String, String[]> result = new MultiValueMap<>(new HashMap<String, List<String[]>>());
         for (String value : values) {
             if (value != null) {
+                String[] split;
                 if ((value.indexOf("|") == value.length())) {
                     // If one pipe is included in and ended with.
-                    result.add(value.split(DELIMITER, 2));
+                    split = value.split(DELIMITER, 2);
                 } else {
-                    result.add(value.split(DELIMITER, 3));
+                    split = value.split(DELIMITER, 3);
+                }
+                if (defaultKey != null) {
+                    result.add(defaultKey, split);
+                } else {
+                    result.add(split[0], Arrays.copyOfRange(split, 1, split.length));
                 }
             }
         }
@@ -211,7 +232,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         return findLocaleSpecificString(getDisplayName(), locale);
     }
 
-    private Set<String[]> getDisplayDescription() {
+    private List<String[]> getDisplayDescription() {
         Set<String> displayDescription = null;
         try {
             displayDescription = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.DESCRIPTION);
@@ -220,7 +241,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.DESCRIPTION +" from repository");
         }
-        return splitPipeDelimited(convertAttributeValues(displayDescription));
+        return splitPipeDelimited(convertAttributeValues(displayDescription), "name").get("name");
     }
 
     /**
@@ -230,7 +251,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         return findLocaleSpecificString(getDisplayDescription(), locale);
     }
 
-    @VisibleForTesting String findLocaleSpecificString(Set<String[]> delimitedStrings, Locale locale) {
+    @VisibleForTesting String findLocaleSpecificString(Collection<String[]> delimitedStrings, Locale locale) {
         String defaultValue = null;
         for (String language : languageStrings(locale)) {
             for (String[] value : delimitedStrings) {
@@ -259,6 +280,18 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         return convertAttributeValues(scopes);
     }
 
+    private Set<String> getClaimStrings() {
+        Set<String> scopes = null;
+        try {
+            scopes = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.CLAIMS);
+        } catch (Exception e) {
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.SCOPES, e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.SCOPES +" from repository");
+        }
+        return convertAttributeValues(scopes);
+    }
+
     @VisibleForTesting List<String> languageStrings(Locale locale) {
         List<String> strings = new ArrayList<String>();
         String localeString = locale.toString();
@@ -277,65 +310,85 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     /**
      * {@inheritDoc}
      */
-    public Map<String, String> getScopeDescriptions(Locale locale) {
-        final Map<String, String> descriptions = new LinkedHashMap<String, String>();
-        final Map<String, String> i18nDescriptions = new LinkedHashMap<String, String>();
-        final Set<String> hiddenI18nDescriptions = new HashSet<String>();
-        final Set<String> combinedScopes = new HashSet<String>();
+    public Map<String, String> getScopeDescriptions(Locale locale) throws ServerException {
+        final Set<String> combinedScopes = new HashSet<>();
         combinedScopes.addAll(getAllowedGrantScopes());
         combinedScopes.addAll(getDefaultGrantScopes());
+        return getTranslations(locale, combinedScopes, providerSettings.getSupportedScopesWithTranslations());
+    }
 
-        if (combinedScopes.isEmpty()) {
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, String> getClaimDescriptions(Locale locale) throws ServerException {
+        final HashSet<String> clientClaims = new HashSet<>(getClaimStrings());
+        return getTranslations(locale, clientClaims, providerSettings.getSupportedClaimsWithTranslations());
+    }
+
+    private Map<String, String> getTranslations(Locale locale, Set<String> configured, Set<String> defaults) {
+        final Map<String, String> descriptions = new LinkedHashMap<>();
+        final Set<String> hiddenI18nDescriptions = new HashSet<>();
+
+        if (configured.isEmpty() && defaults.isEmpty()) {
             return descriptions;
         }
 
-        Set<String[]> scopes = splitPipeDelimited(combinedScopes);
+        MultiValueMap<String, String[]> allTranslations = splitPipeDelimited(configured, null);
         List<String> languageStrings = languageStrings(locale);
+        for (Map.Entry<String, List<String[]>> translation : allTranslations.entrySet()) {
+            setTranslation(languageStrings, translation.getKey(), translation.getValue(), descriptions,
+                    hiddenI18nDescriptions, false);
+        }
+
+        MultiValueMap<String, String[]> defaultTranslations = splitPipeDelimited(defaults, null);
+        for (Map.Entry<String, List<String[]>> defaultTranslation : defaultTranslations.entrySet()) {
+            String translated = defaultTranslation.getKey();
+            if (!descriptions.containsKey(translated) && !hiddenI18nDescriptions.contains(translated)) {
+                setTranslation(languageStrings, translated, defaultTranslation.getValue(), descriptions,
+                        hiddenI18nDescriptions, true);
+            }
+        }
+
+        return descriptions;
+    }
+
+    private void setTranslation(List<String> languageStrings, String key, List<String[]> values,
+            Map<String, String> descriptions, Set<String> hiddenI18nDescriptions, boolean addKeyAsDefault) {
+        if (values == null) {
+            return;
+        }
+
+        Collections.sort(values, I18N_SPECIFICITY_COMPARATOR);
+
+        // Check for config specifc to a preferred language
         for (String language : languageStrings) {
-            Iterator<String[]> i = scopes.iterator();
-            while (i.hasNext()) {
-                String[] parts = i.next();
-                if (parts != null && parts.length != 0) {
-                    if (parts.length == 1) {
-                        if (!descriptions.containsKey(parts[0])) {
-                            // no description or locale -> scope (e.g. email -> email)
-                            descriptions.put(parts[0], parts[0]);
-                        }
-                    } else if (parts.length == 2) {
-                        if (!StringUtils.isBlank(parts[1])) {
-                            // no locale -> default description (e.g. email|E-Mail -> E-Mail)
-                            descriptions.put(parts[0], parts[1]);
-                        } else {
-                            // end with pipe -> hidden (e.g. email| -> )
-                        }
-                    } else if (parts.length == 3) {
-                        if (!StringUtils.isBlank(parts[2])) {
-                            if (parts[1].equals(language) && !i18nDescriptions.containsKey(parts[0])) {
-                                // match locale -> localized description (e.g. email|fr|Email -> Email)
-                                i18nDescriptions.put(parts[0], parts[2]);
-                            } else if (!descriptions.containsKey(parts[0]) && !i18nDescriptions.containsKey(parts[0])) {
-                                // no match locale -> scope (e.g. email|fr|Email -> email)
-                                descriptions.put(parts[0], parts[0]);
-                            }
-                        } else {
-                            if (parts[1].equals(language) && !i18nDescriptions.containsKey(parts[0])) {
-                                // end with pipe -> hidden (e.g. email|fr| -> )
-                                hiddenI18nDescriptions.add(parts[0]);
-                            } else if (!descriptions.containsKey(parts[0]) && !i18nDescriptions.containsKey(parts[0])) {
-                                // no match locale -> scope (e.g. email|fr| -> )
-                                descriptions.put(parts[0], parts[0]);
-                            }
-                        }
+            for (String[] value : values) {
+                if (value.length == 2 && value[0].equals(language)) {
+                    if (StringUtils.isNotBlank(value[1])) {
+                        descriptions.put(key, value[1]);
+                    } else {
+                        hiddenI18nDescriptions.add(key);
                     }
+                    return;
                 }
             }
         }
 
-        descriptions.putAll(i18nDescriptions);
-        for (String hiddenI18nDescription : hiddenI18nDescriptions) {
-            descriptions.remove(hiddenI18nDescription);
+        // No language match, use default value
+        for (String[] value : values) {
+            if (value.length == 1) {
+                if (StringUtils.isNotBlank(value[0])) {
+                    descriptions.put(key, value[0]);
+                } else {
+                    hiddenI18nDescriptions.add(key);
+                }
+                return;
+            }
         }
-        return descriptions;
+
+        if (addKeyAsDefault) {
+            descriptions.put(key, key);
+        }
     }
 
     private Set<String> getDefaultGrantScopes() {

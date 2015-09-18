@@ -21,17 +21,20 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.mockito.Mockito.*;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.shared.debug.Debug;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
-
 import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.UserInfoClaims;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.StandardScriptEngineManager;
@@ -41,10 +44,6 @@ import org.forgerock.openam.utils.IOUtils;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.shared.debug.Debug;
 
 public class OidcClaimsExtensionTest {
 
@@ -87,14 +86,19 @@ public class OidcClaimsExtensionTest {
         when(identity.getAttribute("cn")).thenReturn(asSet("Joe Bloggs"));
 
         // When
-        Map<String, Object> result = scriptEvaluator.evaluateScript(script, variables);
+        UserInfoClaims result = scriptEvaluator.evaluateScript(script, variables);
 
         // Then
-        assertThat(result).containsOnly(entry("given_name", "joe"),
+        assertThat(result.getValues()).containsOnly(entry("given_name", "joe"),
                 entry("family_name", "bloggs"),
                 entry("name", "Joe Bloggs"),
                 entry("zoneinfo", "Europe/London"),
                 entry("locale", "en"));
+
+        assertThat(result.getCompositeScopes()).hasSize(1);
+        ArrayList<String> hashProfile = (ArrayList<String>) result.getCompositeScopes().get("profile");
+        assertThat(hashProfile).contains("zoneinfo", "name", "locale", "family_name", "given_name");
+        assertThat(hashProfile).hasSize(5);
     }
 
     @Test
@@ -107,13 +111,18 @@ public class OidcClaimsExtensionTest {
         when(identity.getAttribute("cn")).thenReturn(asSet("Joe Bloggs"));
 
         // When
-        Map<String, Object> result = scriptEvaluator.evaluateScript(script, variables);
+        UserInfoClaims result = scriptEvaluator.evaluateScript(script, variables);
 
         // Then
-        assertThat(result).containsOnly(
+        assertThat(result.getValues()).containsOnly(
                 entry("given_name", "fred"),
                 entry("family_name", "flintstone"),
                 entry("name", "Joe Bloggs"));
+
+        assertThat(result.getCompositeScopes()).containsOnlyKeys("profile");
+        ArrayList<String> hashProfile = (ArrayList<String>) result.getCompositeScopes().get("profile");
+        assertThat(hashProfile).contains("zoneinfo", "name", "locale", "family_name", "given_name");
+        assertThat(hashProfile).hasSize(5);
 
         verify(identity).getAttribute("cn");
         verify(identity).getAttribute("preferredlocale");
@@ -130,10 +139,10 @@ public class OidcClaimsExtensionTest {
         Bindings variables = testBindings(asSet("openid"), requestedClaims);
 
         // When
-        Map<String, Object> result = scriptEvaluator.evaluateScript(script, variables);
+        UserInfoClaims result = scriptEvaluator.evaluateScript(script, variables);
 
         // Then
-        assertThat(result).containsOnly(
+        assertThat(result.getValues()).containsOnly(
                 entry("given_name", "fred"),
                 entry("family_name", "flintstone"));
     }

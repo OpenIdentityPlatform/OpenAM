@@ -880,6 +880,7 @@ public class OAuth2Constants {
     public class OAuth2Client {
         public static final String REDIRECT_URI = "com.forgerock.openam.oauth2provider.redirectionURIs";
         public static final String SCOPES = "com.forgerock.openam.oauth2provider.scopes";
+        public static final String CLAIMS = "com.forgerock.openam.oauth2provider.claims";
         public static final String DEFAULT_SCOPES = "com.forgerock.openam.oauth2provider.defaultScopes";
         public static final String NAME = "com.forgerock.openam.oauth2provider.name";
         public static final String DESCRIPTION = "com.forgerock.openam.oauth2provider.description";

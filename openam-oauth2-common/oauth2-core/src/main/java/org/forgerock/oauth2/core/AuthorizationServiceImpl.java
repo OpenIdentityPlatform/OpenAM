@@ -25,6 +25,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
+
+import org.forgerock.guava.common.base.Predicates;
+import org.forgerock.guava.common.collect.Maps;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
@@ -33,11 +36,13 @@ import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequiredException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.openam.utils.StringUtils;
 import org.slf4j.Logger;
@@ -121,12 +126,22 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             if (locale == null) {
                 locale = request.getLocale();
             }
+
+            UserInfoClaims userInfo = null;
+            try {
+                userInfo = providerSettings.getUserInfo(request.getToken(AccessToken.class), request);
+            } catch (UnauthorizedClientException e) {
+                logger.debug("Couldn't get user info - continuing to display consent page without claims.", e);
+            }
+
             final String clientName = clientRegistration.getDisplayName(locale);
             final String clientDescription = clientRegistration.getDisplayDescription(locale);
-            final Set<String> scopeDescriptions = getScopeDescriptions(validatedScope,
+            final Map<String, String> scopeDescriptions = getScopeDescriptions(validatedScope,
                     clientRegistration.getScopeDescriptions(locale));
-            throw new ResourceOwnerConsentRequired(clientName, clientDescription, scopeDescriptions,
-                    resourceOwner.getName(providerSettings));
+            final Map<String, String> claimDescriptions = getClaimDescriptions(userInfo.getValues(),
+                    clientRegistration.getClaimDescriptions(locale));
+            throw new ResourceOwnerConsentRequired(clientName, clientDescription, scopeDescriptions, claimDescriptions,
+                    userInfo, resourceOwner.getName(providerSettings));
         }
 
         return tokenIssuer.issueTokens(request, clientRegistration, resourceOwner, scope, providerSettings);
@@ -145,20 +160,23 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     /**
      * Gets the scope descriptions for the requested scopes.
      *
+     * @param claims The claims being provided.
+     * @param claimDescriptions The descriptions for all possible allowed claims.
+     * @return A {@code Set} of requested scope descriptions.
+     */
+    private Map<String, String> getClaimDescriptions(Map<String, Object> claims, Map<String, String> claimDescriptions) {
+        return Maps.filterKeys(claimDescriptions, Predicates.in(claims.keySet()));
+    }
+
+    /**
+     * Gets the scope descriptions for the requested scopes.
+     *
      * @param scopes The requested scopes.
      * @param scopeDescriptions The descriptions for all possible allowed scopes.
      * @return A {@code Set} of requested scope descriptions.
      */
-    private Set<String> getScopeDescriptions(Set<String> scopes, Map<String, String> scopeDescriptions) {
-        final Set<String> list = new LinkedHashSet<String>();
-        for (final String scope : scopes) {
-            for (final Map.Entry<String, String> scopeDescription : scopeDescriptions.entrySet()) {
-                if (scopeDescription.getKey().equalsIgnoreCase(scope)) {
-                    list.add(scopeDescription.getValue());
-                }
-            }
-        }
-        return list;
+    private Map<String, String> getScopeDescriptions(Set<String> scopes, Map<String, String> scopeDescriptions) {
+        return Maps.filterKeys(scopeDescriptions, Predicates.in(scopes));
     }
 
     /**

@@ -117,6 +117,15 @@
                             <Value>[0]=</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="com.forgerock.openam.oauth2provider.claims"
+                                     type="list"
+                                     uitype="unorderedlist"
+                                     syntax="string"
+                                     i18nKey="a7055">
+                        <DefaultValues>
+                            <Value>[0]=</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="com.forgerock.openam.oauth2provider.defaultScopes"
                                      type="list"
                                      uitype="unorderedlist"

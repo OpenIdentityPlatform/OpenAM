@@ -338,6 +338,7 @@
                             <Value>java.util.LinkedHashMap$LinkedEntrySet</Value>
                             <Value>org.forgerock.openam.oauth2.OpenAMAccessToken</Value>
                             <Value>java.util.HashMap$Node</Value>
+                            <Value>org.forgerock.oauth2.core.UserInfoClaims</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>

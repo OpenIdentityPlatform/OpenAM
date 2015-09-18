@@ -53,10 +53,10 @@
                     formTarget: "${(target!'.')?js_string}",
                     <#if display_name??>displayName: "${display_name?js_string}",</#if>
                     <#if user_name??>userName: "${user_name?js_string}",</#if>
-                    displayScopes: []
+                    displayScopes: ${display_scopes},
+                    displayClaims: ${display_claims}
                 }
             };
-            <#list display_scope as r>pageData.oauth2Data.displayScopes.push({"name":"${r?js_string}"});</#list>
         </script>
         <script data-main="${baseUrl?html}/XUI/main-authorize" src="${baseUrl?html}/XUI/libs/requirejs-2.1.14-min.js"></script>
     </body>

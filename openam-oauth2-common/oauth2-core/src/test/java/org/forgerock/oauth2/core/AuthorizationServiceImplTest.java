@@ -28,6 +28,7 @@ import static org.testng.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -88,6 +89,8 @@ public class AuthorizationServiceImplTest {
                 .willReturn(validatedScope);
         given(providerSettings.isConsentSaved(eq(resourceOwner), anyString(), eq(validatedScope))).willReturn(false);
         given(resourceOwnerConsentVerifier.verify(anyBoolean(), eq(request), eq(clientRegistration))).willReturn(false);
+        given(providerSettings.getUserInfo(any(AccessToken.class), any(OAuth2Request.class)))
+                .willReturn(new UserInfoClaims(new HashMap<String, Object>(), new HashMap<String, List<String>>()));
 
         //When
         authorizationService.authorize(request);

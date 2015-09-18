@@ -17,8 +17,7 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.fest.assertions.Assertions.*;
-import static org.fest.assertions.MapAssert.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.mockito.Mockito.*;
@@ -29,22 +28,28 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.PEMDecoder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class OpenAMClientRegistrationTest {
 
+    @Mock
     private AMIdentity amIdentity;
     private OpenAMClientRegistration clientRegistration;
-    private OpenIdResolverService mockResolver;
+    @Mock
+    private OpenIdResolverService resolver;
+    @Mock
+    private OAuth2ProviderSettings providerSettings;
 
     @BeforeMethod
     public void setup() throws Exception {
-        amIdentity = mock(AMIdentity.class);
-        mockResolver = mock(OpenIdResolverService.class);
-        clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder(), mockResolver);
+        MockitoAnnotations.initMocks(this);
+        clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder(), resolver, providerSettings);
     }
 
     @Test
@@ -84,7 +89,7 @@ public class OpenAMClientRegistrationTest {
     @Test(dataProvider = "languageStrings")
     public void testFindLocaleSpecificString(Set<String> strings, Locale locale, String expected) throws Exception {
         // Given
-        Set<String[]> splitStrings = clientRegistration.splitPipeDelimited(strings);
+        List<String[]> splitStrings = clientRegistration.splitPipeDelimited(strings, "").get("");
 
         // When
         String result = clientRegistration.findLocaleSpecificString(splitStrings, locale);
@@ -114,12 +119,30 @@ public class OpenAMClientRegistrationTest {
         when(amIdentity.getAttribute(DEFAULT_SCOPES)).thenReturn(asSet(
                 "[0]=scope1",
                 "[1]=scope2|Default",
-                "[2]=scope2|fr|En français",
+                "[2]=scope2|fr|En Français",
                 "[3]=scope3|en|Default English",
                 "[4]=scope3|en_GB|British, innit",
                 "[5]=scope3|en_US|American y'all",
                 "[6]=scope4",
-                "[7]=scope4|en|English only"
+                "[7]=scope4|en|English only",
+                "[8]=scope5|Default with overridden French exclusion",
+                "[9]=scope5|fr|",
+                "[10]=scope6|en|Included in English",
+                "[11]=scope6|"
+        ));
+
+        when(providerSettings.getSupportedScopesWithTranslations()).thenReturn(asSet(
+                "scope1",
+                "scope2",
+                "scope2|fr_FR|Pas en Français",
+                "scope3",
+                "scope4",
+                "scope5",
+                "scope6",
+                "scope7",
+                "scope8",
+                "scope8|fr|Aussi en Français",
+                "scope8|en|In English"
         ));
 
         // When
@@ -127,10 +150,23 @@ public class OpenAMClientRegistrationTest {
         Map<String, String> english = clientRegistration.getScopeDescriptions(Locale.UK);
 
         // Then
-        assertThat(french).includes(entry("scope2", "En français"));
-        assertThat(french.size()).isEqualTo(4);
-        assertThat(english).includes(entry("scope2", "Default"), entry("scope3", "British, innit"), entry("scope4", "English only"));
-        assertThat(english.size()).isEqualTo(4);
+        assertThat(french).containsOnly(
+                entry("scope1", "scope1"),
+                entry("scope2", "En Français"),
+                entry("scope3", "scope3"),
+                entry("scope4", "scope4"),
+                entry("scope7", "scope7"),
+                entry("scope8", "Aussi en Français"));
+        assertThat(english).containsOnly(
+                entry("scope1", "scope1"),
+                entry("scope2", "Default"),
+                entry("scope3", "British, innit"),
+                entry("scope4", "English only"),
+                entry("scope5", "Default with overridden French exclusion"),
+                entry("scope6", "Included in English"),
+                entry("scope7", "scope7"),
+                entry("scope8", "In English")
+        );
     }
 
 }

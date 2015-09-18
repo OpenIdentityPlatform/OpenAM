@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -36,6 +36,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.UserInfoClaims;
 import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -53,9 +54,12 @@ import org.restlet.Request;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -248,7 +252,7 @@ public class ScopeImpl implements Scope {
     /**
      * {@inheritDoc}
      */
-    public Map<String,Object> getUserInfo(CoreToken token){
+    public UserInfoClaims getUserInfo(CoreToken token){
 
         Set<String> scopes = token.getScope();
         Map<String,Object> response = new HashMap<String, Object>();
@@ -325,7 +329,7 @@ public class ScopeImpl implements Scope {
             }
         }
 
-        return response;
+        return new UserInfoClaims(response, Collections.<String, List<String>>emptyMap());
     }
 
 }

@@ -48,6 +48,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.Token;
+import org.forgerock.oauth2.core.UserInfoClaims;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -192,10 +193,10 @@ public class OpenAMScopeValidator implements ScopeValidator {
     /**
      * {@inheritDoc}
      */
-    public Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request)
+    public UserInfoClaims getUserInfo(AccessToken token, OAuth2Request request)
             throws UnauthorizedClientException, NotFoundException {
 
-        Map<String, Object> response = new HashMap<String, Object>();
+        Map<String, Object> response = new HashMap<>();
         Bindings scriptVariables = new SimpleBindings();
         SSOToken ssoToken = getUsersSession(request);
         String realm;

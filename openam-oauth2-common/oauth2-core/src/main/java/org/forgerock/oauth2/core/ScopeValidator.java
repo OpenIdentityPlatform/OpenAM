@@ -88,7 +88,7 @@ public interface ScopeValidator {
      * @throws UnauthorizedClientException If the client's authorization fails.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request) throws UnauthorizedClientException, NotFoundException;
+    UserInfoClaims getUserInfo(AccessToken token, OAuth2Request request) throws UnauthorizedClientException, NotFoundException;
 
     /**
      * Gets the specified access token's information.

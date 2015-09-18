@@ -31,8 +31,8 @@
                 {{#each oauth2Data.displayScopes}}
                 {{#if this.values}}
                 <div class="panel panel-info">
-                    <div class="panel-heading am-panel-heading" data-toggle="collapse"
-                         href="#oauth2Scope{{@index}}" aria-expanded="false" aria-controls="oauth2Scope{{@index}}">
+                    <div class="panel-heading am-panel-heading-hover" data-toggle="collapse" aria-expanded="false"
+                         data-target="#oauth2Scope{{@index}}" aria-controls="oauth2Scope{{@index}}">
                         {{this.name}}
                         <div class="pull-right"><i class="fa fa-angle-down"></i></div>
                     </div>
@@ -59,8 +59,8 @@
                 {{#each oauth2Data.displayClaims}}
                 {{#if this.values}}
                 <div class="panel panel-info">
-                    <div class="panel-heading bg-info am-panel-heading" role="tab" data-toggle="collapse"
-                         href="#oauth2Claims{{@index}}" aria-expanded="false" aria-controls="oauth2Claims{{@index}}">
+                    <div class="panel-heading am-panel-heading-hover" data-toggle="collapse" aria-expanded="false"
+                         data-target="#oauth2Claims{{@index}}" role="tab" aria-controls="oauth2Claims{{@index}}">
                         {{this.name}}
                         <div class="pull-right"><i class="fa fa-angle-down"></i></div>
                     </div>

@@ -171,11 +171,11 @@
                         resourceName="supportedScopes"
                         i18nKey="a108">
                     <DefaultValues>
-                        <Value>openid</Value>
-                        <Value>profile</Value>
-                        <Value>email</Value>
-                        <Value>address</Value>
-                        <Value>phone</Value>
+                        <Value>openid|</Value>
+                        <Value>profile|Your personal information</Value>
+                        <Value>email|Your email address</Value>
+                        <Value>address|Your postal address</Value>
+                        <Value>phone|Your telephone number(s)</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -222,14 +222,14 @@
                         resourceName="supportedClaims"
                         i18nKey="a112">
                     <DefaultValues>
-                        <Value>email</Value>
-                        <Value>address</Value>
-                        <Value>phone_number</Value>
-                        <Value>given_name</Value>
-                        <Value>zoneinfo</Value>
-                        <Value>family_name</Value>
-                        <Value>locale</Value>
-                        <Value>name</Value>
+                        <Value>email|Email address</Value>
+                        <Value>address|Postal address</Value>
+                        <Value>phone_number|Phone number</Value>
+                        <Value>given_name|Given name</Value>
+                        <Value>zoneinfo|Time zone</Value>
+                        <Value>family_name|Family name</Value>
+                        <Value>locale|Locale</Value>
+                        <Value>name|Full name</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

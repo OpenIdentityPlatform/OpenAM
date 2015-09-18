@@ -16,7 +16,10 @@
 
 package org.forgerock.oauth2.core.exceptions;
 
+import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.oauth2.core.UserInfoClaims;
 
 /**
  * Thrown when the resource owner's consent is required before the authorization can be granted to a OAuth2 client.
@@ -27,8 +30,10 @@ public class ResourceOwnerConsentRequired extends Exception {
 
     private final String clientName;
     private final String clientDescription;
-    private final Set<String> scopeDesciptions;
+    private final Map<String, String> scopeDesciptions;
     private final String userDisplayName;
+    private final Map<String, String> claimDesciptions;
+    private final UserInfoClaims claims;
 
     /**
      * Constructs a new ResourceOwnerConsentRequired instance with the specified client name, description and scope
@@ -37,12 +42,18 @@ public class ResourceOwnerConsentRequired extends Exception {
      * @param clientName The display name of the client.
      * @param clientDescription The display description of the client.
      * @param scopeDescriptions The display descriptions of the requested scopes.
+     * @param claimDescriptions The display descriptions of the provided claims.
+     * @param claims The claims being provided.
+     * @param userDisplayName The displayable name of the user, if it can be deduced.
      */
-    public ResourceOwnerConsentRequired(final String clientName, final String clientDescription,
-            final Set<String> scopeDescriptions, String userDisplayName) {
+    public ResourceOwnerConsentRequired(String clientName, String clientDescription,
+            Map<String, String> scopeDescriptions, Map<String, String> claimDescriptions, UserInfoClaims claims,
+            String userDisplayName) {
         this.clientName = clientName;
         this.clientDescription = clientDescription;
         this.scopeDesciptions = scopeDescriptions;
+        this.claimDesciptions = claimDescriptions;
+        this.claims = claims;
         this.userDisplayName = userDisplayName;
     }
 
@@ -78,7 +89,25 @@ public class ResourceOwnerConsentRequired extends Exception {
      *
      * @return The desciption of the scopes.
      */
-    public Set<String> getScopeDescriptions() {
+    public Map<String, String> getScopeDescriptions() {
         return scopeDesciptions;
+    }
+
+    /**
+     * Gets the claim descriptions.
+     *
+     * @return The desciption of the claims.
+     */
+    public Map<String, String> getClaimDescriptions() {
+        return claimDesciptions;
+    }
+
+    /**
+     * Gets the claim values.
+     *
+     * @return The values of the claims.
+     */
+    public UserInfoClaims getClaims() {
+        return claims;
     }
 }

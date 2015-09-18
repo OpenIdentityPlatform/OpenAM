@@ -15,6 +15,7 @@
 */
 import com.iplanet.sso.SSOException
 import com.sun.identity.idm.IdRepoException
+import org.forgerock.oauth2.core.UserInfoClaims
 
 /*
 * Defined variables:
@@ -30,6 +31,8 @@ import com.sun.identity.idm.IdRepoException
 *                  requested claims with no requested values will have a key but no value in the map. A key with
 *                  a single value in its Set indicates this is the only value that should be returned.
 * Required to return a Map of claims to be added to the id_token claims
+*
+* Expected return value struture:
 */
 
 // user session not guaranteed to be present
@@ -95,9 +98,15 @@ def computeClaim = { claim, requestedValues ->
     }
 }
 
-scopes.findAll { s -> !"openid".equals(s) && scopeClaimsMap.containsKey(s) }.inject(claims) { map, s ->
+def computedClaims = scopes.findAll { s -> !"openid".equals(s) && scopeClaimsMap.containsKey(s) }.inject(claims) { map, s ->
     scopeClaims = scopeClaimsMap.get(s)
     map << scopeClaims.findAll { c -> !requestedClaims.containsKey(c) }.collectEntries([:]) { claim -> computeClaim(claim, null) }
 }.findAll { map -> map.value != null } << requestedClaims.collectEntries([:]) { claim, requestedValue ->
     computeClaim(claim, requestedValue)
 }
+
+def compositeScopes = scopeClaimsMap.findAll { scope ->
+    scopes.contains(scope.key)
+}
+
+return new UserInfoClaims((Map)computedClaims, (Map)compositeScopes)

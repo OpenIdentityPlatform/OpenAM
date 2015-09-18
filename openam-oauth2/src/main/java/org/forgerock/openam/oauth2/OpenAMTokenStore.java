@@ -272,7 +272,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         try {
             AccessToken accessToken = request.getToken(AccessToken.class);
-            Map<String, Object> userInfo = providerSettings.getUserInfo(accessToken, request);
+            Map<String, Object> userInfo = providerSettings.getUserInfo(accessToken, request).getValues();
 
             for (Map.Entry<String, Object> claim : userInfo.entrySet()) {
                 oidcToken.put(claim.getKey(), claim.getValue());
@@ -301,7 +301,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             try {
                 JSONObject claimsObject = new JSONObject(claims);
                 JSONObject idTokenClaimsRequest = claimsObject.getJSONObject(OAuth2Constants.JWTTokenParams.ID_TOKEN);
-                Map<String, Object> userInfo = providerSettings.getUserInfo(accessToken, request);
+                Map<String, Object> userInfo = providerSettings.getUserInfo(accessToken, request).getValues();
 
                 Iterator<String> it = idTokenClaimsRequest.keys();
                 while (it.hasNext()) {
