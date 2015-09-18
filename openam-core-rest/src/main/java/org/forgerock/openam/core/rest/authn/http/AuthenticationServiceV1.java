@@ -17,6 +17,7 @@
 package org.forgerock.openam.core.rest.authn.http;
 
 import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +39,7 @@ import com.sun.identity.shared.locale.Locale;
 import org.forgerock.http.Context;
 import org.forgerock.http.context.AttributesContext;
 import org.forgerock.http.header.ContentTypeHeader;
+import org.forgerock.http.protocol.Entity;
 import org.forgerock.http.protocol.Form;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -245,11 +247,16 @@ public class AuthenticationServiceV1 {
      */
     private JsonValue getJsonContent(Request request) throws IOException {
 
-        if (request.getEntity() == null) {
+        Entity entity = request.getEntity();
+        if (entity == null) {
             return null;
         }
 
-        return json(request.getEntity().getJson());
+        if (entity.mayContainData() && entity.getString().isEmpty()) {
+            return json(entity.getJson());
+        } else {
+            return json(object());
+        }
     }
 
     /**
