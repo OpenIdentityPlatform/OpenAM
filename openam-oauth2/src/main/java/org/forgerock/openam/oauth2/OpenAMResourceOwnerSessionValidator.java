@@ -168,6 +168,11 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                     throw authenticationRequired(request, token);
                 }
 
+                final String acrValuesStr = request.getParameter(ACR_VALUES);
+                if (acrValuesStr != null) {
+                    setCurrentAcr(token, request, acrValuesStr);
+                }
+
                 try {
                     final long authTime = stringToDate(token.getProperty(ISAuthConstants.AUTH_INSTANT)).getTime();
 
@@ -179,11 +184,6 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                     final AMIdentity id = IdUtils.getIdentity(
                             AccessController.doPrivileged(AdminTokenAction.getInstance()),
                             token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
-
-                    final String acrValuesStr = request.getParameter(ACR_VALUES);
-                    if (acrValuesStr != null) {
-                        setCurrentAcr(token, request, acrValuesStr);
-                    }
 
                     return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id, authTime);
 
@@ -210,7 +210,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                             refreshToken.getRealm()));
                 }
             }
-        } catch (UnsupportedEncodingException | URISyntaxException e) {
+        } catch (SSOException | UnsupportedEncodingException | URISyntaxException e) {
             throw new AccessDeniedException(e);
         }
     }
@@ -278,18 +278,24 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
      * look to see if they've already matched one. If they have, we set the acr value on the request.
      */
     private void setCurrentAcr(SSOToken token, OAuth2Request request, String acrValuesStr)
-            throws NotFoundException, ServerException, SSOException {
+            throws NotFoundException, ServerException, SSOException, AccessDeniedException,
+            UnsupportedEncodingException, URISyntaxException, ResourceOwnerAuthenticationRequired {
         String serviceUsed = token.getProperty(ISAuthConstants.SERVICE);
         Set<String> acrValues = new HashSet<>(Arrays.asList(acrValuesStr.split("\\s+")));
         OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
         Map<String, AuthenticationMethod> acrMap = settings.getAcrMapping();
+        boolean matched = false;
         for (String acr : acrValues) {
             if (acrMap.containsKey(acr)) {
                 if (serviceUsed.equals(acrMap.get(acr).getName())) {
                     final Request req = request.getRequest();
                     req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, acr);
+                    matched = true;
                 }
             }
+        }
+        if (!matched) {
+            throw authenticationRequired(request, token);
         }
     }
 
