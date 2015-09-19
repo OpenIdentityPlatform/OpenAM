@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.util.Collections;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
-import org.forgerock.http.Session;
-import org.forgerock.http.context.AttributesContext;
-import org.forgerock.http.context.RootContext;
-import org.forgerock.http.context.SessionContext;
+import org.forgerock.http.session.Session;
+import org.forgerock.services.context.AttributesContext;
+import org.forgerock.services.context.RootContext;
+import org.forgerock.http.session.SessionContext;
 import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;

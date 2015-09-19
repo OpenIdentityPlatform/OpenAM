@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.AccessToken;

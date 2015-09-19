@@ -23,7 +23,7 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 import java.text.ParseException;
 import java.util.List;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;

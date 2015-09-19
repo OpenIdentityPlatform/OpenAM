@@ -32,14 +32,14 @@ import java.net.URI;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
-import org.forgerock.http.Context;
+import org.forgerock.http.session.Session;
+import org.forgerock.http.session.SessionContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.http.Handler;
-import org.forgerock.http.Session;
-import org.forgerock.http.context.ClientContext;
-import org.forgerock.http.context.AttributesContext;
-import org.forgerock.http.context.RequestAuditContext;
-import org.forgerock.http.context.RootContext;
-import org.forgerock.http.context.SessionContext;
+import org.forgerock.services.context.ClientContext;
+import org.forgerock.services.context.AttributesContext;
+import org.forgerock.services.context.RequestAuditContext;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -228,9 +228,9 @@ public class AbstractHttpAccessAuditFilterTest {
     private void verifyAccessFailedAuditEvent(JsonValue auditEvent) {
         verifyAccessAuditEvent(auditEvent);
         assertThat(auditEvent).stringAt("eventName").isEqualTo(AM_ACCESS_OUTCOME.toString());
-        assertThat(auditEvent).stringAt("response/status").startsWith("FAILED");
+        assertThat(auditEvent).stringAt("response/status").isEqualTo("FAILURE");
         assertThat(auditEvent).longAt("response/elapsedTime").isNotNull();
-        assertThat(auditEvent).stringAt("response/message").isNotNull();
+        assertThat(auditEvent).stringAt("response/detail").isNotNull();
     }
 
     private void verifyAccessAuditEvent(JsonValue auditEvent) {

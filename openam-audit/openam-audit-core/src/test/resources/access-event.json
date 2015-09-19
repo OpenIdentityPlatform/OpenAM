@@ -31,8 +31,10 @@
     "headers": {  }
   },
   "response": {
-    "status": "200",
-    "elapsedTime": 42
+    "status": "SUCCESS",
+    "statusCode": "200",
+    "elapsedTime": 42,
+    "elapsedTimeUnits": "ms"
   },
   "extraInfo": [ "extra", "info" ]
 }

@@ -18,7 +18,7 @@ package org.forgerock.openam.entitlement.rest;
 
 import com.sun.identity.entitlement.EntitlementException;
 import javax.security.auth.Subject;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 
 /**
  * Abstract factory pattern for looking up {@link PolicyStore} implementations for a given realm and caller subject

@@ -17,7 +17,7 @@ package org.forgerock.openam.selfservice;
 
 import static org.forgerock.openam.selfservice.SelfServiceGuiceModule.INTERIM_TYPE;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.AbstractRequestHandler;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;

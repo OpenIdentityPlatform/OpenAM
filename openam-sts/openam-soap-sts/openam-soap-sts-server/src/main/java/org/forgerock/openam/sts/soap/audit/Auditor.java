@@ -16,10 +16,14 @@
 
 package org.forgerock.openam.sts.soap.audit;
 
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AuditConstants.Component.STS;
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 
 import com.google.inject.assistedinject.Assisted;
+import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -86,7 +90,7 @@ public class Auditor {
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_OUTCOME)
                 .component(STS)
-                .response("SUCCESS", elapsedTime)
+                .response(SUCCESS, "", elapsedTime, MILLISECONDS)
                 .toEvent();
     }
 
@@ -96,13 +100,14 @@ public class Auditor {
     AuditEvent auditAccessFailure() {
         final long endTime = timeService.now();
         final long elapsedTime = endTime - startTime;
+        final String statusCode = Integer.toString(response.getStatusCode());
         return accessEvent()
                 .forHttpServletRequest(request)
                 .timestamp(endTime)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_OUTCOME)
                 .component(STS)
-                .responseWithMessage("FAILED - " + response.getStatusCode(), elapsedTime, response.getMessage())
+                .responseWithDetail(FAILURE, statusCode, elapsedTime, MILLISECONDS, response.getMessage())
                 .toEvent();
     }
 

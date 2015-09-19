@@ -18,7 +18,7 @@ package org.forgerock.openam.rest;
 
 import javax.security.auth.Subject;
 import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 
 /**

@@ -14,7 +14,7 @@
   },
   "remoteAddress": "168.0.0.10",
   "parent": {
-    "class": "org.forgerock.http.context.RootContext",
+    "class": "org.forgerock.services.context.RootContext",
     "id": "08a39103-91aa-41e1-aac7-c1d01d502ddf",
     "parent": null
   }

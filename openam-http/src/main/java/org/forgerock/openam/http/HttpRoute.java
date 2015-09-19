@@ -20,7 +20,7 @@ import javax.inject.Provider;
 import java.lang.annotation.Annotation;
 
 import com.google.inject.Key;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;

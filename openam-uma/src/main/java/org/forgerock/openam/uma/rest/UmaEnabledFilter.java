@@ -21,7 +21,7 @@ import static org.forgerock.util.promise.Promises.*;
 
 import javax.inject.Inject;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;

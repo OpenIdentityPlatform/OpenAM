@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.audit.JsonUtils.*;
 
@@ -42,7 +44,7 @@ public class AMAccessAuditEventBuilderTest {
                 .server("216.58.208.36", 80)
                 .resourceOperation("/some/path", "CREST", "READ")
                 .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
-                .response("200", 42)
+                .response(SUCCESS, "200", 42, MILLISECONDS)
                 .extraInfo("extra", "info")
                 .toEvent();
 
@@ -62,7 +64,7 @@ public class AMAccessAuditEventBuilderTest {
                 .server("216.58.208.36", 80)
                 .resourceOperation("/some/path", "CREST", "READ")
                 .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
-                .response("200", 42)
+                .response(SUCCESS, "200", 42, MILLISECONDS)
                 .extraInfo("extra", "info")
                 .toEvent();
 

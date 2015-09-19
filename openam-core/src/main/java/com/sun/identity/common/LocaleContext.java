@@ -18,7 +18,7 @@ package com.sun.identity.common;
 
 import java.util.Locale;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.http.HttpContext;
 
 /**

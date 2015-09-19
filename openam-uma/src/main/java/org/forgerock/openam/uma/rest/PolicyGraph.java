@@ -32,7 +32,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;

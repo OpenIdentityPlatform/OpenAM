@@ -31,7 +31,7 @@ import java.util.Set;
 
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -47,7 +47,7 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.services.context.SecurityContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;

@@ -25,7 +25,7 @@ import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.exceptions.JwtReconstructionException;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.openam.entitlement.rest.PolicyEvaluator;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;

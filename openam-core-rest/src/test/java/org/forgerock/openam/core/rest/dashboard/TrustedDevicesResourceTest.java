@@ -28,11 +28,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.http.context.ClientContext;
+import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;

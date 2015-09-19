@@ -21,9 +21,9 @@ import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.AccessAuditEventBuilder;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.http.MutableUri;
-import org.forgerock.http.context.ClientContext;
+import org.forgerock.services.context.ClientContext;
 import org.forgerock.http.protocol.Headers;
 import org.forgerock.http.protocol.Request;
 

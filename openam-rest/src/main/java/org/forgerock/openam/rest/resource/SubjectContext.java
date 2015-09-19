@@ -18,7 +18,7 @@ package org.forgerock.openam.rest.resource;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 
 import javax.security.auth.Subject;
 

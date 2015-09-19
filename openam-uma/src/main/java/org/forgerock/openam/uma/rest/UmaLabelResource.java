@@ -30,7 +30,7 @@ import java.util.Set;
 
 import com.sun.identity.common.LocaleContext;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;

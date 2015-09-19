@@ -45,7 +45,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
-import org.forgerock.http.routing.RouteMatcher;
+import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.http.routing.RouteMatchers;
 import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
 import org.forgerock.openam.audit.AuditConstants.Component;

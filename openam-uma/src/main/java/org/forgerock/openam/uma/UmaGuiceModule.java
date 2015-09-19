@@ -38,7 +38,7 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.context.RootContext;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;

@@ -45,7 +45,7 @@ import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
 import org.forgerock.caf.authentication.api.AuthenticationException;
 import org.forgerock.caf.authentication.api.MessageInfoContext;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.context.AttributesContext;
+import org.forgerock.services.context.AttributesContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;

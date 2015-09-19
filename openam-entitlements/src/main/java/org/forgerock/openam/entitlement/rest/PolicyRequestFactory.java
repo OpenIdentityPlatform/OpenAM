@@ -18,7 +18,7 @@ package org.forgerock.openam.entitlement.rest;
 
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.openam.entitlement.rest.model.json.BatchPolicyRequest;
 import org.forgerock.openam.entitlement.rest.model.json.PolicyRequest;
 import org.forgerock.openam.entitlement.rest.model.json.TreePolicyRequest;

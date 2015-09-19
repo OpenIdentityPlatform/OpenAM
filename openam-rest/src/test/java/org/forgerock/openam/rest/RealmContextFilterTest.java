@@ -30,9 +30,9 @@ import java.util.Map;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.http.Handler;
-import org.forgerock.http.context.RootContext;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;

@@ -20,12 +20,12 @@ import static org.forgerock.http.routing.RouteMatchers.resourceApiVersionMatcher
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.http.header.AcceptApiVersionHeader;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
-import org.forgerock.http.routing.RouteMatch;
-import org.forgerock.http.routing.RouteMatcher;
 import org.forgerock.http.routing.Version;
+import org.forgerock.services.routing.RouteMatch;
+import org.forgerock.services.routing.RouteMatcher;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;

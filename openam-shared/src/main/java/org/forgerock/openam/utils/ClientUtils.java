@@ -33,10 +33,10 @@ package org.forgerock.openam.utils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.Context;
-import org.forgerock.http.context.ClientContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.services.context.ClientContext;
+import org.forgerock.services.context.Context;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

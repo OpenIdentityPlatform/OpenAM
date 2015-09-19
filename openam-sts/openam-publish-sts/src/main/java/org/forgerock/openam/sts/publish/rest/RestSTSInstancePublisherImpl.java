@@ -31,7 +31,7 @@ import com.google.inject.Injector;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.routing.RouteMatcher;
+import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;

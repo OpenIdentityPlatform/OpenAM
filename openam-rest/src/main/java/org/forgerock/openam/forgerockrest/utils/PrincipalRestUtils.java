@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest.utils;
 
 import java.security.Principal;
 import javax.security.auth.Subject;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.openam.rest.resource.SubjectContext;
 
 /**

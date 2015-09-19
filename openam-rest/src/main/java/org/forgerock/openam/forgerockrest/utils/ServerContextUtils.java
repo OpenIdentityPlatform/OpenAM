@@ -23,21 +23,20 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.SecurityContext;
 
 /**
  * For the convenience of generating information from different types of ServerContexts.

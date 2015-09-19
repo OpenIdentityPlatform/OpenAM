@@ -16,6 +16,8 @@
 package org.forgerock.openam.audit;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
@@ -29,8 +31,8 @@ import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
-import org.forgerock.http.Context;
-import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.JsonValue;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
@@ -54,7 +56,7 @@ public class AuditEventPublisherTest {
     private AuditEventPublisher auditEventPublisher;
     private AuditServiceConfigurator mockConfigurator;
     private AMAuditServiceConfiguration configuration;
-    private ArgumentCaptor<CreateRequest> requestCaptor;
+    private ArgumentCaptor<JsonValue> auditEventCaptor;
     private Promise<ResourceResponse, ResourceException> dummyPromise;
 
     @BeforeMethod
@@ -66,7 +68,7 @@ public class AuditEventPublisherTest {
         when(mockConfigurator.getAuditServiceConfiguration()).thenReturn(configuration);
         auditService.register(mockHandler, "handler", asSet("access"));
         auditEventPublisher = new AuditEventPublisher(auditService, mockConfigurator);
-        requestCaptor = ArgumentCaptor.forClass(CreateRequest.class);
+        auditEventCaptor = ArgumentCaptor.forClass(JsonValue.class);
         dummyPromise = newResultPromise(newResourceResponse("", "", json(object())));
     }
 
@@ -81,17 +83,17 @@ public class AuditEventPublisherTest {
                 .server("216.58.208.36", 80)
                 .resourceOperation("/some/path", "CREST", "READ")
                 .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
-                .response("200", 42)
+                .response(SUCCESS, "200", 42, MILLISECONDS)
                 .toEvent();
 
-        when(mockHandler.createInstance(any(Context.class), requestCaptor.capture())).thenReturn(dummyPromise);
+        when(mockHandler.publishEvent(
+                any(Context.class), eq("access"), auditEventCaptor.capture())).thenReturn(dummyPromise);
 
         // When
         auditEventPublisher.publish("access", auditEvent);
 
         // Then
-        assertThat(requestCaptor.getValue().getResourcePath()).isEqualTo("access");
-        assertThat(requestCaptor.getValue().getContent()).isEqualTo(auditEvent.getValue());
+        assertThat(auditEventCaptor.getValue()).isEqualTo(auditEvent.getValue());
     }
 
     @Test
@@ -105,7 +107,7 @@ public class AuditEventPublisherTest {
                 .server("216.58.208.36", 80)
                 .resourceOperation("/some/path", "CREST", "READ")
                 .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
-                .response("200", 42)
+                .response(SUCCESS, "200", 42, MILLISECONDS)
                 .toEvent();
         configuration.setAuditFailureSuppressed(true);
 
@@ -128,7 +130,7 @@ public class AuditEventPublisherTest {
                 .server("216.58.208.36", 80)
                 .resourceOperation("/some/path", "CREST", "READ")
                 .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
-                .response("200", 42)
+                .response(SUCCESS, "200", 42, MILLISECONDS)
                 .toEvent();
         configuration.setAuditFailureSuppressed(false);
 

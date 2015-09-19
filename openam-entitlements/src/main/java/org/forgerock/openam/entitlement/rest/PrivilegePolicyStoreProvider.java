@@ -17,7 +17,7 @@
 package org.forgerock.openam.entitlement.rest;
 
 import com.sun.identity.entitlement.PrivilegeManager;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;

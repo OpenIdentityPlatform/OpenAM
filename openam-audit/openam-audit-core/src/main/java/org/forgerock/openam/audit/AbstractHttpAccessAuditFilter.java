@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.audit;
 
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableContexts;
 import static org.forgerock.openam.audit.AuditConstants.Component;
 import static org.forgerock.openam.audit.AuditConstants.EventName;
@@ -24,14 +27,14 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 import java.util.Map;
 
 import org.forgerock.audit.AuditException;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
-import org.forgerock.http.context.RequestAuditContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.services.context.RequestAuditContext;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
@@ -102,7 +105,8 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
         if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
-            final RequestAuditContext requestAuditContext = context.asContext(RequestAuditContext.class);
+            long elapsedTime = endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime();
+
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -110,7 +114,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(response))
                     .contexts(getContextsForAccessOutcome(response))
-                    .response("SUCCESS", endTime - requestAuditContext.getRequestReceivedTime())
+                    .response(SUCCESS, "", elapsedTime, MILLISECONDS)
                     .forRequest(request, context);
 
             auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
@@ -121,6 +125,10 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
         if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
+            String responseCode = Integer.toString(response.getStatus().getCode());
+            long elapsedTime = endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime();
+            String responseDetail = response.getStatus().getReasonPhrase();
+
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -128,9 +136,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(response))
                     .contexts(getContextsForAccessOutcome(response))
-                    .responseWithMessage("FAILED - " + response.getStatus().getCode(),
-                            endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime(),
-                            response.getStatus().getReasonPhrase())
+                    .responseWithDetail(FAILURE, responseCode, elapsedTime, MILLISECONDS, responseDetail)
                     .forRequest(request, context);
 
             auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());

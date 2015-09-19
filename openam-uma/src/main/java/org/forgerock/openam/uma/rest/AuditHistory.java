@@ -26,7 +26,7 @@ import java.util.Set;
 import com.google.inject.Inject;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;

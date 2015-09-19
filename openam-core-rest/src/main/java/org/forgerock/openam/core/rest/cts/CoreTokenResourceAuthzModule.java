@@ -20,7 +20,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;

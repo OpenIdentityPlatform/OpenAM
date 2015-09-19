@@ -43,11 +43,11 @@ import java.util.UUID;
 import javax.security.auth.Subject;
 
 import org.assertj.core.api.Assertions;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.http.context.ClientContext;
+import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;

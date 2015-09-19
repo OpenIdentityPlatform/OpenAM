@@ -23,7 +23,7 @@ import javax.inject.Named;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;

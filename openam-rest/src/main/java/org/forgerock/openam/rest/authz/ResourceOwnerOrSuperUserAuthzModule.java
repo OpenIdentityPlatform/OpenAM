@@ -26,7 +26,7 @@ import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;

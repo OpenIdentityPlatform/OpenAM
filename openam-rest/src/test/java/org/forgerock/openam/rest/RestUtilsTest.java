@@ -22,8 +22,8 @@ import static org.forgerock.json.JsonValue.*;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.forgerock.http.Context;
-import org.forgerock.http.context.ClientContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.http.HttpContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

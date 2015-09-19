@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.rest;
 
-import org.forgerock.json.resource.SecurityContext;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.SecurityContext;
 
 /**
  * This class contains method that help with getting information out of ServerContexts objects.
@@ -32,8 +32,8 @@ public final class ServerContextHelper {
      */
     public static String getCookieFromServerContext(Context context) {
         SecurityContext securityContext = context.asContext(SecurityContext.class);
-        if (securityContext.getAuthorizationId() != null) {
-            return (String) securityContext.getAuthorizationId().get("tokenId");
+        if (securityContext.getAuthorization() != null) {
+            return (String) securityContext.getAuthorization().get("tokenId");
         }
         return null;
     }

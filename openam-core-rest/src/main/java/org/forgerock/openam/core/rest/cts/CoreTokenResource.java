@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;

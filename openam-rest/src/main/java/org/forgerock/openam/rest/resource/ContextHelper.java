@@ -18,7 +18,7 @@ package org.forgerock.openam.rest.resource;
 
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.openam.rest.RealmContext;
 

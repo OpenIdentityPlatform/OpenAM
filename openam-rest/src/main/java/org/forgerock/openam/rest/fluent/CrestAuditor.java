@@ -15,15 +15,19 @@
  */
 package org.forgerock.openam.rest.fluent;
 
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.getTokenFromContext;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
-import org.forgerock.http.context.RequestAuditContext;
+import org.forgerock.audit.events.AccessAuditEventBuilder;
+import org.forgerock.services.context.RequestAuditContext;
 import org.forgerock.json.resource.Request;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
@@ -106,7 +110,7 @@ class CrestAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .response("SUCCESS", elapsedTime);
+                    .response(SUCCESS, "", elapsedTime, MILLISECONDS);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
@@ -133,7 +137,7 @@ class CrestAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .responseWithMessage("FAILED - " + resultCode, elapsedTime, message);
+                    .responseWithDetail(FAILURE, Integer.toString(resultCode), elapsedTime, MILLISECONDS, message);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());

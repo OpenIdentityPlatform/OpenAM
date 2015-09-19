@@ -15,6 +15,9 @@
  */
 package com.iplanet.services.comm.server;
 
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
@@ -24,6 +27,7 @@ import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
+import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
@@ -111,7 +115,7 @@ public class PLLAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(Component.PLL)
-                    .response("SUCCESS", elapsedTime)
+                    .response(SUCCESS, "", elapsedTime, MILLISECONDS)
                     .authentication(authenticationId)
                     .resourceOperation(service, PLL, method)
                     .context(SESSION, contextId)
@@ -157,7 +161,7 @@ public class PLLAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(Component.PLL)
-                    .responseWithMessage(errorCode == null ? "FAILED" : "FAILED - " + errorCode, elapsedTime, message)
+                    .responseWithDetail(FAILURE, errorCode == null ? "" : errorCode, elapsedTime, MILLISECONDS, message)
                     .authentication(authenticationId)
                     .resourceOperation(service, PLL, method)
                     .context(SESSION, contextId)

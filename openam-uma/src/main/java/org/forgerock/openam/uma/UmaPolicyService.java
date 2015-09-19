@@ -18,7 +18,7 @@ package org.forgerock.openam.uma;
 
 import java.util.Collection;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResponse;

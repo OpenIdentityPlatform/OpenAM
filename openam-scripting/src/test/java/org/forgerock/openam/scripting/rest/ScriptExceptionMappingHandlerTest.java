@@ -18,9 +18,9 @@ package org.forgerock.openam.scripting.rest;
 import static org.forgerock.json.JsonValue.*;
 import static org.testng.AssertJUnit.*;
 
-import org.forgerock.http.context.ClientContext;
+import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode;

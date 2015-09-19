@@ -35,7 +35,7 @@ import java.util.Set;
 import javax.inject.Named;
 
 import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.http.context.ClientContext;
+import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;

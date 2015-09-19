@@ -31,8 +31,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.http.Context;
-import org.forgerock.http.context.ClientContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.http.HttpContext;

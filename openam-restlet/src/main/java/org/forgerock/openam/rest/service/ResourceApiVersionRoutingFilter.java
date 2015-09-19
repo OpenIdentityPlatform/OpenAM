@@ -19,7 +19,7 @@ package org.forgerock.openam.rest.service;
 import static org.forgerock.http.routing.Version.version;
 import static org.forgerock.openam.rest.service.ResourceApiVersionRestlet.parseResourceApiVersion;
 
-import org.forgerock.http.context.RootContext;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.http.header.AcceptApiVersionHeader;
 import org.forgerock.http.header.ContentApiVersionHeader;
 import org.forgerock.http.routing.ApiVersionRouterContext;

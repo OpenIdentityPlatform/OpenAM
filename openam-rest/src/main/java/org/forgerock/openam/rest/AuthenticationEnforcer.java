@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -36,7 +36,7 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Response;
-import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.services.context.SecurityContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.util.promise.Promise;
 

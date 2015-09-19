@@ -29,6 +29,8 @@
  */
 package com.sun.identity.log.service;
 
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.iplanet.dpro.parser.ParseOutput;
@@ -227,7 +229,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
                 .resourceOperation(logExtracts.getResourceUrl(), "HTTP", "UNKNOWN")
                 .client(clientIp)
                 .context(Context.SESSION, contextId)
-                .response(logExtracts.getStatus(), -1)
+                .response(null, logExtracts.getStatus(), -1, MILLISECONDS)
                 .toEvent();
 
         auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, auditEvent);

@@ -15,6 +15,9 @@
  */
 package org.forgerock.openam.rest.audit;
 
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableContexts;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.restlet.ext.servlet.ServletUtils.getRequest;
@@ -112,6 +115,8 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
         if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
+            long elapsedTime = endTime - request.getDate().getTime();
+
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -119,7 +124,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(request, response))
                     .contexts(getContextsForAccessOutcome(request, response))
-                    .response("SUCCESS", endTime - request.getDate().getTime());
+                    .response(SUCCESS, "", elapsedTime, MILLISECONDS);
 
             addHttpData(request, builder);
 
@@ -131,6 +136,10 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
         if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
+            String responseCode = Integer.toString(response.getStatus().getCode());
+            long elapsedTime = endTime - request.getDate().getTime();
+            String responseDetail = response.getStatus().getDescription();
+
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -138,8 +147,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(request, response))
                     .contexts(getContextsForAccessOutcome(request, response))
-                    .responseWithMessage("FAILED - " + response.getStatus().getCode(), endTime - request.getDate()
-                            .getTime(), response.getStatus().getDescription());
+                    .responseWithDetail(FAILURE, responseCode, elapsedTime, MILLISECONDS, responseDetail);
 
             addHttpData(request, builder);
 

@@ -15,9 +15,8 @@
  */
 package org.forgerock.openam.rest.resource;
 
-import org.forgerock.http.Context;
-import org.forgerock.http.Context;
-import org.forgerock.http.context.AbstractContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.AbstractContext;
 import org.forgerock.openam.audit.AuditConstants.Component;
 
 /**

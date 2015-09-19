@@ -35,7 +35,7 @@ import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;

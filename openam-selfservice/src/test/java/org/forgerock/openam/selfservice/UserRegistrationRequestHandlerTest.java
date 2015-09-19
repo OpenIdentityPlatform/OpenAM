@@ -23,8 +23,8 @@ import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAs
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.isA;
 
-import org.forgerock.http.Context;
-import org.forgerock.http.context.RootContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;

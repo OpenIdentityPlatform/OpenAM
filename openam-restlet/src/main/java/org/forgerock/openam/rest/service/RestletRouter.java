@@ -17,9 +17,9 @@
 package org.forgerock.openam.rest.service;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.Context;
-import org.forgerock.http.routing.AbstractRouter;
-import org.forgerock.http.routing.IncomparableRouteMatchException;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.routing.AbstractRouter;
+import org.forgerock.services.routing.IncomparableRouteMatchException;
 import org.forgerock.util.Pair;
 import org.restlet.Request;
 import org.restlet.Response;

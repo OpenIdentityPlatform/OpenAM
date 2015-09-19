@@ -18,7 +18,7 @@ package org.forgerock.oauth2.core;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.http.Context;
+import org.forgerock.services.context.Context;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 
 /**
