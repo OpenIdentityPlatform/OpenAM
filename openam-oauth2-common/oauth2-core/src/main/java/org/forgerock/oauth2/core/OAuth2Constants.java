@@ -768,6 +768,8 @@ public class OAuth2Constants {
         public static final String CODE_VERIFIER = "code_verifier";
         public static final String CODE_CHALLENGE_METHOD_S_256 = "S256";
         public static final String CODE_CHALLENGE_METHOD_PLAIN = "plain";
+        public static final String RESPONSE_MODE = "response_mode";
+        public static final String FORM_POST = "form_post";
 
         /**
          * The display mode in which to render the dialog. The default is

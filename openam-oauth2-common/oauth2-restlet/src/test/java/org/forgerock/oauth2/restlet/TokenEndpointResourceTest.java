@@ -48,7 +48,7 @@ public class TokenEndpointResourceTest {
     public void setUp() {
         requestFactory = mock(OAuth2RequestFactory.class);
         accessTokenService = mock(AccessTokenService.class);
-        OAuth2Representation representation = new OAuth2Representation();
+        OAuth2Representation representation = new OAuth2Representation(null);
         exceptionHandler = new ExceptionHandler(representation, null, null);
         hook = mock(TokenRequestHook.class);
 
