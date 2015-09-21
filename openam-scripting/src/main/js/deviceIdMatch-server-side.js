@@ -25,7 +25,7 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 var ScalarComparator = {}, ScreenComparator = {}, MultiValueComparator = {}, UserAgentComparator = {}, GeolocationComparator = {};
@@ -780,19 +780,23 @@ function matchDevicePrint() {
                 }
 
                 function getNotExpiredProfiles() {
-                    var results = [],
-                        profiles = idRepository.getAttribute(username, "devicePrintProfiles"),
-                        iter = profiles.iterator(),
-                        profile;
-                    while (iter.hasNext()) {
-                        profile = JSON.parse(iter.next());
-                        if (!isExpiredProfile(profile)) {
-                            results.push(profile);
+                    var profile,
+                        results = [],
+                        profiles = idRepository.getAttribute(username, "devicePrintProfiles");
+                
+                    if (profiles) {
+                        var iter = profiles.iterator();
+                        
+                        while (iter.hasNext()) {
+                            profile = JSON.parse(iter.next());
+                            if (!isExpiredProfile(profile)) {
+                                results.push(profile);
+                            }
                         }
                     }
                     if (logger.messageEnabled()) {
                         logger.message("stored non-expired profiles: " + JSON.stringify(results));
-                    }
+                    }                    
                     return results;
                 }
 
