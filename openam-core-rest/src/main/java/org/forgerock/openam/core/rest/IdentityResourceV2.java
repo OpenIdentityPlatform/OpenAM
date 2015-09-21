@@ -62,6 +62,7 @@ import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.opensso.GeneralAccessDeniedError;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.SMSException;
@@ -1358,15 +1359,22 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         IdentityDetails dtls, newDtls;
         ResourceResponse resource;
         try {
-            SSOToken admin = getSSOToken(getCookieFromServerContext(context));
+            SSOToken token = getSSOToken(getCookieFromServerContext(context));
             // Retrieve details about user to be updated
-            dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm, objectType), admin);
+            dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm, objectType), token);
             // Continue modifying the identity if read success
 
-            for (String key : jVal.keys()) {
-                if ("userpassword".equalsIgnoreCase(key)) {
-                    return new BadRequestException("Cannot update user password via PUT. "
-                            + "Use POST with _action=changePassword or _action=forgotPassword.").asPromise();
+            boolean isUpdatingHisOwnPassword = SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID) ?
+                    token.getProperty(ISAuthConstants.USER_ID).equals(resourceId) :
+                    token.getProperty(ISAuthConstants.USER_ID).equalsIgnoreCase(resourceId);
+
+            // If the user wants to modify his password, he should use a different action.
+            if (isUpdatingHisOwnPassword) {
+                for (String key : jVal.keys()) {
+                    if (USER_PASSWORD.equalsIgnoreCase(key)) {
+                        return new BadRequestException("Cannot update user password via PUT. "
+                                + "Use POST with _action=changePassword or _action=forgotPassword.").asPromise();
+                    }
                 }
             }
 
@@ -1422,13 +1430,13 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             }
 
             // update resource with new details
-            identityServices.update(newDtls, admin);
+            identityServices.update(newDtls, token);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.updateInstance :: UPDATE of resourceId={} in realm={} performed " +
                     "by principalName={}", resourceId, realm, principalName);
             // read updated identity back to client
             IdentityDetails checkIdent = identityServices.read(dtls.getName(),
-                    getIdentityServicesAttributes(realm, objectType), admin);
+                    getIdentityServicesAttributes(realm, objectType), token);
             // handle updated resource
             resource = newResourceResponse(resourceId, "0", identityDetailsToJsonValue(checkIdent));
             return newResultPromise(resource);
