@@ -16,15 +16,15 @@
 
 /*global define*/
 define("org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper", [
-    "org/forgerock/commons/ui/common/main/Router"
-], function (Router) {
+    "org/forgerock/commons/ui/common/util/URIUtils"
+], function (URIUtils) {
     return {
         /**
          * Extracts from the URI hash fragment and returns realm which is being currently edited by administrator
          * @returns String current realm decoded
          */
         getCurrentRealm: function () {
-            return decodeURIComponent(Router.getURIFragment().split("/")[1]);
+            return decodeURIComponent(URIUtils.getCurrentFragment().split("/")[1]);
         }
     };
 });

@@ -33,10 +33,10 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/util/URIUtils"
 ], function ($, _, AbstractView, validatorsManager, userDelegate, conf,
-             cookieHelper, eventManager, constants, Router, RealmHelper) {
+             cookieHelper, eventManager, constants, RealmHelper, URIUtils) {
     var ForgottenPasswordView = AbstractView.extend({
         template: "templates/openam/ForgotPasswordTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
@@ -57,7 +57,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             "Service Unavailable":      { status: "503" }
         },
         render: function (args, callback) {
-            this.data.urlParams = Router.convertCurrentUrlToJSON().params;
+            this.data.urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
             this.data.isStageOne = _.keys(_.pick(this.data.urlParams, "confirmationId", "tokenId")).length !== 2;
 
             this.parentRender (function () {

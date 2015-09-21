@@ -22,8 +22,8 @@ define("config/process/AMConfig", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/openam/ui/common/util/ThemeManager",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, Constants, EventManager, Router, SMSGlobalDelegate, ThemeManager, UIUtils) {
+    "org/forgerock/commons/ui/common/util/URIUtils"
+], function ($, Constants, EventManager, Router, SMSGlobalDelegate, ThemeManager, URIUtils) {
     return [{
         startEvent: Constants.EVENT_LOGOUT,
         description: "used to override common logout event",
@@ -35,7 +35,7 @@ define("config/process/AMConfig", [
         ],
         processDescription: function (event, router, conf, sessionManager) {
             var argsURLFragment = event ? (event.args ? event.args[0] : "") : "",
-                urlParams = Router.convertQueryParametersToJSON(argsURLFragment),
+                urlParams = URIUtils.parseQueryString(argsURLFragment),
                 gotoURL = urlParams.goto;
 
             sessionManager.logout(function () {
@@ -43,7 +43,7 @@ define("config/process/AMConfig", [
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
                 delete conf.gotoURL;
                 if (gotoURL) {
-                    UIUtils.setUrl(decodeURIComponent(gotoURL));
+                    Router.setUrl(decodeURIComponent(gotoURL));
                 } else {
                     EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
                         route: router.configuration.routes.loggedOut
@@ -55,7 +55,7 @@ define("config/process/AMConfig", [
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
                 if (gotoURL) {
-                    UIUtils.setUrl(decodeURIComponent(gotoURL));
+                    Router.setUrl(decodeURIComponent(gotoURL));
                 } else {
                     EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
                         route: router.configuration.routes.login

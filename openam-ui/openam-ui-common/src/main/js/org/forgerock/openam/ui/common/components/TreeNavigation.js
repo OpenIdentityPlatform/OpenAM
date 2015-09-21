@@ -20,8 +20,8 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/ModuleLoader",
-    "org/forgerock/commons/ui/common/main/Router"
-], function ($, _, AbstractView, ModuleLoader, Router) {
+    "org/forgerock/commons/ui/common/util/URIUtils"
+], function ($, _, AbstractView, ModuleLoader, URIUtils) {
     var TreeNavigation = AbstractView.extend({
         events: {
             "click .sidenav a[href]:not([data-toggle])": "navigateToPage"
@@ -72,7 +72,7 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
 
             self.parentRender(function () {
                 self.$el.find(".sidenav li").removeClass("active");
-                self.findActiveNavItem(Router.getURIFragment());
+                self.findActiveNavItem(URIUtils.getCurrentFragment());
                 if (!self.nextRenderPage) {
                     ModuleLoader.load(self.route.page).then(function (page) {
                         self.renderPage(page, args, callback);

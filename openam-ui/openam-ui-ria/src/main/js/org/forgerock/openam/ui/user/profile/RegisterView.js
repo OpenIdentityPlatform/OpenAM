@@ -33,11 +33,11 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/URIUtils",
     "UserDelegate",
     "org/forgerock/commons/ui/common/main/ValidatorsManager"
 ], function ($, _, form2js, AbstractView, Configuration, Constants, CookieHelper,
-             EventManager, RealmHelper, Router, UserDelegate, ValidatorsManager) {
+             EventManager, RealmHelper, URIUtils, UserDelegate, ValidatorsManager) {
     var RegisterView = AbstractView.extend({
         template: "templates/openam/RegisterTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
@@ -56,7 +56,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
             "Conflict":     { status: "409" }
         },
         render: function (args, callback) {
-            this.data.urlParams = Router.convertCurrentUrlToJSON().params;
+            this.data.urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
             this.data.isStageOne = _.keys(_.pick(this.data.urlParams, "confirmationId", "tokenId")).length !== 2;
 
             this.parentRender(function () {

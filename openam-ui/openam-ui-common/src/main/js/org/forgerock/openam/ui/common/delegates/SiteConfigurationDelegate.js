@@ -29,9 +29,9 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(constants, AbstractDelegate, configuration, eventManager, uiUtils, RealmHelper) {
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/util/URIUtils"
+], function(constants, AbstractDelegate, configuration, eventManager, RealmHelper, URIUtils) {
     var obj = new AbstractDelegate(constants.host + "/" + constants.context ),
         lastKnownSubRealm,
         lastKnownOverrideRealm;
@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
 
                 if (fqdn !== null && hostname !== fqdn) {
                     // Redirect browser back to the server using the FQDN to ensure cookies are set correctly
-                    location.href = uiUtils.getUrl().replace(hostname, fqdn);
+                    location.href = URIUtils.getCurrentUrl().replace(hostname, fqdn);
                 } else {
                     successCallback(response);
                 }

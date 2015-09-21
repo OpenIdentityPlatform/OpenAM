@@ -81,19 +81,19 @@ require([
     "underscore",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
-    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main",
     "org/forgerock/openam/ui/main",
     "config/main"
-], function (_, Constants, ServiceInvoker, UIUtils, CookieHelper, RealmHelper) {
+], function (_, Constants, ServiceInvoker, URIUtils, CookieHelper, RealmHelper) {
     var conf = {
             defaultHeaders: {}
         },
         callParams,
         responseMessage,
-        urlParams = UIUtils.convertCurrentUrlToJSON().params,
+        urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString()),
         basePath = _.initial(Constants.context.split("/")).join("/"),
         host = Constants.host + "/" + basePath + "/json/",
         searchParams = window.location.search.substring(1);
@@ -103,7 +103,7 @@ require([
         type: "GET",
         headers: { "Cache-Control": "no-cache" },
         success: function () {
-            window.location.href = UIUtils.getCurrentUrlBasePart() + "/" + basePath
+            window.location.href = URIUtils.getCurrentOrigin() + "/" + basePath
                 + "/XUI/#continueRegister/&" + searchParams;
         },
         error: function (err) {
@@ -118,22 +118,22 @@ require([
 
                 expire.setDate(expire.getDate() + 1);
                 CookieHelper.setCookie("invalidRealm", cookieVal, expire);
-                window.location.href = UIUtils.getCurrentUrlBasePart() + "/" + basePath + "/XUI/#login";
+                window.location.href = URIUtils.getCurrentOrigin() + "/" + basePath + "/XUI/#login";
             }
         }
     };
 
     if (urlParams.username) {
-        window.location.href = UIUtils.getCurrentUrlBasePart() + "/" + basePath
+        window.location.href = URIUtils.getCurrentOrigin() + "/" + basePath
             + "/XUI/#forgotPasswordChange/&" + searchParams;
     } else if (urlParams.realm) {
         ServiceInvoker.configuration = conf;
         ServiceInvoker.restCall(callParams);
     } else if (urlParams.email) {
-        window.location.href = UIUtils.getCurrentUrlBasePart() + "/" + basePath
+        window.location.href = URIUtils.getCurrentOrigin() + "/" + basePath
             + "/XUI/#continueRegister/&" + searchParams;
     } else {
-        window.location.href = UIUtils.getCurrentUrlBasePart() + "/" + basePath
+        window.location.href = URIUtils.getCurrentOrigin() + "/" + basePath
             + "/XUI/#login";
     }
 });

@@ -32,9 +32,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
-    "org/forgerock/commons/ui/common/util/UIUtils"
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/util/URIUtils"
 ], function ($, _, AbstractView, AuthNDelegate, Configuration, Constants, CookieHelper, EventManager, Form2js,
-            Handlebars, i18nManager, Messages, ModuleLoader, RESTLoginHelper, Router, SessionManager, UIUtils) {
+             Handlebars, i18nManager, Messages, ModuleLoader, RESTLoginHelper, Router, SessionManager, UIUtils,
+             URIUtils) {
 
     var LoginView = AbstractView.extend({
 
@@ -343,7 +345,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             }
         },
         handleUrlParams: function () {
-            var urlParams = UIUtils.convertCurrentUrlToJSON().params;
+            var urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
 
             // Rest does not accept the params listed in the array below as is
             // they must be transformed into the "authIndexType" and "authIndexValue" params

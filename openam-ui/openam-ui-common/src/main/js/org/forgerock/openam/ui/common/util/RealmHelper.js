@@ -18,8 +18,8 @@
 define("org/forgerock/openam/ui/common/util/RealmHelper", [
     "underscore",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/Router"
-], function (_, Configuration, Router) {
+    "org/forgerock/commons/ui/common/util/URIUtils"
+], function (_, Configuration, URIUtils) {
     /**
      * @exports org/forgerock/openam/ui/common/util/RealmHelper
      */
@@ -86,8 +86,9 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
      * @returns {String} Override realm AS IS (no slash modification) (e.g. <code>/</code> or <code>/realm1</code>)
      */
     obj.getOverrideRealm = function () {
-        var uri = Router.convertQueryParametersToJSON(Router.getURIQueryString()).realm, // Realm from URI query string
-            fragment = Router.convertQueryParametersToJSON(Router.getURIFragmentQueryString()).realm; // Realm from Fragment query string
+        // Note: unlike in other places, the URI query parameter takes precedence over the fragment query parameter
+        var uri = URIUtils.parseQueryString(URIUtils.getCurrentQueryString()).realm,
+            fragment = URIUtils.parseQueryString(URIUtils.getCurrentFragmentQueryString()).realm;
 
         return uri ? uri : fragment;
     };
@@ -97,7 +98,7 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
      * @returns {String} Sub realm WITHOUT any leading or trailing slash (e.g. <code>realm1/realm2</code>)
      */
     obj.getSubRealm = function () {
-        var subRealmSplit = Router.getURIFragment().split("/"),
+        var subRealmSplit = URIUtils.getCurrentFragment().split("/"),
             page = subRealmSplit.shift().split("&")[0],
             subRealmSpecifiablePages = ["login", "forgotPassword", "register"],
             subRealm;
