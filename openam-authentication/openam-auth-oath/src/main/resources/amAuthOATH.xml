@@ -75,6 +75,15 @@
                         <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="forgerock-oath-sharedsecret-implementation-class"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a512">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oath-algorithm"
                                  type="single_choice"
                                  syntax="string"
@@ -179,6 +188,14 @@
                                      i18nKey="a503">
                         <DefaultValues>
                             <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-oath-sharedsecret-implementation-class"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a512">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oath-algorithm"
