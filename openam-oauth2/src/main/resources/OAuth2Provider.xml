@@ -413,6 +413,33 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="verificationUrl" type="single" syntax="string" i18nKey="a127">
+                </AttributeSchema>
+
+                <AttributeSchema name="completionUrl" type="single" syntax="string" i18nKey="a128">
+                </AttributeSchema>
+
+                <AttributeSchema name="deviceCodeLifetime" type="single" i18nKey="a129"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647">
+                    <DefaultValues>
+                        <Value>300</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="devicePollInterval" type="single" i18nKey="a130"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="deviceAsyncRequestTimeout" type="single" i18nKey="a131"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
             </Organization>
         </Schema>
     </Service>
