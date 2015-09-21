@@ -36,8 +36,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, spinnerManager) {
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, RealmHelper) {
 
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
@@ -56,17 +57,16 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             //save the login params in a cookie for use with the cancel button on forgotPassword/register page 
             //and also the "proceed to login" link once password has been successfully changed or registration is complete
             var expire = new Date(),
-                cookieVal = "/" + conf.globalData.auth.subRealm,
+                realm = RealmHelper.getOverrideRealm() || RealmHelper.getSubRealm(),
+                cookieVal = (realm.substring(0, 1) === '/') ? realm : '/' + realm,
                 href = e.target.href + "/";
-            if(conf.globalData.auth.urlParams){
+            if (conf.globalData.auth.urlParams) {
                 cookieVal += restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
             }
             expire.setDate(expire.getDate() + 1);
             cookieHelper.setCookie("loginUrlParams",cookieVal,expire);
-            if(conf.globalData.auth.subRealm) {
-                href += conf.globalData.auth.subRealm;
-            }
-            location.href = href;
+
+            location.href = RealmHelper.decorateURLWithOverrideRealm(href) + RealmHelper.getSubRealm();
         },
         autoLogin: function() {
             var index,

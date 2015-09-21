@@ -41,11 +41,24 @@ define('org/forgerock/openam/ui/common/util/RealmHelper', [
      */
     obj.decorateURLWithOverrideRealm = function(uri) {
         var overrideRealm = obj.getOverrideRealm(),
-            prepend;
+            prepend, idx, fragment;
 
-        if(overrideRealm) {
+        if (overrideRealm) {
+            if (uri.indexOf("realm=") !== -1) {
+                // URI is already decorated by some other means
+                return uri;
+            }
+            idx = uri.indexOf('#');
+            if (idx !== -1) {
+                fragment = uri.slice(idx);
+                uri = uri.slice(0, idx);
+            }
+
             prepend = uri.indexOf('?') === -1 ? '?' : '&';
             uri = uri + prepend + 'realm=' + overrideRealm;
+            if (fragment) {
+                uri = uri + fragment;
+            }
         }
 
         return uri;
@@ -109,7 +122,7 @@ define('org/forgerock/openam/ui/common/util/RealmHelper', [
         subRealmSplit = obj.getURIFragment().split('/');
         page = subRealmSplit.shift().split('&')[0];
 
-        if(page && _.include(['login', 'forgotPassword'], page)) {
+        if(page && _.include(['login', 'forgotPassword', 'register'], page)) {
             subRealm = subRealmSplit.join('/').split('&')[0];
         } else if(Configuration.globalData.auth.subRealm) {
             subRealm = Configuration.globalData.auth.subRealm;
