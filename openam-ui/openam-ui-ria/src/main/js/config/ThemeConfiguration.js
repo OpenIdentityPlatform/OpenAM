@@ -17,6 +17,7 @@
 /*global define */
 define("config/ThemeConfiguration", {
     themes: {
+        // There must be a theme named "default".
         "default": {
             // An ordered list of URLs to stylesheets that will be applied to every page.
             stylesheets: ["css/bootstrap-3.3.5-custom.css", "css/styles.css"],
@@ -58,10 +59,16 @@ define("config/ThemeConfiguration", {
             }
         }
     },
+    // Each mapping will be tested in order. The theme from the first matching mapping will be used. If no mapping
+    // matches then the theme "default" will be used.
     mappings: [
         // Use the theme with the key "my-theme" if the realm is either /my-realm or /my/sub-realm.
         //{ theme: "my-theme", realms: ["/my-realm", "/my/sub-realm"] }
         // Use the theme "my-second-theme" if the realm starts with /a. e.g. /ab or /a/c.
         //{ theme: "my-second-theme", realms: [/^\/a/] }
+        // Use the theme "my-third-theme" if the realm is /a and the authentication chain is auth-chain-1.
+        //{ theme: "my-third-theme", realms: ["/a"], authenticationChains: ["auth-chain-1"] }
+        // Use the theme "my-fourth-theme" if the default authentication chain is in use.
+        //{ theme: "my-fourth-theme", authenticationChains: [""] }
     ]
 });

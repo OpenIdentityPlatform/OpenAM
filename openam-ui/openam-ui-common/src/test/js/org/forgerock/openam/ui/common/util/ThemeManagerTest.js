@@ -25,7 +25,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManagerTest", [
 ], function ($, _, Squire, sinon, Constants) {
     return {
         executeAll: function () {
-            var ThemeManager, Configuration, mock$, themeConfig;
+            var ThemeManager, Configuration, Router, mock$, themeConfig, urlParams;
             QUnit.module("org/forgerock/openam/ui/common/util/ThemeManager", {
                 setup: function () {
                     var injector = new Squire();
@@ -49,15 +49,24 @@ define("org/forgerock/openam/ui/common/util/ThemeManagerTest", [
                         ]
                     };
 
+                    urlParams = {};
+
                     mock$ = sinon.spy(function () { return mock$; });
                     mock$.remove = sinon.spy();
                     mock$.appendTo = sinon.spy();
                     mock$.Deferred = _.bind($.Deferred, $);
 
+                    Router = {
+                        convertCurrentUrlToJSON: sinon.stub().returns({
+                            params: urlParams
+                        })
+                    };
+
                     QUnit.stop();
                     injector
                         .mock("jquery", mock$)
                         .mock("config/ThemeConfiguration", themeConfig)
+                        .mock("org/forgerock/commons/ui/common/main/Router", Router)
                         .store("org/forgerock/commons/ui/common/main/Configuration")
                         .require(["org/forgerock/openam/ui/common/util/ThemeManager", "mocks"], function (d, mocks) {
                             ThemeManager = d;
@@ -126,6 +135,99 @@ define("org/forgerock/openam/ui/common/util/ThemeManagerTest", [
                 QUnit.stop();
                 themeConfig.mappings[0].realms[0] = /^\/hello.*/;
                 Configuration.globalData.realm = "/hello/world";
+                ThemeManager.getTheme().then(function () {
+                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
+                    QUnit.start();
+                });
+            });
+            test("getTheme selects the correct theme based on the authentication chain", function () {
+                QUnit.stop();
+                urlParams.service = "test";
+                themeConfig.mappings.push({
+                    theme: "other",
+                    authenticationChains: ["test"]
+                });
+                ThemeManager.getTheme().then(function () {
+                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
+                    QUnit.start();
+                });
+            });
+            test("getTheme selects the default theme if no authentication chains match", function () {
+                QUnit.stop();
+                urlParams.service = "tester";
+                themeConfig.mappings.push({
+                    theme: "other",
+                    authenticationChains: ["test"]
+                });
+                ThemeManager.getTheme().then(function () {
+                    deepEqual(Configuration.globalData.theme, themeConfig.themes.default, "selected default theme");
+                    QUnit.start();
+                });
+            });
+            test("getTheme allows mappings to specify regular expressions to match authentication chains", function () {
+                QUnit.stop();
+                urlParams.service = "tester";
+                themeConfig.mappings.push({
+                    theme: "other",
+                    authenticationChains: [/test/]
+                });
+                ThemeManager.getTheme().then(function () {
+                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
+                    QUnit.start();
+                });
+            });
+            test("getTheme matches realms and authentication chains if both are specified in a mapping", function () {
+                QUnit.stop();
+                Configuration.globalData.realm = "/a";
+                urlParams.service = "test";
+                // No match - wrong realm
+                themeConfig.mappings.push({
+                    theme: "default",
+                    realms: ["/b"],
+                    authenticationChains: ["test"]
+                });
+                // No match - wrong authentication chain
+                themeConfig.mappings.push({
+                    theme: "default",
+                    realms: ["/a"],
+                    authenticationChains: ["tester"]
+                });
+                // Match
+                themeConfig.mappings.push({
+                    theme: "other",
+                    realms: ["/a"],
+                    authenticationChains: ["test"]
+                });
+                ThemeManager.getTheme().then(function () {
+                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
+                    QUnit.start();
+                });
+            });
+            test("getTheme won't match a mapping that needs an authentication chain if none is present", function () {
+                QUnit.stop();
+                Configuration.globalData.realm = "/a";
+                // No match - wants an authentication chain but none is present
+                themeConfig.mappings.push({
+                    theme: "default",
+                    realms: ["/a"],
+                    authenticationChains: ["test"]
+                });
+                // Match
+                themeConfig.mappings.push({
+                    theme: "other",
+                    realms: ["/a"]
+                });
+                ThemeManager.getTheme().then(function () {
+                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
+                    QUnit.start();
+                });
+            });
+            test("getTheme matches a mapping that has an empty authentication chain if none is present", function () {
+                QUnit.stop();
+                themeConfig.mappings.push({
+                    theme: "other",
+                    authenticationChains: [""]
+                });
                 ThemeManager.getTheme().then(function () {
                     deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
                     QUnit.start();

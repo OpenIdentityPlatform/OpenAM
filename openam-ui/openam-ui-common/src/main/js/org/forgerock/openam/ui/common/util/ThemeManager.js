@@ -28,8 +28,9 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "underscore",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "config/ThemeConfiguration"
-], function ($, _, Constants, Configuration, ThemeConfiguration) {
+    "config/ThemeConfiguration",
+    "org/forgerock/commons/ui/common/util/URIUtils"
+], function ($, _, Constants, Configuration, ThemeConfiguration, URIUtils) {
     /**
      * @exports org/forgerock/openam/ui/common/util/ThemeManager
      */
@@ -61,19 +62,29 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
 
         /**
          * Determine if a mapping specification matches the current environment. Mappings are of the form:
-         * { theme: "theme-name", realms: ["/a", "/b"] }.
+         * { theme: "theme-name", realms: ["/a", "/b"], authenticationChains: ["test", "cats"] }.
          *
          * @param {string} realm The full realm path to match the themes against.
+         * @param {string} authenticationChain The name of the authentication chain to match themes against.
          * @param {object} mapping the mapping specification provided by the theme configuration.
          * @returns {boolean} true if mapping matches the current environment.
          */
-        isMatchingThemeMapping = function (realm, mapping) {
-            return _.some(mapping.realms, function (mappingRealm) {
-                if (_.isRegExp(mappingRealm)) {
-                    return mappingRealm.test(realm);
-                } else {
-                    return mappingRealm === realm;
-                }
+        isMatchingThemeMapping = function (realm, authenticationChain, mapping) {
+            var matchers = {
+                    realms: realm,
+                    authenticationChains: authenticationChain
+                },
+                matcherMappings = _.pick(mapping, _.keys(matchers));
+
+            return _.every(matcherMappings, function (mappings, matcher) {
+                var value = matchers[matcher];
+                return _.some(mappings, function (mapping) {
+                    if (_.isRegExp(mapping)) {
+                        return mapping.test(value);
+                    } else {
+                        return mapping === value;
+                    }
+                });
             });
         },
 
@@ -83,13 +94,15 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
          * If a theme is found that matches the current environment then its name will be
          * returned, otherwise the default theme name will be returned.
          * @param {string} realm The full realm path to match the themes against.
+         * @param {string} authenticationChain The name of the authentication chain to match themes against.
          * @returns {string} theme The selected theme configuration name.
          */
-        findMatchingTheme = function (realm) {
+        findMatchingTheme = function (realm, authenticationChain) {
             if (!_.isArray(ThemeConfiguration.mappings)) {
                 return defaultThemeName;
             }
-            var matchedThemeMapping = _.find(ThemeConfiguration.mappings, _.partial(isMatchingThemeMapping, realm));
+            var matchedThemeMapping = _.find(ThemeConfiguration.mappings,
+                _.partial(isMatchingThemeMapping, realm, authenticationChain));
             if (matchedThemeMapping) {
                 return matchedThemeMapping.theme;
             }
@@ -131,6 +144,18 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
             if (!_.isObject(ThemeConfiguration.themes[defaultThemeName])) {
                 throw "Theme configuration must specify a default theme";
             }
+        },
+
+        // TODO: This code should be shared with the RESTLoginView and friends.
+        getAuthenticationChainName = function () {
+            var urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
+            if (urlParams.service) {
+                return urlParams.service;
+            }
+            if (urlParams.authIndexType && urlParams.authIndexType === "service") {
+                return urlParams.authIndexValue || "";
+            }
+            return "";
         };
 
     return {
@@ -143,7 +168,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
         getTheme: function (force) {
             validateConfig();
 
-            var themeName = findMatchingTheme(Configuration.globalData.realm),
+            var themeName = findMatchingTheme(Configuration.globalData.realm, getAuthenticationChainName()),
                 defaultTheme = ThemeConfiguration.themes[defaultThemeName],
                 isSameTheme = Configuration.globalData.themeName && themeName === Configuration.globalData.themeName,
                 isAdminUser = Configuration.loggedUser && _.contains(Configuration.loggedUser.roles, "ui-admin"),
