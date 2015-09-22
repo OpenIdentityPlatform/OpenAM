@@ -809,8 +809,16 @@ public class OAuth2Constants {
 
         public static final String RSR_ENDPOINT = "resource-set-reg-endpoint";
         public static final String JWK_RESOLVER = "jwk-resolver";
+    }
+
+    /**
+     * Constants relating to the device code flow.
+     */
+    public class DeviceCode {
         public static final String DEVICE_CODE = "device_code";
-        public static final String DEVICE_USER_CODE = "user_code";
+        public static final String USER_CODE = "user_code";
+        public static final String VERIFICATION_URL = "verification_url";
+        public static final String INTERVAL = "interval";
     }
 
     public enum DisplayType {
@@ -876,7 +884,6 @@ public class OAuth2Constants {
         public static final String DEVICE_COMPLETION_URL = "completionUrl";
         public static final String DEVICE_CODE_LIFETIME = "deviceCodeLifetime";
         public static final String DEVICE_CODE_POLL_INTERVAL = "devicePollInterval";
-        public static final String DEVICE_CODE_ASYNC_LIFETIME = "deviceAsyncRequestTimeout";
     }
 
     /**

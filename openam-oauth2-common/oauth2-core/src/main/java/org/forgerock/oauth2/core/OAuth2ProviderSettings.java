@@ -516,10 +516,4 @@ public interface OAuth2ProviderSettings {
      */
     int getDeviceCodePollInterval() throws ServerException;
 
-    /**
-     * The timeout for asynchronous requests from the device for tokens.
-     * @return The timeout in seconds.
-     * @throws ServerException If the setting could not be retrieved.
-     */
-    int getDeviceCodeAsyncLifetime() throws ServerException;
 }

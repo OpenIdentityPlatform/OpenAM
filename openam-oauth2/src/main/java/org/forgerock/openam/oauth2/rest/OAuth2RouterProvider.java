@@ -30,6 +30,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
 import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
 import org.forgerock.oauth2.restlet.AuthorizeResource;
+import org.forgerock.oauth2.restlet.DeviceCodeResource;
 import org.forgerock.oauth2.restlet.TokenEndpointFilter;
 import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
@@ -84,6 +85,7 @@ public class OAuth2RouterProvider implements Provider<Router> {
         router.attach("/tokeninfo", restletAuditFactory.createFilter(OAUTH2, wrap(ValidationServerResource.class)));
 
         // OAuth 2.0 Token Introspection Endpoint
+
         router.attach("/introspect", restletAuditFactory.createFilter(OAUTH2, wrap(TokenIntrospectionResource.class)));
 
         // OpenID Connect endpoints
@@ -103,6 +105,10 @@ public class OAuth2RouterProvider implements Provider<Router> {
         // OpenID Connect Discovery
 
         router.attach("/.well-known/openid-configuration", wrap(OpenIDConnectConfiguration.class));
+
+        // Device Code
+
+        router.attach("/device/code", wrap(DeviceCodeResource.class));
 
         return router;
     }

@@ -210,7 +210,7 @@ public interface TokenStore {
      */
     DeviceCode createDeviceCode(Set<String> scope, String clientId, String nonce, String responseType,
             String state, String acrValues, String prompt, String uiLocales, String loginHint,
-            int maxAge, String claims, OAuth2Request request, String codeChallenge, String codeChallengeMethod)
+            Integer maxAge, String claims, OAuth2Request request, String codeChallenge, String codeChallengeMethod)
             throws ServerException, NotFoundException;
 
     /**

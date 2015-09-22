@@ -1040,11 +1040,6 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         return (int) getLongSettingValue(OAuth2ProviderService.DEVICE_CODE_POLL_INTERVAL);
     }
 
-    @Override
-    public int getDeviceCodeAsyncLifetime() throws ServerException {
-        return (int) getLongSettingValue(OAuth2ProviderService.DEVICE_CODE_ASYNC_LIFETIME);
-    }
-
     /**
      * ServiceListener implementation to clear cache when it changes.
      */

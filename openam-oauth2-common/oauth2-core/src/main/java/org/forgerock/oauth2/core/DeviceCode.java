@@ -36,8 +36,6 @@ import org.forgerock.openam.utils.CollectionUtils;
  */
 public class DeviceCode extends JsonValue implements Token {
 
-    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
-
     /**
      * Constructs a new OpenAMAuthorizationCode backed with the data in the specified JsonValue.
      *
@@ -46,7 +44,7 @@ public class DeviceCode extends JsonValue implements Token {
      */
     public DeviceCode(JsonValue token) throws InvalidGrantException {
         super(token);
-        if (!OAuth2Constants.Custom.DEVICE_CODE.equals(getTokenName()) || getTokenId() == null ||
+        if (!OAuth2Constants.DeviceCode.DEVICE_CODE.equals(getTokenName()) || getTokenId() == null ||
                 getUserCode() == null || getClientId() == null) {
             throw new InvalidGrantException();
         }
@@ -54,12 +52,12 @@ public class DeviceCode extends JsonValue implements Token {
 
     public DeviceCode(String deviceCode, String userCode, String clientId, String nonce, String responseType,
             String state, String acrValues, String prompt, String uiLocales, String loginHint,
-            int maxAge, String claims, long expiryTime, Set<String> scope, String realm, String codeChallenge,
+            Integer maxAge, String claims, long expiryTime, Set<String> scope, String realm, String codeChallenge,
             String codeChallengeMethod) {
         super(object());
-        setStringProperty(TOKEN_NAME, OAuth2Constants.Custom.DEVICE_CODE);
+        setStringProperty(TOKEN_NAME, OAuth2Constants.DeviceCode.DEVICE_CODE);
         setStringProperty(OAuth2Constants.CoreTokenParams.ID, deviceCode);
-        setStringProperty(OAuth2Constants.Custom.DEVICE_USER_CODE, userCode);
+        setStringProperty(OAuth2Constants.DeviceCode.USER_CODE, userCode);
         setStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
         setStringProperty(OAuth2Constants.JWTTokenParams.NONCE, nonce);
         setStringProperty(OAuth2Constants.Params.RESPONSE_TYPE, responseType);
@@ -90,7 +88,7 @@ public class DeviceCode extends JsonValue implements Token {
      * @return The user code.
      */
     public String getUserCode() {
-        return getStringProperty(OAuth2Constants.Custom.DEVICE_USER_CODE);
+        return getStringProperty(OAuth2Constants.DeviceCode.USER_CODE);
     }
 
     /**
@@ -269,13 +267,6 @@ public class DeviceCode extends JsonValue implements Token {
             return (Set<String>) param.getObject();
         }
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    private String getResourceString(String s) {
-        return RESOURCE_BUNDLE.getString(s);
     }
 
     private String getStringProperty(String key) {
