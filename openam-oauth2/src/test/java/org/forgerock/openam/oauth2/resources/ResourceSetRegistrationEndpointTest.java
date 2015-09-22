@@ -18,6 +18,7 @@ package org.forgerock.openam.oauth2.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.in;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
@@ -50,12 +51,15 @@ import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.oauth2.extensions.ResourceRegistrationFilter;
 import org.forgerock.util.query.BaseQueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -86,6 +90,7 @@ public class ResourceSetRegistrationEndpointTest {
     private ResourceSetDescriptionValidator validator;
     private ResourceSetRegistrationListener listener;
     private ResourceSetLabelRegistration labelRegistration;
+    private ResourceRegistrationFilter resourceRegistrationFilter;
 
     private Response response;
 
@@ -100,6 +105,10 @@ public class ResourceSetRegistrationEndpointTest {
         listener = mock(ResourceSetRegistrationListener.class);
         listeners.add(listener);
         labelRegistration = mock(ResourceSetLabelRegistration.class);
+        ExtensionFilterManager extensionFilterManager = mock(ExtensionFilterManager.class);
+        resourceRegistrationFilter = mock(ResourceRegistrationFilter.class);
+        given(extensionFilterManager.getFilters(ResourceRegistrationFilter.class))
+                .willReturn(Collections.singletonList(resourceRegistrationFilter));
 
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
@@ -107,7 +116,7 @@ public class ResourceSetRegistrationEndpointTest {
         given(providerSettings.getResourceSetStore()).willReturn(store);
 
         endpoint = spy(new ResourceSetRegistrationEndpoint(providerSettingsFactory, validator, requestFactory,
-                listeners, labelRegistration));
+                listeners, labelRegistration, extensionFilterManager));
 
         Request request = mock(Request.class);
         ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC);
@@ -202,7 +211,10 @@ public class ResourceSetRegistrationEndpointTest {
         //Then
         ArgumentCaptor<ResourceSetDescription> resourceSetCaptor =
                 ArgumentCaptor.forClass(ResourceSetDescription.class);
-        verify(store).create(Matchers.<OAuth2Request>anyObject(), resourceSetCaptor.capture());
+        InOrder inOrder = inOrder(resourceRegistrationFilter, store, resourceRegistrationFilter);
+        inOrder.verify(resourceRegistrationFilter).beforeResourceRegistration(any(ResourceSetDescription.class));
+        inOrder.verify(store).create(Matchers.<OAuth2Request>anyObject(), resourceSetCaptor.capture());
+        inOrder.verify(resourceRegistrationFilter).afterResourceRegistration(any(ResourceSetDescription.class));
         assertThat(resourceSetCaptor.getValue().getId()).isNotNull().isNotEmpty();
         assertThat(resourceSetCaptor.getValue().getClientId()).isEqualTo("CLIENT_ID");
         assertThat(resourceSetCaptor.getValue().getName()).isEqualTo("NAME");
@@ -236,6 +248,7 @@ public class ResourceSetRegistrationEndpointTest {
         //Then
         ArgumentCaptor<QueryFilter> queryCaptor = ArgumentCaptor.forClass(QueryFilter.class);
         verify(store).query(queryCaptor.capture());
+        verifyZeroInteractions(resourceRegistrationFilter);
         String queryString = queryCaptor.getValue().toString();
         assertThat(queryString)
                 .contains("name eq \"NAME\"")
