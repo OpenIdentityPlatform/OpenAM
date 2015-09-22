@@ -36,7 +36,6 @@ require.config({
         "handlebars":   "libs/handlebars-3.0.3-min",
         "i18next":      "libs/i18next-1.7.3-min",
         "jquery":       "libs/jquery-2.1.1-min",
-        "bootstrap":    "libs/bootstrap-3.3.5-custom",
         "text":         "libs/text"
     },
 
@@ -64,8 +63,7 @@ require([
     "text!templates/common/LoginBaseTemplate.html",
     "text!templates/common/FooterTemplate.html",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "ThemeManager",
-    "bootstrap"
+    "ThemeManager"
 ], function ($, _, HandleBars, Configuration, Constants, AuthorizeTemplate,
             LoginBaseTemplate, FooterTemplate, i18nManager, ThemeManager) {
 
@@ -95,8 +93,12 @@ require([
         footerTemplate = HandleBars.compile(FooterTemplate);
 
         $("#wrapper").html(baseTemplate(data));
-        $("#content").html(formTemplate(data)).find(".collapse").collapse({ toggle: false });
         $("#footer").html(footerTemplate(data));
+        $("#content").html(formTemplate(data)).find(".panel-heading")
+        .click(function (e) {
+            $(this).toggleClass("expanded").next(".panel-collapse").slideToggle();
+        });
+
     });
 
 });

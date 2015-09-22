@@ -410,17 +410,17 @@ body, .modal-open {
     border-color: #adadad;
 }
 
-.am-panel-heading {
+.am-panel-heading-hover {
 
-    &:hover{
+    &:hover {
         cursor:pointer;
     }
 
-    .fa-angle-down{
+    .fa-angle-down {
         transition: all 0.3s ease-out;
     }
 
-    &[aria-expanded="true"]{
+    &.expanded {
         .fa-angle-down {
             -webkit-transform: rotateX(180deg);
             -moz-transform: rotateX(180deg);
