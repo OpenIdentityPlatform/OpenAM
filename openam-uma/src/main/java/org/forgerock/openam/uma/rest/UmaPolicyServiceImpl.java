@@ -41,7 +41,6 @@ import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -59,6 +58,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.core.CoreServicesWrapper;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.rest.AggregateQuery;
 import org.forgerock.openam.rest.resource.ContextHelper;
@@ -73,7 +73,9 @@ import org.forgerock.openam.uma.UmaSettingsFactory;
 import org.forgerock.openam.uma.UmaUtils;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
+import org.forgerock.openam.uma.extensions.ResourceDelegationFilter;
 import org.forgerock.openam.utils.Config;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Function;
 import org.forgerock.util.Pair;
@@ -99,6 +101,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     private final CoreServicesWrapper coreServicesWrapper;
     private final Debug debug;
     private final UmaSettingsFactory umaSettingsFactory;
+    private final ExtensionFilterManager extensionFilterManager;
 
     /**
      * Creates an instance of the {@code UmaPolicyServiceImpl}.
@@ -111,13 +114,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * @param coreServicesWrapper An instance of the {@code CoreServicesWrapper}.
      * @param debug An instance of the REST {@code Debug}.
      * @param umaSettingsFactory An instance of the {@code UmaSettingsFactory}.
+     * @param extensionFilterManager An instance of the {@code ExtensionFilterManager}.
      */
     @Inject
     public UmaPolicyServiceImpl(PolicyResourceDelegate policyResourceDelegate,
             ResourceSetStoreFactory resourceSetStoreFactory, Config<UmaAuditLogger> auditLogger,
             ContextHelper contextHelper, UmaPolicyEvaluatorFactory policyEvaluatorFactory,
             CoreServicesWrapper coreServicesWrapper, @Named("frRest") Debug debug,
-            UmaSettingsFactory umaSettingsFactory) {
+            UmaSettingsFactory umaSettingsFactory, ExtensionFilterManager extensionFilterManager) {
         this.policyResourceDelegate = policyResourceDelegate;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
         this.auditLogger = auditLogger;
@@ -126,6 +130,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         this.coreServicesWrapper = coreServicesWrapper;
         this.debug = debug;
         this.umaSettingsFactory = umaSettingsFactory;
+        this.extensionFilterManager = extensionFilterManager;
     }
 
     private JsonValue resolveUsernameToUID(final Context context, JsonValue policy) {
@@ -221,9 +226,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      */
     @Override
     public Promise<UmaPolicy, ResourceException> createPolicy(final Context context, JsonValue policy) {
-        UmaPolicy umaPolicy;
+        final UmaPolicy umaPolicy;
         final ResourceSetDescription resourceSet;
-        String userId = contextHelper.getUserId(context);
+        final String userId = contextHelper.getUserId(context);
         String realm = getRealm(context);
         try {
             String policyId = UmaPolicy.idOf(policy);
@@ -240,9 +245,66 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         } catch (ResourceException e) {
             return e.asPromise();
         }
-        return policyResourceDelegate.createPolicies(context, umaPolicy.asUnderlyingPolicies(userId))
+        return beforeResourceShared(umaPolicy)
+                .thenAsync(new AsyncFunction<UmaPolicy, List<ResourceResponse>, ResourceException>() {
+                    @Override
+                    public Promise<List<ResourceResponse>, ResourceException> apply(UmaPolicy umaPolicy) {
+                        return policyResourceDelegate.createPolicies(context, umaPolicy.asUnderlyingPolicies(userId));
+                    }
+                })
+                .thenAlways(afterResourceShared(umaPolicy))
                 .thenAsync(new UpdatePolicyGraphStatesFunction<List<ResourceResponse>>(resourceSet, context))
                 .thenAsync(new AuditAndProduceUmaPolicyFunction(resourceSet, context));
+    }
+
+    private Promise<UmaPolicy, ResourceException> beforeResourceShared(UmaPolicy umaPolicy) {
+        try {
+            for (ResourceDelegationFilter filter : extensionFilterManager.getFilters(ResourceDelegationFilter.class)) {
+                filter.beforeResourceShared(umaPolicy);
+            }
+            return newResultPromise(umaPolicy);
+        } catch (ResourceException e) {
+            return newExceptionPromise(e);
+        }
+    }
+
+    private AsyncFunction<UmaPolicy, UmaPolicy, ResourceException> beforeResourceSharedModified(
+            final UmaPolicy updatedUmaPolicy) {
+        return new AsyncFunction<UmaPolicy, UmaPolicy, ResourceException>() {
+            @Override
+            public Promise<UmaPolicy, ResourceException> apply(UmaPolicy currentUmaPolicy) throws ResourceException {
+                for (ResourceDelegationFilter filter :
+                        extensionFilterManager.getFilters(ResourceDelegationFilter.class)) {
+                    filter.beforeResourceSharedModification(currentUmaPolicy, updatedUmaPolicy);
+                }
+                return newResultPromise(currentUmaPolicy);
+            }
+        };
+    }
+
+    private AsyncFunction<UmaPolicy, UmaPolicy, ResourceException> onResourceSharedDeletion() {
+        return new AsyncFunction<UmaPolicy, UmaPolicy, ResourceException>() {
+            @Override
+            public Promise<UmaPolicy, ResourceException> apply(UmaPolicy umaPolicy) throws ResourceException {
+                for (ResourceDelegationFilter filter
+                        :extensionFilterManager.getFilters(ResourceDelegationFilter.class)) {
+                    filter.onResourceSharedDeletion(umaPolicy);
+                }
+                return newResultPromise(umaPolicy);
+            }
+        };
+    }
+
+    private Runnable afterResourceShared(final UmaPolicy umaPolicy) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                for (ResourceDelegationFilter filter
+                        : extensionFilterManager.getFilters(ResourceDelegationFilter.class)) {
+                    filter.afterResourceShared(umaPolicy);
+                }
+            }
+        };
     }
 
     private class UpdatePolicyGraphStatesFunction<T> implements AsyncFunction<T, T, ResourceException> {
@@ -382,6 +444,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             return e.asPromise();
         }
         return internalReadPolicy(context, resourceSetId)
+                .thenAsync(beforeResourceSharedModified(updatedUmaPolicy))
                 .thenOnResult(new ResultHandler<UmaPolicy>() {
                     @Override
                     public void handleResult(UmaPolicy currentUmaPolicy) {
@@ -494,6 +557,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             return e.asPromise();
         }
         return internalReadPolicy(context, resourceSetId)
+                .thenAsync(onResourceSharedDeletion())
                 .thenAsync(new AsyncFunction<UmaPolicy, List<ResourceResponse>, ResourceException>() {
                     @Override
                     public Promise<List<ResourceResponse>, ResourceException> apply(UmaPolicy value) {

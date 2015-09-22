@@ -35,6 +35,8 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.uma.extensions.PermissionRequestFilter;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.restlet.Request;
@@ -55,19 +57,23 @@ public class PermissionRequestEndpoint extends ServerResource {
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final OAuth2RequestFactory<Request> requestFactory;
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
+    private final ExtensionFilterManager extensionFilterManager;
 
     /**
      * Constructs a new PermissionRequestEndpoint instance
      *
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param requestFactory An instance of the OAuth2RequestFactory.
+     * @param extensionFilterManager An instance of the ExtensionFilterManager.
      */
     @Inject
     public PermissionRequestEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            OAuth2RequestFactory<Request> requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory) {
+            OAuth2RequestFactory<Request> requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory,
+            ExtensionFilterManager extensionFilterManager) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.requestFactory = requestFactory;
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
+        this.extensionFilterManager = extensionFilterManager;
     }
 
     /**
@@ -89,6 +95,9 @@ public class PermissionRequestEndpoint extends ServerResource {
         ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, resourceOwnerId,
                 providerSettings);
         Set<String> scopes = validateScopes(permissionRequest, resourceSetDescription);
+        for (PermissionRequestFilter filter : extensionFilterManager.getFilters(PermissionRequestFilter.class)) {
+            filter.onPermissionRequest(resourceSetDescription, scopes, clientId);
+        }
         String ticket = umaProviderSettingsFactory.get(getRequest()).getUmaTokenStore()
                 .createPermissionTicket(resourceSetId, scopes, clientId).getId();
         return setResponse(201, Collections.<String, Object>singletonMap("ticket", ticket));

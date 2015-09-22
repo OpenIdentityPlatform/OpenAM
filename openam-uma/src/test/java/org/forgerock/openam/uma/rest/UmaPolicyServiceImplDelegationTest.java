@@ -43,6 +43,7 @@ import java.util.UUID;
 import javax.security.auth.Subject;
 
 import org.assertj.core.api.Assertions;
+import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -138,8 +139,11 @@ public class UmaPolicyServiceImplDelegationTest {
         UmaSettingsFactory umaSettingsFactory = mock(UmaSettingsFactory.class);
         given(umaSettingsFactory.create(anyString())).willReturn(umaSettings);
 
+        ExtensionFilterManager extensionFilterManager = mock(ExtensionFilterManager.class);
+
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
-                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory);
+                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory,
+                extensionFilterManager);
 
         given(contextHelper.getRealm(Matchers.<Context>anyObject())).willReturn("REALM");
     }

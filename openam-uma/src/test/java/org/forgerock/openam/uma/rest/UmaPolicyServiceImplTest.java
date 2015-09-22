@@ -42,6 +42,8 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.uma.extensions.ResourceDelegationFilter;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -74,6 +76,7 @@ import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
+import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -99,6 +102,7 @@ public class UmaPolicyServiceImplTest {
     private Evaluator policyEvaluator;
     private CoreServicesWrapper coreServicesWrapper;
     private UmaSettings umaSettings;
+    private ResourceDelegationFilter resourceDelegationFilter;
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -116,8 +120,15 @@ public class UmaPolicyServiceImplTest {
         UmaSettingsFactory umaSettingsFactory = mock(UmaSettingsFactory.class);
         UmaSettings umaSettings = mock(UmaSettings.class);
         given(umaSettingsFactory.create(anyString())).willReturn(umaSettings);
+
+        ExtensionFilterManager extensionFilterManager = mock(ExtensionFilterManager.class);
+        resourceDelegationFilter = mock(ResourceDelegationFilter.class);
+        given(extensionFilterManager.getFilters(ResourceDelegationFilter.class))
+                .willReturn(Collections.singleton(resourceDelegationFilter));
+
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
-                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory);
+                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory,
+                extensionFilterManager);
 
         given(contextHelper.getRealm(Matchers.<Context>anyObject())).willReturn("REALM");
         given(contextHelper.getUserId(Matchers.<Context>anyObject())).willReturn(RESOURCE_OWNER_ID);
@@ -255,6 +266,11 @@ public class UmaPolicyServiceImplTest {
         UmaPolicy umaPolicy = policyService.createPolicy(context, policy).getOrThrowUninterruptibly();
 
         //Then
+        InOrder inOrder = inOrder(resourceDelegationFilter, policyResourceDelegate, resourceDelegationFilter);
+        inOrder.verify(resourceDelegationFilter).beforeResourceShared(any(UmaPolicy.class));
+        inOrder.verify(policyResourceDelegate).createPolicies(eq(context), anySetOf(JsonValue.class));
+        inOrder.verify(resourceDelegationFilter).afterResourceShared(any(UmaPolicy.class));
+
         assertThat(umaPolicy.getId()).isEqualTo("RESOURCE_SET_ID");
         assertThat(umaPolicy.getRevision()).isNotNull();
         assertThat(umaPolicy.asJson().asMap()).hasSize(3)
@@ -442,6 +458,11 @@ public class UmaPolicyServiceImplTest {
                 .getOrThrowUninterruptibly();
 
         //Then
+        InOrder inOrder = inOrder(resourceDelegationFilter, policyResourceDelegate);
+        inOrder.verify(resourceDelegationFilter).beforeResourceSharedModification(any(UmaPolicy.class),
+                any(UmaPolicy.class));
+        inOrder.verify(policyResourceDelegate, times(2)).updatePolicies(any(Context.class), anySetOf(JsonValue.class));
+
         assertThat(umaPolicy.getId()).isEqualTo("RESOURCE_SET_ID");
         assertThat(umaPolicy.getRevision()).isNotNull();
         JsonValue expectedPolicyJson = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_A", "SCOPE_C");
@@ -542,7 +563,9 @@ public class UmaPolicyServiceImplTest {
         policyService.deletePolicy(context, "RESOURCE_SET_ID").getOrThrowUninterruptibly();
 
         //Then
-        verify(policyResourceDelegate).deletePolicies(eq(context), anyListOf(String.class));
+        InOrder inOrder = inOrder(resourceDelegationFilter, policyResourceDelegate);
+        inOrder.verify(resourceDelegationFilter).onResourceSharedDeletion(any(UmaPolicy.class));
+        inOrder.verify(policyResourceDelegate).deletePolicies(eq(context), anyListOf(String.class));
     }
 
     @Test(expectedExceptions = ResourceException.class)

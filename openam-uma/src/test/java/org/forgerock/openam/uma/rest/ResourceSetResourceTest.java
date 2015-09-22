@@ -26,7 +26,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.forgerock.services.context.Context;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -44,9 +46,11 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
+import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.oauth2.rest.AggregateQuery;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
@@ -54,9 +58,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 public class ResourceSetResourceTest {
 
@@ -73,7 +74,10 @@ public class ResourceSetResourceTest {
         contextHelper = mock(ContextHelper.class);
         umaLabelsStore = mock(UmaLabelsStore.class);
         validator = mock(ResourceSetDescriptionValidator.class);
-        resource = new ResourceSetResource(resourceSetService, contextHelper, umaLabelsStore, validator);
+        ExtensionFilterManager extensionFilterManager = mock(ExtensionFilterManager.class);
+
+        resource = new ResourceSetResource(resourceSetService, contextHelper, umaLabelsStore, validator,
+                extensionFilterManager);
     }
 
     @Test

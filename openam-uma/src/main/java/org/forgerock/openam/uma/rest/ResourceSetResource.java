@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.uma.extensions.ResourceDelegationFilter;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -81,20 +83,24 @@ public class ResourceSetResource implements CollectionResourceProvider {
     private final ContextHelper contextHelper;
     private final UmaLabelsStore umaLabelsStore;
     private final ResourceSetDescriptionValidator validator;
+    private final ExtensionFilterManager extensionFilterManager;
 
     /**
      * Constructs a new ResourceSetResource instance.
      *
      * @param resourceSetService An instance of the ResourceSetService.
      * @param contextHelper An instance of the ContextHelper.
+     * @param extensionFilterManager An instance of the ExtensionFilterManager.
      */
     @Inject
     public ResourceSetResource(ResourceSetService resourceSetService, ContextHelper contextHelper,
-            UmaLabelsStore umaLabelsStore, ResourceSetDescriptionValidator validator) {
+            UmaLabelsStore umaLabelsStore, ResourceSetDescriptionValidator validator,
+            ExtensionFilterManager extensionFilterManager) {
         this.resourceSetService = resourceSetService;
         this.contextHelper = contextHelper;
         this.umaLabelsStore = umaLabelsStore;
         this.validator = validator;
+        this.extensionFilterManager = extensionFilterManager;
     }
 
     /**
@@ -166,13 +172,15 @@ public class ResourceSetResource implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(final Context context, final QueryRequest request,
             final QueryResourceHandler handler) {
 
+        final String userId = getUserId(context);
         final ResourceSetWithPolicyQuery query;
         try {
             if (request.getQueryId() != null && request.getQueryId().equals("*")) {
                 query = new ResourceSetWithPolicyQuery();
                 query.setResourceSetQuery(QueryFilter.<String>alwaysTrue());
             } else if (request.getQueryFilter() != null) {
-                query = request.getQueryFilter().accept(new ResourceSetQueryFilter(context), new ResourceSetWithPolicyQuery());
+                query = beforeQueryResourceSets(userId, request)
+                        .accept(new ResourceSetQueryFilter(context), new ResourceSetWithPolicyQuery());
             } else {
                 return new BadRequestException("Invalid query").asPromise();
             }
@@ -182,7 +190,6 @@ public class ResourceSetResource implements CollectionResourceProvider {
 
         boolean augmentWithPolicies = augmentWithPolicies(request);
         String realm = getRealm(context);
-        final String userId = getUserId(context);
         return resourceSetService.getResourceSets(context, realm, query, userId, augmentWithPolicies)
                 .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, QueryResponse, ResourceException>() {
                     @Override
@@ -199,6 +206,18 @@ public class ResourceSetResource implements CollectionResourceProvider {
                         }
                     }
                 });
+    }
+
+    private QueryFilter<JsonPointer> beforeQueryResourceSets(String userId, QueryRequest request) {
+        QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
+        for (ResourceDelegationFilter filter :
+                extensionFilterManager.getFilters(ResourceDelegationFilter.class)) {
+            QueryFilter<JsonPointer> extensionQueryFilter = filter.beforeQueryResourceSets(userId, queryFilter);
+            if (extensionQueryFilter != null) {
+                queryFilter = extensionQueryFilter;
+            }
+        }
+        return queryFilter;
     }
 
     private String getUserId(Context context) {

@@ -38,6 +38,8 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.uma.extensions.PermissionRequestFilter;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
@@ -59,6 +61,7 @@ public class PermissionRequestEndpointTest {
     private ResourceSetStore resourceSetStore;
     private Response response;
     private UmaTokenStore umaTokenStore;
+    private PermissionRequestFilter permissionRequestFilter;
 
     @BeforeMethod
     @SuppressWarnings("unchecked")
@@ -78,8 +81,13 @@ public class PermissionRequestEndpointTest {
         given(umaProviderSettingsFactory.get(any(Request.class))).willReturn(umaProviderSettings);
         given(umaProviderSettings.getUmaTokenStore()).willReturn(umaTokenStore);
 
+        ExtensionFilterManager extensionFilterManager = mock(ExtensionFilterManager.class);
+        permissionRequestFilter = mock(PermissionRequestFilter.class);
+        given(extensionFilterManager.getFilters(PermissionRequestFilter.class))
+                .willReturn(Collections.singleton(permissionRequestFilter));
+
         endpoint = spy(new PermissionRequestEndpoint(providerSettingFactory, requestFactory,
-                umaProviderSettingsFactory));
+                umaProviderSettingsFactory, extensionFilterManager));
 
         response = mock(Response.class);
         endpoint.setResponse(response);
@@ -313,6 +321,8 @@ public class PermissionRequestEndpointTest {
                 .readValue(responseBody.getText(), Map.class);
         assertThat(permissionTicket).containsEntry("ticket", "abc");
 
+        verify(permissionRequestFilter).onPermissionRequest(any(ResourceSetDescription.class), anySetOf(String.class),
+                anyString());
         ArgumentCaptor<Status> statusCaptor = ArgumentCaptor.forClass(Status.class);
         verify(response).setStatus(statusCaptor.capture());
         assertThat(statusCaptor.getValue().getCode()).isEqualTo(201);
