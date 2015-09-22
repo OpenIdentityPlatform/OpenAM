@@ -234,7 +234,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
                 scopes = splitScope(scopeStr);
             }
 
-            scriptVariables.put(OAuth2Constants.ScriptParams.SCOPES, scopes);
+            scriptVariables.put(OAuth2Constants.ScriptParams.SCOPES, getScriptFriendlyScopes(scopes));
             scriptVariables.put(OAuth2Constants.ScriptParams.IDENTITY, id);
             scriptVariables.put(OAuth2Constants.ScriptParams.LOGGER, logger);
             scriptVariables.put(OAuth2Constants.ScriptParams.CLAIMS, response);
@@ -255,6 +255,10 @@ public class OpenAMScopeValidator implements ScopeValidator {
         } catch (SSOException e) {
             throw new NotFoundException(e.getMessage());
         }
+    }
+
+    private Set<String> getScriptFriendlyScopes(Set<String> scopes) {
+        return scopes == null ? new HashSet<String>() : new HashSet<>(scopes);
     }
 
     private Map<String, Set<String>> gatherRequestedClaims(OAuth2ProviderSettings providerSettings,
