@@ -16,6 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.services.context.Context;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 
@@ -36,5 +37,17 @@ public interface ClientRegistrationStore {
      * @throws NotFoundException If requested realm doesn't exist
      */
     ClientRegistration get(String clientId, OAuth2Request request) 
+            throws InvalidClientException, NotFoundException;
+
+    /**
+     *  Gets the client registration for the given client id.
+     *
+     * @param clientId The client id
+     * @param realm The realm
+     * @return The ClientRegistration.
+     * @throws InvalidClientException If client cannot be retrieved from the store.
+     * @throws NotFoundException If requested realm doesn't exist
+     */
+    ClientRegistration get(String clientId, String realm, Context context)
             throws InvalidClientException, NotFoundException;
 }

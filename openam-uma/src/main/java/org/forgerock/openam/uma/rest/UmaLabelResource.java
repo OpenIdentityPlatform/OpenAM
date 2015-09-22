@@ -184,7 +184,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
 
         for (ResourceSetLabel label : labels) {
             try {
-                label = resolveLabelName(contextHelper.getRealm(serverContext), label, localeContext);
+                label = resolveLabelName(contextHelper.getRealm(serverContext), label, localeContext, serverContext);
             } catch (InternalServerErrorException e) {
                 debug.error("Could not resolve Resource Server label name. id: {}, name: {}", label.getId(),
                         label.getName(), e);
@@ -196,11 +196,12 @@ public class UmaLabelResource implements CollectionResourceProvider {
         return newResultPromise(newQueryResponse());
     }
 
-    private ResourceSetLabel resolveLabelName(String realm, ResourceSetLabel label, LocaleContext localeContext)
+    private ResourceSetLabel resolveLabelName(String realm, ResourceSetLabel label, LocaleContext localeContext,
+                                              Context serverContext)
             throws InternalServerErrorException {
         if (label.getId().endsWith("/" + label.getName())) {
             String resourceServerId = label.getId().substring(0, label.getId().lastIndexOf("/"));
-            String resourceServerName = resolveResourceServerName(resourceServerId, realm, localeContext);
+            String resourceServerName = resolveResourceServerName(resourceServerId, realm, localeContext, serverContext);
             if (resourceServerName != null) {
                 label.setName(resourceServerName + "/" + label.getName());
             }
@@ -208,33 +209,11 @@ public class UmaLabelResource implements CollectionResourceProvider {
         return label;
     }
 
-    private String resolveResourceServerName(String resourceServerId, final String realm, LocaleContext localeContext)
+    private String resolveResourceServerName(String resourceServerId, final String realm, LocaleContext
+            localeContext, Context serverContext)
             throws InternalServerErrorException {
         try {
-            ClientRegistration clientRegistration = clientRegistrationStore.get(resourceServerId, new OAuth2Request() {
-                @Override
-                public <T> T getRequest() {
-                    throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
-                }
-
-                @Override
-                public <T> T getParameter(String name) {
-                    if (OAuth2Constants.Custom.REALM.equals(name)) {
-                        return (T) realm;
-                    }
-                    throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
-                }
-
-                @Override
-                public JsonValue getBody() {
-                    return null;
-                }
-
-                @Override
-                public Locale getLocale() {
-                    return null;
-                }
-            });
+            ClientRegistration clientRegistration = clientRegistrationStore.get(resourceServerId, realm, serverContext);
             return clientRegistration.getDisplayName(localeContext.getLocale());
         } catch (InvalidClientException | NotFoundException e) {
             throw new InternalServerErrorException("Could not resolve Resource Server label name", e);

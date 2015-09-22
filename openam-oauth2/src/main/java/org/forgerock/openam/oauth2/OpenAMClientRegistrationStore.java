@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import org.forgerock.services.context.Context;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -76,13 +77,23 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
     /**
      * {@inheritDoc}
      */
-    public OpenIdConnectClientRegistration get(String clientId, OAuth2Request request) 
+    public OpenIdConnectClientRegistration get(String clientId, OAuth2Request request)
             throws InvalidClientException, NotFoundException {
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
         return new OpenAMClientRegistration(getIdentity(clientId, realm), pemDecoder, resolverService,
                 providerSettingsFactory.get(request));
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public OpenIdConnectClientRegistration get(String clientId, String realm, Context context)
+            throws InvalidClientException, NotFoundException {
+
+        final String normalisedRealm = realmNormaliser.normalise(realm);
+        return new OpenAMClientRegistration(getIdentity(clientId, normalisedRealm), pemDecoder, resolverService,
+                providerSettingsFactory.get(normalisedRealm, context));
     }
 
     @SuppressWarnings("unchecked")

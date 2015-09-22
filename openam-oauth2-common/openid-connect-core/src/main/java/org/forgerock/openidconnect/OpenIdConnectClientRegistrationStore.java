@@ -16,6 +16,7 @@
 
 package org.forgerock.openidconnect;
 
+import org.forgerock.services.context.Context;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -33,4 +34,11 @@ public interface OpenIdConnectClientRegistrationStore extends ClientRegistration
      */
     OpenIdConnectClientRegistration get(String clientId, OAuth2Request request) 
             throws InvalidClientException, NotFoundException;
+
+    /**
+     * {@inheritDoc}
+     */
+    OpenIdConnectClientRegistration get(String clientId, String realm, Context context)
+            throws InvalidClientException, NotFoundException;
+
 }
