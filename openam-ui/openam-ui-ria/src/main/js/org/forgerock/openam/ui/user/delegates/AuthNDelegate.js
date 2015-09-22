@@ -152,7 +152,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
         }).then(processSucceeded, function (jqXHR) {
             var oldReqs,errorBody,msg,
                 currentStage = requirementList.length,
-                responseMessage = jqXHR.responseJSON.message,
+                message,
                 failReason = null,
                 countIndex,
                 warningText = "Invalid Password!!Warning: Account lockout will occur after next ";
@@ -187,11 +187,16 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                  */
                 }).fail(processFailed);
             } else if (jqXHR.status === 500) {
-                msg = {
-                    message: responseMessage,
-                    type: "error"
-                };
-                Messages.messages.addMessage(msg);
+                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    message = jqXHR.responseJSON.message;
+                } else {
+                    message = $.t("config.messages.CommonMessages.unknown");
+                }
+
+                Messages.addMessage({
+                    message: message,
+                    type: Messages.TYPE_DANGER
+                });
             } else { // we have a 401 unauthorized response
                 errorBody = $.parseJSON(jqXHR.responseText);
 
