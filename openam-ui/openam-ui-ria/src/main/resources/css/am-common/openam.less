@@ -128,9 +128,13 @@
     >tbody>tr>td{
       vertical-align: middle;
     }
-
 }
 
+.table-with-border-bottom {
+    tbody>tr:last-of-type>td {
+        border-bottom: 1px solid #eee;
+    }
+}
 
 .page-toolbar, .panel-toolbar {
     border-bottom: 1px solid #ddd; //FIXME: Needs to go into Bootstrap

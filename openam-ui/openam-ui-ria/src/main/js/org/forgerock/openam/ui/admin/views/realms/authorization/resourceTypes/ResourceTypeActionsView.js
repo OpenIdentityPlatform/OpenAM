@@ -19,89 +19,129 @@
 define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypeActionsView", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/common/main/AbstractView" ,
-    "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListEditingView"
-], function ($, _, AbstractView, StripedListEditingView) {
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function ($, _, AbstractView, EventManager, Constants, UIUtils) {
 
-    function ResourceTypeActionsView() {
-    }
+    return AbstractView.extend({
+        element: "#actions",
+        template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesActionsTemplate.html",
+        noBaseTemplate: true,
+        events: {
+            "click .radio-inline": "toggleRadio",
+            "keyup .radio-inline": "toggleRadio",
+            "click .editing button": "addItem",
+            "keyup .editing button": "addItem",
+            "click .fa-close ": "deleteItem",
+            "keyup .fa-close ": "deleteItem"
+        },
+        render: function(data, el, callback) {
+            var self = this;
+            _.extend(this.data, data);
+            this.element = el;
 
-    // TODO: Rename StripedListEditingView or rewrite to bootstrap table
-    ResourceTypeActionsView.prototype = new StripedListEditingView();
-
-    ResourceTypeActionsView.prototype.render = function (entity, actions, el, callback) {
-        this.data = {};
-        this.entity = entity;
-
-        this.data.items = actions || [];
-
-        this.events["click .radio-inline"] = this.toggleRadio.bind(this);
-        this.events["keyup .radio-inline"] = this.toggleRadio.bind(this);
-
-        this.baseRender(this.data, "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesActionsTemplate.html", el, callback);
-    };
-
-    ResourceTypeActionsView.prototype.toggleRadio = function (e) {
-        var target = $(e.target),
-            permitted,
-            actionName,
-            parent;
-
-        parent = target.parents("li");
-
-        permitted = target.val() || target.find("input").val();
-        actionName = parent.data("item-name").toString();
-
-        if (!actionName) {
-            return;
-        }
-
-        _.find(this.data.items,function (action) {
-            return action.name === actionName;
-        }).value = (permitted === "true");
-
-        this.updateEntity();
-
-        this.renderParent();
-    };
-
-    ResourceTypeActionsView.prototype.getPendingItem = function (e) {
-        var editing = this.$el.find(".editing"),
-            key = editing.find(".form-control"),
-            input = editing.find("input:checked"),
-            action = {};
-
-        action.name = key.val();
-        action.value = input.val() === "true";
-
-        return action;
-    };
-
-    ResourceTypeActionsView.prototype.isValid = function (e) {
-        return this.getPendingItem(e).name !== "";
-    };
-
-    ResourceTypeActionsView.prototype.isExistingItem = function (itemPending, itemFromCollection) {
-        return itemPending.name === itemFromCollection.name;
-    };
-
-    ResourceTypeActionsView.prototype.getCollectionWithout = function (e) {
-        var itemName = $(e.target).parents("li").data("item-name");
-        return _.without(this.data.items, _.findWhere(this.data.items, {name: itemName}));
-    };
-
-    ResourceTypeActionsView.prototype.updateEntity = function () {
-        var actions = null;
-
-        if (this.data.items.length) {
-            actions = {};
-            this.data.items.forEach(function (el) {
-                actions[el.name] = el.value;
+            this.parentRender(function () {
+                self.renderActionsTable(callback);
             });
+        },
+
+        renderActionsTable: function (callback) {
+            var self = this;
+            UIUtils.fillTemplateWithData(
+                "templates/admin/views/realms/authorization/common/ActionsTableTemplate.html",
+                { "items": this.data.actions }, function (tpl) {
+                    self.$el.find("#createdActions").html(tpl);
+                    if (callback) {
+                        callback();
+                    }
+                });
+        },
+
+        updateEntity: function () {
+            var actions = null;
+
+            if (this.data.actions.length) {
+                actions = {};
+                this.data.actions.forEach(function (el) {
+                    actions[el.name] = el.value;
+                });
+            }
+
+            this.data.entity.actions = actions;
+        },
+
+        isExistingItem: function (itemPending, itemFromCollection) {
+            return itemPending.name === itemFromCollection.name;
+        },
+
+        addItem: function (e) {
+            if (e.type === "keyup" && e.keyCode !== 13) {
+                return;
+            }
+
+            var editing = this.$el.find(".editing"),
+                actionName = editing.find(".form-control").val(),
+                pending = {"name": actionName, "value": true},
+                duplicateIndex = -1,
+                counter = 0,
+                self = this;
+
+            if (pending.name === "") {
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidItem");
+                return;
+            }
+
+            _.each(this.data.actions, function (item) {
+                if (self.isExistingItem(pending, item)) {
+                    duplicateIndex = counter;
+                    return;
+                }
+                counter++;
+            });
+
+            if (duplicateIndex >= 0) {
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateItem");
+            } else {
+                this.data.actions.push(pending);
+                this.updateEntity();
+                this.renderActionsTable(function () {
+                    self.$el.find(".editing input[type=text]").focus();
+                });
+            }
+        },
+
+        deleteItem: function (e) {
+            if (e.type === "keyup" && e.keyCode !== 13) {
+                return;
+            }
+
+            var $target = $(e.target),
+                actionName = $target.closest("tr").find(".action-name").text().trim();
+
+            this.data.actions = _.without(this.data.actions, _.findWhere(this.data.actions, {name: actionName}));
+            this.updateEntity();
+            this.renderActionsTable();
+        },
+
+        toggleRadio: function (e) {
+            var $target = $(e.target),
+                permitted,
+                actionName;
+
+            permitted = $target.val() || $target.find("input").val();
+            actionName = $target.closest("tr").find(".action-name").text().trim();
+
+            if (!actionName) {
+                return;
+            }
+
+            _.find(this.data.actions, function (action) {
+                return action.name === actionName;
+            }).value = (permitted === "true");
+
+            this.updateEntity();
         }
-
-        this.entity.actions = actions;
-    };
-
-    return ResourceTypeActionsView;
+    });
 });

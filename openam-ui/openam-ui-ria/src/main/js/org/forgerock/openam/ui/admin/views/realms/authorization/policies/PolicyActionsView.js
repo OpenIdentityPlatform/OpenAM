@@ -38,8 +38,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
             _.extend(this.data, data);
 
             var availableActions = _.cloneDeep(data.options.availableActions),
-                selectedActions = [],
-                itemTpl = "templates/admin/views/realms/authorization/policies/StripedListActionItemTemplate.html";
+                selectedActions = [];
 
             _.each(data.entity.actionValues, function (value, key) {
                 availableActions = _.without(availableActions, _.findWhere(availableActions, {action: key}));
@@ -47,6 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
             });
 
             this.data.availableActions = availableActions;
+            this.data.selectedActions = selectedActions;
 
             this.parentRender(function () {
                 var d1 = $.Deferred(), d2 = $.Deferred();
@@ -55,13 +55,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                     d1.resolve();
                 });
 
-                this.actionsListSelectedView = new StripedList();
-                this.actionsListSelectedView.render({
-                    itemTpl: itemTpl,
-                    items: selectedActions,
-                    title: $.t("console.authorization.common.action"),
-                    created: true
-                }, "#selectedActions", function () {
+                this.renderSelectedActions(function () {
                     d2.resolve();
                 });
 
@@ -85,6 +79,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                 });
         },
 
+        renderSelectedActions: function (callback) {
+            var self = this;
+            UIUtils.fillTemplateWithData(
+                "templates/admin/views/realms/authorization/common/ActionsTableTemplate.html",
+                {"items": this.data.selectedActions}, function (tpl) {
+                    self.$el.find("#selectedActions").html(tpl);
+                    if (callback) {
+                        callback();
+                    }
+                });
+        },
+
         selectAction: function (e) {
             e.preventDefault();
 
@@ -96,8 +102,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                 _.findWhere(this.data.availableActions, {action: actionName})
             );
             this.renderAvailableActions();
-            this.actionsListSelectedView.addItem(cloned);
-            this.actionsListSelectedView.renderItems();
+            this.data.selectedActions.push(cloned);
+            this.renderSelectedActions();
 
             this.data.entity.actionValues[action.action] = action.value;
         },
@@ -105,9 +111,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
         changePermission: function (e) {
             var $target = $(e.target),
                 permitted = ($target.val() || $target.find("input").val()) === "true",
-                actionName = $target.closest("li").data("listItem");
+                actionName = $target.closest("tr").find(".action-name").text().trim();
 
-            _.findWhere(this.actionsListSelectedView.getAllItems(), {action: actionName}).value = permitted;
+            _.findWhere(this.data.selectedActions, {action: actionName}).value = permitted;
 
             this.data.entity.actionValues[actionName] = permitted;
         },
@@ -117,11 +123,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                 return;
             }
             var $target = $(e.target),
-                actionName = $target.closest("li").data("listItem"),
-                selectedAction = _.findWhere(this.actionsListSelectedView.getAllItems(), {action: actionName});
+                actionName = $target.closest("tr").find(".action-name").text().trim(),
+                selectedAction = _.findWhere(this.data.selectedActions, {action: actionName});
 
-            this.actionsListSelectedView.removeItem(selectedAction);
-            this.actionsListSelectedView.renderItems();
+            this.data.selectedActions = _.without(this.data.selectedActions, selectedAction);
+            this.renderSelectedActions();
 
             delete this.data.entity.actionValues[actionName];
 

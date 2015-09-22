@@ -765,6 +765,7 @@
                 "environments": "Environments",
                 "resourceType": "Resource Type",
                 "resourceTypes": "Resource Types",
+                "defaultState": "Default State",
 
                 "noRealms": "There are no selected realms...",
                 "noActions": "There are no actions...",
@@ -777,6 +778,7 @@
                 "noPatterns": "There are no patterns...",
                 "noResourceTypesAvailable": "There are no available resource types...",
                 "noApplicationsAvailable": "There are no available policy sets...",
+                "noItems": "There are no items ...",
 
                 "weekdays": {
                     "Monday": {
@@ -807,10 +809,6 @@
                         "short": "sun",
                         "full": "Sunday"
                     }
-                },
-                "stripedList": {
-                    "filterPlaceholder": "Select or search for available items",
-                    "noItems": "There are no items ..."
                 }
             },
 

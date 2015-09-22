@@ -1,33 +1,9 @@
-<div class="list-table created-items">
-    {{#if items}}
-    <h5 class="list-group-header">{{t "console.authorization.common.actions"}}</h5>
-    <ul class="list-group">
-        {{#each items}}
-        <li class="{{#equals this ../../options.justAdded}}text-success{{/equals}} list-group-item" data-item-name="{{name}}">
-            {{name}}
-
-            <span tabindex="0" class="fa fa-close pull-right"></span>
-
-            <div class="pull-right radio-group">
-                <label class="radio-inline">
-                    <input name="{{name}}Permission" type="radio" value="true" {{#if value}}checked{{/if}}> {{t "common.form.allow"}}
-                </label>
-
-                <label class="radio-inline">
-                    <input name="{{name}}Permission" type="radio" value="false" {{#unless value}}checked{{/unless}}> {{t "common.form.deny"}}
-                </label>
-            </div>
-        </li>
-        {{/each}}
-    </ul>
-    {{/if}}
-
-    <div class="editing">
-        <div class="form-group">
-            <input class="form-control" type="text" placeholder="{{t 'console.authorization.resourceTypes.edit.addNewActionPlaceholder'}}" />
-        </div>
-        <button class="btn btn-default add-item">
-            <i class="fa fa-plus"></i> {{t 'console.authorization.resourceTypes.edit.addAction'}}
-        </button>
+<div id="createdActions"></div>
+<div class="editing">
+    <div class="form-group">
+        <input class="form-control" type="text" placeholder="{{t 'console.authorization.resourceTypes.edit.addNewActionPlaceholder'}}" />
     </div>
+    <button class="btn btn-default add-item">
+        <i class="fa fa-plus"></i> {{t 'console.authorization.resourceTypes.edit.addAction'}}
+    </button>
 </div>

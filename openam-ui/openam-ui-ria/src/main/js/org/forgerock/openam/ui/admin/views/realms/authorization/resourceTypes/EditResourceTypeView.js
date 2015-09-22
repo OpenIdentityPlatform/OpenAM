@@ -99,7 +99,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 self.patternsView.render(data.entity, data.entity.patterns, "#resTypePatterns", resolve());
 
                 self.actionsList = new ResourceTypeActionsView();
-                self.actionsList.render(data.entity, data.actions, "#resTypeActions", resolve());
+                self.actionsList.render(data, "#resTypeActions", resolve());
 
                 $.when.apply($, promises).done(function () {
                     if (self.renderCallback) { self.renderCallback(); }

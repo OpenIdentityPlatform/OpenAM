@@ -1,0 +1,39 @@
+{{#if items}}
+<table class="table actions-table table-with-border-bottom">
+    <thead>
+        <tr>
+            <th>{{t "console.authorization.common.action"}}</th>
+            <th>{{t "console.authorization.common.defaultState"}}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#each items}}
+        <tr>
+            {{#if action}}
+                <td class="action-name">{{action}}</td>
+            {{/if}}
+            {{#if name}}
+                <td class="action-name">{{name}}</td>
+            {{/if}}
+            <td class="action-permissions">
+                <div class="radio-group">
+                    <label class="radio-inline">
+                        <input name="{{action}}{{name}}Permission" type="radio" value="true" {{#if value}}checked{{/if}}> {{t "common.form.allow"}}
+                    </label>
+
+                    <label class="radio-inline">
+                        <input name="{{action}}{{name}}Permission" type="radio" value="false" {{#unless value}}checked{{/unless}}> {{t "common.form.deny"}}
+                    </label>
+                </div>
+            </td>
+            <td>
+                <button name="delete" type="button" class="btn btn-link pull-right" title="Delete">
+                    <i class="fa fa-close"></i>
+                </button>
+            </td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{/if}}
