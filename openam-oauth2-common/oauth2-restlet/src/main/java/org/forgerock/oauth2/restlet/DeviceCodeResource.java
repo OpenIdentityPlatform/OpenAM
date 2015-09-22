@@ -16,13 +16,11 @@
 
 package org.forgerock.oauth2.restlet;
 
-import static java.util.Arrays.asList;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.DeviceCode.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -48,6 +46,7 @@ import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 /**
@@ -73,7 +72,7 @@ public class DeviceCodeResource extends ServerResource {
         this.baseURLProviderFactory = baseURLProviderFactory;
     }
 
-    @Get
+    @Post
     public Representation issueCode()
             throws BadRequestException, NotFoundException, InvalidClientException, ServerException {
         final Request restletRequest = getRequest();

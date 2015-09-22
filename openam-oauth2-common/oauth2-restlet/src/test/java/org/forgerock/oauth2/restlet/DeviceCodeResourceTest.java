@@ -33,7 +33,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -83,7 +82,7 @@ public class DeviceCodeResourceTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(request.getMethod()).thenReturn(Method.GET);
+        when(request.getMethod()).thenReturn(Method.POST);
 
         resource = spy(new DeviceCodeResource(tokenStore, mockOAuth2RequestFactory(), clientRegistrationStore,
                 mockProviderSettingsFactory(), baseURLProviderFactory));

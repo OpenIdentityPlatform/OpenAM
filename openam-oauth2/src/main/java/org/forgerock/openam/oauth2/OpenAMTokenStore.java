@@ -868,6 +868,11 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             NotFoundException, InvalidGrantException {
         try {
             JsonValue token = tokenStore.read(code);
+
+            if (token == null) {
+                return null;
+            }
+
             DeviceCode deviceCode = new DeviceCode(token);
             if (!clientId.equals(deviceCode.getClientId())) {
                 throw new InvalidGrantException();

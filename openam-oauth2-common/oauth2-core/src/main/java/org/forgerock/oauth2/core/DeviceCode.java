@@ -188,10 +188,34 @@ public class DeviceCode extends JsonValue implements Token {
     }
 
     /**
-     * Sets this Device Code to issued state.
+     * Sets the tokens that have been issued for this Device Code.
      */
-    public void setIssued() {
+    public void setTokens(Map<String, String> tokens) {
+        this.put("tokens", tokens);
         this.put(ISSUED, stringToSet("true"));
+    }
+
+    /**
+     * Gets the tokens that have been issued for the device.
+     * @return The tokens.
+     */
+    public Map<String, String> getTokens() {
+        return (Map<String, String>) this.get("tokens").getObject();
+    }
+
+    /**
+     * Updates the last poll time of this device code.
+     */
+    public void poll() {
+        this.put("lastQueried", System.currentTimeMillis());
+    }
+
+    /**
+     * Gets the time that this device code was last polled by the device.
+     * @return The last poll time in milliseconds.
+     */
+    public long getLastPollTime() {
+        return this.get("lastQueried").asLong();
     }
 
     /**

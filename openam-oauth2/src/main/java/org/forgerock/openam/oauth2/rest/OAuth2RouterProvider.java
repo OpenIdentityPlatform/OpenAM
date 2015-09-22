@@ -31,6 +31,7 @@ import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
 import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
 import org.forgerock.oauth2.restlet.AuthorizeResource;
 import org.forgerock.oauth2.restlet.DeviceCodeResource;
+import org.forgerock.oauth2.restlet.DeviceTokenResource;
 import org.forgerock.oauth2.restlet.TokenEndpointFilter;
 import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
@@ -109,6 +110,7 @@ public class OAuth2RouterProvider implements Provider<Router> {
         // Device Code
 
         router.attach("/device/code", wrap(DeviceCodeResource.class));
+        router.attach("/device/token", wrap(DeviceTokenResource.class));
 
         return router;
     }
