@@ -39,6 +39,7 @@ import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.UpdateResponse;
 import com.sun.identity.idsvcs.opensso.GeneralAccessDeniedError;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.SMSException;
@@ -78,6 +79,7 @@ import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
@@ -1358,8 +1360,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
 
-        Token admin = new Token();
-        admin.setId(getCookieFromServerContext(context));
+        Token token = new Token();
+        token.setId(getCookieFromServerContext(context));
 
         final JsonValue jVal = request.getContent();
         final String rev = request.getRevision();
@@ -1368,14 +1370,23 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         Resource resource;
         try {
             // Retrieve details about user to be updated
-            dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), token);
             // Continue modifying the identity if read success
 
-            for (String key : jVal.keys()) {
-                if ("userpassword".equalsIgnoreCase(key)) {
-                    handler.handleError(new BadRequestException("Cannot update user password via PUT. "
-                            + "Use POST with _action=changePassword or _action=forgotPassword."));
-                    return;
+            SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
+            SSOToken ssoToken = tokenContext.getSSOToken(getCookieFromServerContext(context));
+
+            boolean isUpdatingHisOwnPassword = SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID) ?
+                    ssoToken.getProperty(ISAuthConstants.USER_ID).equals(resourceId) :
+                    ssoToken.getProperty(ISAuthConstants.USER_ID).equalsIgnoreCase(resourceId);
+
+            if (isUpdatingHisOwnPassword) {
+                for (String key : jVal.keys()) {
+                    if (USER_PASSWORD.equalsIgnoreCase(key)) {
+                        handler.handleError(new BadRequestException("Cannot update user password via PUT. "
+                                + "Use POST with _action=changePassword or _action=forgotPassword."));
+                        return;
+                    }
                 }
             }
 
@@ -1431,12 +1442,12 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             }
 
             // update resource with new details
-            UpdateResponse message = idsvc.update(newDtls, admin);
+            UpdateResponse message = idsvc.update(newDtls, token);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.updateInstance :: UPDATE of " + resourceId + " in realm " + realm +
                     " performed by " + principalName);
             // read updated identity back to client
-            IdentityDetails checkIdent = idsvc.read(dtls.getName(), getIdentityServicesAttributes(realm), admin);
+            IdentityDetails checkIdent = idsvc.read(dtls.getName(), getIdentityServicesAttributes(realm), token);
             // handle updated resource
             resource = new Resource(resourceId, "0", identityDetailsToJsonValue(checkIdent));
             handler.handleResult(resource);
