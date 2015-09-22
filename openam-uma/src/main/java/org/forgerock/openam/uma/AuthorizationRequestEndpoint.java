@@ -47,9 +47,11 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
+import org.forgerock.openam.uma.extensions.RequestAuthorizationFilter;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
@@ -79,6 +81,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     private final UmaAuditLogger auditLogger;
     private final PendingRequestsService pendingRequestsService;
     private final Map<String, ClaimGatherer> claimGatherers;
+    private final ExtensionFilterManager extensionFilterManager;
 
     /**
      * Constructs a new AuthorizationRequestEndpoint
@@ -87,7 +90,8 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     public AuthorizationRequestEndpoint(UmaProviderSettingsFactory umaProviderSettingsFactory,
             TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
             OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, UmaAuditLogger auditLogger,
-            PendingRequestsService pendingRequestsService, Map<String, ClaimGatherer> claimGatherers) {
+            PendingRequestsService pendingRequestsService, Map<String, ClaimGatherer> claimGatherers,
+            ExtensionFilterManager extensionFilterManager) {
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
         this.requestFactory = requestFactory;
         this.oauth2TokenStore = oauth2TokenStore;
@@ -95,6 +99,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         this.auditLogger = auditLogger;
         this.pendingRequestsService = pendingRequestsService;
         this.claimGatherers = claimGatherers;
+        this.extensionFilterManager = extensionFilterManager;
     }
 
     @Post
@@ -222,7 +227,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     }
 
     private boolean isEntitled(UmaProviderSettings umaProviderSettings, PermissionTicket permissionTicket,
-            String requestingPartyId) throws EntitlementException, ServerException {
+            String requestingPartyId) throws EntitlementException, ServerException, UmaException {
         String realm = permissionTicket.getRealm();
         String resourceSetId = permissionTicket.getResourceSetId();
         String resourceName = UmaConstants.UMA_POLICY_SCHEME;
@@ -243,11 +248,13 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         }
         Subject requestingPartySubject = UmaUtils.createSubject(createIdentity(requestingPartyId, realm));
 
+        beforeAuthorization(permissionTicket, requestingPartySubject, resourceOwnerSubject);
+
         // Implicitly grant access to the resource owner
         if (isRequestingPartyResourceOwner(requestingPartySubject, resourceOwnerSubject)) {
+            afterAuthorization(true, permissionTicket, requestingPartySubject, resourceOwnerSubject);
             return true;
         }
-
         List<Entitlement> entitlements = umaProviderSettings.getPolicyEvaluator(requestingPartySubject,
                 permissionTicket.getClientId().toLowerCase())
                 .evaluate(realm, requestingPartySubject, resourceName, null, false);
@@ -263,11 +270,27 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             }
         }
 
-        return requiredScopes.isEmpty();
+        boolean isAuthorized = requiredScopes.isEmpty();
+        afterAuthorization(isAuthorized, permissionTicket, requestingPartySubject, resourceOwnerSubject);
+        return isAuthorized;
     }
 
     private boolean isRequestingPartyResourceOwner(Subject requestingParty, Subject resourceOwner) {
         return resourceOwner.equals(requestingParty);
+    }
+
+    private void beforeAuthorization(PermissionTicket permissionTicket, Subject requestingParty,
+            Subject resourceOwner) throws UmaException {
+        for (RequestAuthorizationFilter filter : extensionFilterManager.getFilters(RequestAuthorizationFilter.class)) {
+            filter.beforeAuthorization(permissionTicket, requestingParty, resourceOwner);
+        }
+    }
+
+    private void afterAuthorization(boolean isAuthorized, PermissionTicket permissionTicket, Subject requestingParty,
+            Subject resourceOwner) {
+        for (RequestAuthorizationFilter filter : extensionFilterManager.getFilters(RequestAuthorizationFilter.class)) {
+            filter.afterAuthorization(isAuthorized, permissionTicket, requestingParty, resourceOwner);
+        }
     }
 
     protected AMIdentity createIdentity(String username, String realm) {
