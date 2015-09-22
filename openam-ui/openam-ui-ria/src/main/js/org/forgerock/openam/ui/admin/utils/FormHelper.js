@@ -43,7 +43,8 @@ define("org/forgerock/openam/ui/admin/utils/FormHelper", [
         element.width(element.width());
 
         var span = element.find("span"),
-            text = span.text();
+            text = span.text(),
+            elementClass = element.attr("class");
 
         span.fadeOut(300, function () {
             span.empty();
@@ -54,11 +55,12 @@ define("org/forgerock/openam/ui/admin/utils/FormHelper", [
                 span.removeClass().addClass("fa fa-check fa-fw");
             }).fail(function () {
                 span.removeClass().addClass("fa fa-times fa-fw");
+                element.removeClass().addClass("btn btn-danger");
             }).always(function () {
                 _.delay(function () {
                     span.fadeOut(300, function () {
                         span.removeClass().text(text);
-                        element.prop("disabled", false);
+                        element.removeClass().addClass(elementClass).prop("disabled", false);
                         span.fadeIn(300);
                     });
                 }, 1000);
