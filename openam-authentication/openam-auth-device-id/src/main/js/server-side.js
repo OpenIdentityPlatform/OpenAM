@@ -782,10 +782,11 @@ function matchDevicePrint() {
                 function getNotExpiredProfiles() {
                     var profile,
                         results = [],
-                        profiles = idRepository.getAttribute(username, "devicePrintProfiles");
+                        profiles = idRepository.getAttribute(username, "devicePrintProfiles"),
+                        iter;
                 
                     if (profiles) {
-                        var iter = profiles.iterator();
+                        iter = profiles.iterator();
                         
                         while (iter.hasNext()) {
                             profile = JSON.parse(iter.next());
