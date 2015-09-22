@@ -26,9 +26,12 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
+
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -45,6 +48,7 @@ import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.utils.Utils;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthorizationCode;
+import org.forgerock.oauth2.core.DeviceCode;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -60,6 +64,7 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
@@ -88,6 +93,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     private final RealmNormaliser realmNormaliser;
     private final SSOTokenManager ssoTokenManager;
     private final CookieExtractor cookieExtractor;
+    private final SecureRandom secureRandom;
 
     /**
      * Constructs a new OpenAMTokenStore.
@@ -104,7 +110,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     public OpenAMTokenStore(OAuthTokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
-                            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger) {
+            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger, SecureRandom secureRandom) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.clientRegistrationStore = clientRegistrationStore;
@@ -113,6 +119,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         this.cookieExtractor = cookieExtractor;
         this.auditLogger = auditLogger;
         this.logger = logger;
+        this.secureRandom = secureRandom;
     }
 
     /**
@@ -125,7 +132,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         logger.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
 
         OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
-        
+
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String code = UUID.randomUUID().toString();
 
@@ -135,7 +142,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         } else {
             expiryTime = clientRegistration.getAuthorizationCodeLifeTime(providerSettings) + System.currentTimeMillis();
         }
-        
+
         final String ssoTokenId = getSsoTokenId(request);
 
         final OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwner.getId(), clientId,
@@ -791,6 +798,127 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             throws InvalidGrantException, NotFoundException {
         if (!tokenRealm.equals(realmNormaliser.normalise(request.<String>getParameter(REALM)))) {
             throw new InvalidGrantException("Grant is not valid for the requested realm");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public DeviceCode createDeviceCode(Set<String> scope, String clientId, String nonce, String responseType,
+            String state, String acrValues, String prompt, String uiLocales, String loginHint,
+            int maxAge, String claims, OAuth2Request request, String codeChallenge, String codeChallengeMethod)
+            throws ServerException, NotFoundException {
+
+        logger.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
+
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final String deviceCode = UUID.randomUUID().toString();
+
+        String userCode = null;
+        int i;
+        for (i = 0; userCode == null && i < 10; i++) {
+            // A 6-byte array will result in an 8-char Base64 user code.
+            byte[] randomBytes = new byte[6];
+            secureRandom.nextBytes(randomBytes);
+            userCode = Base64.encode(randomBytes);
+            try {
+                readDeviceCode(userCode, request);
+                // code can be found - try again
+            } catch (InvalidGrantException e) {
+                // Good, it doesn't exist yet.
+                break;
+            } catch (ServerException e) {
+                logger.message("Could not query CTS, assume duplicate to be safe", e);
+            }
+            userCode = null;
+        }
+
+        if (i == 10) {
+            throw new ServerException("Could not generate a unique user code");
+        }
+
+        long expiryTime = System.currentTimeMillis() + (1000 * providerSettings.getDeviceCodeLifetime());
+        final DeviceCode code = new DeviceCode(deviceCode, userCode, clientId, nonce, responseType, state,
+                acrValues, prompt, uiLocales, loginHint, maxAge, claims, expiryTime, scope,
+                realmNormaliser.normalise(request.<String>getParameter(REALM)), codeChallenge, codeChallengeMethod);
+
+        // Store in CTS
+        try {
+            tokenStore.create(code);
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"CREATED_DEVICE_CODE", code.toString()};
+                auditLogger.logAccessMessage("CREATED_DEVICE_CODE", obs, null);
+            }
+        } catch (CoreTokenException e) {
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"FAILED_CREATE_DEVICE_CODE", code.toString()};
+                auditLogger.logErrorMessage("FAILED_CREATE_DEVICE_CODE", obs, null);
+            }
+            logger.error("Unable to create device code " + code, e);
+            throw new ServerException("Could not create token in CTS");
+        }
+
+        request.setToken(DeviceCode.class, code);
+
+        return code;
+    }
+
+    @Override
+    public DeviceCode readDeviceCode(String clientId, String code, OAuth2Request request) throws ServerException,
+            NotFoundException, InvalidGrantException {
+        try {
+            JsonValue token = tokenStore.read(code);
+            DeviceCode deviceCode = new DeviceCode(token);
+            if (!clientId.equals(deviceCode.getClientId())) {
+                throw new InvalidGrantException();
+            }
+            validateTokenRealm(deviceCode.getRealm(), request);
+            request.setToken(DeviceCode.class, deviceCode);
+            return deviceCode;
+        } catch (CoreTokenException e) {
+            logger.error("Unable to read device code corresponding to id: " + code, e);
+            throw new ServerException("Could not read token in CTS: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public DeviceCode readDeviceCode(String userCode, OAuth2Request request) throws ServerException, NotFoundException,
+            InvalidGrantException {
+        try {
+            JsonValue token = tokenStore.query(equalTo(CoreTokenField.STRING_FOURTEEN, userCode));
+
+            if (token.size() != 1) {
+                throw new InvalidGrantException();
+            }
+
+            DeviceCode deviceCode = new DeviceCode(token);
+            request.setToken(DeviceCode.class, deviceCode);
+            return deviceCode;
+        } catch (CoreTokenException e) {
+            logger.error("Unable to read device code corresponding to id: " + userCode, e);
+            throw new ServerException("Could not read token in CTS: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void updateDeviceCode(DeviceCode code, OAuth2Request request) throws ServerException, NotFoundException,
+            InvalidGrantException {
+        try {
+            readDeviceCode(code.getClientId(), code.getDeviceCode(), request);
+            tokenStore.update(code);
+        } catch (CoreTokenException e) {
+            throw new ServerException("Could not update user code state");
+        }
+    }
+
+    @Override
+    public void deleteDeviceCode(String clientId, String code, OAuth2Request request) throws ServerException,
+            NotFoundException, InvalidGrantException {
+        try {
+            readDeviceCode(clientId, code, request);
+            tokenStore.delete(code);
+        } catch (CoreTokenException e) {
+            throw new ServerException("Could not delete user code state");
         }
     }
 }

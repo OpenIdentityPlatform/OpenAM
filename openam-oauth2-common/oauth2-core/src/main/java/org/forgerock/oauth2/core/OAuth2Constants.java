@@ -794,7 +794,7 @@ public class OAuth2Constants {
         public static final String MODULE = "module";
         public static final String SERVICE = "service";
         public static final String LOCALE = "locale";
-        public static final String UI_LOCALE = "ui_locale";
+        public static final String UI_LOCALES = "ui_locales";
         public static final String GOTO = "goto";
 
         public static final String AUDIENCE = "audience";
@@ -809,6 +809,8 @@ public class OAuth2Constants {
 
         public static final String RSR_ENDPOINT = "resource-set-reg-endpoint";
         public static final String JWK_RESOLVER = "jwk-resolver";
+        public static final String DEVICE_CODE = "device_code";
+        public static final String DEVICE_USER_CODE = "user_code";
     }
 
     public enum DisplayType {
@@ -870,6 +872,11 @@ public class OAuth2Constants {
         public static final String ALWAYS_ADD_CLAIMS_TO_TOKEN = "alwaysAddClaimsToToken";
         public static final String USER_DISPLAY_NAME_ATTRIBUTE = "displayNameAttribute";
         public static final String RESOURCE_OWNER_CUSTOM_LOGIN_URL_TEMPLATE = "customLoginUrlTemplate";
+        public static final String DEVICE_VERIFICATION_URL = "verificationUrl";
+        public static final String DEVICE_COMPLETION_URL = "completionUrl";
+        public static final String DEVICE_CODE_LIFETIME = "deviceCodeLifetime";
+        public static final String DEVICE_CODE_POLL_INTERVAL = "devicePollInterval";
+        public static final String DEVICE_CODE_ASYNC_LIFETIME = "deviceAsyncRequestTimeout";
     }
 
     /**

@@ -18,17 +18,26 @@ package org.forgerock.openam.oauth2;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.assertj.core.data.Offset.offset;
+import static java.util.Collections.singletonMap;
 
 import com.iplanet.sso.SSOTokenManager;
+
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.identity.shared.debug.Debug;
+
+import org.assertj.core.data.Offset;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.DeviceCode;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -39,6 +48,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.guice.OAuth2GuiceModule;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
+import org.forgerock.util.query.QueryFilter;
 import org.restlet.Request;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -71,7 +81,7 @@ public class OpenAMTokenStoreTest {
         debug = mock(Debug.class);
 
         openAMtokenStore = new OpenAMTokenStore(tokenStore, providerSettingsFactory, clientRegistrationStore,
-                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug);
+                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug, new SecureRandom());
     }
 
     @Test
@@ -163,7 +173,7 @@ public class OpenAMTokenStoreTest {
         //Given
         OpenAMTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticTokenStore(tokenStore,
                 providerSettingsFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor,
-                auditLogger, debug);
+                auditLogger, debug, new SecureRandom());
         JsonValue token = json(object(
                 field("tokenName", Collections.singleton("access_token")),
                 field("realm", Collections.singleton("/otherrealm"))));
@@ -180,5 +190,115 @@ public class OpenAMTokenStoreTest {
         //Then
         assertThat(accessToken).isNotNull();
         assertThat(request.getToken(AccessToken.class)).isSameAs(accessToken);
+    }
+
+    @Test
+    public void shouldCreateDeviceCode() throws Exception {
+        // Given
+        OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
+        given(providerSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
+        given(providerSettings.getDeviceCodeLifetime()).willReturn(10);
+        given(tokenStore.query(any(QueryFilter.class))).willReturn(json(array()));
+        final RestletOAuth2Request oauth2Request = new RestletOAuth2Request(this.request);
+        given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "MY_REALM")));
+        given(realmNormaliser.normalise("MY_REALM")).willReturn("MY_REALM");
+
+        // When
+        DeviceCode code = openAMtokenStore.createDeviceCode(asSet("one", "two"), "CLIENT ID", "NONCE", "RESPONSE TYPE",
+                "STATE", "ACR VALUES", "PROMPT", "UI LOCALES", "LOGIN HINT", 55, "CLAIMS",
+                oauth2Request, "CODE CHALLENGE", "CODE METHOD");
+
+        // Then
+        assertThat(code.getScope()).containsOnly("one", "two");
+        assertThat(code.getClientId()).isEqualTo("CLIENT ID");
+        assertThat(code.getNonce()).isEqualTo("NONCE");
+        assertThat(code.getResponseType()).isEqualTo("RESPONSE TYPE");
+        assertThat(code.getState()).isEqualTo("STATE");
+        assertThat(code.getAcrValues()).isEqualTo("ACR VALUES");
+        assertThat(code.getPrompt()).isEqualTo("PROMPT");
+        assertThat(code.getUiLocales()).isEqualTo("UI LOCALES");
+        assertThat(code.getLoginHint()).isEqualTo("LOGIN HINT");
+        assertThat(code.getClaims()).isEqualTo("CLAIMS");
+        assertThat(code.getCodeChallenge()).isEqualTo("CODE CHALLENGE");
+        assertThat(code.getCodeChallengeMethod()).isEqualTo("CODE METHOD");
+        assertThat(code.getMaxAge()).isEqualTo(55);
+        assertThat(code.getTokenName()).isEqualTo("device_code");
+        assertThat(code.getExpiryTime()).isCloseTo(System.currentTimeMillis() + 10000, offset(1000L));
+        assertThat(code.getTokenId()).matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
+        assertThat(code.getUserCode()).matches("[a-zA-Z0-9+/]{8}");
+        assertThat(code.getRealm()).isEqualTo("MY_REALM");
+    }
+
+    @Test(expectedExceptions = InvalidGrantException.class)
+    public void shouldThrowExceptionForInvalidDeviceCodeJsonValue() throws Exception {
+        // Given
+        given(tokenStore.read("123")).willReturn(json(object(field("tokenName", asSet("device_code")))));
+
+        // When
+        openAMtokenStore.readDeviceCode(null, "123", null);
+    }
+
+    @Test
+    public void shouldReadValidDeviceCode() throws Exception {
+        // Given
+        given(tokenStore.read("123")).willReturn(json(object(
+                field("tokenName", asSet("device_code")),
+                field("id", asSet("123")),
+                field("user_code", asSet("456")),
+                field("realm", asSet("/")),
+                field("clientID", asSet("CLIENT_ID")))));
+        final RestletOAuth2Request oauth2Request = new RestletOAuth2Request(this.request);
+        given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
+        given(realmNormaliser.normalise("/")).willReturn("/");
+
+        // When
+        DeviceCode code = openAMtokenStore.readDeviceCode("CLIENT_ID", "123", oauth2Request);
+
+        // Then
+        assertThat(code.getTokenId()).isEqualTo("123");
+        assertThat(code.getUserCode()).isEqualTo("456");
+        assertThat(code.getClientId()).isEqualTo("CLIENT_ID");
+    }
+
+    @Test
+    public void shouldUpdateDeviceCode() throws Exception {
+        // Given
+        DeviceCode code = new DeviceCode(json(object(
+                field("tokenName", asSet("device_code")),
+                field("id", asSet("123")),
+                field("user_code", asSet("456")),
+                field("realm", asSet("/")),
+                field("clientID", asSet("CLIENT_ID")))));
+        given(tokenStore.read("123")).willReturn(code);
+        final RestletOAuth2Request oauth2Request = new RestletOAuth2Request(this.request);
+        given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
+        given(realmNormaliser.normalise("/")).willReturn("/");
+
+        // When
+        openAMtokenStore.updateDeviceCode(code, oauth2Request);
+
+        // Then
+        verify(tokenStore).update(code);
+    }
+
+    @Test
+    public void shouldDeleteDeviceCode() throws Exception {
+        // Given
+        DeviceCode code = new DeviceCode(json(object(
+                field("tokenName", asSet("device_code")),
+                field("id", asSet("123")),
+                field("user_code", asSet("456")),
+                field("realm", asSet("/")),
+                field("clientID", asSet("CLIENT_ID")))));
+        given(tokenStore.read("123")).willReturn(code);
+        final RestletOAuth2Request oauth2Request = new RestletOAuth2Request(this.request);
+        given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
+        given(realmNormaliser.normalise("/")).willReturn("/");
+
+        // When
+        openAMtokenStore.deleteDeviceCode("CLIENT_ID", "123", oauth2Request);
+
+        // Then
+        verify(tokenStore).delete("123");
     }
 }

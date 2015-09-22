@@ -288,8 +288,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     private synchronized ScopeValidator getScopeValidator() throws ServerException {
         if (scopeValidator == null) {
             try {
-                final String scopeValidatorClassName =
-                        getStringSetting(realm, OAuth2ProviderService.SCOPE_PLUGIN_CLASS);
+                final String scopeValidatorClassName = getStringSettingValue(OAuth2ProviderService.SCOPE_PLUGIN_CLASS);
                 if (isEmpty(scopeValidatorClassName)) {
                     logger.message("Scope Validator class not set.");
                     throw new ServerException("Scope Validator class not set.");
@@ -304,12 +303,6 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
                 scopeValidator = InjectorHolder.getInstance(scopeValidatorClass.asSubclass(ScopeValidator.class));
 
-            } catch (SSOException e) {
-                logger.error(e.getMessage());
-                throw new ServerException(e);
-            } catch (SMSException e) {
-                logger.error(e.getMessage());
-                throw new ServerException(e);
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage());
                 throw new ServerException(e);
@@ -551,60 +544,28 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public long getAuthorizationCodeLifetime() throws ServerException {
-        try {
-            return getLongSetting(realm, OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
+        return getLongSettingValue(OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME);
     }
 
     /**
      * {@inheritDoc}
      */
     public long getAccessTokenLifetime() throws ServerException {
-        try {
-            return getLongSetting(realm, OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
+        return getLongSettingValue(OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME);
     }
 
     /**
      * {@inheritDoc}
      */
     public long getOpenIdTokenLifetime() throws ServerException {
-        try {
-            return getLongSetting(realm, OAuth2ProviderService.JWT_TOKEN_LIFETIME_NAME);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
+        return getLongSettingValue(OAuth2ProviderService.JWT_TOKEN_LIFETIME_NAME);
     }
 
     /**
      * {@inheritDoc}
      */
     public long getRefreshTokenLifetime() throws ServerException {
-        try {
-            return getLongSetting(realm, OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
+        return getLongSettingValue(OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME);
     }
 
     /**
@@ -830,15 +791,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
     @Override
     public String getHashSalt() throws ServerException {
-        try {
-            return getStringSetting(realm, OAuth2ProviderService.HASH_SALT);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
+        return getStringSettingValue(OAuth2ProviderService.HASH_SALT);
     }
 
     @Override
@@ -863,12 +816,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
     @Override
     public String getUserDisplayNameAttribute() throws ServerException {
-        try {
-            return getStringSetting(realm, OAuth2ProviderService.USER_DISPLAY_NAME_ATTRIBUTE);
-        } catch (SSOException | SMSException e) {
-            logger.error("Could not obtain display name", e);
-            throw new ServerException(e);
-        }
+        return getStringSettingValue(OAuth2ProviderService.USER_DISPLAY_NAME_ATTRIBUTE);
     }
 
     /**
@@ -903,20 +851,12 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public String getJWKSUri() throws ServerException {
-        try {
-            String userDefinedJWKUri = getStringSetting(realm, OAuth2ProviderService.JKWS_URI);
-            if (userDefinedJWKUri != null && !userDefinedJWKUri.isEmpty()) {
-                return userDefinedJWKUri;
-            }
-
-            return getOAuth2BaseUrl() + "/connect/jwk_uri";
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
+        String userDefinedJWKUri = getStringSettingValue(OAuth2ProviderService.JKWS_URI);
+        if (userDefinedJWKUri != null && !userDefinedJWKUri.isEmpty()) {
+            return userDefinedJWKUri;
         }
+
+        return getOAuth2BaseUrl() + "/connect/jwk_uri";
     }
 
     public JsonValue getJWKSet() throws ServerException {
@@ -951,29 +891,12 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     }
 
     public String getCreatedTimestampAttributeName() throws ServerException {
-        try {
-            return getStringSetting(realm, OAuth2ProviderService.CREATED_TIMESTAMP_ATTRIBUTE_NAME);
-        } catch (SSOException e) {
-
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
+        return getStringSettingValue(OAuth2ProviderService.CREATED_TIMESTAMP_ATTRIBUTE_NAME);
     }
 
 
     public String getModifiedTimestampAttributeName() throws ServerException {
-        try {
-            return getStringSetting(realm, OAuth2ProviderService.MODIFIED_TIMESTAMP_ATTRIBUTE_NAME);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
+        return getStringSettingValue(OAuth2ProviderService.MODIFIED_TIMESTAMP_ATTRIBUTE_NAME);
     }
 
     /**
@@ -1038,13 +961,23 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
     @Override
     public String getDefaultAcrValues() throws ServerException {
+        return getStringSettingValue(OAuth2ProviderService.DEFAULT_ACR);
+    }
+
+    private String getStringSettingValue(String key) throws ServerException {
         try {
-            return getStringSetting(realm, OAuth2ProviderService.DEFAULT_ACR);
-        } catch (SSOException e) {
-            logger.message(e.getMessage());
+            return getStringSetting(realm, key);
+        } catch (SSOException | SMSException e) {
+            logger.message("Could not get value of " + key, e);
             throw new ServerException(e);
-        } catch (SMSException e) {
-            logger.message(e.getMessage());
+        }
+    }
+
+    private long getLongSettingValue(String key) throws ServerException {
+        try {
+            return getLongSetting(realm, key);
+        } catch (SSOException | SMSException e) {
+            logger.error("Could not get value of " + key, e);
             throw new ServerException(e);
         }
     }
@@ -1085,6 +1018,31 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             logger.message(e.getMessage());
             throw new ServerException(e);
         }
+    }
+
+    @Override
+    public String getVerificationUrl() throws ServerException {
+        return getStringSettingValue(OAuth2ProviderService.DEVICE_VERIFICATION_URL);
+    }
+
+    @Override
+    public String getCompletionUrl() throws ServerException {
+        return getStringSettingValue(OAuth2ProviderService.DEVICE_COMPLETION_URL);
+    }
+
+    @Override
+    public int getDeviceCodeLifetime() throws ServerException {
+        return (int) getLongSettingValue(OAuth2ProviderService.DEVICE_CODE_LIFETIME);
+    }
+
+    @Override
+    public int getDeviceCodePollInterval() throws ServerException {
+        return (int) getLongSettingValue(OAuth2ProviderService.DEVICE_CODE_POLL_INTERVAL);
+    }
+
+    @Override
+    public int getDeviceCodeAsyncLifetime() throws ServerException {
+        return (int) getLongSettingValue(OAuth2ProviderService.DEVICE_CODE_ASYNC_LIFETIME);
     }
 
     /**

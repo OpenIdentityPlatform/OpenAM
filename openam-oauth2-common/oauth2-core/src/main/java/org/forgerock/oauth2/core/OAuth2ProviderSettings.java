@@ -486,4 +486,40 @@ public interface OAuth2ProviderSettings {
      * @throws ServerException If the custom login url template setting could not be retrieved.
      */
     Template getCustomLoginUrlTemplate() throws ServerException;
+
+    /**
+     * The URL that the user will be instructed to visit to complete their OAuth 2 login and consent when using the
+     * device code flow.
+     * @return The verification URL.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    String getVerificationUrl() throws ServerException;
+
+    /**
+     * The URL that the user will be sent to on completion of their OAuth 2 login and consent when using the device code flow.
+     * @return The completion URL.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    String getCompletionUrl() throws ServerException;
+
+    /**
+     * The lifetime of the device code.
+     * @return The lifetime in seconds.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    int getDeviceCodeLifetime() throws ServerException;
+
+    /**
+     * The polling interval for devices waiting for tokens when using the device code flow.
+     * @return The interval in seconds.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    int getDeviceCodePollInterval() throws ServerException;
+
+    /**
+     * The timeout for asynchronous requests from the device for tokens.
+     * @return The timeout in seconds.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    int getDeviceCodeAsyncLifetime() throws ServerException;
 }

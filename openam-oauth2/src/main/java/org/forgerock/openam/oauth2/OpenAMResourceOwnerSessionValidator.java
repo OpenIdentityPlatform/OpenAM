@@ -338,7 +338,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
 
     private String getRequestLocale(OAuth2Request request) {
         final String locale = request.getParameter(LOCALE);
-        final String uiLocale = request.getParameter(UI_LOCALE);
+        final String uiLocale = request.getParameter(UI_LOCALES);
         if (!isEmpty(uiLocale)) {
             return uiLocale;
         } else {

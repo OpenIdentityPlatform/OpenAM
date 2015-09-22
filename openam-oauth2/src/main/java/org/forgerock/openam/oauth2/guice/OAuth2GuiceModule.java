@@ -130,6 +130,8 @@ import org.restlet.Restlet;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -286,9 +288,9 @@ public class OAuth2GuiceModule extends AbstractModule {
             OAuth2ProviderSettingsFactory providerSettingsFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
-            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug) {
+            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug, SecureRandom secureRandom) {
         return new RealmAgnosticTokenStore(oauthTokenStore, providerSettingsFactory, clientRegistrationStore,
-                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug);
+                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug, secureRandom);
     }
 
     @Inject
@@ -338,9 +340,9 @@ public class OAuth2GuiceModule extends AbstractModule {
                 OAuth2ProviderSettingsFactory providerSettingsFactory,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
                 SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
-                Debug debug) {
+                Debug debug, SecureRandom secureRandom) {
             super(tokenStore, providerSettingsFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
-                    cookieExtractor, auditLogger, debug);
+                    cookieExtractor, auditLogger, debug, secureRandom);
         }
 
         @Override

@@ -19,7 +19,6 @@ package org.forgerock.oauth2.core;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,7 +35,6 @@ import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
@@ -121,7 +119,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         if (!haveConsent) {
             String localeParameter = request.getParameter(LOCALE);
-            String uiLocaleParameter = request.getParameter(UI_LOCALE);
+            String uiLocaleParameter = request.getParameter(UI_LOCALES);
             Locale locale = getLocale(uiLocaleParameter, localeParameter);
             if (locale == null) {
                 locale = request.getLocale();
