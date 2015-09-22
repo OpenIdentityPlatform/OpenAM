@@ -137,9 +137,9 @@ public class RestletRealmRouter extends Router {
     }
 
     private void validateRealm(Request request, String realm) {
-        if ("/.well-known".equals(realm)) {
-            return;
-        }
+        //if ("/.well-known".equals(realm)) {
+            //return;
+        //}
 
         if (!realmValidator.isRealm(realm)) {
             try {
