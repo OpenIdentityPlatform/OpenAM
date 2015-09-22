@@ -289,7 +289,11 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     private void afterAuthorization(boolean isAuthorized, PermissionTicket permissionTicket, Subject requestingParty,
             Subject resourceOwner) {
         for (RequestAuthorizationFilter filter : extensionFilterManager.getFilters(RequestAuthorizationFilter.class)) {
-            filter.afterAuthorization(isAuthorized, permissionTicket, requestingParty, resourceOwner);
+            if (isAuthorized) {
+                filter.afterSuccessfulAuthorization(permissionTicket, requestingParty, resourceOwner);
+            } else {
+                filter.afterFailedAuthorization(permissionTicket, requestingParty, resourceOwner);
+            }
         }
     }
 

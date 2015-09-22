@@ -224,7 +224,7 @@ public class AuthorizationRequestEndpointTest {
             inOrder.verify(requestAuthorizationFilter).beforeAuthorization(eq(permissionTicket), any(Subject.class),
                     any(Subject.class));
             inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), anyMap(), eq(false));
-            inOrder.verify(requestAuthorizationFilter).afterAuthorization(eq(false), eq(permissionTicket),
+            inOrder.verify(requestAuthorizationFilter).afterFailedAuthorization(eq(permissionTicket),
                     any(Subject.class), any(Subject.class));
             assertThat(e.getStatusCode()).isEqualTo(403);
             assertThat(e.getError()).isEqualTo("request_submitted");
@@ -253,7 +253,7 @@ public class AuthorizationRequestEndpointTest {
             inOrder.verify(requestAuthorizationFilter).beforeAuthorization(eq(permissionTicket), any(Subject.class),
                     any(Subject.class));
             inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), anyMap(), eq(false));
-            inOrder.verify(requestAuthorizationFilter).afterAuthorization(eq(false), eq(permissionTicket),
+            inOrder.verify(requestAuthorizationFilter).afterFailedAuthorization(eq(permissionTicket),
                     any(Subject.class), any(Subject.class));
             assertThat(e.getStatusCode()).isEqualTo(403);
             assertThat(e.getError()).isEqualTo("request_submitted");
@@ -280,7 +280,7 @@ public class AuthorizationRequestEndpointTest {
         inOrder.verify(requestAuthorizationFilter).beforeAuthorization(eq(permissionTicket), any(Subject.class),
                 any(Subject.class));
         inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), anyMap(), eq(false));
-        inOrder.verify(requestAuthorizationFilter).afterAuthorization(eq(true), eq(permissionTicket),
+        inOrder.verify(requestAuthorizationFilter).afterSuccessfulAuthorization(eq(permissionTicket),
                 any(Subject.class), any(Subject.class));
     }
 
@@ -304,7 +304,7 @@ public class AuthorizationRequestEndpointTest {
         inOrder.verify(requestAuthorizationFilter).beforeAuthorization(eq(permissionTicket), any(Subject.class),
                 any(Subject.class));
         inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), anyMap(), eq(false));
-        inOrder.verify(requestAuthorizationFilter).afterAuthorization(eq(true), eq(permissionTicket),
+        inOrder.verify(requestAuthorizationFilter).afterSuccessfulAuthorization(eq(permissionTicket),
                 any(Subject.class), any(Subject.class));
     }
 

@@ -25,6 +25,8 @@ import org.forgerock.openam.uma.UmaException;
  * Extension filter that will be called before request authorization and after
  * request authorization.
  *
+ * <p>Implementations of this interface can use the Guice setter based injection.</p>
+ *
  * @since 13.0.0
  */
 public interface RequestAuthorizationFilter extends Comparable<RequestAuthorizationFilter> {
@@ -41,13 +43,22 @@ public interface RequestAuthorizationFilter extends Comparable<RequestAuthorizat
             throws UmaException;
 
     /**
-     * Invoked after the authorization attempt of the request.
+     * Invoked after a successful request authorization attempt.
      *
-     * @param isAuthorized {@code true} if the authorization request was successful.
      * @param permissionTicket The permission ticket associated with the authorization request.
      * @param requestingParty The requesting party.
      * @param resourceOwner The resource owner.
      */
-    void afterAuthorization(boolean isAuthorized, PermissionTicket permissionTicket, Subject requestingParty,
+    void afterSuccessfulAuthorization(PermissionTicket permissionTicket, Subject requestingParty,
+            Subject resourceOwner);
+
+    /**
+     * Invoked after a failed request authorization attempt.
+     *
+     * @param permissionTicket The permission ticket associated with the authorization request.
+     * @param requestingParty The requesting party.
+     * @param resourceOwner The resource owner.
+     */
+    void afterFailedAuthorization(PermissionTicket permissionTicket, Subject requestingParty,
             Subject resourceOwner);
 }

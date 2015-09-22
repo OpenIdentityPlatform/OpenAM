@@ -22,6 +22,8 @@ import org.forgerock.oauth2.resources.ResourceSetDescription;
  * Extension filter that will be called before and after resource sets are
  * registered.
  *
+ * <p>Implementations of this interface can use the Guice setter based injection.</p>
+ *
  * @since 13.0.0
  */
 public interface ResourceRegistrationFilter extends Comparable<ResourceRegistrationFilter> {

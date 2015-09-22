@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.forgerock.guava.common.collect.Lists;
 import org.forgerock.guava.common.collect.Sets;
@@ -50,7 +51,7 @@ public class ExtensionFilterManager {
     public <T> Collection<T> getFilters(Class<T> clazz) {
         if (!cache.containsKey(clazz)) {
             ServiceLoader<T> extensionFilters = ServiceLoader.load(clazz);
-            List<T> filters = Lists.newArrayList(extensionFilters);
+            Set<T> filters = new TreeSet<>(Lists.newArrayList(extensionFilters));
             for (T filter : filters) {
                 InjectorHolder.injectMembers(filter);
             }
