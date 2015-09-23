@@ -195,6 +195,10 @@
             "RestLogoutTemplate" : {
                 "loggedOut" : "You have been logged out.",
                 "returnToLogin" : "Return to Login page"
+            },
+            "ChangesPendingTemplate": {
+                "undo": "Undo Changes",
+                "changesPending": "Changes Pending"
             }
         },
         "admin" : {

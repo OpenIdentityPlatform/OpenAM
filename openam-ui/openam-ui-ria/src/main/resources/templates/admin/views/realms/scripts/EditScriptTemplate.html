@@ -10,7 +10,7 @@
         <div class="form-group">
             <label class="col-sm-2 control-label">{{t "console.common.name"}}</label>
 
-            <div class="col-sm-8">
+            <div class="col-sm-9">
                 <input type="text" id="name" name="scriptName" class="form-control" value="{{entity.name}}"
                        data-field="name" placeholder="{{t 'common.form.validation.required'}}" autofocus required>
             </div>
@@ -20,7 +20,7 @@
         <div class="form-group">
             <label class="col-sm-2 control-label">{{t "console.common.description"}}</label>
 
-            <div class="col-sm-8">
+            <div class="col-sm-9">
                 <textarea id="description" class="form-control pull-left script-text" rows="3"
                           data-field="description">{{entity.description}}</textarea>
             </div>
@@ -30,9 +30,9 @@
         <div class="form-group">
             <label class="col-sm-2 control-label">{{t "console.scripts.edit.scriptType"}}</label>
 
-            <div class="col-sm-8 script-context">
+            <div class="col-sm-9 script-context">
                 <span class="form-control" id="context">{{contextName}}</span>
-                <button type="button" id="changeContext" class="btn btn-default pull-right">
+                <button type="button" id="changeContext" class="btn fr-btn-secondary pull-right">
                     <i class="fa fa-gear"></i> {{t "common.form.change"}}
                 </button>
             </div>
@@ -42,7 +42,7 @@
         <div class="form-group">
             <label class="col-sm-2 control-label">{{t "console.scripts.edit.language"}}</label>
 
-            <div class="col-sm-8">
+            <div class="col-sm-9">
                 {{#each languages}}
                 <div class="radio">
                     <label>
@@ -58,7 +58,7 @@
         <div class="form-group">
             <label class="col-sm-2 control-label" for="script">{{t "console.scripts.edit.script"}}</label>
 
-            <div class="col-sm-8">
+            <div class="col-sm-9">
                 <input type="button" class="btn btn-default script-upload" id="upload" value="{{t 'common.form.upload'}}">
                 <input type="file" name="upload" class="hidden">
 
@@ -70,11 +70,12 @@
                 <input type="button" class="btn btn-default" id="validateScript" value="{{t 'common.form.validate'}}">
             </div>
         </div>
+
+        <div class="script-changes-pending"></div>
     </div>
 
     <div class="panel-footer clearfix">
         <div class="pull-right">
-            <button id="revertChanges" class="btn btn-default" type="reset">{{t "common.form.revert"}}</button>
             <button id="saveChanges" class="btn btn-primary" type="button">{{t 'common.form.save'}}</button>
         </div>
     </div>
