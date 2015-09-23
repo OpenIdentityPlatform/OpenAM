@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock Inc. All rights reserved.
+ * Copyright 2012-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -28,11 +28,15 @@ public class ServerOrSiteEntry {
 
     private String id;
     private String url;
+    private String originalUrl;
 
     public ServerOrSiteEntry(String serverEntry) {
         int index = serverEntry.indexOf("|");
         if (index != -1) {
-            url = serverEntry.substring(0, index).toLowerCase();
+            // Keep a copy of the original URL to avoid cases where the OpenAM context is using mixed-case,
+            // for example /OpenAM rather than say /openam
+            originalUrl = serverEntry.substring(0, index);
+            url = originalUrl.toLowerCase();
             id = serverEntry.substring(index + 1, serverEntry.length());
 
             index = id.indexOf("|");
@@ -40,8 +44,7 @@ public class ServerOrSiteEntry {
                 id = id.substring(0, 2);
             }
         } else {
-            throw new IllegalArgumentException("Invalid server entry: "
-                    + serverEntry);
+            throw new IllegalArgumentException("Invalid server entry: " + serverEntry);
         }
     }
 
@@ -55,6 +58,10 @@ public class ServerOrSiteEntry {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getOriginalUrl() {
+        return originalUrl;
     }
 
     public void setUrl(String url) {
