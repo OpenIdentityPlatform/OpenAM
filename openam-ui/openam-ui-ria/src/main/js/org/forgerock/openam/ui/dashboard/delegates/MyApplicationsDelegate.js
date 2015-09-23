@@ -17,20 +17,19 @@
  */
 
 /*global define */
-
 define("org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate", [
     "underscore",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(_, constants, AbstractDelegate, RealmHelper) {
-    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json/');
+], function (_, constants, AbstractDelegate, RealmHelper) {
+    var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json/");
 
-    obj.sortApps = function(apps) {
-
-        var sortedApps = _.map(_.sortBy(_.keys(apps), function (key){ return key; }), function (key) {
-            var app = {};
-            app.id = key;
+    obj.sortApps = function (apps) {
+        var sortedApps = _.map(_.sortBy(_.keys(apps), function (key) { return key; }), function (key) {
+            var app = {
+                id: key
+            };
             _.each(apps[key], function (v,k) { app[k] = v[0]; });
             return app;
         });
@@ -38,24 +37,24 @@ define("org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate", [
         return sortedApps;
     };
 
-    obj.getMyApplications = function() {
+    obj.getMyApplications = function () {
         var self = this;
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/assigned"),
-            headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"},
+            headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "GET"
-        }).then(function(apps) {
+        }).then(function (apps) {
             return self.sortApps(apps);
         });
     };
 
-    obj.getAvailableApplications = function() {
+    obj.getAvailableApplications = function () {
         var self = this;
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/available"),
-            headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"},
+            headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "GET"
-        }).then(function(apps) {
+        }).then(function (apps) {
             return self.sortApps(apps);
         });
     };
