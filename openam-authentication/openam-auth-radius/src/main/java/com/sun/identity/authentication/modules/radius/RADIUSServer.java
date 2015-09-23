@@ -25,27 +25,52 @@
 package com.sun.identity.authentication.modules.radius;
 
 /**
- *
- * @author Peter Major
+ * Represents a remote radius server to which to delegate authentication for the authentication module.
  */
 public class RADIUSServer {
 
+    /**
+     * The remote radius host.
+     */
     private String host;
+    /**
+     * The remote radius port.
+     */
     private int port;
 
+    /**
+     * Constructs an instance.
+     * @param host the remote host.
+     * @param port the remote port.
+     */
     public RADIUSServer(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
+    /**
+     * Returns the host.
+     * @return the host.
+     */
     public String getHost() {
         return host;
     }
 
+    /**
+     * Returns the port.
+     * @return the port.
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * Answers true if the passed in object has the same class and identical values for host and port.
+     *
+     * @param obj
+     *            an instance of RADIUSServer.
+     * @return true if the passed in object has the same class and identical values for host and port.
+     */
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof RADIUSServer)) {
@@ -59,6 +84,10 @@ public class RADIUSServer {
         return (this.port == other.port);
     }
 
+    /**
+     * The hashcode of this instance.
+     * @return the hashcode.
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -67,6 +96,11 @@ public class RADIUSServer {
         return hash;
     }
 
+    /**
+     * Generated a string representation of this instance.
+     *
+     * @return the string representation.
+     */
     @Override
     public String toString() {
         return "RADIUS server: " + host + ":" + port;

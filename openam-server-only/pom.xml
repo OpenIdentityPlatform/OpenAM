@@ -598,6 +598,16 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-datastore</artifactId>
         </dependency>
+        
+        <dependency>
+        	<groupId>org.forgerock.openam</groupId>
+        	<artifactId>openam-radius-common</artifactId>
+        </dependency>
+        
+        <dependency>
+        	<groupId>org.forgerock.openam</groupId>
+        	<artifactId>openam-radius-server</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>

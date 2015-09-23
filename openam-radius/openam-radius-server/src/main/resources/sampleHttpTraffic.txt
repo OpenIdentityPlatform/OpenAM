@@ -1,0 +1,939 @@
+
++ did toopher and it failed after approving in toopher app so check req id is getting passed back
++ sms failed to accept my entered phone number
++ voice failed to accept my entered phone number
+
+02014-21-02 02:21:23 616 RADIUS AuthN/Z Server Is Ready
+02014-21-02 02:21:23 617 Listening Port   : 1812
+02014-21-02 02:21:23 617 Defined Client   : Any - WARNING: lock this down in production!
+02014-21-02 02:21:23 617 Shared Secret    : radius
+
+02014-21-02 02:21:45 486 ----> ACCESS_REQUEST - 244 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 995328
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-21-02 02:21:45 531 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   ------ total pairings: 6
+<---- ACCESS_CHALLENGE - 244 for boydmr
+    - REPLY_MESSAGE : An access request has been sent to your device.
+
+Authorize Access on your device and then press continue.
+
+Press Cancel to start over.
+
+    - STATE : TOOPHER_AWAIT_DEVICE_APPROVAL
+   -- DONE : 86ms elapsed
+
+   -- Request authentication of user boydmr with persisted pairing ID '5e5862c5-833b-4a0b-b7b6-9a8b0da0c430'
+2014/08/02 14:21:46:410 MDT [DEBUG] BasicClientConnectionManager - Get connection for route {s}->https://api.toopher.com:443
+2014/08/02 14:21:46:703 MDT [DEBUG] DefaultClientConnectionOperator - Connecting to api.toopher.com:443
+2014/08/02 14:21:47:108 MDT [DEBUG] RequestAddCookies - CookieSpec selected: best-match
+2014/08/02 14:21:47:129 MDT [DEBUG] RequestAuthCache - Auth cache not set in the context
+2014/08/02 14:21:47:129 MDT [DEBUG] RequestProxyAuthentication - Proxy auth state: UNCHALLENGED
+2014/08/02 14:21:47:130 MDT [DEBUG] DefaultHttpClient - Attempt 1 to execute request
+2014/08/02 14:21:47:130 MDT [DEBUG] DefaultClientConnection - Sending request: POST /v1/authentication_requests/initiate HTTP/1.1
+2014/08/02 14:21:47:131 MDT [DEBUG] wire -  >> "POST /v1/authentication_requests/initiate HTTP/1.1[\r][\n]"
+2014/08/02 14:21:47:133 MDT [DEBUG] wire -  >> "Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010905", oauth_nonce="-8308818175139054800", oauth_signature="RhcNmc3KrrqCMekXATuLqgPF6Lo%3D"[\r][\n]"
+2014/08/02 14:21:47:134 MDT [DEBUG] wire -  >> "Content-Length: 72[\r][\n]"
+2014/08/02 14:21:47:134 MDT [DEBUG] wire -  >> "Content-Type: application/x-www-form-urlencoded[\r][\n]"
+2014/08/02 14:21:47:134 MDT [DEBUG] wire -  >> "Host: api.toopher.com:443[\r][\n]"
+2014/08/02 14:21:47:134 MDT [DEBUG] wire -  >> "Connection: Keep-Alive[\r][\n]"
+2014/08/02 14:21:47:134 MDT [DEBUG] wire -  >> "User-Agent: ToopherJava/1.0.0[\r][\n]"
+2014/08/02 14:21:47:134 MDT [DEBUG] wire -  >> "[\r][\n]"
+2014/08/02 14:21:47:135 MDT [DEBUG] headers - >> POST /v1/authentication_requests/initiate HTTP/1.1
+2014/08/02 14:21:47:135 MDT [DEBUG] headers - >> Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010905", oauth_nonce="-8308818175139054800", oauth_signature="RhcNmc3KrrqCMekXATuLqgPF6Lo%3D"
+2014/08/02 14:21:47:135 MDT [DEBUG] headers - >> Content-Length: 72
+2014/08/02 14:21:47:135 MDT [DEBUG] headers - >> Content-Type: application/x-www-form-urlencoded
+2014/08/02 14:21:47:135 MDT [DEBUG] headers - >> Host: api.toopher.com:443
+2014/08/02 14:21:47:135 MDT [DEBUG] headers - >> Connection: Keep-Alive
+2014/08/02 14:21:47:135 MDT [DEBUG] headers - >> User-Agent: ToopherJava/1.0.0
+2014/08/02 14:21:47:136 MDT [DEBUG] wire -  >> "pairing_id=5e5862c5-833b-4a0b-b7b6-9a8b0da0c430&terminal_name=VPN+Access"
+2014/08/02 14:21:47:878 MDT [DEBUG] wire -  << "HTTP/1.1 200 OK[\r][\n]"
+2014/08/02 14:21:47:881 MDT [DEBUG] wire -  << "Server: cloudflare-nginx[\r][\n]"
+2014/08/02 14:21:47:881 MDT [DEBUG] wire -  << "Date: Sat, 02 Aug 2014 20:21:47 GMT[\r][\n]"
+2014/08/02 14:21:47:881 MDT [DEBUG] wire -  << "Content-Type: application/json; charset=utf-8[\r][\n]"
+2014/08/02 14:21:47:881 MDT [DEBUG] wire -  << "Transfer-Encoding: chunked[\r][\n]"
+2014/08/02 14:21:47:882 MDT [DEBUG] wire -  << "Connection: keep-alive[\r][\n]"
+2014/08/02 14:21:47:882 MDT [DEBUG] wire -  << "Set-Cookie: __cfduid=d40b6ddbef25a0b0a0b505576ee41cf101407010907144; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly[\r][\n]"
+2014/08/02 14:21:47:882 MDT [DEBUG] wire -  << "Vary: Authorization[\r][\n]"
+2014/08/02 14:21:47:882 MDT [DEBUG] wire -  << "Vary: Accept-Encoding[\r][\n]"
+2014/08/02 14:21:47:882 MDT [DEBUG] wire -  << "Cache-Control: private[\r][\n]"
+2014/08/02 14:21:47:882 MDT [DEBUG] wire -  << "Alternate-Protocol: 80:quic,80:quic[\r][\n]"
+2014/08/02 14:21:47:882 MDT [DEBUG] wire -  << "CF-RAY: 153cfbd9a7000663-SJC[\r][\n]"
+2014/08/02 14:21:47:883 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:21:47:884 MDT [DEBUG] DefaultClientConnection - Receiving response: HTTP/1.1 200 OK
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << HTTP/1.1 200 OK
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << Server: cloudflare-nginx
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << Date: Sat, 02 Aug 2014 20:21:47 GMT
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << Content-Type: application/json; charset=utf-8
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << Transfer-Encoding: chunked
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << Connection: keep-alive
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << Set-Cookie: __cfduid=d40b6ddbef25a0b0a0b505576ee41cf101407010907144; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << Vary: Authorization
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << Vary: Accept-Encoding
+2014/08/02 14:21:47:884 MDT [DEBUG] headers - << Cache-Control: private
+2014/08/02 14:21:47:885 MDT [DEBUG] headers - << Alternate-Protocol: 80:quic,80:quic
+2014/08/02 14:21:47:885 MDT [DEBUG] headers - << CF-RAY: 153cfbd9a7000663-SJC
+2014/08/02 14:21:47:919 MDT [DEBUG] ResponseProcessCookies - Cookie accepted [__cfduid="d40b6ddbef25a0b0a0b505576ee41cf101407010907144", version:0, domain:.toopher.com, path:/, expiry:Mon Dec 23 16:50:00 MST 2019]
+2014/08/02 14:21:47:922 MDT [DEBUG] DefaultHttpClient - Connection can be kept alive indefinitely
+2014/08/02 14:21:47:947 MDT [DEBUG] wire -  << "d5f[\r][\n]"
+2014/08/02 14:21:47:947 MDT [DEBUG] wire -  << "{[\n]"
+2014/08/02 14:21:47:947 MDT [DEBUG] wire -  << "    "terminal": {[\n]"
+2014/08/02 14:21:47:947 MDT [DEBUG] wire -  << "        "name": "VPN Access", [\n]"
+2014/08/02 14:21:47:947 MDT [DEBUG] wire -  << "        "created": "2014-07-01 09:23:46", [\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "        "name_extra": "", [\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "        "modified": "2014-07-01 09:23:46", [\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "        "user": {[\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "            "requester": {[\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "                "created": "2014-06-24 17:12:59", [\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "                "consumer": {[\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "                    "key": "KKpt7nSMkdVhyt7MEw"[\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "                }, [\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "                "id": "8c0db7b3-9182-4908-bc9f-3f811698a86d", [\n]"
+2014/08/02 14:21:47:948 MDT [DEBUG] wire -  << "                "name": "LDS Church", [\n]"
+2014/08/02 14:21:47:949 MDT [DEBUG] wire -  << "                "modified": "2014-06-24 17:12:59"[\n]"
+2014/08/02 14:21:47:949 MDT [DEBUG] wire -  << "            }, [\n]"
+2014/08/02 14:21:47:949 MDT [DEBUG] wire -  << "            "created": "2014-06-26 18:42:41", [\n]"
+2014/08/02 14:21:47:949 MDT [DEBUG] wire -  << "            "id": "405e673d-aeef-4451-a7c6-4b9750cad7f0", [\n]"
+2014/08/02 14:21:47:949 MDT [DEBUG] wire -  << "            "name": "boydmr", [\n]"
+2014/08/02 14:21:47:949 MDT [DEBUG] wire -  << "            "modified": "2014-08-02 20:21:47"[\n]"
+2014/08/02 14:21:47:949 MDT [DEBUG] wire -  << "        }, [\n]"
+2014/08/02 14:21:47:949 MDT [DEBUG] wire -  << "        "id": "4d5d6ecd-77dd-47b2-ba5a-67eef5222a80"[\n]"
+2014/08/02 14:21:47:949 MDT [DEBUG] wire -  << "    }, [\n]"
+2014/08/02 14:21:47:950 MDT [DEBUG] wire -  << "    "pairing": {[\n]"
+2014/08/02 14:21:47:950 MDT [DEBUG] wire -  << "        "authenticator_type": "c2dm", [\n]"
+2014/08/02 14:21:47:950 MDT [DEBUG] wire -  << "        "totp_length": 6, [\n]"
+2014/08/02 14:21:47:950 MDT [DEBUG] wire -  << "        "created": "2014-07-07 03:56:18", [\n]"
+2014/08/02 14:21:47:950 MDT [DEBUG] wire -  << "        "deactivated": false, [\n]"
+2014/08/02 14:21:47:950 MDT [DEBUG] wire -  << "        "reason_code": 0, [\n]"
+2014/08/02 14:21:47:950 MDT [DEBUG] wire -  << "        "created_seconds_since_epoch": 1404705378, [\n]"
+2014/08/02 14:21:47:950 MDT [DEBUG] wire -  << "        "modified": "2014-07-07 03:56:33", [\n]"
+2014/08/02 14:21:47:951 MDT [DEBUG] wire -  << "        "authenticator": {[\n]"
+2014/08/02 14:21:47:951 MDT [DEBUG] wire -  << "            "created": "2014-06-24 21:03:59", [\n]"
+2014/08/02 14:21:47:951 MDT [DEBUG] wire -  << "            "consumer": {[\n]"
+2014/08/02 14:21:47:951 MDT [DEBUG] wire -  << "                "key": "c9nyVMRwHMPey6JMzq"[\n]"
+2014/08/02 14:21:47:951 MDT [DEBUG] wire -  << "            }, [\n]"
+2014/08/02 14:21:47:951 MDT [DEBUG] wire -  << "            "id": "c5a7ea4d-4b89-48ad-93e1-f42e60e22dae", [\n]"
+2014/08/02 14:21:47:951 MDT [DEBUG] wire -  << "            "name": "Toopher Mobile Android", [\n]"
+2014/08/02 14:21:47:951 MDT [DEBUG] wire -  << "            "modified": "2014-06-24 21:04:01"[\n]"
+2014/08/02 14:21:47:951 MDT [DEBUG] wire -  << "        }, [\n]"
+2014/08/02 14:21:47:952 MDT [DEBUG] wire -  << "        "reason": "", [\n]"
+2014/08/02 14:21:47:952 MDT [DEBUG] wire -  << "        "handleable": true, [\n]"
+2014/08/02 14:21:47:952 MDT [DEBUG] wire -  << "        "pending": false, [\n]"
+2014/08/02 14:21:47:952 MDT [DEBUG] wire -  << "        "enabled": true, [\n]"
+2014/08/02 14:21:47:952 MDT [DEBUG] wire -  << "        "id": "5e5862c5-833b-4a0b-b7b6-9a8b0da0c430", [\n]"
+2014/08/02 14:21:47:952 MDT [DEBUG] wire -  << "        "minimum_version": 0, [\n]"
+2014/08/02 14:21:47:952 MDT [DEBUG] wire -  << "        "user": {[\n]"
+2014/08/02 14:21:47:952 MDT [DEBUG] wire -  << "            "requester": {[\n]"
+2014/08/02 14:21:47:952 MDT [DEBUG] wire -  << "                "created": "2014-06-24 17:12:59", [\n]"
+2014/08/02 14:21:47:953 MDT [DEBUG] wire -  << "                "consumer": {[\n]"
+2014/08/02 14:21:47:953 MDT [DEBUG] wire -  << "                    "key": "KKpt7nSMkdVhyt7MEw"[\n]"
+2014/08/02 14:21:47:953 MDT [DEBUG] wire -  << "                }, [\n]"
+2014/08/02 14:21:47:953 MDT [DEBUG] wire -  << "                "id": "8c0db7b3-9182-4908-bc9f-3f811698a86d", [\n]"
+2014/08/02 14:21:47:953 MDT [DEBUG] wire -  << "                "name": "LDS Church", [\n]"
+2014/08/02 14:21:47:953 MDT [DEBUG] wire -  << "                "modified": "2014-06-24 17:12:59"[\n]"
+2014/08/02 14:21:47:961 MDT [DEBUG] wire -  << "            }, [\n]"
+2014/08/02 14:21:47:961 MDT [DEBUG] wire -  << "            "created": "2014-06-26 18:42:41", [\n]"
+2014/08/02 14:21:47:962 MDT [DEBUG] wire -  << "            "id": "405e673d-aeef-4451-a7c6-4b9750cad7f0", [\n]"
+2014/08/02 14:21:47:962 MDT [DEBUG] wire -  << "            "name": "boydmr", [\n]"
+2014/08/02 14:21:47:962 MDT [DEBUG] wire -  << "            "modified": "2014-08-02 20:21:47"[\n]"
+2014/08/02 14:21:47:962 MDT [DEBUG] wire -  << "        }[\n]"
+2014/08/02 14:21:47:962 MDT [DEBUG] wire -  << "    }, [\n]"
+2014/08/02 14:21:47:962 MDT [DEBUG] wire -  << "    "created": "2014-08-02 20:21:47", [\n]"
+2014/08/02 14:21:47:962 MDT [DEBUG] wire -  << "    "automation_requested": false, [\n]"
+2014/08/02 14:21:47:962 MDT [DEBUG] wire -  << "    "granted": false, [\n]"
+2014/08/02 14:21:47:962 MDT [DEBUG] wire -  << "    "reason_code": 0, [\n]"
+2014/08/02 14:21:47:963 MDT [DEBUG] wire -  << "    "created_seconds_since_epoch": 1407010907, [\n]"
+2014/08/02 14:21:47:963 MDT [DEBUG] wire -  << "    "modified": "2014-08-02 20:21:47", [\n]"
+2014/08/02 14:21:47:963 MDT [DEBUG] wire -  << "    "totp_valid": false, [\n]"
+2014/08/02 14:21:47:963 MDT [DEBUG] wire -  << "    "authenticator": {[\n]"
+2014/08/02 14:21:47:963 MDT [DEBUG] wire -  << "        "created": "2014-06-24 21:03:59", [\n]"
+2014/08/02 14:21:47:963 MDT [DEBUG] wire -  << "        "consumer": {[\n]"
+2014/08/02 14:21:47:963 MDT [DEBUG] wire -  << "            "key": "c9nyVMRwHMPey6JMzq"[\n]"
+2014/08/02 14:21:47:963 MDT [DEBUG] wire -  << "        }, [\n]"
+2014/08/02 14:21:47:963 MDT [DEBUG] wire -  << "        "id": "c5a7ea4d-4b89-48ad-93e1-f42e60e22dae", [\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "        "name": "Toopher Mobile Android", [\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "        "modified": "2014-06-24 21:04:01"[\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "    }, [\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "    "cancelled": false, [\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "    "reason": "", [\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "    "handleable": true, [\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "    "pending": true, [\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "    "automated": false, [\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "    "action": {[\n]"
+2014/08/02 14:21:47:964 MDT [DEBUG] wire -  << "        "requester": {[\n]"
+2014/08/02 14:21:47:965 MDT [DEBUG] wire -  << "            "created": "2014-06-24 17:12:59", [\n]"
+2014/08/02 14:21:47:965 MDT [DEBUG] wire -  << "            "consumer": {[\n]"
+2014/08/02 14:21:47:965 MDT [DEBUG] wire -  << "                "key": "KKpt7nSMkdVhyt7MEw"[\n]"
+2014/08/02 14:21:47:965 MDT [DEBUG] wire -  << "            }, [\n]"
+2014/08/02 14:21:47:965 MDT [DEBUG] wire -  << "            "id": "8c0db7b3-9182-4908-bc9f-3f811698a86d", [\n]"
+2014/08/02 14:21:47:965 MDT [DEBUG] wire -  << "            "name": "LDS Church", [\n]"
+2014/08/02 14:21:47:965 MDT [DEBUG] wire -  << "            "modified": "2014-06-24 17:12:59"[\n]"
+2014/08/02 14:21:47:965 MDT [DEBUG] wire -  << "        }, [\n]"
+2014/08/02 14:21:47:966 MDT [DEBUG] wire -  << "        "created": "2014-06-24 21:05:33", [\n]"
+2014/08/02 14:21:47:966 MDT [DEBUG] wire -  << "        "id": "f2d9f48a-9f87-46c7-a61e-53ad317df6c9", [\n]"
+2014/08/02 14:21:47:966 MDT [DEBUG] wire -  << "        "name": "log in", [\n]"
+2014/08/02 14:21:47:966 MDT [DEBUG] wire -  << "        "modified": "2014-06-24 21:05:33"[\n]"
+2014/08/02 14:21:47:966 MDT [DEBUG] wire -  << "    }, [\n]"
+2014/08/02 14:21:47:966 MDT [DEBUG] wire -  << "    "challenge_required": false, [\n]"
+2014/08/02 14:21:47:966 MDT [DEBUG] wire -  << "    "automation_allowed": true, [\n]"
+2014/08/02 14:21:47:967 MDT [DEBUG] wire -  << "    "id": "39c4219a-dc7e-4024-abe1-bb2006f90123", [\n]"
+2014/08/02 14:21:47:967 MDT [DEBUG] wire -  << "    "minimum_version": 0[\n]"
+2014/08/02 14:21:47:967 MDT [DEBUG] wire -  << "}"
+2014/08/02 14:21:47:967 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:21:47:967 MDT [DEBUG] wire -  << "0[\r][\n]"
+2014/08/02 14:21:47:968 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:21:47:968 MDT [DEBUG] BasicClientConnectionManager - Releasing connection org.apache.http.impl.conn.ManagedClientConnectionImpl@3ff47b18
+2014/08/02 14:21:47:968 MDT [DEBUG] BasicClientConnectionManager - Connection can be kept alive indefinitely
+   -- authentication request ID is: 39c4219a-dc7e-4024-abe1-bb2006f90123
+02014-22-02 02:22:25 078 ----> ACCESS_REQUEST - 245 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 995328
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - STATE : TOOPHER_AWAIT_DEVICE_APPROVAL
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-22-02 02:22:25 079 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   -- STATE received: TOOPHER_AWAIT_DEVICE_APPROVAL --> TOOPHER_AWAIT_DEVICE_APPROVAL / null
+  -- Testing authentication status for user 'boydmr' via pid 'null'
+2014/08/02 14:22:25:100 MDT [DEBUG] BasicClientConnectionManager - Get connection for route {s}->https://api.toopher.com:443
+2014/08/02 14:22:25:103 MDT [DEBUG] DefaultClientConnectionOperator - Connecting to api.toopher.com:443
+2014/08/02 14:22:25:255 MDT [DEBUG] RequestAddCookies - CookieSpec selected: best-match
+2014/08/02 14:22:25:255 MDT [DEBUG] RequestAuthCache - Auth cache not set in the context
+2014/08/02 14:22:25:255 MDT [DEBUG] RequestProxyAuthentication - Proxy auth state: UNCHALLENGED
+2014/08/02 14:22:25:256 MDT [DEBUG] DefaultHttpClient - Attempt 1 to execute request
+2014/08/02 14:22:25:256 MDT [DEBUG] DefaultClientConnection - Sending request: GET /v1/authentication_requests/null HTTP/1.1
+2014/08/02 14:22:25:256 MDT [DEBUG] wire -  >> "GET /v1/authentication_requests/null HTTP/1.1[\r][\n]"
+2014/08/02 14:22:25:256 MDT [DEBUG] wire -  >> "Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010945", oauth_nonce="-465689770126782837", oauth_signature="EZF%2BMzq2BPefrrEB062pGxcyjHI%3D"[\r][\n]"
+2014/08/02 14:22:25:256 MDT [DEBUG] wire -  >> "Host: api.toopher.com:443[\r][\n]"
+2014/08/02 14:22:25:256 MDT [DEBUG] wire -  >> "Connection: Keep-Alive[\r][\n]"
+2014/08/02 14:22:25:256 MDT [DEBUG] wire -  >> "User-Agent: ToopherJava/1.0.0[\r][\n]"
+2014/08/02 14:22:25:257 MDT [DEBUG] wire -  >> "[\r][\n]"
+2014/08/02 14:22:25:257 MDT [DEBUG] headers - >> GET /v1/authentication_requests/null HTTP/1.1
+2014/08/02 14:22:25:257 MDT [DEBUG] headers - >> Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010945", oauth_nonce="-465689770126782837", oauth_signature="EZF%2BMzq2BPefrrEB062pGxcyjHI%3D"
+2014/08/02 14:22:25:257 MDT [DEBUG] headers - >> Host: api.toopher.com:443
+2014/08/02 14:22:25:257 MDT [DEBUG] headers - >> Connection: Keep-Alive
+2014/08/02 14:22:25:257 MDT [DEBUG] headers - >> User-Agent: ToopherJava/1.0.0
+2014/08/02 14:22:25:414 MDT [DEBUG] wire -  << "HTTP/1.1 404 Not Found[\r][\n]"
+2014/08/02 14:22:25:414 MDT [DEBUG] wire -  << "Server: cloudflare-nginx[\r][\n]"
+2014/08/02 14:22:25:414 MDT [DEBUG] wire -  << "Date: Sat, 02 Aug 2014 20:22:25 GMT[\r][\n]"
+2014/08/02 14:22:25:414 MDT [DEBUG] wire -  << "Content-Type: application/json; charset=utf-8[\r][\n]"
+2014/08/02 14:22:25:415 MDT [DEBUG] wire -  << "Transfer-Encoding: chunked[\r][\n]"
+2014/08/02 14:22:25:415 MDT [DEBUG] wire -  << "Connection: keep-alive[\r][\n]"
+2014/08/02 14:22:25:415 MDT [DEBUG] wire -  << "Set-Cookie: __cfduid=d87417880febd33b68c2b668faaa6550b1407010945266; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly[\r][\n]"
+2014/08/02 14:22:25:415 MDT [DEBUG] wire -  << "Vary: Accept-Encoding[\r][\n]"
+2014/08/02 14:22:25:415 MDT [DEBUG] wire -  << "Cache-Control: private[\r][\n]"
+2014/08/02 14:22:25:415 MDT [DEBUG] wire -  << "Alternate-Protocol: 80:quic,80:quic[\r][\n]"
+2014/08/02 14:22:25:415 MDT [DEBUG] wire -  << "CF-RAY: 153cfcc7ec930663-SJC[\r][\n]"
+2014/08/02 14:22:25:415 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:25:416 MDT [DEBUG] DefaultClientConnection - Receiving response: HTTP/1.1 404 Not Found
+2014/08/02 14:22:25:416 MDT [DEBUG] headers - << HTTP/1.1 404 Not Found
+2014/08/02 14:22:25:416 MDT [DEBUG] headers - << Server: cloudflare-nginx
+2014/08/02 14:22:25:416 MDT [DEBUG] headers - << Date: Sat, 02 Aug 2014 20:22:25 GMT
+2014/08/02 14:22:25:416 MDT [DEBUG] headers - << Content-Type: application/json; charset=utf-8
+2014/08/02 14:22:25:416 MDT [DEBUG] headers - << Transfer-Encoding: chunked
+2014/08/02 14:22:25:416 MDT [DEBUG] headers - << Connection: keep-alive
+2014/08/02 14:22:25:416 MDT [DEBUG] headers - << Set-Cookie: __cfduid=d87417880febd33b68c2b668faaa6550b1407010945266; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly
+2014/08/02 14:22:25:417 MDT [DEBUG] headers - << Vary: Accept-Encoding
+2014/08/02 14:22:25:417 MDT [DEBUG] headers - << Cache-Control: private
+2014/08/02 14:22:25:417 MDT [DEBUG] headers - << Alternate-Protocol: 80:quic,80:quic
+2014/08/02 14:22:25:417 MDT [DEBUG] headers - << CF-RAY: 153cfcc7ec930663-SJC
+2014/08/02 14:22:25:418 MDT [DEBUG] ResponseProcessCookies - Cookie accepted [__cfduid="d87417880febd33b68c2b668faaa6550b1407010945266", version:0, domain:.toopher.com, path:/, expiry:Mon Dec 23 16:50:00 MST 2019]
+2014/08/02 14:22:25:418 MDT [DEBUG] DefaultHttpClient - Connection can be kept alive indefinitely
+2014/08/02 14:22:25:419 MDT [DEBUG] wire -  << "3c[\r][\n]"
+2014/08/02 14:22:25:419 MDT [DEBUG] wire -  << "{[\n]"
+2014/08/02 14:22:25:419 MDT [DEBUG] wire -  << "    "error_message": "Not Found", [\n]"
+2014/08/02 14:22:25:419 MDT [DEBUG] wire -  << "    "error_code": 404[\n]"
+2014/08/02 14:22:25:419 MDT [DEBUG] wire -  << "}"
+2014/08/02 14:22:25:419 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:25:419 MDT [DEBUG] wire -  << "0[\r][\n]"
+2014/08/02 14:22:25:419 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:25:420 MDT [DEBUG] BasicClientConnectionManager - Releasing connection org.apache.http.impl.conn.ManagedClientConnectionImpl@7687ac8f
+2014/08/02 14:22:25:420 MDT [DEBUG] BasicClientConnectionManager - Connection can be kept alive indefinitely
+- Unable to pair device for: boydmr using phrase ''
+com.toopher.RequestError: Request error
+	at com.toopher.ToopherAPI.getAuthenticationStatus(Unknown Source)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService.getAuthenticationStatus(ToopherService.java:185)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService.access$100(ToopherService.java:11)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService$5.isTriggered(ToopherService.java:175)
+	at com.sun.identity.authentication.modules.radius.server.Transition.isTriggered(Transition.java:84)
+	at com.sun.identity.authentication.modules.radius.server.RadiusListener.listen(RadiusListener.java:260)
+	at com.sun.identity.authentication.modules.radius.server.RadiusListener.main(RadiusListener.java:521)
+Caused by: org.apache.http.client.HttpResponseException: Not Found
+	at com.toopher.ToopherAPI$1.handleResponse(Unknown Source)
+	at com.toopher.ToopherAPI$1.handleResponse(Unknown Source)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:218)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:160)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:136)
+	at com.toopher.ToopherAPI.request(Unknown Source)
+	at com.toopher.ToopherAPI.get(Unknown Source)
+	... 7 more
+  -- Testing authentication status for user 'boydmr' via pid 'null'
+2014/08/02 14:22:25:429 MDT [DEBUG] BasicClientConnectionManager - Get connection for route {s}->https://api.toopher.com:443
+2014/08/02 14:22:25:431 MDT [DEBUG] DefaultClientConnectionOperator - Connecting to api.toopher.com:443
+2014/08/02 14:22:25:595 MDT [DEBUG] RequestAddCookies - CookieSpec selected: best-match
+2014/08/02 14:22:25:596 MDT [DEBUG] RequestAuthCache - Auth cache not set in the context
+2014/08/02 14:22:25:596 MDT [DEBUG] RequestProxyAuthentication - Proxy auth state: UNCHALLENGED
+2014/08/02 14:22:25:596 MDT [DEBUG] DefaultHttpClient - Attempt 1 to execute request
+2014/08/02 14:22:25:596 MDT [DEBUG] DefaultClientConnection - Sending request: GET /v1/authentication_requests/null HTTP/1.1
+2014/08/02 14:22:25:596 MDT [DEBUG] wire -  >> "GET /v1/authentication_requests/null HTTP/1.1[\r][\n]"
+2014/08/02 14:22:25:596 MDT [DEBUG] wire -  >> "Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010945", oauth_nonce="-3378717060818286954", oauth_signature="E43UTLFXKMvaXtLE5LKR17xu574%3D"[\r][\n]"
+2014/08/02 14:22:25:597 MDT [DEBUG] wire -  >> "Host: api.toopher.com:443[\r][\n]"
+2014/08/02 14:22:25:597 MDT [DEBUG] wire -  >> "Connection: Keep-Alive[\r][\n]"
+2014/08/02 14:22:25:597 MDT [DEBUG] wire -  >> "User-Agent: ToopherJava/1.0.0[\r][\n]"
+2014/08/02 14:22:25:597 MDT [DEBUG] wire -  >> "[\r][\n]"
+2014/08/02 14:22:25:597 MDT [DEBUG] headers - >> GET /v1/authentication_requests/null HTTP/1.1
+2014/08/02 14:22:25:597 MDT [DEBUG] headers - >> Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010945", oauth_nonce="-3378717060818286954", oauth_signature="E43UTLFXKMvaXtLE5LKR17xu574%3D"
+2014/08/02 14:22:25:597 MDT [DEBUG] headers - >> Host: api.toopher.com:443
+2014/08/02 14:22:25:597 MDT [DEBUG] headers - >> Connection: Keep-Alive
+2014/08/02 14:22:25:597 MDT [DEBUG] headers - >> User-Agent: ToopherJava/1.0.0
+2014/08/02 14:22:25:826 MDT [DEBUG] wire -  << "HTTP/1.1 404 Not Found[\r][\n]"
+2014/08/02 14:22:25:826 MDT [DEBUG] wire -  << "Server: cloudflare-nginx[\r][\n]"
+2014/08/02 14:22:25:826 MDT [DEBUG] wire -  << "Date: Sat, 02 Aug 2014 20:22:25 GMT[\r][\n]"
+2014/08/02 14:22:25:826 MDT [DEBUG] wire -  << "Content-Type: application/json; charset=utf-8[\r][\n]"
+2014/08/02 14:22:25:826 MDT [DEBUG] wire -  << "Transfer-Encoding: chunked[\r][\n]"
+2014/08/02 14:22:25:826 MDT [DEBUG] wire -  << "Connection: keep-alive[\r][\n]"
+2014/08/02 14:22:25:827 MDT [DEBUG] wire -  << "Set-Cookie: __cfduid=de25e130a2194af4465895a30944e46a91407010945608; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly[\r][\n]"
+2014/08/02 14:22:25:827 MDT [DEBUG] wire -  << "Vary: Accept-Encoding[\r][\n]"
+2014/08/02 14:22:25:827 MDT [DEBUG] wire -  << "Cache-Control: private[\r][\n]"
+2014/08/02 14:22:25:827 MDT [DEBUG] wire -  << "Alternate-Protocol: 80:quic,80:quic[\r][\n]"
+2014/08/02 14:22:25:827 MDT [DEBUG] wire -  << "CF-RAY: 153cfcca003b0663-SJC[\r][\n]"
+2014/08/02 14:22:25:827 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:25:827 MDT [DEBUG] DefaultClientConnection - Receiving response: HTTP/1.1 404 Not Found
+2014/08/02 14:22:25:827 MDT [DEBUG] headers - << HTTP/1.1 404 Not Found
+2014/08/02 14:22:25:827 MDT [DEBUG] headers - << Server: cloudflare-nginx
+2014/08/02 14:22:25:828 MDT [DEBUG] headers - << Date: Sat, 02 Aug 2014 20:22:25 GMT
+2014/08/02 14:22:25:828 MDT [DEBUG] headers - << Content-Type: application/json; charset=utf-8
+2014/08/02 14:22:25:828 MDT [DEBUG] headers - << Transfer-Encoding: chunked
+2014/08/02 14:22:25:828 MDT [DEBUG] headers - << Connection: keep-alive
+2014/08/02 14:22:25:828 MDT [DEBUG] headers - << Set-Cookie: __cfduid=de25e130a2194af4465895a30944e46a91407010945608; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly
+2014/08/02 14:22:25:828 MDT [DEBUG] headers - << Vary: Accept-Encoding
+2014/08/02 14:22:25:828 MDT [DEBUG] headers - << Cache-Control: private
+2014/08/02 14:22:25:828 MDT [DEBUG] headers - << Alternate-Protocol: 80:quic,80:quic
+2014/08/02 14:22:25:828 MDT [DEBUG] headers - << CF-RAY: 153cfcca003b0663-SJC
+2014/08/02 14:22:25:829 MDT [DEBUG] ResponseProcessCookies - Cookie accepted [__cfduid="de25e130a2194af4465895a30944e46a91407010945608", version:0, domain:.toopher.com, path:/, expiry:Mon Dec 23 16:50:00 MST 2019]
+2014/08/02 14:22:25:829 MDT [DEBUG] DefaultHttpClient - Connection can be kept alive indefinitely
+2014/08/02 14:22:25:830 MDT [DEBUG] wire -  << "3c[\r][\n]"
+2014/08/02 14:22:25:830 MDT [DEBUG] wire -  << "{[\n]"
+2014/08/02 14:22:25:830 MDT [DEBUG] wire -  << "    "error_message": "Not Found", [\n]"
+2014/08/02 14:22:25:830 MDT [DEBUG] wire -  << "    "error_code": 404[\n]"
+2014/08/02 14:22:25:830 MDT [DEBUG] wire -  << "}"
+2014/08/02 14:22:25:830 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:25:830 MDT [DEBUG] wire -  << "0[\r][\n]"
+2014/08/02 14:22:25:830 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:25:831 MDT [DEBUG] BasicClientConnectionManager - Releasing connection org.apache.http.impl.conn.ManagedClientConnectionImpl@6b29ca81
+2014/08/02 14:22:25:831 MDT [DEBUG] BasicClientConnectionManager - Connection can be kept alive indefinitely
+- Unable to pair device for: boydmr using phrase ''
+com.toopher.RequestError: Request error
+	at com.toopher.ToopherAPI.getAuthenticationStatus(Unknown Source)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService.getAuthenticationStatus(ToopherService.java:185)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService.access$100(ToopherService.java:11)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService$6.isTriggered(ToopherService.java:203)
+	at com.sun.identity.authentication.modules.radius.server.Transition.isTriggered(Transition.java:84)
+	at com.sun.identity.authentication.modules.radius.server.RadiusListener.listen(RadiusListener.java:260)
+	at com.sun.identity.authentication.modules.radius.server.RadiusListener.main(RadiusListener.java:521)
+Caused by: org.apache.http.client.HttpResponseException: Not Found
+	at com.toopher.ToopherAPI$1.handleResponse(Unknown Source)
+	at com.toopher.ToopherAPI$1.handleResponse(Unknown Source)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:218)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:160)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:136)
+	at com.toopher.ToopherAPI.request(Unknown Source)
+	at com.toopher.ToopherAPI.get(Unknown Source)
+	... 7 more
+<---- ACCESS_REJECT - 245 for boydmr
+    - REPLY_MESSAGE : Device approval was not given.
+   -- DONE : 755ms elapsed
+
+02014-22-02 02:22:37 069 ----> ACCESS_REQUEST - 246 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 999424
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-22-02 02:22:37 070 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   ------ total pairings: 6
+<---- ACCESS_CHALLENGE - 246 for boydmr
+    - REPLY_MESSAGE : An access request has been sent to your device.
+
+Authorize Access on your device and then press continue.
+
+Press Cancel to start over.
+
+    - STATE : TOOPHER_AWAIT_DEVICE_APPROVAL
+   -- DONE : 3ms elapsed
+
+   -- Request authentication of user boydmr with persisted pairing ID '5e5862c5-833b-4a0b-b7b6-9a8b0da0c430'
+2014/08/02 14:22:37:088 MDT [DEBUG] BasicClientConnectionManager - Get connection for route {s}->https://api.toopher.com:443
+2014/08/02 14:22:37:090 MDT [DEBUG] DefaultClientConnectionOperator - Connecting to api.toopher.com:443
+2014/08/02 14:22:37:092 MDT [DEBUG] DefaultClientConnection - Connection 0.0.0.0:45142<->162.159.242.15:443 closed
+2014/08/02 14:22:37:093 MDT [DEBUG] DefaultClientConnection - Connection 0.0.0.0:45141<->162.159.242.15:443 closed
+2014/08/02 14:22:37:242 MDT [DEBUG] RequestAddCookies - CookieSpec selected: best-match
+2014/08/02 14:22:37:243 MDT [DEBUG] RequestAuthCache - Auth cache not set in the context
+2014/08/02 14:22:37:243 MDT [DEBUG] RequestProxyAuthentication - Proxy auth state: UNCHALLENGED
+2014/08/02 14:22:37:243 MDT [DEBUG] DefaultHttpClient - Attempt 1 to execute request
+2014/08/02 14:22:37:243 MDT [DEBUG] DefaultClientConnection - Sending request: POST /v1/authentication_requests/initiate HTTP/1.1
+2014/08/02 14:22:37:243 MDT [DEBUG] wire -  >> "POST /v1/authentication_requests/initiate HTTP/1.1[\r][\n]"
+2014/08/02 14:22:37:243 MDT [DEBUG] wire -  >> "Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010957", oauth_nonce="-7731293963422384200", oauth_signature="mxB0EGrEKuFWb%2FITL2FpUx023ZM%3D"[\r][\n]"
+2014/08/02 14:22:37:244 MDT [DEBUG] wire -  >> "Content-Length: 72[\r][\n]"
+2014/08/02 14:22:37:244 MDT [DEBUG] wire -  >> "Content-Type: application/x-www-form-urlencoded[\r][\n]"
+2014/08/02 14:22:37:244 MDT [DEBUG] wire -  >> "Host: api.toopher.com:443[\r][\n]"
+2014/08/02 14:22:37:244 MDT [DEBUG] wire -  >> "Connection: Keep-Alive[\r][\n]"
+2014/08/02 14:22:37:244 MDT [DEBUG] wire -  >> "User-Agent: ToopherJava/1.0.0[\r][\n]"
+2014/08/02 14:22:37:244 MDT [DEBUG] wire -  >> "[\r][\n]"
+2014/08/02 14:22:37:244 MDT [DEBUG] headers - >> POST /v1/authentication_requests/initiate HTTP/1.1
+2014/08/02 14:22:37:244 MDT [DEBUG] headers - >> Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010957", oauth_nonce="-7731293963422384200", oauth_signature="mxB0EGrEKuFWb%2FITL2FpUx023ZM%3D"
+2014/08/02 14:22:37:245 MDT [DEBUG] headers - >> Content-Length: 72
+2014/08/02 14:22:37:245 MDT [DEBUG] headers - >> Content-Type: application/x-www-form-urlencoded
+2014/08/02 14:22:37:245 MDT [DEBUG] headers - >> Host: api.toopher.com:443
+2014/08/02 14:22:37:245 MDT [DEBUG] headers - >> Connection: Keep-Alive
+2014/08/02 14:22:37:245 MDT [DEBUG] headers - >> User-Agent: ToopherJava/1.0.0
+2014/08/02 14:22:37:245 MDT [DEBUG] wire -  >> "pairing_id=5e5862c5-833b-4a0b-b7b6-9a8b0da0c430&terminal_name=VPN+Access"
+2014/08/02 14:22:38:005 MDT [DEBUG] wire -  << "HTTP/1.1 200 OK[\r][\n]"
+2014/08/02 14:22:38:005 MDT [DEBUG] wire -  << "Server: cloudflare-nginx[\r][\n]"
+2014/08/02 14:22:38:005 MDT [DEBUG] wire -  << "Date: Sat, 02 Aug 2014 20:22:37 GMT[\r][\n]"
+2014/08/02 14:22:38:006 MDT [DEBUG] wire -  << "Content-Type: application/json; charset=utf-8[\r][\n]"
+2014/08/02 14:22:38:006 MDT [DEBUG] wire -  << "Transfer-Encoding: chunked[\r][\n]"
+2014/08/02 14:22:38:006 MDT [DEBUG] wire -  << "Connection: keep-alive[\r][\n]"
+2014/08/02 14:22:38:006 MDT [DEBUG] wire -  << "Set-Cookie: __cfduid=d9b8d3acc15c6f142c960856b799229431407010957254; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly[\r][\n]"
+2014/08/02 14:22:38:006 MDT [DEBUG] wire -  << "Vary: Authorization[\r][\n]"
+2014/08/02 14:22:38:006 MDT [DEBUG] wire -  << "Vary: Accept-Encoding[\r][\n]"
+2014/08/02 14:22:38:006 MDT [DEBUG] wire -  << "Cache-Control: private[\r][\n]"
+2014/08/02 14:22:38:007 MDT [DEBUG] wire -  << "Alternate-Protocol: 80:quic,80:quic[\r][\n]"
+2014/08/02 14:22:38:007 MDT [DEBUG] wire -  << "CF-RAY: 153cfd12d0e50663-SJC[\r][\n]"
+2014/08/02 14:22:38:007 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:38:007 MDT [DEBUG] DefaultClientConnection - Receiving response: HTTP/1.1 200 OK
+2014/08/02 14:22:38:007 MDT [DEBUG] headers - << HTTP/1.1 200 OK
+2014/08/02 14:22:38:007 MDT [DEBUG] headers - << Server: cloudflare-nginx
+2014/08/02 14:22:38:007 MDT [DEBUG] headers - << Date: Sat, 02 Aug 2014 20:22:37 GMT
+2014/08/02 14:22:38:007 MDT [DEBUG] headers - << Content-Type: application/json; charset=utf-8
+2014/08/02 14:22:38:007 MDT [DEBUG] headers - << Transfer-Encoding: chunked
+2014/08/02 14:22:38:007 MDT [DEBUG] headers - << Connection: keep-alive
+2014/08/02 14:22:38:008 MDT [DEBUG] headers - << Set-Cookie: __cfduid=d9b8d3acc15c6f142c960856b799229431407010957254; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly
+2014/08/02 14:22:38:008 MDT [DEBUG] headers - << Vary: Authorization
+2014/08/02 14:22:38:008 MDT [DEBUG] headers - << Vary: Accept-Encoding
+2014/08/02 14:22:38:008 MDT [DEBUG] headers - << Cache-Control: private
+2014/08/02 14:22:38:008 MDT [DEBUG] headers - << Alternate-Protocol: 80:quic,80:quic
+2014/08/02 14:22:38:008 MDT [DEBUG] headers - << CF-RAY: 153cfd12d0e50663-SJC
+2014/08/02 14:22:38:009 MDT [DEBUG] ResponseProcessCookies - Cookie accepted [__cfduid="d9b8d3acc15c6f142c960856b799229431407010957254", version:0, domain:.toopher.com, path:/, expiry:Mon Dec 23 16:50:00 MST 2019]
+2014/08/02 14:22:38:009 MDT [DEBUG] DefaultHttpClient - Connection can be kept alive indefinitely
+2014/08/02 14:22:38:010 MDT [DEBUG] wire -  << "d5f[\r][\n]"
+2014/08/02 14:22:38:010 MDT [DEBUG] wire -  << "{[\n]"
+2014/08/02 14:22:38:010 MDT [DEBUG] wire -  << "    "terminal": {[\n]"
+2014/08/02 14:22:38:010 MDT [DEBUG] wire -  << "        "name": "VPN Access", [\n]"
+2014/08/02 14:22:38:010 MDT [DEBUG] wire -  << "        "created": "2014-07-01 09:23:46", [\n]"
+2014/08/02 14:22:38:010 MDT [DEBUG] wire -  << "        "name_extra": "", [\n]"
+2014/08/02 14:22:38:011 MDT [DEBUG] wire -  << "        "modified": "2014-07-01 09:23:46", [\n]"
+2014/08/02 14:22:38:011 MDT [DEBUG] wire -  << "        "user": {[\n]"
+2014/08/02 14:22:38:011 MDT [DEBUG] wire -  << "            "requester": {[\n]"
+2014/08/02 14:22:38:011 MDT [DEBUG] wire -  << "                "created": "2014-06-24 17:12:59", [\n]"
+2014/08/02 14:22:38:011 MDT [DEBUG] wire -  << "                "consumer": {[\n]"
+2014/08/02 14:22:38:011 MDT [DEBUG] wire -  << "                    "key": "KKpt7nSMkdVhyt7MEw"[\n]"
+2014/08/02 14:22:38:012 MDT [DEBUG] wire -  << "                }, [\n]"
+2014/08/02 14:22:38:012 MDT [DEBUG] wire -  << "                "id": "8c0db7b3-9182-4908-bc9f-3f811698a86d", [\n]"
+2014/08/02 14:22:38:012 MDT [DEBUG] wire -  << "                "name": "LDS Church", [\n]"
+2014/08/02 14:22:38:012 MDT [DEBUG] wire -  << "                "modified": "2014-06-24 17:12:59"[\n]"
+2014/08/02 14:22:38:012 MDT [DEBUG] wire -  << "            }, [\n]"
+2014/08/02 14:22:38:012 MDT [DEBUG] wire -  << "            "created": "2014-06-26 18:42:41", [\n]"
+2014/08/02 14:22:38:012 MDT [DEBUG] wire -  << "            "id": "405e673d-aeef-4451-a7c6-4b9750cad7f0", [\n]"
+2014/08/02 14:22:38:013 MDT [DEBUG] wire -  << "            "name": "boydmr", [\n]"
+2014/08/02 14:22:38:013 MDT [DEBUG] wire -  << "            "modified": "2014-08-02 20:22:37"[\n]"
+2014/08/02 14:22:38:013 MDT [DEBUG] wire -  << "        }, [\n]"
+2014/08/02 14:22:38:013 MDT [DEBUG] wire -  << "        "id": "4d5d6ecd-77dd-47b2-ba5a-67eef5222a80"[\n]"
+2014/08/02 14:22:38:013 MDT [DEBUG] wire -  << "    }, [\n]"
+2014/08/02 14:22:38:013 MDT [DEBUG] wire -  << "    "pairing": {[\n]"
+2014/08/02 14:22:38:013 MDT [DEBUG] wire -  << "        "authenticator_type": "c2dm", [\n]"
+2014/08/02 14:22:38:013 MDT [DEBUG] wire -  << "        "totp_length": 6, [\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "        "created": "2014-07-07 03:56:18", [\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "        "deactivated": false, [\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "        "reason_code": 0, [\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "        "created_seconds_since_epoch": 1404705378, [\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "        "modified": "2014-07-07 03:56:33", [\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "        "authenticator": {[\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "            "created": "2014-06-24 21:03:59", [\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "            "consumer": {[\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "                "key": "c9nyVMRwHMPey6JMzq"[\n]"
+2014/08/02 14:22:38:014 MDT [DEBUG] wire -  << "            }, [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "            "id": "c5a7ea4d-4b89-48ad-93e1-f42e60e22dae", [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "            "name": "Toopher Mobile Android", [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "            "modified": "2014-06-24 21:04:01"[\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "        }, [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "        "reason": "", [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "        "handleable": true, [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "        "pending": false, [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "        "enabled": true, [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "        "id": "5e5862c5-833b-4a0b-b7b6-9a8b0da0c430", [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "        "minimum_version": 0, [\n]"
+2014/08/02 14:22:38:015 MDT [DEBUG] wire -  << "        "user": {[\n]"
+2014/08/02 14:22:38:016 MDT [DEBUG] wire -  << "            "requester": {[\n]"
+2014/08/02 14:22:38:016 MDT [DEBUG] wire -  << "                "created": "2014-06-24 17:12:59", [\n]"
+2014/08/02 14:22:38:016 MDT [DEBUG] wire -  << "                "consumer": {[\n]"
+2014/08/02 14:22:38:016 MDT [DEBUG] wire -  << "                    "key": "KKpt7nSMkdVhyt7MEw"[\n]"
+2014/08/02 14:22:38:016 MDT [DEBUG] wire -  << "                }, [\n]"
+2014/08/02 14:22:38:016 MDT [DEBUG] wire -  << "                "id": "8c0db7b3-9182-4908-bc9f-3f811698a86d", [\n]"
+2014/08/02 14:22:38:016 MDT [DEBUG] wire -  << "                "name": "LDS Church", [\n]"
+2014/08/02 14:22:38:016 MDT [DEBUG] wire -  << "                "modified": "2014-06-24 17:12:59"[\n]"
+2014/08/02 14:22:38:016 MDT [DEBUG] wire -  << "            }, [\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "            "created": "2014-06-26 18:42:41", [\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "            "id": "405e673d-aeef-4451-a7c6-4b9750cad7f0", [\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "            "name": "boydmr", [\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "            "modified": "2014-08-02 20:22:37"[\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "        }[\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "    }, [\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "    "created": "2014-08-02 20:22:37", [\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "    "automation_requested": false, [\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "    "granted": false, [\n]"
+2014/08/02 14:22:38:017 MDT [DEBUG] wire -  << "    "reason_code": 0, [\n]"
+2014/08/02 14:22:38:018 MDT [DEBUG] wire -  << "    "created_seconds_since_epoch": 1407010957, [\n]"
+2014/08/02 14:22:38:018 MDT [DEBUG] wire -  << "    "modified": "2014-08-02 20:22:37", [\n]"
+2014/08/02 14:22:38:018 MDT [DEBUG] wire -  << "    "totp_valid": false, [\n]"
+2014/08/02 14:22:38:018 MDT [DEBUG] wire -  << "    "authenticator": {[\n]"
+2014/08/02 14:22:38:018 MDT [DEBUG] wire -  << "        "created": "2014-06-24 21:03:59", [\n]"
+2014/08/02 14:22:38:018 MDT [DEBUG] wire -  << "        "consumer": {[\n]"
+2014/08/02 14:22:38:018 MDT [DEBUG] wire -  << "            "key": "c9nyVMRwHMPey6JMzq"[\n]"
+2014/08/02 14:22:38:018 MDT [DEBUG] wire -  << "        }, [\n]"
+2014/08/02 14:22:38:018 MDT [DEBUG] wire -  << "        "id": "c5a7ea4d-4b89-48ad-93e1-f42e60e22dae", [\n]"
+2014/08/02 14:22:38:019 MDT [DEBUG] wire -  << "        "name": "Toopher Mobile Android", [\n]"
+2014/08/02 14:22:38:019 MDT [DEBUG] wire -  << "        "modified": "2014-06-24 21:04:01"[\n]"
+2014/08/02 14:22:38:019 MDT [DEBUG] wire -  << "    }, [\n]"
+2014/08/02 14:22:38:019 MDT [DEBUG] wire -  << "    "cancelled": false, [\n]"
+2014/08/02 14:22:38:019 MDT [DEBUG] wire -  << "    "reason": "", [\n]"
+2014/08/02 14:22:38:019 MDT [DEBUG] wire -  << "    "handleable": true, [\n]"
+2014/08/02 14:22:38:019 MDT [DEBUG] wire -  << "    "pending": true, [\n]"
+2014/08/02 14:22:38:019 MDT [DEBUG] wire -  << "    "automated": false, [\n]"
+2014/08/02 14:22:38:019 MDT [DEBUG] wire -  << "    "action": {[\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "        "requester": {[\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "            "created": "2014-06-24 17:12:59", [\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "            "consumer": {[\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "                "key": "KKpt7nSMkdVhyt7MEw"[\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "            }, [\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "            "id": "8c0db7b3-9182-4908-bc9f-3f811698a86d", [\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "            "name": "LDS Church", [\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "            "modified": "2014-06-24 17:12:59"[\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "        }, [\n]"
+2014/08/02 14:22:38:020 MDT [DEBUG] wire -  << "        "created": "2014-06-24 21:05:33", [\n]"
+2014/08/02 14:22:38:021 MDT [DEBUG] wire -  << "        "id": "f2d9f48a-9f87-46c7-a61e-53ad317df6c9", [\n]"
+2014/08/02 14:22:38:022 MDT [DEBUG] wire -  << "        "name": "log in", [\n]"
+2014/08/02 14:22:38:022 MDT [DEBUG] wire -  << "        "modified": "2014-06-24 21:05:33"[\n]"
+2014/08/02 14:22:38:022 MDT [DEBUG] wire -  << "    }, [\n]"
+2014/08/02 14:22:38:023 MDT [DEBUG] wire -  << "    "challenge_required": false, [\n]"
+2014/08/02 14:22:38:023 MDT [DEBUG] wire -  << "    "automation_allowed": true, [\n]"
+2014/08/02 14:22:38:023 MDT [DEBUG] wire -  << "    "id": "a9862f7a-a379-458c-a6af-0a81bfecf17b", [\n]"
+2014/08/02 14:22:38:023 MDT [DEBUG] wire -  << "    "minimum_version": 0[\n]"
+2014/08/02 14:22:38:023 MDT [DEBUG] wire -  << "}"
+2014/08/02 14:22:38:023 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:38:024 MDT [DEBUG] wire -  << "0[\r][\n]"
+2014/08/02 14:22:38:024 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:38:024 MDT [DEBUG] BasicClientConnectionManager - Releasing connection org.apache.http.impl.conn.ManagedClientConnectionImpl@7c4afb60
+2014/08/02 14:22:38:024 MDT [DEBUG] BasicClientConnectionManager - Connection can be kept alive indefinitely
+   -- authentication request ID is: a9862f7a-a379-458c-a6af-0a81bfecf17b
+02014-22-02 02:22:49 228 ----> ACCESS_REQUEST - 247 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 999424
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - STATE : TOOPHER_AWAIT_DEVICE_APPROVAL
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-22-02 02:22:49 229 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   -- STATE received: TOOPHER_AWAIT_DEVICE_APPROVAL --> TOOPHER_AWAIT_DEVICE_APPROVAL / null
+  -- Testing authentication status for user 'boydmr' via pid 'null'
+2014/08/02 14:22:49:236 MDT [DEBUG] BasicClientConnectionManager - Get connection for route {s}->https://api.toopher.com:443
+2014/08/02 14:22:49:238 MDT [DEBUG] DefaultClientConnectionOperator - Connecting to api.toopher.com:443
+2014/08/02 14:22:49:393 MDT [DEBUG] RequestAddCookies - CookieSpec selected: best-match
+2014/08/02 14:22:49:393 MDT [DEBUG] RequestAuthCache - Auth cache not set in the context
+2014/08/02 14:22:49:393 MDT [DEBUG] RequestProxyAuthentication - Proxy auth state: UNCHALLENGED
+2014/08/02 14:22:49:393 MDT [DEBUG] DefaultHttpClient - Attempt 1 to execute request
+2014/08/02 14:22:49:393 MDT [DEBUG] DefaultClientConnection - Sending request: GET /v1/authentication_requests/null HTTP/1.1
+2014/08/02 14:22:49:393 MDT [DEBUG] wire -  >> "GET /v1/authentication_requests/null HTTP/1.1[\r][\n]"
+2014/08/02 14:22:49:394 MDT [DEBUG] wire -  >> "Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010969", oauth_nonce="3135265767908683220", oauth_signature="DqlQao%2B7jUpFl%2FIXl%2FfiJPNnMgU%3D"[\r][\n]"
+2014/08/02 14:22:49:394 MDT [DEBUG] wire -  >> "Host: api.toopher.com:443[\r][\n]"
+2014/08/02 14:22:49:394 MDT [DEBUG] wire -  >> "Connection: Keep-Alive[\r][\n]"
+2014/08/02 14:22:49:394 MDT [DEBUG] wire -  >> "User-Agent: ToopherJava/1.0.0[\r][\n]"
+2014/08/02 14:22:49:394 MDT [DEBUG] wire -  >> "[\r][\n]"
+2014/08/02 14:22:49:394 MDT [DEBUG] headers - >> GET /v1/authentication_requests/null HTTP/1.1
+2014/08/02 14:22:49:394 MDT [DEBUG] headers - >> Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010969", oauth_nonce="3135265767908683220", oauth_signature="DqlQao%2B7jUpFl%2FIXl%2FfiJPNnMgU%3D"
+2014/08/02 14:22:49:394 MDT [DEBUG] headers - >> Host: api.toopher.com:443
+2014/08/02 14:22:49:394 MDT [DEBUG] headers - >> Connection: Keep-Alive
+2014/08/02 14:22:49:395 MDT [DEBUG] headers - >> User-Agent: ToopherJava/1.0.0
+2014/08/02 14:22:49:532 MDT [DEBUG] wire -  << "HTTP/1.1 404 Not Found[\r][\n]"
+2014/08/02 14:22:49:532 MDT [DEBUG] wire -  << "Server: cloudflare-nginx[\r][\n]"
+2014/08/02 14:22:49:532 MDT [DEBUG] wire -  << "Date: Sat, 02 Aug 2014 20:22:49 GMT[\r][\n]"
+2014/08/02 14:22:49:532 MDT [DEBUG] wire -  << "Content-Type: application/json; charset=utf-8[\r][\n]"
+2014/08/02 14:22:49:532 MDT [DEBUG] wire -  << "Transfer-Encoding: chunked[\r][\n]"
+2014/08/02 14:22:49:532 MDT [DEBUG] wire -  << "Connection: keep-alive[\r][\n]"
+2014/08/02 14:22:49:532 MDT [DEBUG] wire -  << "Set-Cookie: __cfduid=d54bca19cc65804d75eeda4d1d2a982cb1407010969402; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly[\r][\n]"
+2014/08/02 14:22:49:533 MDT [DEBUG] wire -  << "Vary: Accept-Encoding[\r][\n]"
+2014/08/02 14:22:49:533 MDT [DEBUG] wire -  << "Cache-Control: private[\r][\n]"
+2014/08/02 14:22:49:533 MDT [DEBUG] wire -  << "Alternate-Protocol: 80:quic,80:quic[\r][\n]"
+2014/08/02 14:22:49:533 MDT [DEBUG] wire -  << "CF-RAY: 153cfd5ec1b70663-SJC[\r][\n]"
+2014/08/02 14:22:49:533 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:49:533 MDT [DEBUG] DefaultClientConnection - Receiving response: HTTP/1.1 404 Not Found
+2014/08/02 14:22:49:533 MDT [DEBUG] headers - << HTTP/1.1 404 Not Found
+2014/08/02 14:22:49:533 MDT [DEBUG] headers - << Server: cloudflare-nginx
+2014/08/02 14:22:49:533 MDT [DEBUG] headers - << Date: Sat, 02 Aug 2014 20:22:49 GMT
+2014/08/02 14:22:49:534 MDT [DEBUG] headers - << Content-Type: application/json; charset=utf-8
+2014/08/02 14:22:49:534 MDT [DEBUG] headers - << Transfer-Encoding: chunked
+2014/08/02 14:22:49:534 MDT [DEBUG] headers - << Connection: keep-alive
+2014/08/02 14:22:49:534 MDT [DEBUG] headers - << Set-Cookie: __cfduid=d54bca19cc65804d75eeda4d1d2a982cb1407010969402; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly
+2014/08/02 14:22:49:534 MDT [DEBUG] headers - << Vary: Accept-Encoding
+2014/08/02 14:22:49:534 MDT [DEBUG] headers - << Cache-Control: private
+2014/08/02 14:22:49:534 MDT [DEBUG] headers - << Alternate-Protocol: 80:quic,80:quic
+2014/08/02 14:22:49:534 MDT [DEBUG] headers - << CF-RAY: 153cfd5ec1b70663-SJC
+2014/08/02 14:22:49:535 MDT [DEBUG] ResponseProcessCookies - Cookie accepted [__cfduid="d54bca19cc65804d75eeda4d1d2a982cb1407010969402", version:0, domain:.toopher.com, path:/, expiry:Mon Dec 23 16:50:00 MST 2019]
+2014/08/02 14:22:49:535 MDT [DEBUG] DefaultHttpClient - Connection can be kept alive indefinitely
+2014/08/02 14:22:49:536 MDT [DEBUG] wire -  << "3c[\r][\n]"
+2014/08/02 14:22:49:536 MDT [DEBUG] wire -  << "{[\n]"
+2014/08/02 14:22:49:536 MDT [DEBUG] wire -  << "    "error_message": "Not Found", [\n]"
+2014/08/02 14:22:49:536 MDT [DEBUG] wire -  << "    "error_code": 404[\n]"
+2014/08/02 14:22:49:536 MDT [DEBUG] wire -  << "}"
+2014/08/02 14:22:49:536 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:49:536 MDT [DEBUG] wire -  << "0[\r][\n]"
+2014/08/02 14:22:49:537 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:49:537 MDT [DEBUG] BasicClientConnectionManager - Releasing connection org.apache.http.impl.conn.ManagedClientConnectionImpl@fca1255
+2014/08/02 14:22:49:537 MDT [DEBUG] BasicClientConnectionManager - Connection can be kept alive indefinitely
+- Unable to pair device for: boydmr using phrase ''
+com.toopher.RequestError: Request error
+	at com.toopher.ToopherAPI.getAuthenticationStatus(Unknown Source)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService.getAuthenticationStatus(ToopherService.java:185)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService.access$100(ToopherService.java:11)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService$5.isTriggered(ToopherService.java:175)
+	at com.sun.identity.authentication.modules.radius.server.Transition.isTriggered(Transition.java:84)
+	at com.sun.identity.authentication.modules.radius.server.RadiusListener.listen(RadiusListener.java:260)
+	at com.sun.identity.authentication.modules.radius.server.RadiusListener.main(RadiusListener.java:521)
+Caused by: org.apache.http.client.HttpResponseException: Not Found
+	at com.toopher.ToopherAPI$1.handleResponse(Unknown Source)
+	at com.toopher.ToopherAPI$1.handleResponse(Unknown Source)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:218)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:160)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:136)
+	at com.toopher.ToopherAPI.request(Unknown Source)
+	at com.toopher.ToopherAPI.get(Unknown Source)
+	... 7 more
+  -- Testing authentication status for user 'boydmr' via pid 'null'
+2014/08/02 14:22:49:553 MDT [DEBUG] BasicClientConnectionManager - Get connection for route {s}->https://api.toopher.com:443
+2014/08/02 14:22:49:559 MDT [DEBUG] DefaultClientConnectionOperator - Connecting to api.toopher.com:443
+2014/08/02 14:22:49:703 MDT [DEBUG] RequestAddCookies - CookieSpec selected: best-match
+2014/08/02 14:22:49:704 MDT [DEBUG] RequestAuthCache - Auth cache not set in the context
+2014/08/02 14:22:49:704 MDT [DEBUG] RequestProxyAuthentication - Proxy auth state: UNCHALLENGED
+2014/08/02 14:22:49:704 MDT [DEBUG] DefaultHttpClient - Attempt 1 to execute request
+2014/08/02 14:22:49:704 MDT [DEBUG] DefaultClientConnection - Sending request: GET /v1/authentication_requests/null HTTP/1.1
+2014/08/02 14:22:49:704 MDT [DEBUG] wire -  >> "GET /v1/authentication_requests/null HTTP/1.1[\r][\n]"
+2014/08/02 14:22:49:704 MDT [DEBUG] wire -  >> "Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010969", oauth_nonce="926999530125321831", oauth_signature="BOK5YNQQiaWu6lzMfJNULIT2ufs%3D"[\r][\n]"
+2014/08/02 14:22:49:704 MDT [DEBUG] wire -  >> "Host: api.toopher.com:443[\r][\n]"
+2014/08/02 14:22:49:704 MDT [DEBUG] wire -  >> "Connection: Keep-Alive[\r][\n]"
+2014/08/02 14:22:49:705 MDT [DEBUG] wire -  >> "User-Agent: ToopherJava/1.0.0[\r][\n]"
+2014/08/02 14:22:49:705 MDT [DEBUG] wire -  >> "[\r][\n]"
+2014/08/02 14:22:49:705 MDT [DEBUG] headers - >> GET /v1/authentication_requests/null HTTP/1.1
+2014/08/02 14:22:49:705 MDT [DEBUG] headers - >> Authorization: OAuth oauth_consumer_key="KKpt7nSMkdVhyt7MEw", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1407010969", oauth_nonce="926999530125321831", oauth_signature="BOK5YNQQiaWu6lzMfJNULIT2ufs%3D"
+2014/08/02 14:22:49:705 MDT [DEBUG] headers - >> Host: api.toopher.com:443
+2014/08/02 14:22:49:705 MDT [DEBUG] headers - >> Connection: Keep-Alive
+2014/08/02 14:22:49:705 MDT [DEBUG] headers - >> User-Agent: ToopherJava/1.0.0
+2014/08/02 14:22:49:839 MDT [DEBUG] wire -  << "HTTP/1.1 404 Not Found[\r][\n]"
+2014/08/02 14:22:49:839 MDT [DEBUG] wire -  << "Server: cloudflare-nginx[\r][\n]"
+2014/08/02 14:22:49:839 MDT [DEBUG] wire -  << "Date: Sat, 02 Aug 2014 20:22:49 GMT[\r][\n]"
+2014/08/02 14:22:49:839 MDT [DEBUG] wire -  << "Content-Type: application/json; charset=utf-8[\r][\n]"
+2014/08/02 14:22:49:840 MDT [DEBUG] wire -  << "Transfer-Encoding: chunked[\r][\n]"
+2014/08/02 14:22:49:840 MDT [DEBUG] wire -  << "Connection: keep-alive[\r][\n]"
+2014/08/02 14:22:49:840 MDT [DEBUG] wire -  << "Set-Cookie: __cfduid=d412ebd6414b05596822e6188ac8512941407010969714; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly[\r][\n]"
+2014/08/02 14:22:49:840 MDT [DEBUG] wire -  << "Vary: Accept-Encoding[\r][\n]"
+2014/08/02 14:22:49:840 MDT [DEBUG] wire -  << "Cache-Control: private[\r][\n]"
+2014/08/02 14:22:49:840 MDT [DEBUG] wire -  << "Alternate-Protocol: 80:quic,80:quic[\r][\n]"
+2014/08/02 14:22:49:840 MDT [DEBUG] wire -  << "CF-RAY: 153cfd60b02d0663-SJC[\r][\n]"
+2014/08/02 14:22:49:840 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:49:840 MDT [DEBUG] DefaultClientConnection - Receiving response: HTTP/1.1 404 Not Found
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << HTTP/1.1 404 Not Found
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << Server: cloudflare-nginx
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << Date: Sat, 02 Aug 2014 20:22:49 GMT
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << Content-Type: application/json; charset=utf-8
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << Transfer-Encoding: chunked
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << Connection: keep-alive
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << Set-Cookie: __cfduid=d412ebd6414b05596822e6188ac8512941407010969714; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.toopher.com; HttpOnly
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << Vary: Accept-Encoding
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << Cache-Control: private
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << Alternate-Protocol: 80:quic,80:quic
+2014/08/02 14:22:49:841 MDT [DEBUG] headers - << CF-RAY: 153cfd60b02d0663-SJC
+2014/08/02 14:22:49:842 MDT [DEBUG] ResponseProcessCookies - Cookie accepted [__cfduid="d412ebd6414b05596822e6188ac8512941407010969714", version:0, domain:.toopher.com, path:/, expiry:Mon Dec 23 16:50:00 MST 2019]
+2014/08/02 14:22:49:843 MDT [DEBUG] DefaultHttpClient - Connection can be kept alive indefinitely
+2014/08/02 14:22:49:843 MDT [DEBUG] wire -  << "3c[\r][\n]"
+2014/08/02 14:22:49:843 MDT [DEBUG] wire -  << "{[\n]"
+2014/08/02 14:22:49:843 MDT [DEBUG] wire -  << "    "error_message": "Not Found", [\n]"
+2014/08/02 14:22:49:843 MDT [DEBUG] wire -  << "    "error_code": 404[\n]"
+2014/08/02 14:22:49:843 MDT [DEBUG] wire -  << "}"
+2014/08/02 14:22:49:843 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:49:844 MDT [DEBUG] wire -  << "0[\r][\n]"
+2014/08/02 14:22:49:844 MDT [DEBUG] wire -  << "[\r][\n]"
+2014/08/02 14:22:49:844 MDT [DEBUG] BasicClientConnectionManager - Releasing connection org.apache.http.impl.conn.ManagedClientConnectionImpl@34a204f3
+2014/08/02 14:22:49:844 MDT [DEBUG] BasicClientConnectionManager - Connection can be kept alive indefinitely
+- Unable to pair device for: boydmr using phrase ''
+com.toopher.RequestError: Request error
+	at com.toopher.ToopherAPI.getAuthenticationStatus(Unknown Source)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService.getAuthenticationStatus(ToopherService.java:185)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService.access$100(ToopherService.java:11)
+	at com.sun.identity.authentication.modules.radius.server.ToopherService$6.isTriggered(ToopherService.java:203)
+	at com.sun.identity.authentication.modules.radius.server.Transition.isTriggered(Transition.java:84)
+	at com.sun.identity.authentication.modules.radius.server.RadiusListener.listen(RadiusListener.java:260)
+	at com.sun.identity.authentication.modules.radius.server.RadiusListener.main(RadiusListener.java:521)
+Caused by: org.apache.http.client.HttpResponseException: Not Found
+	at com.toopher.ToopherAPI$1.handleResponse(Unknown Source)
+	at com.toopher.ToopherAPI$1.handleResponse(Unknown Source)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:218)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:160)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:136)
+	at com.toopher.ToopherAPI.request(Unknown Source)
+	at com.toopher.ToopherAPI.get(Unknown Source)
+	... 7 more
+<---- ACCESS_REJECT - 247 for boydmr
+    - REPLY_MESSAGE : Device approval was not given.
+   -- DONE : 618ms elapsed
+
+02014-23-02 02:23:21 978 ----> ACCESS_REQUEST - 248 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 1003520
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-23-02 02:23:21 979 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+<---- ACCESS_CHALLENGE - 248 for boydmr
+    - REPLY_MESSAGE : Select your preferred callback mechanism.
+ S for SMART Phone Responder
+ T for TEXT Message Delivered passcode
+ P for PHONE Call Delivered Passcode
+ D for DEVICE Generated Passcode
+Press Cancel to start over.
+    - STATE : CHOOSE_WHICH_MULTIFACTOR
+   -- DONE : 2ms elapsed
+
+02014-23-02 02:23:31 480 ----> ACCESS_REQUEST - 249 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 1003520
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - STATE : CHOOSE_WHICH_MULTIFACTOR
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-23-02 02:23:31 481 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   -- STATE received: CHOOSE_WHICH_MULTIFACTOR --> CHOOSE_WHICH_MULTIFACTOR / null
+<---- ACCESS_CHALLENGE - 249 for boydmr
+    - REPLY_MESSAGE : Please enter your SMS capable seven digit phone number prefixed with '+' and country code (1 = U.S.) and NO dashes and press Continue.
+
+    - STATE : GET_SMS_PHONE_NUMBER
+   -- DONE : 2ms elapsed
+
+02014-23-02 02:23:52 356 ----> ACCESS_REQUEST - 250 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 1003520
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - STATE : GET_SMS_PHONE_NUMBER
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-23-02 02:23:52 357 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   -- STATE received: GET_SMS_PHONE_NUMBER --> GET_SMS_PHONE_NUMBER / null
+<---- ACCESS_CHALLENGE - 250 for boydmr
+    - REPLY_MESSAGE : Please enter your SMS capable seven digit phone number prefixed with '+' and country code (1 = U.S.) and NO dashes and press Continue.
+
+    - STATE : GET_SMS_PHONE_NUMBER
+   -- DONE : 2ms elapsed
+
+02014-24-02 02:24:12 514 ----> ACCESS_REQUEST - 251 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 1003520
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - STATE : GET_SMS_PHONE_NUMBER
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-24-02 02:24:12 515 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   -- STATE received: GET_SMS_PHONE_NUMBER --> GET_SMS_PHONE_NUMBER / null
+<---- ACCESS_CHALLENGE - 251 for boydmr
+    - REPLY_MESSAGE : Please enter your SMS capable seven digit phone number prefixed with '+' and country code (1 = U.S.) and NO dashes and press Continue.
+
+    - STATE : GET_SMS_PHONE_NUMBER
+   -- DONE : 2ms elapsed
+
+02014-24-02 02:24:27 126 ----> ACCESS_REQUEST - 253 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 1007616
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-24-02 02:24:27 128 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+<---- ACCESS_CHALLENGE - 253 for boydmr
+    - REPLY_MESSAGE : Select your preferred callback mechanism.
+ S for SMART Phone Responder
+ T for TEXT Message Delivered passcode
+ P for PHONE Call Delivered Passcode
+ D for DEVICE Generated Passcode
+Press Cancel to start over.
+    - STATE : CHOOSE_WHICH_MULTIFACTOR
+   -- DONE : 3ms elapsed
+
+02014-24-02 02:24:34 444 ----> ACCESS_REQUEST - 254 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 1007616
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - STATE : CHOOSE_WHICH_MULTIFACTOR
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-24-02 02:24:34 446 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   -- STATE received: CHOOSE_WHICH_MULTIFACTOR --> CHOOSE_WHICH_MULTIFACTOR / null
+<---- ACCESS_CHALLENGE - 254 for boydmr
+    - REPLY_MESSAGE : Please enter your seven digit phone number prefixed with '+' and country code (1 = U.S.) and press Continue.
+
+    - STATE : GET_VOICE_PHONE_NUMBER
+   -- DONE : 2ms elapsed
+
+02014-24-02 02:24:48 554 ----> ACCESS_REQUEST - 0 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 1007616
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - STATE : GET_VOICE_PHONE_NUMBER
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-24-02 02:24:48 555 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   -- STATE received: GET_VOICE_PHONE_NUMBER --> GET_VOICE_PHONE_NUMBER / null
+<---- ACCESS_CHALLENGE - 0 for boydmr
+    - REPLY_MESSAGE : Please enter the passcode that was conveyed to you by a voice message to your phone and press Continue.
+
+    - STATE : VERIFY_VOICE_PHONE_NUMBER
+   -- DONE : 2ms elapsed
+
+msg: <Response><Say>Your passcode from The L D S Church for Mark Boyd to access V P N is</Say><Say>5</Say><Pause length='1'/><Say>5</Say><Pause length='1'/><Say>0</Say><Pause length='1'/><Say>4</Say></Response>
+twiml url is: http://twimlets.com/echo?Twiml=%3CResponse%3E%3CSay%3EYour+passcode+from+The+L+D+S+Church+for+Mark+Boyd+to+access+V+P+N+is%3C%2FSay%3E%3CSay%3E5%3C%2FSay%3E%3CPause+length%3D%271%27%2F%3E%3CSay%3E5%3C%2FSay%3E%3CPause+length%3D%271%27%2F%3E%3CSay%3E0%3C%2FSay%3E%3CPause+length%3D%271%27%2F%3E%3CSay%3E4%3C%2FSay%3E%3C%2FResponse%3E
+---> Basic QUNhNDhmMjMxNmZmNjZkODdlOGQ5MTVmYTJiYTFjY2U3ODoxNDliM2I4OGI1NDM1NmM2NDQ5YTFlZmYxMzAzNGQzNA==
+2014/08/02 14:24:48:608 MDT [DEBUG] RequestAddCookies - CookieSpec selected: best-match
+2014/08/02 14:24:48:608 MDT [DEBUG] RequestAuthCache - Auth cache not set in the context
+2014/08/02 14:24:48:610 MDT [DEBUG] PoolingHttpClientConnectionManager - Connection request: [route: {s}->https://api.twilio.com:443][total kept alive: 0; route allocated: 0 of 2; total allocated: 0 of 20]
+2014/08/02 14:24:48:621 MDT [DEBUG] PoolingHttpClientConnectionManager - Connection leased: [id: 0][route: {s}->https://api.twilio.com:443][total kept alive: 0; route allocated: 1 of 2; total allocated: 1 of 20]
+2014/08/02 14:24:48:631 MDT [DEBUG] MainClientExec - Opening connection {s}->https://api.twilio.com:443
+2014/08/02 14:24:48:639 MDT [DEBUG] DefaultClientConnection - Connection 0.0.0.0:45144<->162.159.242.15:443 closed
+2014/08/02 14:24:48:640 MDT [DEBUG] DefaultClientConnection - Connection 0.0.0.0:45143<->162.159.242.15:443 closed
+2014/08/02 14:24:48:720 MDT [DEBUG] HttpClientConnectionOperator - Connecting to api.twilio.com/174.129.254.101:443
+2014/08/02 14:24:49:120 MDT [DEBUG] HttpClientConnectionOperator - Connection established 10.118.232.154:37715<->174.129.254.101:443
+2014/08/02 14:24:49:121 MDT [DEBUG] MainClientExec - Executing request POST /2010-04-01/Accounts/ACa48f2316ff66d87e8d915fa2ba1cce78/Calls.json HTTP/1.1
+2014/08/02 14:24:49:121 MDT [DEBUG] MainClientExec - Proxy auth state: UNCHALLENGED
+2014/08/02 14:24:49:122 MDT [DEBUG] headers - http-outgoing-0 >> POST /2010-04-01/Accounts/ACa48f2316ff66d87e8d915fa2ba1cce78/Calls.json HTTP/1.1
+2014/08/02 14:24:49:122 MDT [DEBUG] headers - http-outgoing-0 >> Accept: application/json
+2014/08/02 14:24:49:122 MDT [DEBUG] headers - http-outgoing-0 >> Accept-Charset: utf-8
+2014/08/02 14:24:49:122 MDT [DEBUG] headers - http-outgoing-0 >> Authorization: Basic QUNhNDhmMjMxNmZmNjZkODdlOGQ5MTVmYTJiYTFjY2U3ODoxNDliM2I4OGI1NDM1NmM2NDQ5YTFlZmYxMzAzNGQzNA==
+2014/08/02 14:24:49:122 MDT [DEBUG] headers - http-outgoing-0 >> Content-Length: 514
+2014/08/02 14:24:49:122 MDT [DEBUG] headers - http-outgoing-0 >> Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+2014/08/02 14:24:49:122 MDT [DEBUG] headers - http-outgoing-0 >> Host: api.twilio.com
+2014/08/02 14:24:49:122 MDT [DEBUG] headers - http-outgoing-0 >> Connection: Keep-Alive
+2014/08/02 14:24:49:122 MDT [DEBUG] headers - http-outgoing-0 >> User-Agent: Apache-HttpClient/4.3.3 (java 1.5)
+2014/08/02 14:24:49:123 MDT [DEBUG] headers - http-outgoing-0 >> Accept-Encoding: gzip,deflate
+2014/08/02 14:24:49:123 MDT [DEBUG] wire - http-outgoing-0 >> "POST /2010-04-01/Accounts/ACa48f2316ff66d87e8d915fa2ba1cce78/Calls.json HTTP/1.1[\r][\n]"
+2014/08/02 14:24:49:123 MDT [DEBUG] wire - http-outgoing-0 >> "Accept: application/json[\r][\n]"
+2014/08/02 14:24:49:123 MDT [DEBUG] wire - http-outgoing-0 >> "Accept-Charset: utf-8[\r][\n]"
+2014/08/02 14:24:49:123 MDT [DEBUG] wire - http-outgoing-0 >> "Authorization: Basic QUNhNDhmMjMxNmZmNjZkODdlOGQ5MTVmYTJiYTFjY2U3ODoxNDliM2I4OGI1NDM1NmM2NDQ5YTFlZmYxMzAzNGQzNA==[\r][\n]"
+2014/08/02 14:24:49:123 MDT [DEBUG] wire - http-outgoing-0 >> "Content-Length: 514[\r][\n]"
+2014/08/02 14:24:49:123 MDT [DEBUG] wire - http-outgoing-0 >> "Content-Type: application/x-www-form-urlencoded; charset=UTF-8[\r][\n]"
+2014/08/02 14:24:49:123 MDT [DEBUG] wire - http-outgoing-0 >> "Host: api.twilio.com[\r][\n]"
+2014/08/02 14:24:49:123 MDT [DEBUG] wire - http-outgoing-0 >> "Connection: Keep-Alive[\r][\n]"
+2014/08/02 14:24:49:124 MDT [DEBUG] wire - http-outgoing-0 >> "User-Agent: Apache-HttpClient/4.3.3 (java 1.5)[\r][\n]"
+2014/08/02 14:24:49:124 MDT [DEBUG] wire - http-outgoing-0 >> "Accept-Encoding: gzip,deflate[\r][\n]"
+2014/08/02 14:24:49:124 MDT [DEBUG] wire - http-outgoing-0 >> "[\r][\n]"
+2014/08/02 14:24:49:124 MDT [DEBUG] wire - http-outgoing-0 >> "From=%2B1801-663-7825&To=radius&Url=http%3A%2F%2Ftwimlets.com%2Fecho%3FTwiml%3D%253CResponse%253E%253CSay%253EYour%2Bpasscode%2Bfrom%2BThe%2BL%2BD%2BS%2BChurch%2Bfor%2BMark%2BBoyd%2Bto%2Baccess%2BV%2BP%2BN%2Bis%253C%252FSay%253E%253CSay%253E5%253C%252FSay%253E%253CPause%2Blength%253D%25271%2527%252F%253E%253CSay%253E5%253C%252FSay%253E%253CPause%2Blength%253D%25271%2527%252F%253E%253CSay%253E0%253C%252FSay%253E%253CPause%2Blength%253D%25271%2527%252F%253E%253CSay%253E4%253C%252FSay%253E%253C%252FResponse%253E"
+2014/08/02 14:24:49:452 MDT [DEBUG] wire - http-outgoing-0 << "HTTP/1.1 400 BAD REQUEST[\r][\n]"
+2014/08/02 14:24:49:453 MDT [DEBUG] wire - http-outgoing-0 << "Date: Sat, 02 Aug 2014 20:24:49 GMT[\r][\n]"
+2014/08/02 14:24:49:453 MDT [DEBUG] wire - http-outgoing-0 << "Content-Type: application/json; charset=utf-8[\r][\n]"
+2014/08/02 14:24:49:453 MDT [DEBUG] wire - http-outgoing-0 << "Content-Length: 168[\r][\n]"
+2014/08/02 14:24:49:453 MDT [DEBUG] wire - http-outgoing-0 << "Connection: close[\r][\n]"
+2014/08/02 14:24:49:453 MDT [DEBUG] wire - http-outgoing-0 << "X-Powered-By: AT-5000[\r][\n]"
+2014/08/02 14:24:49:453 MDT [DEBUG] wire - http-outgoing-0 << "X-Shenanigans: none[\r][\n]"
+2014/08/02 14:24:49:453 MDT [DEBUG] wire - http-outgoing-0 << "[\r][\n]"
+2014/08/02 14:24:49:453 MDT [DEBUG] wire - http-outgoing-0 << "{"code": 13223, "message": "The phone number you are attempting to call, 723487, is not valid.", "more_info": "https://www.twilio.com/docs/errors/13223", "status": 400}"
+2014/08/02 14:24:49:454 MDT [DEBUG] headers - http-outgoing-0 << HTTP/1.1 400 BAD REQUEST
+2014/08/02 14:24:49:454 MDT [DEBUG] headers - http-outgoing-0 << Date: Sat, 02 Aug 2014 20:24:49 GMT
+2014/08/02 14:24:49:454 MDT [DEBUG] headers - http-outgoing-0 << Content-Type: application/json; charset=utf-8
+2014/08/02 14:24:49:454 MDT [DEBUG] headers - http-outgoing-0 << Content-Length: 168
+2014/08/02 14:24:49:454 MDT [DEBUG] headers - http-outgoing-0 << Connection: close
+2014/08/02 14:24:49:454 MDT [DEBUG] headers - http-outgoing-0 << X-Powered-By: AT-5000
+2014/08/02 14:24:49:454 MDT [DEBUG] headers - http-outgoing-0 << X-Shenanigans: none
+Response Code: 400
+02014-25-02 02:25:13 810 ----> ACCESS_REQUEST - 1 from /10.109.64.25 - WARNING: Allowing requests from any client.
+    - USER_NAME : boydmr
+    - USER_PASSWORD : *******
+    - NAS_PORT : 1007616
+    - CALLER_STATION_ID : 216.49.183.25
+    - CALLING_STATION_ID : 207.32.175.100
+    - NAS_PORT_TYPE : bytes [ 3d 06 00 00 00 05 ] chars (=.....)
+    - UNKNOWN TYPE : bytes [ 42 10 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (B.207.32.175.100)
+    - NAS_IP_ADDRESS : /10.109.64.25
+    - STATE : VERIFY_VOICE_PHONE_NUMBER
+    - VENDOR_SPECIFIC : bytes [ 1a 23 00 00 00 09 01 1d 69 70 3a 73 6f 75 72 63 65 2d 69 70 3d 32 30 37 2e 33 32 2e 31 37 35 2e 31 30 30 ] chars (.#......ip:source-ip=207.32.175.100)
+    - VENDOR_SPECIFIC : bytes [ 1a 17 00 00 0c 04 92 11 53 56 43 5f 52 41 44 49 55 53 2d 54 45 53 54 ] chars (........SVC_RADIUS-TEST)
+    - VENDOR_SPECIFIC : bytes [ 1a 0c 00 00 0c 04 96 06 00 00 00 02 ] chars (............)
+02014-25-02 02:25:13 811 Unable to find AttributeType for attribute code: 66. Skipping unknown attribute.
+   -- STATE received: VERIFY_VOICE_PHONE_NUMBER --> VERIFY_VOICE_PHONE_NUMBER / null
+<---- ACCESS_REJECT - 1 for boydmr
+    - REPLY_MESSAGE : submitted passcode does not match
+   -- DONE : 2ms elapsed
+
+
+

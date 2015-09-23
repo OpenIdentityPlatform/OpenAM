@@ -362,6 +362,9 @@
         <!-- Final Packaging Distribution Kit -->
         <module>openam-dashboard</module>
 
+	<!-- Radius Server and common libs. -->
+	<module>openam-radius</module>
+
         <module>openam-examples</module>
         <module>openam-annotations</module>
         <module>openam-sts</module>
@@ -519,6 +522,18 @@
                 <artifactId>openam-core-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+	        <dependency>
+	        	<groupId>org.forgerock.openam</groupId>
+	        	<artifactId>openam-radius-common</artifactId>
+	        	<version>${project.version}</version>
+	        </dependency>
+	        
+	        <dependency>
+	        	<groupId>org.forgerock.openam</groupId>
+	        	<artifactId>openam-radius-server</artifactId>
+	        	<version>${project.version}</version>
+	        </dependency>
 
             <!-- Include all Authentication Modules -->
             <dependency>
@@ -2036,7 +2051,7 @@
     <!-- Build -->
     <build>
         <plugins>
-            <plugin>
+            <!-- <plugin>
                 <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
                 <artifactId>svn-revision-number-maven-plugin</artifactId>
                 <executions>
@@ -2054,7 +2069,7 @@
                         </entry>
                     </entries>
                 </configuration>
-            </plugin>
+            </plugin> -->
 
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

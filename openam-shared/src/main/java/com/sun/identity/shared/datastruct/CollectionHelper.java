@@ -28,16 +28,18 @@
  */
 package com.sun.identity.shared.datastruct;
 
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.Debug;
-import org.slf4j.Logger;
-
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class contains various Collection manipulation methods.
@@ -45,7 +47,7 @@ import java.util.Set;
 public class CollectionHelper {
     private static final String localDsameServer = SystemPropertiesManager.get(
             Constants.AM_SERVER_HOST);
-
+    
     /**
      * Returns String from a map of string of set of string.
      *
@@ -72,6 +74,22 @@ public class CollectionHelper {
         String str = getMapAttr(map, name);
         return ((str != null) && (str.length() > 0)) ? str : defaultValue;
     }
+    
+    /**
+     * Return String from a map of strings to set of strings.
+     * @param map
+     * @param key
+     * @return the String value from a map of strings to set of strings.
+     * @throws ValueNotFoundException if no value is found for the key.
+     * 
+     */
+    public static String getMapAttrThrows(Map map, String key) throws ValueNotFoundException{
+    	String str = getMapAttr(map, key);
+    	if(StringUtils.isBlank(str)){
+            throw new ValueNotFoundException("No value found for key '" + key + "'.");
+    	}
+    	return str;
+    }
 
     /**
      * Gets a boolean attribute from a {@code Map<String, Set<String>>}, defaulting to the given default value if
@@ -86,6 +104,25 @@ public class CollectionHelper {
         String value = getMapAttr(map, name, Boolean.toString(defaultValue));
         return Boolean.parseBoolean(value);
     }
+    
+    /**
+     * Gets a boolean attribute from a {@code Map<String, Set<String>>}, throwing an exception if no boolean value (case
+     * insensitive comparisons against "true" or "false") is found for the given key.
+     *
+     * @param map
+     *            the attribute map.
+     * @param name
+     *            the name of the attribute to retrieve.
+     * @return the boolean value using {@link Boolean#parseBoolean(String)}.
+     * @throws ValueNotFoundException
+     *             if no boolean value is found for the given key.
+     */
+    public static boolean getBooleanMapAttrThrows(Map map, String name)
+            throws ValueNotFoundException {
+        String value = getMapAttrThrows(map, name);
+        Boolean boolValue = Boolean.parseBoolean(value);
+        return boolValue;
+    }    
 
     /**
      * Returns integer value from a Map of String of Set of String.
@@ -130,6 +167,26 @@ public class CollectionHelper {
         } catch (NumberFormatException nfe) {
             debug.error("CollectionHelper.getIntMapAttr", nfe);
             return defaultValue;
+        }
+    }
+
+    /**
+     * Returns integer value from a Map of String of Set of String.
+     * 
+     * @param map
+     *            Map of String of Set of String.
+     * @param name
+     *            Key of the map entry.
+     * @return integer value from a Map of String of Set of String.
+     * @throws ValueNotFoundException
+     *             if there is no value for the key provided.
+     */
+    public static int getIntMapAttrThrows(Map map, String name)
+            throws ValueNotFoundException {
+        try {
+            return Integer.parseInt(getMapAttr(map, name));
+        } catch (NumberFormatException nfe) {
+            throw new ValueNotFoundException("No value found for key '" + name + "'.");
         }
     }
 

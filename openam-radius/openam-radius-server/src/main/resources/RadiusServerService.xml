@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: amAuthRadius.xml,v 1.2 2008/06/25 05:45:41 qcheng Exp $
+
+-->
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="RadiusServerService" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/RadiusServerService"
+                i18nFileName="radiusServer"
+                revisionNumber="1"
+                i18nKey="radius-server-service-description">
+
+            <Global validate="yes" >
+                <AttributeSchema name="radiusListenerEnabled"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a-radius-listener-enabled-label">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>NO</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="radiusServerPort"
+                                 cosQualifier="default"
+                                 i18nKey="b-radius-port"
+                                 isSearchable="no"
+                                 syntax="number_range"
+                                 rangeStart="1025"
+                                 rangeEnd="65535"
+                                 type="single" >
+                    <DefaultValues>
+                        <Value>1812</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="radiusThreadPoolCoreSize"
+                                 cosQualifier="default"
+                                 i18nKey="c-radius-thread-pool-core-size"
+                                 isSearchable="no"
+                                 syntax="number_range"
+                                 rangeStart="1"
+                                 rangeEnd="100"
+                                 type="single" >
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="radiusThreadPoolMaxSize"
+                                 cosQualifier="default"
+                                 i18nKey="d-radius-thread-pool-max-size"
+                                 isSearchable="no"
+                                 syntax="number_range"
+                                 rangeStart="1"
+                                 rangeEnd="100"
+                                 type="single" >
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="radiusThreadPoolKeepaliveSeconds"
+                                 cosQualifier="default"
+                                 i18nKey="e-radius-thread-pool-keepalive-seconds"
+                                 isSearchable="no"
+                                 syntax="number_range"
+                                 rangeStart="1"
+                                 rangeEnd="3600"
+                                 type="single" >
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="radiusThreadPoolQueueSize"
+                                 cosQualifier="default"
+                                 i18nKey="f-radius-thread-pool-queue-size"
+                                 isSearchable="no"
+                                 syntax="number_range"
+                                 rangeStart="1"
+                                 rangeEnd="1000"
+                                 type="single" >
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <SubSchema name="radiusClient"
+                           inheritance="multiple"
+                           maintainPriority="no"
+                           supportsApplicableOrganization="no"
+                           i18nFileName="radiusServer"
+                           i18nKey="client-config-instance">
+                    <AttributeSchema name="clientIpAddress"
+                                     i18nKey="a-client-ip-address-label"
+                                     isSearchable="no"
+                                     syntax="string"
+                                     type="single" >
+                    </AttributeSchema>
+                    <AttributeSchema name="clientSecret"
+                                     i18nKey="b-client-secret-label"
+                                     isSearchable="no"
+                                     syntax="string"
+                                     type="single" >
+                        <DefaultValues>
+                            <DefaultValuesClassName 
+                                className="org.forgerock.openam.radius.server.config.DefaultClientSecretGenerator">
+                            </DefaultValuesClassName>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="clientPacketsLogged"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="c-client-log-packets">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>NO</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="handlerClass"
+                                     i18nKey="d-handler-class"
+                                     isSearchable="no"
+                                     syntax="string"
+                                     type="single" >
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.radius.server.spi.handlers.OpenAMAuthHandler</Value>
+                        </DefaultValues>
+
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerConfig"
+                                     i18nKey="e-handler-config-params"
+                                     isSearchable="no"
+                                     syntax="string"
+                                     type="list" >
+                    </AttributeSchema>
+                </SubSchema>
+            </Global>
+            <!--
+             Having an Organization declaration is required before openAM will allows us to save an instance of the
+             global SubSchema. Otherwise, it gives an error upon saving saying, "The service RadiusClientService does
+             not have organization schema." By adding an empty Organization no configuration is added to the Services
+             tab for this service in realms but we can persist intances of radiusClient.
+            -->
+            <Organization>
+            </Organization>
+
+        </Schema>
+    </Service>
+</ServicesConfiguration>

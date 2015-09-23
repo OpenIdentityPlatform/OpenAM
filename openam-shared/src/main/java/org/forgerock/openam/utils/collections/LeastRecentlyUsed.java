@@ -38,4 +38,13 @@ public class LeastRecentlyUsed<T, V> extends LinkedHashMap<T, V> {
     protected boolean removeEldestEntry(Map.Entry<T, V> entry) {
         return size() > maxSize;
     }
+
+    /**
+     * Get the maximum size of the cache.
+     * 
+     * @return the maximum size of the cache.
+     */
+    public int getMaxSize() {
+        return this.maxSize;
+    }
 }

@@ -22,95 +22,103 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RADIUSPrincipal.java,v 1.2 2008/06/25 05:41:59 qcheng Exp $
+ * $Id: AccessAccept.java,v 1.2 2008/06/25 05:42:00 qcheng Exp $
  *
  */
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted [2015] [Intellectual Reserve, Inc (IRI)]
  */
 package com.sun.identity.authentication.modules.radius;
 
 
-
 import java.security.Principal;
 
-
+/**
+ * The {@link java.security.Principal} contributed by the {@link com.sun.identity.authentication.modules.radius.RADIUS}
+ * authentication module upon successful authentication of the user.
+ */
 public class RADIUSPrincipal implements Principal, java.io.Serializable {
 
     /**
+     * The name value.
      * @serial
      */
     private String name;
 
-    
+    /**
+     * Contruct a new instance.
+     *
+     * @param name the name of the principal
+     */
     public RADIUSPrincipal(String name) {
-	if (name == null)
-	    throw new NullPointerException("illegal null input");
+        if (name == null) {
+            throw new NullPointerException("illegal null input");
+        }
 
-	this.name = name;
+        this.name = name;
     }
 
     /**
      * Return the RADIUS username for this <code>RADIUSPrincipal</code>.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      *
      * @return the RADIUS username for this <code>RADIUSPrincipal</code>
      */
     public String getName() {
-	return name;
+        return name;
     }
 
     /**
      * Return a string representation of this <code>RADIUSPrincipal</code>.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      *
      * @return a string representation of this <code>RADIUSPrincipal</code>.
      */
     public String toString() {
-	return("RADIUSPrincipal:  " + name);
+        return ("RADIUSPrincipal:  " + name);
     }
 
     /**
-     * Compares the specified Object with this <code>RADIUSPrincipal</code>
-     * for equality.  Returns true if the given object is also a
-     * <code>RADIUSPrincipal</code> and the two RADIUSPrincipals
-     * have the same username.
+     * Compares the specified Object with this <code>RADIUSPrincipal</code> for equality.  Returns true if the given
+     * object is also a <code>RADIUSPrincipal</code> and the two RADIUSPrincipals have the same username.
+     * <p/>
+     * <p/>
      *
-     * <p>
-     *
-     * @param o Object to be compared for equality with this
-     *		<code>RADIUSPrincipal</code>.
-     *
-     * @return true if the specified Object is equal equal to this
-     *		<code>RADIUSPrincipal</code>.
+     * @param o Object to be compared for equality with this <code>RADIUSPrincipal</code>.
+     * @return true if the specified Object is equal equal to this <code>RADIUSPrincipal</code>.
      */
     public boolean equals(Object o) {
-	if (o == null)
-	    return false;
-
-        if (this == o)
-            return true;
- 
-        if (!(o instanceof RADIUSPrincipal))
+        if (o == null) {
             return false;
-        RADIUSPrincipal that = (RADIUSPrincipal)o;
+        }
 
-	if (this.getName().equals(that.getName()))
-	    return true;
-	return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof RADIUSPrincipal)) {
+            return false;
+        }
+        RADIUSPrincipal that = (RADIUSPrincipal) o;
+
+        if (this.getName().equals(that.getName())) {
+            return true;
+        }
+        return false;
     }
- 
+
     /**
      * Return a hash code for this <code>RADIUSPrincipal</code>.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      *
      * @return a hash code for this <code>RADIUSPrincipal</code>.
      */
     public int hashCode() {
-	return name.hashCode();
+        return name.hashCode();
     }
 }

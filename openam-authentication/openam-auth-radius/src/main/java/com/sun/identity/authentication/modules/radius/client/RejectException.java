@@ -22,31 +22,55 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RejectException.java,v 1.2 2008/06/25 05:42:02 qcheng Exp $
+ * $Id: AccessAccept.java,v 1.2 2008/06/25 05:42:00 qcheng Exp $
  *
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2015 Intellectual Reserve, Inc (IRI)
  */
 package com.sun.identity.authentication.modules.radius.client;
 
-public class RejectException extends Exception
-{
-	private AccessReject _res = null;
+import org.forgerock.openam.radius.common.AccessReject;
+import org.forgerock.openam.radius.common.AttributeSet;
+import org.forgerock.openam.radius.common.AttributeType;
+import org.forgerock.openam.radius.common.ReplyMessageAttribute;
 
-	public RejectException(AccessReject res)
-	{
-		_res = res;
-	}
+/**
+ * Exception used to pass a received AccessReject to calling code.
+ */
+public class RejectException extends Exception {
+    /**
+     * The AccessReject packet.
+     */
+    private AccessReject reject = null;
 
-	public AttributeSet getAttributeSet()
-	{
-		return _res.getAttributeSet();
-	}
-    public String getReplyMessage()
-    {
-        return ((ReplyMessageAttribute)(_res.getAttributeSet().
-            getAttributeByType(Attribute.REPLY_MESSAGE))).getString();
-    }        
+    /**
+     * Construct a new instance with the received AccessReject response packet.
+     *
+     * @param res the AccessReject packet received.
+     */
+    public RejectException(AccessReject res) {
+        reject = res;
+    }
+
+    /**
+     * Returns the attribute set of the contained AccessReject response packet.
+     *
+     * @return the attribute set.
+     */
+    public AttributeSet getAttributeSet() {
+        return reject.getAttributeSet();
+    }
+
+    /**
+     * Returns the reply message if any send with the AccessReject packet.
+     *
+     * @return the reply message or null if not included.
+     */
+    public String getReplyMessage() {
+        return ((ReplyMessageAttribute) (reject.getAttributeSet().
+                getAttributeByType(AttributeType.REPLY_MESSAGE))).getMessage();
+    }
 }

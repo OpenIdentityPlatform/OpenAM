@@ -1,0 +1,65 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.forgerock.openam</groupId>
+    <artifactId>openam-radius</artifactId>
+    <version>13.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>openam-radius-server</artifactId>
+  <name>OpenAM RADIUS Server</name>
+  <description>Provides a RADIUS server that runs as a service inside OpenAM and uses OpenAM 
+  auth chains to resolve authN requests.</description>
+  
+  <dependencies>
+      <dependency>
+      	<groupId>${project.groupId}</groupId>
+      	<artifactId>openam-radius-common</artifactId>
+      	<version>${project.version}</version>
+      </dependency>
+      <dependency>
+      	<groupId>${project.groupId}</groupId>
+      	<artifactId>openam-core</artifactId>
+      </dependency>
+       <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>      
+  </dependencies>
+
+    <!-- Build -->
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>./</classpathPrefix>
+                            <mainClass>org.forgerock.openam.radius.server.ConsoleClient</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Title>OpenAM Radius Server</Implementation-Title>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}
+                            </Implementation-Version>
+                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Build-Jdk>${java.version}</Build-Jdk>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <Version>${project.version}</Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+

@@ -39,6 +39,17 @@
     <artifactId>openam-auth-radius</artifactId>
     <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.forgerock.openam</groupId>
+        	<artifactId>openam-radius-common</artifactId>
+        </dependency>
+    </dependencies>
+
     <!-- Build -->
     <build>
         <plugins>

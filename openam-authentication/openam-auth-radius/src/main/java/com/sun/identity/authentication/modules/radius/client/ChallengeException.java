@@ -22,38 +22,70 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ChallengeException.java,v 1.2 2008/06/25 05:42:00 qcheng Exp $
+ * $Id: AccessAccept.java,v 1.2 2008/06/25 05:42:00 qcheng Exp $
  *
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2015 Intellectual Reserve, Inc (IRI)
  */
 package com.sun.identity.authentication.modules.radius.client;
 
-public class ChallengeException extends Exception
-{
-	private AccessChallenge _res = null;
+import org.forgerock.openam.radius.common.AccessChallenge;
+import org.forgerock.openam.radius.common.AttributeSet;
+import org.forgerock.openam.radius.common.AttributeType;
+import org.forgerock.openam.radius.common.ReplyMessageAttribute;
+import org.forgerock.openam.radius.common.StateAttribute;
 
-	public ChallengeException(AccessChallenge res)
-	{
-		_res = res;
-	}
+/**
+ * Used for handling received challenge responses from radius servers.
+ */
+public class ChallengeException extends Exception {
+    /**
+     * The received packet.
+     */
+    private final AccessChallenge challenge;
 
-	public AttributeSet getAttributeSet()
-	{
-		return _res.getAttributeSet();
-	}
+    /**
+     * Constructs an instance from the received response packet.
+     *
+     * @param res the response packet.
+     */
+    public ChallengeException(AccessChallenge res) {
+        challenge = res;
+    }
 
-	public String getState()
-	{
-		return ((StateAttribute)(_res.getAttributeSet().
-                    getAttributeByType(Attribute.STATE))).getString();
-	}
+    /**
+     * Returns the set of attributes in this packet.
+     *
+     * @return the set of attributes.
+     */
+    public AttributeSet getAttributeSet() {
+        return challenge.getAttributeSet();
+    }
 
-	public String getReplyMessage()
-	{
-		return ((ReplyMessageAttribute)(_res.getAttributeSet().
-                    getAttributeByType(Attribute.REPLY_MESSAGE))).getString();
-	}
+    /**
+     * Returns the state value for the packet as contained in the nested state attribute.
+     *
+     * @return the state value.
+     */
+    public String getState() {
+        return ((StateAttribute) (challenge.getAttributeSet().
+                getAttributeByType(AttributeType.STATE))).getState();
+    }
+
+    /**
+     * Returns the value of the first incurred reply message attribute contained in the packet.
+     *
+     * @return the message string or the empty string if not found
+     */
+    public String getReplyMessage() {
+        ReplyMessageAttribute a = ((ReplyMessageAttribute) (challenge.getAttributeSet().
+                getAttributeByType(AttributeType.REPLY_MESSAGE)));
+        if (a == null) {
+            return "";
+        }
+        return a.getMessage();
+    }
 }
