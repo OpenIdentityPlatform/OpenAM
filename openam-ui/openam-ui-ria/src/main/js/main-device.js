@@ -67,7 +67,7 @@ require([
         nameSpace: "device"
     });
 
-    Configuration.globalData = { realm : data.realm  };
+    Configuration.globalData = { realm : data.realm };
 
     ThemeManager.getTheme().always(function (theme) {
         data.theme = theme;
