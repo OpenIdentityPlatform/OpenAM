@@ -34,10 +34,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.openam.oauth2.OAuth2Utils;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.StringUtils;
@@ -45,9 +42,10 @@ import org.restlet.Request;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Restlet resource for issuing new device codes.
@@ -55,76 +53,90 @@ import org.restlet.resource.ServerResource;
  */
 public class DeviceCodeResource extends ServerResource {
 
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final TokenStore tokenStore;
     private final OAuth2RequestFactory<Request> requestFactory;
     private final ClientRegistrationStore clientRegistrationStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final BaseURLProviderFactory baseURLProviderFactory;
+    private final ExceptionHandler exceptionHandler;
 
     @Inject
     public DeviceCodeResource(TokenStore tokenStore, OAuth2RequestFactory<Request> requestFactory,
             ClientRegistrationStore clientRegistrationStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            BaseURLProviderFactory baseURLProviderFactory) {
+            BaseURLProviderFactory baseURLProviderFactory, ExceptionHandler exceptionHandler) {
         this.tokenStore = tokenStore;
         this.requestFactory = requestFactory;
         this.clientRegistrationStore = clientRegistrationStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.baseURLProviderFactory = baseURLProviderFactory;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @Post
-    public Representation issueCode()
-            throws BadRequestException, NotFoundException, InvalidClientException, ServerException {
+    public Representation issueCode(Representation body) throws OAuth2RestletException {
         final Request restletRequest = getRequest();
         OAuth2Request request = requestFactory.create(restletRequest);
 
+        String state = request.getParameter(STATE);
         // Client ID is required, all other parameters are optional
         String clientId = request.getParameter(CLIENT_ID);
-        if (StringUtils.isEmpty(clientId)) {
-            throw new BadRequestException("client_id is a required parameter");
-        } else {
-            // check client_id exists
-            clientRegistrationStore.get(clientId, request);
+        try {
+            if (StringUtils.isEmpty(clientId)) {
+                throw new OAuth2RestletException(400, "bad_request", "client_id is a required parameter", state);
+            } else {
+                // check client_id exists
+                clientRegistrationStore.get(clientId, request);
+            }
+
+            String scope = request.getParameter(SCOPE);
+            if (scope == null) {
+                scope = "";
+            }
+            final String maxAge = request.getParameter(MAX_AGE);
+            DeviceCode code = tokenStore.createDeviceCode(
+                    OAuth2Utils.split(scope, " "),
+                    clientId,
+                    request.<String>getParameter(NONCE),
+                    request.<String>getParameter(RESPONSE_TYPE),
+                    request.<String>getParameter(STATE),
+                    request.<String>getParameter(ACR_VALUES),
+                    request.<String>getParameter(PROMPT),
+                    request.<String>getParameter(UI_LOCALES),
+                    request.<String>getParameter(LOGIN_HINT),
+                    maxAge == null ? null : Integer.valueOf(maxAge),
+                    request.<String>getParameter(CLAIMS),
+                    request,
+                    request.<String>getParameter(CODE_CHALLENGE),
+                    request.<String>getParameter(CODE_CHALLENGE_METHOD));
+
+            Map<String, Object> result = new HashMap<>();
+            OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+
+            result.put(DEVICE_CODE, code.getDeviceCode());
+            result.put(USER_CODE, code.getUserCode());
+            result.put(EXPIRES_IN, providerSettings.getDeviceCodeLifetime());
+            result.put(INTERVAL, providerSettings.getDeviceCodePollInterval());
+
+            String verificationUrl = providerSettings.getVerificationUrl();
+            if (StringUtils.isBlank(verificationUrl)) {
+                final HttpServletRequest servletRequest = ServletUtils.getRequest(restletRequest);
+                final String realm = request.getParameter(OAuth2Constants.Custom.REALM);
+                verificationUrl = baseURLProviderFactory.get(realm).getURL(servletRequest) + "/oauth2/device/user";
+            }
+            result.put(VERIFICATION_URL, verificationUrl);
+
+            return new JacksonRepresentation<>(result);
+        } catch (OAuth2Exception e) {
+            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), state);
         }
-
-        String scope = request.getParameter(SCOPE);
-        if (scope == null) {
-            scope = "";
-        }
-        final String maxAge = request.getParameter(MAX_AGE);
-        DeviceCode code = tokenStore.createDeviceCode(
-                OAuth2Utils.split(scope, " "),
-                clientId,
-                request.<String>getParameter(NONCE),
-                request.<String>getParameter(RESPONSE_TYPE),
-                request.<String>getParameter(STATE),
-                request.<String>getParameter(ACR_VALUES),
-                request.<String>getParameter(PROMPT),
-                request.<String>getParameter(UI_LOCALES),
-                request.<String>getParameter(LOGIN_HINT),
-                maxAge == null ? null : Integer.valueOf(maxAge),
-                request.<String>getParameter(CLAIMS),
-                request,
-                request.<String>getParameter(CODE_CHALLENGE),
-                request.<String>getParameter(CODE_CHALLENGE_METHOD));
-
-        Map<String, Object> result = new HashMap<>();
-        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
-
-        result.put(DEVICE_CODE, code.getDeviceCode());
-        result.put(USER_CODE, code.getUserCode());
-        result.put(EXPIRES_IN, providerSettings.getDeviceCodeLifetime());
-        result.put(INTERVAL, providerSettings.getDeviceCodePollInterval());
-
-        String verificationUrl = providerSettings.getVerificationUrl();
-        if (StringUtils.isBlank(verificationUrl)) {
-            final HttpServletRequest servletRequest = ServletUtils.getRequest(restletRequest);
-            final String realm = request.getParameter(OAuth2Constants.Custom.REALM);
-            verificationUrl = baseURLProviderFactory.get(realm).getURL(servletRequest) + "/oauth2/device/user";
-        }
-        result.put(VERIFICATION_URL, verificationUrl);
-
-        return new JacksonRepresentation<>(result);
     }
 
+    @Override
+    protected void doCatch(Throwable throwable) {
+        if (!(throwable.getCause() instanceof OAuth2RestletException)) {
+            logger.error("Exception when issuing device tokens", throwable.getCause());
+        }
+        exceptionHandler.handle(throwable, getResponse());
+    }
 }

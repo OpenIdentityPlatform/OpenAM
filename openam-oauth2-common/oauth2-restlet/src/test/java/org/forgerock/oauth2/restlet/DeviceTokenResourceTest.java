@@ -35,10 +35,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.core.exceptions.AuthorizationDeclinedException;
-import org.forgerock.oauth2.core.exceptions.AuthorizationPendingException;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -74,7 +70,7 @@ public class DeviceTokenResourceTest {
         when(request.getMethod()).thenReturn(Method.POST);
 
         resource = spy(new DeviceTokenResource(tokenStore, mockOAuth2RequestFactory(), clientRegistrationStore,
-                mockProviderSettingsFactory()));
+                mockProviderSettingsFactory(), null));
 
         when(providerSettings.getDeviceCodePollInterval()).thenReturn(5);
 
@@ -90,24 +86,28 @@ public class DeviceTokenResourceTest {
 
         // When
         JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens();
+                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens(null);
 
         // Then
         assertThat(result.getObject()).containsOnly(entry("access_token", "TOKEN"));
     }
 
-    @Test(expectedExceptions = InvalidClientException.class)
+    @Test
     public void shouldCatchInvalidClients() throws Exception {
         // Given
         mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
         given(clientRegistrationStore.get(anyString(), any(OAuth2Request.class)))
-                .willThrow(InvalidClientException.class);
+                .willThrow(new InvalidClientException());
 
         // When
-        JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens();
+        try {
+            resource.issueTokens(null);
 
-        // Then - exception
+            // Then - exception
+            fail("Should have exception");
+        } catch (OAuth2RestletException e) {
+            assertThat(e.getError().equals("invalid_client"));
+        }
     }
 
     @DataProvider
@@ -119,32 +119,40 @@ public class DeviceTokenResourceTest {
         };
     }
 
-    @Test(dataProvider = "invalidParameters", expectedExceptions = BadRequestException.class)
+    @Test(dataProvider = "invalidParameters")
     public void shouldCatchInvalidParameters(String clientId, String clientSecret, String code) throws Exception {
         // Given
         mockRequestRealmClientIdClientSecretAndCode("REALM", clientId, clientSecret, code);
 
         // When
-        JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens();
+        try {
+            resource.issueTokens(null);
 
-        // Then - exception
+            // Then - exception
+            fail("Should have exception");
+        } catch (OAuth2RestletException e) {
+            assertThat(e.getError().equals("bad_request"));
+        }
     }
 
-    @Test(expectedExceptions = InvalidClientException.class)
+    @Test
     public void shouldCatchInvalidClientSecret() throws Exception {
         // Given
         mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "SECRET", "CODE");
         mockClientRegistration();
 
         // When
-        JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens();
+        try {
+            resource.issueTokens(null);
 
-        // Then - exception
+            // Then - exception
+            fail("Should have exception");
+        } catch (OAuth2RestletException e) {
+            assertThat(e.getError().equals("invalid_client"));
+        }
     }
 
-    @Test(expectedExceptions = AuthorizationDeclinedException.class)
+    @Test
     public void shouldCatchNonExistingDeviceCode() throws Exception {
         // Given
         mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
@@ -152,13 +160,17 @@ public class DeviceTokenResourceTest {
         mockDeviceCodeRead(null);
 
         // When
-        JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens();
+        try {
+            resource.issueTokens(null);
 
-        // Then - exception
+            // Then - exception
+            fail("Should have exception");
+        } catch (OAuth2RestletException e) {
+            assertThat(e.getError().equals("authorization_declined"));
+        }
     }
 
-    @Test(expectedExceptions = ExpiredTokenException.class)
+    @Test
     public void shouldCatchExpiredDeviceCode() throws Exception {
         // Given
         mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
@@ -166,13 +178,17 @@ public class DeviceTokenResourceTest {
         mockDeviceCodeRead(deviceCode(field("expireTime", asSet("1"))));
 
         // When
-        JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens();
+        try {
+            resource.issueTokens(null);
 
-        // Then - exception
+            // Then - exception
+            fail("Should have exception");
+        } catch (OAuth2RestletException e) {
+            assertThat(e.getError().equals("bad_request"));
+        }
     }
 
-    @Test(expectedExceptions = AuthorizationPendingException.class)
+    @Test
     public void shouldCatchPendingDeviceCode() throws Exception {
         // Given
         mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
@@ -180,13 +196,17 @@ public class DeviceTokenResourceTest {
         mockDeviceCodeRead(deviceCode(field("expireTime", asSet(String.valueOf(System.currentTimeMillis() + 5000)))));
 
         // When
-        JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens();
+        try {
+            resource.issueTokens(null);
 
-        // Then - exception
+            // Then - exception
+            fail("Should have exception");
+        } catch (OAuth2RestletException e) {
+            assertThat(e.getError().equals("authorization_pending"));
+        }
     }
 
-    @Test(expectedExceptions = BadRequestException.class)
+    @Test
     public void shouldCatchTooRapidRequests() throws Exception {
         // Given
         mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
@@ -197,10 +217,14 @@ public class DeviceTokenResourceTest {
         ));
 
         // When
-        JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens();
+        try {
+            resource.issueTokens(null);
 
-        // Then - exception
+            // Then - exception
+            fail("Should have exception");
+        } catch (OAuth2RestletException e) {
+            assertThat(e.getError().equals("bad_request"));
+        }
     }
 
     private void mockClientRegistration() throws Exception {

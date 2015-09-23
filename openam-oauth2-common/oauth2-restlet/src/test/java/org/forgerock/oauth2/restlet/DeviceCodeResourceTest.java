@@ -45,7 +45,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -85,7 +84,7 @@ public class DeviceCodeResourceTest {
         when(request.getMethod()).thenReturn(Method.POST);
 
         resource = spy(new DeviceCodeResource(tokenStore, mockOAuth2RequestFactory(), clientRegistrationStore,
-                mockProviderSettingsFactory(), baseURLProviderFactory));
+                mockProviderSettingsFactory(), baseURLProviderFactory, null));
 
         when(resource.getRequest()).thenReturn(request);
     }
@@ -99,7 +98,7 @@ public class DeviceCodeResourceTest {
 
         // When
         JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueCode();
+                (JacksonRepresentation<Map<String, Object>>) resource.issueCode(null);
 
         // Then
         verify(clientRegistrationStore).get(eq("CLIENT_ID"), notNull(OAuth2Request.class));
@@ -137,7 +136,7 @@ public class DeviceCodeResourceTest {
 
         // When
         JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueCode();
+                (JacksonRepresentation<Map<String, Object>>) resource.issueCode(null);
 
         // Then
         verify(clientRegistrationStore).get(eq("CLIENT_ID"), notNull(OAuth2Request.class));
@@ -154,15 +153,20 @@ public class DeviceCodeResourceTest {
         );
     }
 
-    @Test(expectedExceptions = BadRequestException.class)
+    @Test
     public void shouldNotIssueCodeWithoutClientId() throws Exception {
         // Given
         mockRequestRealmAndClientId("REALM", null);
 
         // When
-        resource.issueCode();
+        try {
+            resource.issueCode(null);
 
-        // Then - exception
+            // Then - exception
+            fail("Should have exception");
+        } catch (OAuth2RestletException e) {
+            assertThat(e.getError().equals("bad_request"));
+        }
     }
 
     private void mockBaseUrlProvider() {
