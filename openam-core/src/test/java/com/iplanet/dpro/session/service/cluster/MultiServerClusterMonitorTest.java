@@ -21,6 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.SessionIDExtensions;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
@@ -88,7 +89,9 @@ public class MultiServerClusterMonitorTest {
         given(mockClusterService.isUp("01")).willReturn(true);
 
         SessionID mockSessionID = mock(SessionID.class);
-        given(mockSessionID.getExtension(SessionID.PRIMARY_ID)).willReturn("01");
+        SessionIDExtensions mockExtensions = mock(SessionIDExtensions.class);
+        given(mockSessionID.getExtension()).willReturn(mockExtensions);
+        given(mockExtensions.getPrimaryID()).willReturn("01");
         given(mockSessionID.getSessionServerID()).willReturn("03");
 
         // When
@@ -135,9 +138,12 @@ public class MultiServerClusterMonitorTest {
         given(mockClusterService.getServerSelection(0)).willReturn("01");
 
         SessionID mockSessionID = mock(SessionID.class);
-        given(mockSessionID.getExtension(SessionID.PRIMARY_ID)).willReturn("02");
+        SessionIDExtensions mockExtensions = mock(SessionIDExtensions.class);
+        given(mockSessionID.getExtension()).willReturn(mockExtensions);
+        given(mockExtensions.getPrimaryID()).willReturn("02");
         given(mockSessionID.getSessionServerID()).willReturn("03");
-        given(mockSessionID.getExtension(SessionID.STORAGE_KEY)).willReturn("4059025133086137527");
+        given(mockExtensions.getStorageKey()
+        ).willReturn("4059025133086137527");
 
         // When
         MultiServerClusterMonitor clusterMonitor = new MultiServerClusterMonitor(

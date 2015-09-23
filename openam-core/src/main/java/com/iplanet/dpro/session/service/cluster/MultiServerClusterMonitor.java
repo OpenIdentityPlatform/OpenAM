@@ -132,17 +132,6 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
      * {@inheritDoc}
      */
     @Override
-    public void reinitialize() throws Exception {
-        initClusterMemberMap();
-        if (sessionDebug.messageEnabled()) {
-            sessionDebug.message("Re-Initialized ClusterServerList=" + getClusterServerList());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getCurrentHostServer(SessionID sid) throws SessionException {
         if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
             String serverID = locateCurrentHostServer(sid);
@@ -251,7 +240,7 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
      * @throws com.iplanet.dpro.session.SessionException
      */
     String locateCurrentHostServer(SessionID sid) throws SessionException {
-        String primaryID = sid.getExtension(SessionID.PRIMARY_ID);
+        String primaryID = sid.getExtension().getPrimaryID();
         String serverID = sid.getSessionServerID();
         // if this is our local Server
         if (serverConfig.isLocalServer(serverID)) {
@@ -279,7 +268,7 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
             return primaryID;
         } else {
             int selectionListSize = clusterStateService.getServerSelectionListSize();
-            String sKey = sid.getExtension(SessionID.STORAGE_KEY);
+            String sKey = sid.getExtension().getStorageKey();
             if(sKey == null){
                 throw new SessionException("SessionService.locateCurrentHostServer: StorageKey is null");
             }
@@ -324,4 +313,16 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
 
     }
 
+    /**
+     * Signals that this ClusterMonitor should be shutdown.
+     * Will signal the underlying {@link ClusterStateService} to cancel
+     * its runnable thread.
+     *
+     * Thread Safety: Synchronized to prevent possible multiple calls which
+     * would break state in the underlying GeneralRunnableTask framework.
+     */
+    @Override
+    public synchronized void shutdown() {
+        clusterStateService.cancel();
+    }
 }

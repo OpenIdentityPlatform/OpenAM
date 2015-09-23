@@ -51,15 +51,6 @@ public class SingleServerClusterMonitor implements ClusterMonitor {
      * {@inheritDoc}
      */
     @Override
-    public void reinitialize() throws Exception {
-        throw new UnsupportedOperationException(
-                "reinitialize only applicable when session failover enabled.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean checkServerUp(String serverID) {
         throw new UnsupportedOperationException(
                 "checkServerUp only applicable when session failover enabled.");
@@ -73,4 +64,11 @@ public class SingleServerClusterMonitor implements ClusterMonitor {
         return sid.getSessionServerID();
     }
 
+    /**
+     * No operation for this implementation.
+     */
+    @Override
+    public void shutdown() {
+        // SingleServerClusterMonitor has no resources to cleanup on shutdown.
+    }
 }

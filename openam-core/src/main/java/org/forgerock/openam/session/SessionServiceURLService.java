@@ -15,6 +15,7 @@
 */
 package org.forgerock.openam.session;
 
+import static org.forgerock.openam.session.SessionConstants.*;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -25,8 +26,6 @@ import org.forgerock.guice.core.InjectorHolder;
 import javax.inject.Singleton;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.forgerock.openam.session.SessionConstants.SESSION_SERVICE;
 
 /**
  * ClientSDK: This code is ClientSDK aware and will only use the Server SessionService
@@ -125,12 +124,12 @@ public class SessionServiceURLService {
                 if (ss.isSessionFailoverEnabled()) {
                     return getSessionServiceURL(ss.getCurrentHostServer(sid));
                 } else {
-                    primaryId = sid.getExtension(SessionID.PRIMARY_ID);
+                    primaryId = sid.getExtension().getPrimaryID();
                     return getSessionServiceURL(primaryId);
                 }
             }
         } else {
-            primaryId = sid.getExtension(SessionID.PRIMARY_ID);
+            primaryId = sid.getExtension().getPrimaryID();
             if (primaryId != null) {
                 String secondarysites = WebtopNaming.getSecondarySites(primaryId);
 

@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.cts.utils;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.testng.Assert.*;
 import com.google.inject.AbstractModule;
 import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
 import com.iplanet.dpro.session.SessionID;
@@ -41,10 +43,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
 
 @GuiceModules({CoreGuiceModule.class, SharedGuiceModule.class, DataLayerGuiceModule.class, JSONSerialisationTest.DummyAuditConfigModule.class})
 public class JSONSerialisationTest extends GuiceTestCase {

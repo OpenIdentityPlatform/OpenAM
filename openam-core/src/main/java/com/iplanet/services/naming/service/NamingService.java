@@ -32,38 +32,42 @@
 
 package com.iplanet.services.naming.service;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.ServiceListeners;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.naming.share.NamingRequest;
 import com.iplanet.services.naming.share.NamingResponse;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.internal.AuthPrincipal;
-import com.iplanet.services.comm.server.PLLAuditor;
 import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
-import com.sun.identity.security.AdminDNAction;
-import com.sun.identity.security.AdminPasswordAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCookies;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -74,13 +78,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionCookies;
 
-public class NamingService implements RequestHandler, ServiceListener {
+public class NamingService implements RequestHandler {
+
+    public static final String NAMING_SERVICE = "iPlanetAMNamingService";
+    public static final String PLATFORM_SERVICE = "iPlanetAMPlatformService";
 
     public static final int SERVICE_REV_NUMBER_70 = 20;
 
@@ -88,7 +90,7 @@ public class NamingService implements RequestHandler, ServiceListener {
 
     private static Debug namingDebug = null;
 
-    public static final String NAMING_SERVICE = "com.iplanet.am.naming";
+    public static final String NAMING_SERVICE_PACKAGE = "com.iplanet.am.naming";
 
     private static volatile Hashtable namingTable = null;
 
@@ -105,10 +107,6 @@ public class NamingService implements RequestHandler, ServiceListener {
     private static ServiceSchemaManager ssmNaming = null;
 
     private static ServiceSchemaManager ssmPlatform = null;
-
-    private static ServiceConfigManager scmNaming = null;
-
-    private static ServiceConfigManager scmPlatform = null;
 
     private static ServiceConfig sessionServiceConfig = null;
 
@@ -131,44 +129,39 @@ public class NamingService implements RequestHandler, ServiceListener {
         namingDebug = Debug.getInstance("amNaming");
         platformProperties = SystemProperties.getAll();
         server_proto = platformProperties.getProperty(
-            "com.iplanet.am.server.protocol", "");
+                "com.iplanet.am.server.protocol", "");
         server_host = platformProperties.getProperty(
             "com.iplanet.am.server.host", "");
         server_port = platformProperties.getProperty(
-            Constants.AM_SERVER_PORT, "");
+                Constants.AM_SERVER_PORT, "");
+
+        PrivilegedAction<SSOToken> adminAction = InjectorHolder.getInstance(
+                Key.get(new TypeLiteral<PrivilegedAction<SSOToken>>() {
+                }));
+        sso = AccessController.doPrivileged(adminAction);
 
         try {
-            SSOTokenManager mgr = SSOTokenManager.getInstance();
-            String adminDN = (String) AccessController
-                    .doPrivileged(new AdminDNAction());
-            String adminPassword = (String) AccessController
-                    .doPrivileged(new AdminPasswordAction());
-            sso = mgr.createSSOToken(new AuthPrincipal(adminDN), adminPassword);
-            ssmNaming = new ServiceSchemaManager("iPlanetAMNamingService", sso);
-            ssmPlatform = new ServiceSchemaManager("iPlanetAMPlatformService",
-                    sso);
-            scmNaming = new ServiceConfigManager("iPlanetAMNamingService", sso);
-            scmPlatform = new ServiceConfigManager("iPlanetAMPlatformService",
-                    sso);
+            ssmNaming = new ServiceSchemaManager(NAMING_SERVICE, sso);
+            ssmPlatform = new ServiceSchemaManager(PLATFORM_SERVICE, sso);
             serviceRevNumber = ssmPlatform.getRevisionNumber();
-            if (serviceRevNumber < SERVICE_REV_NUMBER_70) {
-                ServiceConfigManager scm = new ServiceConfigManager(
-                        "iPlanetAMSessionService", sso);
-                sessionServiceConfig = scm.getGlobalConfig(null);
-                sessionConfig = sessionServiceConfig.getSubConfigNames();
-            }
-
-            // Add Listener to the platform and naming service 
-            // for schema changes 
-            ssmNaming.addListener(new NamingService());
-            ssmPlatform.addListener(new NamingService());
-            // Add Listener to the platform and naming service
-            // for config changes
-            scmNaming.addListener(new NamingService());
-            scmPlatform.addListener(new NamingService());
-        } catch (Exception ne) {
-            namingDebug.error("Naming Initialization failed.", ne);
+        } catch (SMSException | SSOException e) {
+            throw new IllegalStateException(e);
         }
+
+        ServiceListeners.Action action = new ServiceListeners.Action() {
+            @Override
+            public void performUpdate() {
+                try {
+                    updateNamingTable();
+                    WebtopNaming.updateNamingTable();
+                } catch (Exception ex) {
+                    namingDebug.error("Error occured in updating naming table", ex);
+                }
+            }
+        };
+        ServiceListeners builder = InjectorHolder.getInstance(ServiceListeners.class);
+        builder.config(NAMING_SERVICE).global(action).schema(action).listen();
+        builder.config(PLATFORM_SERVICE).global(action).schema(action).listen();
     }
 
     public NamingService() {
@@ -382,7 +375,7 @@ public class NamingService implements RequestHandler, ServiceListener {
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse, ServletContext servletContext)
     {
-        ResponseSet rset = new ResponseSet(NAMING_SERVICE);
+        ResponseSet rset = new ResponseSet(NAMING_SERVICE_PACKAGE);
         for (Request req : requests) {
             Response res = processRequest(req);
             rset.addResponse(res);
@@ -457,7 +450,7 @@ public class NamingService implements RequestHandler, ServiceListener {
         // %uri with the actual value
         if (reqVersion < 3.0) {
             String uri = SystemProperties.get(
-                Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+                    Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
             if (!uri.startsWith("/")) {
                 uri = "/" + uri;
             }
@@ -492,7 +485,7 @@ public class NamingService implements RequestHandler, ServiceListener {
         String serverID = WebtopNaming.getServerID(url.getProtocol(),
             url.getHost(), Integer.toString(url.getPort()), uri);
         SessionID sessionID = new SessionID(sessionid);
-        String primary_id = sessionID.getExtension(SessionID.PRIMARY_ID);
+        String primary_id = sessionID.getExtension().getPrimaryID();
 
         if (primary_id != null) {
             String secondarysites = WebtopNaming.getSecondarySites(primary_id);
@@ -560,57 +553,6 @@ public class NamingService implements RequestHandler, ServiceListener {
             newTab.put(key, value);
         }
         return newTab;
-    }
-
-    // The following functions are the implementations of service listener
-    // for schema/config change events
-
-    /**
-     * This function updates the naming table whenever it gets a schema changed
-     * event.
-     */
-    public void schemaChanged(String serviceName, String version) {
-        // Do not update if the servieName is not "iPlanetAMPlatformService"
-        if ((serviceName == null)
-            || (!serviceName.equals("iPlanetAMPlatformService") && 
-            !serviceName.equals("iPlanetAMNamingService"))) {
-            return;
-        }
-
-        try {
-            updateNamingTable();
-        } catch (SMSException ex) {
-            namingDebug.error("Error occured in updating naming table", ex);
-        }
-    }
-
-    // We don't need to do anything for the following methods, we kept it
-    // for the implementation sake. But, these methods will never be
-    // invoked since the Platform service currently does not support
-    // global/organization 'Configuration'.
-
-    public void globalConfigChanged(String serviceName, String version,
-            String groupName, String serviceComponent, int type) {
-        if ((serviceName == null)
-                || (!serviceName.equals("iPlanetAMPlatformService") && 
-                    !serviceName.equals("iPlanetAMNamingService"))) {
-            return;
-        }
-        try {
-            updateNamingTable();
-            SessionService ss = InjectorHolder.getInstance(SessionService.class);
-            if ((ss != null) && ss.isSessionFailoverEnabled()) {
-                ss.reinitializeClusterMemberMap();
-            }
-        } catch (Exception ex) {
-            namingDebug.error("Error occured in updating naming table", ex);
-        }
-    }
-
-    public void organizationConfigChanged(String serviceName, String version,
-            String orgName, String groupName, String serviceComponent, int type)
-    {
-        // Do nothing
     }
 
     private static void registFQDNMapping(Set sites) {

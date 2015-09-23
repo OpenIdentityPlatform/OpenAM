@@ -33,14 +33,12 @@ package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.agent.SnmpMib;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
 
 /**
  * This class extends the "SsoServerTopology" class.
@@ -83,8 +81,8 @@ public class SsoServerTopologyImpl extends SsoServerTopology {
          *  and add them to their corresponding tables.
          */
         
-        Hashtable<String, String> ntbl = Agent.getNamingTable();
-        Hashtable<String, String> sidtbl = Agent.getSiteIdTable();
+        Map<String, String> ntbl = Agent.getNamingTable();
+        Map<String, String> sidtbl = Agent.getSiteIdTable();
 
         for (Map.Entry<String, String> entry : sidtbl.entrySet()) {
             String svrId = entry.getKey();

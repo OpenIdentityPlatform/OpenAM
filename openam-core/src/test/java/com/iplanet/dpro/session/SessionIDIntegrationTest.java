@@ -16,64 +16,61 @@
 
 package com.iplanet.dpro.session;
 
-import com.sun.identity.shared.encode.Base64;
+import static org.assertj.core.api.Assertions.*;
+import org.forgerock.util.encode.Base64;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.nio.charset.MalformedInputException;
-import java.util.HashMap;
-import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class SessionIDTest {
+public class SessionIDIntegrationTest {
 
     @Test
     public void shouldParseExtensionsCorrectly() throws Exception {
         // Given
-        final Map<String, String> extMap = new HashMap<String, String>();
+        final SessionIDExtensions extensions = new LegacySessionIDExtensions();
         for (int i = 0; i < 1000; ++i) {
-            extMap.put("Key" + i, "Value" + i);
+            extensions.add("Key" + i, "Value" + i);
         }
 
-        final String encoded = SessionID.makeSessionID("", extMap, null);
+        final String encoded = SessionID.makeSessionID("", extensions, null);
 
         // When
-        final Map<String, String> result = SessionID.readExtensions(encoded);
+        final LegacySessionIDExtensions result = new LegacySessionIDExtensions(encoded);
 
         // Then
-        assertThat(result).isEqualTo(extMap);
+        assertThat(result.asMap()).isEqualTo(extensions.asMap());
     }
 
     @Test
     public void shouldParseWholeSessionIDCorrectly() throws Exception {
         // Given
-        final Map<String, String> extMap = new HashMap<String, String>();
-        extMap.put("one", "one");
-        extMap.put("two", "two");
+        final SessionIDExtensions extensions = new LegacySessionIDExtensions();
+        extensions.add("one", "one");
+        extensions.add("two", "two");
         final String encryptedId = "someEncryptedId";
         final String tail = "I'm a donkey";
 
         // When
-        final SessionID sid = new SessionID(SessionID.makeSessionID(encryptedId, extMap, tail));
+        final SessionID sid = new SessionID(SessionID.makeSessionID(encryptedId, extensions, tail));
 
         // Then
         assertThat(sid.getTail()).isEqualTo(tail);
-        assertThat(sid.getExtension("one")).isEqualTo("one");
-        assertThat(sid.getExtension("two")).isEqualTo("two");
+        assertThat(sid.getExtension().get("one")).isEqualTo("one");
+        assertThat(sid.getExtension().get("two")).isEqualTo("two");
     }
 
     @Test(expectedExceptions = MalformedInputException.class)
     public void shouldRejectNullBytesInExtensionString() throws Exception {
         // Given
-        final Map<String, String> extMap = new HashMap<String, String>();
-        extMap.put("Key\u0000", "Value\u0000");
+        final SessionIDExtensions extensions = new LegacySessionIDExtensions();
+        extensions.add("Key\u0000", "Value\u0000");
 
-        final String encoded = SessionID.makeSessionID("", extMap, null);
+        final String encoded = SessionID.makeSessionID("", extensions, null);
 
         // When
-        SessionID.readExtensions(encoded);
+        new LegacySessionIDExtensions(encoded);
 
         // Then - exception
     }
@@ -84,7 +81,7 @@ public class SessionIDTest {
         String encoded = "This isn't valid Base64";
 
         // When
-        SessionID.readExtensions(encoded);
+        new LegacySessionIDExtensions(encoded);
 
         // Then - exception
     }
@@ -102,7 +99,7 @@ public class SessionIDTest {
         String encoded = Base64.encode(baos.toByteArray());
 
         // When
-        SessionID.readExtensions(encoded);
+        new LegacySessionIDExtensions(encoded);
 
         // Then - exception
     }

@@ -29,13 +29,15 @@
 
 package com.iplanet.dpro.session.service;
 
+import static com.iplanet.dpro.session.service.SessionBroadcastMode.*;
 import static com.iplanet.dpro.session.service.SessionConstants.*;
 import static com.sun.identity.shared.Constants.*;
 import static org.forgerock.openam.cts.api.CoreTokenConstants.*;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.cluster.ClusterStateService;
-import com.sun.identity.common.configuration.ServerConfiguration;
+import com.iplanet.services.naming.ServiceListeners;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -43,7 +45,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
@@ -52,6 +53,8 @@ import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -69,6 +72,8 @@ public class SessionServiceConfig {
     private static final String AM_SESSION_SERVICE_NAME = "iPlanetAMSessionService";
 
     private final Debug sessionDebug;
+    private final SessionServerConfig sessionServerConfig;
+    private final PrivilegedAction<SSOToken> dsameAdminTokenProvider;
 
     /*
      * Constant Properties
@@ -119,7 +124,7 @@ public class SessionServiceConfig {
 
     // Must be True to permit Session Failover HA to be available, but we default this to Disabled or Off for Now.
     private static final boolean DEFAULT_SESSION_FAILOVER_ENABLED = false;
-    private boolean sessionFailoverEnabled;
+    private volatile boolean sessionFailoverEnabled;
 
     private final int sessionFailoverClusterStateCheckTimeout;
     private final long sessionFailoverClusterStateCheckPeriod;
@@ -147,7 +152,7 @@ public class SessionServiceConfig {
     /**
      * Indicates what broadcast to undertake on session logout/destroy
      */
-    private static final SessionBroadcastMode DEFAULT_LOGOUT_DESTROY_BROADCAST = SessionBroadcastMode.OFF;
+    private static final SessionBroadcastMode DEFAULT_LOGOUT_DESTROY_BROADCAST = OFF;
     private volatile SessionBroadcastMode logoutDestroyBroadcast = DEFAULT_LOGOUT_DESTROY_BROADCAST;
 
     /**
@@ -315,11 +320,14 @@ public class SessionServiceConfig {
 
     @Inject
     SessionServiceConfig(
-            @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
-            @Named(SessionConstants.PRIMARY_SERVER_URL) String primaryServerURL,
-            DsameAdminTokenProvider dsameAdminTokenProvider) {
+            @Named(SessionConstants.SESSION_DEBUG) final Debug sessionDebug,
+            SessionServerConfig sessionServerConfig,
+            PrivilegedAction<SSOToken> adminTokenProvider,
+            final ServiceListeners serviceListeners) {
 
         this.sessionDebug = sessionDebug;
+        this.sessionServerConfig = sessionServerConfig;
+        this.dsameAdminTokenProvider = adminTokenProvider;
 
         // Initialize values set from System properties
         maxSessions =
@@ -338,12 +346,6 @@ public class SessionServiceConfig {
                 SystemProperties.getAsLong(APPLICATION_SESSION_MAX_CACHING_TIME, DEFAULT_APPLICATION_MAX_CACHING_TIME);
         returnAppSession =
                 SystemProperties.getAsBoolean(SESSION_RETURN_APP_SESSION, DEFAULT_RETURN_APP_SESSION);
-        useRemoteSaveMethod =
-                SystemProperties.getAsBoolean(AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD, DEFAULT_USE_REMOTE_SAVE_METHOD);
-        useInternalRequestRouting =
-                SystemProperties.getAsBoolean(AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING, DEFAULT_USE_INTERNAL_REQUEST_ROUTING);
-        sessionFailoverEnabled =
-                SystemProperties.getAsBoolean(IS_SFO_ENABLED, DEFAULT_SESSION_FAILOVER_ENABLED);
         sessionFailoverClusterStateCheckTimeout =
                 loadSessionFailoverClusterStateCheckTimeout();
         sessionFailoverClusterStateCheckPeriod =
@@ -353,66 +355,91 @@ public class SessionServiceConfig {
 
             // Initialize settings from SMS
 
-            ServiceSchemaManager serviceSchemaManager =
-                    new ServiceSchemaManager(AM_SESSION_SERVICE_NAME, dsameAdminTokenProvider.getAdminToken());
+            final ServiceSchemaManager serviceSchemaManager =
+                    new ServiceSchemaManager(AM_SESSION_SERVICE_NAME, AccessController.doPrivileged(adminTokenProvider));
             hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
 
-            ServiceConfigManager scm =
-                    new ServiceConfigManager(AM_SESSION_SERVICE_NAME, dsameAdminTokenProvider.getAdminToken());
-            ServiceConfig serviceConfig = scm.getGlobalConfig(null);
+            serviceListeners.config(AM_SESSION_SERVICE_NAME)
+                    .global(new ServiceListeners.Action() {
+                        @Override
+                        public void performUpdate() {
+                            try {
+                                loadSessionFailover();
+                            } catch (SSOException | SMSException e) {
+                                throw new IllegalStateException(e);
+                            }
+                        }
+                    })
+                    .schema(new ServiceListeners.Action() {
+                        @Override
+                        public void performUpdate() {
+                            try {
+                                hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
+                            } catch (Exception e) {
+                                sessionDebug.error("SessionConfigListener : Unable to get Session Service attributes", e);
+                            }
+                        }
+                    }).listen();
 
-            /*
-             * In OpenSSO 8.0, we have switched to create sub configuration with
-             * site name. hence we need to lookup the site name based on the URL
-             */
-            String subCfgName =
-                    SiteConfiguration.getSiteIdByURL(dsameAdminTokenProvider.getAdminToken(), primaryServerURL);
-            ServiceConfig subConfig =
-                    subCfgName != null ?
-                    serviceConfig.getSubConfig(subCfgName) :
-                    null;
-
-            if ((subConfig != null) && subConfig.exists()) {
-
-                Map sessionAttrs = subConfig.getAttributes();
-                boolean sfoEnabled = CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_SFO_ENABLED, false);
-
-                // Currently, we are not allowing to default to Session Failover HA,
-                // even with a single server to enable session persistence.
-                // But can easily be turned on in the Session SubConfig.
-                if (sfoEnabled) {
-
-                    sessionFailoverEnabled = true;
-                    useRemoteSaveMethod = true;
-                    useInternalRequestRouting = true;
-
-                    // Determine whether crosstalk is enabled or disabled.
-                    reducedCrosstalkEnabled =
-                            CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_REDUCED_CROSSTALK_ENABLED, true);
-
-                    if (reducedCrosstalkEnabled) {
-                        logoutDestroyBroadcast = SessionBroadcastMode.valueOf(
-                                CollectionHelper.getMapAttr(
-                                        sessionAttrs, LOGOUT_DESTROY_BROADCAST, SessionBroadcastMode.OFF.name()));
-                    }
-
-                    reducedCrosstalkPurgeDelay =
-                            CollectionHelper.getLongMapAttr(sessionAttrs,
-                                    REDUCED_CROSSTALK_PURGE_DELAY, 1, sessionDebug);
-
-                }
-            }
-
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("Session Failover Enabled = " + sessionFailoverEnabled);
-            }
-            SessionConfigListener sessionConfigListener = new SessionConfigListener(serviceSchemaManager);
-            serviceSchemaManager.addListener(sessionConfigListener);
+            loadSessionFailover();
 
         } catch (Exception ex) {
             sessionDebug.error("SessionService: Initialization Failed", ex);
             // Rethrow exception rather than hobbling on with invalid configuration state
             throw new IllegalStateException("Failed to load SessionService configuration", ex);
+        }
+    }
+
+    private synchronized void loadSessionFailover() throws SSOException, SMSException {
+        useRemoteSaveMethod = SystemProperties.getAsBoolean(AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD, DEFAULT_USE_REMOTE_SAVE_METHOD);
+        useInternalRequestRouting = SystemProperties.getAsBoolean(AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING, DEFAULT_USE_INTERNAL_REQUEST_ROUTING);
+        sessionFailoverEnabled = SystemProperties.getAsBoolean(IS_SFO_ENABLED, DEFAULT_SESSION_FAILOVER_ENABLED);
+
+        SSOToken adminToken = AccessController.doPrivileged(dsameAdminTokenProvider);
+
+        ServiceConfigManager scm = new ServiceConfigManager(AM_SESSION_SERVICE_NAME, adminToken);
+        ServiceConfig serviceConfig = scm.getGlobalConfig(null);
+
+            /*
+             * In OpenSSO 8.0, we have switched to create sub configuration with
+             * site name. hence we need to lookup the site name based on the URL
+             */
+        String subCfgName = SiteConfiguration.getSiteIdByURL(adminToken, sessionServerConfig.getPrimaryServerURL().toString());
+        ServiceConfig subConfig = subCfgName != null ? serviceConfig.getSubConfig(subCfgName) : null;
+
+        if ((subConfig != null) && subConfig.exists()) {
+
+            Map sessionAttrs = subConfig.getAttributes();
+            boolean sfoEnabled = CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_SFO_ENABLED, false);
+
+            // Currently, we are not allowing to default to Session Failover HA,
+            // even with a single server to enable session persistence.
+            // But can easily be turned on in the Session SubConfig.
+            if (sfoEnabled) {
+
+                sessionFailoverEnabled = true;
+                useRemoteSaveMethod = true;
+                useInternalRequestRouting = true;
+
+                // Determine whether crosstalk is enabled or disabled.
+                reducedCrosstalkEnabled =
+                        CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_REDUCED_CROSSTALK_ENABLED, true);
+
+                if (reducedCrosstalkEnabled) {
+                    logoutDestroyBroadcast = valueOf(
+                            CollectionHelper.getMapAttr(
+                                    sessionAttrs, LOGOUT_DESTROY_BROADCAST, OFF.name()));
+                }
+
+                reducedCrosstalkPurgeDelay =
+                        CollectionHelper.getLongMapAttr(sessionAttrs,
+                                REDUCED_CROSSTALK_PURGE_DELAY, 1, sessionDebug);
+
+            }
+        }
+
+        if (sessionDebug.messageEnabled()) {
+            sessionDebug.message("Session Failover Enabled = " + sessionFailoverEnabled);
         }
     }
 
@@ -477,7 +504,7 @@ public class SessionServiceConfig {
     /**
      * Returns amSession.xml property "iplanet-am-session-logout-destroy-broadcast" choice.
      *
-     * Defaults to {@link SessionBroadcastMode.OFF }.
+     * Defaults to {@link SessionBroadcastMode#OFF }.
      */
     public SessionBroadcastMode getLogoutDestroyBroadcast() {
         return logoutDestroyBroadcast;
@@ -752,55 +779,5 @@ public class SessionServiceConfig {
      */
     public long getSessionBlacklistPurgeDelay(TimeUnit unit) {
         return unit.convert(hotSwappableSessionServiceConfig.sessionBlacklistPurgeDelayMinutes, TimeUnit.MINUTES);
-    }
-
-    /**
-     * A single instance of this class is created to listen for changes to the amSession.xml configuration state
-     * and ensure that {@link SessionServiceConfig#hotSwappableSessionServiceConfig} state is kept in sync.
-     */
-    class SessionConfigListener implements ServiceListener {
-
-        private final ServiceSchemaManager serviceSchemaManager;
-
-        /**
-         * Creates a new SessionConfigListener
-         * @param serviceSchemaManager ServiceSchemaManager
-         */
-        public SessionConfigListener(ServiceSchemaManager serviceSchemaManager) {
-            this.serviceSchemaManager = serviceSchemaManager;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void schemaChanged(String serviceName, String version) {
-
-            if ((serviceName != null) && !serviceName.equalsIgnoreCase(AM_SESSION_SERVICE_NAME)) {
-                return;
-            }
-
-            try {
-                hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
-            } catch (Exception e) {
-                sessionDebug.error("SessionConfigListener : Unable to get Session Service attributes", e);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void globalConfigChanged(String serviceName, String version,
-                                        String groupName, String serviceComponent, int type) {
-            // No op.
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void organizationConfigChanged(String serviceName, String version,
-                                              String orgName, String groupName, String serviceComponent, int type) {
-            // No op.
-        }
-
     }
 }

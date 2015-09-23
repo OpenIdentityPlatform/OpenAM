@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.session;
 
@@ -65,11 +65,6 @@ public class SessionConstants {
      * Session service reference
      */
     public static final String SESSION_SERVICE = "session";
-
-    /**
-     * Primary Servier URL reference (for Guice injection)
-     */
-    public static final String PRIMARY_SERVER_URL = "primaryServerURL";
 
     /**
      * Indicator used to reset the loadbalancer cookie for a client.

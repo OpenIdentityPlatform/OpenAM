@@ -29,6 +29,7 @@
 
 package com.iplanet.dpro.session.service;
 
+import static com.sun.identity.shared.Constants.*;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -39,20 +40,17 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import static com.sun.identity.shared.Constants.*;
 
 /**
  * Responsible for collating WebtopNaming configuration state relating to the Session Service.
@@ -72,22 +70,7 @@ public class SessionServerConfig {
     private final String localServerDeploymentPath;
     private final URL localServerURL;
     private final URL localServerSessionServiceURL;
-
-    /*
-     * siteEnabled must be True to permit Session Failover HA to be available.
-     *
-     * If siteEnabled==true and no site is found, issues will arise trying to resolve the serverID
-     * and will hang install and subsequent login attempts.
-     */
-    private final boolean siteEnabled;
-
-    /*
-     * If siteEnabled, we will retrieve details of this site's primary server (usu. load balancer) and the primary
-     * servers of any other sites included in this deployment.
-     */
-    private final String siteID;
-    private final URL siteURL;
-    private final Set<String> secondarySiteIDs;
+    private final Debug sessionDebug;
 
     /**
      * Constructor called by Guice to initialize the Singleton instance of SessionServerConfig.
@@ -98,6 +81,7 @@ public class SessionServerConfig {
     public SessionServerConfig(@Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
                         SessionServiceURLService sessionServiceURLService) {
 
+        this.sessionDebug = sessionDebug;
         try {
 
             localServerProtocol = requiredSystemProperty(AM_SERVER_PROTOCOL);
@@ -115,25 +99,6 @@ public class SessionServerConfig {
             localServerID = WebtopNaming.getServerID(
                     localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
 
-            siteEnabled = WebtopNaming.isSiteEnabled(
-                    localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
-
-            if (siteEnabled) {
-
-                siteID = WebtopNaming.getSiteID(
-                        localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
-                siteURL = new URL(WebtopNaming.getServerFromID(siteID));
-                secondarySiteIDs = findSecondarySiteIDs(
-                        localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
-
-            } else {
-
-                siteID = null;
-                siteURL = null;
-                secondarySiteIDs = Collections.emptySet();
-
-            }
-
         } catch (Exception ex) {
             sessionDebug.error("Failed to load Session Server configuration", ex);
             // Rethrow exception rather than hobbling on with invalid configuration state
@@ -150,7 +115,7 @@ public class SessionServerConfig {
      * - If a site hasn't been setup, then the primary server details will match the local server details.
      */
     public String getPrimaryServerID() {
-        return siteEnabled ? siteID : localServerID;
+        return isSiteEnabled() ? getSiteID() : localServerID;
     }
 
     /**
@@ -162,7 +127,7 @@ public class SessionServerConfig {
      * - If a site hasn't been setup, then the primary server details will match the local server details.
      */
     public URL getPrimaryServerURL() {
-        return siteEnabled ? siteURL : localServerURL;
+        return isSiteEnabled()  ? getSiteURL() : localServerURL;
     }
 
     /**
@@ -191,15 +156,55 @@ public class SessionServerConfig {
     }
 
     /**
-     * Checks if this OpenAM server is deployed as part of a site (or multiple sites).
+     * Indicates if this server is part of a Site (or multiple sites).
      */
     public boolean isSiteEnabled() {
-        return siteEnabled;
+        try {
+            return WebtopNaming.isSiteEnabled(getLocalServerID());
+        } catch (Exception e) {
+            sessionDebug.error("Failed to check if local server {0} is part of site", getLocalServerID(), e);
+            throw new IllegalStateException(e);
+        }
     }
 
-    @VisibleForTesting
-    Set<String> getSecondarySiteIDs() {
-        return secondarySiteIDs;
+    /**
+     * Returns the site ID for this Server.
+     * @return Returns a single Site ID for the server.
+     */
+    public String getSiteID() {
+        if (isSiteEnabled()) {
+            return WebtopNaming.getSiteID(getLocalServerID());
+        }
+        return null;
+    }
+
+    /**
+     * @return Resolves the Site URL for the Site ID.
+     */
+    public URL getSiteURL() {
+        if (isSiteEnabled()) {
+            try {
+                return new URL(WebtopNaming.getServerFromID(getSiteID()));
+            } catch (MalformedURLException | ServerEntryNotFoundException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return Returns the secondary Site IDs for the given Site ID.
+     */
+    public Set<String> getSecondarySiteIDs() {
+        if (isSiteEnabled()) {
+            try {
+                return findSecondarySiteIDs(getLocalServerID());
+            } catch (ServerEntryNotFoundException e) {
+                throw new IllegalStateException(e);
+            }
+        } else {
+            return Collections.emptySet();
+        }
     }
 
     /**
@@ -221,7 +226,7 @@ public class SessionServerConfig {
      * - If a site hasn't been setup, then the primary server details will match the local server details.
      */
     public boolean isPrimaryServer(String serverID) {
-        return siteEnabled ? siteID.equals(serverID) : localServerID.equals(serverID);
+        return isSiteEnabled()  ? getSiteID().equals(serverID) : localServerID.equals(serverID);
     }
 
     /**
@@ -236,7 +241,7 @@ public class SessionServerConfig {
     public boolean isLocalSite(String siteID) {
         // TODO: Investigate this method further and rename / better document its behaviour
         // How does this method compare to WebtopNaming.isSite? Is this method redundant?
-        return this.siteID.equals(siteID) || secondarySiteIDs.contains(siteID);
+        return getSiteID().equals(siteID) || getSecondarySiteIDs().contains(siteID);
     }
 
     /**
@@ -290,7 +295,7 @@ public class SessionServerConfig {
      * of one or more sites, the returned set will only include this server's ID.
      */
     public Set<String> getServerIDsInLocalSite() throws Exception {
-        Set<String> serverIDs = WebtopNaming.getSiteNodes(siteID);
+        Set<String> serverIDs = WebtopNaming.getSiteNodes(getSiteID());
         if ((serverIDs == null) || (serverIDs.isEmpty())) {
             serverIDs = new HashSet<String>();
             serverIDs.add(localServerID);
@@ -301,7 +306,7 @@ public class SessionServerConfig {
     /**
      * Returns all server IDs.
      */
-    public List<String> getAllServerIDs() throws Exception {
+    public Collection<String> getAllServerIDs() throws Exception {
         return WebtopNaming.getAllServerIDs();
     }
 
@@ -367,14 +372,14 @@ public class SessionServerConfig {
         return value;
     }
 
-    private Set<String> findSecondarySiteIDs(String protocol, String host, String port, String path)
+    private Set<String> findSecondarySiteIDs(String serverID)
             throws ServerEntryNotFoundException {
 
         // TODO: Investigate this method further - under what circumstances does it actually return results?
 
         Set<String> results = new HashSet<String>();
 
-        String secondarySites = WebtopNaming.getSecondarySites(protocol, host, port, path);
+        String secondarySites = WebtopNaming.getSecondarySites(serverID);
         if (secondarySites != null) {
             if (secondarySites.contains("|")) {
                 StringTokenizer st = new StringTokenizer(secondarySites, "|");

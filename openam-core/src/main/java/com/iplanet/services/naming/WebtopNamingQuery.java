@@ -89,4 +89,8 @@ public class WebtopNamingQuery {
     public boolean isAvailable(URL url) throws Exception {
         return WebtopNaming.SiteMonitor.isAvailable(url);
     }
+
+    public SessionIDCorrector getSessionIDCorrector() {
+        return WebtopNaming.getSessionIDCorrector();
+    };
 }

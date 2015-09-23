@@ -142,9 +142,9 @@ public class Agent {
     private static String ssoSiteID;
     private static String ssoServerID;
     private static boolean dsIsEmbedded;
-    private static Hashtable<String, String> siteIdTable;
-    private static Hashtable<String, String> serverIDTable;
-    private static Hashtable<String, String> namingTable;
+    private static Map<String, String> siteIdTable;
+    private static Map<String, String> serverIDTable;
+    private static Map<String, String> namingTable;
     private static Map<String, String> siteToURL;
     private static Map<String, String> URLToSite;
     private static String startDate;
@@ -1164,7 +1164,7 @@ public class Agent {
         }
     }
 
-    public static Hashtable<String, String> getSiteIdTable() {
+    public static Map<String, String> getSiteIdTable() {
         if (agentSvrInfo != null) {
             return agentSvrInfo.siteIDTable;
         } else {
@@ -1172,7 +1172,7 @@ public class Agent {
         }
     }
 
-    public static Hashtable<String, String> getServerIdTable() {
+    public static Map<String, String> getServerIdTable() {
         if (agentSvrInfo != null) {
             return agentSvrInfo.serverIDTable;
         } else {
@@ -1180,7 +1180,7 @@ public class Agent {
         }
     }
 
-    public static Hashtable<String, String> getNamingTable() {
+    public static Map<String, String> getNamingTable() {
         if (agentSvrInfo != null) {
             return agentSvrInfo.namingTable;
         } else {

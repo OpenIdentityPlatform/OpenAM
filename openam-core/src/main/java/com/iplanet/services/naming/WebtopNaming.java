@@ -54,8 +54,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -64,16 +64,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
-
-/*
- *  these are here temporarily, just to see how long it takes to
- *  build the monitoring stuff
- */
-
-/*
- *  and this stuff is here for retrieving session config
- */
-
 
 /**
  * The <code>WebtopNaming</code> class is used to get URLs for various
@@ -104,29 +94,7 @@ public class WebtopNaming {
 
     private static final String FAM_NAMING_PREFIX = "sun-naming-";
 
-    private static Hashtable namingTable = null;
-
-    private static Hashtable serverIdTable = null;
-
-    private static Hashtable<String, String> siteIdTable = null;
-
-    private static Set<String> serverIDs = null;
-    private static Set<String> siteIDs = null;
-    private static Set<String> secondarySiteIDs = null;
-    private static Map<String, String> siteNameToIdTable = null;
-
-    //This is created for storing server id and lbcookievalue mapping
-    //key:serverid | value:lbcookievalue      
-    private static Hashtable lbCookieValuesTable = null;
-
-    private static Vector platformServers = new Vector();
-
-    //This is created for ignore case comparison
-    private static Vector lcPlatformServers = new Vector();
-
     private static String namingServiceURL[] = null;
-
-    private static Vector platformServerIDs = new Vector();
 
     /**
      * The debug instance.
@@ -152,6 +120,12 @@ public class WebtopNaming {
     
     private static Map mapSiteToServer = new HashMap();
 
+    private static final NamingTableConfigurationFactory configFactory = new NamingTableConfigurationFactory();
+    private static NamingTableConfigurationFactory.NamingTableConfiguration config = null;
+
+    // Autocorrect is initialised in-step with WebtopNaming.
+    private static volatile SessionIDCorrector sessionIDCorrector;
+
     static {
         initialize();
     }
@@ -175,8 +149,8 @@ public class WebtopNaming {
                     }
                 }
             }
-        } 
-        
+        }
+
         try {
             getAMServer();
             debug = Debug.getInstance("amNaming");
@@ -213,7 +187,7 @@ public class WebtopNaming {
      * @return <code>true</code> if the ID corresponds to a server.
      */
     public static boolean isServer(String serverID) {
-        return serverIDs.contains(serverID);
+        return config.getServerIDs().contains(serverID);
     }
 
     /**
@@ -223,7 +197,7 @@ public class WebtopNaming {
      * @return <code>true</code> if the ID corresponds to a site.
      */
     public static boolean isSite(String siteID) {
-        return siteIDs.contains(siteID);
+        return config.getSiteIDs().contains(siteID);
     }
 
     /**
@@ -233,7 +207,7 @@ public class WebtopNaming {
      * @return <code>true</code> if the ID corresponds to a secondary site.
      */
     public static boolean isSecondarySite(String secondarySiteID) {
-        return secondarySiteIDs.contains(secondarySiteID);
+        return config.getSecondarySiteIDs().contains(secondarySiteID);
     }
 
     /**
@@ -270,7 +244,7 @@ public class WebtopNaming {
      * @throws Exception if the given server ID is null
      */
     public static boolean isSiteEnabled(String serverid) throws Exception {
-        String siteid = siteIdTable.get(serverid);
+        String siteid = config.getSiteIDsTable().get(serverid);
         return (!serverid.equals(siteid));
     }
 
@@ -342,9 +316,9 @@ public class WebtopNaming {
      */
     public static URL getServiceURL(String service, URL url, boolean validate)
         throws URLNotFoundException {
-        return getServiceURL(service, url.getProtocol(), 
-            url.getHost(), Integer.toString(url.getPort()), url.getPath(),
-            validate);
+        return getServiceURL(service, url.getProtocol(),
+                url.getHost(), Integer.toString(url.getPort()), url.getPath(),
+                validate);
     }
 
     /**
@@ -438,16 +412,14 @@ public class WebtopNaming {
                 port = Integer.toString(mappedURL.getPort());
                 uri = mappedURL.getPath();
             }
-            if (namingTable == null) {
-                getNamingProfile(false);
-            }
+            getNamingProfile(false);
             String url = null;
 
             String name = AM_NAMING_PREFIX + service.toLowerCase() + "-url";
-            url = (String) namingTable.get(name);
+            url = config.getNamingTable().get(name);
             if (url == null) {
                 name = FAM_NAMING_PREFIX + service.toLowerCase() + "-url";
-                url = (String) namingTable.get(name);
+                url = config.getNamingTable().get(name);
             }
             
             if (url != null) {
@@ -522,15 +494,13 @@ public class WebtopNaming {
         Vector allurls = null;
 
         try {
-            if (namingTable == null) {
-                getNamingProfile(false);
-            }
+            getNamingProfile(false);
 
             String name = AM_NAMING_PREFIX + service.toLowerCase() + "-url";
-            String url = (String)namingTable.get(name);
+            String url = config.getNamingTable().get(name);
             if (url == null) {
                 name = FAM_NAMING_PREFIX + service.toLowerCase() + "-url";
-                url = (String)namingTable.get(name);
+                url = config.getNamingTable().get(name);
             }
 
             if (url != null) {
@@ -571,7 +541,7 @@ public class WebtopNaming {
      * @throws Exception if an error occurs when updating the
      *     nameing table
      */
-    public static Vector<String> getPlatformServerList() throws Exception {
+    public static Set<String> getPlatformServerList() throws Exception {
          return getPlatformServerList(true);
     }
 
@@ -587,28 +557,27 @@ public class WebtopNaming {
      *     nameing table
      */
 
-    public static Vector<String> getPlatformServerList(boolean update)
+    public static Set<String> getPlatformServerList(boolean update)
              throws Exception {
          getNamingProfile(update);
-         return platformServers;
+         return config.getPlatformServers();
     }
 
     /**
      * Returns key value from a hashtable, ignoring the case of the
      * key.
      */
-    private static String getValueFromTable(Hashtable table, String key) {
-        if (table == null)
+    private static String getValueFromTable(Map<String, String> map, String key) {
+        if (map == null)
             { return null; }
         if ( (key == null) || (key.isEmpty()) )
             { return null; }
-        if (table.contains(key)) {
-            return (String) table.get(key);
+        if (map.containsKey(key)) {
+            return map.get(key);
         }
-        for (Enumeration keys = table.keys(); keys.hasMoreElements();) {
-            String tmpKey = (String) keys.nextElement();
-            if (tmpKey.equalsIgnoreCase(key)) {
-                return (String) table.get(tmpKey);
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(key)) {
+                return entry.getValue();
             }
         }
         return null;
@@ -678,7 +647,7 @@ public class WebtopNaming {
         boolean updatetbl
     ) throws ServerEntryNotFoundException {
         String installTime = SystemProperties.get(
-            Constants.SYS_PROPERTY_INSTALL_TIME, "false");
+                Constants.SYS_PROPERTY_INSTALL_TIME, "false");
         try {
             // check before the first naming table update to avoid deadlock
             if (protocol == null || host == null || port == null ||
@@ -706,20 +675,21 @@ public class WebtopNaming {
                 serverWithoutURI;
 
             String serverID = null;
-            if (serverIdTable != null) {
-                serverID = getValueFromTable(serverIdTable, server);
+
+            if (config != null) {
+                serverID = getValueFromTable(config.getServerIDTable(), server);
                 
                 if (serverID == null) {
                     //try without URI, this is for prior release of OpenSSO
                     //Enterprise 8.0
-                    serverID = getValueFromTable(serverIdTable, 
+                    serverID = getValueFromTable(config.getServerIDTable(),
                         serverWithoutURI);
                 }
 
                 if (serverID == null) {
                     // try with the URI, Agent 3.0 preferred naming URL
                     // is missing the amServer URI
-                    serverID = getValueFromTable(serverIdTable,
+                    serverID = getValueFromTable(config.getServerIDTable(),
                         serverWithURI);
                 }
             }
@@ -727,18 +697,18 @@ public class WebtopNaming {
             //if it can not find it
             if (( serverID == null ) && (updatetbl == true)) {
                 getNamingProfile(true);
-                serverID = getValueFromTable(serverIdTable, server);
+                serverID = getValueFromTable(config.getServerIDTable(), server);
                 if (serverID == null) {
                     //try without URI, this is for prior release of OpenSSO
                     //Enterprise 8.0
-                    serverID = getValueFromTable(serverIdTable, 
+                    serverID = getValueFromTable(config.getServerIDTable(),
                         serverWithoutURI);
                 }
 
                 if (serverID == null) {
                     // try with the URI, Agent 3.0 preferred naming URL
                     // is missing the amServer URI
-                    serverID = getValueFromTable(serverIdTable,
+                    serverID = getValueFromTable(config.getServerIDTable(),
                         serverWithURI);
                 }
             }
@@ -783,12 +753,12 @@ public class WebtopNaming {
         String server = null;
         try {
             // refresh local naming table in case the key is not found
-            if (namingTable != null) {
-                server = getValueFromTable(namingTable, serverID);
+            if (config != null) {
+                server = getValueFromTable(config.getNamingTable(), serverID);
             }
             if (server == null) {
                 getNamingProfile(true);
-                server = getValueFromTable(namingTable, serverID);
+                server = getValueFromTable(config.getNamingTable(), serverID);
             }
             if (server == null) {
                 throw new ServerEntryNotFoundException(NamingBundle
@@ -811,43 +781,10 @@ public class WebtopNaming {
      * @throws Exception if an error occurs when updating the
      *     nameing table
      */
-    public static Vector getAllServerIDs() throws Exception  {
-        if (namingTable == null) {
-            getNamingProfile(false);
-        }
+    public static Collection<String> getAllServerIDs() throws Exception  {
+        getNamingProfile(false);
 
-        return platformServerIDs;
-    }
-
-    private static void updateLBCookieValueMappings() {
-        Hashtable lbcookieTbl = new Hashtable();
-        String serverSet = (String) namingTable.get(
-                           Constants.SERVERID_LBCOOKIEVALUE_LIST);
-
-        if ((serverSet == null) || (serverSet.length() == 0)) {
-            return;
-        }
-
-        StringTokenizer tok = new StringTokenizer(serverSet, ",");
-        while (tok.hasMoreTokens()) {
-            String serverid = tok.nextToken();
-            String lbCookieValue = serverid;
-            int idx = serverid.indexOf(NODE_SEPARATOR);
-            if (idx != -1) {
-                lbCookieValue = serverid.substring(idx + 1, serverid.length());
-                serverid = serverid.substring(0, idx);
-            }
-            lbcookieTbl.put(serverid, lbCookieValue);
-        }
-
-        lbCookieValuesTable = lbcookieTbl;
-        
-        if (debug.messageEnabled()) {
-            debug.message("WebtopNaming.updateLBCookieValueMappings():" +
-                "LBCookieValues table -> " + lbCookieValuesTable.toString());
-        }
-
-        return;
+        return config.getPlatformServerIDs();
     }
 
     /**
@@ -866,7 +803,7 @@ public class WebtopNaming {
                     " server id is null, returning null ");
             }
             return null;
-        } else if (lbCookieValuesTable == null) {
+        } else if (config.getLbCookieValuesTable() == null) {
             if (debug.messageEnabled()) {
                 debug.message("WebtopNaming.getLBCookieValue():" +
                     " lbCookieValues table is null, returning server id: " +
@@ -875,7 +812,7 @@ public class WebtopNaming {
             return serverid;
         }
 
-        lbCookieValue = (String) lbCookieValuesTable.get(serverid);
+        lbCookieValue = (String) config.getLbCookieValuesTable().get(serverid);
         if (lbCookieValue == null) {
             if (debug.messageEnabled()) {
                 debug.message("WebtopNaming.getLBCookieValue():" +
@@ -929,11 +866,11 @@ public class WebtopNaming {
         String primary_site = null;
         String sitelist = null;
 
-        if (siteIdTable == null) {
+        if (config.getSiteIDsTable() == null) {
             return null;
         }
 
-        sitelist = (String) siteIdTable.get(serverid);
+        sitelist = config.getSiteIDsTable().get(serverid);
         StringTokenizer tok = new StringTokenizer(sitelist, NODE_SEPARATOR);
         if (tok != null) {
             primary_site = tok.nextToken();
@@ -950,11 +887,11 @@ public class WebtopNaming {
     public static String getSiteIdByName(String siteName) {
         String siteId = null;
         
-        if (siteNameToIdTable == null) {
+        if (config.getSiteNameToIdTable() == null) {
             return null;
         }
         
-        siteId = siteNameToIdTable.get(siteName);
+        siteId = config.getSiteNameToIdTable().get(siteName);
         
         if (debug.messageEnabled()) {
             debug.message("WebtopNaming : Site ID for " + siteName + " is "
@@ -967,11 +904,11 @@ public class WebtopNaming {
     public static String getSiteNameById(String siteId) {
         String siteName = null;
         
-        if (siteNameToIdTable == null) {
+        if (config.getSiteNameToIdTable() == null) {
             return null;
         }
         
-        for (Map.Entry<String, String> siteNameEntry : siteNameToIdTable.entrySet()) {
+        for (Map.Entry<String, String> siteNameEntry : config.getSiteNameToIdTable().entrySet()) {
             if (siteNameEntry.getValue().equals(siteId)) {
                 siteName = siteNameEntry.getKey();
                 break;
@@ -1021,11 +958,11 @@ public class WebtopNaming {
         String sitelist = null;
         String secondarysites = null;
 
-        if (siteIdTable == null) {
+        if (config.getSiteIDsTable() == null) {
             return null;
         }
 
-        sitelist = siteIdTable.get(serverid);
+        sitelist = config.getSiteIDsTable().get(serverid);
         if (sitelist == null) {
             return null;
         }
@@ -1057,15 +994,11 @@ public class WebtopNaming {
     public static Set<String> getSiteNodes(String serverid) throws Exception {
         HashSet<String> nodeset = new HashSet();
 
-        if (namingTable == null) {
-            getNamingProfile(false);
-        }
+        getNamingProfile(false);
 
         String siteid = getSiteID(serverid);
 
-        Enumeration e = siteIdTable.keys();
-        while (e.hasMoreElements()) {
-            String node = (String) e.nextElement();
+        for (String node: config.getSiteIDsTable().keySet()) {
             if (siteid.equalsIgnoreCase(node)) {
                 continue;
             }
@@ -1091,16 +1024,14 @@ public class WebtopNaming {
     public static String getServiceClass(String service)
             throws ClassNotFoundException {
         try {
-            if (namingTable == null) {
-                getNamingProfile(false);
-            }
+            getNamingProfile(false);
             String cls = null;
             String name = AM_NAMING_PREFIX + service.toLowerCase()
                     + "-class";
-            cls = (String) namingTable.get(name);
+            cls = config.getNamingTable().get(name);
             if (cls == null) {
                 name = FAM_NAMING_PREFIX + service.toLowerCase() + "-class";
-                cls = (String)namingTable.get(name);
+                cls = config.getNamingTable().get(name);
             }
             if (cls == null) {
                 throw new Exception(NamingBundle.getString("noServiceClass")
@@ -1138,7 +1069,7 @@ public class WebtopNaming {
 
     private synchronized static void getNamingProfile(boolean update)
             throws Exception {
-        if (update || namingTable == null) {
+        if (update || config == null) {
             updateNamingTable();
         }
     }
@@ -1162,7 +1093,7 @@ public class WebtopNaming {
         SystemProperties.initializeProperties(Constants.AM_SERVER_PORT,
             amServerPort);
         SystemProperties.initializeProperties(
-            Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, amServerURI);
+                Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, amServerURI);
         if (debug.messageEnabled()) {
             debug.message("Server Properties are changed : ");
             debug.message(Constants.AM_SERVER_PROTOCOL + " : "
@@ -1207,7 +1138,14 @@ public class WebtopNaming {
         return nametbl;
     }
 
-    private static void updateNamingTable() throws Exception {
+    /**
+     * Triggers the update of the NamingTable by examining the contents of
+     * {@link NamingService} for the naming information. Assembles this int
+     * a table of Servers and Sites that make up the platform.
+     *
+     * @throws Exception If there was an error processing naming information.
+     */
+    public synchronized static void updateNamingTable() throws Exception {
 
         if (!serverMode) {
             if (namingServiceURL == null) {
@@ -1231,169 +1169,15 @@ public class WebtopNaming {
                 throw new Exception(NamingBundle
                         .getString("noNamingServiceAvailable"));
             } else {
-                namingTable = namingtbl;
+                config = configFactory.getConfiguration(namingtbl);
             }
 
             updateServerProperties(tempNamingURL);
         } else {
-            namingTable = NamingService.getNamingTable();
+            config = configFactory.getConfiguration(NamingService.getNamingTable());
         }
 
-        String servers = (String) namingTable.get(Constants.PLATFORM_LIST);
-
-        if (servers != null) {
-            StringTokenizer st = new StringTokenizer(servers, ",");
-            Vector platformServersNEW = new Vector(); 
-            Vector lcPlatformServersNEW = new Vector(); 
-            while (st.hasMoreTokens()) {
-                String svr = st.nextToken();
-                lcPlatformServersNEW.add(svr.toLowerCase());
-                platformServersNEW.add(svr);
-            }
-            platformServers = platformServersNEW;
-            lcPlatformServers = lcPlatformServersNEW;
-        }
-        updateServerIdMappings();
-        updateSiteIdMappings();
-        updateSiteNameToIDMappings();
-        updatePlatformServerIDs();
-        updateLBCookieValueMappings();
-        updatePlatformSets();
-                
-        if (debug.messageEnabled()) {
-            debug.message("Naming table -> " + namingTable.toString());
-            debug.message("Server Id Table -> " + serverIdTable.toString());
-            debug.message("Site Id Table -> " + siteIdTable.toString());
-            debug.message("Site Name to Id Table -> " + siteNameToIdTable.toString());
-            debug.message("Platform Servers -> " + platformServers.toString());
-            debug.message("Platform Server IDs -> "
-                          + platformServerIDs.toString());
-        }
-    }
-
-    /*
-     * This method is to update the servers and their IDs in a seprate 
-     * hash. It will get updated each time when the naming table gets
-     * updated. Note: this table will have all the entries in the
-     * naming table but in a reverse order except the platform server
-     * list. We can just keep only server ID mappings but we need to 
-     * exclude each other entry which is there in.
-     */
-    private static void updateServerIdMappings() {
-        Hashtable serverIdTbl = new Hashtable();
-        Enumeration e = namingTable.keys();
-        while (e.hasMoreElements()) {
-            String key = (String) e.nextElement();
-            String value = (String) namingTable.get(key);
-            if ((key == null) || (value == null)) {
-                continue;
-            }
-            // If the key is server list skip it, since it would
-            // have the same value
-            if (key.equals(Constants.PLATFORM_LIST)) {
-                continue;
-            }
-            serverIdTbl.put(value, key);
-        }
-        
-        serverIdTable = serverIdTbl;
-    }
-
-    private static void updateSiteIdMappings() {
-        Hashtable<String, String> siteIdTbl = new Hashtable<String, String>();
-        String serverSet = (String) namingTable.get(Constants.SITE_ID_LIST);
-
-        if ((serverSet == null) || (serverSet.length() == 0)) {
-            return;
-        }
-
-        StringTokenizer tok = new StringTokenizer(serverSet, ",");
-        while (tok.hasMoreTokens()) {
-            String serverid = tok.nextToken();
-            String siteid = serverid;
-            int idx = serverid.indexOf(NODE_SEPARATOR);
-            if (idx != -1) {
-                siteid = serverid.substring(idx + 1, serverid.length());
-                serverid = serverid.substring(0, idx);
-            }
-            siteIdTbl.put(serverid, siteid);
-        }
-
-        siteIdTable = siteIdTbl;
-        if (debug.messageEnabled()) {
-            debug.message("SiteID table -> " + siteIdTable.toString());
-        }
-
-        return;
-    }
-
-    private static void updatePlatformServerIDs()
-        throws MalformedURLException, ServerEntryNotFoundException {
-        Iterator it = platformServers.iterator();
-        while (it.hasNext()) {
-            String plaformURL = (String) it.next();
-            URL url = new URL(plaformURL);
-            String serverID = getServerID(url.getProtocol(), url.getHost(),
-                Integer.toString(url.getPort()), url.getPath(), false);
-            if (serverID !=null && !platformServerIDs.contains(serverID)) {
-                platformServerIDs.add(serverID);
-            }
-        }
-    }
-    
-    private static void updateSiteNameToIDMappings() {
-        Map siteNameToIdTbl = new HashMap();
-        String siteNameToIDs = (String) namingTable.get(Constants.SITE_NAMES_LIST);
-
-        if ((siteNameToIDs == null) || (siteNameToIDs.length() == 0)) {
-	     siteNameToIdTable = siteNameToIdTbl;
-            return;
-        }
-
-        StringTokenizer tok = new StringTokenizer(siteNameToIDs, ",");
-        while (tok.hasMoreTokens()) {
-            String siteNameAndID = tok.nextToken();
-            String siteName = siteNameAndID;
-            String siteId = siteNameAndID;
-            
-            int idx = siteNameAndID.indexOf(NODE_SEPARATOR);
-            if (idx != -1) {
-                siteId = siteNameAndID.substring(idx + 1, siteNameAndID.length());
-                siteName = siteNameAndID.substring(0, idx);
-            }
-            siteNameToIdTbl.put(siteName, siteId);
-        }
-
-        siteNameToIdTable = siteNameToIdTbl;
-        if (debug.messageEnabled()) {
-            debug.message("SiteNameToIDs table -> " + siteNameToIdTable.toString());
-        }
-
-        return;
-    }
-
-    private static void updatePlatformSets() {
-        Set<String> siteIDSet = new HashSet<String>(siteNameToIdTable.values());
-        Set<String> secondarySiteIDSet = new HashSet<String>();
-        Set<String> serverIDSet = new HashSet<String>(platformServerIDs);
-
-        for (Map.Entry<String, String> entry : siteIdTable.entrySet()) {
-            String siteId = entry.getValue();
-            if (siteId.indexOf(NODE_SEPARATOR) != -1) {
-                StringTokenizer tokenizer = new StringTokenizer(siteId, NODE_SEPARATOR);
-                //the first one is always the primary site ID, which we don't need now
-                tokenizer.nextToken();
-                while (tokenizer.hasMoreTokens()) {
-                    secondarySiteIDSet.add(tokenizer.nextToken());
-                }
-            }
-        }
-        serverIDSet.removeAll(siteIDSet);
-        serverIDSet.removeAll(secondarySiteIDSet);
-
-        siteIDs = siteIDSet;
-        secondarySiteIDs = secondarySiteIDSet;
-        serverIDs = serverIDSet;
+        sessionIDCorrector = SessionIDCorrector.create();
     }
 
     private static void validate(
@@ -1420,19 +1204,19 @@ public class WebtopNaming {
             }
             if (debug.messageEnabled()) {
                 debug.message("WebtopNaming.validate: platformServers= " + 
-                    platformServers);
+                    config.getPlatformServers());
             }
 
-            if (!lcPlatformServers.contains(server)) {
+            if (!config.getLcPlatformServers().contains(server)) {
                 getNamingProfile(true);
-                if (!platformServers.contains(server)) {
+                if (!config.getPlatformServers().contains(server)) {
                     throw new URLNotFoundException(NamingBundle
                             .getString("invalidServiceHost")
                             + " " + server);
                 }
             }
         } catch (Exception e) {
-            debug.error("platformServers: " + platformServers, e);
+            debug.error("platformServers: " + config.getPlatformServers(), e);
             throw new URLNotFoundException(e.getMessage());
         }
     }
@@ -1614,10 +1398,10 @@ public class WebtopNaming {
                         svrURI(amServerURI).
                         svrPort(amServerPort).
                         embeddedDS(isEmbeddedDS).
-                        siteIdTable(siteIdTable).
-                        svrIdTable(serverIdTable).
+                        siteIdTable(config.getSiteIDsTable()).
+                        svrIdTable(config.getServerIDTable()).
                         startDate(startDate).
-                        namingTable(namingTable).build();
+                        namingTable(config.getNamingTable()).build();
     
                 Agent.siteAndServerInfo(srvrInfo);
 
@@ -1636,7 +1420,22 @@ public class WebtopNaming {
         }
         return -2;
     }
-    
+
+    /**
+     * When server/site configuration changes, Sessions issued against the previous configuration
+     * will be out of date and refer to an invalid configuration. SessionIDCorrector can compensate for
+     * these changes.
+     *
+     * @return Null if WebtopNaming has not been configured, otherwise the instance of SessionIDCorrector
+     * associated with the WebtopNaming configuration.
+     */
+    public static SessionIDCorrector getSessionIDCorrector() {
+        if (config == null) {
+            return null;
+        }
+        return sessionIDCorrector;
+    }
+
     /**
      * The <code>SiteMonitor</code> class is used to monitor the
      * health status of all the sites.
@@ -1765,7 +1564,7 @@ static public class SiteMonitor extends GeneralTaskRunnable {
      * @throws Exception if failing to get the naming service url.
      */
     public static boolean isAvailable(URL url) throws Exception {
-        if ((namingTable == null) || (keepMonitoring == false)) {
+        if ((config == null) || (keepMonitoring == false)) {
             return true;
         }
 
@@ -1813,7 +1612,7 @@ static public class SiteMonitor extends GeneralTaskRunnable {
      * @throws Exception if failing to get the naming service url.    
      */
     public static boolean isCurrentSite(URL url) throws Exception {
-        if ((namingTable == null) || !keepMonitoring) {
+        if ((config == null) || !keepMonitoring) {
             return true;
         }
 

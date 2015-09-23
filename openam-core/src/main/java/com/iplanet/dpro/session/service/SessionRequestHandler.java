@@ -32,10 +32,8 @@
 
 package com.iplanet.dpro.session.service;
 
-import static org.forgerock.openam.audit.AuditConstants.Component.SESSION;
-import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
+import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.session.SessionConstants.*;
-
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
@@ -46,31 +44,30 @@ import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
+import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.iplanet.services.comm.server.PLLAuditor;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.CookieUtils;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.SessionServiceURLService;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 public class SessionRequestHandler implements RequestHandler {
 
@@ -284,9 +281,9 @@ public class SessionRequestHandler implements RequestHandler {
 
                         if (!serverConfig.isLocalSessionService(originService)) {
                             if (!serverConfig.isSiteEnabled()) {
-                                String siteID = sid.getExtension(SessionID.SITE_ID);
+                                String siteID = sid.getExtension().getSiteID();
                                 if (siteID != null) {
-                                    String primaryID = sid.getExtension(SessionID.PRIMARY_ID);
+                                    String primaryID = sid.getExtension().getPrimaryID();
                                     String localServerID = serverConfig.getLocalServerID();
                                     if ( (primaryID != null) && (localServerID != null) )
                                     {

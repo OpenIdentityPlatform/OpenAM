@@ -69,6 +69,15 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.ClientUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -93,15 +102,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-import org.forgerock.openam.utils.ClientUtils;
 
 public class AuthClientUtils {
 
@@ -2434,7 +2434,7 @@ public class AuthClientUtils {
                         SystemProperties.get(Constants.
                         AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
                 }
-                Vector platformList = WebtopNaming.getPlatformServerList();
+                Set<String> platformList = WebtopNaming.getPlatformServerList();
                 if (utilDebug.messageEnabled()) {
                     utilDebug.message("search CookieURL : " + tmpCookieURL);
                     utilDebug.message("platform server List : " 

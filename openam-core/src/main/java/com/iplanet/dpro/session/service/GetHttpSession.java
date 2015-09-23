@@ -32,6 +32,7 @@
 
 package com.iplanet.dpro.session.service;
 
+import static org.forgerock.openam.session.SessionConstants.*;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.dpro.session.SessionException;
@@ -56,11 +57,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.security.AccessController;
+import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
-
-import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
 
 /**
  * This servlet class is used as a helper to aid SessionService to perform
@@ -143,7 +142,7 @@ public final class GetHttpSession extends HttpServlet {
                 sessionDebug.error("GetHttpSession.validateRequest: Max time elapsed for the Request");
                 return false;
             }
-            Vector platformServerList = WebtopNaming.getPlatformServerList();
+            Set<String> platformServerList = WebtopNaming.getPlatformServerList();
 
             if (!platformServerList.contains(serverURL)) {
                 sessionDebug.error("GetHttpSession.validateRequest: request host :" + serverURL

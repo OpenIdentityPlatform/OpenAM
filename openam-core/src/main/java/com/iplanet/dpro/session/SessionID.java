@@ -27,11 +27,7 @@
  */
 
 /**
-<<<<<<< HEAD
- * Portions Copyrighted 2011-2015 ForgeRock AS.
-=======
  * Portions Copyrighted 2011-2015 ForgeRock, AS.
->>>>>>> stateless
  */
 
 package com.iplanet.dpro.session;
@@ -48,23 +44,15 @@ import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import org.forgerock.openam.utils.PerThreadCache;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
 import java.security.AccessController;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -80,7 +68,6 @@ public class SessionID implements Serializable {
     public static final String SHANDLE_SCHEME_PREFIX = "shandle:";
 
     private String encryptedString = "";
-    private boolean isParsed = false;
     private boolean comingFromAuth = false;
     private String sessionServerProtocol = "";
     private String sessionServer = "";
@@ -88,12 +75,13 @@ public class SessionID implements Serializable {
     private String sessionServerURI = "";
     protected String sessionDomain = "";
     private String sessionServerID = "";
-    private String tail = null;
-    private String extensionPart = null;
-    private Map extensions = new HashMap();
     private static String cookieName = null;
     private static Debug debug;
     private Boolean cookieMode = null;
+
+    private transient boolean isParsed = false; // Should not be persisted to enable parsing
+    private transient String tail = null; // Instantiated by SessionID#parseSessionString
+    private transient SessionIDExtensions extensions; // Instantiated by SessionID#parseSessionString
 
     static {
         cookieName = System.getProperty("com.iplanet.am.cookie.name");
@@ -102,12 +90,6 @@ public class SessionID implements Serializable {
         }
         debug = Debug.getInstance("amSession");
     }
-
-    // prefix "S" is reserved to be used by session framework-specific
-    // extensions for session id format
-    public static final String PRIMARY_ID = "S1";
-    public static final String STORAGE_KEY = "SK";
-    public static final String SITE_ID = "SI";
 
     private static final PerThreadCache<SecureRandom, RuntimeException> secureRandom =
             new PerThreadCache<SecureRandom, RuntimeException>(Integer.MAX_VALUE) {
@@ -243,7 +225,7 @@ public class SessionID implements Serializable {
      public boolean getComingFromAuth() {
          if (debug.messageEnabled()) {
              debug.message("SessionID.getComingFromAuth():"
-                 +"comingFromAuth:"+comingFromAuth);
+                     + "comingFromAuth:" + comingFromAuth);
          }
          return comingFromAuth;
      }
@@ -363,7 +345,7 @@ public class SessionID implements Serializable {
             return;
         }
 
-        /**
+        /*
          * This check is done because the SessionID object is getting created
          * with empty sid value. This is a temparory fix. The correct fix for
          * this is, throw a SessionException while creating the SessionID
@@ -390,11 +372,17 @@ public class SessionID implements Serializable {
             tail = outer.substring(tailIndex + 1);
 
             if (tailIndex != -1) {
-                extensionPart = outer.substring(0, tailIndex);
-                extensions = readExtensions(extensionPart);
+                String extensionPart = outer.substring(0, tailIndex);
+                extensions = new DynamicSessionIDExtensions(new LegacySessionIDExtensions(extensionPart));
+            } else {
+                extensions = new LegacySessionIDExtensions();
             }
 
-            serverID = (String) extensions.get(SITE_ID);
+            /*
+             * Assigning the SITE_ID to ServerID is counter-intuitive. See {@link SessionID#validate()}
+             * for JavaDoc detailing this arrangement.
+             */
+            serverID = extensions.getSiteID();
             if (serverID != null) {
                 setServerID(serverID);
             }
@@ -404,56 +392,6 @@ public class SessionID implements Serializable {
             throw new IllegalArgumentException("Invalid sessionid format:["+serverID+"]" + e);
         }
         isParsed = true;
-    }
-
-    /**
-     * Optimised alternative to DataInputStream#readUTF (which is very slow).
-     *
-     * @param extensionPart the extension map part of the session id
-     * @return the parsed extension map
-     * @throws IOException if there is an error decoding the extensions
-     */
-    @VisibleForTesting
-    static Map<String, String> readExtensions(String extensionPart) throws IOException {
-        // The bytes are actually written via DataOutputStream#writeUTF which uses "modified UTF-8". We decode this
-        // as normal UTF-8. This should only cause an issue with 'null' characters (\u0000), which should never
-        // appear anyway.
-        final CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder()
-                .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT);
-        final Map<String, String> extMap = new HashMap<String, String>();
-        final byte[] bytes = Base64.decode(extensionPart);
-
-        if (bytes == null) {
-            debug.message("SessionID.readExtensions: Invalid extension data {}", extensionPart);
-            throw new IllegalArgumentException("Invalid Base64-encoded data");
-        }
-
-        for (int i = 0; i < bytes.length;) {
-            // Data is encoded as a 2-byte unsigned short length, followed by 'length' bytes of UTF-8
-            int length = parseUnsignedShort(bytes, i);
-            i += 2;
-            String key = decoder.decode(ByteBuffer.wrap(bytes, i, length)).toString();
-            i += length;
-            length = parseUnsignedShort(bytes, i);
-            i += 2;
-            String val = decoder.decode(ByteBuffer.wrap(bytes, i, length)).toString();
-            i += length;
-            extMap.put(key, val);
-        }
-        return extMap;
-    }
-
-    /**
-     * Parses the next two bytes from the given byte array as an unsigned short value. As Java does not support
-     * unsigned types, we return the value as the least-significant bits of a signed integer. The most-significant
-     * 16 bits of the result will always be 0. Assumes Big-Endian format as in DataInput#readUnsignedShort.
-     *
-     * @param bytes the byte array to read the unsigned short from.
-     * @param i the offset into the byte array of the start of the unsigned short.
-     * @return the unsigned short as a (positive) signed integer.
-     */
-    private static int parseUnsignedShort(final byte[] bytes, final int i) {
-        return ((bytes[i] & 0xFF) << 8) | (bytes[i+1] & 0xFF);
     }
 
     /**
@@ -513,13 +451,11 @@ public class SessionID implements Serializable {
      * <code>SessionService.PRIMARY_ID</code>,
      * <code>SessionService.SECONDARY_ID</code> used if internal request
      * routing mode is enabled.
-     * 
-     * @param name Name of the session ID extension.
      * @return extension.
      */
-    public String getExtension(String name) {
+    public SessionIDExtensions getExtension() {
         parseSessionString();
-        return (String) extensions.get(name);
+        return extensions;
     }
 
     /**
@@ -533,7 +469,7 @@ public class SessionID implements Serializable {
      * @return encoded session id string.
      * @throws SessionException
      */
-    public static String makeSessionID(String encryptedID, Map extensions,
+    static String makeSessionID(String encryptedID, SessionIDExtensions extensions,
             String tail) throws SessionException {
         try {
             StringBuilder buf = new StringBuilder();
@@ -544,11 +480,9 @@ public class SessionID implements Serializable {
             if (extensions != null) {
                 ByteArrayOutputStream baOut = new ByteArrayOutputStream();
                 DataOutputStream dataOut = new DataOutputStream(baOut);
-                for (Iterator iter = extensions.entrySet().iterator(); iter
-                        .hasNext();) {
-                    Map.Entry entry = (Map.Entry) iter.next();
-                    dataOut.writeUTF((String) entry.getKey());
-                    dataOut.writeUTF((String) entry.getValue());
+                for (Map.Entry<String, String> entry : extensions.asMap().entrySet()) {
+                    dataOut.writeUTF(entry.getKey());
+                    dataOut.writeUTF(entry.getValue());
                 }
                 dataOut.close();
                 buf.append(Base64.encode(baOut.toByteArray()));
@@ -582,7 +516,7 @@ public class SessionID implements Serializable {
     public static String makeRelatedSessionID(String encryptedID,
             SessionID prototype) throws SessionException {
         prototype.parseSessionString();
-        return makeSessionID(encryptedID, prototype.extensions, prototype.tail);
+        return makeSessionID(encryptedID, prototype.getExtension(), prototype.tail);
     }
 
     /**
@@ -751,23 +685,22 @@ public class SessionID implements Serializable {
         SessionID sid;
         String encryptedID = generateEncryptedID(serverConfig);
 
-        Map ext = new HashMap();
-        ext.put(SessionID.SITE_ID, serverConfig.getPrimaryServerID());
-
+        String siteID = serverConfig.getPrimaryServerID();
+        String primaryID = "";
         // AME-129 Required for Automatic Session Failover Persistence
         if (serverConfig.isSiteEnabled() &&
                 serverConfig.getLocalServerID() != null &&
                 !serverConfig.getLocalServerID().isEmpty()) {
 
             if (StringUtils.isNotBlank(jwt)) {
-                ext.put(SessionID.PRIMARY_ID, serverConfig.getPrimaryServerID());
+                primaryID = serverConfig.getPrimaryServerID();
             } else {
-                ext.put(SessionID.PRIMARY_ID, serverConfig.getLocalServerID());
+                primaryID = serverConfig.getLocalServerID();
             }
         }
-
         // AME-129, always set a Storage Key regardless of persisting or not.
-        ext.put(SessionID.STORAGE_KEY, String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong()));
+        String storageKey = String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong());
+        LegacySessionIDExtensions ext = new LegacySessionIDExtensions(primaryID, siteID, storageKey);
 
         String sessionID = SessionID.makeSessionID(encryptedID, ext, jwt);
 
@@ -798,8 +731,8 @@ public class SessionID implements Serializable {
      * created within this OpenAM deployment.
      */
     public void validate() throws SessionException {
-        String siteID = getExtension(SessionID.SITE_ID);
-        String primaryID = getExtension(SessionID.PRIMARY_ID);
+        String siteID = getExtension().getSiteID();
+        String primaryID = getExtension().getPrimaryID();
         String errorMessage = null;
         if (primaryID == null) {
             //In this case by definition the server is not assigned to a site, so we want to ensure that the

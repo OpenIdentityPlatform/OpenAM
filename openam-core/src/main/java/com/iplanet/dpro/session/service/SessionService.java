@@ -28,6 +28,8 @@
  */
 package com.iplanet.dpro.session.service;
 
+import static org.forgerock.openam.audit.AuditConstants.EventName.*;
+import static org.forgerock.openam.session.SessionConstants.*;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionEvent;
@@ -65,7 +67,6 @@ import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.stats.Stats;
 import org.apache.commons.collections.Predicate;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -109,10 +110,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_LOGGED_OUT;
-import static org.forgerock.openam.session.SessionConstants.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class represents a Session Service
@@ -161,13 +159,21 @@ public class SessionService {
     private final SessionAdapter tokenAdapter;
     private final SessionInfoFactory sessionInfoFactory;
     private final InternalSessionCache cache;
-    private final ClusterMonitor clusterMonitor; // TODO: Inject from Guice
+
 
     private final SessionServiceURLService sessionServiceURLService;
     private final SessionCache sessionCache;
     private final SessionCookies sessionCookies;
     private final SessionPollerPool sessionPollerPool;
     private final StatelessSessionFactory statelessSessionFactory;
+
+    /**
+     * Reference to the ClusterMonitor instance. When server configuration changes which requires
+     * a different instance (e.g. SFO changing state) then this AtomicReference will ensure
+     * thread safety around the access to the ClusterMonitor instance.
+     */
+    private AtomicReference<ClusterMonitor> clusterMonitor = new AtomicReference<>();
+
 
     /**
      * Private Singleton Session Service.
@@ -233,9 +239,6 @@ public class SessionService {
             // But can easily be turned on in the Session SubConfig.
             if (serviceConfig.isSessionFailoverEnabled()) {
 
-                // XXX: Leaking 'this' before constructor completes
-                clusterMonitor = new MultiServerClusterMonitor(this, sessionDebug, serviceConfig, serverConfig);
-
                 // **************************************************************************
                 // Now Bootstrap CoreTokenService (CTS) Implementation, if one was specified.
                 if (coreTokenService == null) {
@@ -245,10 +248,6 @@ public class SessionService {
                     sessionDebug.message("amTokenRepository Implementation: " +
                             ((coreTokenService == null) ? "None" : coreTokenService.getClass().getSimpleName()));
                 }
-            } else {
-
-                clusterMonitor = new SingleServerClusterMonitor();
-
             }
 
         } catch (Exception ex) {
@@ -256,6 +255,73 @@ public class SessionService {
             sessionDebug.error("SessionService initialization failed.", ex);
             throw new IllegalStateException("SessionService initialization failed.", ex);
 
+        }
+    }
+
+    /**
+     * The ClusterMonitor state depends on whether the system is configured for
+     * SFO or not. As such, this method is aware of the change in SFO state
+     * and triggers a re-initialisation of the ClusterMonitor as required.
+     *
+     * Note, this method also acts as the lazy initialiser for the ClusterMonitor.
+     *
+     * Thread Safety: Uses atomic reference to ensure only one thread can modify
+     * the reference at any one time.
+     *
+     * @return A non null instance of the current ClusterMonitor.
+     * @throws SessionException If there was an error initialising the ClusterMonitor.
+     */
+    private ClusterMonitor getClusterMonitor() throws SessionException {
+        if (!isClusterMonitorValid()) {
+            try {
+                ClusterMonitor previous = clusterMonitor.getAndSet(resolveClusterMonitor());
+                if (previous != null) {
+                    sessionDebug.message("Previous ClusterMonitor shutdown: {}", previous.getClass().getSimpleName());
+                    previous.shutdown();
+                }
+                sessionDebug.message("ClusterMonitor initialised: {}", clusterMonitor.get().getClass().getSimpleName());
+            } catch (Exception e) {
+                sessionDebug.error("Failed to initialise ClusterMonitor", e);
+            }
+        }
+
+
+        ClusterMonitor monitor = clusterMonitor.get();
+        if (monitor == null) {
+            throw new SessionException("Failed to initialise ClusterMonitor");
+        }
+        return monitor;
+    }
+
+    /**
+     * @return True if the ClusterMonitor is valid for the current SessionServiceConfiguration.
+     */
+    private boolean isClusterMonitorValid() {
+        // Handles lazy init case
+        if (clusterMonitor.get() == null) {
+            return false;
+        }
+
+        Class<? extends ClusterMonitor> monitorClass = clusterMonitor.get().getClass();
+        if (serviceConfig.isSessionFailoverEnabled()) {
+            return monitorClass.isAssignableFrom(MultiServerClusterMonitor.class);
+        } else {
+            return monitorClass.isAssignableFrom(SingleServerClusterMonitor.class);
+        }
+    }
+
+
+    /**
+     * Resolves the appropriate instance of ClusterMonitor to initialise.
+     *
+     * @return A non null ClusterMonitor based on service configuration.
+     * @throws Exception If there was an unexpected error in initialising the MultiClusterMonitor.
+     */
+    private ClusterMonitor resolveClusterMonitor() throws Exception {
+        if (serviceConfig.isSessionFailoverEnabled()) {
+            return new MultiServerClusterMonitor(this, sessionDebug, serviceConfig, serverConfig);
+        } else {
+            return new SingleServerClusterMonitor();
         }
     }
 
@@ -1098,14 +1164,6 @@ public class SessionService {
     }
 
     /**
-     * Initialize the cluster server map given the server IDs in Set.
-     * Invoked by NamingService whenever any global configuration changes occur.
-     */
-    public void reinitializeClusterMemberMap() throws Exception {
-        clusterMonitor.reinitialize();
-    }
-
-    /**
      * This is a key method for "internal request routing" mode It determines
      * the server id which is currently hosting session identified by sid. In
      * "internal request routing" mode, this method also has a side effect of
@@ -1118,7 +1176,9 @@ public class SessionService {
      * @throws SessionException
      */
     public String getCurrentHostServer(SessionID sid) throws SessionException {
-        String serverId = clusterMonitor.getCurrentHostServer(sid);
+
+        String serverId = getClusterMonitor().getCurrentHostServer(sid);
+
         if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
             // if we have a local session replica, discard it as hosting server instance is not supposed to be local
             if (!serverConfig.isLocalServer(serverId)) {
@@ -1136,7 +1196,12 @@ public class SessionService {
      * @return true if server is up, false otherwise
      */
     public boolean checkServerUp(String serverID) {
-        return clusterMonitor.checkServerUp(serverID);
+        try {
+            return getClusterMonitor().checkServerUp(serverID);
+        } catch (SessionException e) {
+            sessionDebug.error("Failed to check Server Up for {0}", serverID, e);
+            return false;
+        }
     }
 
     /**
@@ -1146,7 +1211,12 @@ public class SessionService {
      * @return True if the Site is up, False if it failed to respond to a query.
      */
     public boolean isSiteUp(String siteId) {
-        return clusterMonitor.isSiteUp(siteId);
+        try {
+            return getClusterMonitor().isSiteUp(siteId);
+        } catch (SessionException e) {
+            sessionDebug.error("Failed to check isSiteUp for {0}", siteId, e);
+            return false;
+        }
     }
 
     /**
@@ -1563,7 +1633,7 @@ public class SessionService {
         sess.putProperty(sessionCookies.getLBCookieName(), serverConfig.getLBCookieValue());
         if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
             SessionID sid = sess.getID();
-            String primaryID = sid.getExtension(SessionID.PRIMARY_ID);
+            String primaryID = sid.getExtension().getPrimaryID();
             if (!serverConfig.isLocalServer(primaryID)) {
                 remoteSessionSet.add(sid);
             }

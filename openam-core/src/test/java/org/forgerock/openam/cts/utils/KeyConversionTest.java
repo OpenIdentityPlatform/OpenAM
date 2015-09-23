@@ -15,13 +15,11 @@
  */
 package org.forgerock.openam.cts.utils;
 
+import static org.mockito.BDDMockito.*;
+import static org.testng.Assert.*;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.SessionIDExtensions;
 import org.testng.annotations.Test;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 
 public class KeyConversionTest {
     @Test
@@ -41,7 +39,9 @@ public class KeyConversionTest {
     public void shouldNotFailToEncryptKey() {
         // Given
         SessionID key = mock(SessionID.class);
-        given(key.getExtension(SessionID.STORAGE_KEY)).willReturn("badger");
+        SessionIDExtensions extensions = mock(SessionIDExtensions.class);
+        given(key.getExtension()).willReturn(extensions);
+        given(extensions.getStorageKey()).willReturn("badger");
 
         KeyConversion conversion = new KeyConversion();
 

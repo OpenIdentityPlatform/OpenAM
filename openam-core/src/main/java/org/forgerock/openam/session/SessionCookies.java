@@ -15,6 +15,7 @@
 */
 package org.forgerock.openam.session;
 
+import static org.forgerock.openam.session.SessionConstants.*;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -29,8 +30,6 @@ import org.forgerock.openam.utils.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import static org.forgerock.openam.session.SessionConstants.RESET_LB_COOKIE_NAME;
 
 /**
  * Responsible for providing functionality around Session cookie management.
@@ -146,7 +145,7 @@ public class SessionCookies {
         }
 
         if (StringUtils.isBlank(cookieValue)) {
-            cookieValue = WebtopNaming.getLBCookieValue(sid.getExtension(SessionID.PRIMARY_ID));
+            cookieValue = WebtopNaming.getLBCookieValue(sid.getExtension().getPrimaryID());
         }
 
         return lbCookieName + "=" + cookieValue;

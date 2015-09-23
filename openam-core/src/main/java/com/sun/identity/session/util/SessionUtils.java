@@ -29,8 +29,7 @@
  */
 package com.sun.identity.session.util;
 
-import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
-
+import static org.forgerock.openam.session.SessionConstants.*;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
@@ -49,18 +48,16 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.utils.ClientUtils;
+
+import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.URL;
 import java.security.AccessController;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
-import javax.servlet.http.HttpServletRequest;
-
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.utils.ClientUtils;
 
 /**
  * This class Implements utility methods for handling HTTP Session.
@@ -136,14 +133,14 @@ public class SessionUtils {
                 }
             } else {
                 // use platform server list as a default fallback
-                Vector psl = WebtopNaming.getPlatformServerList();
+                Set<String> psl = WebtopNaming.getPlatformServerList();
                 if (psl == null) {
                     throw new SessionException(SessionBundle.rbName,
                             "emptyTrustedSourceList", null);
                 }
-                for (Enumeration e = psl.elements(); e.hasMoreElements();) {
+                for (String e : psl) {
                     try {
-                        URL url = new URL((String) e.nextElement());
+                        URL url = new URL(e);
                         result.add(InetAddress.getByName(url.getHost()));
                     } catch (Exception ex) {
                         debug.error("SessionUtils.getTrustedSourceList : " + 
@@ -182,7 +179,7 @@ public class SessionUtils {
      */
     public static String getEncryptedStorageKey(SessionID sessionID) throws Exception {
 
-        String sKey = sessionID.getExtension(SessionID.STORAGE_KEY);
+        String sKey = sessionID.getExtension().getStorageKey();
         if (sKey == null){
             throw new SessionException("SessionUtils.getEncryptedStorageKey: StorageKey is null");
         }

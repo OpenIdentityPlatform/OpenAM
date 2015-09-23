@@ -589,8 +589,8 @@ public class SSOTokenManager {
                 return getStatelessFactory().containsJwt((SessionID) object);
             }
             return getStatelessFactory().containsJwt(object.toString());
-        } catch (SessionException e) {
-            debug.message("Failed to determine if {0} contained a JWT:\n{1}",
+        } catch (SessionException | IllegalArgumentException e) {
+            debug.message("Error whilst inspecting JWT:\nClass: {0}\n{1}",
                     object.getClass(), object, e);
             return false;
         }
