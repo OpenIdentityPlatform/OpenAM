@@ -25,38 +25,30 @@ define("org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate", [
 ], function (_, constants, AbstractDelegate, RealmHelper) {
     var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json/");
 
-    obj.sortApps = function (apps) {
-        var sortedApps = _.map(_.sortBy(_.keys(apps), function (key) { return key; }), function (key) {
+    function sortApps (apps) {
+        return _.map(_.sortBy(_.keys(apps), function (key) { return key; }), function (key) {
             var app = {
                 id: key
             };
             _.each(apps[key], function (v,k) { app[k] = v[0]; });
             return app;
         });
-
-        return sortedApps;
-    };
+    }
 
     obj.getMyApplications = function () {
         var self = this;
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/assigned"),
-            headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" },
-            type: "GET"
-        }).then(function (apps) {
-            return self.sortApps(apps);
-        });
+            headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
+        }).then(sortApps);
     };
 
     obj.getAvailableApplications = function () {
         var self = this;
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/available"),
-            headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" },
-            type: "GET"
-        }).then(function (apps) {
-            return self.sortApps(apps);
-        });
+            headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
+        }).then(sortApps);
     };
 
     return obj;

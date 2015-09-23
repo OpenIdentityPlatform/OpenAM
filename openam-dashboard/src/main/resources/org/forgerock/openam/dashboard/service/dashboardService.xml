@@ -121,7 +121,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="dashboardIcon"/>
-                        <Value>salesforce.gif</Value>
+                        <Value>images/logos/salesforce.png</Value>
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="dashboardLogin"/>
@@ -149,7 +149,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="dashboardIcon"/>
-                        <Value>Google.gif</Value>
+                        <Value>images/logos/googleplus.png</Value>
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="dashboardLogin"/>
@@ -177,7 +177,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="dashboardIcon"/>
-                        <Value>ZenDesk.gif</Value>
+                        <Value>images/logos/zendesk.png</Value>
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="dashboardLogin"/>
@@ -192,4 +192,3 @@
         </Configuration>
     </Service>
 </ServicesConfiguration>
-
