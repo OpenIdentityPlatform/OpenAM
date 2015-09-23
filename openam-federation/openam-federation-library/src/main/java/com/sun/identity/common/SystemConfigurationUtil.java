@@ -24,10 +24,7 @@
  *
  * $Id: SystemConfigurationUtil.java,v 1.7 2008/08/06 17:26:14 exu Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.common;
@@ -329,7 +326,7 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
             initPlatformNaming();
         }
 
-        String server = (String)idToServerTable.get(id);
+        String server = idToServerTable.get(id);
         if (server == null) {
             Object[] data = { id };
             throw new SystemConfigurationException("noServerFromID", data);
@@ -433,7 +430,9 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
                 try {
                     ServerOrSiteEntry entry = new ServerOrSiteEntry(serverEntry);
                     serverList.add(entry.getUrl());
-                    idToServerTable.put(entry.getId(), entry.getUrl());
+                    // Use the original URL value to preserve the case of the context, OpenAM may have been deployed
+                    // using a mixed case value, for example /OpenAM
+                    idToServerTable.put(entry.getId(), entry.getOriginalUrl());
                     serverToIdTable.put(entry.getUrl(), entry.getId());
                     if (getDebug().messageEnabled()) {
                         getDebug().message("SystemConfigUtil.storeServerAndSiteList: " +
