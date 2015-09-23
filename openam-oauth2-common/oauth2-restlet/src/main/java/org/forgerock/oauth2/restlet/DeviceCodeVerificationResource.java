@@ -15,11 +15,15 @@
  */
 package org.forgerock.oauth2.restlet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.DeviceCode;
@@ -41,7 +45,10 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.xui.XUIState;
 import org.restlet.Context;
 import org.restlet.Request;
+import org.restlet.data.Language;
+import org.restlet.data.Preference;
 import org.restlet.ext.freemarker.TemplateRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -94,11 +101,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                 request);
 
         if (deviceCode == null || deviceCode.isIssued()) {
-            TemplateRepresentation response = getTemplateFactory(getContext()).getTemplateRepresentation(FORM);
-            Map<String, String> dataModel = new HashMap<>();
-            dataModel.put("errorCode", "not_found");
-            response.setDataModel(dataModel);
-            return response;
+            return getTemplateRepresentation(FORM, request, "not_found");
         }
 
         addRequestParamsFromDeviceCode(restletRequest, deviceCode);
@@ -147,7 +150,23 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                     e.getParameterLocation());
         }
 
-        return getTemplateFactory(getContext()).getTemplateRepresentation(THANKS_PAGE);
+        return getTemplateRepresentation(THANKS_PAGE, request, null);
+    }
+
+    private Representation getTemplateRepresentation(String template, OAuth2Request request, String errorCode) {
+        TemplateRepresentation response = getTemplateFactory(getContext()).getTemplateRepresentation(template);
+        Map<String, String> dataModel = new HashMap<>();
+        dataModel.put("errorCode", errorCode);
+        dataModel.put("baseUrl", baseURLProviderFactory.get(request.<String>getParameter("realm"))
+                .getURL(ServletUtils.getRequest(getRequest())));
+        List<String> locale = new ArrayList<>();
+        for (Preference<Language> language : getRequest().getClientInfo().getAcceptedLanguages()) {
+            locale.add(language.getMetadata().getName());
+        }
+        dataModel.put("locale", OAuth2Utils.join(locale, " "));
+        dataModel.put("realm", request.<String>getParameter(OAuth2Constants.Params.REALM));
+        response.setDataModel(dataModel);
+        return response;
     }
 
     private void addRequestParamsFromDeviceCode(Request restletRequest, DeviceCode deviceCode) {
@@ -179,10 +198,11 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     @Get
     public Representation userCodeForm() throws OAuth2RestletException, InvalidGrantException, NotFoundException,
             ServerException {
-        if (requestFactory.create(getRequest()).getParameter(OAuth2Constants.DeviceCode.USER_CODE) != null) {
+        final OAuth2Request request = requestFactory.create(getRequest());
+        if (request.getParameter(OAuth2Constants.DeviceCode.USER_CODE) != null) {
             return verify(null);
         } else {
-            return getTemplateFactory(getContext()).getTemplateRepresentation(FORM);
+            return getTemplateRepresentation(FORM, request, null);
         }
     }
 

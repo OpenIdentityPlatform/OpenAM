@@ -57,21 +57,7 @@ require([
 ], function ($, HandleBars, Configuration, Constants, DeviceTemplate, DeviceDoneTemplate,
             LoginBaseTemplate, FooterTemplate, i18nManager, ThemeManager, URIUtils) {
     var data = window.pageData,
-        template = URIUtils.getCurrentQueryParam("done") ? DeviceDoneTemplate : DeviceTemplate;
-
-    // FIXME: Remove when integrated
-    data = {
-        realm: "/",
-        locale: "en",
-        theme: null
-    };
-
-    // FIXME: Remove when integrated
-    // data.error = {
-    //     uri: "URI",
-    //     message: "Message",
-    //     description: "Description"
-    // };
+        template = data.done ? DeviceDoneTemplate : DeviceTemplate;
 
     i18nManager.init({
         paramLang: {
@@ -81,7 +67,7 @@ require([
         nameSpace: "device"
     });
 
-    Configuration.globalData = { realm : data.realm };
+    Configuration.globalData = { realm : data.realm  };
 
     ThemeManager.getTheme().always(function (theme) {
         data.theme = theme;

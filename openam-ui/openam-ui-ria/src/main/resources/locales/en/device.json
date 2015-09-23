@@ -9,5 +9,6 @@
         "code": "Enter your code here",
         "description": "Enter the code:",
         "submit": "Submit"
-    }
+    },
+    "not_found": "The code you entered cannot be found"
 }

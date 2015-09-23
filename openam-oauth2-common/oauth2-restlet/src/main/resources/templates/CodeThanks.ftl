@@ -16,13 +16,24 @@
 -->
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="OAuth 2.0 Device Flow Code">
-    <title>Thanks</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OAuth2 Authorization">
+  <title>OAuth2 Authorization Server</title>
 </head>
-<body>
-Thanks!
+
+<body style="display:none">
+<div id="wrapper">Loading...</div>
+<footer id="footer" class="footer"></footer>
+<script type="text/javascript">
+  pageData = {
+      <#if locale??>locale: "${locale?js_string}",</#if>
+      baseUrl : "${baseUrl?js_string}/XUI",
+      realm : "${realm?js_string}/XUI",
+      done: true
+  };
+</script>
+<script data-main="${baseUrl?html}/XUI/main-device" src="${baseUrl?html}/XUI/libs/requirejs-2.1.14-min.js"></script>
 </body>
 </html>
