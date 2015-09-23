@@ -16,20 +16,9 @@
 
 package org.forgerock.oauth2.restlet;
 
-import static org.forgerock.json.JsonValue.*;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -39,13 +28,9 @@ import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
-import org.forgerock.openam.rest.service.RouterContextResource;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.xui.XUIState;
-import org.owasp.esapi.ESAPI;
 import org.restlet.Request;
-import org.restlet.data.Reference;
-import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -58,7 +43,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 12.0.0
  */
-public class AuthorizeResource extends RouterContextResource {
+public class AuthorizeResource extends ConsentRequiredResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
@@ -67,8 +52,6 @@ public class AuthorizeResource extends RouterContextResource {
     private final ExceptionHandler exceptionHandler;
     private final OAuth2Representation representation;
     private final Set<AuthorizeRequestHook> hooks;
-    private final XUIState xuiState;
-    private final BaseURLProviderFactory baseURLProviderFactory;
 
     /**
      * Constructs a new AuthorizeResource.
@@ -82,14 +65,12 @@ public class AuthorizeResource extends RouterContextResource {
     public AuthorizeResource(OAuth2RequestFactory<Request> requestFactory, AuthorizationService authorizationService,
             ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
             XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory) {
-        super(router);
+        super(router, baseURLProviderFactory, xuiState);
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
         this.exceptionHandler = exceptionHandler;
         this.representation = representation;
         this.hooks = hooks;
-        this.xuiState = xuiState;
-        this.baseURLProviderFactory = baseURLProviderFactory;
     }
 
     /**
@@ -148,87 +129,6 @@ public class AuthorizeResource extends RouterContextResource {
                     request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"),
                     e.getParameterLocation());
         }
-    }
-
-    /**
-     * Gets the data model to use when rendering the error page.
-     *
-     * @param consentRequired The details for requesting consent.
-     * @param request The OAuth2 request.
-     * @return The data model.
-     */
-    private Map<String, Object> getDataModel(ResourceOwnerConsentRequired consentRequired, OAuth2Request request) {
-        String displayName = consentRequired.getClientName();
-        String displayDescription = consentRequired.getClientDescription();
-        String userDisplayName = consentRequired.getUserDisplayName();
-        Map<String, Object> data = new HashMap<>(getRequest().getAttributes());
-        data.putAll(getQuery().getValuesMap());
-        Reference resRef = getRequest().getResourceRef();
-        String target = resRef.getPath();
-        String query = resRef.getQuery();
-        if (!StringUtils.isBlank(query)) {
-            target = target + "?" + query;
-        }
-        data.put("target", target);
-        data.put("display_name", ESAPI.encoder().encodeForHTML(displayName));
-        data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
-        addDisplayScopesAndClaims(consentRequired, data);
-        data.put("user_name", userDisplayName);
-        data.put("xui", xuiState.isXUIEnabled());
-        data.put("baseUrl", baseURLProviderFactory.get(request.<String>getParameter("realm"))
-                .getURL(ServletUtils.getRequest(getRequest())));
-        return data;
-    }
-
-    private void addDisplayScopesAndClaims(ResourceOwnerConsentRequired consentRequired, Map<String, Object> data) {
-        JsonValue scopes = json(array());
-        Set<String> allScopeClaims = new HashSet<>();
-        final Map<String, List<String>> compositeScopes = consentRequired.getClaims().getCompositeScopes();
-        final Map<String, String> claimDescriptions = consentRequired.getClaimDescriptions();
-        final Map<String, Object> claimValues = new LinkedHashMap<>(consentRequired.getClaims().getValues());
-
-        for (Map.Entry<String, String> scope : consentRequired.getScopeDescriptions().entrySet()) {
-            JsonValue value = json(object(field("name", encodeForHTML(scope.getValue()))));
-            scopes.add(value.getObject());
-            List<String> scopeClaims = compositeScopes.get(scope.getKey());
-            if (scopeClaims != null) {
-                final LinkedHashMap<String, Object> claims = new LinkedHashMap<>();
-                value.put("values", claims);
-                for (String claim : scopeClaims) {
-                    Object claimValue = claimValues.get(claim);
-                    if (claimValue != null) {
-                        claims.put(
-                                encodeForHTML(claimDescriptions.get(claim)),
-                                encodeForHTML(claimValue.toString()));
-                        allScopeClaims.add(claim);
-                    }
-                }
-            }
-        }
-        data.put("display_scopes", scopes.toString());
-
-        for (String claim : allScopeClaims) {
-            claimValues.remove(claim);
-        }
-
-        JsonValue claims = json(array());
-        for (Map.Entry<String, Object> claim : claimValues.entrySet()) {
-            claims.add(object(
-                    field("name", encodeForHTML(claimDescriptions.get(claim.getKey()))),
-                    field("values", encodeForHTML(claimValues.get(claim.getKey()).toString()))
-            ));
-        }
-        data.put("display_claims", claims.toString());
-    }
-
-    /**
-     * Encodes a description so that it can be displayed in a HTML page.
-     *
-     * @param description The {@code String} to encode.
-     * @return The encoded {@code String}.
-     */
-    private String encodeForHTML(String description) {
-        return ESAPI.encoder().encodeForHTML(description);
     }
 
     /**

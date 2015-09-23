@@ -17,7 +17,6 @@
 package org.forgerock.openam.oauth2.rest;
 
 import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH2;
-import static org.forgerock.openam.audit.AuditConstants.Component.UMA;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import javax.inject.Inject;
@@ -30,6 +29,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
 import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
 import org.forgerock.oauth2.restlet.AuthorizeResource;
+import org.forgerock.oauth2.restlet.DeviceCodeVerificationResource;
 import org.forgerock.oauth2.restlet.DeviceCodeResource;
 import org.forgerock.oauth2.restlet.DeviceTokenResource;
 import org.forgerock.oauth2.restlet.TokenEndpointFilter;
@@ -107,8 +107,9 @@ public class OAuth2RouterProvider implements Provider<Router> {
 
         router.attach("/.well-known/openid-configuration", wrap(OpenIDConnectConfiguration.class));
 
-        // Device Code
+        // OAuth 2 Device Flow
 
+        router.attach("/device/user", wrap(DeviceCodeVerificationResource.class));
         router.attach("/device/code", wrap(DeviceCodeResource.class));
         router.attach("/device/token", wrap(DeviceTokenResource.class));
 

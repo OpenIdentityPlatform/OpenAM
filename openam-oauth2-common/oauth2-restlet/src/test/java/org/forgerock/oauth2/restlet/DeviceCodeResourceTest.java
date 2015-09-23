@@ -59,6 +59,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class DeviceCodeResourceTest {
@@ -93,7 +94,7 @@ public class DeviceCodeResourceTest {
     public void shouldIssueCode() throws Exception {
         // Given
         mockDeviceCodeCreation();
-        mockRequestRealmAndClientId("REALM", "CLIENT_ID");
+        mockRequestRealmClientIdScopeAndResponseType("REALM", "CLIENT_ID", "SCOPE", "RESPONSE_TYPE");
         mockProviderSettings();
 
         // When
@@ -116,14 +117,12 @@ public class DeviceCodeResourceTest {
     public void shouldIssueCodeWithDefaultUrl() throws Exception {
         // Given
         mockDeviceCodeCreation();
-        mockRequestRealmAndClientId("REALM", "CLIENT_ID");
+        mockRequestRealmClientIdScopeAndResponseType("REALM", "CLIENT_ID", "some scopes", "RESPONSE_TYPE");
         mockProviderSettingsWithoutUrl();
         mockBaseUrlProvider();
 
         request.getResourceRef()
-                .addQueryParameter("scope", "some scopes")
                 .addQueryParameter("nonce", "NONCE")
-                .addQueryParameter("response_type", "RESPONSE_TYPE")
                 .addQueryParameter("state", "STATE")
                 .addQueryParameter("acr_values", "ACR_VALUES")
                 .addQueryParameter("prompt", "PROMPT")
@@ -153,10 +152,20 @@ public class DeviceCodeResourceTest {
         );
     }
 
-    @Test
-    public void shouldNotIssueCodeWithoutClientId() throws Exception {
+    @DataProvider
+    public Object[][] badParameters() {
+        return new Object[][] {
+                { null, "SCOPE", "RESPONSE_TYPE" },
+                { "CLIENT_ID", null, "RESPONSE_TYPE" },
+                { "CLIENT_ID", "SCOPE", null }
+        };
+    }
+
+    @Test(dataProvider = "badParameters")
+    public void shouldNotIssueCodeWithoutRequiredParameters(String clientId, String scope, String responseType)
+            throws Exception {
         // Given
-        mockRequestRealmAndClientId("REALM", null);
+        mockRequestRealmClientIdScopeAndResponseType("REALM", clientId, scope, responseType);
 
         // When
         try {
@@ -185,9 +194,14 @@ public class DeviceCodeResourceTest {
         given(providerSettings.getDeviceCodePollInterval()).willReturn(5);
     }
 
-    private void mockRequestRealmAndClientId(String realm, String clientId) {
+    private void mockRequestRealmClientIdScopeAndResponseType(String realm, String clientId, String scope,
+            String responseType) {
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) realm)));
-        given(request.getResourceRef()).willReturn(new Reference().addQueryParameter("client_id", clientId));
+        given(request.getResourceRef()).willReturn(new Reference()
+                    .addQueryParameter("client_id", clientId)
+                    .addQueryParameter("scope", scope)
+                    .addQueryParameter("response_type", responseType)
+        );
     }
 
     private void mockDeviceCodeCreation() throws ServerException, NotFoundException {

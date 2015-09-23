@@ -19,6 +19,7 @@ package org.forgerock.openam.oauth2;
 import static com.sun.identity.shared.DateUtils.stringToDate;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.DeviceCode.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.FRAGMENT;
 import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.QUERY;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
@@ -320,6 +321,9 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         removeLoginPrompt(request.<Request>getRequest());
 
         String gotoUrl = request.<Request>getRequest().getResourceRef().toString();
+        if (request.getParameter(USER_CODE) != null) {
+            gotoUrl += (gotoUrl.indexOf('?') > -1 ? "&" : "?") + USER_CODE + "=" + request.getParameter(USER_CODE);
+        }
         String acrValues = request.getParameter(ACR_VALUES);
         String realm = request.getParameter(OAuth2Constants.Custom.REALM);
         String moduleName = request.getParameter(MODULE);

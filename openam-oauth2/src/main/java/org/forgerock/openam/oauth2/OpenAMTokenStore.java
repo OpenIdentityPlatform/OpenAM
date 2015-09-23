@@ -896,7 +896,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
                 throw new InvalidGrantException();
             }
 
-            DeviceCode deviceCode = new DeviceCode(token);
+            DeviceCode deviceCode = new DeviceCode(json(token.asSet().iterator().next()));
             request.setToken(DeviceCode.class, deviceCode);
             return deviceCode;
         } catch (CoreTokenException e) {

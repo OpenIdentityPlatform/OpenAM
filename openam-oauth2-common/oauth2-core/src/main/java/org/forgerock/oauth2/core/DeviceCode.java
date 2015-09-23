@@ -19,6 +19,7 @@ package org.forgerock.oauth2.core;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.oauth2.core.Utils.*;
 
+import com.sun.jdi.IntegerValue;
 import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -66,7 +67,7 @@ public class DeviceCode extends JsonValue implements Token {
         setStringProperty(OAuth2Constants.Custom.PROMPT, prompt);
         setStringProperty(OAuth2Constants.Custom.UI_LOCALES, uiLocales);
         setStringProperty(OAuth2Constants.Params.LOGIN_HINT, loginHint);
-        put(OAuth2Constants.Params.MAX_AGE, maxAge);
+        setStringProperty(OAuth2Constants.Params.MAX_AGE, maxAge == null ? null : String.valueOf(maxAge));
         setStringProperty(OAuth2Constants.Custom.CLAIMS, claims);
         setStringProperty(REALM, realm == null || realm.isEmpty() ? "/" : realm);
         setStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE, codeChallenge);
@@ -136,7 +137,8 @@ public class DeviceCode extends JsonValue implements Token {
      * @return The max age.
      */
     public Integer getMaxAge() {
-        return get(OAuth2Constants.Params.MAX_AGE).asInteger();
+        final String value = getStringProperty(OAuth2Constants.Params.MAX_AGE);
+        return value == null ? null : Integer.valueOf(value);
     }
 
     /**
@@ -207,7 +209,7 @@ public class DeviceCode extends JsonValue implements Token {
      * Updates the last poll time of this device code.
      */
     public void poll() {
-        this.put("lastQueried", System.currentTimeMillis());
+        this.put("lastQueried", CollectionUtils.asSet(String.valueOf(System.currentTimeMillis())));
     }
 
     /**
@@ -215,7 +217,8 @@ public class DeviceCode extends JsonValue implements Token {
      * @return The last poll time in milliseconds.
      */
     public long getLastPollTime() {
-        return this.get("lastQueried").asLong();
+        final String lastQueried = getStringProperty("lastQueried");
+        return lastQueried == null ? -1 : Long.valueOf(lastQueried);
     }
 
     /**
@@ -302,7 +305,9 @@ public class DeviceCode extends JsonValue implements Token {
     }
 
     private void setStringProperty(String key, String value) {
-        put(key, CollectionUtils.asSet(value));
+        if (value != null) {
+            put(key, CollectionUtils.asSet(value));
+        }
     }
 
 }

@@ -72,7 +72,9 @@ public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator 
         final ClientRegistration clientRegistration = clientRegistrationStore.get(request.<String>getParameter("client_id"),
                 request);
 
-        redirectUriValidator.validate(clientRegistration, request.<String>getParameter(REDIRECT_URI));
+        if (request.getParameter(OAuth2Constants.DeviceCode.USER_CODE) == null) {
+            redirectUriValidator.validate(clientRegistration, request.<String>getParameter(REDIRECT_URI));
+        }
 
         responseTypeValidator.validate(clientRegistration,
                 splitResponseType(request.<String>getParameter(RESPONSE_TYPE)), providerSettingsFactory.get(request));

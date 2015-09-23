@@ -107,6 +107,9 @@
             {{#if oauth2Data.acr}}
             <input type="hidden" name="acr" value="{{oauth2Data.acr}}"/>
             {{/if}}
+            {{#if oauth2Data.userCode}}
+            <input type="hidden" name="user_code" value="{{oauth2Data.userCode}}"/>
+            {{/if}}
 
             <!-- Required parameters -->
             <input type="hidden" name="response_type" value="{{oauth2Data.responseType}}"/>

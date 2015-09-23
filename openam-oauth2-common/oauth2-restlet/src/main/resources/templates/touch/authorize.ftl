@@ -53,6 +53,7 @@
                     formTarget: "${(target!'.')?js_string}",
                     <#if display_name??>displayName: "${display_name?js_string}",</#if>
                     <#if user_name??>userName: "${user_name?js_string}",</#if>
+                    <#if user_code??>userCode: "${user_code?js_string}",</#if>
                     displayScopes: ${display_scopes},
                     displayClaims: ${display_claims}
                 }

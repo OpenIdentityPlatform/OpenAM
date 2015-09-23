@@ -213,8 +213,8 @@ public class DeviceTokenResourceTest {
         mockClientRegistration();
         mockDeviceCodeRead(deviceCode(
                 field("expireTime", asSet(String.valueOf(System.currentTimeMillis() + 5000))),
-                field("lastQueried", System.currentTimeMillis())
-        ));
+                field("lastQueried", asSet(String.valueOf(System.currentTimeMillis())))
+                ));
 
         // When
         try {
@@ -273,7 +273,6 @@ public class DeviceTokenResourceTest {
         try {
             final JsonValue json = json(object(
                     field("tokenName", asSet("device_code")),
-                    field("lastQueried", -1L),
                     field("id", asSet("123")),
                     field("user_code", asSet("456")),
                     field("realm", asSet("REALM")),

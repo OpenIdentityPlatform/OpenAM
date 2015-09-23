@@ -176,10 +176,12 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
             r = new JsonValue(serialisation.deserialise(data, Map.class));
             Set<String> keys = new HashSet<String>(r.keys());
             for (String key : keys){
-                List<String> x = r.get(key).asList(String.class);
-                Set<String> set = new HashSet<String>(x);
-                r.remove(key);
-                r.add(key, set);
+                if (r.get(key).isList()) {
+                    List<String> x = r.get(key).asList(String.class);
+                    Set<String> set = new HashSet<String>(x);
+                    r.remove(key);
+                    r.add(key, set);
+                }
             }
         } catch (IllegalStateException e) {
             // OAuth tokens are expected to be of type Map

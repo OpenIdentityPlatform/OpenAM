@@ -19,6 +19,7 @@ package org.forgerock.oauth2.restlet;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.DeviceCode.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.openam.utils.StringUtils.isEmpty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,17 +80,19 @@ public class DeviceCodeResource extends ServerResource {
         OAuth2Request request = requestFactory.create(restletRequest);
 
         String state = request.getParameter(STATE);
-        // Client ID is required, all other parameters are optional
+        // Client ID, Response Type and Scope are required, all other parameters are optional
         String clientId = request.getParameter(CLIENT_ID);
+        String scope = request.getParameter(SCOPE);
+        String responseType = request.getParameter(RESPONSE_TYPE);
         try {
-            if (StringUtils.isEmpty(clientId)) {
-                throw new OAuth2RestletException(400, "bad_request", "client_id is a required parameter", state);
+            if (isEmpty(clientId) || isEmpty(scope) || isEmpty(responseType)) {
+                throw new OAuth2RestletException(400, "bad_request",
+                        "client_id, scope and response_type are required parameters", state);
             } else {
                 // check client_id exists
                 clientRegistrationStore.get(clientId, request);
             }
 
-            String scope = request.getParameter(SCOPE);
             if (scope == null) {
                 scope = "";
             }
