@@ -24,11 +24,12 @@ import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
-import org.forgerock.openam.utils.StringUtils;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Responsible for creating StatelessSession and SessionInfo instances from JWT
@@ -94,7 +95,7 @@ public class StatelessSessionFactory {
      * @return {@code true} if the session id contains a client-side session JWT.
      */
     public boolean containsJwt(SessionID sid) {
-        return getJWTFromSessionID(sid) != null;
+        return getJWTFromSessionID(sid, false) != null;
     }
 
     /**
@@ -121,7 +122,7 @@ public class StatelessSessionFactory {
      * @return SessionInfo which corresponds to this SessionID.
      */
     public SessionInfo getSessionInfo(SessionID sessionID) {
-        String jwt = getJWTFromSessionID(sessionID);
+        String jwt = getJWTFromSessionID(sessionID, true);
         if (cache.contains(jwt)) {
             return cache.getSessionInfo(jwt);
         }
@@ -213,9 +214,10 @@ public class StatelessSessionFactory {
     /**
      * Understands the detail around extracting the encoded JWT from the SessionID.
      * @param sessionID Possibly null SessionID.
+     * @param cleanupC66Encoding Whether to undo damage done to the JWT by c66 decoding if detected.
      * @return Null if there was no JWT present, otherwise a valid JWT.
      */
-    public static String getJWTFromSessionID(SessionID sessionID) {
+    public static String getJWTFromSessionID(SessionID sessionID, boolean cleanupC66Encoding) {
         if (sessionID == null || sessionID.toString().isEmpty()) {
             return null;
         }
@@ -226,6 +228,10 @@ public class StatelessSessionFactory {
         if (tail.isEmpty()) {
             return null;
         }
-        return tail.replace('=', '.'); // undo damage done to JWT by c66 decoding
+        if (cleanupC66Encoding && sessionID.isC66Encoded()) {
+            // Undo damage done to the JWT by lossy c66 decoding:
+            tail = tail.replace('=', '.').replace('/', '_').replace('+', '-');
+        }
+        return tail;
     }
 }

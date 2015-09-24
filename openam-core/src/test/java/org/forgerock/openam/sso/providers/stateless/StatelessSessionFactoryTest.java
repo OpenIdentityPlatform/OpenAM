@@ -53,18 +53,68 @@ public class StatelessSessionFactoryTest {
     public void shouldExtractJWTFromSessionID() {
         SessionID id = mock(SessionID.class);
         given(id.getTail()).willReturn("badger=");
-        assertThat(StatelessSessionFactory.getJWTFromSessionID(id)).isEqualTo("badger.");
+        given(id.isC66Encoded()).willReturn(true);
+        assertThat(StatelessSessionFactory.getJWTFromSessionID(id, true)).isEqualTo("badger.");
     }
 
     @Test
     public void shouldReturnNullIfNoJWTInSessionID() {
         SessionID id = mock(SessionID.class);
         given(id.getTail()).willReturn(null);
-        assertThat(StatelessSessionFactory.getJWTFromSessionID(id)).isNull();
+        assertThat(StatelessSessionFactory.getJWTFromSessionID(id, true)).isNull();
     }
 
     @Test
     public void shouldReturnNullIfNoSessionIDProvided() {
-        assertThat(StatelessSessionFactory.getJWTFromSessionID(null)).isNull();
+        assertThat(StatelessSessionFactory.getJWTFromSessionID(null, true)).isNull();
+    }
+
+    /**
+     * OpenAM's C66 encoding/decoding in SessionID is lossy. In particular, c66 decoding changes base64url-encoded JWTs
+     * into normal Base64 encoding. While this loses no information when decoding the JWT, it does cause any
+     * signature to fail due to the input bytes changing. Rather than fixing the c66 encoding to be lossless (which
+     * could break agents and other software that expects to be able to decode session ids), we instead work around
+     * the problem by undoing the damage. We can always do this losslessly for JWTs.
+     */
+    @Test
+    public void shouldUndoC66DecodingDamageToJwt() {
+        // Given
+        final String fullJwtAlphabet = ".-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        // NB: '*' indicates that the sid is c66-encoded, '@' separates the encrypted id from the tail part (no exts).
+        final SessionID sessionID = new SessionID("*@" + fullJwtAlphabet);
+
+        // When
+        final String result = StatelessSessionFactory.getJWTFromSessionID(sessionID, true);
+
+        // Then
+        assertThat(result).isEqualTo(fullJwtAlphabet);
+    }
+
+    @Test
+    public void shouldNotUndoC66DecodingIfNotAsked() {
+        // Given
+        final String fullJwtAlphabet = ".-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        // NB: '*' indicates that the sid is c66-encoded, '@' separates the encrypted id from the tail part (no exts).
+        final SessionID sessionID = new SessionID("*@" + fullJwtAlphabet);
+
+        // When
+        final String result = StatelessSessionFactory.getJWTFromSessionID(sessionID, false);
+
+        // Then
+        assertThat(result).isEqualTo(sessionID.getTail());
+    }
+
+    @Test
+    public void shouldNotUndoC66DecodingIfNotEncoded() {
+        // Given
+        final String fullJwtAlphabet = ".-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        final SessionID sessionID = new SessionID("notencoded@" + fullJwtAlphabet);
+
+        // When
+        final String result = StatelessSessionFactory.getJWTFromSessionID(sessionID, true);
+
+        // Then
+        assertThat(result).isEqualTo(fullJwtAlphabet);
+        assertThat(sessionID.isC66Encoded()).isFalse();
     }
 }

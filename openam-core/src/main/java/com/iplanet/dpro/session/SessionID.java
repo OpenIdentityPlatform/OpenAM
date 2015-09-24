@@ -358,7 +358,7 @@ public class SessionID implements Serializable {
         try {
             String sidString = encryptedString;
             // sidString would have * if it has been c66 encoded
-            if (sidString.contains("*")) {
+            if (isC66Encoded()) {
                 sidString = c66DecodeCookieString(encryptedString);
             }
             int outerIndex = sidString.lastIndexOf("@");
@@ -631,6 +631,17 @@ public class SessionID implements Serializable {
             }
         }
         return new String(chars); 
+    }
+
+
+    /**
+     * Determines whether the session ID is c66 encoded or not.
+     *
+     * @return {@code true} if the session ID is non-null and c66-encoded.
+     * @see Constants#C66_ENCODE_AM_COOKIE
+     */
+    public boolean isC66Encoded() {
+        return encryptedString != null && encryptedString.contains("*");
     }
 
     public SessionID generateRelatedSessionID(SessionServerConfig serverConfig) throws SessionException {
