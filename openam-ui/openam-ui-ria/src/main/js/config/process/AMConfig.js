@@ -17,13 +17,14 @@
 /*global define, window */
 define("config/process/AMConfig", [
     "jquery",
+    "underscore",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/openam/ui/common/util/ThemeManager",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, Constants, EventManager, Router, SMSGlobalDelegate, ThemeManager, URIUtils) {
+], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, ThemeManager, URIUtils) {
     return [{
         startEvent: Constants.EVENT_LOGOUT,
         description: "used to override common logout event",
@@ -104,18 +105,27 @@ define("config/process/AMConfig", [
         dependencies: [
             "org/forgerock/commons/ui/common/main/Router",
             "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
-            "org/forgerock/openam/ui/admin/views/realms/RealmsListView"
+            "org/forgerock/openam/ui/admin/views/realms/RealmsListView",
+            "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
         ],
-        processDescription: function (event, Router, CreateUpdateRealmDialog, RealmsListView) {
+        processDescription: function (event, Router, CreateUpdateRealmDialog, RealmsListView, SMSGlobalDelegate) {
             Router.routeTo(Router.configuration.routes.realms, {
                 args: [],
                 trigger: true
             });
 
-            CreateUpdateRealmDialog.show({
-                callback : function () {
-                    RealmsListView.render();
-                }
+            SMSGlobalDelegate.realms.all().done(function (data) {
+                var allRealmPaths = [];
+                _.each(data.result, function (realm) {
+                    allRealmPaths.push(realm.path);
+                });
+
+                CreateUpdateRealmDialog.show({
+                    allRealmPaths : allRealmPaths,
+                    callback : function () {
+                        RealmsListView.render();
+                    }
+                });
             });
         }
     }, {
