@@ -23,6 +23,7 @@ import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.scripting.rest.batch.BatchResource;
 
 /**
@@ -37,7 +38,7 @@ public class ScriptingRestRouteProvider extends AbstractRestRouteProvider {
 
         realmRouter.route("scripts")
                 .auditAs(SCRIPT)
-                .authorizeWith(AdminOnlyAuthzModule.class)
+                .authorizeWith(PrivilegeAuthzModule.class)
                 .toCollection(ScriptResource.class);
 
         realmRouter.route("batch")
