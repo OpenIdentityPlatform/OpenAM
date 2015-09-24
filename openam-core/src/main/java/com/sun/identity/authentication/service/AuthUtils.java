@@ -24,7 +24,7 @@
  *
  * $Id: AuthUtils.java,v 1.33 2009/12/15 16:39:47 qcheng Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -2087,27 +2087,24 @@ public class AuthUtils extends AuthClientUtils {
             }
         } else {
             String plis = null;
-            
             if (intSession != null) {
                 plis = intSession.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
+            } else {
+                plis = token.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
+                if (utilDebug.messageEnabled()) {
+                    utilDebug.message("InternalSession is null, obtaining PAP instance from ssotoken");
+                }
             }
             if (plis != null && plis.length() > 0) {
                 StringTokenizer st = new StringTokenizer(plis, "|");
-                
-                if (token != null) {
-                    while (st.hasMoreTokens()) {
-                        String pli = (String)st.nextToken();
-                        
-                        try {
-                            AMPostAuthProcessInterface postProcess = 
-                                    (AMPostAuthProcessInterface)
-                                    Thread.currentThread().
-                                    getContextClassLoader().
-                                    loadClass(pli).newInstance();
+                while (st.hasMoreTokens()) {
+                    String pli = (String)st.nextToken();
+                    try {
+                        AMPostAuthProcessInterface postProcess = (AMPostAuthProcessInterface) Thread.currentThread().
+                                    getContextClassLoader().loadClass(pli).newInstance();
                             postProcess.onLogout(request, response, token);
-                        } catch (Exception ex) {
+                    } catch (Exception ex) {
                             utilDebug.error("AuthUtils.logout:" + pli, ex);
-                        }
                     }
                 }
             }
@@ -2117,12 +2114,10 @@ public class AuthUtils extends AuthClientUtils {
         
         try {
             isTokenValid = SSOTokenManager.getInstance().isValidToken(token);
-            
-            if ((token != null) && isTokenValid) {
+            if (isTokenValid) {
                 AuthD.getAuth().logLogout(token);
                 Session session = Session.getSession(new SessionID(token.getTokenID().toString()));
                 session.logout();
-                
                 if (utilDebug.messageEnabled()) {
                     utilDebug.message("AuthUtils.logout: logout successful.");
                 }
