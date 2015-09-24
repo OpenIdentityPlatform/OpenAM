@@ -149,9 +149,11 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                     undo: !this.newEntity,
                     undoCallback: function (changes) {
                         _.extend(self.data.entity, changes);
-                        self.data.contextName = _.findWhere(self.data.contexts, {
+                        var context = _.findWhere(self.data.contexts, {
                             "_id": self.data.entity.context
-                        }).name;
+                        });
+                        self.data.contextName = context.name;
+                        self.data.languages = self.addLanguageNames(context.languages);
                         self.reRenderView();
                     }
                 });
