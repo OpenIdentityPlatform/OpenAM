@@ -55,7 +55,6 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.DecoderException;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.openam.core.rest.devices.OathDeviceSettings;
 import org.forgerock.openam.core.rest.devices.OathDevicesDao;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorOathService;
@@ -136,7 +135,6 @@ public class AuthenticatorOATH extends AMLoginModule {
 
     private AuthenticatorOathService realmOathService;
     private AMIdentity id;
-
 
     private final OathDevicesDao devicesDao = InjectorHolder.getInstance(OathDevicesDao.class);
     private final OathMaker deviceFactory = InjectorHolder.getInstance(OathMaker.class);
@@ -336,6 +334,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                     selectedIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
                     if (selectedIndex == OPT_DEVICE_SKIP_INDEX) {
                         realmOathService.setUserSkipOath(id, AuthenticatorOathService.SKIPPABLE);
+                        realmOathService.removeAllUserDevices(id); //user backed out of saving device
                         return ISAuthConstants.LOGIN_SUCCEED;
                     }
                 case LOGIN_SAVED_DEVICE:
@@ -404,7 +403,7 @@ public class AuthenticatorOATH extends AMLoginModule {
     }
 
     private boolean isRecoveryCode(String otp, OathDeviceSettings settings, AMIdentity id)
-            throws InternalServerErrorException, IOException, AuthLoginException {
+            throws IOException, AuthLoginException {
         //check settings aren't null
         if (settings == null) {
             debug.error("OATH.checkOTP() : Invalid stored settings.");
@@ -453,7 +452,8 @@ public class AuthenticatorOATH extends AMLoginModule {
     }
 
     private void paintRegisterDeviceCallback(AMIdentity id, OathDeviceSettings settings) throws AuthLoginException {
-        replaceCallback(REGISTER_DEVICE, SCRIPT_OUTPUT_CALLBACK_INDEX, createQRCodeCallback(settings, id, SCRIPT_OUTPUT_CALLBACK_INDEX));
+        replaceCallback(REGISTER_DEVICE, SCRIPT_OUTPUT_CALLBACK_INDEX, createQRCodeCallback(settings, id,
+                SCRIPT_OUTPUT_CALLBACK_INDEX));
     }
 
     /**
@@ -474,13 +474,15 @@ public class AuthenticatorOATH extends AMLoginModule {
     * hideButtonHack
     *           A hack to reverse a hack in RESTLoginView.js. See more detailed comment above.*
     */
-    private Callback createQRCodeCallback(OathDeviceSettings settings, AMIdentity id, int callbackIndex) throws AuthLoginException {
+    private Callback createQRCodeCallback(OathDeviceSettings settings, AMIdentity id, int callbackIndex)
+            throws AuthLoginException {
 
         try {
             final String authenticatorAppRegistrationUri = getAuthenticatorAppRegistrationUri(settings, id);
             final String callback = "callback_" + callbackIndex;
             return new ScriptTextOutputCallback(
-                    GenerationUtils.getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(callback, authenticatorAppRegistrationUri));
+                    GenerationUtils.getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(callback,
+                            authenticatorAppRegistrationUri));
 
         } catch (IOException e) {
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
@@ -489,7 +491,7 @@ public class AuthenticatorOATH extends AMLoginModule {
     }
 
     private String getAuthenticatorAppRegistrationUri(OathDeviceSettings settings, AMIdentity id) throws
-            AuthLoginException, InternalServerErrorException, IOException {
+            AuthLoginException, IOException {
 
         //check settings aren't null
         if (settings == null) {
@@ -695,7 +697,7 @@ public class AuthenticatorOATH extends AMLoginModule {
      * device settings were returned.
      */
     private OathDeviceSettings getOathDeviceSettings(String username, String realm)
-            throws InternalServerErrorException, IOException, AuthLoginException {
+            throws IOException, AuthLoginException {
 
         //get data from the DAO
         List<JsonValue> profiles = devicesDao.getDeviceProfiles(username, realm);
@@ -760,7 +762,7 @@ public class AuthenticatorOATH extends AMLoginModule {
      * @param settings The settings to store the value in.
      */
     private void setCounterAttr(AMIdentity id, int counter, OathDeviceSettings settings)
-            throws AuthLoginException, IOException, InternalServerErrorException {
+            throws AuthLoginException, IOException {
         settings.setCounter(counter);
         devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
                 Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
@@ -774,7 +776,7 @@ public class AuthenticatorOATH extends AMLoginModule {
      * @param settings The settings to store the value in.
      */
     private void setLoginTime(AMIdentity id, long time, OathDeviceSettings settings)
-            throws AuthLoginException, IOException, InternalServerErrorException {
+            throws AuthLoginException, IOException {
         settings.setLastLogin(time * totpTimeStep, TimeUnit.SECONDS);
 
         // Update the observed time-step drift for resynchronisation

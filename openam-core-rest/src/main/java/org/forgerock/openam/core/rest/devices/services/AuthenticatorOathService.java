@@ -24,16 +24,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.util.Collections;
-import java.util.HashMap;
-import org.forgerock.json.jose.jwe.EncryptionMethod;
-import org.forgerock.json.jose.jwe.JweAlgorithm;
-import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
-import org.forgerock.openam.core.rest.devices.EncryptedJwtDeviceSerialisation;
-import org.forgerock.openam.core.rest.devices.JsonDeviceSerialisation;
-import org.forgerock.openam.shared.security.crypto.KeyStoreBuilder;
-import org.forgerock.openam.shared.security.crypto.KeyStoreType;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.AccessController;
@@ -45,8 +35,19 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import org.forgerock.json.jose.jwe.EncryptionMethod;
+import org.forgerock.json.jose.jwe.JweAlgorithm;
+import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
+import org.forgerock.openam.core.rest.devices.EncryptedJwtDeviceSerialisation;
+import org.forgerock.openam.core.rest.devices.JsonDeviceSerialisation;
+import org.forgerock.openam.shared.security.crypto.KeyStoreBuilder;
+import org.forgerock.openam.shared.security.crypto.KeyStoreType;
+import org.forgerock.util.Reject;
 
 /**
  * Implementation of the OATH Service. Provides all necessary configuration information
@@ -156,12 +157,26 @@ public class AuthenticatorOathService implements DeviceService {
      * @throws IdRepoException If there were troubles talking to the IdRepo.
      * @throws SSOException If there were issues setting values on the provided ID.
      */
-    public void setUserSkipOath(AMIdentity id, int userSkipOath)
+    public void setUserSkipOath(@Nonnull AMIdentity id, int userSkipOath)
             throws IdRepoException, SSOException {
+        Reject.ifNull(id);
         final HashMap<String, Set<String>> attributesToWrite = new HashMap<>();
-        attributesToWrite.put(getSkippableAttributeName(),
-                Collections.singleton(String.valueOf(userSkipOath)));
+        attributesToWrite.put(getSkippableAttributeName(), Collections.singleton(String.valueOf(userSkipOath)));
         id.setAttributes(attributesToWrite);
+        id.store();
+    }
+
+    /**
+     * Removes all user's current devices of this type.
+     *
+     * @param id User's identity.
+     * @throws IdRepoException If there were troubles talking to the IdRepo.
+     * @throws SSOException If there were issues setting values on the provided ID.
+     */
+    public void removeAllUserDevices(@Nonnull AMIdentity id)
+            throws IdRepoException, SSOException {
+        Reject.ifNull(id);
+        id.removeAttributes(Collections.singleton(getConfigStorageAttributeName()));
         id.store();
     }
 

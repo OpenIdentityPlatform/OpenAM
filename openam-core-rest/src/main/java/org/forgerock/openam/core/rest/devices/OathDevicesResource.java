@@ -16,14 +16,8 @@
 
 package org.forgerock.openam.core.rest.devices;
 
-import static org.forgerock.json.resource.ResourceException.getException;
-import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.Collections;
-import java.util.Set;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
@@ -31,7 +25,9 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.services.context.Context;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.DeleteRequest;
@@ -44,6 +40,7 @@ import org.forgerock.openam.core.rest.devices.services.AuthenticatorOathServiceF
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.annotations.VisibleForTesting;
 import org.forgerock.util.promise.Promise;
 
@@ -123,9 +120,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
                     try {
 
                         realmOathService.setUserSkipOath(identity, AuthenticatorOathService.NOT_SET);
-                        identity.removeAttributes(
-                                Collections.singleton(realmOathService.getConfigStorageAttributeName()));
-                        identity.store();
+                        realmOathService.removeAllUserDevices(identity);
 
                         return newResultPromise(newActionResponse(JsonValueBuilder.jsonValue().put(RESULT, true).build()));
 
