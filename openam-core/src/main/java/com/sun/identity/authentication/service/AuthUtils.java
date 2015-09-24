@@ -2024,26 +2024,29 @@ public class AuthUtils extends AuthClientUtils {
             
             if (intSession != null) {
                 plis = intSession.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
+            } else {
+                plis = token.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
+                if (utilDebug.messageEnabled()) {
+                    utilDebug.message("InternalSession is null, obtaining PAP instance from ssotoken");
+                }
             }
             if (plis != null && plis.length() > 0) {
                 StringTokenizer st = new StringTokenizer(plis, "|");
                 
-                if (token != null) {
-                    while (st.hasMoreTokens()) {
-                        String pli = (String)st.nextToken();
+
+                while (st.hasMoreTokens()) {
+                    String pli = (String)st.nextToken();
                         
-                        try {
-                            AMPostAuthProcessInterface postProcess = 
-                                    (AMPostAuthProcessInterface)
-                                    Thread.currentThread().
-                                    getContextClassLoader().
-                                    loadClass(pli).newInstance();
+                    try {
+                        AMPostAuthProcessInterface postProcess =
+                                    (AMPostAuthProcessInterface) Thread.currentThread().
+                                    getContextClassLoader().loadClass(pli).newInstance();
                             postProcess.onLogout(request, response, token);
-                        } catch (Exception ex) {
+                    } catch (Exception ex) {
                             utilDebug.error("AuthUtils.logout:" + pli, ex);
-                        }
                     }
                 }
+
             }
         }
         
@@ -2052,7 +2055,7 @@ public class AuthUtils extends AuthClientUtils {
         try {
             isTokenValid = SSOTokenManager.getInstance().isValidToken(token);
             
-            if ((token != null) && isTokenValid) {
+            if (isTokenValid) {
                 AuthD.getAuth().logLogout(token);
                 SSOTokenManager.getInstance().logout(token);
 
