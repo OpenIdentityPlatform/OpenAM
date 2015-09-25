@@ -22,9 +22,11 @@
                 <td>
                     <a class="edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmPath _id}}">{{_id}}</a>
                     {{#if defaultConfig}}
-                    <div class="default-config">
-                        {{#if defaultConfig.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if defaultConfig.orgConfig}}/ {{/if}}{{/if}}
-                        {{#if defaultConfig.orgConfig}}{{t 'console.authentication.chains.defaultOrgAuthConfiguration'}} {{/if}}
+                    <div>
+                        <small class="text-muted">
+                            {{#if defaultConfig.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if defaultConfig.orgConfig}}/ {{/if}}{{/if}}
+                            {{#if defaultConfig.orgConfig}}{{t 'console.authentication.chains.defaultOrgAuthConfiguration'}} {{/if}}
+                        </small>
                     </div>
                     {{/if}}
                 </td>

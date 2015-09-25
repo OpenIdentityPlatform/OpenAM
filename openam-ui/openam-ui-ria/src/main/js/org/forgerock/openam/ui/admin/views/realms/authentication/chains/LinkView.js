@@ -39,28 +39,28 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             "click .criteria-btn-container button": "selectCriteria"
         },
 
-        deleteBtnClick: function(e){
+        deleteBtnClick: function (e) {
             if(e){
                 e.preventDefault();
             }
             this.deleteItem($(e.currentTarget).data().mapId);
         },
 
-        deleteItem: function(mapId) {
+        deleteItem: function (mapId) {
             this.parent.data.form.chainData.authChainConfiguration.splice(this.$el.index(), 1);
             this.parent.data.linkViewMap[mapId].remove();
             this.parent.setArrows();
             this.remove();
         },
 
-        editItem: function(e) {
+        editItem: function (e) {
             if (e) {
                 e.preventDefault();
             }
             EditLinkView.show(this);
         },
 
-        moveBtnClick: function(e) {
+        moveBtnClick: function (e) {
             e.preventDefault();
 
             var direction = parseInt($(e.currentTarget).data().direction, 10),
@@ -71,7 +71,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             this.parent.sortChainData(originalIndex, targetIndex);
 
             // The buttons contain the directions -1 for up and +1 for down.
-            if (direction === -1 ) {
+            if (direction === -1) {
                 this.$el.insertBefore(chainlinks.eq(targetIndex));
             } else {
                 this.$el.insertAfter(chainlinks.eq(targetIndex));
@@ -80,7 +80,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
         },
 
         render: function () {
-            var self = this;
+            var self = this,
+                moduleName = null;
+
             this.data.id = this.cid;
 
             self.parentRender(function () {
@@ -91,8 +93,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
 
                 self.linkInfoView = new LinkInfoView();
                 self.linkInfoView.element = "#link-info-" + self.data.id;
-                if (self.data.linkConfig.module) {
-                    self.data.typeDescription = _.findWhere(self.data.allModules, {_id : self.data.linkConfig.module}).typeDescription;
+                moduleName = _.findWhere(self.data.allModules, { _id : self.data.linkConfig.module });
+                if (self.data.linkConfig.module && moduleName) {
+                    // The server allows for deletion of modules that are in use within a chain. The chain itself
+                    // will still have a reference to the deleetd module.
+                    // Below we are checking if the module is present. If it isn't the typeDescription is left undefined
+                    self.data.typeDescription = moduleName.typeDescription;
                 }
                 self.linkInfoView.render(self.data.linkConfig, self.data.typeDescription);
 
@@ -104,7 +110,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             });
         },
 
-        setArrows: function(){
+        setArrows: function () {
             if (this.data.linkConfig.criteria.toLowerCase() === this.criteriaView.REQUIRED && this.parent.data.firstRequiredIndex === -1) {
                 this.parent.data.firstRequiredIndex = this.$el.index();
             }
@@ -114,7 +120,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
                 this.criteriaView.setPassThroughAndFailArrows(false);
             }
         },
-        setBtnStates: function(){
+
+        setBtnStates: function () {
             var numLinks = this.$el.parent().children(".chain-link").length - 1,
                 itemIndex = this.$el.index(),
                 moveUpBtn = this.$el.find("#moveUpLi"),
@@ -125,17 +132,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             moveDownBtn.removeClass("disabled");
             deleteBtn.removeClass("disabled");
 
-            if (itemIndex === 0){
+            if (itemIndex === 0) {
                 moveUpBtn.addClass("disabled");
             }
-            if (itemIndex === numLinks){
+            if (itemIndex === numLinks) {
                 moveDownBtn.addClass("disabled");
             }
-            if(numLinks < 1){
+            if (numLinks < 1) {
                 deleteBtn.addClass("disabled");
             }
         },
-        selectCriteria: function(e){
+
+        selectCriteria: function (e) {
             var criteria = $(e.currentTarget).data().criteria;
             this.criteriaView.setCriteria(criteria);
             this.parent.setArrows();
