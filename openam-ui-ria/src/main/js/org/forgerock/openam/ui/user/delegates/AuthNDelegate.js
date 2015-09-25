@@ -155,7 +155,14 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                     var oldReqs,errorBody,msg,
                         currentStage = requirementList.length,
                         responseMessage = jqXHR.responseJSON.message,
-                        failReason = null;
+                        failReason = "authenticationFailed",
+                        countIndex,
+                        warningText = 'Invalid Password!!Warning: Account lockout will occur after next ',
+                        messagesMap = {"user account locked": "userAccountLockout",
+                               "user account expired!!": "userAccountExpired",
+                               "maximum sessions limit reached": "maxSessionsLimitOrSessionQuota",
+                               " your password has expired. please contact service desk to reset your password": "loginFailureLockout",
+                               " your account is locked. please contact service desk to unlock your account": "userAccountLockout"};
                     if (jqXHR.status === 408) {
                         // we timed out, so let's try again with a fresh session
                         oldReqs = requirementList[0];
@@ -200,20 +207,12 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                .fail(processFailed);
 
                         } else {
-                            switch (errorBody.message) {
-                                case "User Account Locked":
-                                    failReason = "loginFailureLockout";
-                                break;
-                                case "Maximum Sessions Limit Reached.":
-                                    failReason = "maxSessionsLimitOrSessionQuota";
-                                break;
-                                case " Your password has expired. Please contact service desk to reset your password":
-                                    failReason = "loginFailureLockout";
-                                break;
-                                default: 
-                                    failReason = "authenticationFailed";
-                            }
 
+                            failReason = messagesMap[errorBody.message.toLowerCase()];
+                            countIndex = errorBody.message.indexOf(warningText);
+                            if ( countIndex >= 0 ) {
+                                failReason = {key: "authenticationFailedWarning", count: errorBody.message.slice(warningText.length, warningText.length + 1)};
+                            }
                             processFailed(failReason);
                             goToFailureUrl(errorBody);
                         }

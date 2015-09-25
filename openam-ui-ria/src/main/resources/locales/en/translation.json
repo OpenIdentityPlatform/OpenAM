@@ -9,6 +9,7 @@
         "messages" : {
             "CommonMessages" : {
                 "authenticationFailed" : "Login/password combination is invalid.",
+                "authenticationFailedWarning" : "Invalid Password! Warning: Account lockout will occur after next __count__ password failure(s)",
                 "loginFailureLockout" : "Your password has expired. Please contact service desk to reset your password",
                 "maxSessionsLimitOrSessionQuota": "Maximum sessions limit reached or session quota has exhausted.",
                 "invalidRealm" : "The realm doesn't exist",
@@ -26,7 +27,9 @@
                 "conflictError" : "Detected conflict in request.",
                 "incorrectRevisionError" : "Cannot update the record because the version is not the latest.",
                 "tokenNotFound" : "Token not found.",
-                "securityDataChanged" : "Password was changed"
+                "securityDataChanged" : "Password was changed",
+                "userAccountLockout" : "Your Account has been locked. Please contact service desk to unlock your account",
+                "userAccountExpired" : "Your Account has expired. Please contact service desk to extend the expiration time"
             },
             "UserMessages" : {
                 "invalidOldPassword" : "Old password is invalid.",
