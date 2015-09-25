@@ -147,7 +147,8 @@ public final class ScriptConstants {
         FILTER_NOT("23"),
         FILTER_PRESENT("24"),
         RESOURCE_FILTER_NOT_SUPPORTED("26"),
-        SCRIPT_DECODING_FAILED("27");
+        SCRIPT_DECODING_FAILED("27"),
+        DELETING_DEFAULT_SCRIPT("28");
 
         private final String code;
 

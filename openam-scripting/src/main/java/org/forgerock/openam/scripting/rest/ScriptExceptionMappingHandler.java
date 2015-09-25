@@ -18,6 +18,7 @@ package org.forgerock.openam.scripting.rest;
 import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
 import static org.forgerock.json.resource.ResourceException.CONFLICT;
 import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
+import static org.forgerock.json.resource.ResourceException.FORBIDDEN;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 
@@ -118,6 +119,7 @@ public class ScriptExceptionMappingHandler implements ExceptionMappingHandler<Sc
             ERROR_CODE_MAP.put(FILTER_PRESENT, BAD_REQUEST);
             ERROR_CODE_MAP.put(RESOURCE_FILTER_NOT_SUPPORTED, BAD_REQUEST);
             ERROR_CODE_MAP.put(SCRIPT_DECODING_FAILED, BAD_REQUEST);
+            ERROR_CODE_MAP.put(DELETING_DEFAULT_SCRIPT, FORBIDDEN);
         }
         return ERROR_CODE_MAP.containsKey(scriptErrorCode) ? ERROR_CODE_MAP.get(scriptErrorCode) : INTERNAL_ERROR;
     }

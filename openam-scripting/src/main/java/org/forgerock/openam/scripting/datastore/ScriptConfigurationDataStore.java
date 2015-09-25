@@ -92,6 +92,9 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore {
 
     @Override
     public void delete(String uuid) throws ScriptException {
+        if (containsGlobalUuid(uuid)) {
+            throw new ScriptException(DELETING_DEFAULT_SCRIPT, uuid);
+        }
         try {
             getSubOrgConfig().removeSubConfig(uuid);
         } catch (SSOException | SMSException e) {
