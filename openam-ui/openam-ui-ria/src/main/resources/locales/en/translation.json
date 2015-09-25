@@ -623,7 +623,9 @@
                 "scripts": "Scripts"
             },
             "description": "Description",
-            "type": "Type"
+            "type": "Type",
+            "editFullScreen": "Edit Fullscreen",
+            "exitFullScreen": "Exit Fullscreen"
         },
         "authentication": {
             "settings": {

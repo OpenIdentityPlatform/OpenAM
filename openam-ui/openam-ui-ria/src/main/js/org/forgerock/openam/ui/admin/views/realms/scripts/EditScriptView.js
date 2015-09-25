@@ -21,8 +21,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
     "underscore",
     "bootstrap-dialog",
     "libs/codemirror/lib/codemirror",
-    "libs/codemirror/mode/groovy/groovy",
-    "libs/codemirror/mode/javascript/javascript",
     "org/forgerock/commons/ui/common/components/ChangesPending",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -33,9 +31,12 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
     "org/forgerock/openam/ui/admin/delegates/ScriptsDelegate",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, _, BootstrapDialog, CodeMirror, Groovy, Javascript, ChangesPending, Messages, AbstractView,
-             EventManager, Router, Base64, Constants, UIUtils, Script, ScriptsDelegate, SMSGlobalDelegate) {
+    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "libs/codemirror/mode/groovy/groovy",
+    "libs/codemirror/mode/javascript/javascript",
+    "libs/codemirror/addon/display/fullscreen"
+], function ($, _, BootstrapDialog, CodeMirror, ChangesPending, Messages, AbstractView, EventManager, Router, Base64,
+             Constants, UIUtils, Script, ScriptsDelegate, SMSGlobalDelegate) {
 
     return AbstractView.extend({
         initialize: function (options) {
@@ -55,6 +56,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             "change input[name=language]": "onChangeLanguage",
             "click #saveChanges": "submitForm",
             "click #delete": "deleteScript",
+            "click #editFullScreen": "editFullScreen",
+            "click .full-screen-bar button": "exitFullScreen",
             "change [data-field]": "checkChanges"
         },
 
@@ -481,6 +484,19 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 success: onSuccess,
                 error: onError
             });
+        },
+
+        editFullScreen: function () {
+            this.toggleFullScreen(true);
+        },
+
+        exitFullScreen: function () {
+            this.toggleFullScreen(false);
+        },
+
+        toggleFullScreen: function (fullScreen) {
+            this.scriptEditor.setOption("fullScreen", fullScreen);
+            this.$el.find(".full-screen-bar").toggle(fullScreen);
         }
     });
 });
