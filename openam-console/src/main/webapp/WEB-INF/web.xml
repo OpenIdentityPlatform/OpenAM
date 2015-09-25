@@ -62,6 +62,10 @@
         <param-name>jato:com.sun.identity.console.sts.*:moduleURL</param-name>
         <param-value>../sts</param-value>
     </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.audit.*:moduleURL</param-name>
+        <param-value>../audit</param-value>
+    </context-param>
 
     <servlet>
         <servlet-name>UMServlet</servlet-name>
@@ -123,6 +127,10 @@
         <servlet-name>STSServlet</servlet-name>
         <servlet-class>com.sun.identity.console.sts.STSServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AuditServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.audit.AuditServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>AuthServlet</servlet-name>
@@ -183,5 +191,9 @@
     <servlet-mapping>
         <servlet-name>STSServlet</servlet-name>
         <url-pattern>/sts/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuditServlet</servlet-name>
+        <url-pattern>/audit/*</url-pattern>
     </servlet-mapping>
 </web-app>

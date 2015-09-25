@@ -24,7 +24,7 @@
 
    $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
 
-   Portions Copyrighted 2013-2014 ForgeRock AS.
+   Portions Copyrighted 2013-2015 ForgeRock AS.
    Portions Copyrighted 2014 Nomura Research Institute, Ltd.
 -->
 <accesscontrols>
@@ -262,6 +262,34 @@
         <actionhandler name="button1,button2,button3" />
     </viewbean>
     <viewbean view="SoapSecurityTokenService" modify="SoapSecurityTokenService" classname="com.sun.identity.console.sts.SoapSTSEditViewBean">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+
+    <!-- Audit -->
+    <viewbean classname="com.sun.identity.console.audit.GlobalAuditConfigViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2,tblSubConfigButtonAdd,tblSubConfigButtonDelete" />
+        <table name="tblSubConfig" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.audit.GlobalEventHandlerSelectViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.audit.GlobalEventHandlerEditViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2,button3" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.audit.GlobalEventHandlerAddViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.audit.RealmAuditConfigViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2,tblSubConfigButtonAdd,tblSubConfigButtonDelete" />
+        <table name="tblSubConfig" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.audit.RealmEventHandlerSelectViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.audit.RealmEventHandlerEditViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2,button3" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.audit.RealmEventHandlerAddViewBean" view="null" modify="null">
         <actionhandler name="button1,button2" />
     </viewbean>
 
