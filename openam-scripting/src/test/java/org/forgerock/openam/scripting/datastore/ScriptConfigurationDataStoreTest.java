@@ -18,12 +18,14 @@ package org.forgerock.openam.scripting.datastore;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.JAVASCRIPT;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.scripting.ScriptException;
@@ -46,6 +48,7 @@ public class ScriptConfigurationDataStoreTest {
     };
     private ScriptConfigurationDataStore dataStore;
     private ServiceConfigManager configManager;
+    private ServiceConfig subGlobalConfig;
 
     @BeforeMethod
     public void setUp() throws ResourceException {
@@ -53,10 +56,16 @@ public class ScriptConfigurationDataStoreTest {
         Subject subject = new Subject();
         subject.getPrincipals().add(testUserPrinciple);
         configManager = mock(ServiceConfigManager.class);
+        subGlobalConfig = mock(ServiceConfig.class);
         dataStore = new ScriptConfigurationDataStore(logger, subject, "/") {
             @Override
             protected ServiceConfigManager getConfigManager() throws SSOException, SMSException {
                 return configManager;
+            }
+
+            @Override
+            ServiceConfig getSubGlobalConfig() throws SMSException, SSOException {
+                return subGlobalConfig;
             }
         };
     }
@@ -95,7 +104,25 @@ public class ScriptConfigurationDataStoreTest {
             // then
             assertEquals(e.getScriptErrorCode(), DELETE_FAILED);
         }
+    }
 
+    @Test
+    public void shouldFailIfAttemptingToDeleteDefaultScript() throws Exception {
+        // given
+        String uuid = "1234567890";
+
+        ServiceConfig defaultScriptSubConfig = mock(ServiceConfig.class);
+        given(subGlobalConfig.getSubConfig(uuid)).willReturn(defaultScriptSubConfig);
+        given(defaultScriptSubConfig.exists()).willReturn(true);
+
+        // when
+        try {
+            dataStore.delete(uuid);
+            fail("shouldFailIfAttemptingToDeleteDefaultScript");
+        } catch (ScriptException e) {
+            // then
+            assertEquals(e.getScriptErrorCode(), DELETING_DEFAULT_SCRIPT);
+        }
     }
 
     @Test
