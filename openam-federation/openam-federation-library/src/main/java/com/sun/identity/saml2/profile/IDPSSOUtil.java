@@ -30,7 +30,14 @@
 
 package com.sun.identity.saml2.profile;
 
-import com.sun.identity.saml2.common.*;
+import com.sun.identity.saml2.common.AccountUtils;
+import com.sun.identity.saml2.common.NameIDInfo;
+import com.sun.identity.saml2.common.NewBoolean;
+import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import com.sun.identity.saml2.common.SAML2InvalidNameIDPolicyException;
+import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -96,8 +103,8 @@ import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.utils.ClientUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.PrivateKey;
 import java.util.LinkedHashSet;
@@ -154,6 +161,9 @@ public class IDPSSOUtil {
 
         agent = MonitorManager.getAgent();
         saml2Svc = MonitorManager.getSAML2Svc();
+    }
+
+    private IDPSSOUtil() {
     }
 
     /**
@@ -502,7 +512,7 @@ public class IDPSSOUtil {
                 SAML2Utils.debug.error("IDPSSOUtil.sendResponseToACS: There was a problem when invoking the "
                         + "preSendResponse of the IDP Adapter: ", se);
             }
-            sendResponse(request, response, acsBinding, spEntityID, idpEntityID,
+            sendResponse(request, response, out, acsBinding, spEntityID, idpEntityID,
                     idpMetaAlias, realm, relayState, acsURL, res, session);
         } else {
             SAML2Utils.debug.error("IDPSSOUtil.sendResponseToACS:" +
@@ -593,6 +603,7 @@ public class IDPSSOUtil {
      *
      * @param request The servlet request.
      * @param response The servlet response.
+     * @param out The print writer for writing out presentation.
      * @param idpMetaAlias The IdP's metaAlias.
      * @param idpEntityID The IdP's entity ID.
      * @param realm The realm where the IdP belongs to.
@@ -601,7 +612,7 @@ public class IDPSSOUtil {
      * @param spEntityID The SP's entity ID.
      * @throws SAML2Exception If there was an error while creating or sending the response back to the SP.
      */
-    public static void sendNoPassiveResponse(HttpServletRequest request, HttpServletResponse response,
+    public static void sendNoPassiveResponse(HttpServletRequest request, HttpServletResponse response, PrintWriter out,
             String idpMetaAlias, String idpEntityID, String realm, AuthnRequest authnReq, String relayState,
             String spEntityID) throws SAML2Exception {
         Response res = SAML2Utils.getErrorResponse(authnReq, SAML2Constants.RESPONDER, SAML2Constants.NOPASSIVE, null,
@@ -609,14 +620,16 @@ public class IDPSSOUtil {
         StringBuffer returnedBinding = new StringBuffer();
         String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm, authnReq, request, returnedBinding);
         String acsBinding = returnedBinding.toString();
-        sendResponse(request, response, acsBinding, spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
+        sendResponse(request, response, out, acsBinding, spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
                 acsURL, res, null);
     }
 
     /**
      * Sends a response to service provider
      *
-     * @param response    the <code>HttpServletResponse</code> object
+     * @param request The servlet request.
+     * @param response The servlet response.
+     * @param out The print writer for writing out presentation.
      * @param cachedResID the key used to retrieve response information
      *                    from the response information cache
      * @throws SAML2Exception if the operation is not successful
@@ -624,6 +637,7 @@ public class IDPSSOUtil {
     public static void sendResponse(
             HttpServletRequest request,
             HttpServletResponse response,
+            PrintWriter out,
             String cachedResID)
             throws SAML2Exception {
 
@@ -640,7 +654,7 @@ public class IDPSSOUtil {
             String acsURL = (String) cacheList.get(6);
             Response res = (Response) cacheList.get(7);
             Object session = cacheList.get(8);
-            sendResponse(request, response, acsBinding, spEntityID, idpEntityID,
+            sendResponse(request, response, out, acsBinding, spEntityID, idpEntityID,
                     idpMetaAlias, realm, relayState, acsURL, res, session);
         } else {
             SAML2Utils.debug.error(classMethod +
@@ -668,6 +682,7 @@ public class IDPSSOUtil {
     public static void sendResponse(
             HttpServletRequest request,
             HttpServletResponse response,
+            PrintWriter out,
             String acsBinding,
             String spEntityID,
             String idpEntityID,
@@ -729,7 +744,7 @@ public class IDPSSOUtil {
             // encryption is optional based on SP config settings.
             signAndEncryptResponseComponents(
                     realm, spEntityID, idpEntityID, res, true);
-            IDPSSOUtil.sendResponseECP(request, response, idpEntityID,
+            IDPSSOUtil.sendResponseECP(request, response, out, idpEntityID,
                     realm, acsURL, res);
         } else {
             SAML2Utils.debug.error(classMethod +
@@ -1079,7 +1094,8 @@ public class IDPSSOUtil {
         try {
             if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                 long sessionExpireTime = System.currentTimeMillis() / 1000 + (sessionProvider.getTimeLeft(session));
-                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(sessionIndex, new IDPSessionCopy(idpSession), sessionExpireTime);
+                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(sessionIndex, new IDPSessionCopy(idpSession),
+                        sessionExpireTime);
             }
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(classMethod + "SAVE IDPSession!");
@@ -2074,7 +2090,8 @@ public class IDPSSOUtil {
             if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                 try {
                     long expireTime = getValidTimeofResponse(realm, idpEntityID, res) / 1000;
-                    SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(artStr, res.toXMLString(true, true), expireTime);
+                    SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(artStr,
+                            res.toXMLString(true, true), expireTime);
                     if (SAML2Utils.debug.messageEnabled()) {
                         SAML2Utils.debug.message(classMethod + "Saved Response to SAML2 Token Repository using key "
                                 + artStr);
@@ -2131,7 +2148,9 @@ public class IDPSSOUtil {
     /**
      * This method sends SAML Response back to ECP.
      *
-     * @param response    the <code>HttpServletResponse</code> object
+     * @param request The servlet request.
+     * @param response The servlet response.
+     * @param out The print writer for writing out presentation.
      * @param idpEntityID the entity id of the identity provider
      * @param realm       the realm name of the identity provider
      * @param acsURL      the assertion consumer service <code>URL</code>
@@ -2140,6 +2159,7 @@ public class IDPSSOUtil {
      */
     public static void sendResponseECP(HttpServletRequest request,
                                        HttpServletResponse response,
+                                       PrintWriter out,
                                        String idpEntityID, String realm, String acsURL,
                                        Response res) throws SAML2Exception {
 
@@ -2175,9 +2195,10 @@ public class IDPSSOUtil {
             SAML2Utils.putHeaders(reply.getMimeHeaders(), response);
 
             // Write out the message on the response stream
-            OutputStream os = response.getOutputStream();
-            reply.writeTo(os);
-            os.flush();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            reply.writeTo(stream);
+            out.println(stream.toString());
+            out.flush();
         } catch (Exception ex) {
             SAML2Utils.debug.error("IDPSSOUtil.sendResponseECP", ex);
             String[] data = {idpEntityID, realm, acsURL};

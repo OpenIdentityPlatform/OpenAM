@@ -28,6 +28,7 @@
  */
 package com.sun.identity.saml2.profile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 
@@ -63,7 +64,6 @@ import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Scoping;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -104,7 +104,10 @@ public class IDPProxyUtil {
              SAML2Utils.debug.error("IDPSSOFederate:Static Init Failed", ex);
          }
     }
- 
+
+    private IDPProxyUtil() {
+    }
+
     /**
      * Gets the preferred IDP Id to be proxied. This method makes use of an
      * SPI to determine the preferred IDP.
@@ -276,7 +279,8 @@ public class IDPProxyUtil {
             try {
                 // sessionExpireTime is counted in seconds
                 long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;
-                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(requestID, new AuthnRequestInfoCopy(reqInfo), sessionExpireTime);
+                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(requestID, new AuthnRequestInfoCopy(reqInfo),
+                        sessionExpireTime);
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID);
                 }
@@ -560,6 +564,7 @@ public class IDPProxyUtil {
      *
      * @param request The request.
      * @param response The response.
+     * @param out The print writer for writing out presentation.
      * @param requestID The requestID of the proxied AuthnRequest.
      * @param idpMetaAlias The IdP's metaAlias.
      * @param hostEntityID The IdP's entity ID.
@@ -567,11 +572,13 @@ public class IDPProxyUtil {
      * @throws SAML2Exception If there was an error while sending the NoPassive response.
      */
     public static void sendNoPassiveProxyResponse(HttpServletRequest request, HttpServletResponse response,
-            String requestID, String idpMetaAlias, String hostEntityID, String realm) throws SAML2Exception {
+            PrintWriter out, String requestID, String idpMetaAlias, String hostEntityID, String realm)
+            throws SAML2Exception {
+
         AuthnRequest origRequest = (AuthnRequest) IDPCache.proxySPAuthnReqCache.remove(requestID);
         String relayState = (String) IDPCache.relayStateCache.remove(origRequest.getID());
 
-        IDPSSOUtil.sendNoPassiveResponse(request, response, idpMetaAlias, hostEntityID, realm,
+        IDPSSOUtil.sendNoPassiveResponse(request, response, out, idpMetaAlias, hostEntityID, realm,
                 origRequest, relayState, origRequest.getIssuer().getValue());
     }
 
@@ -630,6 +637,7 @@ public class IDPProxyUtil {
      * authenticating identity provider. 
      * @param request HttpServletRequest 
      * @param response HttpServletResponse
+     * @param out The print writer for writing out presentation.
      * @param partner Authenticating identity provider 
      * @param spMetaAlias IDP proxy's meta alias acting as SP
      * @param realm Realm
@@ -637,6 +645,7 @@ public class IDPProxyUtil {
     public static void initiateSPLogoutRequest( 
         HttpServletRequest request,
         HttpServletResponse response,
+        PrintWriter out,
         String partner,
         String spMetaAlias, 
         String realm,
@@ -684,7 +693,7 @@ public class IDPProxyUtil {
                 paramsMap.put(SAML2Constants.RELAY_STATE, relayState);
             } 
             idpSession.removeSessionPartner(partner);
-            SPSingleLogout.initiateLogoutRequest(request,response,
+            SPSingleLogout.initiateLogoutRequest(request,response, out,
                 binding, paramsMap, logoutReq, msg, ssoToken);
         } catch (SAML2Exception sse) {
             SAML2Utils.debug.error("Error sending Logout Request " , sse);
@@ -795,6 +804,7 @@ public class IDPProxyUtil {
     public static void sendProxyLogoutRequest(
         HttpServletRequest request,
         HttpServletResponse response,
+        PrintWriter out,
         LogoutRequest logoutReq,
         List partners,
         String binding,
@@ -827,7 +837,7 @@ public class IDPProxyUtil {
             if (idpSession != null) {
                 idpSession.removeSessionPartner(party);
                 IDPCache.idpSessionsBySessionID.remove(tokenID);
-                initiateSPLogoutRequest(request,response, party, metaAlias, realm,
+                initiateSPLogoutRequest(request,response, out, party, metaAlias, realm,
                     logoutReq, null, idpSession, binding, relayState);
             }
         } catch (SessionException se) {
@@ -873,6 +883,7 @@ public class IDPProxyUtil {
     public static void sendProxyLogoutRequestSOAP(
         HttpServletRequest request,
         HttpServletResponse response,
+        PrintWriter out,
         SOAPMessage msg,
         List partners, 
         IDPSession idpSession)
@@ -894,7 +905,7 @@ public class IDPProxyUtil {
                 getRealm(SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
             String party = partner.getPartner();
             idpSession.removeSessionPartner(party);
-            initiateSPLogoutRequest(request,response, party, metaAlias, realm,
+            initiateSPLogoutRequest(request,response, out, party, metaAlias, realm,
                 null, msg ,idpSession, SAML2Constants.SOAP, null);
        
    }
@@ -969,10 +980,9 @@ public class IDPProxyUtil {
         }
    }
    
-   public static void sendProxyLogoutResponseBySOAP(
-       SOAPMessage reply,
-       HttpServletResponse resp)
-   {   try {
+   public static void sendProxyLogoutResponseBySOAP(SOAPMessage reply, HttpServletResponse resp, PrintWriter out) {
+
+       try {
            //  Need to call saveChanges because we're
            // going to use the MimeHeaders to set HTTP
            // response information. These MimeHeaders
@@ -983,14 +993,15 @@ public class IDPProxyUtil {
            resp.setStatus(HttpServletResponse.SC_OK);
            SAML2Utils.putHeaders(reply.getMimeHeaders(), resp);
            // Write out the message on the response stream
-           OutputStream os = resp.getOutputStream();
-           reply.writeTo(os);
-           os.flush();
-        } catch (SOAPException se) {
+           ByteArrayOutputStream stream = new ByteArrayOutputStream();
+           reply.writeTo(stream);
+           out.println(stream.toString());
+           out.flush();
+       } catch (SOAPException se) {
             SAML2Utils.debug.error("sendProxyLogoutResponseBySOAP: ", se); 
-        } catch (IOException ie) {
+       } catch (IOException ie) {
             SAML2Utils.debug.error("sendProxyLogoutResponseBySOAP: ", ie); 
-        }       
+       }
    }
    
    public static void sendIDPInitProxyLogoutRequest(

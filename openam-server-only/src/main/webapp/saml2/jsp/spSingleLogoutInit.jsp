@@ -24,9 +24,7 @@
 
    $Id: spSingleLogoutInit.jsp,v 1.13 2009/10/15 00:01:11 exu Exp $
 
---%>
-<%--
-   Portions Copyrighted 2012-2014 ForgeRock AS
+   Portions Copyrighted 2012-2015 ForgeRock AS.
 --%>
 
 <%@ page import="com.sun.identity.plugin.session.SessionManager" %>
@@ -44,8 +42,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
-
-
+<%@ page import="java.io.PrintWriter" %>
 
 <%--
     spSingleLogoutInit.jsp
@@ -241,9 +238,7 @@
             paramsMap.put(SAML2Constants.RELAY_STATE, RelayState);
         }
 
-        String sessionIndex = request.getParameter("sessionIndex");
-        SPSingleLogout.initiateLogoutRequest( request,response,
-            binding,paramsMap);
+        SPSingleLogout.initiateLogoutRequest(request,response, new PrintWriter(out, true), binding, paramsMap);
         
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
             if (RelayState != null && !RelayState.isEmpty()

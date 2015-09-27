@@ -113,6 +113,9 @@ public class IDPSingleLogout {
         saml2Svc = MonitorManager.getSAML2Svc();
     }
 
+    private IDPSingleLogout() {
+    }
+
     /**
      * Parses the request parameters and initiates the Logout
      * Request to be sent to the SP.
@@ -595,7 +598,7 @@ public class IDPSingleLogout {
             logoutRes = updateLogoutResponse(logoutRes, retStatus);
             List partners = IDPProxyUtil.getSessionPartners(request);
             if (partners != null &&  !partners.isEmpty()) {
-                IDPProxyUtil.sendProxyLogoutRequest(request, response,
+                IDPProxyUtil.sendProxyLogoutRequest(request, response, out,
                     logoutReq, partners, binding, relayState);
             } else {
                 LogoutUtil.sendSLOResponse(response, request, logoutRes, location,
@@ -1214,7 +1217,8 @@ public class IDPSingleLogout {
                     }
 
                     String bindingUsed = logoutEndpoint.getBinding();
-                    if (bindingUsed.equals(SAML2Constants.HTTP_REDIRECT) || bindingUsed.equals(SAML2Constants.HTTP_POST)) {
+                    if (bindingUsed.equals(SAML2Constants.HTTP_REDIRECT) ||
+                            bindingUsed.equals(SAML2Constants.HTTP_POST)) {
                         String requestIDStr = requestID.toString();
                         if (requestIDStr != null && requestIDStr.length() != 0) {
                             idpSession.setPendingLogoutRequestID(requestIDStr);
