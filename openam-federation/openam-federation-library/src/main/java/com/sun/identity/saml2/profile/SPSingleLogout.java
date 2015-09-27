@@ -113,12 +113,16 @@ public class SPSingleLogout {
         saml2Svc = MonitorManager.getSAML2Svc();
     }
 
+    private SPSingleLogout() {
+    }
+
     /**
      * Parses the request parameters and initiates the Logout
      * Request to be sent to the IDP.
      *
      * @param request the HttpServletRequest.
      * @param response the HttpServletResponse.
+     * @param out The print writer for writing out presentation.
      * @param binding binding used for this request.
      * @param paramsMap Map of all other parameters.
      *       Following parameters names with their respective
@@ -135,10 +139,11 @@ public class SPSingleLogout {
     public static void initiateLogoutRequest(
         HttpServletRequest request,
         HttpServletResponse response,
+        PrintWriter out,
         String binding,
         Map paramsMap) 
     throws SAML2Exception {
-        initiateLogoutRequest(request, response, binding,
+        initiateLogoutRequest(request, response, out, binding,
             paramsMap, null, null, null);
     }
 
@@ -148,6 +153,7 @@ public class SPSingleLogout {
      *
      * @param request the HttpServletRequest.
      * @param response the HttpServletResponse.
+     * @param out The print writer for writing out presentation.
      * @param binding binding used for this request.
      * @param paramsMap Map of all other parameters.
      *       Following parameters names with their respective
@@ -167,6 +173,7 @@ public class SPSingleLogout {
     public static void initiateLogoutRequest(
         HttpServletRequest request,
         HttpServletResponse response,
+        PrintWriter out,
         String binding,
         Map paramsMap, 
         LogoutRequest origLogoutRequest, 
@@ -323,17 +330,14 @@ public class SPSingleLogout {
                 //send out the LogoutRequest to the single IdP correctly. Once that's done the IdP will send the
                 //logout request to the other SP instance, invalidating the session for both SPs.
                 if (nameIdInfoKey.getHostEntityID().equals(spEntityID)) {
-                    requestID = prepareForLogout(realm, tokenID, metaAlias, extensionsList, binding, relayState, request,
-                            response, paramsMap, tmpInfoKeyString, origLogoutRequest, msg);
+                    requestID = prepareForLogout(realm, tokenID, metaAlias, extensionsList, binding, relayState,
+                            request, response, paramsMap, tmpInfoKeyString, origLogoutRequest, msg);
                 }
             }
             // IDP Proxy 
-            SOAPMessage soapMsg = (SOAPMessage) 
-                IDPCache.SOAPMessageByLogoutRequestID.get(
-                requestID); 
+            SOAPMessage soapMsg = (SOAPMessage) IDPCache.SOAPMessageByLogoutRequestID.get(requestID);
             if (soapMsg != null) {   
-                IDPProxyUtil.sendProxyLogoutResponseBySOAP(
-                    soapMsg,response);  
+                IDPProxyUtil.sendProxyLogoutResponseBySOAP(soapMsg, response, out);
             }     
             // local log out for SOAP. For HTTP case, session will be destroyed 
             // when SAML Response reached the SP side.
