@@ -20,21 +20,22 @@ import static com.google.inject.multibindings.MapBinder.newMapBinder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
-import static org.forgerock.openam.audit.AuditConstants.Component.*;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
+import static org.forgerock.openam.audit.AuditConstants.Component.CONFIG;
+import static org.forgerock.openam.audit.AuditConstants.Component.USERS;
 import static org.forgerock.openam.rest.Routers.ssoToken;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.fail;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-import java.lang.annotation.Annotation;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.Set;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import com.google.inject.Binder;
 import com.google.inject.Key;
@@ -49,20 +50,20 @@ import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.session.Session;
-import org.forgerock.http.session.SessionContext;
-import org.forgerock.services.context.Context;
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplication;
-import org.forgerock.services.context.AttributesContext;
-import org.forgerock.services.context.RequestAuditContext;
-import org.forgerock.services.context.RootContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
+import org.forgerock.http.session.Session;
+import org.forgerock.http.session.SessionContext;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Requests;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
 import org.forgerock.openam.audit.AuditConstants;
@@ -70,15 +71,30 @@ import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
-import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.http.HttpGuiceModule;
 import org.forgerock.openam.http.annotations.Get;
 import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.services.context.AttributesContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RequestAuditContext;
+import org.forgerock.services.context.RootContext;
+import org.forgerock.services.context.SecurityContext;
+import org.forgerock.util.promise.NeverThrowsException;
+import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import java.lang.annotation.Annotation;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
 
 @GuiceModules({HttpGuiceModule.class, RestGuiceModule.class})
 public class RestRouterIT extends GuiceTestCase {
@@ -87,6 +103,7 @@ public class RestRouterIT extends GuiceTestCase {
 
     private SingletonResourceProvider configResource;
     private CollectionResourceProvider usersResource;
+    private CollectionResourceProvider internalResource;
     private DashboardResource dashboardResource;
     private AuthenticateResource authenticateResource;
     private AbstractHttpAccessAuditFilter httpAccessAuditFilter;
@@ -101,6 +118,7 @@ public class RestRouterIT extends GuiceTestCase {
     public void setupMocks() {
         configResource = mock(SingletonResourceProvider.class);
         usersResource = mock(CollectionResourceProvider.class);
+        internalResource = mock(CollectionResourceProvider.class);
         dashboardResource = spy(new DashboardResource());
         authenticateResource = spy(new AuthenticateResource());
 
@@ -144,6 +162,7 @@ public class RestRouterIT extends GuiceTestCase {
 
         binder.bind(Key.get(SingletonResourceProvider.class, Names.named("ConfigResource"))).toInstance(configResource);
         binder.bind(Key.get(CollectionResourceProvider.class, Names.named("UsersResource"))).toInstance(usersResource);
+        binder.bind(Key.get(CollectionResourceProvider.class, Names.named("InternalResource"))).toInstance(internalResource);
         binder.bind(Key.get(Object.class, Names.named("DashboardResource"))).toInstance(dashboardResource);
         binder.bind(Key.get(Object.class, Names.named("AuthenticateResource"))).toInstance(authenticateResource);
 
@@ -168,6 +187,7 @@ public class RestRouterIT extends GuiceTestCase {
         mockDnsAlias("HOSTNAME", "/");
         doThrow(IdRepoException.class).when(coreWrapper).getOrganization(any(SSOToken.class), eq("users"));
         doThrow(IdRepoException.class).when(coreWrapper).getOrganization(any(SSOToken.class), eq("authenticate"));
+        doThrow(IdRepoException.class).when(coreWrapper).getOrganization(any(SSOToken.class), eq("internal"));
     }
 
     @Test
@@ -267,6 +287,41 @@ public class RestRouterIT extends GuiceTestCase {
         verify(authenticateResource).get();
     }
 
+    @Test
+    public void shouldNotBePossibleToReachInternalResourceViaChf() throws Exception {
+        // Given
+        Context context = mockContext();
+        Request request = newRequest("GET", "/json/internal");
+
+        // When
+        Promise<Response, NeverThrowsException> promise = handler.handle(context, request);
+
+        // Then
+        Response response = promise.get();
+        assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND);
+
+        verifyZeroInteractions(internalResource);
+    }
+
+    @Test
+    public void shouldBeAbleToReachInternalViaInternalRouter() throws Exception {
+        // Given
+        Promise<ResourceResponse, ResourceException> promise =
+                newResultPromise(newResourceResponse("1", "1", json(object())));
+        given(internalResource.readInstance(any(Context.class), eq("123"), any(ReadRequest.class))).willReturn(promise);
+
+        Router internalRouter = InjectorHolder.getInstance(Key.get(Router.class, Names.named("InternalCrestRouter")));
+
+        Context context = mockSecurityContext();
+        ReadRequest request = Requests.newReadRequest("internal/123");
+
+        // When
+        internalRouter.handleRead(context, request);
+
+        // Then
+        verify(internalResource).readInstance(any(Context.class), eq("123"), any(ReadRequest.class));
+    }
+
     private Context mockContext() {
         AttributesContext httpRequestContext = new AttributesContext(new SessionContext(new RootContext(), mock(Session.class)));
 
@@ -274,6 +329,10 @@ public class RestRouterIT extends GuiceTestCase {
         httpRequestContext.getAttributes().put(HttpServletRequest.class.getName(), httpServletRequest);
 
         return new RequestAuditContext(httpRequestContext);
+    }
+
+    private Context mockSecurityContext() {
+        return new SecurityContext(mockContext(), null, null);
     }
 
     private Request newRequest(String method, String uri) throws URISyntaxException {
@@ -309,6 +368,7 @@ public class RestRouterIT extends GuiceTestCase {
 
         private SingletonResourceProvider configResource;
         private CollectionResourceProvider usersResource;
+        private CollectionResourceProvider internalResource;
         private Object dashboardResource;
         private Object authenticateResource;
 
@@ -367,6 +427,13 @@ public class RestRouterIT extends GuiceTestCase {
                     .toService(EQUALS, authenticateResource);
         }
 
+        @Override
+        public void addInternalRoutes(ResourceRouter internalRouter) {
+            internalRouter.route("internal")
+                    .authenticateWith(ssoToken().exceptRead())
+                    .toCollection(internalResource);
+        }
+
         @Inject
         void setConfigResource(@Named("ConfigResource") SingletonResourceProvider configResource) {
             this.configResource = configResource;
@@ -375,6 +442,11 @@ public class RestRouterIT extends GuiceTestCase {
         @Inject
         void setUsersResource(@Named("UsersResource") CollectionResourceProvider usersResource) {
             this.usersResource = usersResource;
+        }
+
+        @Inject
+        void setInternalResource(@Named("InternalResource") CollectionResourceProvider internalResource) {
+            this.internalResource = internalResource;
         }
 
         @Inject

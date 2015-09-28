@@ -20,11 +20,6 @@ import static org.forgerock.caf.authentication.framework.AuthenticationFilter.Au
 import static org.forgerock.http.routing.RouteMatchers.resourceApiVersionContextFilter;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.Provider;
@@ -52,6 +47,11 @@ import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Guice module for bindings for the REST routers and route registration.
@@ -173,6 +173,15 @@ public class RestGuiceModule extends AbstractModule {
     }
 
     @Provides
+    @Named("InternalCrestRouter")
+    @Singleton
+    Router getInternalCrestRealmRouter(@Named("CrestRealmRouter") Router crestRealmRouter) {
+        Router internalCrestRouter = new Router();
+        internalCrestRouter.setDefaultRoute(crestRealmRouter);
+        return internalCrestRouter;
+    }
+
+    @Provides
     @Named("CrestRealmRouter")
     @Singleton
     Router getCrestRealmRouter() {
@@ -214,6 +223,15 @@ public class RestGuiceModule extends AbstractModule {
             ContextFilter contextFilter, @Named("LoggingFilter") Filter loggingFilter) {
         return new Routers.ResourceRouterImpl(crestRealmRouter, invalidRealms, defaultAuthenticationEnforcer,
                 auditFilter, contextFilter, loggingFilter);
+    }
+
+    @Provides
+    @Named("InternalResourceRouter")
+    ResourceRouter getInternalRealmResourceRouter(@Named("InternalCrestRouter") Router internalCrestRouter,
+            @Named("InvalidRealmNames") Set<String> invalidRealms, AuthenticationEnforcer defaultAuthenticationEnforcer,
+            AuditFilter auditFilter, ContextFilter contextFilter, @Named("LoggingFilter") Filter loggingFilter) {
+        return new Routers.ResourceRouterImpl(internalCrestRouter, invalidRealms,
+                defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
     }
 
     @Provides

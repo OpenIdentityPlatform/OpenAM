@@ -35,9 +35,11 @@ public abstract class AbstractRestRouteProvider implements RestRouteProvider {
 
     @Override
     public final void addRoutes(ResourceRouter rootResourceRouter, ResourceRouter realmResourceRouter,
-            ServiceRouter rootServiceRouter, ServiceRouter realmServiceRouter) {
+                                ResourceRouter internalRouter, ServiceRouter rootServiceRouter,
+                                ServiceRouter realmServiceRouter) {
         addResourceRoutes(rootResourceRouter, realmResourceRouter);
         addServiceRoutes(rootServiceRouter, realmServiceRouter);
+        addInternalRoutes(internalRouter);
     }
 
     /**
@@ -58,6 +60,15 @@ public abstract class AbstractRestRouteProvider implements RestRouteProvider {
      */
     public void addServiceRoutes(ServiceRouter rootRouter, ServiceRouter realmRouter) {
 
+    }
+
+    /**
+     * Add a CREST resource route to the internal router.
+     *
+     * @param internalRouter
+     *         the internal router
+     */
+    public void addInternalRoutes(ResourceRouter internalRouter) {
     }
 
     protected ResourceRouter getRootResourceRouter() {
