@@ -57,8 +57,10 @@ public class DevicePrintDao {
 
         Set<String> set = (Set<String>) amIdentity.getAttribute(LDAP_DEVICE_PRINT_ATTRIBUTE_NAME);
         List<Map<String, Object>> profiles = new ArrayList<Map<String, Object>>();
-        for (String profile : set) {
-            profiles.add(MAPPER.readValue(profile, Map.class));
+        if (null != set) {
+            for (String profile : set) {
+                profiles.add(MAPPER.readValue(profile, Map.class));
+            }
         }
         return profiles;
     }
