@@ -203,7 +203,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                         app[dataField] = field.value;
                     }
                 } else {
-                    app[dataField] = field.value;
+                    app[dataField] = field.value.trim();
                 }
             });
 
