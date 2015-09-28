@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.JsonValue;
@@ -408,10 +409,10 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
             certificates = pullClientCertFromRequestAttribute(context.asContext(ClientContext.class));
         }
 
-        if (certificates != null) {
+        if (!ArrayUtils.isEmpty(certificates)) {
             return marshalX509CertIntoTokenValidatorParameters(certificates);
         } else {
-            if (!"".equals(offloadedTlsClientCertKey)) {
+            if ("".equals(offloadedTlsClientCertKey)) {
                 throw new TokenMarshalException(ResourceException.BAD_REQUEST, "A token transformation specifying an " +
                         "x509 token as input must be consumed via two-way-tls. No header was specified referencing the " +
                         "certificate, and the client's certificate was not found in the " +
