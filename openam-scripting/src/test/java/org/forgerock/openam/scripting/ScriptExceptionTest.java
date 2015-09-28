@@ -15,12 +15,13 @@
  */
 package org.forgerock.openam.scripting;
 
+import static java.text.MessageFormat.format;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
-import static org.testng.AssertJUnit.assertEquals;
 
 import org.testng.annotations.Test;
 
-import java.text.MessageFormat;
 import java.util.Locale;
 
 public class ScriptExceptionTest {
@@ -38,271 +39,142 @@ public class ScriptExceptionTest {
         // when
         se = new ScriptException(CONTEXT_NOT_RECOGNISED, context);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Script type not recognised: {0}", context));
+        assertThat(se.getMessage()).isEqualTo(format("Script type not recognised: {0}", context));
 
         // when
         se = new ScriptException(LANGUAGE_NOT_SUPPORTED, language);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Scripting language not supported: {0}", language));
+        assertThat(se.getMessage()).isEqualTo(format("Scripting language not supported: {0}", language));
 
         // when
         se = new ScriptException(FIND_BY_NAME_FAILED, scriptName, realm);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Failed to read script called {0} from realm {1}", scriptName, realm));
+        assertThat(se.getMessage()).isEqualTo(format("Failed to read script called {0} from realm {1}", scriptName,
+                realm));
 
         // when
         se = new ScriptException(FIND_BY_UUID_FAILED, uuid, realm);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Failed to read script with UUID {0} from realm {1}", uuid, realm));
+        assertThat(se.getMessage()).isEqualTo(format("Failed to read script with UUID {0} from realm " + "{1}", uuid,
+                realm));
 
         // when
         se = new ScriptException(DELETE_FAILED, uuid, realm);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Failed to delete script with UUID {0} from realm {1}", uuid, realm));
+        assertThat(se.getMessage()).isEqualTo(format("Failed to delete script with UUID {0} from realm " + "{1}",
+                uuid, realm));
 
         // when
         se = new ScriptException(RETRIEVE_FAILED, uuid, realm);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Failed to retrieve script with UUID {0} from realm {1}", uuid, realm));
+        assertThat(se.getMessage()).isEqualTo(format("Failed to retrieve script with UUID {0} from " + "realm {1}",
+                uuid, realm));
 
         // when
         se = new ScriptException(RETRIEVE_ALL_FAILED, realm);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Failed to retrieve scripts from realm {0}", realm));
+        assertThat(se.getMessage()).isEqualTo(format("Failed to retrieve scripts from realm {0}", realm));
 
         // when
         se = new ScriptException(SAVE_FAILED, uuid, realm);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Failed to save script with UUID {0} in realm {1}", uuid, realm));
+        assertThat(se.getMessage()).isEqualTo(format("Failed to save script with UUID {0} in realm " + "{1}", uuid,
+                realm));
 
         // when
         se = new ScriptException(MISSING_SCRIPT_UUID);
         //then
-        assertEquals(se.getMessage(), "Script UUID must be specified");
+        assertThat(se.getMessage()).isEqualTo("Script UUID must be specified");
 
         // when
         se = new ScriptException(MISSING_SCRIPT_NAME);
         //then
-        assertEquals(se.getMessage(), "Script name must be specified");
+        assertThat(se.getMessage()).isEqualTo("Script name must be specified");
 
         // when
         se = new ScriptException(MISSING_SCRIPT);
         //then
-        assertEquals(se.getMessage(), "A script must be specified");
+        assertThat(se.getMessage()).isEqualTo("A script must be specified");
 
         // when
         se = new ScriptException(MISSING_SCRIPTING_LANGUAGE);
         //then
-        assertEquals(se.getMessage(), "Scripting language must be specified");
+        assertThat(se.getMessage()).isEqualTo("Scripting language must be specified");
 
         // when
         se = new ScriptException(MISSING_SCRIPT_CONTEXT);
         //then
-        assertEquals(se.getMessage(), "Script type must be specified");
+        assertThat(se.getMessage()).isEqualTo("Script type must be specified");
 
         // when
         se = new ScriptException(SCRIPT_NAME_EXISTS, scriptName, realm);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Script with name {0} already exist in realm {1}", scriptName, realm));
+        assertThat(se.getMessage()).isEqualTo(format("Script with name {0} already exist in realm {1}", scriptName,
+                realm));
 
         // when
         se = new ScriptException(SCRIPT_UUID_EXISTS, uuid, realm);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Script with UUID {0} already exist in realm {1}", uuid, realm));
+        assertThat(se.getMessage()).isEqualTo(format("Script with UUID {0} already exist in realm {1}", uuid, realm));
 
         // when
         se = new ScriptException(SCRIPT_UUID_NOT_FOUND, uuid, realm);
         //then
-        assertEquals(se.getMessage(),
-                MessageFormat.format("Script with UUID {0} could not be found in realm {1}", uuid, realm));
+        assertThat(se.getMessage()).isEqualTo(format("Script with UUID {0} could not be found in realm {1}", uuid,
+                realm));
 
         // when
         se = new ScriptException(FILTER_BOOLEAN_LITERAL_FALSE);
         //then
-        assertEquals(se.getMessage(), "The 'boolean literal' filter with value of 'false' is not supported");
+        assertThat(se.getMessage()).isEqualTo("The 'boolean literal' filter with value of 'false' is not supported");
 
         // when
         se = new ScriptException(FILTER_EXTENDED_MATCH);
         //then
-        assertEquals(se.getMessage(), "The 'extended match' filter is not supported");
+        assertThat(se.getMessage()).isEqualTo("The 'extended match' filter is not supported");
 
         // when
         se = new ScriptException(FILTER_GREATER_THAN);
         //then
-        assertEquals(se.getMessage(), "The 'greater than' filter is not supported");
+        assertThat(se.getMessage()).isEqualTo("The 'greater than' filter is not supported");
 
         // when
         se = new ScriptException(FILTER_GREATER_THAN_OR_EQUAL);
         //then
-        assertEquals(se.getMessage(), "The 'greater than or equal' filter is not supported");
+        assertThat(se.getMessage()).isEqualTo("The 'greater than or equal' filter is not supported");
 
         // when
         se = new ScriptException(FILTER_LESS_THAN);
         //then
-        assertEquals(se.getMessage(), "The 'less than' filter is not supported");
+        assertThat(se.getMessage()).isEqualTo("The 'less than' filter is not supported");
 
         // when
         se = new ScriptException(FILTER_LESS_THAN_OR_EQUAL);
         //then
-        assertEquals(se.getMessage(), "The 'less than or equal' filter is not supported");
+        assertThat(se.getMessage()).isEqualTo("The 'less than or equal' filter is not supported");
 
         // when
         se = new ScriptException(FILTER_NOT);
         //then
-        assertEquals(se.getMessage(), "The 'not' filter is not supported");
+        assertThat(se.getMessage()).isEqualTo("The 'not' filter is not supported");
 
         // when
         se = new ScriptException(FILTER_PRESENT);
         //then
-        assertEquals(se.getMessage(), "The 'present' filter is not supported");
+        assertThat(se.getMessage()).isEqualTo("The 'present' filter is not supported");
     }
 
     @Test
     public void shouldMapScriptErrorCodeToLocalisedMessage() {
         // given
         ScriptException se;
-        Locale locale = new Locale("af");
+        Locale locale = new Locale("te");
 
-        // when
-        se = new ScriptException(CONTEXT_NOT_RECOGNISED, context);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Skrip konteks kan nie erken word nie: {0}", context));
-
-        // when
-        se = new ScriptException(LANGUAGE_NOT_SUPPORTED, language);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Skrip taal word nie geondersteun nie: {0}", language));
-
-        // when
-        se = new ScriptException(FIND_BY_NAME_FAILED, scriptName, realm);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Lees van skrip genaamd {0} uit realm {1} het misluk", scriptName, realm));
-
-        // when
-        se = new ScriptException(FIND_BY_UUID_FAILED, uuid, realm);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Lees van skrip met UUID {0} uit realm {1} het misluk", uuid, realm));
-
-        // when
-        se = new ScriptException(DELETE_FAILED, uuid, realm);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Verwydering van skrip met UUID {0} uit realm {1} het misluk", uuid, realm));
-
-        // when
-        se = new ScriptException(RETRIEVE_FAILED, uuid, realm);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Ontrek van skrip met UUID {0} uit realm {1} het misluk", uuid, realm));
-
-        // when
-        se = new ScriptException(RETRIEVE_ALL_FAILED, realm);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Ontrek van skripte uit realm {0} het misluk", realm));
-
-        // when
-        se = new ScriptException(SAVE_FAILED, uuid, realm);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Stooring van skrip met UUID {0} in realm {1} het misluk", uuid, realm));
-
-        // when
-        se = new ScriptException(MISSING_SCRIPT_UUID);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Skrip UUID moet gespesifiseer word");
-
-        // when
-        se = new ScriptException(MISSING_SCRIPT_NAME);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Skrip naam moet gespesifiseer word");
-
-        // when
-        se = new ScriptException(MISSING_SCRIPT);
-        //then
-        assertEquals(se.getL10NMessage(locale), "'n Skrip moet gespesifiseer word");
-
-        // when
-        se = new ScriptException(MISSING_SCRIPTING_LANGUAGE);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Skrip taal moet gespesifiseer word");
-
-        // when
-        se = new ScriptException(MISSING_SCRIPT_CONTEXT);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Skrip konteks moet gespesifiseer word");
-
-        // when
-        se = new ScriptException(SCRIPT_NAME_EXISTS, scriptName, realm);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Skrip genaamd {0} bestaan reeds in realm {1}", scriptName, realm));
-
-        // when
-        se = new ScriptException(SCRIPT_UUID_EXISTS, uuid, realm);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Skrip met UUID {0} bestaan reeds in realm {1}", uuid, realm));
-
-        // when
-        se = new ScriptException(SCRIPT_UUID_NOT_FOUND, uuid, realm);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                MessageFormat.format("Skrip met UUID {0} kon nie gevind word in realm {1}", uuid, realm));
-
-        // when
-        se = new ScriptException(FILTER_BOOLEAN_LITERAL_FALSE);
-        //then
-        assertEquals(se.getL10NMessage(locale),
-                "Die 'boolean literal' filter met waarde van 'false' word nie geondersteun nie");
-
-        // when
-        se = new ScriptException(FILTER_EXTENDED_MATCH);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Die 'extended match' filter word nie geondersteun nie");
-
-        // when
-        se = new ScriptException(FILTER_GREATER_THAN);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Die 'greater than' filter word nie geondersteun nie");
-
-        // when
-        se = new ScriptException(FILTER_GREATER_THAN_OR_EQUAL);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Die 'greater than or equal' filter word nie geondersteun nie");
-
-        // when
-        se = new ScriptException(FILTER_LESS_THAN);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Die 'less than' filter word nie geondersteun nie");
-
-        // when
-        se = new ScriptException(FILTER_LESS_THAN_OR_EQUAL);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Die 'less than or equal' filter word nie geondersteun nie");
-
-        // when
-        se = new ScriptException(FILTER_NOT);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Die 'not' filter word nie geondersteun nie");
-
-        // when
-        se = new ScriptException(FILTER_PRESENT);
-        //then
-        assertEquals(se.getL10NMessage(locale), "Die 'present' filter word nie geondersteun nie");
+        for (ScriptErrorCode errorCode : ScriptErrorCode.values()) {
+            // when
+            se = new ScriptException(errorCode);
+            //then
+            assertThat(se.getL10NMessage(locale)).isEqualTo(format(errorCode.name() + "-TRANSLATED"));
+        }
     }
 }

@@ -72,7 +72,7 @@ public final class ScriptConstants {
     /**
      * The context in which a script will be used.
      */
-    public static enum ScriptContext {
+    public enum ScriptContext {
         AUTHENTICATION_SERVER_SIDE,
         AUTHENTICATION_CLIENT_SIDE,
         POLICY_CONDITION,
@@ -84,7 +84,7 @@ public final class ScriptConstants {
      * Predefined global script configuration IDs. The global script configurations are defined in the
      * scripting service and accessible in all realms.
      */
-    public static enum GlobalScript {
+    public enum GlobalScript {
         AUTH_MODULE_SERVER_SIDE("Scripted Module - Server Side", "7e3d7067-d50f-4674-8c76-a3e13a810c33"),
         AUTH_MODULE_CLIENT_SIDE("Scripted Module - Client Side", ""),
         DEVICE_ID_MATCH_SERVER_SIDE("Device Id (Match) - Server Side", "703dab1a-1921-4981-98dd-b8e5349d8548"),
@@ -95,7 +95,7 @@ public final class ScriptConstants {
         private final String displayName;
         private final String id;
 
-        private GlobalScript(String displayName, String id) {
+        GlobalScript(String displayName, String id) {
             this.displayName = displayName;
             this.id = id;
         }
@@ -121,48 +121,34 @@ public final class ScriptConstants {
      * Error messages are stored in the scripting.properties file to facilitate translation. Each entry in this
      * enum corresponds to a specific error message in the file keyed on the code.
      */
-    public static enum ScriptErrorCode {
-        CONTEXT_NOT_RECOGNISED("1"),
-        LANGUAGE_NOT_SUPPORTED("2"),
-        FIND_BY_NAME_FAILED("3"),
-        FIND_BY_UUID_FAILED("4"),
-        DELETE_FAILED("5"),
-        RETRIEVE_FAILED("6"),
-        RETRIEVE_ALL_FAILED("7"),
-        SAVE_FAILED("8"),
-        MISSING_SCRIPT_UUID("9"),
-        MISSING_SCRIPT_NAME("10"),
-        MISSING_SCRIPT("11"),
-        MISSING_SCRIPTING_LANGUAGE("12"),
-        MISSING_SCRIPT_CONTEXT("13"),
-        SCRIPT_NAME_EXISTS("14"),
-        SCRIPT_UUID_EXISTS("15"),
-        SCRIPT_UUID_NOT_FOUND("16"),
-        FILTER_BOOLEAN_LITERAL_FALSE("17"),
-        FILTER_EXTENDED_MATCH("18"),
-        FILTER_GREATER_THAN("19"),
-        FILTER_GREATER_THAN_OR_EQUAL("20"),
-        FILTER_LESS_THAN("21"),
-        FILTER_LESS_THAN_OR_EQUAL("22"),
-        FILTER_NOT("23"),
-        FILTER_PRESENT("24"),
-        RESOURCE_FILTER_NOT_SUPPORTED("26"),
-        SCRIPT_DECODING_FAILED("27"),
-        DELETING_DEFAULT_SCRIPT("28");
-
-        private final String code;
-
-        private ScriptErrorCode(String code) {
-            this.code = code;
-        }
-
-        /**
-         * Get the code for this error message.
-         * @return the error message code
-         */
-        public String getCode() {
-            return code;
-        }
+    public enum ScriptErrorCode {
+        CONTEXT_NOT_RECOGNISED,
+        LANGUAGE_NOT_SUPPORTED,
+        FIND_BY_NAME_FAILED,
+        FIND_BY_UUID_FAILED,
+        DELETE_FAILED,
+        RETRIEVE_FAILED,
+        RETRIEVE_ALL_FAILED,
+        SAVE_FAILED,
+        MISSING_SCRIPT_UUID,
+        MISSING_SCRIPT_NAME,
+        MISSING_SCRIPT,
+        MISSING_SCRIPTING_LANGUAGE,
+        MISSING_SCRIPT_CONTEXT,
+        SCRIPT_NAME_EXISTS,
+        SCRIPT_UUID_EXISTS,
+        SCRIPT_UUID_NOT_FOUND,
+        FILTER_BOOLEAN_LITERAL_FALSE,
+        FILTER_EXTENDED_MATCH,
+        FILTER_GREATER_THAN,
+        FILTER_GREATER_THAN_OR_EQUAL,
+        FILTER_LESS_THAN,
+        FILTER_LESS_THAN_OR_EQUAL,
+        FILTER_NOT,
+        FILTER_PRESENT,
+        RESOURCE_FILTER_NOT_SUPPORTED,
+        SCRIPT_DECODING_FAILED,
+        DELETING_DEFAULT_SCRIPT
     }
 
     /**

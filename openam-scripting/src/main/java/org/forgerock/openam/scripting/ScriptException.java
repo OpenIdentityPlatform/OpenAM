@@ -36,7 +36,7 @@ public class ScriptException extends L10NMessageImpl {
      * @param arguments Arguments used in the message associated with the error code.
      */
     public ScriptException(ScriptErrorCode errorCode, Throwable cause, String... arguments) {
-        super(RESOURCE_BUNDLE, errorCode.getCode(), arguments);
+        super(RESOURCE_BUNDLE, errorCode.name(), arguments);
         initCause(cause);
         this.scriptErrorCode = errorCode;
     }
