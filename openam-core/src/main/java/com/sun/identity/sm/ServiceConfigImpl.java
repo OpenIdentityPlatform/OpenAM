@@ -51,7 +51,7 @@ class ServiceConfigImpl implements ServiceListener {
     private ServiceConfigManagerImpl scm;
     
     // Schema manager to register for schema changes
-    ServiceSchemaManagerImpl ssmi;
+    private ServiceSchemaManagerImpl ssmi;
 
     private ServiceSchemaImpl ss;
 
@@ -548,14 +548,11 @@ class ServiceConfigImpl implements ServiceListener {
         // Add to cache
         synchronized (configImpls) {
             // Check if already added by another thread
-            ServiceConfigImpl tmp = getFromCache(cacheName, null);
-            if (tmp == null) {
+            answer = getFromCache(cacheName, null);
+            if (answer == null) {
                 // Not in cache, construct service config impl
-                answer = new ServiceConfigImpl(scm, ss, entry, orgName,
-                    groupName, compName, globalConfig, token);
+                answer = new ServiceConfigImpl(scm, ss, entry, orgName, groupName, compName, globalConfig, token);
                 configImpls.put(cacheName, answer);
-            } else {
-                answer = tmp;
             }
         }
 
@@ -601,11 +598,9 @@ class ServiceConfigImpl implements ServiceListener {
         throws SMSException, SSOException {
         ServiceConfigImpl answer = (ServiceConfigImpl) configImpls.get(cn);
         if (answer != null) {
-            if (!answer.isValid()) {
+            if (!answer.isValid() || answer.smsEntry.isNewEntry()) {
                 configImpls.remove(cn);
                 answer.clear();
-                answer = null;
-            } else if (answer.smsEntry.isNewEntry()) {
                 answer = null;
             }
         }
