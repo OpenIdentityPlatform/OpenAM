@@ -150,7 +150,7 @@ public class AuthenticationServiceV1 {
             return handleErrorResponse(httpRequest, Status.valueOf(e.getStatusCode()), e);
         } catch (RestAuthException e) {
             DEBUG.message("AuthenticationService.authenticate() :: Rest Authentication Exception", e);
-            return handleErrorResponse(httpRequest, Status.UNAUTHORIZED, e);
+            return handleErrorResponse(httpRequest, Status.valueOf(e.getStatusCode()), e);
         } catch (IOException e) {
             DEBUG.error("AuthenticationService.authenticate() :: Internal Error", e);
             return handleErrorResponse(httpRequest, Status.INTERNAL_SERVER_ERROR, e);
