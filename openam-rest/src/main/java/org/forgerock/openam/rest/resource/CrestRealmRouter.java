@@ -96,6 +96,9 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
 
     private boolean getRealmFromURI(ServerContext context, RealmContext realmContext) throws BadRequestException {
         if (context.containsContext(RouterContext.class)) {
+            if (realmContext.getOverrideRealm() != null) {
+                return true;
+            }
             String subRealm = context.asContext(RouterContext.class).getUriTemplateVariables().get("realm");
             subRealm = validateRealm(realmContext.getRebasedRealm(), subRealm);
             if (subRealm != null) {

@@ -142,6 +142,8 @@ public class CrestRealmRouterTest {
                 {"openam.example.com", "/realm", null, "/realm"},
                 //http://openam.example.com:8080/openam/json/realmAlias/users/demo
                 {"openam.example.com", "/realmAlias", null, "/realm"},
+                //http://openam.example.com:8080/openam/json/realmAlias/users/demo?realm=overrideRealm
+                {"openam.example.com", "/realm", "overrideRealm", "/overrideRealm"},
 
                 //http://alias.example.com:8080/openam/json/nextRealm/users/demo
                 {"alias.example.com", "nextRealm", null, "/otherRealm/nextRealm"},
