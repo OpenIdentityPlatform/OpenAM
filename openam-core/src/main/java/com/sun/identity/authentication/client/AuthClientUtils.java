@@ -126,7 +126,7 @@ public class AuthClientUtils {
         Boolean.valueOf(SystemProperties.get(
         Constants.REWRITE_AS_PATH,"")).booleanValue();
     public static final String templatePath =
-        new StringBuffer().append(Constants.FILE_SEPARATOR)
+        new StringBuilder().append(Constants.FILE_SEPARATOR)
     .append(ISAuthConstants.CONFIG_DIR)
     .append(Constants.FILE_SEPARATOR)
     .append(ISAuthConstants.AUTH_DIR).toString();
@@ -360,51 +360,59 @@ public class AuthClientUtils {
         String clientEncoding = request.getCharacterEncoding();
         String encoding = (clientEncoding != null) ? clientEncoding : "UTF-8";
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("AuthUtils::decodeHash:clientEncoding = "  
-                    + clientEncoding
-                    + ", encoding=" + encoding);
+            utilDebug.message("AuthUtils::decodeHash: clientEncoding='{}', encoding='{}'", clientEncoding, encoding);
         }
+
         @SuppressWarnings("unchecked")
         Enumeration<String> names = request.getParameterNames();
-        String encoded = request.getParameter("encoded");
-        if(encoded == null){
-        	encoded = "false"; 
-        }
+        boolean base64Encoded = Boolean.parseBoolean(request.getParameter("encoded"));
+
         while (names.hasMoreElements()) {
             String name = names.nextElement();
             String value = request.getParameter(name);
-            if(name.equalsIgnoreCase("SunQueryParamsString")){
-                // This will nornally be the case when browser back button is 
+            if (value == null) {
+                if (utilDebug.messageEnabled()) {
+                    utilDebug.message("AuthUtils::decodeHash parameter '{}' is null", name);
+                }
+                continue;
+            }
+            if (name.equalsIgnoreCase("SunQueryParamsString")){
+                // This will normally be the case when browser back button is
                 // used and the form is posted again with the base64 encoded 
                 // parameters            	
-                if ((value != null) && (value.length()>0)){
+                if (!value.isEmpty()){
                     value = Base64.decodeAsUTF8String(value);
+                    if (utilDebug.messageEnabled()) {
+                        utilDebug.message("AuthUtils::decodeHash base 64 decoded '{}'='{}'", name, value);
+                    }
                     StringTokenizer st = new StringTokenizer(value, "&");
                     while (st.hasMoreTokens()) {
                         String str = st.nextToken();
                         if (str.indexOf("=") != -1 ) {
                             int index = str.indexOf("=");
                             String parameter = str.substring(0,index);
-                            String parameterValue = str.substring(index+1);
-                            data.put(parameter, 
-                            getCharDecodedField(parameterValue, encoding, utilDebug));                            
+                            String parameterValue = str.substring(index + 1);
+                            putDecodedValue(data, parameter, parameterValue, encoding);
                         } 
-                    }          
-            	}            	
-            }else if(name.equals("goto")){
+                    }
+            	}
+            } else if ("goto".equals(name)){
                 // Again this will be the case when browser back
                 // button is used and the form is posted with the
                 // base64 encoded parameters including goto
-                if ((value != null) && (value.length()>0)){
-             	    if(encoded.equalsIgnoreCase("true")){
-             	        value = Base64.decodeAsUTF8String(value);
-             	    }
+                if (utilDebug.messageEnabled()) {
+                    utilDebug.message("AuthUtils::decodeHash '{}'='{}', encoded='{}'", name, value, base64Encoded);
                 }
-                data.put(name, 
-                    getCharDecodedField(value, encoding, utilDebug));             	   
-            }else{
-                data.put(name, 
-                    getCharDecodedField(value, encoding, utilDebug));
+
+                if (base64Encoded) {
+                    value = Base64.decodeAsUTF8String(value);
+                    if (utilDebug.messageEnabled()) {
+                        utilDebug.message("AuthUtils::decodeHash base 64 decoded '{}'='{}'", name, value);
+                    }
+                }
+                putDecodedValue(data, name, value, encoding);
+            } else{
+                putDecodedValue(data, name, value, encoding);
             }
         }// while
         return (data);
@@ -464,9 +472,8 @@ public class AuthClientUtils {
     public static Cookie createCookie(String cookieValue, String cookieDomain) {
         String cookieName = getCookieName();
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("cookieName : " + cookieName);
-            utilDebug.message("cookieValue : " + cookieValue);
-            utilDebug.message("cookieDomain : " + cookieDomain);
+            utilDebug.message("cookieName='{}', cookieValue='{}', cookieDomain='{}'", cookieName, cookieValue,
+                    cookieDomain);
         }
         return (createCookie(cookieName,cookieValue,cookieDomain));
     }    
@@ -484,7 +491,7 @@ public class AuthClientUtils {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("queryOrg is :" + queryOrg);
         }
-        return (queryOrg);
+        return queryOrg;
     }   
 
 
@@ -498,9 +505,8 @@ public class AuthClientUtils {
             return;
         }
         for (int i = 0; i < ck.length; ++i) {
-            if ( utilDebug.messageEnabled()) {
-                utilDebug.message("Received Cookie:" + ck[i].getName() + 
-                                  " = " + ck[i].getValue());
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("Received Cookie: '{}'='{}'", ck[i].getName(), ck[i].getValue());
             }
         }
     }    
@@ -522,8 +528,7 @@ public class AuthClientUtils {
                     String tmp[] = (String[])value;
                     for (int ii=0; ii < tmp.length; ii++) {
                         if (utilDebug.messageEnabled()) {
-                            utilDebug.message("printHash : String[] keyname ("+ 
-                                              key + ") = " + tmp[ii]);
+                            utilDebug.message("printHash : String[] keyname '{}'='{}'", key, tmp[ii]);
                         }
                     }
                 }
@@ -561,33 +566,26 @@ public class AuthClientUtils {
      * @param cookieDomain Domain for which the cookie is to be set.
      * @return the cookie object.
      */
-    public static Cookie createCookie(
-        String cookieName,
-        String cookieValue,
-        String cookieDomain
-    ) {
+    public static Cookie createCookie(String cookieName, String cookieValue, String cookieDomain) {
+
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("cookieName   : " + cookieName);
-            utilDebug.message("cookieValue  : " + cookieValue);
-            utilDebug.message("cookieDomain : " + cookieDomain);
+            utilDebug.message("cookieName='{}', cookieValue='{}', cookieDomain='{}'", cookieName, cookieValue,
+                    cookieDomain);
         }
 
         Cookie cookie = null;
         try {
-            // hardcoded need to read from attribute and set cookie
-            // for all domains
-            cookie = CookieUtils.newCookie(cookieName, cookieValue,
-                "/", cookieDomain);
+            // hardcoded need to read from attribute and set cookie for all domains
+            cookie = CookieUtils.newCookie(cookieName, cookieValue, "/", cookieDomain);
         } catch (Exception e) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Error creating cookie. : " 
-                                  + e.getMessage());
+                utilDebug.message("Error creating cookie. : " + e.getMessage());
             }
         }
         if (utilDebug.messageEnabled()) {
             utilDebug.message("createCookie Cookie is set : " + cookie);
         }
-        return (cookie);
+        return cookie;
     }
 
     public static void clearlbCookie(HttpServletRequest request,
@@ -611,23 +609,19 @@ public class AuthClientUtils {
 
     /* return the the error message for the error code */
     public static String getErrorMessage(String errorCode) {
-        String errorMessage = getErrorVal(errorCode, ERROR_MESSAGE);
-        return (errorMessage);
+        return getErrorVal(errorCode, ERROR_MESSAGE);
     }
 
     /* return the the error template for the error code */
     public static String getErrorTemplate(String errorCode) {
-        String errorTemplate = getErrorVal(errorCode,ERROR_TEMPLATE);
-        return (errorTemplate);
-    } 
+        return getErrorVal(errorCode,ERROR_TEMPLATE);
+    }
 
     public static boolean checkForCookies(HttpServletRequest req) {
 
         // came here if cookie not found , return false
-        return(
-            (CookieUtils.getCookieValueFromReq(req,getAuthCookieName()) != null)
-            ||
-            (CookieUtils.getCookieValueFromReq(req,getCookieName()) !=null));
+        return CookieUtils.getCookieValueFromReq(req,getAuthCookieName()) != null
+                || CookieUtils.getCookieValueFromReq(req,getCookieName()) != null;
     }       
 
     // Get Original Redirect URL for Auth to redirect the Login request
@@ -648,12 +642,11 @@ public class AuthClientUtils {
             }
         } catch (Exception e) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Error in getOrigRedirectURL:"
-                                  + e.toString());
+                utilDebug.message("Error in getOrigRedirectURL:", e);
             }
-            return (null);
+            return null;
         }
-        return (null);
+        return null;
     }     
 
     /**
@@ -674,7 +667,7 @@ public class AuthClientUtils {
         if ((logoutCookie == null) || (isCookieSupported)) {
             logoutURL = url;
         } else {
-            StringBuffer cookieString = new StringBuffer();
+            StringBuilder cookieString = new StringBuilder();
             cookieString.append(URLEncDec.encode(getCookieName()))
             .append("=").append(URLEncDec.encode(logoutCookie));
 
@@ -692,12 +685,7 @@ public class AuthClientUtils {
             }
         }
 
-        /*if (utilDebug.messageEnabled()) {
-         *  utilDebug.message("logoutURL is : "+ logoutURL);
-         *}
-         */
-
-        return (logoutURL);
+        return logoutURL;
     }                 
 
     /**
@@ -752,7 +740,7 @@ public class AuthClientUtils {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("AuthUtils:returning sessionID:" + sessionID);
         }
-        return (sessionID);
+        return sessionID;
     }    
 
     /**
@@ -769,7 +757,7 @@ public class AuthClientUtils {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("newSessionArgExists : " + newSessionArgExists);
         }
-        return (newSessionArgExists);
+        return newSessionArgExists;
     }
 
     // Get the AuthContext.IndexType given string index type value
@@ -797,7 +785,7 @@ public class AuthClientUtils {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("getIndexType : IndexType = " + indexType);
         }
-        return (indexType);
+        return indexType;
     }
 
     // Get the index name given index type from the existing valid session
@@ -821,13 +809,12 @@ public class AuthClientUtils {
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("Error in getIndexName :"+ e.toString());
             }
-            return (indexName);
+            return indexName;
         }
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("getIndexName : IndexType = " + indexType);
-            utilDebug.message("getIndexName : IndexName = " + indexName);
+            utilDebug.message("getIndexName : IndexType='{}', IndexName='{}'", indexType, indexName);
         }
-        return (indexName);
+        return indexName;
     }
 
     // Get the first or latest index name from the string of index names
@@ -840,7 +827,7 @@ public class AuthClientUtils {
                 firstIndexName = (String)st.nextToken();
             }
         }
-        return (firstIndexName);
+        return firstIndexName;
     }
 
     // search valve in the String
@@ -853,18 +840,18 @@ public class AuthClientUtils {
                 StringTokenizer st = new StringTokenizer(value, "|");
                 while (st.hasMoreTokens()) {
                     if ((st.nextToken()).equals(key)) {
-                        return (true);
+                        return true;
                     }
                 }
             } else {
                 if (value.trim().equals(key.trim())) {
-                    return (true);
+                    return true;
                 }
             }
         } catch (Exception e) {
-            utilDebug.error("error : " + e.toString());
+            utilDebug.error("AuthClientUtils.isContain: error : ", e);
         }
-        return (false);
+        return false;
     }
 
     // Method to check if this is Session Upgrade
@@ -882,8 +869,7 @@ public class AuthClientUtils {
                 tmp = (String) reqDataHash.get("user");
                 value = ssoToken.getProperty("UserToken");
                 if (utilDebug.messageEnabled()) {
-                    utilDebug.message("user : " + tmp);
-                    utilDebug.message("userToken : " + value);
+                    utilDebug.message("user='{}', userToken ='{}'", tmp, value);
                 }
                 if (!tmp.equals(value)) {
                     upgrade = true;
@@ -900,8 +886,7 @@ public class AuthClientUtils {
 	            } else if (reqDataHash.get("service")!=null &&
 	                    reqDataHash.get(Constants.COMPOSITE_ADVICE) == null) {
                 if(utilDebug.messageEnabled()) {
-                    utilDebug.message("AuthClientUtils.checkSessionUpgrade:"
-                         +" service");
+                    utilDebug.message("AuthClientUtils.checkSessionUpgrade:service");
                 }
                 tmp = (String) reqDataHash.get("service");
                 value = ssoToken.getProperty("Service");
@@ -932,13 +917,13 @@ public class AuthClientUtils {
                 upgrade = true;
             }
         } catch (Exception e) {
-            utilDebug.message("Exception in checkSessionUpgrade : " , e);
+            utilDebug.message("Exception in checkSessionUpgrade : ", e);
         }
 
         if (utilDebug.messageEnabled()) {
             utilDebug.message("Check session upgrade : " + upgrade);
         }
-        return (upgrade);
+        return upgrade;
     }
 
     /**
@@ -958,7 +943,7 @@ public class AuthClientUtils {
                 return checkSessionUpgrade(token, reqDataHash);
             } catch (SSOException ssoe) {
                 if (utilDebug.messageEnabled()) {
-                    utilDebug.message("Unable to create sso token for isSessionUpgrade check: " + ssoe);
+                    utilDebug.message("Unable to create sso token for isSessionUpgrade check: ", ssoe);
                 }
             }
         }
@@ -982,7 +967,7 @@ public class AuthClientUtils {
             }
         } catch (SSOException ssoe) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("SSOException occured while checking session upgrade case" + ssoe);
+                utilDebug.message("SSOException occurred while checking session upgrade case", ssoe);
             }
         }
 
@@ -998,7 +983,7 @@ public class AuthClientUtils {
                     + Integer.toString(sessionServerURL.getPort()) + serviceURI;
         } catch (SessionException se) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("LoginServlet error in Session : " + se.toString());
+                utilDebug.message("LoginServlet error in Session : ", se);
             }
         }
 
@@ -1015,10 +1000,9 @@ public class AuthClientUtils {
         }
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("clientDetectionEnabled = " 
-                              + clientDetectionEnabled);
+            utilDebug.message("clientDetectionEnabled = " + clientDetectionEnabled);
         }
-        return (clientDetectionEnabled);
+        return clientDetectionEnabled;
     }
 
     /**
@@ -1034,8 +1018,7 @@ public class AuthClientUtils {
     public static String getClientType(HttpServletRequest req) {
         if (isClientDetectionEnabled() && (clientDetector != null)) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("clienttype = "
-                    +clientDetector.getClientType(req));
+                utilDebug.message("clienttype = " + clientDetector.getClientType(req));
             }
             return (clientDetector.getClientType(req));
         }
@@ -1053,15 +1036,13 @@ public class AuthClientUtils {
                 // add observer, so auth will be notified if the client changed
                 // defClient.addObserver(this);
             } catch (Exception e) {
-                utilDebug.error("getDefaultClientType Error : " 
-                                + e.toString());
+                utilDebug.error("getDefaultClientType Error : ", e);
             }
         }
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("getDefaultClientType, ClientType = " +
-                defaultClientType);
+            utilDebug.message("getDefaultClientType, ClientType = " + defaultClientType);
         }
-        return (defaultClientType);
+        return defaultClientType;
     }
 
     /**
@@ -1071,12 +1052,12 @@ public class AuthClientUtils {
     private static Client getClientInstance(String clientType) {
         if (!clientType.equals(getDefaultClientType())) {
             try {
-                return (AuthClient.getInstance(clientType,null));
+                return AuthClient.getInstance(clientType, null);
             } catch (Exception ce) {
-                utilDebug.warning("getClientInstance()" , ce);
+                utilDebug.warning("getClientInstance: clientType='{}'", clientType, ce);
             }
         }
-        return (defaultClient);
+        return defaultClient;
     }
 
     /**
@@ -1095,11 +1076,10 @@ public class AuthClientUtils {
             return (getClientInstance(clientType).getProperty(property));
         } catch (Exception ce) {
             // which means we did not get the client Property
-            utilDebug.warning("Error retrieving Client Data : " + property + 
-                ce.toString());
+            utilDebug.warning("Error retrieving Client Data : property='{}'", property, ce);
             // if this was not the default client type then lets
             // try to get the default client Property
-            return (getDefaultProperty(property));
+            return getDefaultProperty(property);
         }
     }
 
@@ -1110,7 +1090,7 @@ public class AuthClientUtils {
         try {
             return (defaultClient.getProperty(property));
         } catch (Exception ce) {
-            utilDebug.warning("Could not get " + property + ce.toString());
+            utilDebug.warning("Could not get property='{}'", property, ce);
         }
         return (null);
     }
@@ -1119,24 +1099,21 @@ public class AuthClientUtils {
      * return the charset associated with the clientType
      */
     public static String getCharSet(String clientType,java.util.Locale locale) {
-        String charset = Client.CDM_DEFAULT_CHARSET; // ISO-8859-1
+        String charset = Client.CDM_DEFAULT_CHARSET;
         if (isClientDetectionEnabled()) {
             try {
                 charset = getClientInstance(clientType).getCharset(locale);
             } catch (Exception ce) {
                 if (utilDebug.warningEnabled()) {
-                    utilDebug.warning("AuthClientUtils.getCharSet:"
-                        + " Client data was "
-                        + "not found, setting charset to UTF-8.");
+                    utilDebug.warning("AuthClientUtils.getCharSet:Client data was not found, setting charset to UTF-8.");
                 }
                 charset = Constants.CONSOLE_UI_DEFAULT_CHARSET;
             }
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("AuthClientUtils.getCharSet: Charset from"+
-                    " Client is : " + charset);
+                utilDebug.message("AuthClientUtils.getCharSet: Charset from Client is charset='{}'", charset);
             }
         } else {
-            charset = Constants.CONSOLE_UI_DEFAULT_CHARSET; // UTF-8
+            charset = Constants.CONSOLE_UI_DEFAULT_CHARSET;
         }
         return (charset);
     }
@@ -1147,9 +1124,9 @@ public class AuthClientUtils {
     public static String getFilePath(String clientType) {
         String filePath = getProperty(clientType,"filePath");
         if (filePath == null) {
-            return (DEFAULT_FILE_PATH);
+            return DEFAULT_FILE_PATH;
         }
-        return (filePath);
+        return filePath;
     }
 
     /**
@@ -1162,7 +1139,7 @@ public class AuthClientUtils {
         if (contentType == null) {
             return (DEFAULT_CONTENT_TYPE);
         }
-        return (contentType);
+        return contentType;
     }
 
     /**
@@ -1171,13 +1148,13 @@ public class AuthClientUtils {
      * RFE 4412286
      */
     public static String getCookieSupport(String clientType) {
-        String cookieSup = getProperty(clientType,"cookieSupport");
+        String cookieSup = getProperty(clientType, "cookieSupport");
 
         if (cookieSup == null) {
             return (DEFAULT_COOKIE_SUPPORT);
         }
 
-        return (cookieSup);
+        return cookieSup;
     }
 
     /**
@@ -1185,7 +1162,7 @@ public class AuthClientUtils {
      */
     public static boolean isGenericHTMLClient(String clientType) {
         String type = getProperty(clientType,"genericHTML");
-        return(type == null) || type.equals("true");
+        return type == null || "true".equals(type);
     }    
 
     /* return true if cookiSupport is true or cookieDetection
@@ -1199,7 +1176,7 @@ public class AuthClientUtils {
             utilDebug.message("setCookie : " + setCookie);
         }
 
-        return (setCookie);
+        return setCookie;
     }
 
     /* checks the cookieDetect , cookieSupport values to
@@ -1217,12 +1194,11 @@ public class AuthClientUtils {
         boolean setCookie = (cookieSup || cookieDetect) ;
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("cookieSupport : " + cookieSupport);
-            utilDebug.message("cookieDetect : " + cookieDetect);
-            utilDebug.message(" setCookie is : " +  setCookie);
+            utilDebug.message("cookieSupport='{}', cookieDetect='{}', setCookie='{}'", cookieSupport, cookieDetect,
+                    setCookie);
         }
 
-        return (setCookie);
+        return setCookie;
     }
 
     /** Returns true if cookieDetect mode else false.
@@ -1231,13 +1207,13 @@ public class AuthClientUtils {
      */
     public static boolean getCookieDetect(String cookieSupport) {
         boolean cookieDetect
-            = ((cookieSupport == null) ||
+                = ((cookieSupport == null) ||
             (cookieSupport.equalsIgnoreCase(
             ISAuthConstants.COOKIE_DETECT_PROPERTY)));
         if (utilDebug.messageEnabled()) {
             utilDebug.message("CookieDetect : " + cookieDetect);
         }
-        return (cookieDetect);
+        return cookieDetect;
     }
 
     /**
@@ -1262,7 +1238,7 @@ public class AuthClientUtils {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("Client URL is :" + clientURL);
         }
-        return (clientURL);
+        return clientURL;
     }
 
     /* return true if cookieSupport is false and cookie Detect
@@ -1277,11 +1253,11 @@ public class AuthClientUtils {
             utilDebug.message("rewriteURL : " + rewriteURL);
         }
 
-        return (rewriteURL);
+        return rewriteURL;
     }
 
     public static String getDSAMEVersion() {
-        return (dsameVersion);
+        return dsameVersion;
     }
 
     public static boolean isVersionHeaderEnabled() {
@@ -1293,7 +1269,7 @@ public class AuthClientUtils {
      * @return authCookieName, a String,the auth cookie name.
      */
     public static String getAuthCookieName() {
-        return (authCookieName);
+        return authCookieName;
     }
 
     /**Returns the Dist Auth Cookie Name.
@@ -1301,11 +1277,11 @@ public class AuthClientUtils {
      * @return authCookieName, a String, the dist auth cookie name.
      */
     public static String getDistAuthCookieName() {
-        return (distAuthCookieName);
+        return distAuthCookieName;
     }
 
     public static String getCookieName() {
-        return (cookieName);
+        return cookieName;
     }
 
     public static String getlbCookieName() {
@@ -1319,8 +1295,8 @@ public class AuthClientUtils {
         }
 
         if(utilDebug.messageEnabled()){
-        	utilDebug.message("AuthClientUtils.getlbCookieName()" +
-                "loadBalanceCookieName is:" + loadBalanceCookieName);        	
+        	utilDebug.message("AuthClientUtils.getlbCookieName() loadBalanceCookieName is:"
+                    + loadBalanceCookieName);
         }
         return loadBalanceCookieName;
     }
@@ -1328,14 +1304,15 @@ public class AuthClientUtils {
     public static String getlbCookieValue() {
         if (SystemProperties.isServerMode()) {
             try {
-                return (WebtopNaming.getLBCookieValue(
-                    WebtopNaming.getAMServerID()));
+                return WebtopNaming.getLBCookieValue(WebtopNaming.getAMServerID());
             } catch (Exception e) {
-                return (null);
+                if(utilDebug.messageEnabled()){
+                    utilDebug.message("AuthClientUtils.getlbCookieValue(). Can't get the lbCookie value.", e);
+                }
+                return null;
             }
         } else {
-            return SystemProperties.get(
-                    Constants.AM_DISTAUTH_LB_COOKIE_VALUE);
+            return SystemProperties.get(Constants.AM_DISTAUTH_LB_COOKIE_VALUE);
         }
     }
 
@@ -1345,12 +1322,10 @@ public class AuthClientUtils {
             SSOToken token = AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
             try {
-                ServiceSchemaManager scm  = new ServiceSchemaManager(
-                    "iPlanetAMPlatformService",token);
+                ServiceSchemaManager scm  = new ServiceSchemaManager("iPlanetAMPlatformService",token);
                 ServiceSchema psc = scm.getGlobalSchema();
                 Map attrs = psc.getAttributeDefaults();
-                cookieDomains =
-                    (Set)attrs.get(ISAuthConstants.PLATFORM_COOKIE_DOMAIN_ATTR);
+                cookieDomains = (Set)attrs.get(ISAuthConstants.PLATFORM_COOKIE_DOMAIN_ATTR);
             } catch (SMSException ex) {
                 // Ignore the exception and leave cookieDomains empty;
                 utilDebug.message("getCookieDomains - SMSException ");
@@ -1363,10 +1338,12 @@ public class AuthClientUtils {
             utilDebug.message("getCookieDomains - SSOException ");
         }
         if (utilDebug.messageEnabled() && (!cookieDomains.isEmpty())) {
-            utilDebug.message("CookieDomains : ");
+            StringBuilder message = new StringBuilder("CookieDomains : ");
             for (String cookieDomain : cookieDomains) {
-                utilDebug.message("  " + cookieDomain);
+                message.append("  '").append(cookieDomain).append("'");
             }
+            utilDebug.message(message.toString());
+
         }
         return cookieDomains;
     }
@@ -1398,8 +1375,7 @@ public class AuthClientUtils {
         }
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("AuthClientUtils:getCookieDomainsForReq returns "
-                    + domains); 
+            utilDebug.message("AuthClientUtils:getCookieDomainsForReq returns " + domains);
         }
         return domains;
     }
@@ -1439,7 +1415,7 @@ public class AuthClientUtils {
             }
         } catch (Exception oe) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Could not get orgName",oe);
+                utilDebug.message("Could not get orgName", oe);
             }
         }
 
@@ -1461,17 +1437,16 @@ public class AuthClientUtils {
                     orgName = IdUtils.getOrganization(token,orgParam);
                 } catch (Exception e) {
                     if (utilDebug.messageEnabled()) {
-                        utilDebug.message("Could not get orgName"+orgParam,e);
+                        utilDebug.message("Could not get orgName='{}'", orgParam, e);
                     }
                 }
             }
         }
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("getOrganizationDN : orgParam... :" + orgParam);
-            utilDebug.message("getOrganizationDN : orgDN ... :" + orgName);
+            utilDebug.message("getOrganizationDN : orgParam.='{}', orgDN='{}'", orgParam, orgName);
         }
-        return (orgName);
+        return orgName;
     }
 
     /** This method determines the org parameter
@@ -1514,7 +1489,7 @@ public class AuthClientUtils {
         }
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("orgParam is.. :" + orgParam);
+            utilDebug.message("orgParam='{}'", orgParam);
         }
 
         // try to get the host name if org or domain Param is null
@@ -1522,16 +1497,16 @@ public class AuthClientUtils {
             noQueryParam= true;
             orgParam = request.getServerName();
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Hostname : " + orgParam);
+                utilDebug.message("Hostname='{}'", orgParam);
             }
         }
         String orgDN = getOrganizationDN(orgParam,noQueryParam,request);
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("orgDN is " + orgDN);
+            utilDebug.message("orgDN='{}'", orgDN);
         }
 
-        return (orgDN);
+        return orgDN;
     }
 
     private static String getRealmFromAttribute(HttpServletRequest request) {
@@ -1561,9 +1536,12 @@ public class AuthClientUtils {
     static String stripPort(String in) {
         try {
             URL url = new URL(in);
-            return(url.getProtocol() + "://" + url.getHost()+ url.getFile());
+            return url.getProtocol() + "://" + url.getHost()+ url.getFile();
         } catch (MalformedURLException ex) {
-            return (in);
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("URL='{}' is mal formed", in, ex);
+            }
+            return in;
         }
     }
 
@@ -1579,17 +1557,15 @@ public class AuthClientUtils {
         }
 
         boolean retVal = FQDNUtils.getInstance().isHostnameValid(hostName);
-
-        if (retVal) {
-            utilDebug.message("hostname  and fqdnDefault match returning true");
-        } else {
-            utilDebug.message("hostname and fqdnDefault don't match");
-        }
-
         if (utilDebug.messageEnabled()) {
+            if (retVal) {
+                utilDebug.message("hostname  and fqdnDefault match returning true");
+            } else {
+                utilDebug.message("hostname and fqdnDefault don't match");
+            }
             utilDebug.message("retVal is : " + retVal);
         }
-        return (retVal);
+        return retVal;
     }
 
     /**
@@ -1599,10 +1575,7 @@ public class AuthClientUtils {
      * @param partialHostName Partial host name.
      * @param servletRequest HTTP Servlet Request.
      */
-    public static String getValidFQDNResource(
-        String partialHostName,
-        HttpServletRequest servletRequest
-    ) {
+    public static String getValidFQDNResource(String partialHostName, HttpServletRequest servletRequest) {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("Get mapping for " + partialHostName);
         }
@@ -1616,15 +1589,15 @@ public class AuthClientUtils {
         }
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("fully qualified hostname :"+ validHostName);
+            utilDebug.message("fully qualified hostname :" + validHostName);
         }
 
         String requestURL = constructURL(validHostName,servletRequest);
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("Request URL :"+ requestURL);
+            utilDebug.message("Request URL :" + requestURL);
         }
-        return (requestURL);
+        return requestURL;
     }
 
     /* get the host name from the servlet request's host header or
@@ -1646,7 +1619,7 @@ public class AuthClientUtils {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("Returning host name : " + hostname);
         }
-        return (hostname);
+        return hostname;
 
     }
 
@@ -1661,13 +1634,15 @@ public class AuthClientUtils {
         String queryString = servletRequest.getQueryString();
 
         StringBuilder urlBuffer = new StringBuilder();
-        urlBuffer.append(scheme).append("://")
-        .append(validHostName).append(":")
-        .append(port).append(requestURI);
+        urlBuffer.append(scheme)
+                .append("://")
+                .append(validHostName)
+                .append(":")
+                .append(port)
+                .append(requestURI);
 
         if (queryString != null) {
-            urlBuffer.append("?")
-            .append(queryString);
+            urlBuffer.append("?").append(queryString);
         }
 
         String urlString = urlBuffer.toString();
@@ -1676,13 +1651,13 @@ public class AuthClientUtils {
             utilDebug.message("returning new url : " + urlString);
         }
 
-        return (urlString);
+        return urlString;
     }
 
     private static boolean ignoreParameter(String parameter) {
         boolean ignore = false;
         for (int i = 0; i < ignoreList.length; i++) {
-        if (parameter.equalsIgnoreCase(ignoreList[i])) {
+            if (parameter.equalsIgnoreCase(ignoreList[i])) {
                 ignore = true;
                 break;
             }
@@ -1692,23 +1667,21 @@ public class AuthClientUtils {
 
     public static String constructLoginURL(HttpServletRequest request) {
         StringBuilder loginURL = new StringBuilder(serviceURI);
-        String queryString = "";
+        StringBuilder queryString = new StringBuilder();
         String clientEncoding = request.getCharacterEncoding();
         String encoding = (clientEncoding != null) ? clientEncoding : "UTF-8";
-        String encoded = request.getParameter("encoded");
-        if(encoded == null){
-        	encoded = "false"; 
-        }
+        boolean encoded = Boolean.parseBoolean(request.getParameter("encoded"));
+
         if (request.getAttribute("javax.servlet.forward.servlet_path") != null) {
             //this is a forwarded request, we should only save the forwarded URL.
-            queryString = request.getQueryString();
-            if (queryString != null) {
-                loginURL.append('?').append(queryString);
+            queryString.append(request.getQueryString());
+            if (queryString.length() > 0) {
+                loginURL.append('?')
+                        .append(queryString);
             }
 
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("constructLoginURL: Returning login url for forwarded request: "
-                        + loginURL.toString());
+                utilDebug.message("constructLoginURL: Returning login url for forwarded request: " + loginURL);
             }
             return loginURL.toString();
         }
@@ -1730,43 +1703,41 @@ public class AuthClientUtils {
                     if ((queryParams != null) &&
                          (queryParams.length()>0)) {
                         if(utilDebug.messageEnabled()) {
-                            utilDebug.message("constructLoginURL: value: "
-                                 + queryParams);
+                            utilDebug.message("constructLoginURL: value: " + queryParams);
                         }
                         // This function will encode all the parameters in
                         // SunQueryParamsString 
                         queryParams = URLencodedSunQueryParamsString(queryParams,encoding);
                     }
-                    queryString = queryString + queryParams;
+                    queryString.append(queryParams);
                 } else {
                     String value = request.getParameter(parameter);
-                    if(( value != null) && value.length()>0) {
-                       if(parameter.equals("goto")) {
+                    if ( value != null && !value.isEmpty()) {
+                       if ("goto".equals(parameter) && encoded) {
                     	   // Again this will be the case when browser back
                     	   // button is used and the form is posted with the
                     	   // base64 encoded parameters including goto
-                    	   if(encoded.equalsIgnoreCase("true")){
-                    	       value = Base64.decodeAsUTF8String(value);
-                    	   }
+                           value = Base64.decodeAsUTF8String(value);
+                           if(utilDebug.messageEnabled()) {
+                               utilDebug.message("constructLoginURL: Base64 decoded goto='{}'", value);
+                           }
                        } 
-                       queryString = queryString + URLEncDec.encode(parameter)
-                       + "=" + URLEncDec.encode(
-                       getCharDecodedField(value, encoding, utilDebug));
+                       queryString.append(URLEncDec.encode(parameter)).append("=")
+                               .append(URLEncDec.encode(getCharDecodedField(value, encoding)));
                     }
                 }
                 if (parameters.hasMoreElements()) {
-                    queryString = queryString + "&";
+                    queryString.append("&");
                 }
             }
         }
+
         if(queryString.length() > 0){
-            loginURL.append("?");
-            loginURL.append(queryString);
+            loginURL.append("?")
+                    .append(queryString);
         }
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("AuthClientUtils.constructLoginURL() " +
-                              "returning URLEncoded login url : " + 
-                              loginURL.toString());
+            utilDebug.message("AuthClientUtils.constructLoginURL()returning URLEncoded login url : " + loginURL);
         }
         return loginURL.toString();
     }
@@ -1805,15 +1776,14 @@ public class AuthClientUtils {
           StringTokenizer st = new StringTokenizer(queryParams, "&");
           while (st.hasMoreTokens()) {
               String str = st.nextToken();
-              if (str.indexOf("=") != -1 ) {
+              if (str.indexOf("=") != -1) {
                   int index = str.indexOf("=");
                   String parameter = str.substring(0,index);
                   String value = str.substring(index+1);
                   if(parameter.equalsIgnoreCase("realm")||
                      parameter.equalsIgnoreCase("org")||
                      parameter.equalsIgnoreCase("module")){
-                     value = 
-                    	 getCharDecodedField(value, encoding, utilDebug);
+                     value = getCharDecodedField(value, encoding);
                   }
                   sb.append(URLEncDec.encode(parameter));
                   sb.append("=");
@@ -1840,12 +1810,11 @@ public class AuthClientUtils {
             }
         } catch (Exception e) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Error in getExistingValidSSOToken :"
-                                  + e.toString());
+                utilDebug.message("Error in getExistingValidSSOToken", e);
             }
-            return (ssoToken);
+            return ssoToken;
         }
-        return (ssoToken);
+        return ssoToken;
     }
 
     // Check for Session Timed Out
@@ -1867,7 +1836,7 @@ public class AuthClientUtils {
             }
         }
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("Session Timed Out :"+ isTimedOut);
+            utilDebug.message("Session Timed Out :" + isTimedOut);
         }
         return isTimedOut;
     }
@@ -1882,8 +1851,7 @@ public class AuthClientUtils {
         String templateName=null;
         String resProperty = bundle.getString(errorCode);
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("errorCod is.. : " + errorCode);
-            utilDebug.message("resProperty is.. : " + resProperty);
+            utilDebug.message("errorCod='{}', resProperty='{}'", errorCode, resProperty);
         }
         if ((resProperty != null) && (resProperty.length() != 0)) {
             int commaIndex = resProperty.indexOf(MSG_DELIMITER);
@@ -1896,22 +1864,22 @@ public class AuthClientUtils {
             }
         }
 
-        if (type.equals(ERROR_MESSAGE)) {
-            return (errorMsg);
-        } else if (type.equals(ERROR_TEMPLATE)) {
-            return (templateName);
+        if (ERROR_MESSAGE.equals(type)) {
+            return errorMsg;
+        } else if (ERROR_TEMPLATE.equals(type)) {
+            return templateName;
         } else {
-            return (null);
+            return null;
         }
     }
 
     public static boolean isCookieSupported(HttpServletRequest req) {
         boolean cookieSupported = true;
         String cookieSupport = getCookieSupport(getClientType(req));
-        if ((cookieSupport != null) && cookieSupport.equals("false")) {
+        if ((cookieSupport != null) && "false".equals(cookieSupport)) {
             cookieSupported = false;
         }
-        return (cookieSupported);
+        return cookieSupported;
     }
 
     public static boolean isCookieSet(HttpServletRequest req) {
@@ -1921,11 +1889,10 @@ public class AuthClientUtils {
         if (isClientDetectionEnabled() && cookieDetect) {
             cookieSet = true;
         }
-        return (cookieSet);
+        return cookieSet;
     }
 
-    public static Cookie createCookie(String name, String value,
-            int maxAge, String cookieDomain) {
+    public static Cookie createCookie(String name, String value, int maxAge, String cookieDomain) {
 
         Cookie pCookie = CookieUtils.newCookie(name, value, "/", cookieDomain);
         if (maxAge >= 0) {
@@ -1933,10 +1900,10 @@ public class AuthClientUtils {
         }
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("pCookie is.. :" + pCookie);
+            utilDebug.message("pCookie='{}'", pCookie);
         }
 
-        return (pCookie);
+        return pCookie;
     }
 
     public static Cookie createlbCookie(String cookieDomain) throws AuthException {
@@ -1984,14 +1951,13 @@ public class AuthClientUtils {
             }
         } catch (Exception e) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Error getCookieString : " 
-                                  + e.getMessage());
+                utilDebug.message("Error getCookieString : ", e);
             }
         }
         if (utilDebug.messageEnabled()) {
             utilDebug.message("Cookie is : " + cookie);
         }
-        return (cookie);
+        return cookie;
     }
 
     /**
@@ -2019,30 +1985,21 @@ public class AuthClientUtils {
 
         String encodedURL = url;
         if (urlRewriteInPath) {
-            encodedURL =
-                encodeURL(url,SessionUtils.SEMICOLON,false,
-                          cookieName,ac.getAuthIdentifier());
+            encodedURL = encodeURL(url,SessionUtils.SEMICOLON,false, cookieName,ac.getAuthIdentifier());
         } else {
-            encodedURL =
-                encodeURL(url,SessionUtils.QUERY,true,
-                          cookieName,ac.getAuthIdentifier());
+            encodedURL = encodeURL(url,SessionUtils.QUERY,true, cookieName,ac.getAuthIdentifier());
         }
 
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("encodeURL : URL = " + url +
-                ", \nRewritten URL = " + encodedURL);
+            utilDebug.message("encodeURL : URL='{}', \nRewritten URL='{}'", url, encodedURL);
         }
-        return(encodedURL);
+        return encodedURL;
     }
 
-    private static String encodeURL(String url,short encodingScheme,boolean escape,
-        String cookieName, String strSessionID) {
-        String encodedURL = url;
-        String cookieStr = 
-            SessionEncodeURL.createCookieString(cookieName,strSessionID);
-        encodedURL = SessionEncodeURL.encodeURL(cookieStr,url,
-            encodingScheme,escape);
-        return (encodedURL);
+    private static String encodeURL(String url, short encodingScheme,boolean escape,
+            String cookieName, String strSessionID) {
+        String cookieStr = SessionEncodeURL.createCookieString(cookieName,strSessionID);
+        return SessionEncodeURL.encodeURL(cookieStr,url, encodingScheme,escape);
     }
 
     /**
@@ -2078,26 +2035,25 @@ public class AuthClientUtils {
 
         String templateFile = null;
         try {
-            templateFile = ResourceLookup.getFirstExisting(
-                servletContext,
-                fileRoot,strlocale,orgFilePath,filePath,fileName,
-                templatePath);
+            templateFile = ResourceLookup.getFirstExisting(servletContext, fileRoot, strlocale, orgFilePath, filePath,
+                    fileName, templatePath);
         } catch (Exception e) {
-            templateFile = new StringBuffer().append(templatePath)
-            .append(fileRoot).append(Constants.FILE_SEPARATOR)
-            .append(fileName).toString();
+            templateFile = new StringBuilder()
+                    .append(templatePath)
+                    .append(fileRoot)
+                    .append(Constants.FILE_SEPARATOR)
+                    .append(fileName).toString();
         }
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("getDefaultFileName:templateFile is :" +
-                templateFile);
+            utilDebug.message("getDefaultFileName:templateFile is :" + templateFile);
         }
-        return (templateFile);
+        return templateFile;
     }
 
     /* get the root suffix , eg. o= isp */
     public static String getRootSuffix() {
         // rootSuffix is already normalized in SMSEntry
-        return (rootSuffix);
+        return rootSuffix;
     }
 
     /* get the root dir to start lookup from./<default org>
@@ -2135,7 +2091,7 @@ public class AuthClientUtils {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("charsetFilename is : "+ charsetFilename);
         }
-        return (charsetFilename);
+        return charsetFilename;
     }
 
     /* retrieve the resource (file) using resource lookup */
@@ -2162,9 +2118,9 @@ public class AuthClientUtils {
                 templatePath);
         }
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("Resource is.. " + resourceName);
+            utilDebug.message("resourceName='{}'", resourceName);
         }
-        return (resourceName);
+        return resourceName;
     }
 
     /* constructs the filePath parameter for FileLookUp
@@ -2198,7 +2154,7 @@ public class AuthClientUtils {
 
         String newFilePath = filePathBuffer.toString();
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("FilePath is.. :" + newFilePath);
+            utilDebug.message("FilePath='{}'", newFilePath);
         }
 
         return newFilePath;
@@ -2216,7 +2172,7 @@ public class AuthClientUtils {
         String orgPath = null;
 
         if (normOrgDN != null) {
-            StringBuffer orgFilePath = new StringBuffer();
+            StringBuilder orgFilePath = new StringBuilder();
             String remOrgDN = normOrgDN;
             String orgName = null;
             while ((remOrgDN != null) && (remOrgDN.length() != 0)
@@ -2241,7 +2197,7 @@ public class AuthClientUtils {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("getOrgFilePath: orgPath is : " + orgPath);
         }
-        return (orgPath);
+        return orgPath;
     }
 
     /**
@@ -2273,22 +2229,22 @@ public class AuthClientUtils {
             String orgFilePath = getOrgFilePath(orgDN);
 
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Calling ResourceLookup: filename = " 
-                                  + fileName + ", defaultOrg = " + fileRoot 
-                                  + ", locale = " + localeName + 
-                                  ", filePath = " + filePath + 
-                                  ", orgPath = " + orgFilePath);
+                utilDebug.message("Calling ResourceLookup: filename='{}', defaultOrg='{}'," +
+                                " locale='{}', filePath='{}', orgPath='{}'",
+                        fileName, fileRoot, localeName, filePath, orgFilePath);
             }
 
             templateFile = getResourceLocation(fileRoot,localeName,orgFilePath,
                 filePath,fileName,templatePath,servletContext,servletRequest);
         } catch (Exception e) {
-            utilDebug.message("Error getting File : " + e.getMessage());
-            templateFile = new StringBuffer().append(templatePath)
-            .append(Constants.FILE_SEPARATOR)
-            .append(ISAuthConstants.DEFAULT_DIR)
-            .append(Constants.FILE_SEPARATOR)
-            .append(fileName).toString();
+            utilDebug.message("Error getting File : ", e);
+            templateFile = new StringBuilder()
+                    .append(templatePath)
+                    .append(Constants.FILE_SEPARATOR)
+                    .append(ISAuthConstants.DEFAULT_DIR)
+                    .append(Constants.FILE_SEPARATOR)
+                    .append(fileName)
+                    .toString();
         }
         if (utilDebug.messageEnabled()) {
             utilDebug.message("File/Resource is : " + templateFile);
@@ -2323,7 +2279,7 @@ public class AuthClientUtils {
             orgParam = realm;
         }
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("orgParam is.. :" + orgParam);
+            utilDebug.message("orgParam='{}'", orgParam);
         }
         // try to get the host name if org or domain Param is null
         if ((orgParam == null) || (orgParam.length() == 0)) {
@@ -2418,8 +2374,7 @@ public class AuthClientUtils {
             String urlStr   = serverURL + serviceURI;
 
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("This server URL : " + urlStr);
-                utilDebug.message("Server URL from cookie : " + cookieURL);
+                utilDebug.message("This server URL='{}', Server URL from cookie='{}'", urlStr, cookieURL);
             }
 
             if ((urlStr != null) && (cookieURL != null) &&
@@ -2436,9 +2391,7 @@ public class AuthClientUtils {
                 }
                 Set<String> platformList = WebtopNaming.getPlatformServerList();
                 if (utilDebug.messageEnabled()) {
-                    utilDebug.message("search CookieURL : " + tmpCookieURL);
-                    utilDebug.message("platform server List : " 
-                                      + platformList);
+                    utilDebug.message("search CookieURL='{}', platform server List='{}' ", tmpCookieURL, platformList);
                 }
                 // if cookie URL is not in the Platform server list then
                 // consider as new authentication for that local server
@@ -2451,7 +2404,7 @@ public class AuthClientUtils {
                 utilDebug.message("Error isLocalServer : " + e.getMessage());
             }
         }
-        return (local);
+        return local;
     }
     // Check whether the request is coming to the server who created the
     // original Auth request or session
@@ -2462,7 +2415,7 @@ public class AuthClientUtils {
         if (uriIndex != -1) {
             tmpCookieURL = cookieURL.substring(0,uriIndex);
         }
-        return (isLocalServer(tmpCookieURL+serviceURI, true));
+        return isLocalServer(tmpCookieURL + serviceURI, true);
     }
     
     public static boolean isServerMemberOfLocalSite(String cookieURL) {
@@ -2535,12 +2488,14 @@ public class AuthClientUtils {
 
         // Print request Headers
         if (utilDebug.messageEnabled()) {
+            StringBuilder message = new StringBuilder();
             Enumeration<String> requestHeaders = request.getHeaderNames();
             while (requestHeaders.hasMoreElements()) {
                 String name = requestHeaders.nextElement();
                 Enumeration value = (Enumeration) request.getHeaders(name);
-                utilDebug.message("Header name = " + name + " Value = " + value);
+                message.append("Header name='").append(name).append("', Value='").append(value).append("'\n");
             }
+            utilDebug.message(message.toString());
         }
 
         // Open URL connection
@@ -2637,9 +2592,8 @@ public class AuthClientUtils {
             // Receiving input from Original Auth server...
             utilDebug.message("RECEIVING DATA ... ");
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Response Code: " + conn.getResponseCode());
-                utilDebug.message("Response Message: " 
-                                  + conn.getResponseMessage());
+                utilDebug.message("Response Code='{}', Response Message='{}' ", conn.getResponseCode(),
+                        conn.getResponseMessage());
             }
 
             // Check response code
@@ -2711,14 +2665,13 @@ public class AuthClientUtils {
                     out.close();
                 } catch (IOException ioe) {
                     if (utilDebug.messageEnabled()) {
-                        utilDebug.message("send IOException : " 
-                                          + ioe.toString());
+                        utilDebug.message("send IOException : ", ioe);
                     }
                 }
             }
         }
 
-        return (origRequestData);
+        return origRequestData;
     }
 
     private static boolean isSameServer(URL url1, URL url2) {
@@ -2782,19 +2735,17 @@ public class AuthClientUtils {
     // Get cookies string from HTTP request object
     private static String getCookiesString(HttpServletRequest request) {
         Cookie cookies[] = request.getCookies();
-        StringBuffer cookieStr = null;
+        StringBuilder cookieStr = null;
         String strCookies = null;
         // Process Cookies
         if (cookies != null) {
             for (int nCookie = 0; nCookie < cookies.length; nCookie++) {
                 if (utilDebug.messageEnabled()) {
-                    utilDebug.message("Cookie name = " + 
-                                      cookies[nCookie].getName());
-                    utilDebug.message("Cookie value = " + 
-                                      cookies[nCookie].getValue());
+                    utilDebug.message("Cookie name='{}', value='{}'",
+                            cookies[nCookie].getName(), cookies[nCookie].getValue());
                 }
                 if (cookieStr == null) {
-                    cookieStr = new StringBuffer();
+                    cookieStr = new StringBuilder();
                 } else {
                     cookieStr.append(";");
                 }
@@ -3001,7 +2952,7 @@ public class AuthClientUtils {
             Map adviceMap = PolicyUtils.parseAdvicesXML(decodedAdviceXML);
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("AuthUtils.checkForForcedAuth : decoded XML "
-                    +"= " + decodedAdviceXML);
+                    + "= " + decodedAdviceXML);
                 utilDebug.message("AuthUtils.checkForForcedAuth : result Map = "
                 + adviceMap);
             }
@@ -3254,13 +3205,21 @@ public class AuthClientUtils {
         return whitelist.isEmpty() || whitelist.contains(referer);
     }
 
-    private static String getCharDecodedField(String strIn, String charset,
-            Debug debug) {
+    /**
+     * Decode the value
+     * @param strIn
+     * @param charset
+     * @return an empty string if strIn is null. Use UTF-8 if the charset is empty or null. Return the original
+     * string if the decoding failed.
+     */
+    private static String getCharDecodedField(String strIn, String charset) {
 
         if (strIn == null) {
-            return strIn;
+            return "";
         }
-        String strOut = null;
+        if (charset == null || charset.isEmpty()) {
+            charset = "UTF-8";
+        }
         try {
             // Translate the individual field values in the encoding value.
             // Do not use getBytes() instead convert unicode into bytes by
@@ -3275,19 +3234,42 @@ public class AuthClientUtils {
             int offset = 0;
             char[] carr = strIn.toCharArray();
             while (i < len) {
-                byte b = (byte) carr[i];
                 buf[offset++] = (byte) carr[i++];
             }
-            if (charset == null || charset.length() == 0) {
-                strOut = new String(buf, 0, offset, "UTF-8");
-            } else {
-                strOut = new String(buf, 0, offset, charset);
-            }
+            return new String(buf, 0, offset, charset);
+
         } catch (Exception ex) {
-            debug.error("AuthClientUtils.getCharDecodedField():", ex);
-            strOut = strIn;
+            utilDebug.error("AuthClientUtils.getCharDecodedField():", ex);
+            return strIn;
         }
-        return strOut;
     }
 
+    /**
+     * Put the value in the map. The value will be char decoded with the correct encoding.
+     * If for any reason, the value is empty, this function won't add the value to the map. So no Null or empty value
+     * will added to the map
+     * @param data the map where you want to add the value
+     * @param name the value key name
+     * @param value the value you want to add in the map.
+     * @param encoding the encoding charset. If null, UTF-8 will be used
+     */
+    private static void putDecodedValue(Map<String, String> data, String name, String value, String encoding) {
+
+        if (value == null || value.isEmpty()) {
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("AuthUtils::putDecodedValue the '" + name + "' value is null or empty'");
+            }
+            return;
+        }
+
+        String decodedValue = getCharDecodedField(value, encoding);
+        if (decodedValue.isEmpty()) {
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("AuthUtils::putDecodedValue decoding with encoding '" + encoding + "' is empty");
+            }
+            return;
+        }
+
+        data.put(name, decodedValue);
+    }
 }
