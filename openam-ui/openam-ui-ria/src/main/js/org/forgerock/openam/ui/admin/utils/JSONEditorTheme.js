@@ -138,7 +138,7 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                         parseHtml = document.implementation.createHTMLDocument();
 
                     el.className = "col-sm-offset-" + gridColWidth2 + " col-sm-" + gridColWidth3 + " help-block";
-                    parseHtml.body.innerHTML = "<div>" + text + "</div>";
+                    parseHtml.body.innerHTML = "<div class='wordwrap'>" + text + "</div>";
                     el.appendChild(parseHtml.body.getElementsByTagName("div")[0]);
 
                     return el;
