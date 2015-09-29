@@ -152,7 +152,8 @@ public class WindowsDesktopSSO extends AMLoginModule {
         int result = ISAuthConstants.LOGIN_IGNORE;
 
         // Check to see if the Rest Auth Endpoint has signified that IWA has failed.
-        if (hasWDSSOFailed(getHttpServletRequest())) {
+        HttpServletRequest request = getHttpServletRequest();
+        if (request != null && hasWDSSOFailed(request)) {
             return ISAuthConstants.LOGIN_IGNORE;
         }
 
@@ -161,8 +162,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
         }
 
         // retrieve the spnego token
-        byte[] spnegoToken = 
-            getSPNEGOTokenFromHTTPRequest(getHttpServletRequest());
+        byte[] spnegoToken = getSPNEGOTokenFromHTTPRequest(request);
         if (spnegoToken == null) {
             spnegoToken = getSPNEGOTokenFromCallback(callbacks);
         }
