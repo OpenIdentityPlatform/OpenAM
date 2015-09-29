@@ -623,7 +623,9 @@
                 "scripts": "Scripts"
             },
             "description": "Description",
-            "type": "Type"
+            "type": "Type",
+            "editFullScreen": "Edit Fullscreen",
+            "exitFullScreen": "Exit Fullscreen"
         },
         "authentication": {
             "settings": {
@@ -635,9 +637,14 @@
                 "addModuleDialogTitle" : "Create new Module",
                 "addModuleDialogError": "Authentication instance already exists.",
                 "selectModuleType" : "Select Module type   ",
-                "addModule": "Add Module",
-                "moduleName": "Module Name",
-                "moduleType": "Type"
+                "addModule" : "Add Module",
+                "moduleName" : "Module Name",
+                "moduleType" : "Type",
+                "chain" : "Chain",
+                "inUse": {
+                    "title": "Edit module",
+                    "message": "The <code>__moduleName__</code> module is being used by the following Authentication Chain(s) <code>__usedChains__</code>. Editing this module may change their behaviour. <br><br>Are you sure you want to continue?"
+                }
             },
             "chains": {
                 "title" : "Authentication Chains",

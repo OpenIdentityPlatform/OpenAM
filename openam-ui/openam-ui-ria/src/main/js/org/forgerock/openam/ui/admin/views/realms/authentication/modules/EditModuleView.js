@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
 
                 self.parentRender(function () {
                     if (!self.data.schema.grouped) {
-                        self.data.form = new Form(self.$el.find("#tabContent")[0], self.data.schema, self.data.values);
+                        self.data.form = new Form(self.$el.find("#tabpanel")[0], self.data.schema, self.data.values);
                     }
 
                     self.$el.find("ul.nav a:first").tab("show");
@@ -81,7 +81,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
         renderTab: function (event) {
             var id = $(event.target).attr("href").slice(1),
                 schema = this.data.schema.properties[id],
-                element = this.$el.find("#tabContent").empty().get(0);
+                element = this.$el.find("#tabpanel").empty().get(0);
 
             this.data.form = new Form(element, schema, this.data.values);
         }

@@ -77,7 +77,7 @@ public class TokenRequestMarshallerImplTest {
             return LoggerFactory.getLogger(AMSTSConstants.REST_STS_DEBUG_ID);
         }
 
-        //Must be empty for the testX509CertificateTokenMarshalling() to reference cert from ServletRequest attribute
+        //Must be empty for the testX509CertificateTokenMarshalling() to reference cert from ClientContext
         @Provides
         @Named(AMSTSConstants.OFFLOADED_TWO_WAY_TLS_HEADER_KEY)
         String getOffloadedTwoWayTLSHeaderKey() {
@@ -135,6 +135,14 @@ public class TokenRequestMarshallerImplTest {
                 (RestTokenTransformValidatorParameters<X509Certificate[]>)
                 tokenMarshaller.buildTokenTransformValidatorParameters(new X509TokenState().toJson(), clientInfoContext);
         assertEquals(certificate.getEncoded(), (params.getInputToken()[0].getEncoded()));
+    }
+
+    @Test (expectedExceptions = TokenMarshalException.class)
+    public void testMissingX509CertificateTokenMarshalling() throws Exception {
+        ClientContext clientInfoContext = ClientContext.buildExternalClientContext(null).build();
+        //no certificate present in the ClientContext, and the offload header set to "" by the module above, so
+        //exception should be thrown
+        tokenMarshaller.buildTokenTransformValidatorParameters(new X509TokenState().toJson(), clientInfoContext);
     }
 
     @Test

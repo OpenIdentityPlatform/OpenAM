@@ -1,7 +1,35 @@
 {{> headers/_Title title="console.dashboard.title" }}
 
-<a href="#" id="editProperties" class="btn btn-primary pull-right">{{t 'console.dashboard.realmProperties'}}</a>
+<div class="raised-page-header-button-group button-group pull-right">
+    <a href="#" id="editProperties" class="btn btn-primary">{{t 'console.dashboard.realmProperties'}}</a>
+</div>
+
+
 <div class="page-description">
+    <ul class="list-inline fr-list-inline-piped">
+        <li>
+            {{#equals realm.status 'Active'}}
+            <span class="text-success">
+                <i class="fa fa-check-circle"></i> {{realm.status}}
+            </span>
+            {{else}}
+            <span class="text-warning">
+                <i class="fa fa-exclamation-triangle"></i> {{realm.status}}
+            </span>
+            {{/equals}}
+        </li>
+        {{#if realm.aliases}}
+        <li class="text-muted">
+            <i class="fa fa-globe"></i>
+            {{#each realm.aliases}}
+                {{this}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+        </li>
+        {{/if}}
+    </ul>
+</div>
+
+<div class="page-description hidden">
     <ul class="list-unstyled">
         <li><span>{{t 'console.common.realmStatus'}}: </span><strong>{{realm.status}}</strong></li>
         <li><span>{{t 'console.common.realmDnsAliases'}}: </span>

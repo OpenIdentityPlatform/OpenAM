@@ -22,6 +22,7 @@ import static org.forgerock.openam.rest.Routers.ssoToken;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
 import org.forgerock.openam.core.rest.cts.CoreTokenResource;
@@ -40,6 +41,7 @@ import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.ServiceRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
+import org.forgerock.openam.services.MailService;
 
 /**
  * A {@link RestRouteProvider} that add routes for all the core endpoints.
@@ -114,6 +116,13 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(RECORD)
                 .authorizeWith(AdminOnlyAuthzModule.class)
                 .toCollection(RecordResource.class);
+    }
+
+    @Override
+    public void addInternalRoutes(ResourceRouter internalRouter) {
+        internalRouter
+                .route("email")
+                .toRequestHandler(RoutingMode.STARTS_WITH, MailService.class);
     }
 
     @Override

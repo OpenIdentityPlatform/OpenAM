@@ -84,10 +84,11 @@ public class XMLResourceExceptionHandler implements ResponseWriter {
             }
             Response response = context.getResponse();
             response.setStatus(Status.valueOf(jre.getCode()));
-            context.<Response>getResponse().getHeaders().putSingle(ContentTypeHeader.valueOf(MediaType.XML_UTF_8.toString()));
+            context.<Response>getResponse().getHeaders().put(ContentTypeHeader.valueOf(MediaType.XML_UTF_8.toString()));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Transformer transformer = XMLUtils.getTransformerFactory().newTransformer();
-            transformer.transform(new DOMSource(asXMLDOM(jre.includeCauseInJsonValue().toJsonValue().asMap())), new StreamResult(outputStream));
+            transformer.transform(new DOMSource(asXMLDOM(jre.includeCauseInJsonValue().toJsonValue().asMap())),
+                    new StreamResult(outputStream));
             response.getEntity().setBytes(outputStream.toByteArray());
         } catch (TransformerException e1) {
             throw new IllegalStateException("Could not write XML to response", e1);

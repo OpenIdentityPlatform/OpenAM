@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         TIME_ZONE_PLACEHOLDER: "console.authorization.policies.edit.conditionTypes.SimpleTime.props.enterTimeZone",
         SCRIPT_TYPE: "scriptId",
         TIME_ZONE_TYPE: "enforcementTimeZone",
-        IDENTITY_TYPE: "users",
+        IDENTITY_TYPES: ["users", "groups"],
         DEFAULT_TIME_ZONE: "GMT",
 
         render: function (data, element, callback) {
@@ -102,7 +102,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                     view.data.itemData.enforcementTimeZone = value ? value : view.DEFAULT_TIME_ZONE;
                                 }
                             });
-                        } else if (type === view.IDENTITY_TYPE) {
+                        } else if (_.contains(view.IDENTITY_TYPES, type)) {
                             _.extend(options, {
                                 placeholder: $.t(view.IDENTITY_PLACEHOLDER),
                                 sortField: "value",

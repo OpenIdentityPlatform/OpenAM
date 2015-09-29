@@ -29,7 +29,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
         noBaseTemplate: true,
         events: {
             "click .radio-inline": "changePermission",
-            "click .add-item": "selectAction",
+            "change .editing select": "selectAction",
+            "click .add-item": "addAction",
             "click .fa-close ": "deleteItem",
             "keyup .fa-close ": "deleteItem"
         },
@@ -85,27 +86,34 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                 "templates/admin/views/realms/authorization/common/ActionsTableTemplate.html",
                 {"items": this.data.selectedActions}, function (tpl) {
                     self.$el.find("#selectedActions").html(tpl);
+                    self.$el.find("button.add-item").prop("disabled", true);
                     if (callback) {
                         callback();
                     }
                 });
         },
 
-        selectAction: function (e) {
+        selectAction: function () {
+            this.$el.find("button.add-item").prop("disabled", false);
+        },
+
+        addAction: function (e) {
             e.preventDefault();
 
             var actionName = this.$el.find("select").val(),
                 action = _.findWhere(this.data.options.availableActions, {action: actionName}),
                 cloned = _.clone(action);
 
-            this.data.availableActions = _.without(this.data.availableActions,
-                _.findWhere(this.data.availableActions, {action: actionName})
-            );
-            this.renderAvailableActions();
-            this.data.selectedActions.push(cloned);
-            this.renderSelectedActions();
+            if (action) {
+                this.data.availableActions = _.without(this.data.availableActions,
+                    _.findWhere(this.data.availableActions, {action: actionName})
+                );
+                this.renderAvailableActions();
+                this.data.selectedActions.push(cloned);
+                this.renderSelectedActions();
 
-            this.data.entity.actionValues[action.action] = action.value;
+                this.data.entity.actionValues[action.action] = action.value;
+            }
         },
 
         changePermission: function (e) {

@@ -44,6 +44,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
 
     private ResourceRouter rootResourceRouter;
     private ResourceRouter realmResourceRouter;
+    private ResourceRouter internalResourceRouter;
     private ServiceRouter rootServiceRouter;
     private ServiceRouter realmServiceRouter;
     private Injector injector;
@@ -52,7 +53,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     public Set<HttpRoute> get() {
         for (RestRouteProvider routeProvider : ServiceLoader.load(RestRouteProvider.class)) {
             injector.injectMembers(routeProvider);
-            routeProvider.addRoutes(rootResourceRouter, realmResourceRouter, rootServiceRouter, realmServiceRouter);
+            routeProvider.addRoutes(rootResourceRouter, realmResourceRouter,
+                    internalResourceRouter, rootServiceRouter, realmServiceRouter);
         }
         return Collections.singleton(
                 newHttpRoute(STARTS_WITH, "json", Key.get(Handler.class, Names.named("RestHandler"))));
@@ -76,6 +78,11 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     @Inject
     public void setRealmServiceRouter(@Named("RealmServiceRouter") ServiceRouter realmRouter) {
         this.realmServiceRouter = realmRouter;
+    }
+
+    @Inject
+    public void setInternalResourceRouter(@Named("InternalResourceRouter") ResourceRouter internalResourceRouter) {
+        this.internalResourceRouter = internalResourceRouter;
     }
 
     @Inject

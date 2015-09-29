@@ -28,7 +28,7 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
-import org.apache.commons.lang3.StringUtils;
+import org.forgerock.guava.common.base.Strings;
 import org.forgerock.openam.radius.common.AccessAccept;
 import org.forgerock.openam.radius.common.AccessChallenge;
 import org.forgerock.openam.radius.common.AccessReject;
@@ -197,7 +197,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
     private static String getConfigProperty(String propName, Properties config, boolean required) {
         final String value = config.getProperty(propName);
 
-        if (required && StringUtils.isEmpty(value)) {
+        if (required && Strings.isNullOrEmpty(value)) {
             throw new IllegalStateException("Configuration property '" + propName
                     + "' not found in handler configuration. "
                     + "It must be added to the Configuration Properties for this class in the Radius Client's "

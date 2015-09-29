@@ -59,15 +59,20 @@
             <label class="col-sm-2 control-label" for="script">{{t "console.scripts.edit.script"}}</label>
 
             <div class="col-sm-9">
-                <input type="button" class="btn btn-default script-upload" id="upload" value="{{t 'common.form.upload'}}">
-                <input type="file" name="upload" class="hidden">
-
                 <div class="script-area">
                     <textarea id="script">{{entity.script}}</textarea>
                 </div>
 
-                <div id="validation" class="script-validation-message"></div>
+                <input type="button" class="btn btn-default script-upload" id="upload" value="{{t 'common.form.upload'}}">
+                <input type="file" name="upload" class="hidden">
+
                 <input type="button" class="btn btn-default" id="validateScript" value="{{t 'common.form.validate'}}">
+
+                <button type="button" class="btn btn-default" id="editFullScreen">
+                    <i class="fa fa-expand"></i> {{t "console.common.editFullScreen"}}
+                </button>
+
+                <div id="validation" class="script-validation-message"></div>
             </div>
         </div>
 
@@ -75,8 +80,12 @@
     </div>
 
     <div class="panel-footer clearfix">
-        <div class="pull-right">
-            <button id="saveChanges" class="btn btn-primary" type="button">{{t 'common.form.save'}}</button>
-        </div>
+        <button id="saveChanges" class="btn btn-primary pull-right" type="button">{{t 'common.form.save'}}</button>
+    </div>
+
+    <div class="full-screen-bar">
+        <button type="button" class="btn btn-link pull-right">
+            <i class="fa fa-compress"></i> {{t "console.common.exitFullScreen"}}
+        </button>
     </div>
 </div>

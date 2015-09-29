@@ -333,7 +333,7 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore {
      * @throws SMSException If the sub configuration could not be read.
      * @throws SSOException If the Admin token could not be found.
      */
-    private ServiceConfig getSubGlobalConfig()throws SMSException, SSOException {
+    ServiceConfig getSubGlobalConfig()throws SMSException, SSOException {
         final ServiceConfig config = getGlobalConfig().getSubConfig("globalScripts");
         if (config == null) {
             throw new SMSException("Global Configuration for '" + SERVICE_NAME + "' could not be retrieved.");

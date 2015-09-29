@@ -34,6 +34,7 @@ public interface RestRouteProvider {
      * @param rootServiceRouter The root CHF REST router.
      * @param realmServiceRouter The realm CHF REST router.
      */
-    void addRoutes(ResourceRouter rootResourceRouter, ResourceRouter realmResourceRouter,
+    void addRoutes(ResourceRouter rootResourceRouter, ResourceRouter realmResourceRouter, ResourceRouter internalRouter,
             ServiceRouter rootServiceRouter, ServiceRouter realmServiceRouter);
+
 }

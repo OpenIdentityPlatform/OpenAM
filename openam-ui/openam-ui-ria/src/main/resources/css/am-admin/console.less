@@ -35,8 +35,13 @@ h3.block-header {
     margin-bottom: 20px;
 }
 
-.nav-tab-content .btn-action-group{
-    margin-left: -2px;
+.fr-panel-tab{
+    .btn-toolbar {
+        margin-top: 0;
+    }
+    .btn-action-group {
+        margin-left: -2px;
+    }
 }
 
 .form-horizontal .form-group .info-button{
@@ -89,17 +94,14 @@ div[data-schemaid] {
 }
 
 
-
-div.default-config {
-    color: #647077;
-    font-size: 12px;
-}
-
-
 .btn-toolbar.page-toolbar {
     border-top: 1px solid #ddd;
     padding: 10px;
     margin-top: 0;
+
+    ul.btn-group {
+        margin-bottom: 0;
+    }
 }
 
 @chaining-success-color:#517A93;
@@ -358,4 +360,20 @@ a[data-toggle="popover"] {
         color: inherit;
         font-weight: normal;
     }
+}
+
+
+.full-screen-bar {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1001;
+    background-color: @background-color;
+}
+
+.CodeMirror-fullscreen {
+    top: 34px;
+    z-index: 1001;
 }

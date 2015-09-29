@@ -36,9 +36,11 @@
     </ul>
 </div>
 
-<div class="tab-content tab-content-with-border clearfix">
-    <div role="tabpanel" class="tab-pane active" id="resourcesTab">
-        <div class="panel-body tab-pane-body">
+<div class="panel panel-default fr-panel-tab">
+
+    <div class="panel-body tab-content">
+
+        <div role="tabpanel" class="tab-pane active" id="resourcesTab">
             <p class="panel-description">{{t "console.authorization.policies.edit.resourcesDescription"}}</p>
 
             <div class="form-group clearfix">
@@ -61,57 +63,54 @@
 
             <div id="editResources" class="clearfix"></div>
         </div>
-    </div>
 
-    <div role="tabpanel" class="tab-pane" id="actionsTab">
-        <div class="panel-body tab-pane-body form-inline">
-            <p class="panel-description">{{t "console.authorization.policies.edit.actionsDescription"}}</p>
-            <div id="actions" class="clearfix"></div>
+        <div role="tabpanel" class="tab-pane" id="actionsTab">
+            <div class="form-inline">
+                <p class="panel-description">{{t "console.authorization.policies.edit.actionsDescription"}}</p>
+                <div id="actions" class="clearfix"></div>
+            </div>
         </div>
-    </div>
 
-    <div role="tabpanel" class="tab-pane" id="subjectsTab">
-        <div class="panel-body tab-pane-body">
+        <div role="tabpanel" class="tab-pane" id="subjectsTab">
             <p class="panel-description">{{t "console.authorization.policies.edit.subjectConditionsDescription"}}</p>
             <div id="subjectContainer" class="clearfix"></div>
         </div>
-    </div>
 
-    <div role="tabpanel" class="tab-pane" id="environmentsTab">
-        <div class="panel-body tab-pane-body">
+        <div role="tabpanel" class="tab-pane" id="environmentsTab">
             <p class="panel-description">{{t "console.authorization.policies.edit.environmentConditionsDescription"}}</p>
             <div id="environmentContainer" class="clearfix"></div>
         </div>
-    </div>
 
-    <div role="tabpanel" class="tab-pane" id="responseAttributesTab">
-        <div class="panel-body tab-pane-body">
+        <div role="tabpanel" class="tab-pane" id="responseAttributesTab">
             <div class="row clearfix">
                 <div class="col-sm-6" id="userAttrs"></div>
                 <div class="col-sm-6" id="staticAttrs"></div>
             </div>
         </div>
-    </div>
 
-    <div role="tabpanel" class="tab-pane" id="settingsTab">
-        <div class="panel-body tab-pane-body form-horizontal">
-            <div class="form-group">
-                <label class="col-sm-2 control-label" for="policyName">{{t "console.common.name"}}</label>
-                <div class="col-sm-9">
-                    <input class="form-control" id="policyName" name="entityName" type="text"
-                           value="{{entity.name}}" data-field="name" required
-                           placeholder="{{t 'common.form.validation.required'}}"/>
+        <div role="tabpanel" class="tab-pane" id="settingsTab">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="policyName">{{t "console.common.name"}}</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" id="policyName" name="entityName" type="text"
+                            value="{{entity.name}}" data-field="name" required
+                            placeholder="{{t 'common.form.validation.required'}}"/>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-2 control-label" for="policyDescription">{{t "console.common.description"}}</label>
-                <div class="col-sm-9">
-                    <textarea class="form-control" id="policyDescription" data-field="description">{{entity.description}}</textarea>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="policyDescription">{{t "console.common.description"}}</label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" id="policyDescription" data-field="description">{{entity.description}}</textarea>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
+
     <div class="panel-footer clearfix">
         <input type="button" name="submitForm" value="{{t 'common.form.saveChanges'}}" class="btn btn-primary pull-right">
     </div>
+
 </div>

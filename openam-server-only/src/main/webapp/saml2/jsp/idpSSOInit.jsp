@@ -24,14 +24,8 @@
 
    $Id: idpSSOInit.jsp,v 1.9 2009/06/24 23:05:30 mrudulahg Exp $
 
-   Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2015 ForgeRock AS.
 --%>
-
-
-
-
-<!-- %@ page import="com.iplanet.am.util.Debug" % -->
-<%@ page import="com.sun.identity.shared.debug.Debug" %>
 
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
@@ -84,7 +78,7 @@
     7. affiliationID	    affiliation entity ID
 --%>
 <%
-    // Retreive the Request Query Parameters
+    // Retrieve the Request Query Parameters
     // metaAlias and spEntiyID are the required query parameters
     // metaAlias - Identity Provider Entity Id
     // spEntityID - Service Provider Identifier
@@ -94,7 +88,7 @@
         // cookie writer. There is already an assertion response
         // cached in this provider. Send it back directly.
         if ((cachedResID != null) && (cachedResID.length() != 0)) {
-            IDPSSOUtil.sendResponse(request, response, cachedResID);
+            IDPSSOUtil.sendResponse(request, response, new PrintWriter(out, true), cachedResID);
             return;
         }
 
@@ -117,7 +111,7 @@
 	String nameIDFormat =
 		request.getParameter(SAML2Constants.NAMEID_POLICY_FORMAT);
 	String relayState = SAML2Utils.getRelayState(request);
-	IDPSSOUtil.doSSOFederate(request,response,new PrintWriter(out, true),null,spEntityID,
+	IDPSSOUtil.doSSOFederate(request, response, new PrintWriter(out, true), null, spEntityID,
 				 metaAlias, nameIDFormat,relayState);
     } catch (SAML2Exception sse) {
 	    SAML2Utils.debug.error("Error processing request " , sse);

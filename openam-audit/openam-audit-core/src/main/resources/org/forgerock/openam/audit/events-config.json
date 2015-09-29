@@ -11,7 +11,7 @@
         "contexts": {
           "type": "object"
         },
-        "domain": {
+        "realm": {
           "type": "string"
         },
         "extraInfo": {
@@ -35,7 +35,7 @@
         "contexts": {
           "type": "object"
         },
-        "domain": {
+        "realm": {
           "type": "string"
         },
         "extraInfo": {
@@ -59,7 +59,7 @@
         "contexts": {
           "type": "object"
         },
-        "domain": {
+        "realm": {
           "type": "string"
         },
         "extraInfo": {
@@ -83,7 +83,7 @@
         "contexts": {
           "type": "object"
         },
-        "domain": {
+        "realm": {
           "type": "string"
         },
         "extraInfo": {

@@ -36,6 +36,9 @@ import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.Locale;
+
+import org.forgerock.http.header.AcceptLanguageHeader;
+import org.forgerock.http.header.MalformedHeaderException;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.http.header.ContentTypeHeader;
@@ -150,7 +153,7 @@ public class AuthenticationServiceV1 {
             return handleErrorResponse(httpRequest, Status.valueOf(e.getStatusCode()), e);
         } catch (RestAuthException e) {
             DEBUG.message("AuthenticationService.authenticate() :: Rest Authentication Exception", e);
-            return handleErrorResponse(httpRequest, Status.UNAUTHORIZED, e);
+            return handleErrorResponse(httpRequest, Status.valueOf(e.getStatusCode()), e);
         } catch (IOException e) {
             DEBUG.error("AuthenticationService.authenticate() :: Internal Error", e);
             return handleErrorResponse(httpRequest, Status.INTERNAL_SERVER_ERROR, e);
@@ -267,10 +270,10 @@ public class AuthenticationServiceV1 {
 
         Response response = new Response(Status.OK);
 
-        response.getHeaders().putSingle(CACHE_CONTROL_HEADER_NAME, NO_CACHE_CACHE_CONTROL_HEADER);
-        response.getHeaders().putSingle(PRAGMA_HEADER_NAME, PRAGMA_NO_CACHE_HEADER);
-        response.getHeaders().putSingle(EXPIRES_HEADER_NAME, ALWAYS_EXPIRE_HEADER);
-        response.getHeaders().putSingle(CONTENT_TYPE_HEADER_NAME, "application/json");
+        response.getHeaders().put(CACHE_CONTROL_HEADER_NAME, NO_CACHE_CACHE_CONTROL_HEADER);
+        response.getHeaders().put(PRAGMA_HEADER_NAME, PRAGMA_NO_CACHE_HEADER);
+        response.getHeaders().put(EXPIRES_HEADER_NAME, ALWAYS_EXPIRE_HEADER);
+        response.getHeaders().put(CONTENT_TYPE_HEADER_NAME, "application/json");
 
         response.setEntity(jsonResponse.getObject());
         return response;
@@ -292,7 +295,7 @@ public class AuthenticationServiceV1 {
         if (exception instanceof RestAuthResponseException) {
             final RestAuthResponseException authResponseException = (RestAuthResponseException) exception;
             for (Map.Entry<String, String> entry : authResponseException.getResponseHeaders().entrySet()) {
-                response.getHeaders().putSingle(entry.getKey(), entry.getValue());
+                response.getHeaders().put(entry.getKey(), entry.getValue());
             }
             rep.putAll(authResponseException.getJsonResponse().asMap());
 
@@ -323,7 +326,12 @@ public class AuthenticationServiceV1 {
      * @return The localized message.
      */
     protected String getLocalizedMessage(Request request, Exception exception) {
-        List<String> languages = request.getHeaders().get("Accept-Language");
+        AcceptLanguageHeader languages = null;
+        try {
+            languages = request.getHeaders().get(AcceptLanguageHeader.class);
+        } catch (MalformedHeaderException e) {
+            DEBUG.warning("Could not parse accept language header", e);
+        }
         String message = null;
         L10NMessage localizedException = null;
         if (exception instanceof L10NMessage) {
@@ -335,8 +343,8 @@ public class AuthenticationServiceV1 {
             if (languages == null) {
                 message = localizeMessage(localizedException, Locale.getDefaultLocale());
             } else {
-                for (String language : languages) {
-                    message = localizeMessage(localizedException, Locale.getLocale(language));
+                for (java.util.Locale language : languages.getLocales().getLocales()) {
+                    message = localizeMessage(localizedException, language);
                     if (message != null) {
                         break;
                     }

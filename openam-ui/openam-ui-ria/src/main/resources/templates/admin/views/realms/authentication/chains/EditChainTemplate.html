@@ -7,11 +7,10 @@
     </ul>
 </div>
 
-<div class="nav-tab-content">
+<div class="panel panel-default fr-panel-tabbed">
+    <div class="panel-body tab-content">
 
-    <div class="tab-content clearfix">
-
-        <div role="tabpanel" class="tab-pane  active" id="chains">
+        <div role="tabpanel" class="tab-pane active" id="chains">
 
             <a  data-toggle="popover"
                 data-placement="top"
@@ -22,7 +21,6 @@
                 class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
 
             <button type="button" id="addModuleLink" class="btn btn-default"><i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}</button>
-
             <div id="sortableContainer">
                 <ol id="sortable"></ol>
             </div>
@@ -32,7 +30,6 @@
         <div role="tabpanel" class="tab-pane" id="settings">
 
              <div class="block clearfix">
-
                  <a data-toggle="popover"
                     data-placement="top"
                     data-trigger="focus"
@@ -43,25 +40,20 @@
 
         	    <h3 class="block-header">{{t 'console.authentication.editChains.redirectUrls'}}</h3>
                 <div class="form-horizontal">
-
                     <div class="form-group">
                         <label for="loginSuccessUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.successUrl'}}</label>
                         <div class="col-sm-6">
                             <input id="loginSuccessUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}"  value="{{chainData.loginSuccessUrl.[0]}}">
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label for="loginFailureUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.failUrl'}}</label>
                         <div class="col-sm-6">
                             <input id="loginFailureUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}" value="{{chainData.loginFailureUrl.[0]}}">
                         </div>
                     </div>
-
                 </div>
-
             </div>
-
             <div class="block clearfix">
                  <a data-toggle="popover"
                     data-placement="top"
@@ -79,7 +71,7 @@
 
     </div>
 
-    <div class="tab-pane-footer clearfix">
+    <div class="panel-footer clearfix">
         <div class="pull-right">
             <button id="saveChanges" class="btn btn-primary" type="button">
                 <span>{{t "common.form.saveChanges"}}</span>

@@ -24,6 +24,7 @@
  *
  * $Id: IDPSingleLogoutServiceSOAP.java,v 1.10 2009/10/14 23:59:44 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
@@ -46,8 +47,7 @@ import java.io.OutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.List; 
-import java.util.ArrayList;
-import java.util.Map; 
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
@@ -116,7 +116,7 @@ public class IDPSingleLogoutServiceSOAP extends HttpServlet {
                         reqElem);
                     IDPCache.SOAPMessageByLogoutRequestID.put(
                         logoutReq.getID(), reply); 
-                    IDPProxyUtil.sendProxyLogoutRequestSOAP(req, resp,
+                    IDPProxyUtil.sendProxyLogoutRequestSOAP(req, resp, resp.getWriter(),
                         reply, partners, (IDPSession) aMap.get(
                         SAML2Constants.IDP_SESSION));
                 } else {

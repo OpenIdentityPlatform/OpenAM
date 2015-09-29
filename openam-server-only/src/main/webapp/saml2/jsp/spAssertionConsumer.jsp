@@ -24,7 +24,7 @@
 
    $Id: spAssertionConsumer.jsp,v 1.17 2010/01/23 00:07:06 exu Exp $
 
-   Portions Copyrighted 2012-2014 ForgeRock AS.
+   Portions Copyrighted 2012-2015 ForgeRock AS.
 --%>
 
 <%@page
@@ -218,8 +218,8 @@ java.util.logging.Level
         if (isProxyOn) {
             if ("noPassiveResponse".equals(se.getErrorCode())) {
                 try {
-                    IDPProxyUtil.sendNoPassiveProxyResponse(request, response, requestID, metaAlias, hostEntityId,
-                            orgName);
+                    IDPProxyUtil.sendNoPassiveProxyResponse(request, response, new PrintWriter(out, true),
+                            requestID, metaAlias, hostEntityId, orgName);
                 } catch (SAML2Exception samle) {
                     SAML2Utils.debug.error("Failed to send nopassive proxy response", samle);
                 }

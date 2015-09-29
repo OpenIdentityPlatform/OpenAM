@@ -24,15 +24,8 @@
 
    $Id: idpSSOFederate.jsp,v 1.6 2009/10/15 00:00:41 exu Exp $
 
-   Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2015 ForgeRock AS.
 --%>
-
-
-
-
-
-<!-- %@ page import="com.iplanet.am.util.Debug" % -->
-<%@ page import="com.sun.identity.shared.debug.Debug" %>
 
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
@@ -55,7 +48,7 @@
         // cookie writer. There is already an assertion response
         // cached in this provider. Send it back directly.
         if ((cachedResID != null) && (cachedResID.length() != 0)) {
-            IDPSSOUtil.sendResponse(request, response, cachedResID);
+            IDPSSOUtil.sendResponse(request, response, new PrintWriter(out, true), cachedResID);
             return;
         }
     } catch (SAML2Exception sse) {

@@ -21,6 +21,7 @@ import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.AccessAuditEventBuilder;
+import org.forgerock.http.protocol.Header;
 import org.forgerock.services.context.Context;
 import org.forgerock.http.MutableUri;
 import org.forgerock.services.context.ClientContext;
@@ -173,8 +174,8 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
 
     private Map<String, List<String>> getHeadersAsMap(Headers requestHeaders) {
         Map<String, List<String>> headers = new HashMap<>();
-        for (String headerName : requestHeaders.keySet()) {
-            headers.put(headerName, new ArrayList<>(requestHeaders.get(headerName)));
+        for (Map.Entry<String, Header> header : requestHeaders.asMapOfHeaders().entrySet()) {
+            headers.put(header.getKey(), new ArrayList<>(header.getValue().getValues()));
         }
         return headers;
     }
