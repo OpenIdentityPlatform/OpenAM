@@ -31,6 +31,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import java.net.URI;
 
 import org.forgerock.audit.AuditException;
+import org.forgerock.audit.AuditService;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.http.session.Session;
 import org.forgerock.http.session.SessionContext;
@@ -62,13 +63,16 @@ public class AbstractHttpAccessAuditFilterTest {
 
     @Mock
     private AuditEventPublisher eventPublisher;
+    @Mock
+    private AuditServiceProvider auditServiceProvider;
+    @Mock
+    private AMAuditService auditService;
 
     @BeforeMethod
     public void setUp() {
         initMocks(this);
-        AuditServiceConfigurator auditServiceConfigurator = mock(AuditServiceConfigurator.class);
-        when(auditServiceConfigurator.getAuditServiceConfiguration()).thenReturn(new AMAuditServiceConfiguration());
-        AuditEventFactory eventFactory = new AuditEventFactory(auditServiceConfigurator);
+        when(auditServiceProvider.getDefaultAuditService()).thenReturn(auditService);
+        AuditEventFactory eventFactory = new AuditEventFactory(auditServiceProvider);
 
         auditFilter = new MockAccessAuditFilter(eventPublisher, eventFactory);
 

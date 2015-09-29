@@ -15,21 +15,64 @@
  */
 package org.forgerock.openam.audit.configuration;
 
+import java.util.Set;
+
 /**
- * Implementations of this interface are responsible for configuring the audit service.
+ * Implementations of this interface are responsible for supplying the configuring for the audit service.
  *
  * @since 13.0.0
  */
 public interface AuditServiceConfigurator {
 
     /**
-     * Configure the audit service and register the service config listener.
+     * This will be called once startup is complete. It should register a listener for SMS configuration changes and
+     * notify any audit configuration listeners that the configuration has changed.
      */
-    void configureAuditService();
+    void configurationSetupComplete();
 
     /**
-     * Get the pre-configured audit service configuration.
-     * @return The pre-configured audit service configuration.
+     * Add a listener that will be notified of any changes in the SMS audit service configuration.
+     *
+     * @param listener The listener to be notified.
      */
-    AMAuditServiceConfiguration getAuditServiceConfiguration();
+    void addConfigurationListener(AuditServiceConfigurationListener listener);
+
+    /**
+     * Remove the listener from the notification list.
+     *
+     * @param listener The listener to remove.
+     */
+    void removeConfigurationListener(AuditServiceConfigurationListener listener);
+
+    /**
+     * Get the default audit service configuration.
+     *
+     * @return The default audit service configuration.
+     */
+    AMAuditServiceConfiguration getDefaultConfiguration();
+
+    /**
+     * Get the audit service configuration for the specified realm. If no configuration exists for this realm, the
+     * default configuration will be returned.
+     *
+     * @param realm The realm for which the configuration is required.
+     * @return The audit service configuration.
+     */
+    AMAuditServiceConfiguration getRealmConfiguration(String realm);
+
+    /**
+     * Get the default audit event handler configuration.
+     *
+     * @return The default audit event handler configuration.
+     */
+    Set<AuditEventHandlerConfigurationWrapper> getDefaultEventHandlerConfigurations();
+
+    /**
+     * Get the audit event handler configuration for the specified realm. If no configuration exists for this realm, the
+     * default configuration will be returned.
+     *
+     * @param realm The realm for which the configuration is required.
+     * @return The audit event handler configuration.
+     */
+    Set<AuditEventHandlerConfigurationWrapper> getRealmEventHandlerConfigurations(String realm);
 }

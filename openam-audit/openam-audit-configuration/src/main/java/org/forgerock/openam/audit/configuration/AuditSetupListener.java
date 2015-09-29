@@ -27,6 +27,6 @@ public class AuditSetupListener implements SetupListener {
 
     @Override
     public void setupComplete() {
-        InjectorHolder.getInstance(AuditServiceConfigurator.class).configureAuditService();
+        InjectorHolder.getInstance(AuditServiceConfigurator.class).configurationSetupComplete();
     }
 }

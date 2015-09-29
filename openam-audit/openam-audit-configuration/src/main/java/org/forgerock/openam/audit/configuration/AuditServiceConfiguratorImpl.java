@@ -15,34 +15,32 @@
  */
 package org.forgerock.openam.audit.configuration;
 
-import static com.iplanet.am.util.SystemProperties.CONFIG_PATH;
-import static com.iplanet.am.util.SystemProperties.get;
+import static com.iplanet.am.util.SystemProperties.*;
 import static com.sun.identity.shared.Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR;
-import static org.forgerock.openam.audit.AuditConstants.*;
+import static com.sun.identity.shared.datastruct.CollectionHelper.*;
+import static java.util.Collections.emptySet;
+import static org.forgerock.openam.audit.AuditConstants.EventHandlerType.CSV;
+import static org.forgerock.openam.audit.AuditConstants.SERVICE_NAME;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
-import org.forgerock.audit.AuditException;
-import org.forgerock.audit.AuditService;
-import org.forgerock.audit.events.handlers.AuditEventHandler;
-import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandler;
 import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandlerConfiguration;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.utils.StringUtils;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.security.AccessController;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Listens to Audit Logger configuration changes and notify the Audit Service.
@@ -52,74 +50,90 @@ import java.util.Set;
 @Singleton
 public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, ServiceListener {
 
-    private static final Debug DEBUG = Debug.getInstance("amAudit");
+    private final Debug debug = Debug.getInstance("amAudit");
+    private final List<AuditServiceConfigurationListener> listeners = new CopyOnWriteArrayList<>();
 
-    private final AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration();
-    private final AuditService auditService;
     private volatile boolean initialised = false;
 
-    /**
-     * Create a new instance of {@code AuditServiceConfiguratorImpl}.
-     * @param auditService The audit service that needs to be configured.
-     */
-    @Inject
-    public AuditServiceConfiguratorImpl(AuditService auditService) {
-        this.auditService = auditService;
-    }
-
     @Override
-    public void configureAuditService() {
-        try {
-            refreshConfiguration();
-            registerServiceListener();
-            registerEventHandlers();
-            auditService.configure(configuration);
-        } catch (ResourceException | AuditException e) {
-            DEBUG.error("Unable to configure AuditService", e);
-            throw new RuntimeException("Unable to configure AuditService.", e);
+    public void configurationSetupComplete() {
+        if (initialised) {
+            return;
         }
+
+        notifyDefaultConfigurationListeners();
+
+        for (String realm : getRealmNames()) {
+            notifyRealmConfigurationListeners(realm);
+        }
+
+        registerServiceListener();
+        initialised = true;
     }
 
     @Override
-    public AMAuditServiceConfiguration getAuditServiceConfiguration() {
-        return configuration;
+    public void addConfigurationListener(AuditServiceConfigurationListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeConfigurationListener(AuditServiceConfigurationListener listener) {
+        listeners.remove(listener);
     }
 
     @Override
     public void globalConfigChanged(String serviceName, String version, String groupName, String component, int type) {
-        if (!SERVICE_NAME.equals(serviceName)) {
-            return;
-        }
-
-        if (StringUtils.isEmpty(component)) {
-            refreshConfiguration();
-
-            if (configuration.isAuditEnabled()) {
-                try {
-                    registerEventHandlers();
-                } catch (ResourceException | AuditException e) {
-                    DEBUG.error("Unable to register audit event handlers.", e);
-                }
-            }
-        } else {
-            serviceComponentChanged(component);
+        if (SERVICE_NAME.equals(serviceName)) {
+            notifyDefaultConfigurationListeners();
         }
     }
 
-    private void registerEventHandlers() throws ResourceException, AuditException {
-        if (!configuration.isAuditEnabled()) {
-            DEBUG.message("Audit logging is disabled. No event handlers will be registered.");
-            return;
+    @Override
+    public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
+                                          String component, int type) {
+
+        if (SERVICE_NAME.equals(serviceName)) {
+            notifyRealmConfigurationListeners(DNMapper.orgNameToRealmName(orgName));
         }
 
-        try {
-            ServiceConfig parentConfig = getAuditGlobalConfiguration();
-            Set<String> handlerNames = parentConfig.getSubConfigNames();
-            for (String handler : handlerNames) {
-                updateEventHandlerConfiguration(parentConfig.getSubConfig(handler), auditService);
+    }
+
+    @Override
+    public AMAuditServiceConfiguration getDefaultConfiguration() {
+        return getConfiguration(getAuditGlobalConfiguration());
+    }
+
+    @Override
+    public AMAuditServiceConfiguration getRealmConfiguration(String realm) {
+        return getConfiguration(getAuditRealmConfiguration(realm));
+    }
+
+    @Override
+    public Set<AuditEventHandlerConfigurationWrapper> getDefaultEventHandlerConfigurations() {
+        return getEventHandlerConfigurations(getAuditGlobalConfiguration());
+    }
+
+    @Override
+    public Set<AuditEventHandlerConfigurationWrapper> getRealmEventHandlerConfigurations(String realm) {
+        return getEventHandlerConfigurations(getAuditRealmConfiguration(realm));
+    }
+
+    private void notifyDefaultConfigurationListeners() {
+        for (AuditServiceConfigurationListener listener : listeners) {
+            listener.globalConfigurationChanged();
+        }
+    }
+
+    private void notifyRealmConfigurationListeners(String realm) {
+        ServiceConfig config = getAuditRealmConfiguration(realm);
+        if (serviceExists(config)) {
+            for (AuditServiceConfigurationListener listener : listeners) {
+                listener.realmConfigurationChanged(realm);
             }
-        } catch (SSOException | SMSException e) {
-            DEBUG.error("Error accessing service {}", SERVICE_NAME, e);
+        } else {
+            for (AuditServiceConfigurationListener listener : listeners) {
+                listener.realmConfigurationRemoved(realm);
+            }
         }
     }
 
@@ -130,112 +144,117 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
      * @throws IllegalStateException if the configuration listener cannot be registered.
      */
     private void registerServiceListener() {
-        if (initialised) {
-            return;
-        }
         try {
             String listenerId = new ServiceConfigManager(SERVICE_NAME, getAdminToken()).addListener(this);
             if (listenerId == null) {
                 throw new SMSException("Unable to register service config listener");
             }
-            initialised = true;
-            DEBUG.message("Registered service config listener: {}", listenerId);
+            debug.message("Registered service config listener: {}", listenerId);
         } catch (SSOException | SMSException e) {
-            DEBUG.error("Unable to create ServiceConfigManager", e);
+            debug.error("Unable to create ServiceConfigManager", e);
             throw new IllegalStateException(e);
         }
     }
 
-    private void refreshConfiguration() {
-        ServiceConfig globalConfig = getAuditGlobalConfiguration();
+    private AMAuditServiceConfiguration getConfiguration(ServiceConfig config) {
         @SuppressWarnings("unchecked")
-        Map<String, Set<String>> attributes = globalConfig.getAttributes();
-        configuration.setAuditEnabled(CollectionHelper.getBooleanMapAttr(attributes, "auditEnabled", false));
-        configuration.setAuditFailureSuppressed(
-                CollectionHelper.getBooleanMapAttr(attributes, "suppressAuditFailure", true));
-        configuration.setResolveHostNameEnabled(CollectionHelper.getBooleanMapAttr(attributes,
-                "resolveHostNameEnabled", false));
+        Map<String, Set<String>> attributes = config.getAttributes();
+        return new AMAuditServiceConfiguration(
+                getBooleanMapAttr(attributes, "auditEnabled", false),
+                getBooleanMapAttr(attributes, "suppressAuditFailure", true),
+                getBooleanMapAttr(attributes, "resolveHostNameEnabled", false));
     }
 
-    private void serviceComponentChanged(String serviceComponent) {
-        serviceComponent = serviceComponent.startsWith("/") ? serviceComponent.substring(1).trim() : serviceComponent;
-        String[] components = serviceComponent.split("/");
-        if (components.length == 1) {
-            ServiceConfig eventHandlerConfig = getEventHandlerConfiguration(components[0]);
-            if (eventHandlerConfig == null) {
-                DEBUG.error(
-                        "No event handler configuration called {} found in service {}. No configuration changes made.",
-                        components[0], SERVICE_NAME);
-                return;
-            }
-            try {
-                updateEventHandlerConfiguration(eventHandlerConfig, InjectorHolder.getInstance(AuditService.class));
-            } catch (ResourceException | AuditException e) {
-                DEBUG.error("Failed to configure the {} event handler", components[0], e);
-            }
+    private Set<AuditEventHandlerConfigurationWrapper> getEventHandlerConfigurations(ServiceConfig serviceConfig) {
+        if (!serviceExists(serviceConfig)) {
+            return emptySet();
         }
+
+        Set<AuditEventHandlerConfigurationWrapper> eventHandlerConfigurations = new HashSet<>();
+        try {
+            Set<String> handlerNames = serviceConfig.getSubConfigNames();
+            for (String handlerName : handlerNames) {
+                AuditEventHandlerConfigurationWrapper eventHandlerConfiguration =
+                        getEventHandlerConfiguration(serviceConfig.getSubConfig(handlerName));
+                if (eventHandlerConfiguration != null) {
+                    eventHandlerConfigurations.add(eventHandlerConfiguration);
+                }
+            }
+        } catch (SSOException | SMSException e) {
+            debug.error("Error accessing service {}. No audit event handlers will be registered.", SERVICE_NAME, e);
+        }
+
+        return eventHandlerConfigurations;
     }
 
-    private void updateEventHandlerConfiguration(ServiceConfig eventHandlerConfig, AuditService auditService)
-            throws ResourceException, AuditException {
-
+    private AuditEventHandlerConfigurationWrapper getEventHandlerConfiguration(ServiceConfig eventHandlerConfig) {
         @SuppressWarnings("unchecked")
         Map<String, Set<String>> attributes = eventHandlerConfig.getAttributes();
-        if (CSV.equalsIgnoreCase(eventHandlerConfig.getSchemaID())) {
-            updateCsvEventHandlerConfiguration(attributes, auditService);
-        }
-    }
+        boolean handlerEnabled = getBooleanMapAttr(attributes, "enabled", false);
 
-    private void updateCsvEventHandlerConfiguration(Map<String, Set<String>> attributes, AuditService auditService)
-            throws AuditException, ResourceException {
-
-        if (!CollectionHelper.getBooleanMapAttr(attributes, "enabled", false)) {
-            // deregister the handler from the audit service here
-            return;
+        if (handlerEnabled && CSV.name().equalsIgnoreCase(eventHandlerConfig.getSchemaID())) {
+            return getCsvEventHandlerConfiguration(eventHandlerConfig.getName(), attributes);
         }
 
-        AuditEventHandler csvAuditEventHandler = auditService.getRegisteredHandler(CSV);
-        if (csvAuditEventHandler == null) {
-            csvAuditEventHandler = new CSVAuditEventHandler();
-            auditService.register(csvAuditEventHandler, CSV, attributes.get("topics"));
-        }
-        CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
-        String location = CollectionHelper.getMapAttr(attributes, "location");
-        csvHandlerConfiguration.setLogDirectory(location.replaceAll("%BASE_DIR%", get(CONFIG_PATH))
-                .replaceAll("%SERVER_URI%", get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
-        csvAuditEventHandler.configure(csvHandlerConfiguration);
-    }
-
-    private ServiceConfig getEventHandlerConfiguration(String handler) {
-        try {
-            return getAuditGlobalConfiguration().getSubConfig(handler);
-        } catch (SMSException | SSOException e) {
-            DEBUG.error("Error accessing service {}", SERVICE_NAME, e);
-        }
         return null;
+    }
+
+    private AuditEventHandlerConfigurationWrapper getCsvEventHandlerConfiguration(
+            String name, Map<String, Set<String>> attributes) {
+
+        CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
+        String location = getMapAttr(attributes, "location");
+        csvHandlerConfiguration.setLogDirectory(location.replaceAll("%BASE_DIR%", get(CONFIG_PATH)).replaceAll
+                ("%SERVER_URI%", get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
+
+        return new AuditEventHandlerConfigurationWrapper(csvHandlerConfiguration, CSV, name, attributes.get("topics"));
     }
 
     private ServiceConfig getAuditGlobalConfiguration() {
         try {
             return new ServiceConfigManager(SERVICE_NAME, getAdminToken()).getGlobalConfig("default");
         } catch (SMSException | SSOException e) {
-            DEBUG.error("Error accessing service {}", SERVICE_NAME, e);
+            debug.error("Error accessing service {}", SERVICE_NAME, e);
             throw new IllegalStateException(e);
         }
+    }
+
+    private ServiceConfig getAuditRealmConfiguration(String realm) {
+        try {
+            return new ServiceConfigManager(SERVICE_NAME, getAdminToken()).getOrganizationConfig(realm, null);
+        } catch (SMSException | SSOException e) {
+            debug.error("Error accessing service {}", SERVICE_NAME, e);
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private boolean serviceExists(ServiceConfig auditServiceConfig) {
+        return auditServiceConfig != null && auditServiceConfig.exists();
     }
 
     private SSOToken getAdminToken() {
         return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 
-    @Override
-    public void schemaChanged(String serviceName, String version) {
-        // Ignore
+    @SuppressWarnings("unchecked")
+    private Set<String> getRealmNames() {
+        try {
+            Set<String> rootSubRealms = new OrganizationConfigManager(getAdminToken(), "/")
+                    .getSubOrganizationNames("*", true);
+            Set<String> qualifiedRealmNames = new HashSet<>();
+            qualifiedRealmNames.add("/");
+            for (String subRealm : rootSubRealms) {
+                qualifiedRealmNames.add("/" + subRealm);
+            }
+            return qualifiedRealmNames;
+        } catch (SMSException e) {
+            debug.error("An error occurred while trying to retrieve the list of realms", e);
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
-    public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
-                                          String serviceComponent, int type) {
+    public void schemaChanged(String serviceName, String version) {
         // Ignore
     }
 }

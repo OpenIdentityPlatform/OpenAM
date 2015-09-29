@@ -150,6 +150,14 @@ public final class AuditConstants {
     }
 
     /**
+     * Types of available event handlers.
+     */
+    public enum EventHandlerType {
+        /** CSV event handler type */
+        CSV
+    }
+
+    /**
      * The topic to which events built using {@link AMAccessAuditEventBuilder} should be routed.
      */
     public static final String ACCESS_TOPIC = "access";
@@ -163,11 +171,6 @@ public final class AuditConstants {
      * SMS service name for the audit service.
      */
     public static final String SERVICE_NAME = "AuditService";
-
-    /**
-     * Name of the event handlers registered with the audit service.
-     */
-    public static final String CSV = "csv";
 
     /**
      * Name of the {@link com.sun.identity.shared.debug.Debug} instance.

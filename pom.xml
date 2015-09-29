@@ -123,7 +123,7 @@
         <forgerock.rest.version>3.0.0-SNAPSHOT</forgerock.rest.version>
         <forgerock.ui.version>3.1.0-SNAPSHOT</forgerock.ui.version>
         <forgerock.guava.version>18.0.1</forgerock.guava.version>
-        <forgerock.audit.version>0.4.0-SNAPSHOT</forgerock.audit.version>
+        <forgerock.audit.version>0.5.0-SNAPSHOT</forgerock.audit.version>
         <forgerock.guice.version>1.1.0-SNAPSHOT</forgerock.guice.version>
         <forgerock.selfservice.version>0.2.0-SNAPSHOT</forgerock.selfservice.version>
 

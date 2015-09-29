@@ -15,21 +15,31 @@
  */
 package org.forgerock.openam.audit;
 
-import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
+import org.forgerock.json.resource.ConnectionFactory;
 
 /**
- * Responsible for creating and initializing an instance of the AuditService.
+ * Responsible for creating and initializing instances of {@link AuditService} and its associated
+ * {@link ConnectionFactory}.
  *
  * @since 13.0.0
  */
 public interface AuditServiceProvider {
 
     /**
-     * Creates a new instance of the AuditService with any required configuration applied.
+     * Get the audit service for the specified realm. If no audit service exists for the given realm, the default
+     * audit service will be returned. This audit service will never be {@code null}.
      *
-     * @return a new AuditService instance.
-     * @throws AuditException If unable to configure the audit service.
+     * @param realm The realm for which the audit service is required.
+     * @return the requested audit service.
      */
-    AuditService createAuditService() throws AuditException;
+    AMAuditService getAuditService(String realm);
+
+    /**
+     * Get the default audit service, which is not associated with a specific realm.
+     * This audit service will never be {@code null}.
+     *
+     * @return the requested audit service.
+     */
+    AMAuditService getDefaultAuditService();
 }

@@ -15,23 +15,18 @@
  */
 package org.forgerock.openam.audit;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.MapBinder;
-import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.audit.AuditService;
+import org.forgerock.json.resource.ServiceUnavailableException;
+import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 
-/**
- * Guice Module for configuring bindings for the OpenAM Audit Core classes.
- */
-@GuiceModule
-public class AuditCoreGuiceModule extends AbstractModule {
+public interface AMAuditService extends AuditService {
 
-    @Override
-    protected void configure() {
-        bind(AuditServiceProvider.class).to(AuditServiceProviderImpl.class);
+    void setDelegate(AuditService delegate, AMAuditServiceConfiguration configuration) throws ServiceUnavailableException;
 
-        // Initial binding for a Map of Component to AbstractHttpAccessAuditFilter
-        // which other Guice modules will populate.
-        MapBinder.newMapBinder(binder(), AuditConstants.Component.class, AbstractHttpAccessAuditFilter.class);
-    }
+    boolean isAuditEnabled(String topic);
+
+    boolean isAuditFailureSuppressed();
+
+    boolean isResolveHostNameEnabled();
 
 }

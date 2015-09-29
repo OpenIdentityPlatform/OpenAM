@@ -21,12 +21,14 @@ import static org.forgerock.openam.audit.AuditConstants.USER_ID;
 import static org.mockito.Mockito.*;
 
 import org.forgerock.audit.AuditException;
+import org.forgerock.audit.AuditServiceBuilder;
 import org.forgerock.audit.events.AuditEvent;
-import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AMAuditService;
+import org.forgerock.openam.audit.AMAuditServiceProxy;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -42,17 +44,24 @@ public class AbstractRestletAccessAuditFilterTest {
 
     private AuditEventFactory eventFactory;
     private AuditEventPublisher eventPublisher;
-    private MockAccessAuditFilter auditFilter;
+    private RestletAccessAuditFilterTest auditFilter;
+    private AuditServiceProvider auditServiceProvider;
     private Restlet restlet;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         restlet = mock(Restlet.class);
-        AuditServiceConfigurator auditServiceConfigurator = mock(AuditServiceConfigurator.class);
-        when(auditServiceConfigurator.getAuditServiceConfiguration()).thenReturn(new AMAuditServiceConfiguration());
-        eventFactory = new AuditEventFactory(auditServiceConfigurator);
+
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false, false);
+        AuditServiceBuilder builder = AuditServiceBuilder.newAuditService().withConfiguration(serviceConfig);
+        AMAuditService auditService = new AMAuditServiceProxy(builder.build(), serviceConfig);
+        auditService.startup();
+        auditServiceProvider = mock(AuditServiceProvider.class);
+        when(auditServiceProvider.getDefaultAuditService()).thenReturn(auditService);
+
+        eventFactory = new AuditEventFactory(auditServiceProvider);
         eventPublisher = mock(AuditEventPublisher.class);
-        auditFilter = new MockAccessAuditFilter(restlet, eventPublisher, eventFactory);
+        auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory);
     }
 
     @Test
@@ -66,7 +75,6 @@ public class AbstractRestletAccessAuditFilterTest {
         when(representation.isTransient()).thenReturn(false);
         AuditRequestContext.putProperty(USER_ID, "User 1");
         when(eventPublisher.isAuditing(anyString())).thenReturn(true);
-        when(eventPublisher.isSuppressExceptions()).thenReturn(false);
         doThrow(AuditException.class).when(eventPublisher).publish(anyString(), any(AuditEvent.class));
 
         // When
@@ -95,11 +103,11 @@ public class AbstractRestletAccessAuditFilterTest {
     }
 
     /**
-     * Mock class to test AbstractRestletAccessAuditFilter.
+     * Class to test AbstractRestletAccessAuditFilter.
      */
-    private class MockAccessAuditFilter extends AbstractRestletAccessAuditFilter {
+    private class RestletAccessAuditFilterTest extends AbstractRestletAccessAuditFilter {
 
-        public MockAccessAuditFilter(Restlet restlet, AuditEventPublisher publisher, AuditEventFactory factory) {
+        public RestletAccessAuditFilterTest(Restlet restlet, AuditEventPublisher publisher, AuditEventFactory factory) {
             super(AUTHENTICATION, restlet, publisher, factory);
         }
     }

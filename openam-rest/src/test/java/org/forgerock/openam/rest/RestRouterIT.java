@@ -25,7 +25,6 @@ import static org.forgerock.openam.rest.Routers.ssoToken;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.fail;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -68,9 +67,9 @@ import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
-import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.http.HttpGuiceModule;
@@ -91,6 +90,7 @@ public class RestRouterIT extends GuiceTestCase {
     private AuthenticateResource authenticateResource;
     private AbstractHttpAccessAuditFilter httpAccessAuditFilter;
     private AuditServiceConfigurator auditServiceConfigurator;
+    private AuditServiceProvider auditServiceProvider;
     private ResourceApiVersionBehaviourManager versionBehaviourManager;
     private SSOTokenManager ssoTokenManager;
     private AuthUtilsWrapper authUtilsWrapper;
@@ -107,6 +107,7 @@ public class RestRouterIT extends GuiceTestCase {
         httpAccessAuditFilter = spy(new AbstractHttpAccessAuditFilter(AUTHENTICATION, mock(AuditEventPublisher.class),
                 mock(AuditEventFactory.class)) {});
         auditServiceConfigurator = mock(AuditServiceConfigurator.class);
+        auditServiceProvider = mock(AuditServiceProvider.class);
 
         versionBehaviourManager = mock(ResourceApiVersionBehaviourManager.class);
 
@@ -140,6 +141,7 @@ public class RestRouterIT extends GuiceTestCase {
 
 
         binder.bind(AuditServiceConfigurator.class).toInstance(auditServiceConfigurator);
+        binder.bind(AuditServiceProvider.class).toInstance(auditServiceProvider);
 
 
         binder.bind(Key.get(SingletonResourceProvider.class, Names.named("ConfigResource"))).toInstance(configResource);
@@ -286,7 +288,7 @@ public class RestRouterIT extends GuiceTestCase {
 
     private void auditingOff() {
         AMAuditServiceConfiguration auditServiceConfiguration = mock(AMAuditServiceConfiguration.class);
-        given(auditServiceConfigurator.getAuditServiceConfiguration()).willReturn(auditServiceConfiguration);
+        given(auditServiceConfigurator.getDefaultConfiguration()).willReturn(auditServiceConfiguration);
         given(auditServiceConfiguration.isAuditEnabled()).willReturn(false);
     }
 
