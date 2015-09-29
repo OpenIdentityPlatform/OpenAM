@@ -55,7 +55,7 @@ public class CrestProtocolEnforcementFilterTest {
         Request request = new Request();
         Handler next = mock(Handler.class);
 
-        request.getHeaders().putSingle(AcceptApiVersionHeader.valueOf("protocol=1"));
+        request.getHeaders().put(AcceptApiVersionHeader.valueOf("protocol=1"));
 
         //When
         filter.filter(context, request, next);
@@ -89,7 +89,7 @@ public class CrestProtocolEnforcementFilterTest {
         Request request = new Request();
         Handler next = mock(Handler.class);
 
-        request.getHeaders().putSingle(AcceptApiVersionHeader.valueOf("protocol=1.1"));
+        request.getHeaders().put(AcceptApiVersionHeader.valueOf("protocol=1.1"));
 
         //When
         Response response = filter.filter(context, request, next).getOrThrowUninterruptibly();
@@ -108,7 +108,7 @@ public class CrestProtocolEnforcementFilterTest {
         Request request = new Request();
         Handler next = mock(Handler.class);
 
-        request.getHeaders().putSingle(AcceptApiVersionHeader.valueOf("protocol=2"));
+        request.getHeaders().put(AcceptApiVersionHeader.valueOf("protocol=2"));
 
         //When
         Response response = filter.filter(context, request, next).getOrThrowUninterruptibly();

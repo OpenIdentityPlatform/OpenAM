@@ -151,7 +151,7 @@ public class PendingRequestEmailTemplate {
     private String resolveScope(String scope, Locale locale) {
         if (URI.create(scope).getScheme() != null) {
             Request request = new Request().setMethod("GET").setUri(URI.create(scope));
-            request.getHeaders().putSingle("Accept-Language", locale.toLanguageTag());
+            request.getHeaders().put("Accept-Language", locale.toLanguageTag());
             Response response = client.send(request).getOrThrowUninterruptibly();
             if (Status.OK.equals(response.getStatus())) {
                 try {

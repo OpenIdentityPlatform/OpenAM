@@ -75,7 +75,7 @@ public class CrestProtocolEnforcementFilter implements Filter {
             throw new BadRequestException(e);
         }
         apiVersionHeader.withDefaultProtocolVersion(ENFORCE_PROTOCOL_VERSION);
-        request.getHeaders().putSingle(apiVersionHeader);
+        request.getHeaders().put(apiVersionHeader);
         return apiVersionHeader.getProtocolVersion();
     }
 

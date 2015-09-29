@@ -55,7 +55,7 @@ public class AuthenticationServiceV1Test {
         AttributesContext context = new AttributesContext(new SessionContext(new RootContext(), mock(Session.class)));
         Request httpRequest = new Request();
         httpRequest.setEntity("<xml></xml>");
-        httpRequest.getHeaders().putSingle(ContentTypeHeader.NAME, "application/xml");
+        httpRequest.getHeaders().put(ContentTypeHeader.NAME, "application/xml");
 
         // when
         Response response = authServiceV1.authenticate(context, httpRequest);
@@ -109,7 +109,7 @@ public class AuthenticationServiceV1Test {
         // given
         Request httpRequest = new Request();
         AuthLoginException exception = new AuthLoginException("amAuth", "120", null);
-        httpRequest.getHeaders().putSingle("Accept-Language", "fr-fr");
+        httpRequest.getHeaders().put("Accept-Language", "fr-fr");
 
         // when
         String message = authServiceV1.getLocalizedMessage(httpRequest, exception);
@@ -124,7 +124,7 @@ public class AuthenticationServiceV1Test {
         Request httpRequest = new Request();
         AuthLoginException ale = new AuthLoginException("amAuth", "120", null);
         RestAuthException exception = new RestAuthException(401, ale);
-        httpRequest.getHeaders().putSingle("Accept-Language", "fr-fr");
+        httpRequest.getHeaders().put("Accept-Language", "fr-fr");
 
         // when
         String message = authServiceV1.getLocalizedMessage(httpRequest, exception);

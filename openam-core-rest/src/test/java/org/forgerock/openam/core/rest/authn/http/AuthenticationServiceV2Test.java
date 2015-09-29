@@ -54,7 +54,7 @@ public class AuthenticationServiceV2Test {
         AttributesContext context = new AttributesContext(new SessionContext(new RootContext(), mock(Session.class)));
         Request httpRequest = new Request();
         httpRequest.setEntity("<xml></xml>");
-        httpRequest.getHeaders().putSingle(ContentTypeHeader.NAME, "application/xml");
+        httpRequest.getHeaders().put(ContentTypeHeader.NAME, "application/xml");
 
         // when
         Response response = authServiceV2.authenticate(context, httpRequest);

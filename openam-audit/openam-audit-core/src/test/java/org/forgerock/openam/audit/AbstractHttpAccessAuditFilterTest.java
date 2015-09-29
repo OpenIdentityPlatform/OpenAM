@@ -133,7 +133,7 @@ public class AbstractHttpAccessAuditFilterTest {
         Request request = new Request()
                 .setMethod("GET")
                 .setUri(URI.create("http://example.com:8080?query=value"));
-        request.getHeaders().putSingle(ContentTypeHeader.valueOf("CONTENT_TYPE"));
+        request.getHeaders().put(ContentTypeHeader.valueOf("CONTENT_TYPE"));
 
         enableAccessTopicAuditing();
         Handler handler = mockHandler(context, request, responseStatus);

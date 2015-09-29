@@ -53,7 +53,7 @@ public class AuthenticationServiceV2 extends AuthenticationServiceV1 {
         if (exception instanceof RestAuthResponseException) {
             final RestAuthResponseException authResponseException = (RestAuthResponseException)exception;
             for (Map.Entry<String, String> entry : authResponseException.getResponseHeaders().entrySet()) {
-                response.getHeaders().putSingle(entry.getKey(), entry.getValue());
+                response.getHeaders().add(entry.getKey(), entry.getValue());
             }
             response.setEntity(authResponseException.getJsonResponse().asMap());
             return response;
