@@ -17,9 +17,9 @@ package org.forgerock.openam.audit.configuration;
 
 /**
  * Implementors of this interface will be notified of changes to the Audit service SMS configuration. Add the listener
- * by calling {@link AuditServiceConfigurator#addConfigurationListener(AuditServiceConfigurationListener)}.
+ * by calling {@link AuditServiceConfigurationProvider#addConfigurationListener(AuditServiceConfigurationListener)}.
  *
- * @Since 13.0.0
+ * @since 13.0.0
  */
 public interface AuditServiceConfigurationListener {
 

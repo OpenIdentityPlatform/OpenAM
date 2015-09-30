@@ -17,7 +17,9 @@ package org.forgerock.openam.selfservice;
 
 import static org.forgerock.openam.selfservice.SelfServiceGuiceModule.INTERIM_TYPE;
 
-import org.forgerock.services.context.Context;
+import javax.inject.Inject;
+import java.util.Arrays;
+
 import org.forgerock.json.resource.AbstractRequestHandler;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -32,10 +34,8 @@ import org.forgerock.selfservice.core.ProgressStageFactory;
 import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
-
-import javax.inject.Inject;
-import java.util.Arrays;
 
 /**
  * Utilises the common anonymous process service to deliver forgotten password behaviour.
@@ -51,8 +51,8 @@ final class ForgottenPasswordRequestHandler extends AbstractRequestHandler {
                                     SnapshotTokenHandlerFactory tokenHandlerFactory, ProcessStore localStore) {
         ProcessInstanceConfig config = new ProcessInstanceConfig()
                 .setStageConfigs(Arrays.asList(new InterimConfig()))
-                .setStorageType(StorageType.STATELESS.name())
-                .setSnapshotTokenType(INTERIM_TYPE);
+                .setStorageType(StorageType.STATELESS)
+                .setSnapshotTokenConfig(INTERIM_TYPE);
 
         anonymousProcess = new AnonymousProcessService(config, stageFactory, tokenHandlerFactory, localStore);
     }

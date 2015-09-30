@@ -31,7 +31,7 @@ import javax.inject.Singleton;
  *
  * Facilitates mocking of audit event handlers.
  *
- * @Since 13.0.0
+ * @since 13.0.0
  */
 @Singleton
 public class AuditEventHandlerFactory {
@@ -46,7 +46,7 @@ public class AuditEventHandlerFactory {
      */
     public AuditEventHandler create(AuditEventHandlerConfigurationWrapper config) throws AuditException {
         if (CSV.equals(config.getType())) {
-            getCsvEventHandler((CSVAuditEventHandlerConfiguration) config.getConfiguration());
+            return getCsvEventHandler((CSVAuditEventHandlerConfiguration) config.getConfiguration());
         }
 
         throw new AuditException("No event handler exists for " + config.getName());

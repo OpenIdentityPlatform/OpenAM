@@ -48,7 +48,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 13.0.0
  */
 @Singleton
-public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, ServiceListener {
+public class AuditServiceConfigurationProviderImpl implements AuditServiceConfigurationProvider, ServiceListener {
 
     private final Debug debug = Debug.getInstance("amAudit");
     private final List<AuditServiceConfigurationListener> listeners = new CopyOnWriteArrayList<>();
@@ -56,7 +56,7 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
     private volatile boolean initialised = false;
 
     @Override
-    public void configurationSetupComplete() {
+    public void setupComplete() {
         if (initialised) {
             return;
         }
@@ -204,8 +204,8 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
 
         CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
         String location = getMapAttr(attributes, "location");
-        csvHandlerConfiguration.setLogDirectory(location.replaceAll("%BASE_DIR%", get(CONFIG_PATH)).replaceAll
-                ("%SERVER_URI%", get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
+        csvHandlerConfiguration.setLogDirectory(location.replaceAll("%BASE_DIR%", get(CONFIG_PATH))
+                .replaceAll("%SERVER_URI%", get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
 
         return new AuditEventHandlerConfigurationWrapper(csvHandlerConfiguration, CSV, name, attributes.get("topics"));
     }

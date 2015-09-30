@@ -19,14 +19,45 @@ import org.forgerock.audit.AuditService;
 import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 
+/**
+ * Extended interface of the commons {@link AuditService} to allow for OpenAM specific configuration.
+ *
+ * @since 13.0.0
+ */
 public interface AMAuditService extends AuditService {
 
-    void setDelegate(AuditService delegate, AMAuditServiceConfiguration configuration) throws ServiceUnavailableException;
+    /**
+     * Set the new delegate to set on the {@link org.forgerock.audit.AuditServiceProxy} and the configuration for the
+     * OpenAM specific settings.
+     *
+     * @param delegate The audit service delegate.
+     * @param configuration OpenAM specific configuration.
+     * @throws ServiceUnavailableException If the delegate is unavailable.
+     * @see org.forgerock.audit.AuditServiceProxy#setDelegate(AuditService)
+     */
+    void setDelegate(AuditService delegate, AMAuditServiceConfiguration configuration)
+            throws ServiceUnavailableException;
 
+    /**
+     * Determines if the audit service is auditing the specified {@literal topic}.
+     *
+     * @param topic The auditing topic.
+     * @return {@code true} if Auditing is switched on and if the topic should be audited.
+     */
     boolean isAuditEnabled(String topic);
 
+    /**
+     * Stop failure to log an audit message from also failing the operation that is audited.
+     *
+     * @return true if audit failure should be suppressed.
+     */
     boolean isAuditFailureSuppressed();
 
+    /**
+     * Is access event reverse DNS lookup enabled.
+     *
+     * @return true if enabled
+     */
     boolean isResolveHostNameEnabled();
 
 }

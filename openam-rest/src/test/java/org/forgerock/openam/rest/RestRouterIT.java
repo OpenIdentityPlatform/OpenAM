@@ -23,6 +23,7 @@ import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
 import static org.forgerock.openam.audit.AuditConstants.Component.CONFIG;
 import static org.forgerock.openam.audit.AuditConstants.Component.USERS;
@@ -70,8 +71,6 @@ import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.AuditServiceProvider;
-import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.http.HttpGuiceModule;
@@ -108,7 +107,7 @@ public class RestRouterIT extends GuiceTestCase {
     private DashboardResource dashboardResource;
     private AuthenticateResource authenticateResource;
     private AbstractHttpAccessAuditFilter httpAccessAuditFilter;
-    private AuditServiceConfigurator auditServiceConfigurator;
+    private AuditEventPublisher auditEventPublisher;
     private AuditServiceProvider auditServiceProvider;
     private ResourceApiVersionBehaviourManager versionBehaviourManager;
     private SSOTokenManager ssoTokenManager;
@@ -124,9 +123,9 @@ public class RestRouterIT extends GuiceTestCase {
         dashboardResource = spy(new DashboardResource());
         authenticateResource = spy(new AuthenticateResource());
 
-        httpAccessAuditFilter = spy(new AbstractHttpAccessAuditFilter(AUTHENTICATION, mock(AuditEventPublisher.class),
-                mock(AuditEventFactory.class)) {});
-        auditServiceConfigurator = mock(AuditServiceConfigurator.class);
+        httpAccessAuditFilter = spy(new AbstractHttpAccessAuditFilter(AUTHENTICATION, mock(AuditEventPublisher.class)
+                , mock(AuditEventFactory.class)) {});
+        auditEventPublisher = mock(AuditEventPublisher.class);
         auditServiceProvider = mock(AuditServiceProvider.class);
 
         versionBehaviourManager = mock(ResourceApiVersionBehaviourManager.class);
@@ -160,7 +159,7 @@ public class RestRouterIT extends GuiceTestCase {
         httpAccessAuditFilterMapBinder.addBinding(AUTHENTICATION).toInstance(httpAccessAuditFilter);
 
 
-        binder.bind(AuditServiceConfigurator.class).toInstance(auditServiceConfigurator);
+        binder.bind(AuditEventPublisher.class).toInstance(auditEventPublisher);
         binder.bind(AuditServiceProvider.class).toInstance(auditServiceProvider);
 
 
@@ -348,9 +347,7 @@ public class RestRouterIT extends GuiceTestCase {
     }
 
     private void auditingOff() {
-        AMAuditServiceConfiguration auditServiceConfiguration = mock(AMAuditServiceConfiguration.class);
-        given(auditServiceConfigurator.getDefaultConfiguration()).willReturn(auditServiceConfiguration);
-        given(auditServiceConfiguration.isAuditEnabled()).willReturn(false);
+        given(auditEventPublisher.isAuditing(ACCESS_TOPIC)).willReturn(false);
     }
 
     private void mockDnsAlias(String alias, String realm) throws Exception {

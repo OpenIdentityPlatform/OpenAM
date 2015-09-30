@@ -19,13 +19,12 @@ import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-import org.forgerock.audit.AuditService;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
 import org.forgerock.audit.events.handlers.EventHandlerConfiguration;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfigurationWrapper;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurationListener;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
+import org.forgerock.openam.audit.configuration.AuditServiceConfigurationProvider;
 import org.forgerock.util.thread.listener.ShutdownManager;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -40,7 +39,7 @@ import java.util.Set;
 public class AuditServiceProviderImplTest {
 
     private AuditServiceProvider provider;
-    private AuditServiceConfigurator configurator;
+    private AuditServiceConfigurationProvider configurator;
     private AuditServiceConfigurationListener configListener;
     private AuditEventHandlerConfigurationWrapper handlerConfig;
 
@@ -60,7 +59,7 @@ public class AuditServiceProviderImplTest {
         handlerConfig = new AuditEventHandlerConfigurationWrapper(mock(EventHandlerConfiguration.class),
                         AuditConstants.EventHandlerType.CSV, "handler", singleton("access"));
 
-        configurator = new MockAuditServiceConfigurator();
+        configurator = new MockAuditServiceConfigurationProvider();
         provider = new AuditServiceProviderImpl(configurator, mockHandlerFactory, mockShutdownManager);
 
         when(mockHandlerFactory.create(any(AuditEventHandlerConfigurationWrapper.class))).thenReturn(mockHandler);
@@ -100,10 +99,11 @@ public class AuditServiceProviderImplTest {
         assertThat(provider.getAuditService("anyRealm")).isEqualTo(provider.getDefaultAuditService());
     }
 
-    class MockAuditServiceConfigurator implements AuditServiceConfigurator {
+    class MockAuditServiceConfigurationProvider implements AuditServiceConfigurationProvider {
 
         @Override
-        public void configurationSetupComplete() {}
+        public void setupComplete() {
+        }
 
         @Override
         public void addConfigurationListener(AuditServiceConfigurationListener listener) {
@@ -111,7 +111,8 @@ public class AuditServiceProviderImplTest {
         }
 
         @Override
-        public void removeConfigurationListener(AuditServiceConfigurationListener listener) {}
+        public void removeConfigurationListener(AuditServiceConfigurationListener listener) {
+        }
 
         @Override
         public AMAuditServiceConfiguration getDefaultConfiguration() {

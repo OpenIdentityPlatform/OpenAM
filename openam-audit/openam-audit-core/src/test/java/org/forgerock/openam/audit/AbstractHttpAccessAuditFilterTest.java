@@ -31,7 +31,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import java.net.URI;
 
 import org.forgerock.audit.AuditException;
-import org.forgerock.audit.AuditService;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.http.session.Session;
 import org.forgerock.http.session.SessionContext;
@@ -46,8 +45,6 @@ import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;

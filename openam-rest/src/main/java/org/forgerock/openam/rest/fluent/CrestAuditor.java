@@ -85,9 +85,9 @@ class CrestAuditor {
      * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     void auditAccessAttempt() throws AuditException {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                     .forHttpCrestRequest(context, request)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -95,7 +95,7 @@ class CrestAuditor {
                     .component(component);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
-            auditEventPublisher.publish(realm, ACCESS_TOPIC, builder.toEvent());
+            auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
         }
     }
 
@@ -106,11 +106,11 @@ class CrestAuditor {
      * captured in the debug logs but otherwise ignored.
      */
     void auditAccessSuccess() {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                     .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -119,7 +119,7 @@ class CrestAuditor {
                     .response(SUCCESS, "", elapsedTime, MILLISECONDS);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
-            auditEventPublisher.tryPublish(realm, ACCESS_TOPIC, builder.toEvent());
+            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
         }
     }
 
@@ -133,11 +133,11 @@ class CrestAuditor {
      * @param message    A human-readable description of the error that occurred.
      */
     void auditAccessFailure(int resultCode, String message) {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                     .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -146,7 +146,7 @@ class CrestAuditor {
                     .responseWithDetail(FAILURE, Integer.toString(resultCode), elapsedTime, MILLISECONDS, message);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
-            auditEventPublisher.tryPublish(realm, ACCESS_TOPIC, builder.toEvent());
+            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
         }
     }
 

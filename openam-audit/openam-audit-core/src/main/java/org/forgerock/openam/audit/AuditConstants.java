@@ -153,7 +153,7 @@ public final class AuditConstants {
      * Types of available event handlers.
      */
     public enum EventHandlerType {
-        /** CSV event handler type */
+        /** CSV event handler type. */
         CSV
     }
 

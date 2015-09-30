@@ -22,13 +22,13 @@ import java.util.Set;
  *
  * @since 13.0.0
  */
-public interface AuditServiceConfigurator {
+public interface AuditServiceConfigurationProvider {
 
     /**
-     * This will be called once startup is complete. It should register a listener for SMS configuration changes and
-     * notify any audit configuration listeners that the configuration has changed.
+     * This will be called once system startup is complete. It should register a listener for SMS configuration changes
+     * and notify any audit configuration listeners that the configuration has changed.
      */
-    void configurationSetupComplete();
+    void setupComplete();
 
     /**
      * Add a listener that will be notified of any changes in the SMS audit service configuration.

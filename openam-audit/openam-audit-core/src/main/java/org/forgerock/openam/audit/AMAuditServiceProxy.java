@@ -25,7 +25,7 @@ import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
  * Extension of the commons {@link AuditServiceProxy} that allows for OpenAM specific configuration to be exposed
  * in a thread-safe way.
  *
- * @Since 13.0.0
+ * @since 13.0.0
  */
 public class AMAuditServiceProxy extends AuditServiceProxy implements AMAuditService {
 
@@ -34,10 +34,11 @@ public class AMAuditServiceProxy extends AuditServiceProxy implements AMAuditSer
     private volatile AMAuditServiceConfiguration auditServiceConfiguration;
 
     /**
+     * Create a new instance of the {@code AMAuditServiceProxy}. Note that the given delegate should be started
+     * manually before passed to the proxy.
      *
-     * @param delegate
-     * @param auditServiceConfiguration
-     * @throws ServiceUnavailableException
+     * @param delegate The audit service delegate.
+     * @param auditServiceConfiguration OpenAM specific configuration.
      */
     public AMAuditServiceProxy(AuditService delegate, AMAuditServiceConfiguration auditServiceConfiguration) {
         super(delegate);

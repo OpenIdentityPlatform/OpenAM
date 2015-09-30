@@ -30,7 +30,7 @@ import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfigurationWrapper;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurationListener;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
+import org.forgerock.openam.audit.configuration.AuditServiceConfigurationProvider;
 import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.forgerock.openam.core.guice.DataLayerGuiceModule;
 import org.forgerock.openam.cts.TokenTestUtils;
@@ -183,15 +183,15 @@ public class JSONSerialisationTest extends GuiceTestCase {
     public static class DummyAuditConfigModule extends AbstractModule {
         @Override
         protected void configure() {
-            bind(AuditServiceConfigurator.class).to(DummyAuditServiceConfigurator.class);
+            bind(AuditServiceConfigurationProvider.class).to(DummyAuditServiceConfigurationProvider.class);
             bind(AuditServiceProvider.class).to(DummyAuditServiceProvider.class);
         }
     }
 
-    public static final class DummyAuditServiceConfigurator implements AuditServiceConfigurator {
+    public static final class DummyAuditServiceConfigurationProvider implements AuditServiceConfigurationProvider {
 
         @Override
-        public void configurationSetupComplete() {
+        public void setupComplete() {
 
         }
 

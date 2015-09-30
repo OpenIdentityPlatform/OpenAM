@@ -15,8 +15,7 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
@@ -24,14 +23,14 @@ import org.forgerock.audit.AuditServiceBuilder;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ServiceUnavailableException;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.forgerock.util.thread.listener.ShutdownManager;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfigurationWrapper;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurationListener;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
+import org.forgerock.openam.audit.configuration.AuditServiceConfigurationProvider;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -52,16 +51,23 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
 
     private final Debug debug = Debug.getInstance("amAudit");
 
-    private final AuditServiceConfigurator configurator;
+    private final AuditServiceConfigurationProvider configProvider;
     private final AuditEventHandlerFactory handlerFactory;
     private final AMAuditService defaultAuditService;
     private final Map<String, AMAuditService> auditServices = new ConcurrentHashMap<>();
     private final ShutdownManager shutdownManager;
 
+    /**
+     * Create an instance of AuditServiceProviderImpl.
+     *
+     * @param configProvider The configProvider responsible for providing audit service configuration.
+     * @param handlerFactory The event handler factory.
+     * @param shutdownManager The shutdown manager to register the shutdown listener to.
+     */
     @Inject
-    public AuditServiceProviderImpl(AuditServiceConfigurator configurator, AuditEventHandlerFactory handlerFactory,
-                                    ShutdownManager shutdownManager) {
-        this.configurator = configurator;
+    public AuditServiceProviderImpl(AuditServiceConfigurationProvider configProvider,
+                                    AuditEventHandlerFactory handlerFactory, ShutdownManager shutdownManager) {
+        this.configProvider = configProvider;
         this.handlerFactory = handlerFactory;
         this.shutdownManager = shutdownManager;
         this.defaultAuditService = createDefaultAuditService();
@@ -86,7 +92,7 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
 
     private void registerListeners() {
 
-        configurator.addConfigurationListener(new AuditServiceConfigurationListener() {
+        configProvider.addConfigurationListener(new AuditServiceConfigurationListener() {
             @Override
             public void globalConfigurationChanged() {
                 refreshDefaultAuditService();
@@ -128,11 +134,11 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
     }
 
     private void refreshDefaultAuditService() {
-        AMAuditServiceConfiguration configuration = configurator.getDefaultConfiguration();
+        AMAuditServiceConfiguration configuration = configProvider.getDefaultConfiguration();
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withCoreTopicSchemaExtensions(getCoreTopicSchemaExtensions())
                 .withConfiguration(configuration);
-        configureEventHandlers(builder, configurator.getDefaultEventHandlerConfigurations());
+        configureEventHandlers(builder, configProvider.getDefaultEventHandlerConfigurations());
 
         try {
             defaultAuditService.setDelegate(builder.build(), configuration);
@@ -142,11 +148,11 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
     }
 
     private void refreshRealmAuditService(String realm) {
-        AMAuditServiceConfiguration configuration = configurator.getRealmConfiguration(realm);
+        AMAuditServiceConfiguration configuration = configProvider.getRealmConfiguration(realm);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withCoreTopicSchemaExtensions(getCoreTopicSchemaExtensions())
                 .withConfiguration(configuration);
-        configureEventHandlers(builder, configurator.getRealmEventHandlerConfigurations(realm));
+        configureEventHandlers(builder, configProvider.getRealmEventHandlerConfigurations(realm));
 
         AMAuditService auditService = auditServices.get(realm);
         try {
@@ -172,12 +178,12 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
 
     private void closeAuditServices() {
         for (final AMAuditService auditService : auditServices.values()) {
-            new Thread() {
+            new Thread(new Runnable() {
                 @Override
                 public void run() {
                     auditService.shutdown();
                 }
-            }.start();
+            }).start();
         }
     }
 
@@ -189,7 +195,7 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
                 AuditEventHandler eventHandler = handlerFactory.create(config);
                 builder.withAuditEventHandler(eventHandler, config.getName(), config.getEventTopics());
             } catch (AuditException e) {
-                debug.error("Unable to configure audit event handler called {}", e, config.getName());
+                debug.error("Unable to configure audit event handler called {}", config.getName(), e);
             }
         }
     }

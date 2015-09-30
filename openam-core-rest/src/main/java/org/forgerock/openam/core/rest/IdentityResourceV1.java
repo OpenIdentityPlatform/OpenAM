@@ -105,6 +105,7 @@ import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.Pair;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 
@@ -659,7 +660,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             Map<String, Set<String>> searchAttributes = getIdentityServicesAttributes(realm);
             searchAttributes.putAll(getAttributeFromRequest(jsonBody));
 
-            List searchResults = identityServices.search(new CrestQuery(""), searchAttributes, adminToken);
+            List searchResults = identityServices.search(new CrestQuery("*"), searchAttributes, adminToken);
 
             if (searchResults.isEmpty()) {
                 throw new NotFoundException("User not found");

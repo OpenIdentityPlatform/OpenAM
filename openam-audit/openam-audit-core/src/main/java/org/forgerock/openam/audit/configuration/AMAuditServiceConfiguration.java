@@ -17,12 +17,9 @@ package org.forgerock.openam.audit.configuration;
 
 import org.forgerock.audit.AuditServiceConfiguration;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Audit service configuration specific to OpenAM. An instance of the current state can be retrieved from
- * {@link org.forgerock.openam.audit.configuration.AuditServiceConfigurator}.
+ * {@link AuditServiceConfigurationProvider}.
  *
  * @since 13.0.0
  */
@@ -35,9 +32,9 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
     /**
      * Create an instance of {@code AMAuditServiceConfiguration} with the specified values.
      *
-     * @param auditEnabled
-     * @param auditFailureSuppressed
-     * @param resolveHostNameEnabled
+     * @param auditEnabled Is audit logging enabled.
+     * @param auditFailureSuppressed Is audit failure suppressed.
+     * @param resolveHostNameEnabled Is resolve host name enabled.
      */
     public AMAuditServiceConfiguration(boolean auditEnabled, boolean auditFailureSuppressed,
                                         boolean resolveHostNameEnabled) {
@@ -48,7 +45,7 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
     }
 
     /**
-     * Is audit logging is enabled.
+     * Is audit logging enabled.
      * @return true if audit logging is enabled.
      */
     public boolean isAuditEnabled() {

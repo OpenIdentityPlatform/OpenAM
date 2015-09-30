@@ -29,6 +29,7 @@ import org.forgerock.selfservice.core.ProgressStage;
 import org.forgerock.selfservice.core.ProgressStageFactory;
 import org.forgerock.selfservice.core.StageResponse;
 import org.forgerock.selfservice.core.config.StageConfig;
+import org.forgerock.selfservice.core.snapshot.SnapshotTokenConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandler;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
 import org.forgerock.selfservice.stages.utils.RequirementsBuilder;
@@ -61,8 +62,8 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Provides
     @Singleton
-    Map<String, SnapshotTokenHandler> getTokenHandlers() {
-        Map<String, SnapshotTokenHandler> tokenHandlers = new HashMap<>();
+    Map<SnapshotTokenConfig, SnapshotTokenHandler> getTokenHandlers() {
+        Map<SnapshotTokenConfig, SnapshotTokenHandler> tokenHandlers = new HashMap<>();
         tokenHandlers.put(INTERIM_TYPE, new InterimSnapshotTokenHandler());
         return tokenHandlers;
     }
@@ -75,7 +76,12 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         return stageFactory;
     }
 
-    static final String INTERIM_TYPE = "interimType";
+    static final SnapshotTokenConfig INTERIM_TYPE = new SnapshotTokenConfig() {
+        @Override
+        public String getType() {
+            return "interimType";
+        }
+    };
 
     private static final class InterimSnapshotTokenHandler implements SnapshotTokenHandler {
 
