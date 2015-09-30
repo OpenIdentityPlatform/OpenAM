@@ -38,8 +38,11 @@
 @import (less) "codemirror/lib/codemirror.css";
 @import (less) "codemirror/addon/display/fullscreen.css";
 
-@import "common/backgrid.less";
-@import "common/common.less";
+// Admin pages always use the supplied theme, so there is no need to distinguish between structure and theme.
+@import "common/structure.less";
+@import "common/theme.less";
+
+@import "common/structure/backgrid.less";
 @import "common/list.less";
 
 // Specific CSS

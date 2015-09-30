@@ -132,8 +132,11 @@ module.exports = function (grunt) {
              */
             compile: {
                 files: [{
-                    src: compositionDirectory + "/css/styles.less",
-                    dest: compiledDirectory + "/css/styles.css"
+                    src: compositionDirectory + "/css/structure.less",
+                    dest: compiledDirectory + "/css/structure.css"
+                }, {
+                    src: compositionDirectory + "/css/theme.less",
+                    dest: compiledDirectory + "/css/theme.css"
                 }, {
                     src: compositionDirectory + "/css/styles-admin.less",
                     dest: compiledDirectory + "/css/styles-admin.css"

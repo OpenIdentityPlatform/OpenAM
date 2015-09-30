@@ -339,6 +339,7 @@
                             <Value>org.forgerock.openam.oauth2.OpenAMAccessToken</Value>
                             <Value>java.util.HashMap$Node</Value>
                             <Value>org.forgerock.oauth2.core.UserInfoClaims</Value>
+                            <Value>org.codehaus.groovy.runtime.GStringImpl</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>
