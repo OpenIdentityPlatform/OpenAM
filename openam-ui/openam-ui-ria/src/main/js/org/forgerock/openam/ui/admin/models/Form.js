@@ -27,6 +27,9 @@ define("org/forgerock/openam/ui/admin/models/Form", [
         this.schema = schema;
         this.values = values;
 
+        // Attributes that are identifiable as passwords
+        this.passwordAttributes = _.pluck(_.where(schema.properties, { format: "password" }), "_id");
+
         JSONEditor.plugins.selectize.enable = true;
         JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(6, 4);
 
@@ -35,7 +38,6 @@ define("org/forgerock/openam/ui/admin/models/Form", [
             "disable_edit_json": true,
             "disable_properties": true,
             "iconlib": "fontawesome4",
-            "remove_empty_properties": true,
             "schema": schema,
             "theme": "openam"
         });
@@ -67,8 +69,24 @@ define("org/forgerock/openam/ui/admin/models/Form", [
         this.reset();
     };
 
+    /**
+     * Filters out empty, specified attributes from an object
+     * @param  {Object} object    Object to filter
+     * @param  {Array} attributes Attribute names to filter
+     * @returns {Object}          Filtered object
+     */
+    function filterEmptyAttributes (object, attributes) {
+        return _.omit(object, function (value, key) {
+            if (_.contains(attributes, key)) {
+                return _.isEmpty(value);
+            } else {
+                return false;
+            }
+        });
+    }
+
     obj.prototype.data = function () {
-        return this.editor.getValue();
+        return filterEmptyAttributes(this.editor.getValue(), this.passwordAttributes);
     };
 
     obj.prototype.reset = function () {
