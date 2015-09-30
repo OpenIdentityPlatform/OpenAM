@@ -15,13 +15,17 @@
  */
 package org.forgerock.openam.audit.configuration;
 
-import static com.iplanet.am.util.SystemProperties.*;
+import static com.iplanet.am.util.SystemProperties.CONFIG_PATH;
+import static com.iplanet.am.util.SystemProperties.get;
 import static com.sun.identity.shared.Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR;
 import static com.sun.identity.shared.datastruct.CollectionHelper.*;
+import static com.sun.identity.sm.SMSUtils.*;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.forgerock.openam.audit.AuditConstants.EventHandlerType.CSV;
 import static org.forgerock.openam.audit.AuditConstants.SERVICE_NAME;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
@@ -29,10 +33,12 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandlerConfiguration;
+import org.forgerock.openam.utils.RealmUtils;
 
 import javax.inject.Singleton;
 import java.security.AccessController;
@@ -140,8 +146,6 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
     /**
      * Registers this configurator with the {@link com.sun.identity.sm.ServiceConfigManager} to receive updates
      * when the script configuration changes.
-     *
-     * @throws IllegalStateException if the configuration listener cannot be registered.
      */
     private void registerServiceListener() {
         try {
@@ -152,13 +156,17 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
             debug.message("Registered service config listener: {}", listenerId);
         } catch (SSOException | SMSException e) {
             debug.error("Unable to create ServiceConfigManager", e);
-            throw new IllegalStateException(e);
         }
     }
 
+    @SuppressWarnings("unchecked")
     private AMAuditServiceConfiguration getConfiguration(ServiceConfig config) {
-        @SuppressWarnings("unchecked")
-        Map<String, Set<String>> attributes = config.getAttributes();
+        Map<String, Set<String>> attributes;
+        if (config == null) {
+            attributes = emptyMap();
+        } else {
+            attributes = config.getAttributes();
+        }
         return new AMAuditServiceConfiguration(
                 getBooleanMapAttr(attributes, "auditEnabled", false),
                 getBooleanMapAttr(attributes, "suppressAuditFailure", true),
@@ -204,8 +212,8 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
 
         CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
         String location = getMapAttr(attributes, "location");
-        csvHandlerConfiguration.setLogDirectory(location.replaceAll("%BASE_DIR%", get(CONFIG_PATH))
-                .replaceAll("%SERVER_URI%", get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
+        csvHandlerConfiguration.setLogDirectory(location.replaceAll("%BASE_DIR%", SystemProperties.get(CONFIG_PATH))
+                .replaceAll("%SERVER_URI%", SystemProperties.get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
 
         return new AuditEventHandlerConfigurationWrapper(csvHandlerConfiguration, CSV, name, attributes.get("topics"));
     }
@@ -215,8 +223,8 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
             return new ServiceConfigManager(SERVICE_NAME, getAdminToken()).getGlobalConfig("default");
         } catch (SMSException | SSOException e) {
             debug.error("Error accessing service {}", SERVICE_NAME, e);
-            throw new IllegalStateException(e);
         }
+        return null;
     }
 
     private ServiceConfig getAuditRealmConfiguration(String realm) {
@@ -224,33 +232,21 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
             return new ServiceConfigManager(SERVICE_NAME, getAdminToken()).getOrganizationConfig(realm, null);
         } catch (SMSException | SSOException e) {
             debug.error("Error accessing service {}", SERVICE_NAME, e);
-            throw new IllegalStateException(e);
         }
-    }
-
-    private boolean serviceExists(ServiceConfig auditServiceConfig) {
-        return auditServiceConfig != null && auditServiceConfig.exists();
+        return null;
     }
 
     private SSOToken getAdminToken() {
         return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 
-    @SuppressWarnings("unchecked")
     private Set<String> getRealmNames() {
         try {
-            Set<String> rootSubRealms = new OrganizationConfigManager(getAdminToken(), "/")
-                    .getSubOrganizationNames("*", true);
-            Set<String> qualifiedRealmNames = new HashSet<>();
-            qualifiedRealmNames.add("/");
-            for (String subRealm : rootSubRealms) {
-                qualifiedRealmNames.add("/" + subRealm);
-            }
-            return qualifiedRealmNames;
+            RealmUtils.getRealmNames(getAdminToken());
         } catch (SMSException e) {
             debug.error("An error occurred while trying to retrieve the list of realms", e);
-            throw new IllegalStateException(e);
         }
+        return emptySet();
     }
 
     @Override

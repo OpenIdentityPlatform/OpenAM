@@ -30,22 +30,15 @@ package com.sun.identity.sm;
 
 import static org.forgerock.openam.ldap.LDAPUtils.addAttributeToMapAsString;
 
-import java.security.AccessController;
-import java.util.ArrayList;
+import com.sun.identity.common.CaseInsensitiveHashMap;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Entry;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.iplanet.sso.SSOException;
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Entry;
 
 public class SMSUtils {
 
@@ -507,5 +500,15 @@ public class SMSUtils {
             }
         }
         return answer;
+    }
+
+    /**
+     * Check if the Service Config is not null and exists in SMS.
+     *
+     * @param serviceConfig The service config to check.
+     * @return {@code true} if the Service Config is not null and exist.
+     */
+    public static boolean serviceExists(ServiceConfig serviceConfig) {
+        return serviceConfig != null && serviceConfig.exists();
     }
 }
