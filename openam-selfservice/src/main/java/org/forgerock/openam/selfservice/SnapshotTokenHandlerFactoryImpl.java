@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.selfservice;
 
+import org.forgerock.selfservice.core.snapshot.SnapshotTokenConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandler;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
 import org.forgerock.util.Reject;
@@ -37,7 +38,7 @@ final class SnapshotTokenHandlerFactoryImpl implements SnapshotTokenHandlerFacto
     }
 
     @Override
-    public SnapshotTokenHandler get(String tokenType) {
+    public SnapshotTokenHandler get(SnapshotTokenConfig tokenType) {
         Reject.ifFalse(tokenHandlers.containsKey(tokenType), "Unknown snapshot token type");
         return tokenHandlers.get(tokenType);
     }

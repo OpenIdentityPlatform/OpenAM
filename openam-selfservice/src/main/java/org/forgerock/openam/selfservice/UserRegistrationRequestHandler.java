@@ -51,8 +51,8 @@ public final class UserRegistrationRequestHandler extends AbstractRequestHandler
                                           SnapshotTokenHandlerFactory tokenHandlerFactory, ProcessStore localStore) {
         ProcessInstanceConfig config = new ProcessInstanceConfig()
                 .setStageConfigs(Arrays.asList(new InterimConfig()))
-                .setStorageType(StorageType.STATELESS.name())
-                .setSnapshotTokenType(INTERIM_TYPE);
+                .setStorageType(StorageType.STATELESS)
+                .setSnapshotTokenConfig(INTERIM_TYPE);
 
         anonymousProcess = new AnonymousProcessService(config, stageFactory, tokenHandlerFactory, localStore);
     }
