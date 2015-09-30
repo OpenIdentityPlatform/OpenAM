@@ -30,10 +30,10 @@ import java.util.Map;
  */
 final class SnapshotTokenHandlerFactoryImpl implements SnapshotTokenHandlerFactory {
 
-    private final Map<String, SnapshotTokenHandler> tokenHandlers;
+    private final Map<SnapshotTokenConfig, SnapshotTokenHandler> tokenHandlers;
 
     @Inject
-    SnapshotTokenHandlerFactoryImpl(Map<String, SnapshotTokenHandler> tokenHandlers) {
+    SnapshotTokenHandlerFactoryImpl(Map<SnapshotTokenConfig, SnapshotTokenHandler> tokenHandlers) {
         this.tokenHandlers = tokenHandlers;
     }
 
