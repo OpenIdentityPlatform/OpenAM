@@ -83,6 +83,8 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         definitions.put("evaluateTree", evaluateDefinition);
         definitions.put("schema", PrivilegeDefinition
                 .getInstance("schema", PrivilegeDefinition.Action.READ));
+        definitions.put("validate", PrivilegeDefinition
+                .getInstance("validate", PrivilegeDefinition.Action.READ));
         definitions.put("template", PrivilegeDefinition
                 .getInstance("template", PrivilegeDefinition.Action.READ));
 
