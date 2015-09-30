@@ -24,7 +24,8 @@ require.config({
             "UserProfileView"           : "org/forgerock/commons/ui/user/profile/UserProfileView",
             "LoginDialog"               : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
             "RegisterView"              : "org/forgerock/openam/ui/user/profile/RegisterView",
-            "ChangeSecurityDataDialog"  : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog"
+            "ChangeSecurityDataDialog"  : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
+            "underscore"                : "lodash"
         }
     },
     paths: {
@@ -53,11 +54,11 @@ require.config({
         "jquery"      : "libs/jquery-2.1.1-min",
         "js2form"     : "libs/js2form-2.0",
         "jsonEditor"  : "libs/jsoneditor-0.7.22-custom",
+        "lodash"      : "libs/lodash-3.10.1-min",
         "moment"      : "libs/moment-2.8.1-min",
         "qrcode"      : "libs/qrcode-1.0.0-min",
         "sortable"    : "libs/jquery-nestingSortable-0.9.12",
         "spin"        : "libs/spin-2.0.1-min",
-        "underscore"  : "libs/lodash-2.4.1-min",
         "xdate"       : "libs/xdate-0.8-min",
         "selectize"   : "libs/selectize-non-standalone-0.12.1-min",
         "sifter"      : "libs/sifter-0.4.1-min",
