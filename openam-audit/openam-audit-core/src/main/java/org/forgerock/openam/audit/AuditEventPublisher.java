@@ -17,14 +17,16 @@ package org.forgerock.openam.audit;
 
 import static org.forgerock.audit.events.AuditEventBuilder.EVENT_NAME;
 import static org.forgerock.json.resource.Requests.newCreateRequest;
+import static org.forgerock.json.resource.Resources.newInternalConnection;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Connection;
+import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.Resources;
+import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.services.context.RootContext;
 
 import javax.inject.Inject;
@@ -70,7 +72,15 @@ public class AuditEventPublisher {
      * @throws AuditException if an exception occurs while trying to publish the audit event.
      */
     public void publish(String topic, AuditEvent auditEvent) throws AuditException {
-        publish(auditServiceProvider.getDefaultAuditService(), topic, auditEvent);
+        AMAuditService auditService = auditServiceProvider.getDefaultAuditService();
+        Connection connection = newInternalConnection(auditService);
+        CreateRequest request = newCreateRequest(topic, auditEvent.getValue());
+
+        try {
+            connection.create(new RootContext(), request);
+        } catch (ResourceException e) {
+            handleResourceException(e, auditService, topic, auditEvent);
+        }
     }
 
     /**
@@ -93,25 +103,31 @@ public class AuditEventPublisher {
      * @throws AuditException if an exception occurs while trying to publish the audit event.
      */
     public void publish(String realm, String topic, AuditEvent auditEvent) throws AuditException {
-        publish(auditServiceProvider.getAuditService(realm), topic, auditEvent);
-    }
-
-    private void publish(AMAuditService auditService, String topic, AuditEvent auditEvent) throws AuditException {
+        AMAuditService auditService = auditServiceProvider.getAuditService(realm);
+        Connection connection = newInternalConnection(auditService);
+        CreateRequest request = newCreateRequest(topic, auditEvent.getValue());
 
         try {
-
-            Connection connection = Resources.newInternalConnection(auditService);
-            connection.create(new RootContext(), newCreateRequest(topic, auditEvent.getValue()));
-
+            connection.create(new RootContext(), request);
         } catch (ResourceException e) {
-
-            final String eventName = getValue(auditEvent.getValue(), EVENT_NAME, "-unknown-");
-            debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
-                    topic, eventName, e.getMessage(), e.getReason(), e);
-
-            if (!auditService.isAuditFailureSuppressed()) {
-                throw new AuditException("Unable to publish " + topic + " audit event '" + eventName + "'", e);
+            if (e instanceof ServiceUnavailableException) {
+                debug.error("Audit Service for realm {} is unavailable. Trying the default Audit Service", realm, e);
+                publish(topic, auditEvent);
+            } else {
+                handleResourceException(e, auditService, topic, auditEvent);
             }
+        }
+    }
+
+    private void handleResourceException(ResourceException e, AMAuditService auditService, String topic,
+                                         AuditEvent auditEvent) throws AuditException {
+
+        final String eventName = getValue(auditEvent.getValue(), EVENT_NAME, "-unknown-");
+        debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
+                topic, eventName, e.getMessage(), e.getReason(), e);
+
+        if (!auditService.isAuditFailureSuppressed()) {
+            throw new AuditException("Unable to publish " + topic + " audit event '" + eventName + "'", e);
         }
     }
 
@@ -125,7 +141,7 @@ public class AuditEventPublisher {
      */
     public void tryPublish(String topic, AuditEvent auditEvent) {
         try {
-            publish(auditServiceProvider.getDefaultAuditService(), topic, auditEvent);
+            publish(topic, auditEvent);
         } catch (AuditException e) {
             // suppress - error logged in publish method
         }
@@ -142,7 +158,7 @@ public class AuditEventPublisher {
      */
     public void tryPublish(String realm, String topic, AuditEvent auditEvent) {
         try {
-            publish(auditServiceProvider.getAuditService(realm), topic, auditEvent);
+            publish(realm, topic, auditEvent);
         } catch (AuditException e) {
             // suppress - error logged in publish method
         }
