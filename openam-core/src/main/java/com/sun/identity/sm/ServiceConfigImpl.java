@@ -51,7 +51,7 @@ class ServiceConfigImpl implements ServiceListener {
     private ServiceConfigManagerImpl scm;
     
     // Schema manager to register for schema changes
-    private ServiceSchemaManagerImpl ssmi;
+    ServiceSchemaManagerImpl ssmi;
 
     private ServiceSchemaImpl ss;
 
@@ -78,7 +78,7 @@ class ServiceConfigImpl implements ServiceListener {
     private CachedSubEntries subEntries;
 
     private String labeledUri;
-
+    
     private String serviceSchemaManagerListernerID;
 
     /**
@@ -316,7 +316,7 @@ class ServiceConfigImpl implements ServiceListener {
     boolean isNewEntry() {
         return (smsEntry.isNewEntry());
     }
-
+    
     /**
      * Checks if the entry is still valid
      */
@@ -331,7 +331,7 @@ class ServiceConfigImpl implements ServiceListener {
         }
         return (smsEntry.isValid());
     }
-
+    
     /**
      * Clears the instance variables and deregisters notifications
      */
@@ -365,7 +365,7 @@ class ServiceConfigImpl implements ServiceListener {
         hash = 41 * hash + (configID != null ? configID.hashCode() : 0);
         return hash;
     }
-
+    
     public boolean equals(Object scio) {
         if (scio instanceof ServiceConfigImpl) {
             ServiceConfigImpl s = (ServiceConfigImpl) scio;
@@ -519,7 +519,7 @@ class ServiceConfigImpl implements ServiceListener {
         if (!entry.isValid()) {
             entry = checkAndUpdatePermission(cacheName, dn, token);
         }
-
+        
         // Since entry not in cache, check if service schema exists
         if (ss == null) {
             // Need to get the sub-schema name
@@ -540,7 +540,7 @@ class ServiceConfigImpl implements ServiceListener {
             }
             // Return null if schema is not defined
             if (ss == null) {
-                // SMSEntry shouldn't exist in this case, but if it does, it is most
+                // SMSEntry shouldn't exist in this case, but if it does, it is most 
                 // likely to be incorrect, hence we remove it from the cache.
                 entry.clear();
                 configImpls.remove(cacheName);
@@ -555,11 +555,14 @@ class ServiceConfigImpl implements ServiceListener {
         // Add to cache
         synchronized (configImpls) {
             // Check if already added by another thread
-            answer = getFromCache(cacheName, null);
-            if (answer == null) {
+            ServiceConfigImpl tmp = getFromCache(cacheName, null);
+            if (tmp == null) {
                 // Not in cache, construct service config impl
-                answer = new ServiceConfigImpl(scm, ss, entry, orgName, groupName, compName, globalConfig, token);
+                answer = new ServiceConfigImpl(scm, ss, entry, orgName,
+                    groupName, compName, globalConfig, token);
                 configImpls.put(cacheName, answer);
+            } else {
+                answer = tmp;
             }
         }
 
@@ -578,7 +581,7 @@ class ServiceConfigImpl implements ServiceListener {
         throws SSOException, SMSException {
 
         if (debug.messageEnabled()) {
-            debug.message("ServiceConfigImpl::deleteInstance: called: dn: "
+            debug.message("ServiceConfigImpl::deleteInstance: called: dn: " 
                 + dn + " Org Name: " + oName + " Group Name: " + groupName
                 + " Component Name: "+ compName);
         }
@@ -589,12 +592,12 @@ class ServiceConfigImpl implements ServiceListener {
             orgName, groupName, compName, globalConfig);
 
         if (debug.messageEnabled()) {
-            debug.message("ServiceConfigImpl::deleteInstance: cacheName: " +
+            debug.message("ServiceConfigImpl::deleteInstance: cacheName: " + 
                     cacheName);
         }
         // Delete from cache if it exists.
         configImpls.remove(cacheName);
-
+        
         if (debug.messageEnabled()) {
             debug.message("ServiceConfigImpl::deleteInstance: deleted: " + dn);
         }
@@ -605,9 +608,11 @@ class ServiceConfigImpl implements ServiceListener {
         throws SMSException, SSOException {
         ServiceConfigImpl answer = (ServiceConfigImpl) configImpls.get(cn);
         if (answer != null) {
-            if (!answer.isValid() || answer.smsEntry.isNewEntry()) {
+            if (!answer.isValid()) {
                 configImpls.remove(cn);
                 answer.clear();
+                answer = null;
+            } else if (answer.smsEntry.isNewEntry()) {
                 answer = null;
             }
         }
