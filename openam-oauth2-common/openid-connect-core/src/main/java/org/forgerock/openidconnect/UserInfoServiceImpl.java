@@ -88,6 +88,6 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
-        return new JsonValue(providerSettings.getUserInfo(token, request));
+        return new JsonValue(providerSettings.getUserInfo(token, request).getValues());
     }
 }

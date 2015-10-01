@@ -222,10 +222,8 @@ public class OpenAMScopeValidator implements ScopeValidator {
                 id = identityManager.getResourceOwnerIdentity(token.getResourceOwnerId(), realm);
 
                 response.put(OAuth2Constants.JWTTokenParams.SUB, subId);
-
-                //todo: figure out why this was here
-                //response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
-                //  token.getRealm(), request));
+                response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
+                        token.getRealm(), request));
             } else {
                 //otherwise we're simply reading claims into the id_token, so grab it from the request/ssoToken
                 realm = DNMapper.orgNameToRealmName(ssoToken.getProperty(ISAuthConstants.ORGANIZATION));
@@ -472,6 +470,10 @@ public class OpenAMScopeValidator implements ScopeValidator {
             } catch (ServerException e) {
                 logger.error("Unable to read last modified attribute from datastore", e);
                 return DEFAULT_TIMESTAMP;
+            }
+
+            if (modifyTimestampAttributeName == null && createdTimestampAttributeName == null) {
+                return null;
             }
 
             final AMHashMap timestamps = getTimestamps(username, realm, modifyTimestampAttributeName,
