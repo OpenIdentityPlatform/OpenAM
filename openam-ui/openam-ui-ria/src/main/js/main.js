@@ -25,6 +25,7 @@ require.config({
             "LoginDialog"               : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
             "RegisterView"              : "org/forgerock/openam/ui/user/profile/RegisterView",
             "ChangeSecurityDataDialog"  : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
+            // TODO: Remove this when there are no longer any references to the "underscore" dependency
             "underscore"                : "lodash"
         }
     },

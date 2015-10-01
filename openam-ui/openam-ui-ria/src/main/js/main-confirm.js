@@ -19,7 +19,9 @@ require.config({
     map: {
         "*": {
             "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
-            "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
+            "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate",
+            // TODO: Remove this when there are no longer any references to the "underscore" dependency
+            "underscore":   "lodash"
         }
     },
     paths: {
@@ -32,9 +34,9 @@ require.config({
         "i18next": "libs/i18next-1.7.3-min",
         "jquery": "libs/jquery-2.1.1-min",
         "js2form": "libs/js2form-2.0",
+        "lodash": "libs/lodash-3.10.1-min",
         "moment": "libs/moment-2.8.1-min",
         "spin": "libs/spin-2.0.1-min",
-        "underscore": "libs/lodash-2.4.1-min",
         "xdate": "libs/xdate-0.8-min"
     },
     shim: {
