@@ -90,8 +90,9 @@ public class OATH extends AMLoginModule {
     private static final String LAST_LOGIN_TIME_ATTRIBUTE_NAME = "iplanet-am-auth-oath-last-login-time-attribute-name";
     private static final String MIN_SECRET_KEY_LENGTH = "iplanet-am-auth-oath-min-secret-key-length";
     private static final String SHARED_SECRET_IMPLEMENTATION_CLASS = "forgerock-oath-sharedsecret-implementation-class";
+    private static final String MAXIMUM_CLOCK_DRIFT = "forgerock-oath-maximum-clock-drift";
+    private static final String OBSERVED_CLOCK_DRIFT_ATTRIBUTE_NAME = "forgerock-oath-observed-clock-drift-attribute-name";
 
-    // module attribute holders
     private int passLen = 0;
     private int minSecretKeyLength = 0;
     private String secretKeyAttrName = null;
@@ -102,8 +103,11 @@ public class OATH extends AMLoginModule {
     private boolean checksum = false;
     private int totpTimeStep = 0;
     private int totpStepsInWindow = 0;
-    private long time = 0;
+    private int totpMaxClockDrift = -1;
+    private long timeInSeconds = 0;
     private String loginTimeAttrName = null;
+    private boolean clockDriftCheckEnabled = false;
+    private String observedClockDriftAttrName = null;
 
     private static final int HOTP = 0;
     private static final int TOTP = 1;
@@ -182,6 +186,8 @@ public class OATH extends AMLoginModule {
             this.totpStepsInWindow = Integer.parseInt(CollectionHelper.getMapAttr(options, TOTP_STEPS_IN_WINDOW));
             this.loginTimeAttrName = CollectionHelper.getMapAttr(options, LAST_LOGIN_TIME_ATTRIBUTE_NAME);
             this.sharedSecretImplClass = CollectionHelper.getMapAttr(options, SHARED_SECRET_IMPLEMENTATION_CLASS);
+            this.totpMaxClockDrift = CollectionHelper.getIntMapAttr(options, MAXIMUM_CLOCK_DRIFT, -1, debug);
+            this.observedClockDriftAttrName = CollectionHelper.getMapAttr(options, OBSERVED_CLOCK_DRIFT_ATTRIBUTE_NAME);
 
             String algorithm = CollectionHelper.getMapAttr(options, ALGORITHM);
             if (algorithm.equalsIgnoreCase("HOTP")) {
@@ -194,11 +200,7 @@ public class OATH extends AMLoginModule {
             }
 
             String checksumVal = CollectionHelper.getMapAttr(options, CHECKSUM);
-            if (checksumVal.equalsIgnoreCase("False")) {
-                checksum = false;
-            } else {
-                checksum = true;
-            }
+            checksum = Boolean.parseBoolean(checksumVal);
 
             // set authentication level
             if (authLevel != null) {
@@ -216,9 +218,8 @@ public class OATH extends AMLoginModule {
         try {
             userName = (String) sharedState.get(getUserKey());
         } catch (Exception e) {
-            debug.error("OATH.init(): Unable to get username : ", e);
+            debug.error("OATH.init(): Unable to get username: ", e);
         }
-
     }
 
     /**
@@ -287,22 +288,20 @@ public class OATH extends AMLoginModule {
                     }
 
                     // get Arrival time of the OTP
-                    time = System.currentTimeMillis() / 1000L;
+                    timeInSeconds = System.currentTimeMillis() / 1000L;
 
-                    // check HOTP
                     if (checkOTP(OTP)) {
                         return ISAuthConstants.LOGIN_SUCCEED;
                     } else {
-                        // the OTP is out of the window or incorect
+                        // the OTP is out of the window or incorrect
                         setFailureID(userName);
                         throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
                     }
             }
         } catch (SSOException e) {
-            debug.error("OATH" + ".process() : " + "SSOException", e);
+            debug.error("OATH.process(): SSOException", e);
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
-
         return ISAuthConstants.LOGIN_IGNORE;
     }
 
@@ -359,7 +358,7 @@ public class OATH extends AMLoginModule {
                 int counter = 0;
                 Set<String> counterSet = null;
                 try {
-                    if (counterAttrName == null || counterAttrName.isEmpty()) {
+                    if (StringUtils.isEmpty(counterAttrName)) {
                         debug.error("OATH" +
                                 ".checkOTP() : " +
                                 "invalid counter attribute name : ");
@@ -425,131 +424,115 @@ public class OATH extends AMLoginModule {
                     }
                 }
             } else if (algorithm == TOTP) {
-                /*
-                 * TOTP check section
-                 */
 
-                //get Last login time
-                Set<String> lastLoginTimeSet = null;
+                validateTOTPParameters();
+                clockDriftCheckEnabled = !StringUtils.isEmpty(observedClockDriftAttrName);
+                Set attrNames = new HashSet();
+                String lastLoginTimeAttrValue = "";
+                String lastObservedClockDriftAttr = null;
+                Map<String, Set<String>> totpAttributeValues = null;
+                long lastClockDriftInSeconds = 0;
+                long lastLoginTimeInSeconds = 0;
+
+                attrNames.add(loginTimeAttrName);
+                if (clockDriftCheckEnabled) {
+                    attrNames.add(observedClockDriftAttrName);
+                }
                 try {
-                    if (loginTimeAttrName == null || loginTimeAttrName.isEmpty()) {
-                        debug.error("OATH" +
-                                ".checkOTP() : " +
-                                "invalid login time attribute name : ");
+                    totpAttributeValues = id.getAttributes(attrNames);
+                    if (!totpAttributeValues.isEmpty()) {
+                        lastLoginTimeAttrValue = CollectionHelper.getMapAttr(totpAttributeValues, loginTimeAttrName);
+                        if (lastLoginTimeAttrValue != null && !lastLoginTimeAttrValue.isEmpty()) {
+                            lastLoginTimeInSeconds = Long.parseLong(lastLoginTimeAttrValue);
+                        }
+                        if (lastLoginTimeInSeconds < 0) {
+                            debug.error("OATH.checkOTP(): invalid login time value: " + lastLoginTimeInSeconds);
+                            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                        }
+                        if (clockDriftCheckEnabled) {
+                            lastObservedClockDriftAttr = CollectionHelper.getMapAttr(totpAttributeValues,
+                                    observedClockDriftAttrName);
+                            if (!StringUtils.isEmpty(lastObservedClockDriftAttr)) {
+                                lastClockDriftInSeconds = Long.parseLong(lastObservedClockDriftAttr);
+                            } else {
+                                if (debug.messageEnabled()) {
+                                    debug.message("OATH.checkOTP(): last observed time drift Set was empty");
+                                }
+                            }
+                        }
+                    } else {
+                        debug.error("OATH.checkOTP(): error TOTP attributes were empty");
                         throw new AuthLoginException(amAuthOATH, "authFailed", null);
                     }
-                    lastLoginTimeSet = id.getAttribute(loginTimeAttrName);
                 } catch (IdRepoException e) {
-                    debug.error("OATH" +
-                                    ".checkOTP() : " +
-                                    "error getting last login time attribute : ",
-                            e);
+                    debug.error("OATH.checkOTP(): error getting TOTP attributes : ", e);
                     throw new AuthLoginException(amAuthOATH, "authFailed", null);
                 } catch (SSOException e) {
-                    debug.error("OATH" +
-                                    ".checkOTP() : " +
-                                    "error invalid repo id : " +
-                                    id,
-                            e);
-                    throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                }
-                long lastLoginTime = 0;
-                if (lastLoginTimeSet != null && !lastLoginTimeSet.isEmpty()) {
-                    lastLoginTime = Long.parseLong(
-                            (String) (lastLoginTimeSet.iterator().next()));
-                }
-
-                //Check TOTP values for validity
-                if (lastLoginTime < 0) {
-                    debug.error("OATH" +
-                            ".checkOTP() : " +
-                            "invalid login time value : ");
+                    debug.error("OATH.checkOTP(): error invalid repo id : " + id, e);
                     throw new AuthLoginException(amAuthOATH, "authFailed", null);
                 }
 
-                //must be greater than 0 or we get divide by 0, and cant be negetive
-                if (totpTimeStep <= 0) {
-                    debug.error("OATH" +
-                            ".checkOTP() : " +
-                            "invalid TOTP time step interval : ");
-                    throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                }
-
-                if (totpStepsInWindow < 0) {
-                    debug.error("OATH" +
-                            ".checkOTP() : " +
-                            "invalid TOTP steps in window value : ");
-                    throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                }
-
-                //get Time Step
-                long localTime = time;
-                localTime /= totpTimeStep;
-
+                // convert last login time in seconds to TOTP time steps
+                long lastLoginTimeStep = lastLoginTimeInSeconds / totpTimeStep;
+                // get the current time step based on arrival time of OTP
+                long currentTimeStep = (timeInSeconds / totpTimeStep) + (lastClockDriftInSeconds / totpTimeStep);
                 boolean sameWindow = false;
 
-                //check if we are in the time window to prevent 2
-                //logins within the window using the same OTP
-
-                if (lastLoginTime >= (localTime - totpStepsInWindow) &&
-                        lastLoginTime <= (localTime + totpStepsInWindow)) {
+                // check if we are in the time window to prevent 2
+                // logins within the window using the same OTP
+                if (lastLoginTimeStep >= (currentTimeStep - totpStepsInWindow)
+                        && lastLoginTimeStep <= (currentTimeStep + totpStepsInWindow)) {
                     if (debug.messageEnabled()) {
-                        debug.message("OATH" +
-                                ".checkOTP() : " +
-                                "Logging in in the same TOTP window");
+                        debug.message("OATH.checkOTP(): Login in the same TOTP window");
                     }
                     sameWindow = true;
                 }
 
+                if (debug.messageEnabled()) {
+                    debug.message("OATH.checkOTP(): values lastLoginTimeInSeconds: " + lastLoginTimeInSeconds
+                            + " lastLoginTimeStep: " + lastLoginTimeStep + " sameWindow:" + sameWindow
+                            + " \n clockDriftSeconds:  " + lastClockDriftInSeconds + " clockDriftCheckEnabled:  "
+                            + clockDriftCheckEnabled);
+                }
+
                 String passLenStr = Integer.toString(passLen);
-                otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes,
-                        Long.toHexString(localTime),
-                        passLenStr);
+                otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes, Long.toHexString(currentTimeStep), passLenStr);
                 if (otpGen.equals(otp)) {
-                    setLoginTime(id, localTime);
+                    setLoginTime(id, currentTimeStep);
                     return true;
                 }
 
-                for (int i = 1; i <= totpStepsInWindow; i++) {
-                    long time1 = localTime + i;
-                    long time2 = localTime - i;
+                for (int curTimeStepOffSet = 1; curTimeStepOffSet <= totpStepsInWindow; curTimeStepOffSet++) {
+                    long timeInFutureStep = currentTimeStep + curTimeStepOffSet;
+                    long timeInPastStep = currentTimeStep - curTimeStepOffSet;
 
-                    //check time step after current time
-                    otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes,
-                            Long.toHexString(time1),
-                            passLenStr);
+                    // check time step after current time
+                    otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes, Long.toHexString(timeInFutureStep), passLenStr);
                     if (otpGen.equals(otp)) {
-                        setLoginTime(id, time1);
+                        setLoginTime(id, timeInFutureStep);
                         return true;
                     }
 
-                    //check time step before current time
-
-                    otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes,
-                            Long.toHexString(time2),
-                            passLenStr);
-                    if (otpGen.equals(otp) && sameWindow){
-                        debug.error("OATH" +
-                                ".checkOTP() : " +
-                                "Logging in in the same window with a OTP that is older than the current times OTP");
+                    // check time step before current time
+                    otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes, Long.toHexString(timeInPastStep), passLenStr);
+                    if (otpGen.equals(otp) && sameWindow) {
+                        debug.error("OATH.checkOTP(): "
+                                + "Logging in in the same window with a OTP that is older than the current OTP");
                         return false;
-                    } else if(otpGen.equals(otp) && !sameWindow)  {
-                        setLoginTime(id, time2);
+                    } else if (otpGen.equals(otp) && !sameWindow) {
+                        setLoginTime(id, timeInPastStep);
                         return true;
                     }
                 }
-
             } else {
-                debug.error("OATH" +
-                        ".checkOTP() : " +
-                        "No OTP algorithm selected");
+                debug.error("OATH.checkOTP(): No OTP algorithm selected");
                 throw new AuthLoginException(amAuthOATH, "authFailed", null);
             }
+        } catch (AuthLoginException e) {
+            // Re-throw to avoid the catch-all block below that would log and lose the error message.
+            throw e;
         } catch (Exception e) {
-            debug.error("OATH" +
-                            ".checkOTP() : " +
-                            "checkOTP process failed : ",
-                    e);
+            debug.error("OATH.checkOTP(): checkOTP process failed : ", e);
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
         return false;
@@ -590,12 +573,11 @@ public class OATH extends AMLoginModule {
         SharedSecretProvider sharedSecretProvider = null;
         try {
             if (!StringUtils.isEmpty(sharedSecretImplClass)) {
-                sharedSecretProvider = Class.forName(sharedSecretImplClass)
-                        .asSubclass(SharedSecretProvider.class).newInstance();
-
+                sharedSecretProvider = Class.forName(sharedSecretImplClass).asSubclass(SharedSecretProvider.class)
+                        .newInstance();
             } else {
-                //
-                debug.error("OATH.getSharedSecret(): SharedSecretProvider class is empty falling back to default implementation");
+                debug.error("OATH.getSharedSecret(): SharedSecretProvider class is empty falling back to "
+                        + "default implementation");
                 sharedSecretProvider = new DefaultSharedSecretProvider();
             }
             debug.message("Invoking SharedSecretProvider hook using:" + sharedSecretImplClass);
@@ -618,8 +600,8 @@ public class OATH extends AMLoginModule {
         }
 
         // since the minkeyLength accounts is for a hex encoded format, we need to adjust the byte length
-        if ((secretKeyBytes.length*2) < minSecretKeyLength) {
-            debug.error("OATH.getSharedSecret(): Secret key of length " + (secretKeyBytes.length *2)
+        if ((secretKeyBytes.length * 2) < minSecretKeyLength) {
+            debug.error("OATH.getSharedSecret(): Secret key of length " + (secretKeyBytes.length * 2)
                     + " is less than the minimum secret key length of " + minSecretKeyLength);
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
@@ -697,41 +679,72 @@ public class OATH extends AMLoginModule {
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
         return;
-
     }
 
     /**
-     * Sets the last login time of a user.
+     * Sets the last login time and time-step drift of a user.
      *
      * @param id   The id of the user to set the attribute of.
-     * @param time The time to set the attribute too.
+     * @param timeStep The time step of the login.
      * @throws AuthLoginException on any error.
      */
-    private void setLoginTime(AMIdentity id, long time)
-            throws AuthLoginException {
-        Map<String, Set> map = new HashMap<String, Set>();
-        Set<String> values = new HashSet<String>();
-        String timeS = Long.toString(time);
-        values.add(timeS);
-        map.put(loginTimeAttrName, values);
+    private void setLoginTime(AMIdentity id, long timeStep) throws AuthLoginException {
+
+        // set login time converting back to seconds
+        Map<String, Set<String>> attrMap = new HashMap<String, Set<String>>();
+        Set<String> loginTimeInSeconds = Collections.singleton(Long.toString(timeStep * totpTimeStep));
+        attrMap.put(loginTimeAttrName, loginTimeInSeconds);
+
+        long observedClockDrift = 0;
+        if (clockDriftCheckEnabled) {
+            // Update the observed time-step drift for resynchronisation
+            observedClockDrift = timeStep - (timeInSeconds / totpTimeStep);
+            if (Math.abs(observedClockDrift) > totpMaxClockDrift) {
+                setFailureID(userName);
+                throw new InvalidPasswordException(amAuthOATH, "outOfSync", null, userName, null);
+            }
+            // convert drift step back to seconds
+            Set<String> clockDriftValue = Collections.singleton(Long.toString((int) observedClockDrift * totpTimeStep));
+            attrMap.put(observedClockDriftAttrName, clockDriftValue);
+        }
+
         try {
-            id.setAttributes(map);
+            id.setAttributes(attrMap);
             id.store();
         } catch (IdRepoException e) {
-            debug.error("OATH" +
-                            ".setLoginTime : " +
-                            "error setting time attribute to : " +
-                            timeS,
-                    e);
+            String driftMsg = clockDriftCheckEnabled ? " observedClockDrift:" + observedClockDrift : "";
+            debug.error("OATH.setLoginTime: error setting attributes time: " + timeStep + driftMsg, e);
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         } catch (SSOException e) {
-            debug.error("OATH" +
-                            ".setLoginTime : " +
-                            "error invalid token for id : " +
-                            id,
-                    e);
+            debug.error("OATH.setLoginTime: error invalid token for id : " + id, e);
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
+
         return;
+    }
+
+    /**
+     * Validate TOTP specific settings.
+     * @throws AuthLoginException
+     */
+    private void validateTOTPParameters() throws AuthLoginException {
+        StringBuilder errorMessages = new StringBuilder();
+        if (StringUtils.isEmpty(loginTimeAttrName)) {
+            errorMessages.append("Login time attribute name is empty \n");
+        }
+        if (clockDriftCheckEnabled && StringUtils.isEmpty(observedClockDriftAttrName)) {
+            errorMessages.append("Observed time drift attribute name is empty \n");
+        }
+        // must be greater than 0 or we get divide by 0, and can't be negative
+        if (totpTimeStep <= 0) {
+            errorMessages.append("Invalid TOTP time step interval: " + totpTimeStep + " \n");
+        }
+        if (totpStepsInWindow < 0) {
+            errorMessages.append("Invalid TOTP steps in window value: " + totpStepsInWindow);
+        }
+        if (errorMessages.length() > 0) {
+            debug.error("OATH.validateTOTPParameters(): Invalid settings : " + errorMessages.toString());
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
     }
 }
