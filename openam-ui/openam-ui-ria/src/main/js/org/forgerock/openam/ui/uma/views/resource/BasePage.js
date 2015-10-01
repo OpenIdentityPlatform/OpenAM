@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
             });
         },
         createLabelCollection: function(labelId) {
-            var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.username + "\""];
+            var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.get("username") + "\""];
 
             if(labelId) {
                 filters.push("labels eq \"" + labelId + "\"");
@@ -62,11 +62,11 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
 
             return this.createCollection(RealmHelper.decorateURIWithRealm("/" + Constants.context +
                                                                           "/json/__subrealm__/users/" +
-                                                                          Configuration.loggedUser.username +
+                                                                          Configuration.loggedUser.get("username") +
                                                                           "/oauth2/resources/sets"), filters);
         },
         createSetCollection: function(notResourceOwner) {
-            var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.username + "\""];
+            var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.get("username") + "\""];
 
             if(notResourceOwner) {
                 filters[0] = "! " + filters[0];
@@ -74,7 +74,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
 
             return this.createCollection(RealmHelper.decorateURIWithRealm("/" + Constants.context +
                                                                           "/json/__subrealm__/users/" +
-                                                                          Configuration.loggedUser.username +
+                                                                          Configuration.loggedUser.get("username") +
                                                                           "/oauth2/resources/sets"), filters);
         },
         createColumns: function(pathToResource) {

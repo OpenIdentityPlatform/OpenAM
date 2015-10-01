@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
 
             collection = new (Backbone.PageableCollection.extend({
                 url: RealmHelper.decorateURIWithRealm("/" + Constants.context +
-                                                      "/json/__subrealm__/users/" + Configuration.loggedUser.username +
+                                                      "/json/__subrealm__/users/" + Configuration.loggedUser.get("username") +
                                                       "/uma/auditHistory"),
                 state: {
                     pageSize: 10,

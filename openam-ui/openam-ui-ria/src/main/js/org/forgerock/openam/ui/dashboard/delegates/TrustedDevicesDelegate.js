@@ -28,14 +28,14 @@ define("org/forgerock/openam/ui/dashboard/delegates/TrustedDevicesDelegate", [
 
     obj.getTrustedDevices = function() {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + Configuration.loggedUser.uid + "/devices/trusted/?_queryId=*"),
+            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + Configuration.loggedUser.get("uid") + "/devices/trusted/?_queryId=*"),
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.deleteTrustedDevice = function(id) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + Configuration.loggedUser.uid + "/devices/trusted/" + id),
+            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + Configuration.loggedUser.get("uid") + "/devices/trusted/" + id),
             type: "DELETE",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });

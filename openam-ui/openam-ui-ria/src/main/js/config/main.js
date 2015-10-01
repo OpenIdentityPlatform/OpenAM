@@ -27,7 +27,6 @@
 define("config/main", [
     "./errorhandlers/CommonErrorHandlers",
     "./validators/CommonValidators",
-    "./validators/UserValidators",
 
     "./routes/CommonRoutesConfig",  // In FR-Commons
     "./routes/AMRoutesConfig",
@@ -41,6 +40,5 @@ define("config/main", [
     "./AppMessages",
     "./AppConfiguration",
     "./process/CommonConfig",
-    "./process/UserConfig",
     "./process/AMConfig"
 ]);

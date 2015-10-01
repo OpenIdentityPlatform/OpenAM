@@ -17,10 +17,13 @@
 /*global define*/
 define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
     "jquery",
+    "underscore",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/openam/ui/common/components/TreeNavigation"
-], function ($, Router, SMSGlobalDelegate, TreeNavigation) {
+], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, TreeNavigation) {
     var RealmTreeNavigationView = TreeNavigation.extend({
         template: "templates/admin/views/realms/RealmTreeNavigationTemplate.html",
         realmExists: function (path) {
@@ -34,11 +37,20 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
 
             this.realmExists(this.data.realmPath).done(function () {
                 TreeNavigation.prototype.render.call(self, args, callback);
-            }).fail(function () {
-                Router.routeTo(Router.configuration.routes.realms, {
-                    args: [],
-                    trigger: true
-                });
+            }).fail(function (xhr) {
+                if (_.isObject(xhr) && _.isObject(xhr.responseJSON) && xhr.responseJSON.code === 401) {
+                    // session timeout, redirect to login page
+                    Router.routeTo(Router.configuration.routes.login, {
+                        args: [],
+                        trigger: true
+                    });
+                } else {
+                    // invalid realm specificied, return to realm list page
+                    Router.routeTo(Router.configuration.routes.realms, {
+                        args: [],
+                        trigger: true
+                    });
+                }
             });
         }
     });

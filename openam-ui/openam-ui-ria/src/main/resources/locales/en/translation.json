@@ -352,6 +352,7 @@
             "login" : "Log in",
             "loginConfirm" : "You have already logged in. Do you want to log out and then login to a different organization?",
             "profile" : "Profile",
+            "basicInfo" : "Basic Info",
             "myProfile" : "My Profile",
             "userProfile" : "User profile",
             "username" : "Username",

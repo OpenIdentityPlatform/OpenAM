@@ -50,7 +50,6 @@ define("config/AppConfiguration", [
             configuration: {
                 processConfigurationFiles: [
                     "config/process/AMConfig",
-                    "config/process/UserConfig",
                     "config/process/CommonConfig"
                 ]
             }
@@ -106,7 +105,6 @@ define("config/AppConfiguration", [
                 policyDelegate: "org/forgerock/openam/ui/common/delegates/PolicyDelegate",
                 validators: { },
                 loader: [
-                     { "validators": "config/validators/UserValidators" },
                      { "validators": "config/validators/CommonValidators" }
                 ]
             }
@@ -116,11 +114,11 @@ define("config/AppConfiguration", [
                 userBar: [
                     {
                         "id": "profileLink",
-                        "href": "#profile/",
+                        "href": "#profile/details",
                         "i18nKey": "common.user.profile"
                     }, {
                         "id": "changePasswordLink",
-                        "event" : Constants.EVENT_SHOW_CHANGE_SECURITY_DIALOG,
+                        "href": "#profile/password",
                         "i18nKey": "common.user.changePassword"
                     }, {
                         "id": "logoutLink",

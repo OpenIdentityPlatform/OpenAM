@@ -63,7 +63,7 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
             id = args[0];
 
             RequestCollection = Backbone.Collection.extend({
-                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.username + "/uma/pendingrequests/" + id)
+                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.get("username") + "/uma/pendingrequests/" + id)
             });
 
             columns = [{

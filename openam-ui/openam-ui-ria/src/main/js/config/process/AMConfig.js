@@ -82,24 +82,6 @@ define("config/process/AMConfig", [
             }
         }
     }, {
-        startEvent: Constants.EVENT_SHOW_CONFIRM_PASSWORD_DIALOG,
-        description: "",
-        dependencies: [
-            "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog"
-        ],
-        processDescription: function (event, ConfirmPasswordDialog) {
-            ConfirmPasswordDialog.show();
-        }
-    }, {
-        startEvent: Constants.EVENT_SHOW_CHANGE_SECURITY_DIALOG,
-        override: true,
-        dependencies: [
-            "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog"
-        ],
-        processDescription: function (event, ChangeSecurityDataDialog) {
-            ChangeSecurityDataDialog.show(event);
-        }
-    }, {
         startEvent: Constants.EVENT_ADD_NEW_REALM_DIALOG,
         override: true,
         dependencies: [
@@ -140,6 +122,15 @@ define("config/process/AMConfig", [
                                    encodeURIComponent(subRealm);
         }
     }, {
+            startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,
+            description: "",
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Router"
+            ],
+            processDescription: function(event, Router) {
+                Router.routeTo(Router.configuration.routes.profile, {trigger: true});
+            }
+    }, {
         startEvent: Constants.EVENT_AUTHENTICATED,
         description: "",
         dependencies: [
@@ -149,7 +140,7 @@ define("config/process/AMConfig", [
         ],
         processDescription: function (event, _, Configuration, Navigation) {
             ThemeManager.getTheme(true);
-            if (_.contains(Configuration.loggedUser.roles, "ui-admin")) {
+            if (_.contains(Configuration.loggedUser.get("roles"), "ui-admin")) {
                 Navigation.addLink({
                     "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
                                                 [encodeURIComponent("/")]),

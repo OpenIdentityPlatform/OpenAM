@@ -28,9 +28,22 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
      */
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/global-config/"),
         schemaWithValues = function (url) {
+            // prevent session timeouts from triggering LoginDialogs
+            var sessionTimeoutHandlers = {
+                "auth" : {
+                    status: "401"
+                }
+            };
             return $.when(
-                obj.serviceCall({ url: url + "?_action=schema", type: "POST" }),
-                obj.serviceCall({ url: url })
+                obj.serviceCall({
+                    url: url + "?_action=schema",
+                    type: "POST",
+                    errorsHandlers: sessionTimeoutHandlers
+                }),
+                obj.serviceCall({
+                    url: url,
+                    errorsHandlers: sessionTimeoutHandlers
+                })
             ).then(function (schemaData, valuesData) {
                 return {
                     schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
@@ -43,11 +56,11 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                 obj.serviceCall({ url: url + "?_action=schema", type: "POST" }),
                 obj.serviceCall({ url: url + "?_action=template", type: "POST" })
             ).then(function (schemaData, templateData) {
-                    return {
-                        schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
-                        values: templateData[0]
-                    };
-                });
+                return {
+                    schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
+                    values: templateData[0]
+                };
+            });
         },
         getRealmPath = function (realm) {
             if (realm.parentPath === "/") {

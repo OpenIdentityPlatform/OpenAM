@@ -27,10 +27,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
     "org/forgerock/commons/ui/common/util/URIUtils",
-    "UserDelegate",
+    "org/forgerock/openam/ui/user/UserModel",
     "org/forgerock/commons/ui/common/main/ViewManager"
 ], function ($, _, AbstractConfigurationAware, AuthNDelegate, CookieHelper, Configuration, Constants, Router,
-            SessionDelegate, URIUtils, UserDelegate, ViewManager) {
+            SessionDelegate, URIUtils, UserModel, ViewManager) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -91,30 +91,16 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     };
 
     obj.getLoggedUser = function (successCallback, errorCallback) {
-        try {
-            UserDelegate.getProfile(function (user) {
-                Configuration.globalData.auth.subRealm = user.userid.realm.slice(1);
+        return UserModel.getProfile().then(successCallback, function (xhr) {
+            // Try to remove any cookie that is lingering, as it is apparently no longer valid
+            obj.removeSessionCookie();
 
-                // keep track of the current realm as a future default value, following logout:
-                Router.configuration.routes.login.defaults[0] = user.userid.realm;
-
-                UserDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, function (e) {
-                    if (e.responseJSON.code === 404) {
-                        errorCallback("loggedIn");
-                    } else {
-                        errorCallback();
-                    }
-                } , { "Not Found": { status: "404" } });
-            }, function () {
-                // Try to remove any cookie that is lingering, as it is apparently no longer valid
-                obj.removeSessionCookie();
-
+            if (xhr && xhr.responseJSON && xhr.responseJSON.code === 404) {
+                errorCallback("loggedIn");
+            } else {
                 errorCallback();
-            } , { "serverError": { status: "503" }, "unauthorized": { status: "401" } });
-        } catch (e) {
-            console.log(e);
-            errorCallback();
-        }
+            }
+        });
     };
 
     obj.getLoginUrlParams = function () {
@@ -142,7 +128,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                     promise.reject();
                 });
         } else {
-            if (url !== Constants.CONSOLE_PATH || _.contains(Configuration.loggedUser.roles, "ui-admin")) {
+            if (url !== Constants.CONSOLE_PATH || _.contains(Configuration.loggedUser.get("roles"), "ui-admin")) {
                 if (!Configuration.globalData.auth.urlParams) {
                     Configuration.globalData.auth.urlParams = {};
                 }

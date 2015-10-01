@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/uma/util/URLHelper", [
                 var replacedUrl = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
                     .replace("__host__", Constants.host)
                     .replace("__context__", Constants.context)
-                    .replace("__username__", Configuration.loggedUser.username);
+                    .replace("__username__", Configuration.loggedUser.get("username"));
 
                 return RealmHelper.decorateURIWithSubRealm(replacedUrl);
             };
