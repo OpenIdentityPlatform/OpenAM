@@ -92,7 +92,7 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
                     parentName = shift.shift(),
                     parent;
                 label.name = shift.join("/");
-                parent = _.findWhere(collection, { title: parentName });
+                parent = _.find(collection, { title: parentName });
                 if (!parent) {
                     parent = { title: parentName, children: [], viewId: _.uniqueId("viewId_") };
                     collection.push(parent);

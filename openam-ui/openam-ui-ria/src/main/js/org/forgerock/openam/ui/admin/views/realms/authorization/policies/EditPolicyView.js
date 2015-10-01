@@ -142,7 +142,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                         self.data.options.availableSubjects =
                             _.findByValues(allSubjects[0].result, "title", policySet.subjects);
 
-                        resourceType = _.findWhere(self.data.options.availableResourceTypes, {
+                        resourceType = _.find(self.data.options.availableResourceTypes, {
                             uuid: self.model.attributes.resourceTypeUuid
                         });
 
@@ -204,7 +204,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
         changeResourceType: function (value) {
             this.data.entity.resourceTypeUuid = value;
 
-            var resourceType = _.findWhere(this.data.options.availableResourceTypes, {uuid: value});
+            var resourceType = _.find(this.data.options.availableResourceTypes, {uuid: value});
 
             this.data.options.availableActions = this.getAvailableActionsForResourceType(resourceType);
             this.data.options.availablePatterns = resourceType ? resourceType.patterns : [];

@@ -93,7 +93,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
 
                 self.linkInfoView = new LinkInfoView();
                 self.linkInfoView.element = "#link-info-" + self.data.id;
-                moduleName = _.findWhere(self.data.allModules, { _id : self.data.linkConfig.module });
+                moduleName = _.find(self.data.allModules, { _id : self.data.linkConfig.module });
                 if (self.data.linkConfig.module && moduleName) {
                     // The server allows for deletion of modules that are in use within a chain. The chain itself
                     // will still have a reference to the deleetd module.

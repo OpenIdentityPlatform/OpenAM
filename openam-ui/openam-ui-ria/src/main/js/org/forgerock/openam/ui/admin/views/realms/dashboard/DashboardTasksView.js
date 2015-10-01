@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView"
             e.preventDefault();
             var dataset = $(e.currentTarget).data();
             if (dataset.taskGroup) {
-                this.data.taskGroup = _.findWhere(this.data.allTasks, { _id: dataset.taskGroup});
+                this.data.taskGroup = _.find(this.data.allTasks, { _id: dataset.taskGroup});
                 this.parentRender();
             } else {
                 RedirectToLegacyConsole.commonTasks(this.realmPath, dataset.taskLink);

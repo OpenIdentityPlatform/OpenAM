@@ -40,7 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
         },
         getRealmFromEvent: function (event) {
             var path = $(event.currentTarget).closest("div[data-realm-path]").data("realm-path"),
-                realm = _.findWhere(this.data.realms, { path: path });
+                realm = _.find(this.data.realms, { path: path });
 
             return realm;
         },
@@ -134,13 +134,13 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             });
         },
         getRealmFromList: function (path) {
-            return _.findWhere(this.data.realms, { path: path });
+            return _.find(this.data.realms, { path: path });
         },
         render: function (args, callback) {
             var self = this;
 
             SMSGlobalDelegate.realms.all().done(function (data) {
-                var result = _.findWhere(data.result, { name: "/" });
+                var result = _.find(data.result, { name: "/" });
                 if (result) {
                     result.name = $.t("console.common.topLevelRealm");
                 }

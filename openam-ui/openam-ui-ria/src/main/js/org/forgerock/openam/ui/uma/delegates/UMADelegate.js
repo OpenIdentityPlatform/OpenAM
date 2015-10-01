@@ -97,7 +97,7 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
                                                       encodeURIComponent(Configuration.loggedUser.username) +
                                                       "/oauth2/resources/labels?_queryFilter=true")
             }).then(function(data) {
-                return _.findWhere(data.result, { _id: id });
+                return _.find(data.result, { _id: id });
             });
         },
         getByName: function(name) {

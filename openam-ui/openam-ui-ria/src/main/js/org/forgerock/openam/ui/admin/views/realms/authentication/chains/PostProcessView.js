@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
 
         add: function(e){
             var newProcessClass = this.$el.find("#newProcessClass").val().trim(),
-                invalidName = _.findWhere(this.data.chainData.loginPostProcessClass, function(className) {
+                invalidName = _.find(this.data.chainData.loginPostProcessClass, function(className) {
                     return className === newProcessClass;
                 }),
                 alert;

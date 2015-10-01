@@ -42,7 +42,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                 selectedActions = [];
 
             _.each(data.entity.actionValues, function (value, key) {
-                availableActions = _.without(availableActions, _.findWhere(availableActions, {action: key}));
+                availableActions = _.without(availableActions, _.find(availableActions, {action: key}));
                 selectedActions.push({action: key, value: value});
             });
 
@@ -101,12 +101,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
             e.preventDefault();
 
             var actionName = this.$el.find("select").val(),
-                action = _.findWhere(this.data.options.availableActions, {action: actionName}),
+                action = _.find(this.data.options.availableActions, {action: actionName}),
                 cloned = _.clone(action);
 
             if (action) {
                 this.data.availableActions = _.without(this.data.availableActions,
-                    _.findWhere(this.data.availableActions, {action: actionName})
+                    _.find(this.data.availableActions, {action: actionName})
                 );
                 this.renderAvailableActions();
                 this.data.selectedActions.push(cloned);
@@ -121,7 +121,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                 permitted = ($target.val() || $target.find("input").val()) === "true",
                 actionName = $target.closest("tr").find(".action-name").text().trim();
 
-            _.findWhere(this.data.selectedActions, {action: actionName}).value = permitted;
+            _.find(this.data.selectedActions, {action: actionName}).value = permitted;
 
             this.data.entity.actionValues[actionName] = permitted;
         },
@@ -132,7 +132,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
             }
             var $target = $(e.target),
                 actionName = $target.closest("tr").find(".action-name").text().trim(),
-                selectedAction = _.findWhere(this.data.selectedActions, {action: actionName});
+                selectedAction = _.find(this.data.selectedActions, {action: actionName});
 
             this.data.selectedActions = _.without(this.data.selectedActions, selectedAction);
             this.renderSelectedActions();

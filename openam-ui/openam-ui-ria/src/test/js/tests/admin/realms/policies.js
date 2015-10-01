@@ -299,7 +299,7 @@ define("tests/admin/realms/policies", [
                         action;
 
                     _.each(resourceTypesActions, function (rtAction) {
-                        action = _.findWhere(availableActions, function (action) {
+                        action = _.find(availableActions, function (action) {
                             return rtAction.action === $(action).data("listItem");
                         });
 

@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                             chainName = dialog.getModalBody().find("#newName").val().trim();
 
                             // TODO : More client side validation here
-                            invalidName = _.findWhere(self.data.sortedChains, function(chain){
+                            invalidName = _.find(self.data.sortedChains, function(chain){
                                 return chain._id === chainName;
                             });
 

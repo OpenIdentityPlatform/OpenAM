@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
             var self = this,
                 statusDevice,
                 uuid = $(event.currentTarget).closest("div[data-device-uuid]").attr("data-device-uuid"),
-                device = _.findWhere(this.data.devices, {uuid: uuid});
+                device = _.find(this.data.devices, {uuid: uuid});
 
             UIUtils.fillTemplateWithData("templates/openam/dashboard/EditDeviceDialogTemplate.html", device, function(html) {
                 BootstrapDialog.show({

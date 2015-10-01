@@ -72,7 +72,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
             key = data.attrKey.toString(),
             val = data.attrVal.toString();
 
-        return _.without(this.data.items, _.findWhere(this.data.items, {propertyName: key, propertyValues: val}));
+        return _.without(this.data.items, _.find(this.data.items, {propertyName: key, propertyValues: val}));
     };
 
     StaticResponseAttributesView.prototype.splitAttrs = function (attrs) {

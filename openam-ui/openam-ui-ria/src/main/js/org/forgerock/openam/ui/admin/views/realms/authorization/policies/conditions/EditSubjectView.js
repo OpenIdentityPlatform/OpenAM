@@ -119,7 +119,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 itemData = {},
                 hiddenData,
                 selectedType = e.target.value,
-                schema = _.findWhere(this.data.subjects, {title: selectedType}) || {},
+                schema = _.find(this.data.subjects, {title: selectedType}) || {},
                 delay = self.$el.find(".field-float-pattern").length > 0 ? 500 : 0;
 
             if (this.$el.data().itemData && this.$el.data().itemData.type === selectedType) {

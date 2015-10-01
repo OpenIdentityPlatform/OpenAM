@@ -161,7 +161,7 @@ define("tests/admin/realms/scripts", [
                                     ok(page.$el.find("#name").val() === entity.name, "Name is set");
                                     equal(page.$el.find("#script").val(), entity.script, "Script text is present");
                                     equal(page.$el.find("input[name=language]:checked").val(), entity.language, "Language is set");
-                                    equal(page.$el.find("#context").html(), _.findWhere(page.data.contexts,function (context) {
+                                    equal(page.$el.find("#context").html(), _.find(page.data.contexts,function (context) {
                                         return context._id === entity.context;
                                     }).name, "Script type is set");
                                     start();

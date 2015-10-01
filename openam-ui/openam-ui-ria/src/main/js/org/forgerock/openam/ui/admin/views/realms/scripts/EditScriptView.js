@@ -135,7 +135,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 context;
 
             if (this.model.id) {
-                context = _.findWhere(this.data.contexts, function (context) {
+                context = _.find(this.data.contexts, function (context) {
                     return context._id === self.data.entity.context;
                 });
                 self.data.contextName = context.name;
@@ -152,7 +152,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                     undo: !this.newEntity,
                     undoCallback: function (changes) {
                         _.extend(self.data.entity, changes);
-                        var context = _.findWhere(self.data.contexts, {
+                        var context = _.find(self.data.contexts, {
                             "_id": self.data.entity.context
                         });
                         self.data.contextName = context.name;
@@ -366,7 +366,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
         changeContext: function () {
             var self = this,
-                selectedContext = _.findWhere(this.data.contexts, function (context) {
+                selectedContext = _.find(this.data.contexts, function (context) {
                     return context._id === self.data.entity.context;
                 }),
                 defaultScript,
