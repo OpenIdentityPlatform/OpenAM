@@ -253,6 +253,9 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
 
     @VisibleForTesting String findLocaleSpecificString(Collection<String[]> delimitedStrings, Locale locale) {
         String defaultValue = null;
+        if (delimitedStrings == null) {
+            return defaultValue;
+        }
         for (String language : languageStrings(locale)) {
             for (String[] value : delimitedStrings) {
                 if (value.length == 2) {
