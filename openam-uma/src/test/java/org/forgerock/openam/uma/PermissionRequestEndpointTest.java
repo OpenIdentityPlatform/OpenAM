@@ -37,17 +37,13 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.uma.extensions.PermissionRequestFilter;
-import org.forgerock.util.query.QueryFilter;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.ChallengeResponse;
-import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Status;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
@@ -86,8 +82,10 @@ public class PermissionRequestEndpointTest {
         given(extensionFilterManager.getFilters(PermissionRequestFilter.class))
                 .willReturn(Collections.singleton(permissionRequestFilter));
 
+        UmaExceptionHandler exceptionHandler = mock(UmaExceptionHandler.class);
+
         endpoint = spy(new PermissionRequestEndpoint(providerSettingFactory, requestFactory,
-                umaProviderSettingsFactory, extensionFilterManager));
+                umaProviderSettingsFactory, extensionFilterManager, exceptionHandler));
 
         response = mock(Response.class);
         endpoint.setResponse(response);

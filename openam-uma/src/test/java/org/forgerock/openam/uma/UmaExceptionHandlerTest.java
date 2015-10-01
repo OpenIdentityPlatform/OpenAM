@@ -20,49 +20,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.Map;
 
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.Restlet;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class UmaExceptionFilterTest {
+public class UmaExceptionHandlerTest {
 
-    private UmaExceptionFilter exceptionFilter;
+    private UmaExceptionHandler exceptionFilter;
 
     @BeforeMethod
     public void setup() {
-        Restlet next = mock(Restlet.class);
-
-        exceptionFilter = new UmaExceptionFilter(next);
-    }
-
-    @Test
-    public void shouldNotSetExceptionResponse() {
-
-        //Given
-        Request request = mock(Request.class);
-        Response response = mock(Response.class);
-        Status status = new Status(111);
-
-        given(response.getStatus()).willReturn(status);
-
-        //When
-        exceptionFilter.afterHandle(request, response);
-
-        //Then
-        verify(response, never()).setEntity(Matchers.<Representation>anyObject());
-        verify(response, never()).setStatus(Matchers.<Status>anyObject());
+        exceptionFilter = new UmaExceptionHandler();
     }
 
     @Test
@@ -70,7 +47,6 @@ public class UmaExceptionFilterTest {
     public void shouldSet500ExceptionResponse() throws IOException {
 
         //Given
-        Request request = mock(Request.class);
         Response response = mock(Response.class);
         Exception exception = new Exception("MESSAGE");
         Status status = new Status(444, exception);
@@ -78,7 +54,7 @@ public class UmaExceptionFilterTest {
         given(response.getStatus()).willReturn(status);
 
         //When
-        exceptionFilter.afterHandle(request, response);
+        exceptionFilter.handleException(response, exception);
 
         //Then
         ArgumentCaptor<JacksonRepresentation> exceptionResponseCaptor =
@@ -98,15 +74,16 @@ public class UmaExceptionFilterTest {
     public void shouldSetUmaExceptionResponse() throws IOException {
 
         //Given
-        Request request = mock(Request.class);
         Response response = mock(Response.class);
+        Throwable throwable = mock(Throwable.class);
         Exception exception = new UmaException(444, "ERROR", "DESCRIPTION");
+        given(throwable.getCause()).willReturn(exception);
         Status status = new Status(444, exception);
 
         given(response.getStatus()).willReturn(status);
 
         //When
-        exceptionFilter.afterHandle(request, response);
+        exceptionFilter.handleException(response, throwable);
 
         //Then
         ArgumentCaptor<JacksonRepresentation> exceptionResponseCaptor =
@@ -126,16 +103,17 @@ public class UmaExceptionFilterTest {
     public void shouldSetUmaExceptionResponseWithDetail() throws IOException {
 
         //Given
-        Request request = mock(Request.class);
         Response response = mock(Response.class);
+        Throwable throwable = mock(Throwable.class);
         Exception exception = new UmaException(444, "ERROR", "DESCRIPTION")
                 .setDetail(json(object(field("DETAIL", "VALUE"))));
+        given(throwable.getCause()).willReturn(exception);
         Status status = new Status(444, exception);
 
         given(response.getStatus()).willReturn(status);
 
         //When
-        exceptionFilter.afterHandle(request, response);
+        exceptionFilter.handleException(response, throwable);
 
         //Then
         ArgumentCaptor<JacksonRepresentation> exceptionResponseCaptor =

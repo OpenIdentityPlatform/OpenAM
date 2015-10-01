@@ -17,7 +17,6 @@
 package org.forgerock.openam.uma;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.BDDMockito.*;
@@ -107,9 +106,10 @@ public class AuthorizationRequestEndpointTest {
                 TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
                 OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
                 UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,
-                Map<String, ClaimGatherer> claimGatherers, ExtensionFilterManager extensionFilterManager) {
+                Map<String, ClaimGatherer> claimGatherers, ExtensionFilterManager extensionFilterManager,
+                UmaExceptionHandler exceptionHandler) {
             super(umaProviderSettingsFactory, oauth2TokenStore, requestFactory, oAuth2ProviderSettingsFactory,
-                    auditLogger, pendingRequestsService, claimGatherers, extensionFilterManager);
+                    auditLogger, pendingRequestsService, claimGatherers, extensionFilterManager, exceptionHandler);
         }
 
         @Override
@@ -186,9 +186,11 @@ public class AuthorizationRequestEndpointTest {
         given(extensionFilterManager.getFilters(RequestAuthorizationFilter.class))
                 .willReturn(Collections.singletonList(requestAuthorizationFilter));
 
+        UmaExceptionHandler exceptionHandler = mock(UmaExceptionHandler.class);
+
         endpoint = spy(new AuthorizationRequestEndpoint2(umaProviderSettingsFactory, oauth2TokenStore,
                 requestFactory, oauth2ProviderSettingsFactory, umaAuditLogger, pendingRequestsService, claimGatherers,
-                extensionFilterManager));
+                extensionFilterManager, exceptionHandler));
         request = mock(Request.class);
         given(endpoint.getRequest()).willReturn(request);
 

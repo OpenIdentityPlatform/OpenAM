@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.uma.rest;
 
-import static org.forgerock.openam.audit.AuditConstants.Component.UMA;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 import static org.forgerock.openam.uma.UmaConstants.AUTHORIZATION_REQUEST_ENDPOINT;
 import static org.forgerock.openam.uma.UmaConstants.PERMISSION_REQUEST_ENDPOINT;
@@ -31,7 +30,6 @@ import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.audit.RestletAccessAuditFilterFactory;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
-import org.forgerock.openam.uma.UmaExceptionFilter;
 import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
@@ -68,16 +66,14 @@ public class UmaRouterProvider implements Provider<Router> {
         router.attach("/permission_request", getRestlet(PERMISSION_REQUEST_ENDPOINT));
         router.attach("/authz_request", getRestlet(AUTHORIZATION_REQUEST_ENDPOINT));
         // Well-Known Discovery
-        router.attach("/.well-known/uma-configuration",
-                new UmaExceptionFilter(wrap(UmaWellKnownConfigurationEndpoint.class)));
+        router.attach("/.well-known/uma-configuration", wrap(UmaWellKnownConfigurationEndpoint.class));
 //        router.attach("/permission_request",
 //                restletAuditFactory.createFilter(UMA, getRestlet(PERMISSION_REQUEST_ENDPOINT)));
 //        router.attach("/authz_request",
 //                restletAuditFactory.createFilter(UMA, getRestlet(AUTHORIZATION_REQUEST_ENDPOINT)));
 //        // Well-Known Discovery
 //        router.attach("/.well-known/uma-configuration",
-//                restletAuditFactory.createFilter(UMA,
-//                        new UmaExceptionFilter(wrap(UmaWellKnownConfigurationEndpoint.class))));
+//                restletAuditFactory.createFilter(UMA, wrap(UmaWellKnownConfigurationEndpoint.class)));
         return router;
     }
 

@@ -82,6 +82,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     private final PendingRequestsService pendingRequestsService;
     private final Map<String, ClaimGatherer> claimGatherers;
     private final ExtensionFilterManager extensionFilterManager;
+    private final UmaExceptionHandler exceptionHandler;
 
     /**
      * Constructs a new AuthorizationRequestEndpoint
@@ -91,7 +92,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
             OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, UmaAuditLogger auditLogger,
             PendingRequestsService pendingRequestsService, Map<String, ClaimGatherer> claimGatherers,
-            ExtensionFilterManager extensionFilterManager) {
+            ExtensionFilterManager extensionFilterManager, UmaExceptionHandler exceptionHandler) {
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
         this.requestFactory = requestFactory;
         this.oauth2TokenStore = oauth2TokenStore;
@@ -100,6 +101,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         this.pendingRequestsService = pendingRequestsService;
         this.claimGatherers = claimGatherers;
         this.extensionFilterManager = extensionFilterManager;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @Post
@@ -151,6 +153,11 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             }
             throw newRequestSubmittedException();
         }
+    }
+
+    @Override
+    protected void doCatch(Throwable throwable) {
+        exceptionHandler.handleException(getResponse(), throwable);
     }
 
     private String getRequestingPartyId(UmaProviderSettings umaProviderSettings, JsonValue requestBody)

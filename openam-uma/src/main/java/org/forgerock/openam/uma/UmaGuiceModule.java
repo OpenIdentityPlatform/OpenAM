@@ -38,8 +38,6 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;
-import org.forgerock.openam.uma.rest.UmaRouterProvider;
-import org.forgerock.services.context.RootContext;
 import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;
@@ -51,7 +49,6 @@ import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.entitlement.rest.PolicyResource;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
-import org.forgerock.openam.oauth2.rest.OAuth2RouterProvider;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
@@ -59,7 +56,9 @@ import org.forgerock.openam.uma.rest.UmaIdRepoCreationListener;
 import org.forgerock.openam.uma.rest.UmaPolicyEvaluatorFactory;
 import org.forgerock.openam.uma.rest.UmaPolicyServiceImpl;
 import org.forgerock.openam.uma.rest.UmaResourceSetRegistrationListener;
+import org.forgerock.openam.uma.rest.UmaRouterProvider;
 import org.forgerock.openam.utils.Config;
+import org.forgerock.services.context.RootContext;
 import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
@@ -156,9 +155,8 @@ public class UmaGuiceModule extends AbstractModule {
     @Singleton
     @Named(UmaConstants.PERMISSION_REQUEST_ENDPOINT)
     public Restlet createPermissionRequestEndpoint(TokenStore store, OAuth2RequestFactory<Request> requestFactory) {
-        return new UmaExceptionFilter(
-                new AccessTokenProtectionFilter(UmaConstants.PAT_SCOPE, store, requestFactory,
-                        wrap(PermissionRequestEndpoint.class)));
+        return new AccessTokenProtectionFilter(UmaConstants.PAT_SCOPE, store, requestFactory,
+                        wrap(PermissionRequestEndpoint.class));
     }
 
     @Provides
@@ -166,9 +164,8 @@ public class UmaGuiceModule extends AbstractModule {
     @Singleton
     @Named(UmaConstants.AUTHORIZATION_REQUEST_ENDPOINT)
     public Restlet createAuthorizationRequestEndpoint(TokenStore store, OAuth2RequestFactory<Request> requestFactory) {
-        return new UmaExceptionFilter(
-                new AccessTokenProtectionFilter(UmaConstants.AAT_SCOPE, store, requestFactory,
-                        wrap(AuthorizationRequestEndpoint.class)));
+        return new AccessTokenProtectionFilter(UmaConstants.AAT_SCOPE, store, requestFactory,
+                        wrap(AuthorizationRequestEndpoint.class));
     }
 
     @Provides

@@ -21,55 +21,41 @@ import java.util.Map;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
-import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.Restlet;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.routing.Filter;
 
 /**
- * Filters the responses from the PermissionRequestEndpoint to ensure that all error responses are in the correct
+ * Handles exceptions from the UMA spec endpoints to ensure that all error responses are in the correct
  * format.
  *
  * @since 13.0.0
  */
-public class UmaExceptionFilter extends Filter {
-
-    /**
-     * Constructs a new UmaExceptionFilter instance.
-     *
-     * @param next The Restlet instance to filter.
-     */
-    public UmaExceptionFilter(Restlet next) {
-        setNext(next);
-    }
+public class UmaExceptionHandler {
 
     /**
      * Checks if an error response is being returned and translates the error into the format described by the
      * specification, https://docs.kantarainitiative.org/uma/draft-uma-core.html#uma-error-response.
      *
-     * @param request The request to handle.
      * @param response The response to update.
+     * @param throwable The throwable
      */
-    @Override
-    protected void afterHandle(Request request, Response response) {
-        if (response.getStatus().isError() && response.getEntity() == null) {
-            Throwable throwable = response.getStatus().getThrowable();
-            if (throwable instanceof UmaException) {
-                UmaException exception = (UmaException) throwable;
-                setExceptionResponse(response, exception.getStatusCode(), exception.getError(), exception.getDetail());
-            } else if (throwable instanceof OAuth2Exception) {
-                OAuth2Exception exception = (OAuth2Exception) throwable;
-                setExceptionResponse(response, exception.getStatusCode(), exception.getError(), null);
-            } else {
-                setExceptionResponse(response, response.getStatus().getCode(), "server_error", null);
-            }
+    protected void handleException(Response response, Throwable throwable) {
+        Throwable cause = throwable.getCause();
+        if (cause instanceof UmaException) {
+            UmaException exception = (UmaException) cause;
+            setExceptionResponse(response, cause, exception.getStatusCode(), exception.getError(),
+                    exception.getDetail());
+        } else if (cause instanceof OAuth2Exception) {
+            OAuth2Exception exception = (OAuth2Exception) cause;
+            setExceptionResponse(response, cause, exception.getStatusCode(), exception.getError(), null);
+        } else {
+            setExceptionResponse(response, throwable, response.getStatus().getCode(), "server_error", null);
         }
     }
 
-    private void setExceptionResponse(Response response, int statusCode, String error, JsonValue detail) {
-        Throwable throwable = response.getStatus().getThrowable();
+    private void setExceptionResponse(Response response, Throwable throwable, int statusCode, String error,
+            JsonValue detail) {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("error", error);
         responseBody.put("error_description", throwable.getMessage());

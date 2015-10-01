@@ -58,22 +58,24 @@ public class PermissionRequestEndpoint extends ServerResource {
     private final OAuth2RequestFactory<Request> requestFactory;
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final ExtensionFilterManager extensionFilterManager;
+    private final UmaExceptionHandler exceptionHandler;
 
     /**
      * Constructs a new PermissionRequestEndpoint instance
-     *
-     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     *  @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param extensionFilterManager An instance of the ExtensionFilterManager.
+     * @param exceptionHandler
      */
     @Inject
     public PermissionRequestEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
             OAuth2RequestFactory<Request> requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory,
-            ExtensionFilterManager extensionFilterManager) {
+            ExtensionFilterManager extensionFilterManager, UmaExceptionHandler exceptionHandler) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.requestFactory = requestFactory;
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
         this.extensionFilterManager = extensionFilterManager;
+        this.exceptionHandler = exceptionHandler;
     }
 
     /**
@@ -101,6 +103,11 @@ public class PermissionRequestEndpoint extends ServerResource {
         String ticket = umaProviderSettingsFactory.get(getRequest()).getUmaTokenStore()
                 .createPermissionTicket(resourceSetId, scopes, clientId).getId();
         return setResponse(201, Collections.<String, Object>singletonMap("ticket", ticket));
+    }
+
+    @Override
+    protected void doCatch(Throwable throwable) {
+        exceptionHandler.handleException(getResponse(), throwable);
     }
 
     private String getResourceSetId(JsonValue permissionRequest) throws UmaException {

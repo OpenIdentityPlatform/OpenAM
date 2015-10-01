@@ -47,7 +47,9 @@ public class UmaWellKnownConfigurationEndpointTest {
 
         providerSettingsFactory = mock(UmaProviderSettingsFactory.class);
 
-        endpoint = new UmaWellKnownConfigurationEndpoint(providerSettingsFactory);
+        UmaExceptionHandler exceptionHandler = mock(UmaExceptionHandler.class);
+
+        endpoint = new UmaWellKnownConfigurationEndpoint(providerSettingsFactory, exceptionHandler);
 
         response = mock(Response.class);
         endpoint.setResponse(response);
