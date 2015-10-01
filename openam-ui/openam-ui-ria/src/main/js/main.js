@@ -18,13 +18,14 @@
 require.config({
     map: {
         "*" : {
-            "ThemeManager"              : "org/forgerock/openam/ui/common/util/ThemeManager",
-            "UserDelegate"              : "org/forgerock/openam/ui/user/delegates/UserDelegate",
-            "LoginView"                 : "org/forgerock/openam/ui/user/login/RESTLoginView",
-            "UserProfileView"           : "org/forgerock/commons/ui/user/profile/UserProfileView",
-            "LoginDialog"               : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
-            "RegisterView"              : "org/forgerock/openam/ui/user/profile/RegisterView",
-            "ChangeSecurityDataDialog"  : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
+            "Footer"                  : "org/forgerock/openam/ui/common/components/Footer",
+            "ThemeManager"            : "org/forgerock/openam/ui/common/util/ThemeManager",
+            "UserDelegate"            : "org/forgerock/openam/ui/user/delegates/UserDelegate",
+            "LoginView"               : "org/forgerock/openam/ui/user/login/RESTLoginView",
+            "UserProfileView"         : "org/forgerock/commons/ui/user/profile/UserProfileView",
+            "LoginDialog"             : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
+            "RegisterView"            : "org/forgerock/openam/ui/user/profile/RegisterView",
+            "ChangeSecurityDataDialog": "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
             // TODO: Remove this when there are no longer any references to the "underscore" dependency
             "underscore"                : "lodash"
         }
@@ -78,7 +79,7 @@ require.config({
             deps: ["backbone"]
         },
         "backbone-relational": {
-            deps: ['backbone']
+            deps: ["backbone"]
         },
 
         "backgrid": {
@@ -136,7 +137,10 @@ require.config({
             exports: "qrcode"
         },
         "selectize": {
-            // sifter, microplugin is additional dependencies for fix release build. It related with this issue https://github.com/brianreavis/selectize.js/issues/417
+            /**
+             * sifter, microplugin is additional dependencies for fix release build.
+             * @see https://github.com/brianreavis/selectize.js/issues/417
+             */
             deps: ["jquery", "sifter", "microplugin"]
         },
         "spin": {
