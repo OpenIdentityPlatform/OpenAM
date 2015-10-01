@@ -38,6 +38,7 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;
+import org.forgerock.openam.uma.rest.UmaRouterProvider;
 import org.forgerock.services.context.RootContext;
 import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.json.resource.RequestHandler;
@@ -68,7 +69,7 @@ public class UmaGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(Key.get(Router.class, Names.named("UMARouter"))).toProvider(OAuth2RouterProvider.class)
+        bind(Key.get(Router.class, Names.named("UMARouter"))).toProvider(UmaRouterProvider.class)
                 .in(Singleton.class);
         bind(UmaPolicyService.class).to(UmaPolicyServiceImpl.class);
 

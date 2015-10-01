@@ -39,7 +39,7 @@ public abstract class RestStatusService extends StatusService {
      * {@inheritDoc}
      */
     @Override
-    public Representation getRepresentation(Status status, Request request, Response response) {
+    public Representation toRepresentation(Status status, Request request, Response response) {
         final JsonValue jsonResponse;
         Throwable throwable = status.getThrowable();
 

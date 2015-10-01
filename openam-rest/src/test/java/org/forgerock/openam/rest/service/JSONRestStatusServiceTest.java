@@ -48,7 +48,7 @@ public class JSONRestStatusServiceTest {
         Response response = mock(Response.class);
 
         //When
-        Representation representation = restStatusService.getRepresentation(status, request, response);
+        Representation representation = restStatusService.toRepresentation(status, request, response);
 
         //Then
         assertTrue(representation.getText().contains("\"code\":400"));
@@ -60,12 +60,12 @@ public class JSONRestStatusServiceTest {
         //Given
         Request request = mock(Request.class);
         Response response = mock(Response.class);
-        ResourceException exception = ResourceException.getException(401);
+        ResourceException exception = ResourceException.newResourceException(401);
         exception.setDetail(json(object(field("bing", "bong"))));
         Status status = new Status(exception.getCode(), exception);
 
         //When
-        Representation representation = restStatusService.getRepresentation(status, request, response);
+        Representation representation = restStatusService.toRepresentation(status, request, response);
 
         //Then
         assertTrue(representation.getText().contains("\"bing\":\"bong\""));

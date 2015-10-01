@@ -48,7 +48,7 @@ public class XMLRestStatusServiceTest {
         Response response = mock(Response.class);
 
         //When
-        Representation representation = restStatusService.getRepresentation(status, request, response);
+        Representation representation = restStatusService.toRepresentation(status, request, response);
 
         //Then
         assertTrue(representation.getText().contains("<code>400</code>"));
@@ -65,7 +65,7 @@ public class XMLRestStatusServiceTest {
         Status status = new Status(exception.getCode(), exception);
 
         //When
-        Representation representation = restStatusService.getRepresentation(status, request, response);
+        Representation representation = restStatusService.toRepresentation(status, request, response);
 
         //Then
         assertTrue(representation.getText().contains("<bing>bong</bing>"));
