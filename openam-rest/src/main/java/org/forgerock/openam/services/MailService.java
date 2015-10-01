@@ -133,7 +133,7 @@ public final class MailService extends AbstractRequestHandler {
         }
 
         try {
-            mailServer.sendEmail(to, subject, message);
+            mailServer.sendHtmlEmail(to, subject, message);
         } catch (MessagingException e) {
             throw new InternalServerErrorException("Failed to send email", e);
         }

@@ -15,13 +15,17 @@
  */
 package org.forgerock.openam.selfservice;
 
+import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
+import org.forgerock.selfservice.core.exceptions.StageConfigException;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandler;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
-import org.forgerock.util.Reject;
+import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandler;
+import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandlerConfig;
 
-import javax.inject.Inject;
-import java.util.Map;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Factory for providing snapshot token handlers.
@@ -30,17 +34,34 @@ import java.util.Map;
  */
 final class SnapshotTokenHandlerFactoryImpl implements SnapshotTokenHandlerFactory {
 
-    private final Map<SnapshotTokenConfig, SnapshotTokenHandler> tokenHandlers;
+    @Override
+    public SnapshotTokenHandler get(SnapshotTokenConfig config) {
+        if (config.getType().equals(JwtTokenHandlerConfig.TYPE)) {
+            return configureJwtTokenHandler((JwtTokenHandlerConfig) config);
+        }
 
-    @Inject
-    SnapshotTokenHandlerFactoryImpl(Map<SnapshotTokenConfig, SnapshotTokenHandler> tokenHandlers) {
-        this.tokenHandlers = tokenHandlers;
+        throw new StageConfigException("Unknown token type " + config.getType());
     }
 
-    @Override
-    public SnapshotTokenHandler get(SnapshotTokenConfig tokenType) {
-        Reject.ifFalse(tokenHandlers.containsKey(tokenType), "Unknown snapshot token type");
-        return tokenHandlers.get(tokenType);
+    private SnapshotTokenHandler configureJwtTokenHandler(JwtTokenHandlerConfig config) {
+        try {
+            SigningManager signingManager = new SigningManager();
+            SigningHandler signingHandler = signingManager.newHmacSigningHandler(config.getSharedKey());
+
+            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(config.getKeyPairAlgorithm());
+            keyPairGen.initialize(config.getKeyPairSize());
+
+            return new JwtTokenHandler(
+                    config.getJweAlgorithm(),
+                    config.getEncryptionMethod(),
+                    keyPairGen.generateKeyPair(),
+                    config.getJwsAlgorithm(),
+                    signingHandler,
+                    config.getTokenLifeTimeInSeconds());
+
+        } catch (NoSuchAlgorithmException nsaE) {
+            throw new IllegalArgumentException("Unknown algorithm as defined in the config", nsaE);
+        }
     }
 
 }

@@ -33,6 +33,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.services.context.Context;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -104,7 +105,7 @@ public final class IdentityRestUtils {
             Map<String, Set<String>> attrs = asMap(details.getAttributes());
 
             for (Map.Entry<String, Set<String>>aix : attrs.entrySet()) {
-                result.put(aix.getKey(), aix.getValue());
+                result.put(aix.getKey(), new ArrayList<>(aix.getValue()));
             }
             return result;
         } catch (final Exception e) {

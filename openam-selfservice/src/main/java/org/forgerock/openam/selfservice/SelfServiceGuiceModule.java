@@ -15,29 +15,28 @@
  */
 package org.forgerock.openam.selfservice;
 
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.selfservice.core.ProcessContext;
+import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.Resources;
+import org.forgerock.json.resource.Router;
 import org.forgerock.selfservice.core.ProcessStore;
-import org.forgerock.selfservice.core.ProgressStage;
 import org.forgerock.selfservice.core.ProgressStageFactory;
-import org.forgerock.selfservice.core.StageResponse;
-import org.forgerock.selfservice.core.config.StageConfig;
-import org.forgerock.selfservice.core.snapshot.SnapshotTokenConfig;
-import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandler;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
-import org.forgerock.selfservice.stages.utils.RequirementsBuilder;
+import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
+import org.forgerock.selfservice.stages.email.VerifyEmailAccountStage;
+import org.forgerock.selfservice.stages.email.VerifyUserIdConfig;
+import org.forgerock.selfservice.stages.email.VerifyUserIdStage;
+import org.forgerock.selfservice.stages.registration.UserRegistrationConfig;
+import org.forgerock.selfservice.stages.registration.UserRegistrationStage;
+import org.forgerock.selfservice.stages.reset.ResetStage;
+import org.forgerock.selfservice.stages.reset.ResetStageConfig;
+import org.forgerock.selfservice.stages.user.UserDetailsConfig;
+import org.forgerock.selfservice.stages.user.UserDetailsStage;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Guice module to bind the self service features together.
@@ -62,70 +61,21 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Provides
     @Singleton
-    Map<SnapshotTokenConfig, SnapshotTokenHandler> getTokenHandlers() {
-        Map<SnapshotTokenConfig, SnapshotTokenHandler> tokenHandlers = new HashMap<>();
-        tokenHandlers.put(INTERIM_TYPE, new InterimSnapshotTokenHandler());
-        return tokenHandlers;
+    @Named("SelfServiceConnectionFactory")
+    ConnectionFactory getConnectionFactory(@Named("InternalCrestRouter") Router router) {
+        return Resources.newInternalConnectionFactory(router);
     }
 
     @Provides
     @Singleton
-    ProgressStageFactory getProgressStageFactory() {
+    ProgressStageFactory getProgressStageFactory(@Named("SelfServiceConnectionFactory") ConnectionFactory connectionFactory) {
         ProgressStageFactoryImpl stageFactory = new ProgressStageFactoryImpl();
-        stageFactory.safePut(InterimConfig.class, new InterimStage());
+        stageFactory.safePut(VerifyUserIdConfig.class, new VerifyUserIdStage(connectionFactory));
+        stageFactory.safePut(ResetStageConfig.class, new ResetStage(connectionFactory));
+        stageFactory.safePut(VerifyEmailAccountConfig.class, new VerifyEmailAccountStage(connectionFactory));
+        stageFactory.safePut(UserRegistrationConfig.class, new UserRegistrationStage(connectionFactory));
+        stageFactory.safePut(UserDetailsConfig.class, new UserDetailsStage(connectionFactory));
         return stageFactory;
-    }
-
-    static final SnapshotTokenConfig INTERIM_TYPE = new SnapshotTokenConfig() {
-        @Override
-        public String getType() {
-            return "interimType";
-        }
-    };
-
-    private static final class InterimSnapshotTokenHandler implements SnapshotTokenHandler {
-
-        @Override
-        public String generate(JsonValue jsonValue) throws ResourceException {
-            return UUID.randomUUID().toString();
-        }
-
-        @Override
-        public void validate(String snapshotToken) throws ResourceException {
-            // Do nothing.
-        }
-
-        @Override
-        public JsonValue validateAndExtractState(String s) throws ResourceException {
-            return json(object());
-        }
-    }
-
-    static final class InterimConfig implements StageConfig {
-
-        @Override
-        public String getName() {
-            return "Interim stage";
-        }
-
-    }
-
-    private static final class InterimStage implements ProgressStage<InterimConfig> {
-
-        @Override
-        public JsonValue gatherInitialRequirements(ProcessContext context,
-                                                   InterimConfig config) throws ResourceException {
-            return RequirementsBuilder
-                    .newEmptyRequirements();
-        }
-
-        @Override
-        public StageResponse advance(ProcessContext context, InterimConfig config) throws ResourceException {
-            return StageResponse
-                    .newBuilder()
-                    .build();
-        }
-
     }
 
 }
