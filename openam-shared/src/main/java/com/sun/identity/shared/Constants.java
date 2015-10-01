@@ -226,6 +226,21 @@ public interface Constants {
     static final String AM_VERSION = "com.iplanet.am.version";
 
     /**
+     * Property string for build version number.
+     */
+    static final String AM_BUILD_VERSION = "com.iplanet.am.buildVersion";
+
+    /**
+     * Property string for build revision number.
+     */
+    static final String AM_BUILD_REVISION = "com.iplanet.am.buildRevision";
+
+    /**
+     * Property string for build date.
+     */
+    static final String AM_BUILD_DATE = "com.iplanet.am.buildDate";
+
+    /**
      * Property string for <code>CertDB</code> directory.
      */
     static final String AM_ADMIN_CLI_CERTDB_DIR = "com.iplanet.am.admin.cli.certdb.dir";

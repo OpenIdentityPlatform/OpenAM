@@ -33,6 +33,7 @@ import org.forgerock.openam.core.rest.devices.TrustedDevicesResource;
 import org.forgerock.openam.core.rest.record.RecordConstants;
 import org.forgerock.openam.core.rest.record.RecordResource;
 import org.forgerock.openam.core.rest.server.ServerInfoResource;
+import org.forgerock.openam.core.rest.server.ServerVersionResource;
 import org.forgerock.openam.core.rest.session.SessionResource;
 import org.forgerock.openam.core.rest.session.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
@@ -61,6 +62,11 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(SERVER_INFO)
                 .forVersion(1, 1)
                 .toCollection(ServerInfoResource.class);
+
+        realmRouter.route("serverinfo/version")
+                .authenticateWith(ssoToken().exceptRead())
+                .auditAs(SERVER_INFO)
+                .toSingleton(ServerVersionResource.class);
 
         realmRouter.route("users")
                 .authenticateWith(ssoToken().exceptActions("register", "confirm", "forgotPassword",
