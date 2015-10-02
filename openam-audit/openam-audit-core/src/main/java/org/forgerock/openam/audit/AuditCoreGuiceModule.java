@@ -16,14 +16,8 @@
 package org.forgerock.openam.audit;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provides;
 import com.google.inject.multibindings.MapBinder;
-import org.forgerock.audit.AuditException;
-import org.forgerock.audit.AuditService;
 import org.forgerock.guice.core.GuiceModule;
-
-import javax.inject.Singleton;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Audit Core classes.
@@ -38,15 +32,6 @@ public class AuditCoreGuiceModule extends AbstractModule {
         // Initial binding for a Map of Component to AbstractHttpAccessAuditFilter
         // which other Guice modules will populate.
         MapBinder.newMapBinder(binder(), AuditConstants.Component.class, AbstractHttpAccessAuditFilter.class);
-    }
-
-    @Provides @Singleton @Inject
-    private AuditService getAuditService(AuditServiceProvider serviceProvider) {
-        try {
-            return serviceProvider.createAuditService();
-        } catch (AuditException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
 }

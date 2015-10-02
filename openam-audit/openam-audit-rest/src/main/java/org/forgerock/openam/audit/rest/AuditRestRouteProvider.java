@@ -19,7 +19,8 @@ package org.forgerock.openam.audit.rest;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUDIT;
 
-import org.forgerock.audit.AuditService;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
@@ -38,6 +39,7 @@ public class AuditRestRouteProvider extends AbstractRestRouteProvider {
         rootRouter.route("audit")
                 .auditAs(AUDIT, AuditEndpointAuditFilter.class)
                 .authorizeWith(AgentOnlyAuthzModule.class)
-                .toRequestHandler(STARTS_WITH, AuditService.class);
+                .toRequestHandler(STARTS_WITH,
+                        InjectorHolder.getInstance(AuditServiceProvider.class).getDefaultAuditService());
     }
 }

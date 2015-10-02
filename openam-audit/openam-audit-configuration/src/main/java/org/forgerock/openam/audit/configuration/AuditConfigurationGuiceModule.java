@@ -26,7 +26,7 @@ public class AuditConfigurationGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(AuditServiceConfigurator.class).to(AuditServiceConfiguratorImpl.class);
+        bind(AuditServiceConfigurationProvider.class).to(AuditServiceConfigurationProviderImpl.class);
     }
 
 }

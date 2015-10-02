@@ -278,6 +278,7 @@ public final class IOUtils {
                     "java.net.InetAddress",
                     "java.util.ArrayList",
                     "java.util.Collections$EmptyMap",
+                    "java.util.Collections$SingletonList",
                     "java.util.HashMap",
                     "java.util.HashSet",
                     "org.forgerock.openam.dpro.session.NoOpTokenRestriction");

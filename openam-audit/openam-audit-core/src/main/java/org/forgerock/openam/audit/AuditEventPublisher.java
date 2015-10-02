@@ -17,44 +17,41 @@ package org.forgerock.openam.audit;
 
 import static org.forgerock.audit.events.AuditEventBuilder.EVENT_NAME;
 import static org.forgerock.json.resource.Requests.newCreateRequest;
+import static org.forgerock.json.resource.Resources.newInternalConnection;
 
-import com.google.inject.Inject;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
-import org.forgerock.audit.AuditService;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Connection;
-import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.Resources;
+import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.services.context.RootContext;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Responsible for publishing locally created audit events to the AuditService.
  *
  * @since 13.0.0
  */
+@Singleton
 public class AuditEventPublisher {
 
     private static Debug debug = Debug.getInstance("amAudit");
 
-    private final AuditService auditService;
-    private final ConnectionFactory auditServiceConnectionFactory;
-    private final AuditServiceConfigurator configurator;
+    private final AuditServiceProvider auditServiceProvider;
 
     /**
      * Constructs a new {@code AuditEventPublisher}.
      *
-     * @param auditService AuditService to which events should be published.
-     * @param configurator AuditServiceConfigurator for configuring the audit service.
+     * @param auditServiceProvider A {@code AuditServiceProvider} instance.
      */
     @Inject
-    public AuditEventPublisher(AuditService auditService, AuditServiceConfigurator configurator) {
-        this.auditService = auditService;
-        this.auditServiceConnectionFactory = Resources.newInternalConnectionFactory(auditService);
-        this.configurator = configurator;
+    public AuditEventPublisher(AuditServiceProvider auditServiceProvider) {
+        this.auditServiceProvider = auditServiceProvider;
     }
 
     /**
@@ -75,21 +72,60 @@ public class AuditEventPublisher {
      * @throws AuditException if an exception occurs while trying to publish the audit event.
      */
     public void publish(String topic, AuditEvent auditEvent) throws AuditException {
+        AMAuditService auditService = auditServiceProvider.getDefaultAuditService();
+        Connection connection = newInternalConnection(auditService);
+        CreateRequest request = newCreateRequest(topic, auditEvent.getValue());
 
         try {
-
-            Connection connection = auditServiceConnectionFactory.getConnection();
-            connection.create(new RootContext(), newCreateRequest(topic, auditEvent.getValue()));
-
+            connection.create(new RootContext(), request);
         } catch (ResourceException e) {
+            handleResourceException(e, auditService, topic, auditEvent);
+        }
+    }
 
-            final String eventName = getValue(auditEvent.getValue(), EVENT_NAME, "-unknown-");
-            debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
-                    topic, eventName, e.getMessage(), e.getReason(), e);
+    /**
+     * Publishes the provided AuditEvent to the specified topic of the AuditService.
+     * <p/>
+     * If an error occurs that prevents the AuditEvent from being published, then details regarding the error
+     * are recorded in the debug logs. However, the debug logs are not be treated as the fallback destination
+     * for audit information. If we need guaranteed capture of audit information then this needs to be a feature
+     * of the audit service itself. Also, the audit event may contain sensitive information that shouldn't be
+     * stored in debug logs.
+     * <p/>
+     * After recording details of the error, the exception will only be propagated back to the caller if the
+     * 'suppress exceptions' configuration option is set to false.
+     *
+     *
+     * @param realm The realm in which the audit event occurred.
+     * @param topic Coarse-grained categorization of the AuditEvent's type.
+     * @param auditEvent The AuditEvent to publish.
+     *
+     * @throws AuditException if an exception occurs while trying to publish the audit event.
+     */
+    public void publish(String realm, String topic, AuditEvent auditEvent) throws AuditException {
+        AMAuditService auditService = auditServiceProvider.getAuditService(realm);
+        Connection connection = newInternalConnection(auditService);
+        CreateRequest request = newCreateRequest(topic, auditEvent.getValue());
 
-            if (!isSuppressExceptions()) {
-                throw new AuditException("Unable to publish " + topic + " audit event '" + eventName + "'", e);
-            }
+        try {
+            connection.create(new RootContext(), request);
+        } catch (ServiceUnavailableException e) {
+            debug.message("Audit Service for realm {} is unavailable. Trying the default Audit Service.", realm, e);
+            publish(topic, auditEvent);
+        } catch (ResourceException e) {
+            handleResourceException(e, auditService, topic, auditEvent);
+        }
+    }
+
+    private void handleResourceException(ResourceException e, AMAuditService auditService, String topic,
+            AuditEvent auditEvent) throws AuditException {
+
+        final String eventName = getValue(auditEvent.getValue(), EVENT_NAME, "-unknown-");
+        debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
+                topic, eventName, e.getMessage(), e.getReason(), e);
+
+        if (!auditService.isAuditFailureSuppressed()) {
+            throw new AuditException("Unable to publish " + topic + " audit event '" + eventName + "'", e);
         }
     }
 
@@ -105,7 +141,24 @@ public class AuditEventPublisher {
         try {
             publish(topic, auditEvent);
         } catch (AuditException e) {
-            // suppress
+            // suppress - error logged in publish method
+        }
+    }
+
+    /**
+     * Tries to publish the provided AuditEvent to the specified topic of the AuditService.
+     * <p/>
+     * If an exception occurs, details are logged but the exception is suppressed.
+     *
+     * @param realm The realm in which the audit event occurred.
+     * @param topic Coarse-grained categorization of the AuditEvent's type.
+     * @param auditEvent The AuditEvent to publish.
+     */
+    public void tryPublish(String realm, String topic, AuditEvent auditEvent) {
+        try {
+            publish(realm, topic, auditEvent);
+        } catch (AuditException e) {
+            // suppress - error logged in publish method
         }
     }
 
@@ -120,15 +173,17 @@ public class AuditEventPublisher {
      * @return {@code true} if the topic should be audited.
      */
     public boolean isAuditing(String topic) {
-        return configurator.getAuditServiceConfiguration().isAuditEnabled() && auditService.isAuditing(topic);
+        return auditServiceProvider.getDefaultAuditService().isAuditEnabled(topic);
     }
 
     /**
-     * Determines if exceptions from the audit service should be suppressed.
+     * Determines if the audit service is auditing the specified {@literal topic}.
      *
-     * @return True if the operation being audited can proceed if an exception occurs while publishing an audit event.
+     * @param realm The realm in which the audit event occurred.
+     * @param topic The auditing topic.
+     * @return {@code true} if the topic should be audited.
      */
-    public boolean isSuppressExceptions() {
-        return configurator.getAuditServiceConfiguration().isAuditFailureSuppressed();
+    public boolean isAuditing(String realm, String topic) {
+        return auditServiceProvider.getAuditService(realm).isAuditEnabled(topic);
     }
 }

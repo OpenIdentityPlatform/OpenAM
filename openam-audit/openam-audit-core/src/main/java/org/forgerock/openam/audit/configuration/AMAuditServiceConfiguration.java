@@ -16,30 +16,42 @@
 package org.forgerock.openam.audit.configuration;
 
 import org.forgerock.audit.AuditServiceConfiguration;
+import org.forgerock.openam.audit.AMAuditService;
 
 /**
  * Audit service configuration specific to OpenAM. An instance of the current state can be retrieved from
- * {@link org.forgerock.openam.audit.configuration.AuditServiceConfigurator}. The instance will be updated with
- * any changes in configuration and should be consulted before for every log event where necessary.
+ * {@link AuditServiceConfigurationProvider}. The instance retrieved from {@link AuditServiceConfigurationProvider}
+ * will represent the current settings in the SMS.
+ * <p/>
+ * Each of the Audit Services has its own configuration, which is stored with the Audit Service and can be retrieved
+ * in a thread-safe way via its own accessor methods - {@link AMAuditService#isAuditEnabled(String)},
+ * {@link AMAuditService#isAuditFailureSuppressed()} and {@link AMAuditService#isResolveHostNameEnabled()}.
  *
  * @since 13.0.0
  */
 public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
 
-    private volatile boolean auditEnabled = false;
-    private volatile boolean auditFailureSuppressed = true;
-    private volatile boolean resolveHostNameEnabled = false;
+    private final boolean auditEnabled;
+    private final boolean auditFailureSuppressed;
+    private final boolean resolveHostNameEnabled;
 
     /**
-     * Is audit logging is enabled.
-     * @param auditEnabled true if audit logging is enabled.
+     * Create an instance of {@code AMAuditServiceConfiguration} with the specified values.
+     *
+     * @param auditEnabled Is audit logging enabled.
+     * @param auditFailureSuppressed Is audit failure suppressed.
+     * @param resolveHostNameEnabled Is resolve host name enabled.
      */
-    public void setAuditEnabled(boolean auditEnabled) {
+    public AMAuditServiceConfiguration(boolean auditEnabled, boolean auditFailureSuppressed,
+                                        boolean resolveHostNameEnabled) {
+
         this.auditEnabled = auditEnabled;
+        this.auditFailureSuppressed = auditFailureSuppressed;
+        this.resolveHostNameEnabled = resolveHostNameEnabled;
     }
 
     /**
-     * Is audit logging is enabled.
+     * Is audit logging enabled.
      * @return true if audit logging is enabled.
      */
     public boolean isAuditEnabled() {
@@ -48,26 +60,10 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
 
     /**
      * Stop failure to log an audit message form also failing the operation that is audited.
-     * @param auditFailureSuppressed true if audit failure should be suppressed.
-     */
-    public void setAuditFailureSuppressed(boolean auditFailureSuppressed) {
-        this.auditFailureSuppressed = auditFailureSuppressed;
-    }
-
-    /**
-     * Stop failure to log an audit message form also failing the operation that is audited.
      * @return true if audit failure should be suppressed.
      */
     public boolean isAuditFailureSuppressed() {
         return auditFailureSuppressed;
-    }
-
-    /**
-     * Set access event reverse DNS lookup enabled.
-     * @param enabled true to enable
-     */
-    public void setResolveHostNameEnabled(boolean enabled) {
-        this.resolveHostNameEnabled = enabled;
     }
 
     /**

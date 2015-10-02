@@ -24,9 +24,13 @@
  *
  * $Id: SCConfigModelImpl.java,v 1.2 2008/06/25 05:43:18 qcheng Exp $
  *
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.service.model;
+
+import static com.sun.identity.console.audit.AuditConsoleConstants.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
@@ -37,6 +41,8 @@ import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceManager;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,7 +51,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
 /* - NEED NOT LOG - */
 
@@ -97,6 +102,8 @@ public class SCConfigModelImpl extends AMModelBase
     public String getServicePropertiesViewBeanURL(String serviceName) {
         if (AMAdminConstants.POLICY_SERVICE.equals(serviceName)) {
             return "../service/SCPolicy";
+        } else if (AUDIT_SERVICE.equals(serviceName)) {
+            return AUDIT_GLOBAL_CONFIG_VIEW_BEAN_URL;
         } else {
             return super.getServicePropertiesViewBeanURL(serviceName);
         }

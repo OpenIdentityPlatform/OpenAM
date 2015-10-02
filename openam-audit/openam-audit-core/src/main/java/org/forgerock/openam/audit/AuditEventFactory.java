@@ -15,9 +15,8 @@
  */
 package org.forgerock.openam.audit;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Factory for creation of AuditEvent builders.
@@ -29,16 +28,16 @@ import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 @Singleton
 public class AuditEventFactory {
 
-    private final AuditServiceConfigurator configurator;
+    private final AuditServiceProvider auditServiceProvider;
 
     /**
      * Constructs a new {@code AuditEventFactory}.
      *
-     * @param configurator A {@code AuditServiceConfigurator} instance.
+     * @param auditServiceProvider A {@code AuditServiceProvider} instance.
      */
     @Inject
-    public AuditEventFactory(AuditServiceConfigurator configurator) {
-        this.configurator = configurator;
+    public AuditEventFactory(AuditServiceProvider auditServiceProvider) {
+        this.auditServiceProvider = auditServiceProvider;
     }
 
     /**
@@ -47,7 +46,21 @@ public class AuditEventFactory {
      * @return AMAccessAuditEventBuilder
      */
     public AMAccessAuditEventBuilder accessEvent() {
-        if (configurator.getAuditServiceConfiguration().isResolveHostNameEnabled()) {
+        if (auditServiceProvider.getDefaultAuditService().isResolveHostNameEnabled()) {
+            return new AMAccessAuditEventBuilder().withReverseDnsLookup();
+        } else {
+            return new AMAccessAuditEventBuilder();
+        }
+    }
+
+    /**
+     * Creates a new AMAccessAuditEventBuilder.
+     *
+     * @param realm The realm in which the audit event occurred.
+     * @return AMAccessAuditEventBuilder
+     */
+    public AMAccessAuditEventBuilder accessEvent(String realm) {
+        if (auditServiceProvider.getAuditService(realm).isResolveHostNameEnabled()) {
             return new AMAccessAuditEventBuilder().withReverseDnsLookup();
         } else {
             return new AMAccessAuditEventBuilder();

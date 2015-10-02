@@ -9,27 +9,13 @@
  * When distributing Covered Software, include this CDDL Header Notice in each file and include
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS. All rights reserved.
  */
-package org.forgerock.openam.audit.configuration;
 
 /**
- * Implementations of this interface are responsible for configuring the audit service.
- *
- * @since 13.0.0
+ * Contains the model, or data access functionality, consumed by the ViewBean context displaying audit instance state
+ * to be created, edited, or deleted.
  */
-public interface AuditServiceConfigurator {
-
-    /**
-     * Configure the audit service and register the service config listener.
-     */
-    void configureAuditService();
-
-    /**
-     * Get the pre-configured audit service configuration.
-     * @return The pre-configured audit service configuration.
-     */
-    AMAuditServiceConfiguration getAuditServiceConfiguration();
-}
+package com.sun.identity.console.audit.model;

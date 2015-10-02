@@ -45,8 +45,6 @@ import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
@@ -62,13 +60,16 @@ public class AbstractHttpAccessAuditFilterTest {
 
     @Mock
     private AuditEventPublisher eventPublisher;
+    @Mock
+    private AuditServiceProvider auditServiceProvider;
+    @Mock
+    private AMAuditService auditService;
 
     @BeforeMethod
     public void setUp() {
         initMocks(this);
-        AuditServiceConfigurator auditServiceConfigurator = mock(AuditServiceConfigurator.class);
-        when(auditServiceConfigurator.getAuditServiceConfiguration()).thenReturn(new AMAuditServiceConfiguration());
-        AuditEventFactory eventFactory = new AuditEventFactory(auditServiceConfigurator);
+        when(auditServiceProvider.getDefaultAuditService()).thenReturn(auditService);
+        AuditEventFactory eventFactory = new AuditEventFactory(auditServiceProvider);
 
         auditFilter = new MockAccessAuditFilter(eventPublisher, eventFactory);
 

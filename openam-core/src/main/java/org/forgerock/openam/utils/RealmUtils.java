@@ -24,15 +24,22 @@
  *
  * $Id: RealmUtils.java,v 1.2 2008/06/25 05:42:16 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Realm related utilites.
+ * Realm related utilities.
  */
-public class RealmUtils {
+public final class RealmUtils {
     private RealmUtils() {
     }
 
@@ -88,5 +95,23 @@ public class RealmUtils {
             }
         }
         return path.trim();
+    }
+
+    /**
+     * Retrieve the names of all the realms starting with '/' and including '/'.
+     *
+     * @param adminToken The admin token.
+     * @return A list of all the realm names.
+     * @throws SMSException If reading from the SMS failed.
+     */
+    @SuppressWarnings("unchecked")
+    public static Set<String> getRealmNames(SSOToken adminToken) throws SMSException {
+        Set<String> rootSubRealms = new OrganizationConfigManager(adminToken, "/").getSubOrganizationNames("*", true);
+        Set<String> qualifiedRealmNames = new HashSet<>();
+        qualifiedRealmNames.add("/");
+        for (String subRealm : rootSubRealms) {
+            qualifiedRealmNames.add("/" + subRealm);
+        }
+        return qualifiedRealmNames;
     }
 }

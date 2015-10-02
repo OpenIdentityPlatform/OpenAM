@@ -23,7 +23,8 @@
                 i18nFileName="audit"
                 revisionNumber="1"
                 resourceName="audit"
-                i18nKey="audit-description">
+                i18nKey="audit-description"
+                propertiesViewBeanURL="../audit/RealmAuditConfig">
             <Global>
                 <AttributeSchema name="auditEnabled" type="single" syntax="boolean" i18nKey="a001">
                     <BooleanValues>
@@ -53,7 +54,7 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <SubSchema name="CSV" i18nKey="eh001">
+                <SubSchema name="CSV" inheritance="multiple" i18nKey="eh001">
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="csv001">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
@@ -80,11 +81,68 @@
                     </AttributeSchema>
                 </SubSchema>
             </Global>
+
+            <Organization>
+                <AttributeSchema name="auditEnabled" type="single" syntax="boolean" i18nKey="a001">
+                    <BooleanValues>
+                        <BooleanTrueValue>true</BooleanTrueValue>
+                        <BooleanFalseValue>false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="suppressAuditFailure" type="single" syntax="boolean" i18nKey="a002">
+                    <BooleanValues>
+                        <BooleanTrueValue>true</BooleanTrueValue>
+                        <BooleanFalseValue>false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="resolveHostNameEnabled" type="single" syntax="boolean" i18nKey="a003">
+                    <BooleanValues>
+                        <BooleanTrueValue>true</BooleanTrueValue>
+                        <BooleanFalseValue>false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <SubSchema name="CSV" inheritance="multiple" i18nKey="eh001">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="csv001">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="csv002">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="location" type="single" i18nKey="csv003">
+                        <DefaultValues>
+                            <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
         </Schema>
 
         <Configuration>
             <GlobalConfiguration>
-                <SubConfiguration name="CSV" id="CSV"/>
+                <SubConfiguration name="Global CSV Handler" id="CSV"/>
             </GlobalConfiguration>
         </Configuration>
     </Service>
