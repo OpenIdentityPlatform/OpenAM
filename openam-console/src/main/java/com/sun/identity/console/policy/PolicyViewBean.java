@@ -70,7 +70,7 @@ public class PolicyViewBean extends RealmPropertiesBase implements HasEntitiesTa
     @Override
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         redirectToXui(getRequestContext().getRequest(), getRedirectRealm(this),
-                MessageFormat.format("realms/{0}/applications/list", getCurrentRealmEncoded()));
+                MessageFormat.format("realms/{0}/policySets/list", getCurrentRealmEncoded()));
     }
 
     @Override
