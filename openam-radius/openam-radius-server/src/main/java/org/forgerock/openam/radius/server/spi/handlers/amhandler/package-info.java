@@ -14,6 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 /**
- * Contains classes that provide the radius server with a handler that utilizes OpenAM's authorization capabilities
+ * Contains classes used by the OpenAMAuthHandler class to encapsulate behaviour or state.
  */
 package org.forgerock.openam.radius.server.spi.handlers.amhandler;

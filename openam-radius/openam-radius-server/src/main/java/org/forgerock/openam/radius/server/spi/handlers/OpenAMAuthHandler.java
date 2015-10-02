@@ -13,7 +13,7 @@
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
  */
-package org.forgerock.openam.radius.server.spi.handlers.amhandler;
+package org.forgerock.openam.radius.server.spi.handlers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +45,10 @@ import org.forgerock.openam.radius.server.RadiusProcessingException;
 import org.forgerock.openam.radius.server.RadiusResponseHandler;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import org.forgerock.openam.radius.server.spi.AccessRequestHandler;
+import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolder;
+import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolderCache;
+import org.forgerock.openam.radius.server.spi.handlers.amhandler.OpenAMAuthFactory;
+import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolder.AuthPhase;
 
 import com.google.inject.Inject;
 import com.sun.identity.authentication.AuthContext;

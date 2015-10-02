@@ -31,7 +31,7 @@
  *     all such answers into the callbacks and submits them back to the
  *     {@link com.sun.identity.authentication.AuthContext} and repeats this pattern until all callback sets have been
  *     exhausted and authentication fails or succeeds.
- *     See {@link org.forgerock.openam.radius.server.spi.handlers.amhandler.OpenAMAuthHandler}.
+ *     See {@link org.forgerock.openam.radius.server.spi.handlers.OpenAMAuthHandler}.
  *
  * </pre>
  *

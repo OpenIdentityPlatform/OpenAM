@@ -30,7 +30,7 @@ import org.forgerock.openam.radius.server.RadiusResponseHandler;
  * {@link com.sun.identity.authentication.modules.radius.client.AccessAccept} packet granting access to everyone and the
  * {@link org.forgerock.openam.radius.server.spi.handlers.RejectAllHandler} that does just the opposite returning an
  * {@link com.sun.identity.authentication.modules.radius.client.AccessReject} packet allowing no access for anyone. The
- * {@link org.forgerock.openam.radius.server.spi.handlers.amhandler.OpenAMAuthHandler} uses an OpenAM realm and chain to allow
+ * {@link org.forgerock.openam.radius.server.spi.handlers.OpenAMAuthHandler} uses an OpenAM realm and chain to allow
  * users to authenticate via authentication modules that are cognizant of non-http clients. Created by markboyd on
  * 11/21/14.
  */

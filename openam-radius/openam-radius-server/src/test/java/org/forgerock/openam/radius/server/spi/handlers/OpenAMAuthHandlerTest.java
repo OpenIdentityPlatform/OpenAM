@@ -13,7 +13,7 @@
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
  */
-package org.forgerock.openam.radius.server.spi.handlers.amhandler;
+package org.forgerock.openam.radius.server.spi.handlers;
 
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
@@ -36,6 +36,10 @@ import org.forgerock.openam.radius.common.UserNameAttribute;
 import org.forgerock.openam.radius.common.UserPasswordAttribute;
 import org.forgerock.openam.radius.server.RadiusProcessingException;
 import org.forgerock.openam.radius.server.RadiusResponseHandler;
+import org.forgerock.openam.radius.server.spi.handlers.OpenAMAuthHandler;
+import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolder;
+import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolderCache;
+import org.forgerock.openam.radius.server.spi.handlers.amhandler.OpenAMAuthFactory;
 import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolder.AuthPhase;
 import org.testng.annotations.Test;
 
