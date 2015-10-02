@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/common/util/URLHelper", [
                 return url.replace("__api__", Constants.host + "/" + Constants.context + "/json" + (realm !== "/" ? realm : ""))
                     .replace("__host__", Constants.host)
                     .replace("__context__", Constants.context)
-                    .replace("__username__", Configuration.loggedUser.username);
+                    .replace("__username__", Configuration.loggedUser.get("username"));
             };
         }
     };
