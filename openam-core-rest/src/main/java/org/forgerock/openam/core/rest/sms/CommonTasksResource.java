@@ -201,7 +201,10 @@ class CommonTasksResource implements CollectionResourceProvider {
 
         private JsonValue getOAuth2OpenIDConnectCommonTaskConfiguration(ResourceBundle resourceBundle) {
             return createTaskGroup(resourceBundle, "OAuth2",
-                    createTask(resourceBundle, "configure.oauth2", "ConfigureOAuth2"));
+                    createTask(resourceBundle, "configure.oauth2", "ConfigureOAuth2?type=oauth2"),
+                    createTask(resourceBundle, "configure.oidc", "ConfigureOAuth2?type=oidc"),
+                    createTask(resourceBundle, "configure.mobileconnect", "ConfigureOAuth2?type=mobileconnect"),
+                    createTask(resourceBundle, "configure.uma", "ConfigureOAuth2?type=uma"));
         }
 
         private JsonValue getFedletCommonTaskConfiguration(ResourceBundle resourceBundle) {

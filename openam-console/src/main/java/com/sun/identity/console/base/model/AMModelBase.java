@@ -1065,7 +1065,7 @@ public class AMModelBase
      * @return realms names that match the filter.
      * @throws AMConsoleException if search fails.
      */
-    public Set getRealmNames(String base, String filter)
+    public Set<String> getRealmNames(String base, String filter)
         throws AMConsoleException
     {
         if ((base == null) || (base.length() == 0)) {
@@ -1081,7 +1081,7 @@ public class AMModelBase
                 orgMgr.getSubOrganizationNames(filter, true), filter);
         } catch (SMSException e) {
             if (e.getExceptionCode() == SMSException.STATUS_NO_PERMISSION) {
-                Set result = new HashSet(2);
+                Set<String> result = new HashSet<>(2);
                 result.add(base);
                 return result;
             } else {
@@ -1098,8 +1098,8 @@ public class AMModelBase
      * performed. Use this to add the base back to the search result,
      * ending up with a fully qualified name.
      */
-    private Set appendBaseDN(String base, Set results, String filter) {
-        Set altered = new HashSet();
+    private Set<String> appendBaseDN(String base, Set<String> results, String filter) {
+        Set<String> altered = new HashSet<>();
         String displayName = null;
         if (base.equals("/")) {
             displayName = AMFormatUtils.DNToName(this, getStartDSDN());
@@ -1111,17 +1111,16 @@ public class AMModelBase
             altered.add(base);
         }
         if ((results != null) && (!results.isEmpty())) {
-            for (Iterator i = results.iterator(); i.hasNext(); ) {
-                String name = (String)i.next();
+            for (String name : results) {
                 if (name.charAt(0) != '/') {
-                    if (base.charAt(base.length() -1) == '/') {
+                    if (base.charAt(base.length() - 1) == '/') {
                         altered.add(base + name);
                     } else {
                         altered.add(base + "/" + name);
                     }
                 } else {
-                    if (base.charAt(base.length() -1) == '/') {
-                        altered.add(base.substring(0, base.length()-1) + name);
+                    if (base.charAt(base.length() - 1) == '/') {
+                        altered.add(base.substring(0, base.length() - 1) + name);
                     } else {
                         altered.add(base + name);
                     }

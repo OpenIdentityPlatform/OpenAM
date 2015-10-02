@@ -27,6 +27,7 @@
 --%>
 
 <%@ page info="ConfigureOAuth2" language="java" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
 <%@taglib tagdir="/WEB-INF/tags" prefix="console"%>
@@ -82,14 +83,7 @@
        </table>
  
        <%-- PAGE CONTENT --------------------------------------------------------- --%>
-       <cc:pagetitle name="pgtitle" bundleID="amConsole" pageTitleText="page.title.configure.oauth2" showPageTitleSeparator="true" viewMenuLabel="" pageTitleHelpMessage="" showPageButtonsTop="true" showPageButtonsBottom="false" />
- 
-       <table border="0" cellpadding="20" cellspacing="0">
-           <tr><td>
-               <cc:text name="txtDesc" defaultValue="page.desc.configure.oauth2" bundleID="amConsole" />
-           </td></tr>
-       </table>
- 
+       <cc:pagetitle name="pgtitle" bundleID="amConsole" showPageTitleSeparator="true" viewMenuLabel="" pageTitleHelpMessage="" showPageButtonsTop="true" showPageButtonsBottom="false" />
  
        <cc:propertysheet name="propertyAttributes" bundleID="amConsole" showJumpLinks="false"/>
  
@@ -114,7 +108,18 @@ var btn2 = frm.elements['ConfigureOAuth2.button2'];
 btn2.onclick = cancelOp;
 var ajaxObj = getXmlHttpRequestObject();
 var userLocale = "<%= viewBean.getUserLocale().toString() %>";
- 
+<%
+   String type = request.getParameter("type");
+   if (!ESAPI.validator().isValidInput("Social AuthN Type", type, "HTTPParameterValue", 2000, true)) {
+       type = null;
+   }
+   if (type != null) {
+       out.println("var type = \"" + ESAPI.encoder().encodeForHTML(type) + "\";");
+   } else {
+       out.println("var type = null;");
+   }
+%>
+
 function getData(){
    var realm = frm.elements['ConfigureOAuth2.tfRealm'].value;
    var rtl = frm.elements['ConfigureOAuth2.choiceRefreshLifetime'].value;
@@ -124,6 +129,7 @@ function getData(){
    var irtr = (frm.elements['ConfigureOAuth2.choiceRefreshTokenOnRefreshing'].checked == true) ? "true" : "false";
    var sic = frm.elements['ConfigureOAuth2.choiceScopeImpl'].value;
    return "&realm=" + escapeEx(realm) +
+           "&type=" + escapeEx(type) +
            "&rtl=" + escapeEx(rtl) +
            "&acl=" + escapeEx(acl) +
            "&atl=" + escapeEx(atl) +

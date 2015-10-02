@@ -130,7 +130,6 @@
                     <DefaultValues>
                         <Value>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</Value>
                         <Value>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</Value>
-                        <Value>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -170,13 +169,6 @@
                         syntax="string"
                         resourceName="supportedScopes"
                         i18nKey="a108">
-                    <DefaultValues>
-                        <Value>openid|</Value>
-                        <Value>profile|Your personal information</Value>
-                        <Value>email|Your email address</Value>
-                        <Value>address|Your postal address</Value>
-                        <Value>phone|Your telephone number(s)</Value>
-                    </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -185,9 +177,6 @@
                         syntax="string"
                         resourceName="jkwsURI"
                         i18nKey="a109">
-                    <DefaultValues>
-                        <Value></Value>
-                    </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -207,12 +196,6 @@
                         syntax="string"
                         resourceName="supportedIDTokenSigningAlgorithms"
                         i18nKey="a111">
-                    <DefaultValues>
-                        <Value>HS256</Value>
-                        <Value>HS384</Value>
-                        <Value>HS512</Value>
-                        <Value>RS256</Value>
-                    </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -221,16 +204,6 @@
                         syntax="string"
                         resourceName="supportedClaims"
                         i18nKey="a112">
-                    <DefaultValues>
-                        <Value>email|Email address</Value>
-                        <Value>address|Postal address</Value>
-                        <Value>phone_number|Phone number</Value>
-                        <Value>given_name|Given name</Value>
-                        <Value>zoneinfo|Time zone</Value>
-                        <Value>family_name|Family name</Value>
-                        <Value>locale|Locale</Value>
-                        <Value>name|Full name</Value>
-                    </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -239,13 +212,6 @@
                         syntax="string"
                         resourceName="defaultScopes"
                         i18nKey="a122">
-                    <DefaultValues>
-                        <Value>openid</Value>
-                        <Value>profile</Value>
-                        <Value>email</Value>
-                        <Value>address</Value>
-                        <Value>phone</Value>
-                    </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="forgerock-oauth2-provider-jwt-token-lifetime"
@@ -384,9 +350,6 @@
                         syntax="string"
                         resourceName="modifiedTimestampAttribute"
                         i18nKey="a120">
-                    <DefaultValues>
-                        <Value>modifyTimestamp</Value>
-                    </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -395,9 +358,6 @@
                         syntax="string"
                         resourceName="createdTimestampAttribute"
                         i18nKey="a121">
-                    <DefaultValues>
-                        <Value>createTimestamp</Value>
-                    </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="alwaysAddClaimsToToken"
