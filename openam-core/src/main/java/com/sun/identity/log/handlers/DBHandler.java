@@ -614,7 +614,8 @@ public class DBHandler extends Handler {
                 //Monit end
             }
             if ((buffer != recordBuffer) && (!buffer.isEmpty())) {
-                for (int i = 0; i < buffer.size(); i++) {
+                int bufsize = buffer.size();
+                for (int i = 0; i < bufsize; i++) {
                     recordBuffer.addFirst(buffer.removeLast());
                 }
             }
