@@ -18,6 +18,7 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Requests.newReadRequest;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -39,7 +40,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -59,8 +59,13 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.Function;
 import org.forgerock.util.Reject;
+import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.PromiseImpl;
+import org.forgerock.util.promise.ResultHandler;
 
 /**
  * A CREST collection provider for SMS schema config.
@@ -104,10 +109,16 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                 return new BadRequestException("Invalid name").asPromise();
             }
             config.addSubConfig(name, lastSchemaNodeName(), 0, attrs);
-            ServiceConfig created = checkedInstanceSubConfig(context, name, config);
+            final ServiceConfig created = checkedInstanceSubConfig(context, name, config);
 
-            JsonValue result = getJsonValue(created);
-            return newResultPromise(newResourceResponse(created.getName(), String.valueOf(result.hashCode()), result));
+            return awaitCreation(context, name)
+                    .then(new Function<Void, ResourceResponse, ResourceException>() {
+                        @Override
+                        public ResourceResponse apply(Void aVoid) {
+                            JsonValue result = getJsonValue(created);
+                            return newResourceResponse(created.getName(), String.valueOf(result.hashCode()), result);
+                        }
+                    });
         } catch (ServiceAlreadyExistsException e) {
             debug.warning("::SmsCollectionProvider:: ServiceAlreadyExistsException on create", e);
             return new ConflictException("Unable to create SMS config: " + e.getMessage()).asPromise();
@@ -128,7 +139,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId,
             DeleteRequest request) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
@@ -140,8 +151,13 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                 config.removeSubConfig(resourceId);
             }
 
-            ResourceResponse resource = newResourceResponse(resourceId, "0", json(object(field("success", true))));
-            return newResultPromise(resource);
+            return awaitDeletion(context, resourceId)
+                    .then(new Function<Void, ResourceResponse, ResourceException>() {
+                        @Override
+                        public ResourceResponse apply(Void aVoid) {
+                            return newResourceResponse(resourceId, "0", json(object(field("success", true))));
+                        }
+                    });
         } catch (ServiceNotFoundException e) {
             debug.warning("::SmsCollectionProvider:: ServiceNotFoundException on delete", e);
             return new NotFoundException("Unable to delete SMS config: " + e.getMessage()).asPromise();
@@ -286,5 +302,94 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return new NotSupportedException("patch operation not supported").asPromise();
+    }
+
+    private static final long MAX_AWAIT_TIMEOUT = 5000L;
+
+    private Promise<Void, ResourceException> awaitCreation(Context context, String resourceId) {
+        final PromiseImpl<Void, ResourceException> awaitPromise = PromiseImpl.create();
+        await(context, resourceId, awaitPromise, System.currentTimeMillis(), awaitCreationResultHandler(awaitPromise),
+                awaitCreationExceptionHandler(context, resourceId, awaitPromise, System.currentTimeMillis()));
+        return awaitPromise;
+    }
+
+    private Promise<Void, ResourceException> awaitDeletion(Context context, String resourceId) {
+        final PromiseImpl<Void, ResourceException> awaitPromise = PromiseImpl.create();
+        await(context, resourceId, awaitPromise, System.currentTimeMillis(),
+                awaitDeletionResultHandler(context, resourceId, awaitPromise, System.currentTimeMillis()),
+                awaitDeletionExceptionHandler(context, resourceId, awaitPromise, System.currentTimeMillis()));
+        return awaitPromise;
+    }
+
+    private void await(Context context, String resourceId, PromiseImpl<Void, ResourceException> awaitPromise,
+            long startTime, ResultHandler<ResourceResponse> resultHandler,
+            ExceptionHandler<ResourceException> exceptionHandler) {
+        if (System.currentTimeMillis() - startTime > MAX_AWAIT_TIMEOUT) {
+            awaitPromise.handleResult(null);
+            return;
+        }
+        try {
+            Thread.sleep(100L);
+        } catch (InterruptedException e) {
+            debug.error("Thread interrupted while awaiting SMS resource creation/deletion", e);
+            awaitPromise.handleException(new InternalServerErrorException("", e));
+        }
+        readInstance(context, resourceId, newReadRequest(""))
+                .thenOnResult(resultHandler)
+                .thenOnException(exceptionHandler);
+    }
+
+    private ResultHandler<ResourceResponse> awaitCreationResultHandler(
+            final PromiseImpl<Void, ResourceException> awaitPromise) {
+        return new ResultHandler<ResourceResponse>() {
+            @Override
+            public void handleResult(ResourceResponse result) {
+                awaitPromise.handleResult(null);
+            }
+        };
+    }
+
+    private ExceptionHandler<ResourceException> awaitCreationExceptionHandler(final Context context,
+            final String resourceId, final PromiseImpl<Void, ResourceException> awaitPromise, final long startTime) {
+        return new ExceptionHandler<ResourceException>() {
+            @Override
+            public void handleException(ResourceException exception) {
+                if (ResourceException.NOT_FOUND != exception.getCode()) {
+                    debug.warning("Unexpected exception returned while awaiting SMS resource creation", exception);
+                }
+                await(context, resourceId, awaitPromise, startTime,
+                        awaitCreationResultHandler(awaitPromise),
+                        awaitCreationExceptionHandler(context, resourceId, awaitPromise, startTime));
+            }
+        };
+    }
+
+    private ResultHandler<ResourceResponse> awaitDeletionResultHandler(final Context context, final String resourceId,
+            final PromiseImpl<Void, ResourceException> awaitPromise, final long startTime) {
+        return new ResultHandler<ResourceResponse>() {
+            @Override
+            public void handleResult(ResourceResponse result) {
+                await(context, resourceId, awaitPromise, startTime,
+                        awaitDeletionResultHandler(context, resourceId, awaitPromise, startTime),
+                        awaitDeletionExceptionHandler(context, resourceId, awaitPromise, startTime));
+            }
+        };
+    }
+
+    private ExceptionHandler<ResourceException> awaitDeletionExceptionHandler(final Context context,
+            final String resourceId, final PromiseImpl<Void, ResourceException> awaitPromise, final long startTime) {
+        return new ExceptionHandler<ResourceException>() {
+            @Override
+            public void handleException(ResourceException exception) {
+                if (ResourceException.NOT_FOUND != exception.getCode()) {
+                    debug.warning("Unexpected exception returned while awaiting SMS resource deletion", exception);
+                    await(context, resourceId, awaitPromise, startTime,
+                            awaitDeletionResultHandler(context, resourceId, awaitPromise, startTime),
+                            awaitDeletionExceptionHandler(context, resourceId, awaitPromise, startTime));
+                } else {
+                    awaitPromise.handleResult(null);
+                }
+            }
+        };
     }
 }
