@@ -24,7 +24,7 @@
  *
  * $Id: AuthClientUtils.java,v 1.40 2010/01/22 03:31:01 222713 Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.client;
 
@@ -102,6 +102,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 public class AuthClientUtils {
 
@@ -393,10 +394,10 @@ public class AuthClientUtils {
                             String parameter = str.substring(0,index);
                             String parameterValue = str.substring(index + 1);
                             putDecodedValue(data, parameter, parameterValue, encoding);
-                        } 
+                        }
                     }
             	}
-            } else if ("goto".equals(name)){
+            } else if(name.equals(RedirectUrlValidator.GOTO) || name.equals(RedirectUrlValidator.GOTO_ON_FAIL)){
                 // Again this will be the case when browser back
                 // button is used and the form is posted with the
                 // base64 encoded parameters including goto
@@ -1716,14 +1717,15 @@ public class AuthClientUtils {
                     queryString.append(queryParams);
                 } else {
                     String value = request.getParameter(parameter);
-                    if ( value != null && !value.isEmpty()) {
-                       if ("goto".equals(parameter) && encoded) {
+                    if (StringUtils.isNotEmpty(value)) {
+                       if (parameter.equals(RedirectUrlValidator.GOTO) ||
+                               parameter.equals(RedirectUrlValidator.GOTO_ON_FAIL)) {
                     	   // Again this will be the case when browser back
                     	   // button is used and the form is posted with the
                     	   // base64 encoded parameters including goto
                            value = Base64.decodeAsUTF8String(value);
                            if(utilDebug.messageEnabled()) {
-                               utilDebug.message("constructLoginURL: Base64 decoded goto='{}'", value);
+                               utilDebug.message("constructLoginURL: Base64 decoded "+parameter+"='{}'", value);
                            }
                        } 
                        queryString.append(URLEncDec.encode(parameter)).append("=")

@@ -1836,7 +1836,7 @@ public class LoginState {
      * @param request
      * @param response
      * @param sid
-     * @param requestHash
+     * @param requestHash the decoded request parameters
      * @return Authentication context for new request.
      * @throws AuthException if it fails to instantiate <code>AuthContext</code>
      */
@@ -1907,8 +1907,8 @@ public class LoginState {
         if (AuthUtils.isClientDetectionEnabled() && cookieDetect) {
             cookieSet = true;
         }
-        setGoToURL();
-        setGoToOnFailURL();
+        setDecodedGoToURL();
+        setDecodedGoToOnFailURL();
         amIdRepo = ad.getAMIdentityRepository(getOrgDN());
         persistentCookieArgExists();
         populateOrgProfile();
@@ -3694,31 +3694,21 @@ public class LoginState {
     /**
      * Sets goto URL.
      */
-    void setGoToURL() {
+   private void setDecodedGoToURL() {
         String arg = (String)requestHash.get("goto");
         if (arg != null && arg.length() != 0) {
-            String encoded = servletRequest.getParameter("encoded");
-            if (encoded != null && encoded.equals("true")) {
-                gotoURL = Base64.decodeAsUTF8String(arg);
-            } else {
                 gotoURL = arg;
             }
-        }
     }
     
     /**
      * Sets gotoOnFail URL.
      */
-    void setGoToOnFailURL() {
+    private void setDecodedGoToOnFailURL() {
         String arg = (String)requestHash.get("gotoOnFail");
         if (arg != null && arg.length() != 0) {
-            String encoded = servletRequest.getParameter("encoded");
-            if (encoded != null && encoded.equals("true")) {
-                gotoOnFailURL = Base64.decodeAsUTF8String(arg);
-            } else {
                 gotoOnFailURL = arg;
             }
-        }
     }
 
     /**
