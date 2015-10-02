@@ -1774,7 +1774,7 @@ public class LoginState {
         if (AuthUtils.isClientDetectionEnabled() && cookieDetect) {
             cookieSet = true;
         }
-        setGoToOnFailURL();
+        setDecodedGoToOnFailURL();
         amIdRepo = LazyConfig.AUTHD.getAMIdentityRepository(getOrgDN());
         populateOrgProfile();
         populateGlobalProfile();
@@ -3178,15 +3178,10 @@ public class LoginState {
     /**
      * Sets gotoOnFail URL.
      */
-    void setGoToOnFailURL() {
+    void setDecodedGoToOnFailURL() {
         String arg = (String) requestHash.get("gotoOnFail");
         if (arg != null && arg.length() != 0) {
-            String encoded = servletRequest.getParameter("encoded");
-            if (encoded != null && encoded.equals("true")) {
-                gotoOnFailURL = Base64.decodeAsUTF8String(arg);
-            } else {
-                gotoOnFailURL = arg;
-            }
+            gotoOnFailURL = arg;
         }
     }
 
