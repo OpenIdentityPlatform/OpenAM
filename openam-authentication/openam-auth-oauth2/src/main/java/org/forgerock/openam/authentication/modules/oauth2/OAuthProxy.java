@@ -29,6 +29,9 @@ package org.forgerock.openam.authentication.modules.oauth2;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
+import java.util.Set;
+import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.shared.encode.CookieUtils;
 import org.owasp.esapi.ESAPI;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
@@ -115,6 +118,12 @@ public class OAuthProxy  {
 
         OAuthUtil.debugMessage("OAuthProxy.toPostForm: form html:\n" + html);
 
+        OAuthUtil.debugMessage("OAuthProxy.toPostForm: removing cookie " + COOKIE_ORIG_URL);
+
+        Set<String> cookieDomains = AuthClientUtils.getCookieDomains();
+        for (String cookieDomain : cookieDomains) {
+            CookieUtils.addCookieToResponse(res, CookieUtils.newCookie(COOKIE_ORIG_URL, "", 0, "/", cookieDomain));
+        }
         return html.toString();
     }
    
