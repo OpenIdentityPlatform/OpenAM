@@ -169,14 +169,18 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
             validateConfig();
 
             var themeName = findMatchingTheme(Configuration.globalData.realm, getAuthenticationChainName()),
-                defaultTheme = ThemeConfiguration.themes[defaultThemeName],
                 isSameTheme = Configuration.globalData.themeName && themeName === Configuration.globalData.themeName,
-                isAdminUser = Configuration.loggedUser && _.contains(Configuration.loggedUser.get("roles"), "ui-admin"),
-                theme, stylesheets;
+                defaultTheme,
+                isAdminUser,
+                theme, 
+                stylesheets;
 
             if (!force && isSameTheme) {
                 return $.Deferred().resolve(Configuration.globalData.theme);
             }
+
+            defaultTheme = ThemeConfiguration.themes[defaultThemeName];
+            isAdminUser = Configuration.loggedUser && _.contains(Configuration.loggedUser.get("roles"), "ui-admin");
 
             theme = ThemeConfiguration.themes[themeName];
             theme = extendTheme(theme, defaultTheme);

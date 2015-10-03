@@ -386,7 +386,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         };
 
         function renderPartial (name, context) {
-            return Handlebars.partials["login/_" + name](_.merge(renderContext, context));
+            return _.find(Handlebars.partials, function (code, templateName) {
+                return templateName.indexOf("login/_" + name) !== -1;
+            })(_.merge(renderContext, context));
         }
 
         switch (this.type) {

@@ -46,25 +46,28 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             this.data.subjects = _.sortBy(this.data.subjects, "i18nKey");
 
-            this.$el.append(UIUtils.fillTemplateWithData(this.template, this.data));
-            this.setElement("#subject_" + itemID);
+            UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
+                self.$el.append(tpl);
 
-            if (itemData) {
-                delete itemData.name; // Temporary fix: The name attribute is being added by the server after the policy is created.
+                self.setElement("#subject_" + itemID);
 
-                if (itemData.type === self.IDENTITY_RESOURCE) { // client side fix for 'Identity'
-                    this.$el.data("hiddenData", self.getUIDsFromUniversalValues(itemData.subjectValues));
+                if (itemData) {
+                    delete itemData.name; // Temporary fix: The name attribute is being added by the server after the policy is created.
+
+                    if (itemData.type === self.IDENTITY_RESOURCE) { // client side fix for 'Identity'
+                        self.$el.data("hiddenData", self.getUIDsFromUniversalValues(itemData.subjectValues));
+                    }
+
+                    self.$el.data("itemData", itemData);
+                    self.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
                 }
 
-                this.$el.data("itemData", itemData);
-                this.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
-            }
+                self.$el.find("select.type-selection:first").focus();
 
-            this.$el.find("select.type-selection:first").focus();
-
-            if (callback) {
-                callback();
-            }
+                if (callback) {
+                    callback();
+                }
+            });
         },
 
         createListItem: function (allSubjects, item) {

@@ -58,32 +58,33 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             this.data.conditions = _.sortBy(this.data.conditions, "i18nKey");
 
-            this.$el.append(UIUtils.fillTemplateWithData(this.template, this.data));
+            UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
+                self.$el.append(tpl);
+                self.setElement("#environment_" + itemID);
 
-            this.setElement("#environment_" + itemID);
+                if (itemData) {
+                    // Temporary fix, the name attribute is being added by the server after the policy is created.
+                    // TODO: Serverside solution required
+                    delete itemData.name;
 
-            if (itemData) {
-                // Temporary fix, the name attribute is being added by the server after the policy is created.
-                // TODO: Serverside solution required
-                delete itemData.name;
+                    // Script name is displayed on UI, but script id is saved along with the condition
+                    if (itemData.type === self.SCRIPT_RESOURCE) {
+                        hiddenData[itemData.type] = itemData.scriptId;
+                        self.$el.data("hiddenData", hiddenData);
+                    }
 
-                // Script name is displayed on UI, but script id is saved along with the condition
-                if (itemData.type === self.SCRIPT_RESOURCE) {
-                    hiddenData[itemData.type] = itemData.scriptId;
-                    this.$el.data("hiddenData", hiddenData);
+                    self.$el.data("itemData", itemData);
+                    self.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
                 }
 
-                this.$el.data("itemData", itemData);
-                this.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
-            }
+                self.$el.find("select.type-selection:first").focus();
 
-            this.$el.find("select.type-selection:first").focus();
+                self.$el.find(".info-button").hide();
 
-            this.$el.find(".info-button").hide();
-
-            if (callback) {
-                callback();
-            }
+                if (callback) {
+                    callback();
+                }
+            });
         },
 
         createListItem: function (allEnvironments, item) {

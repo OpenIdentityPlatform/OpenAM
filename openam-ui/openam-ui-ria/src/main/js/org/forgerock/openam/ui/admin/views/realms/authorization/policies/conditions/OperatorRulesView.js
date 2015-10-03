@@ -49,21 +49,24 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
 
             this.setElement(element);
-            this.$el.append(UIUtils.fillTemplateWithData(this.template, this.data));
 
-            this.setElement("#operator" + itemID);
-            this.select = this.$el.find("select");
-            this.delegateEvents();
+            UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
+                self.$el.append(tpl);
 
-            this.select.focus().trigger("change");
-            this.$el.data("logical", true);
-            this.dropbox = this.$el.find(".dropbox");
+                self.setElement("#operator" + itemID);
+                self.select = self.$el.find("select");
+                self.delegateEvents();
 
-            this.$el.find('.fa[data-toggle="popover"]').popover();
+                self.select.focus().trigger("change");
+                self.$el.data("logical", true);
+                self.dropbox = self.$el.find(".dropbox");
 
-            if (callback) {
-                callback();
-            }
+                self.$el.find('.fa[data-toggle="popover"]').popover();
+
+                if (callback) {
+                    callback();
+                }
+            });
         },
 
         setValue: function (value) {
