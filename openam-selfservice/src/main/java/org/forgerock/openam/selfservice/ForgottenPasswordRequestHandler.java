@@ -28,6 +28,7 @@ import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.config.StageConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
+import org.forgerock.selfservice.stages.email.EmailAccountConfig;
 import org.forgerock.selfservice.stages.email.VerifyUserIdConfig;
 import org.forgerock.selfservice.stages.reset.ResetStageConfig;
 import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandlerConfig;
@@ -52,7 +53,6 @@ final class ForgottenPasswordRequestHandler extends AbstractCussRequestHandler {
             BaseURLProviderFactory baseURLProviderFactory) {
         super(stageFactory, tokenHandlerFactory, localStore);
         this.baseURLProviderFactory = baseURLProviderFactory;
-
     }
 
     @Override
@@ -69,7 +69,7 @@ final class ForgottenPasswordRequestHandler extends AbstractCussRequestHandler {
 
         serverUrl.append("#passwordReset/&realm=").append(realm);
 
-        StageConfig verifyUserIdConfig = new VerifyUserIdConfig()
+        StageConfig verifyUserIdConfig = new VerifyUserIdConfig(new EmailAccountConfig())
                 .setQueryFields(new HashSet<>(Arrays.asList("uid", "mail")))
                 .setIdentityIdField("/uid/0")
                 .setIdentityEmailField("/mail/0")
@@ -87,9 +87,14 @@ final class ForgottenPasswordRequestHandler extends AbstractCussRequestHandler {
                 .setIdentityPasswordField("userPassword");
 
         String secret = SystemProperties.get(Constants.ENC_PWD_PROPERTY);
-        JwtTokenHandlerConfig jwtTokenConfig = new JwtTokenHandlerConfig(
-                secret, "RSA", 1024, JweAlgorithm.RSAES_PKCS1_V1_5,
-                EncryptionMethod.A128CBC_HS256, JwsAlgorithm.HS256, 3L * 60L);
+        JwtTokenHandlerConfig jwtTokenConfig = new JwtTokenHandlerConfig();
+        jwtTokenConfig.setSharedKey(secret);
+        jwtTokenConfig.setKeyPairAlgorithm("RSA");
+        jwtTokenConfig.setKeyPairSize(1024);
+        jwtTokenConfig.setJweAlgorithm(JweAlgorithm.RSAES_PKCS1_V1_5);
+        jwtTokenConfig.setEncryptionMethod(EncryptionMethod.A128CBC_HS256);
+        jwtTokenConfig.setJwsAlgorithm(JwsAlgorithm.HS256);
+        jwtTokenConfig.setTokenLifeTimeInSeconds(3L * 60L);
 
         return new ProcessInstanceConfig()
                 .setStageConfigs(Arrays.asList(verifyUserIdConfig, resetConfig))

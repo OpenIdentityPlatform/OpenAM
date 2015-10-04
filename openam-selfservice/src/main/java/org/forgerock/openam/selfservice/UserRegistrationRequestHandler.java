@@ -28,6 +28,7 @@ import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.config.StageConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
+import org.forgerock.selfservice.stages.email.EmailAccountConfig;
 import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
 import org.forgerock.selfservice.stages.registration.UserRegistrationConfig;
 import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandlerConfig;
@@ -69,7 +70,7 @@ public final class UserRegistrationRequestHandler extends AbstractCussRequestHan
 
         serverUrl.append("#register/&realm=").append(realm);
 
-        StageConfig emailConfig = new VerifyEmailAccountConfig()
+        StageConfig emailConfig = new VerifyEmailAccountConfig(new EmailAccountConfig())
                 .setEmailServiceUrl("/email")
                 .setEmailFrom("info@admin.org")
                 .setEmailSubject("Register new account")
@@ -85,9 +86,14 @@ public final class UserRegistrationRequestHandler extends AbstractCussRequestHan
                 .setIdentityServiceUrl("/users");
 
         String secret = SystemProperties.get(Constants.ENC_PWD_PROPERTY);
-        JwtTokenHandlerConfig jwtTokenConfig = new JwtTokenHandlerConfig(
-                secret, "RSA", 1024, JweAlgorithm.RSAES_PKCS1_V1_5,
-                EncryptionMethod.A128CBC_HS256, JwsAlgorithm.HS256, 3L * 60L);
+        JwtTokenHandlerConfig jwtTokenConfig = new JwtTokenHandlerConfig();
+        jwtTokenConfig.setSharedKey(secret);
+        jwtTokenConfig.setKeyPairAlgorithm("RSA");
+        jwtTokenConfig.setKeyPairSize(1024);
+        jwtTokenConfig.setJweAlgorithm(JweAlgorithm.RSAES_PKCS1_V1_5);
+        jwtTokenConfig.setEncryptionMethod(EncryptionMethod.A128CBC_HS256);
+        jwtTokenConfig.setJwsAlgorithm(JwsAlgorithm.HS256);
+        jwtTokenConfig.setTokenLifeTimeInSeconds(3L * 60L);
 
         return new ProcessInstanceConfig()
                 .setStageConfigs(Arrays.asList(emailConfig, userDetailsConfig, registrationConfig))
