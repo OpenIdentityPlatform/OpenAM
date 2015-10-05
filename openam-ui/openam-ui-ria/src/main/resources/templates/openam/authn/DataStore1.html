@@ -16,7 +16,7 @@
 
                 {{#if ../../showForgotPassword}}
                 <div class="pull-right">
-                    <a href="#forgotPassword" id="forgotPassword">{{t "common.user.forgotPassword" }}</a>
+                    <a href="#passwordReset/" id="passwordReset">{{t "common.user.forgotPassword" }}</a>
                 </div>
                 {{/if}}
 
@@ -33,7 +33,7 @@
 
             {{#if isSubmit}}
             <div class="text-center">
-                {{#if ../../showRegister}}{{t "templates.login.notMember" }} <a href="#register" id="register">{{t "templates.login.joinNow" }}</a>{{/if}}
+                {{#if ../../showRegister}}{{t "templates.login.newHere" }} <a href="#register/" id="register">{{t "templates.login.createAccount" }}</a>{{/if}}
             </div>
             {{/if}}
 

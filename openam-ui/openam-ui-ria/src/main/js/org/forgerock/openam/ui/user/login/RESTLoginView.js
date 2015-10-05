@@ -30,13 +30,14 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/util/ModuleLoader",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/URIUtils"
 ], function ($, _, AbstractView, AuthNDelegate, Configuration, Constants, CookieHelper, EventManager, Form2js,
-             Handlebars, i18nManager, Messages, ModuleLoader, RESTLoginHelper, Router, SessionManager, UIUtils,
-             URIUtils) {
+             Handlebars, i18nManager, Messages, ModuleLoader, RESTLoginHelper, RealmHelper, Router, SessionManager,
+             UIUtils, URIUtils) {
 
     var LoginView = AbstractView.extend({
 
@@ -48,30 +49,27 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         data: {},
         events: {
             "click input[type=submit]": "formSubmit",
-            "click #forgotPassword": "selfServiceClick",
+            "click #passwordReset": "selfServiceClick",
             "click #register": "selfServiceClick"
         },
+
         selfServiceClick: function (e) {
             e.preventDefault();
-            /**
-             *  Save the login params in a cookie for use with the cancel button on forgotPassword/register page
-             *  and also the "proceed to login" link once password has been successfully changed or registration
-             *  is complete.
-             */
-            var expire = new Date(),
-                cookieVal = "/" + Configuration.globalData.auth.subRealm,
-                href = e.target.href + "/";
 
-            if (Configuration.globalData.auth.urlParams) {
-                cookieVal += RESTLoginHelper.filterUrlParams(Configuration.globalData.auth.urlParams);
+            var overrideRealmParameter = RealmHelper.getOverrideRealm(),
+                realmPath;
+
+            if (overrideRealmParameter) {
+                realmPath = overrideRealmParameter.substring(0, 1) === "/" ?
+                    overrideRealmParameter.slice(1) :
+                    overrideRealmParameter;
+            } else {
+                realmPath = RealmHelper.getSubRealm();
             }
-            expire.setDate(expire.getDate() + 1);
-            CookieHelper.setCookie("loginUrlParams",cookieVal,expire);
-            if (Configuration.globalData.auth.subRealm) {
-                href += Configuration.globalData.auth.subRealm;
-            }
-            location.href = href;
+
+            location.href = e.target.href + realmPath;
         },
+
         autoLogin: function () {
             var index,
                 submitContent = {},
@@ -86,6 +84,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             auth.autoLoginAttempts = 1;
             EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, submitContent);
         },
+
         isZeroPageLoginAllowed: function () {
             var referer = document.referrer,
                 whitelist = Configuration.globalData.zeroPageLogin.refererWhitelist;
@@ -100,6 +99,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             return !whitelist || !whitelist.length || whitelist.indexOf(referer) > -1;
         },
+
         formSubmit: function (e) {
             var submitContent, expire;
             e.preventDefault();
@@ -123,6 +123,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, submitContent);
         },
+
         render: function (args, callback) {
             var urlParams = {}, // Deserialized querystring params
                 promise = $.Deferred(),
@@ -222,6 +223,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 }
             });
         },
+
         renderForm: function (reqs, urlParams) {
             var cleaned = _.clone(reqs),
                 implicitConfirmation = true,
@@ -344,6 +346,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     + ":not([type='submit']):not([type='button']):first").focus();
             }
         },
+
         handleUrlParams: function () {
             var urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
 

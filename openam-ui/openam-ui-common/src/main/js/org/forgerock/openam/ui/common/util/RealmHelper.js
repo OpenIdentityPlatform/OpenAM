@@ -100,7 +100,8 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
     obj.getSubRealm = function () {
         var subRealmSplit = URIUtils.getCurrentFragment().split("/"),
             page = subRealmSplit.shift().split("&")[0],
-            subRealmSpecifiablePages = ["login", "forgotPassword", "register"],
+            subRealmSpecifiablePages =
+                [ "login", "passwordReset", "continuePasswordReset", "register", "continueRegister" ],
             subRealm;
 
         if (page && _.include(subRealmSpecifiablePages, page)) {

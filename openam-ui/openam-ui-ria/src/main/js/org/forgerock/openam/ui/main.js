@@ -21,7 +21,6 @@ define("org/forgerock/openam/ui/main", [
     "./common/delegates/SiteConfigurationDelegate",
     "./user/login/RESTLoginHelper",
     "./user/delegates/AuthNDelegate",
-    "./user/delegates/UserDelegate",
     "./user/delegates/SessionDelegate",
     "./user/login/RESTLoginView"
 ]);

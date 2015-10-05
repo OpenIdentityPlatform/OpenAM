@@ -18,15 +18,15 @@
 require.config({
     map: {
         "*" : {
-            "Footer"                  : "org/forgerock/openam/ui/common/components/Footer",
-            "ThemeManager"            : "org/forgerock/openam/ui/common/util/ThemeManager",
-            "UserDelegate"            : "org/forgerock/openam/ui/user/delegates/UserDelegate",
-            "LoginView"               : "org/forgerock/openam/ui/user/login/RESTLoginView",
-            "UserProfileView"         : "org/forgerock/commons/ui/user/profile/UserProfileView",
-            "LoginDialog"             : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
-            "RegisterView"            : "org/forgerock/openam/ui/user/profile/RegisterView",
+            "Footer"           : "org/forgerock/openam/ui/common/components/Footer",
+            "ThemeManager"     : "org/forgerock/openam/ui/common/util/ThemeManager",
+            "LoginView"        : "org/forgerock/openam/ui/user/login/RESTLoginView",
+            "PasswordResetView": "org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView",
+            "UserProfileView"  : "org/forgerock/commons/ui/user/profile/UserProfileView",
+            "LoginDialog"      : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
+            "RegisterView"     : "org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView",
             // TODO: Remove this when there are no longer any references to the "underscore" dependency
-            "underscore"                : "lodash"
+            "underscore"       : "lodash"
         }
     },
     paths: {

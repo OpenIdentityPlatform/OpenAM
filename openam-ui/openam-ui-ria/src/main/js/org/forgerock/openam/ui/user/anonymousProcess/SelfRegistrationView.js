@@ -11,19 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
+/*global define */
 
-define("org/forgerock/openam/ui/user/main", [
-    "./profile/ChangeSecurityDataDialog",
-    "./delegates/TokenDelegate",
-    "./delegates/SessionDelegate",
-    "./delegates/AuthNDelegate",
-    "./login/RESTLoginHelper",
-    "./login/RESTLoginView",
-    "./login/RESTConfirmLoginView",
-    "./login/RESTLoginDialog",
-    "./logout/RESTLogoutView"
-]);
+define("org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView", [
+    "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView"
+], function (AnonymousProcessView) {
+    var SelfRegistrationView = AnonymousProcessView.extend({
+        endpoint: "userRegistration",
+        i18nBase: "common.user.selfRegistration"
+    });
+
+    return new SelfRegistrationView();
+});

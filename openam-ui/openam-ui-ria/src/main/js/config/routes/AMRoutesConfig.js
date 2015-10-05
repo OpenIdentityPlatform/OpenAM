@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -11,30 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2015 ForgeRock AS.
  */
 
 /*global define*/
 define('config/routes/AMRoutesConfig', [], function () {
     return {
-        "forgotPassword": {
-            view: "org/forgerock/openam/ui/user/profile/ForgotPasswordView",
-            url: /forgotPassword(\/[^\&]*)(\&.+)?/,
-            pattern: "forgotPassword??",
-            forceUpdate: true,
-            defaults: ["/", ""],
-            argumentNames: ["realm", "additionalParameters"]
-        },
-        "forgotPasswordChange": {
-            view: "org/forgerock/openam/ui/user/profile/ForgotPasswordView",
-            url: /forgotPasswordChange(\/[^\&]*)(\&.+)?/,
-            pattern: "forgotPasswordChange??",
+        "continuePasswordReset": {
+            view: "org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView",
+            url: /continuePasswordReset(\/[^\&]*)(\&.+)?/,
+            pattern: "continuePasswordReset??",
             forceUpdate: true,
             defaults: ["/", ""],
             argumentNames: ["realm", "additionalParameters"]
         },
         "continueSelfRegister": {
-            view: "org/forgerock/openam/ui/user/profile/RegisterView",
+            view: "org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView",
             url: /continueRegister(\/[^\&]*)(\&.+)?/,
             pattern: "continueRegister??",
             forceUpdate: true,

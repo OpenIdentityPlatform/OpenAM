@@ -164,15 +164,6 @@
                 "passwordAndSecurityQuestionChange" : "Password and security question change",
                 "enterYourOldPassword" : "Please enter your old password"
             },
-            "ForgottenPasswordTemplate" : {
-                "forgottenPasswordQuestion" : "Forgotten password?",
-                "enterLogin" : "Please enter your username, we will send you an email containing instructions on how to reset your password.",
-                "changeForgottenPassword" : "Change forgotten password",
-                "emailSubject" : "OpenAM: You have requested a password reset",
-                "emailMessage" : "Hello from OpenAM, \n\nYou have requested to have your ForgeRock account's password reset.\n\nIf you want to reset your password then follow the link below.\n\n**Note: If you encounter an error message when you click on this link, please copy the url and paste it into your browser instead.\n\n",
-                "emailSent" : "We have sent you an e-mail, please follow the link in the e-mail to complete your password reset process.",
-                "proceedToLogin" : "proceed to login"
-            },
             "TermsOfUseTemplate" : {
                 "termsOfUse" : "Terms of use",
                 "termsOfUseContent" : "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p>"
@@ -239,8 +230,8 @@
             "tokenInfo": "TokenInfo"
         },
         "login" : {
-            "notMember": "Not a member?",
-            "joinNow": "Join now"
+            "newHere": "New here?",
+            "createAccount": "Create an account"
         }
     },
     "common" : {
@@ -348,6 +339,28 @@
             }
         },
         "user" : {
+            "passwordReset" : {
+                "title": "Reset Your Password",
+                "completed": "Your password has been successfully reset.",
+                "failed": "Unable to reset your password",
+                "tryAgain": "Try Resetting Your Password Again",
+                "return": "Return to Login Page"
+            },
+            "selfRegistration" : {
+                "title": "Register Your Account",
+                "completed": "Your account has been successfully registered.",
+                "failed": "Unable to register your account",
+                "tryAgain": "Try Registering Again",
+                "return": "Return to Login Page"
+            },
+            "emailVerification" : {
+                "description" : "Enter the email address associated with your account to reset your password. We will send you an email that will allow you to reset your password.",
+                "send": "Send"
+            },
+            "userIdValidation" : "Enter the username or email address associated with your account. We will send you an email with a link that will allow you to reset your password.",
+            "emailValidation" : "Enter your email address to proceed. We will send you an email with a link that will allow you to continue registering.",
+            "send": "Send",
+            "validateCode" : "An email has been sent to the address you entered. Click the link in that email to proceed.",
             "user" : "User",
             "login" : "Log in",
             "loginConfirm" : "You have already logged in. Do you want to log out and then login to a different organization?",
@@ -358,9 +371,9 @@
             "username" : "Username",
             "emailAddress" : "Email address",
             "givenName" : "First Name",
-            "familyName" : "Last Name",
+            "sn" : "Last Name",
             "changePassword" : "Change password",
-            "forgotPassword" : "Forgot password",
+            "forgotPassword" : "Forgot password?",
             "accountStatus" : "Account status",
             "active" : "Active",
             "inactive" : "Inactive",
