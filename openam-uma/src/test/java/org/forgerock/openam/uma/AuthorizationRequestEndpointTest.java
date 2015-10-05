@@ -148,7 +148,7 @@ public class AuthorizationRequestEndpointTest {
         permissionTicket = mock(PermissionTicket.class);
         given(permissionTicket.getExpiryTime()).willReturn(System.currentTimeMillis() + 10000);
         given(permissionTicket.getResourceSetId()).willReturn(RS_ID);
-        given(permissionTicket.getClientId()).willReturn(RS_CLIENT_ID);
+        given(permissionTicket.getResourceServerClientId()).willReturn(RS_CLIENT_ID);
         given(permissionTicket.getRealm()).willReturn("REALM");
         given(umaTokenStore.readPermissionTicket(anyString())).willReturn(permissionTicket);
         given(umaTokenStore.createRPT(Matchers.<PermissionTicket>anyObject())).willReturn(rpt);

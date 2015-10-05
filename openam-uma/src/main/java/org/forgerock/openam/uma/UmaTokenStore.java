@@ -22,8 +22,7 @@ import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import com.iplanet.services.comm.share.Request;
-import org.forgerock.oauth2.core.AccessToken;
+
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -57,7 +56,7 @@ public class UmaTokenStore {
     RequestingPartyToken createRPT(PermissionTicket permissionTicket) throws ServerException {
         UmaProviderSettings settings = settingsFactory.get(realm);
         Permission permission = new Permission(permissionTicket.getResourceSetId(), permissionTicket.getScopes());
-        RequestingPartyToken rpt = new RequestingPartyToken(null, permissionTicket.getClientId(), asSet(permission),
+        RequestingPartyToken rpt = new RequestingPartyToken(null, permissionTicket.getResourceServerClientId(), asSet(permission),
                 System.currentTimeMillis() + (settings.getRPTLifetime() * 1000));
         rpt.setRealm(realm);
         try {
@@ -126,4 +125,12 @@ public class UmaTokenStore {
         }
     }
 
+    public void updatePermissionTicket(PermissionTicket permissionTicket) throws ServerException {
+        try {
+            cts.update(permissionTicketAdapter.toToken(permissionTicket));
+        } catch (CoreTokenException e) {
+            logger.warn("Could not update token: {}", permissionTicket, e);
+            throw new ServerException("Could not update token: " + permissionTicket.getId());
+        }
+    }
 }

@@ -38,6 +38,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
@@ -108,32 +109,34 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     public Representation requestAuthorization(JsonRepresentation entity) throws BadRequestException, UmaException,
             EntitlementException, ServerException, NotFoundException {
         UmaProviderSettings umaProviderSettings = umaProviderSettingsFactory.get(this.getRequest());
-        JsonValue requestBody = json(toMap(entity));
-        PermissionTicket permissionTicket = getPermissionTicket(umaProviderSettings.getUmaTokenStore(), requestBody);
+        final OAuth2Request oauth2Request = requestFactory.create(getRequest());
+        OAuth2ProviderSettings oauth2ProviderSettings = oauth2ProviderSettingsFactory.get(oauth2Request);
+        final UmaTokenStore umaTokenStore = umaProviderSettings.getUmaTokenStore();
 
-        if (hasExpired(permissionTicket)) {
-            throw new UmaException(400, UmaConstants.EXPIRED_TICKET_ERROR_CODE, "The permission ticket has expired");
-        }
+        JsonValue requestBody = json(toMap(entity));
+
+        PermissionTicket permissionTicket = getPermissionTicket(umaTokenStore, requestBody);
+        validatePermissionTicketHolder(umaTokenStore, permissionTicket);
 
         //Remove permission ticket so it cannot be re-used
-        umaProviderSettings.getUmaTokenStore().deletePermissionTicket(permissionTicket.getId());
+        umaTokenStore.deletePermissionTicket(permissionTicket.getId());
 
         final String resourceSetId = permissionTicket.getResourceSetId();
         final Request request = getRequest();
-        final String resourceOwnerId = getResourceOwnerId(resourceSetId);
+        final String resourceOwnerId = getResourceOwnerId(oauth2ProviderSettings, resourceSetId);
 
         String requestingPartyId = null;
         try {
-            requestingPartyId = getRequestingPartyId(umaProviderSettings, requestBody);
+            requestingPartyId = getRequestingPartyId(umaProviderSettings, oauth2ProviderSettings, requestBody);
         } finally {
             auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.REQUEST, request,
                     requestingPartyId == null ? getAuthorisationApiToken().getResourceOwnerId() : requestingPartyId);
         }
 
-        if (isEntitled(umaProviderSettings, permissionTicket, requestingPartyId)) {
+        if (isEntitled(umaProviderSettings, oauth2ProviderSettings, permissionTicket, requestingPartyId)) {
             getResponse().setStatus(new Status(200));
             auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.GRANTED, request, requestingPartyId);
-            return createJsonRpt(umaProviderSettings.getUmaTokenStore(), permissionTicket);
+            return createJsonRpt(umaTokenStore, permissionTicket);
         } else {
             try {
                 if (verifyPendingRequestDoesNotAlreadyExist(resourceSetId, resourceOwnerId, permissionTicket.getRealm(),
@@ -145,7 +148,8 @@ public class AuthorizationRequestEndpoint extends ServerResource {
                     pendingRequestsService.createPendingRequest(ServletUtils.getRequest(getRequest()), resourceSetId,
                             auditLogger.getResourceName(resourceSetId, request), resourceOwnerId, requestingPartyId,
                             permissionTicket.getRealm(), permissionTicket.getScopes());
-                    auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.REQUEST_SUBMITTED, request, requestingPartyId);
+                    auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.REQUEST_SUBMITTED, request,
+                            requestingPartyId);
                 }
             } catch (org.forgerock.openam.sm.datalayer.store.ServerException e) {
                 logger.error("Failed to create pending request", e);
@@ -155,12 +159,28 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         }
     }
 
+    private void validatePermissionTicketHolder(UmaTokenStore umaTokenStore, PermissionTicket permissionTicket)
+            throws ServerException, UmaException {
+        String requestingClientId = getAuthorisationApiToken().getClientId();
+        final String ticketClientClientId = permissionTicket.getClientClientId();
+
+        if (hasExpired(permissionTicket)) {
+            throw new UmaException(400, UmaConstants.EXPIRED_TICKET_ERROR_CODE, "The permission ticket has expired");
+        }
+
+        if (ticketClientClientId == null) {
+            permissionTicket.setClientClientId(requestingClientId);
+            umaTokenStore.updatePermissionTicket(permissionTicket);
+        }
+    }
+
     @Override
     protected void doCatch(Throwable throwable) {
         exceptionHandler.handleException(getResponse(), throwable);
     }
 
-    private String getRequestingPartyId(UmaProviderSettings umaProviderSettings, JsonValue requestBody)
+    private String getRequestingPartyId(UmaProviderSettings umaProviderSettings,
+            OAuth2ProviderSettings oauth2ProviderSettings, JsonValue requestBody)
             throws ServerException, NotFoundException, UmaException {
         if (requestBody.isDefined("claim_tokens")) {
             for (JsonValue claimToken : requestBody.get("claim_tokens")) {
@@ -178,16 +198,17 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         }
         // Cannot rely on AAT for requesting party if trust elevation is required
         if (umaProviderSettings.isTrustElevationRequired()) {
-            throw newNeedInfoException();
+            throw newNeedInfoException(oauth2ProviderSettings);
         }
         // Default to using AAT
         return getAuthorisationApiToken().getResourceOwnerId();
     }
 
-    private UmaException newNeedInfoException() throws NotFoundException, ServerException {
+    private UmaException newNeedInfoException(OAuth2ProviderSettings providerSettings)
+            throws NotFoundException, ServerException {
         List<Object> requiredClaims = new ArrayList<>();
         for (ClaimGatherer claimGatherer : claimGatherers.values()) {
-            requiredClaims.add(claimGatherer.getRequiredClaimsDetails(getIssuer()).getObject());
+            requiredClaims.add(claimGatherer.getRequiredClaimsDetails(providerSettings.getIssuer()).getObject());
         }
         JsonValue requestingPartyClaims = json(object(
                 field("requesting_party_claims", requiredClaims)));
@@ -218,30 +239,25 @@ public class AuthorizationRequestEndpoint extends ServerResource {
                         + "been submitted to the resource owner requesting access to the resource");
     }
 
-    private String getResourceOwnerId(String resourceSetId) throws NotFoundException, UmaException {
-        OAuth2ProviderSettings providerSettings = oauth2ProviderSettingsFactory.get(requestFactory.create(getRequest()));
+    private String getResourceOwnerId(OAuth2ProviderSettings providerSettings, String resourceSetId)
+            throws NotFoundException, UmaException {
         ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, providerSettings);
         return resourceSetDescription.getResourceOwnerId();
-    }
-
-    private String getIssuer() throws NotFoundException, ServerException {
-        OAuth2ProviderSettings providerSettings = oauth2ProviderSettingsFactory.get(requestFactory.create(getRequest()));
-        return providerSettings.getIssuer();
     }
 
     private boolean hasExpired(PermissionTicket permissionTicket) {
         return permissionTicket.getExpiryTime() < System.currentTimeMillis();
     }
 
-    private boolean isEntitled(UmaProviderSettings umaProviderSettings, PermissionTicket permissionTicket,
-            String requestingPartyId) throws EntitlementException, ServerException, UmaException {
+    private boolean isEntitled(UmaProviderSettings umaProviderSettings, OAuth2ProviderSettings oauth2ProviderSettings,
+            PermissionTicket permissionTicket, String requestingPartyId)
+            throws EntitlementException, ServerException, UmaException {
         String realm = permissionTicket.getRealm();
         String resourceSetId = permissionTicket.getResourceSetId();
         String resourceName = UmaConstants.UMA_POLICY_SCHEME;
         Subject resourceOwnerSubject;
         try {
-            ResourceSetStore store = oauth2ProviderSettingsFactory.get(requestFactory.create(getRequest()))
-                    .getResourceSetStore();
+            ResourceSetStore store = oauth2ProviderSettings.getResourceSetStore();
             Set<ResourceSetDescription> results = store.query(
                     QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
             if (results.size() != 1) {
@@ -263,7 +279,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             return true;
         }
         List<Entitlement> entitlements = umaProviderSettings.getPolicyEvaluator(requestingPartySubject,
-                permissionTicket.getClientId().toLowerCase())
+                permissionTicket.getResourceServerClientId().toLowerCase())
                 .evaluate(realm, requestingPartySubject, resourceName, null, false);
 
         Set<String> requestedScopes = permissionTicket.getScopes();

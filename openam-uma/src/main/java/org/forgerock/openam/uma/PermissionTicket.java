@@ -16,13 +16,15 @@
 
 package org.forgerock.openam.uma;
 
-import java.util.Calendar;
+import static org.forgerock.json.JsonValue.*;
+
 import java.util.Set;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
+import org.forgerock.openam.tokens.JsonValueToJsonBytesConverter;
 import org.forgerock.openam.tokens.LongToCalendarConverter;
-import org.forgerock.openam.tokens.SetToJsonBytesConverter;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.Type;
 
@@ -33,14 +35,17 @@ import org.forgerock.openam.tokens.Type;
  */
 @Type(TokenType.PERMISSION_TICKET)
 public class PermissionTicket implements UmaToken {
-    @Field(field = CoreTokenField.BLOB, converter = SetToJsonBytesConverter.class)
-    private Set<String> scopes;
+    private static final String SCOPES = "scopes";
+    private static final String CLIENT_CLIENT_ID = "clientClientId";
+
+    @Field(field = CoreTokenField.BLOB, converter = JsonValueToJsonBytesConverter.class)
+    private JsonValue blob = json(object());
     @Field(field = CoreTokenField.STRING_ONE)
     private String realm;
     @Field(field = CoreTokenField.STRING_TWO)
     private String resourceSetId;
     @Field(field = CoreTokenField.STRING_THREE)
-    private String clientId;
+    private String resourceServerClientId;
     @Field(field = CoreTokenField.TOKEN_ID, generated = true)
     private String id;
     @Field(field = CoreTokenField.EXPIRY_DATE, converter = LongToCalendarConverter.class)
@@ -49,11 +54,11 @@ public class PermissionTicket implements UmaToken {
     public PermissionTicket() {
     }
 
-    public PermissionTicket(String id, String resourceSetId, Set<String> scopes, String clientId) {
+    public PermissionTicket(String id, String resourceSetId, Set<String> scopes, String resourceServerClientId) {
         this.id = id;
         this.resourceSetId = resourceSetId;
-        this.scopes = scopes;
-        this.clientId = clientId;
+        this.resourceServerClientId = resourceServerClientId;
+        blob.put(SCOPES, scopes);
     }
 
     public String getId() {
@@ -89,18 +94,28 @@ public class PermissionTicket implements UmaToken {
     }
 
     public Set<String> getScopes() {
-        return scopes;
+        JsonValue scopes = blob.get(SCOPES);
+        return scopes == null ? null : scopes.asSet(String.class);
     }
 
     public void setScopes(Set<String> scopes) {
-        this.scopes = scopes;
+        blob.put(SCOPES, scopes);
     }
 
-    public String getClientId() {
-        return clientId;
+    public String getResourceServerClientId() {
+        return resourceServerClientId;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setResourceServerClientId(String resourceServerClientId) {
+        this.resourceServerClientId = resourceServerClientId;
+    }
+
+    public String getClientClientId() {
+        JsonValue value = blob.get(CLIENT_CLIENT_ID);
+        return value == null ? null : value.asString();
+    }
+
+    public void setClientClientId(String clientClientId) {
+        blob.put(CLIENT_CLIENT_ID, clientClientId);
     }
 }
