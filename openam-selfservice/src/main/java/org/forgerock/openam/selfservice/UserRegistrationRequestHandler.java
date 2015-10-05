@@ -43,7 +43,7 @@ import java.util.Arrays;
  *
  * @since 13.0.0
  */
-public final class UserRegistrationRequestHandler extends AbstractCussRequestHandler {
+public final class UserRegistrationRequestHandler extends AbstractSelfServiceRequestHandler {
 
     private final BaseURLProviderFactory baseURLProviderFactory;
 
@@ -53,7 +53,6 @@ public final class UserRegistrationRequestHandler extends AbstractCussRequestHan
             BaseURLProviderFactory baseURLProviderFactory) {
         super(stageFactory, tokenHandlerFactory, localStore);
         this.baseURLProviderFactory = baseURLProviderFactory;
-
     }
 
     @Override
@@ -68,7 +67,7 @@ public final class UserRegistrationRequestHandler extends AbstractCussRequestHan
             serverUrl.append('/');
         }
 
-        serverUrl.append("#register/&realm=").append(realm);
+        serverUrl.append("XUI/#register/&realm=").append(realm);
 
         StageConfig emailConfig = new VerifyEmailAccountConfig(new EmailAccountConfig())
                 .setEmailServiceUrl("/email")

@@ -15,12 +15,15 @@
  */
 package org.forgerock.openam.selfservice;
 
+import static org.forgerock.json.resource.Resources.newInternalConnectionFactory;
+
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
+import com.iplanet.sso.SSOToken;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
+import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStageFactory;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
@@ -37,6 +40,7 @@ import org.forgerock.selfservice.stages.user.UserDetailsStage;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.security.PrivilegedAction;
 
 /**
  * Guice module to bind the self service features together.
@@ -62,8 +66,10 @@ public final class SelfServiceGuiceModule extends PrivateModule {
     @Provides
     @Singleton
     @Named("SelfServiceConnectionFactory")
-    ConnectionFactory getConnectionFactory(@Named("InternalCrestRouter") Router router) {
-        return Resources.newInternalConnectionFactory(router);
+    ConnectionFactory getConnectionFactory(@Named("InternalCrestRouter") Router router,
+            PrivilegedAction<SSOToken> ssoTokenPrivilegedAction) {
+        ConnectionFactory internalConnectionFactory = newInternalConnectionFactory(router);
+        return new ElevatedConnectionFactoryWrapper(internalConnectionFactory, ssoTokenPrivilegedAction);
     }
 
     @Provides

@@ -36,11 +36,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Abstract request handler used to setup the CUSS services.
+ * Abstract request handler used to setup the self services.
  *
  * @since 13.0.0
  */
-public abstract class AbstractCussRequestHandler extends AbstractRequestHandler {
+public abstract class AbstractSelfServiceRequestHandler extends AbstractRequestHandler {
 
     private final ProgressStageFactory stageFactory;
     private final SnapshotTokenHandlerFactory tokenHandlerFactory;
@@ -49,7 +49,7 @@ public abstract class AbstractCussRequestHandler extends AbstractRequestHandler 
     private final ConcurrentMap<String, RequestHandler> serviceCache;
 
     @Inject
-    public AbstractCussRequestHandler(ProgressStageFactory stageFactory,
+    public AbstractSelfServiceRequestHandler(ProgressStageFactory stageFactory,
             SnapshotTokenHandlerFactory tokenHandlerFactory, ProcessStore localStore) {
         serviceCache = new ConcurrentHashMap<>();
 

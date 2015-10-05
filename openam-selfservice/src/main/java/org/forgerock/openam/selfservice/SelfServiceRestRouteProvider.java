@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.selfservice;
 
+import static org.forgerock.openam.rest.Routers.ssoToken;
+
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
@@ -31,10 +33,18 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter
                 .route("/forgottenPassword")
+                .authenticateWith(
+                        ssoToken()
+                                .exceptRead()
+                                .exceptActions("submitRequirements"))
                 .toRequestHandler(RoutingMode.STARTS_WITH, ForgottenPasswordRequestHandler.class);
 
         realmRouter
                 .route("/userRegistration")
+                .authenticateWith(
+                        ssoToken()
+                                .exceptRead()
+                                .exceptActions("submitRequirements"))
                 .toRequestHandler(RoutingMode.STARTS_WITH, UserRegistrationRequestHandler.class);
     }
 

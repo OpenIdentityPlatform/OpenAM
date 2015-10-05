@@ -43,7 +43,7 @@ import java.util.HashSet;
  *
  * @since 13.0.0
  */
-final class ForgottenPasswordRequestHandler extends AbstractCussRequestHandler {
+final class ForgottenPasswordRequestHandler extends AbstractSelfServiceRequestHandler {
 
     private final BaseURLProviderFactory baseURLProviderFactory;
 
@@ -67,7 +67,7 @@ final class ForgottenPasswordRequestHandler extends AbstractCussRequestHandler {
             serverUrl.append('/');
         }
 
-        serverUrl.append("#passwordReset/&realm=").append(realm);
+        serverUrl.append("XUI/#passwordReset/&realm=").append(realm);
 
         StageConfig verifyUserIdConfig = new VerifyUserIdConfig(new EmailAccountConfig())
                 .setQueryFields(new HashSet<>(Arrays.asList("uid", "mail")))

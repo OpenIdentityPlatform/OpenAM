@@ -43,6 +43,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import com.iplanet.sso.SSOToken;
@@ -86,6 +87,8 @@ import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -95,6 +98,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.PrivilegedAction;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -117,8 +121,13 @@ public class RestRouterIT extends GuiceTestCase {
     private CoreWrapper coreWrapper;
     private RestRealmValidator realmValidator;
 
+    @Mock
+    private PrivilegedAction<SSOToken> ssoTokenAction;
+
     @BeforeMethod
     public void setupMocks() {
+        MockitoAnnotations.initMocks(this);
+
         configResource = mock(SingletonResourceProvider.class);
         usersResource = mock(CollectionResourceProvider.class);
         internalResource = mock(CollectionResourceProvider.class);
@@ -139,7 +148,6 @@ public class RestRouterIT extends GuiceTestCase {
 
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
-
 
         coreWrapper = mock(CoreWrapper.class);
         SSOToken adminToken = mock(SSOToken.class);
@@ -183,6 +191,8 @@ public class RestRouterIT extends GuiceTestCase {
 
         binder.bind(CoreWrapper.class).toInstance(coreWrapper);
         binder.bind(RestRealmValidator.class).toInstance(realmValidator);
+
+        binder.bind(new TypeLiteral<PrivilegedAction<SSOToken>>() {}).toInstance(ssoTokenAction);
     }
 
     @Override
