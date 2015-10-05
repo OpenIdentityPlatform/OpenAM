@@ -149,6 +149,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
         // TODO: This code should be shared with the RESTLoginView and friends.
         getAuthenticationChainName = function () {
             var urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
+
             if (urlParams.service) {
                 return urlParams.service;
             }
@@ -172,7 +173,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                 isSameTheme = Configuration.globalData.themeName && themeName === Configuration.globalData.themeName,
                 defaultTheme,
                 isAdminUser,
-                theme, 
+                theme,
                 stylesheets;
 
             if (!force && isSameTheme) {

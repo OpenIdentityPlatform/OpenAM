@@ -56,17 +56,16 @@ define("org/forgerock/openam/ui/common/util/ThemeManagerTest", [
                     mock$.appendTo = sinon.spy();
                     mock$.Deferred = _.bind($.Deferred, $);
 
-                    Router = {
-                        convertCurrentUrlToJSON: sinon.stub().returns({
-                            params: urlParams
-                        })
+                    URIUtils = {
+                        getCurrentCompositeQueryString: sinon.stub().returns(""),
+                        parseQueryString: sinon.stub().returns(urlParams)
                     };
 
                     QUnit.stop();
                     injector
                         .mock("jquery", mock$)
                         .mock("config/ThemeConfiguration", themeConfig)
-                        .mock("org/forgerock/commons/ui/common/main/Router", Router)
+                        .mock("org/forgerock/commons/ui/common/util/URIUtils", URIUtils)
                         .store("org/forgerock/commons/ui/common/main/Configuration")
                         .require(["org/forgerock/openam/ui/common/util/ThemeManager", "mocks"], function (d, mocks) {
                             ThemeManager = d;
