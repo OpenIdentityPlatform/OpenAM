@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.oauth2;
 
+import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
@@ -37,14 +38,23 @@ import org.forgerock.util.Reject;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+
+
 /**
  * A factory for creating/retrieving OpenAMOAuth2ProviderSettings instances.
  *
  * @since 12.0.0
  */
 @Singleton
-public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettingsFactory {
+public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettingsFactory, ServiceListener {
 
+    private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final Map<String, OAuth2ProviderSettings> providerSettingsMap = new HashMap<String, OAuth2ProviderSettings>();
     private final RealmNormaliser realmNormaliser;
     private final CookieExtractor cookieExtractor;
@@ -65,6 +75,23 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
         this.cookieExtractor = cookieExtractor;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
         this.baseURLProviderFactory = baseURLProviderFactory;
+        addServiceListener();
+    }
+
+    private void addServiceListener() {
+        try {
+            final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            final ServiceConfigManager serviceConfigManager = new ServiceConfigManager(token,
+                    OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            if (serviceConfigManager.addListener(this) == null) {
+                logger.error("Could not add listener to ServiceConfigManager instance. OAuth2 provider service " +
+                        "removals will not be dynamically updated");
+            }
+        } catch (Exception e) {
+            String message = "OAuth2Utils::Unable to construct ServiceConfigManager: " + e;
+            logger.error(message, e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     /**
@@ -124,6 +151,26 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
                 }
             }
             return providerSettings;
+        }
+    }
+
+    @Override
+    public void schemaChanged(String serviceName, String version) {
+
+    }
+
+    @Override
+    public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent, int type) {
+
+    }
+
+    @Override
+    public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
+            String serviceComponent, int type) {
+        if (type == ServiceListener.REMOVED) {
+            final String realm = DNMapper.orgNameToRealmName(orgName);
+            logger.message("Removing OAuth2 provider for realm {}", realm);
+            providerSettingsMap.remove(realm);
         }
     }
 }

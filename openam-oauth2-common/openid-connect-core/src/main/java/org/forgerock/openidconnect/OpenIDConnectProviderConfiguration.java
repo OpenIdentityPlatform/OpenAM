@@ -19,6 +19,7 @@ package org.forgerock.openidconnect;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -64,7 +65,12 @@ public class OpenIDConnectProviderConfiguration {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
-        final Map<String, Object> configuration = new HashMap<String, Object>();
+        if (!providerSettings.exists() || providerSettings.getSupportedScopes() == null ||
+                !providerSettings.getSupportedScopes().contains("openid")) {
+            throw new NotFoundException("Invalid URL");
+        }
+
+        final Map<String, Object> configuration = new HashMap<>();
         configuration.put("version", providerSettings.getOpenIDConnectVersion());
         configuration.put("issuer", providerSettings.getIssuer());
         configuration.put("authorization_endpoint", providerSettings.getAuthorizationEndpoint());
