@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"

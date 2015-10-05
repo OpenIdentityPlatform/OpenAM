@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "bootstrap-dialog"
+    "org/forgerock/commons/ui/common/components/BootstrapDialog"
 ], function($, _, AbstractView, BootstrapDialog) {
 
     var PostProcessView = AbstractView.extend({

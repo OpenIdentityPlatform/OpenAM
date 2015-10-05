@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
 ], function ($, _, AbstractView, BootstrapDialog, Form, SMSGlobalDelegate) {

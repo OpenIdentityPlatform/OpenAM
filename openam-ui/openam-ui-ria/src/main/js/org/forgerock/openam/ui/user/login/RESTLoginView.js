@@ -315,7 +315,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                     self.rebind();
                                 }
                             };
-                        ModuleLoader.load("bootstrap-dialog").then(function (BootstrapDialog) {
+                        ModuleLoader.load("org/forgerock/commons/ui/common/components/BootstrapDialog").then(function (BootstrapDialog) {
                             BootstrapDialog.show(args);
                         });
                         return;

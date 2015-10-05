@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/util/UIUtils",
 
     // jquery dependencies
@@ -150,6 +150,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                 dialog.getModalBody().find('#editLinkOptions').html(tableTemplate);
                             });
                         }
+
                     });
                 });
             });

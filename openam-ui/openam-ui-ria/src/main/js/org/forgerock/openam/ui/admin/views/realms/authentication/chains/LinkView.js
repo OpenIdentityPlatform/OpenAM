@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/CriteriaView",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLinkView",

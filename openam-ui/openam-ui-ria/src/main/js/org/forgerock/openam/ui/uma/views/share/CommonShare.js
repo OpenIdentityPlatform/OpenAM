@@ -29,7 +29,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backgrid",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/uma/views/share/ShareCounter",
@@ -107,7 +107,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 $div = $("<div></div>"),
                 data = {},
                 options = {
-                    type: BootstrapDialog.TYPE_DEFAULT,
+                    type: BootstrapDialog.TYPE_PRIMARY,
                     title: $.t("uma.share.shareResource"),
                     size: BootstrapDialog.SIZE_WIDE,
                     cssClass: "shareDialog",

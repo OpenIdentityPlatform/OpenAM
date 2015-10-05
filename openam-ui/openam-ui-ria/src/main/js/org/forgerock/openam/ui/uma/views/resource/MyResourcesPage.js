@@ -18,7 +18,7 @@
 define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
     "jquery",
     "underscore",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/uma/views/resource/BasePage",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",

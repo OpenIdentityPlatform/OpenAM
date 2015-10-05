@@ -21,7 +21,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backgrid",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",

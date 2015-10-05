@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, _, AbstractView, BootstrapDialog, DeviceManagementDelegate, UIUtils) {
@@ -56,7 +56,6 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
 
             UIUtils.fillTemplateWithData("templates/openam/dashboard/EditDeviceDialogTemplate.html", device, function(html) {
                 BootstrapDialog.show({
-                    type: BootstrapDialog.TYPE_DEFAULT,
                     title: device.deviceName,
                     message: $(html),
                     cssClass: "device-details",
