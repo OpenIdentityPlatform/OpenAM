@@ -322,7 +322,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
             // Get full deployment URL
             HttpContext header = context.asContext(HttpContext.class);
-            StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(header.getPath());
+            String baseURL = baseURLProviderFactory.get(realm).getURL(header);
 
             // Get the email address provided from registration page
             emailAddress = jVal.get(EMAIL).asString();
@@ -350,8 +350,10 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             // Build Confirmation URL
             String confURL = restSecurity.getSelfRegistrationConfirmationUrl();
             StringBuilder confURLBuilder = new StringBuilder(100);
-            if (isNullOrEmpty(confURL)) {
-                confURLBuilder.append(deploymentURL.append("/json/confirmation/register").toString());
+            if (StringUtils.isEmpty(confURL)) {
+                confURLBuilder.append(baseURL).append("/json/confirmation/register");
+            } else if(confURL.startsWith("/")) {
+                confURLBuilder.append(baseURL).append(confURL);
             } else {
                 confURLBuilder.append(confURL);
             }
@@ -805,7 +807,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 // Build Confirmation URL
                 String confURL = restSecurity.getForgotPasswordConfirmationUrl();
                 StringBuilder confURLBuilder = new StringBuilder(100);
-                if (confURL == null || confURL.isEmpty()) {
+                if (StringUtils.isEmpty(confURL)) {
                     confURLBuilder.append(baseURL).append("/json/confirmation/forgotPassword");
                 } else if(confURL.startsWith("/")) {
                     confURLBuilder.append(baseURL).append(confURL);
