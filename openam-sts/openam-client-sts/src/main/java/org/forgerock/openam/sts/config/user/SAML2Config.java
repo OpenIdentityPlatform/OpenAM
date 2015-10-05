@@ -708,6 +708,7 @@ public class SAML2Config {
         emptyAttributeMap.put(ENCRYPTION_KEY_ALIAS, Collections.<String>emptySet());
         emptyAttributeMap.put(SIGNATURE_KEY_ALIAS, Collections.<String>emptySet());
         emptyAttributeMap.put(SIGNATURE_KEY_PASSWORD, Collections.<String>emptySet());
+        emptyAttributeMap.put(ISSUER_NAME, Collections.<String>emptySet());
         return emptyAttributeMap;
     }
 }
