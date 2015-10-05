@@ -18,6 +18,8 @@ package org.forgerock.openam.audit;
 import static org.forgerock.audit.events.AuditEventBuilder.EVENT_NAME;
 import static org.forgerock.json.resource.Requests.newCreateRequest;
 import static org.forgerock.json.resource.Resources.newInternalConnection;
+import static org.forgerock.openam.audit.AuditConstants.EVENT_REALM;
+import static org.forgerock.openam.utils.StringUtils.isBlank;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
@@ -72,6 +74,15 @@ public class AuditEventPublisher {
      * @throws AuditException if an exception occurs while trying to publish the audit event.
      */
     public void publish(String topic, AuditEvent auditEvent) throws AuditException {
+        String realm = getValue(auditEvent.getValue(), EVENT_REALM, null);
+        if (isBlank(realm)) {
+            publishToDefault(topic, auditEvent);
+        } else {
+            publishForRealm(realm, topic, auditEvent);
+        }
+    }
+
+    private void publishToDefault(String topic, AuditEvent auditEvent) throws AuditException {
         AMAuditService auditService = auditServiceProvider.getDefaultAuditService();
         Connection connection = newInternalConnection(auditService);
         CreateRequest request = newCreateRequest(topic, auditEvent.getValue());
@@ -83,26 +94,7 @@ public class AuditEventPublisher {
         }
     }
 
-    /**
-     * Publishes the provided AuditEvent to the specified topic of the AuditService.
-     * <p/>
-     * If an error occurs that prevents the AuditEvent from being published, then details regarding the error
-     * are recorded in the debug logs. However, the debug logs are not be treated as the fallback destination
-     * for audit information. If we need guaranteed capture of audit information then this needs to be a feature
-     * of the audit service itself. Also, the audit event may contain sensitive information that shouldn't be
-     * stored in debug logs.
-     * <p/>
-     * After recording details of the error, the exception will only be propagated back to the caller if the
-     * 'suppress exceptions' configuration option is set to false.
-     *
-     *
-     * @param realm The realm in which the audit event occurred.
-     * @param topic Coarse-grained categorization of the AuditEvent's type.
-     * @param auditEvent The AuditEvent to publish.
-     *
-     * @throws AuditException if an exception occurs while trying to publish the audit event.
-     */
-    public void publish(String realm, String topic, AuditEvent auditEvent) throws AuditException {
+    private void publishForRealm(String realm, String topic, AuditEvent auditEvent) throws AuditException {
         AMAuditService auditService = auditServiceProvider.getAuditService(realm);
         Connection connection = newInternalConnection(auditService);
         CreateRequest request = newCreateRequest(topic, auditEvent.getValue());
@@ -111,7 +103,7 @@ public class AuditEventPublisher {
             connection.create(new RootContext(), request);
         } catch (ServiceUnavailableException e) {
             debug.message("Audit Service for realm {} is unavailable. Trying the default Audit Service.", realm, e);
-            publish(topic, auditEvent);
+            publishToDefault(topic, auditEvent);
         } catch (ResourceException e) {
             handleResourceException(e, auditService, topic, auditEvent);
         }
@@ -145,45 +137,26 @@ public class AuditEventPublisher {
         }
     }
 
-    /**
-     * Tries to publish the provided AuditEvent to the specified topic of the AuditService.
-     * <p/>
-     * If an exception occurs, details are logged but the exception is suppressed.
-     *
-     * @param realm The realm in which the audit event occurred.
-     * @param topic Coarse-grained categorization of the AuditEvent's type.
-     * @param auditEvent The AuditEvent to publish.
-     */
-    public void tryPublish(String realm, String topic, AuditEvent auditEvent) {
-        try {
-            publish(realm, topic, auditEvent);
-        } catch (AuditException e) {
-            // suppress - error logged in publish method
-        }
-    }
-
     private String getValue(JsonValue jsonValue, String key, String defaultValue) {
         return jsonValue.isDefined(key) ? jsonValue.get(key).asString() : defaultValue;
     }
 
     /**
-     * Determines if the audit service is auditing the specified {@literal topic}.
+     * Determines if the audit service is auditing the specified {@literal topic} in the specified {@literal realm}. If
+     * the {@literal realm} is either {@code null} or empty, the check will be done against the default audit service.
      *
-     * @param topic The auditing topic.
-     * @return {@code true} if the topic should be audited.
-     */
-    public boolean isAuditing(String topic) {
-        return auditServiceProvider.getDefaultAuditService().isAuditEnabled(topic);
-    }
-
-    /**
-     * Determines if the audit service is auditing the specified {@literal topic}.
+     * Note that We deliberately do not provide a convenience method with no realm to force implementers to consider
+     * providing the realm. We must publish per realm wherever applicable.
      *
-     * @param realm The realm in which the audit event occurred.
+     * @param realm The realm in which the audit event occurred, or null if realm is not applicable.
      * @param topic The auditing topic.
      * @return {@code true} if the topic should be audited.
      */
     public boolean isAuditing(String realm, String topic) {
-        return auditServiceProvider.getAuditService(realm).isAuditEnabled(topic);
+        if (isBlank(realm)) {
+            return auditServiceProvider.getDefaultAuditService().isAuditEnabled(topic);
+        } else {
+            return auditServiceProvider.getAuditService(realm).isAuditEnabled(topic);
+        }
     }
 }

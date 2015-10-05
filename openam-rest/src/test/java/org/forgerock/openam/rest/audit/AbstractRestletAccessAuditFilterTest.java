@@ -74,7 +74,7 @@ public class AbstractRestletAccessAuditFilterTest {
         when(request.getDate()).thenReturn(new Date());
         when(representation.isTransient()).thenReturn(false);
         AuditRequestContext.putProperty(USER_ID, "User 1");
-        when(eventPublisher.isAuditing(anyString())).thenReturn(true);
+        when(eventPublisher.isAuditing(anyString(), anyString())).thenReturn(true);
         doThrow(AuditException.class).when(eventPublisher).publish(anyString(), any(AuditEvent.class));
 
         // When
@@ -93,7 +93,7 @@ public class AbstractRestletAccessAuditFilterTest {
         Representation representation = mock(Representation.class);
         when(request.getEntity()).thenReturn(representation);
         when(representation.isTransient()).thenReturn(false);
-        when(eventPublisher.isAuditing(anyString())).thenReturn(false);
+        when(eventPublisher.isAuditing(anyString(), anyString())).thenReturn(false);
 
         // When
         auditFilter.handle(request, response);

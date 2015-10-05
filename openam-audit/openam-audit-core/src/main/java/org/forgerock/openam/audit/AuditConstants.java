@@ -193,9 +193,16 @@ public final class AuditConstants {
     public static final String USERNAME_AUDIT_CONTEXT_KEY = "username";
 
     /**
-     * The Context IDs.
+     * Names of the realm field on an audit event.
      */
-    public static final String REALM_AUDIT_CONTEXT_KEY = "realm";
+    public static final String EVENT_REALM = "realm";
+
+    /**
+     * To access the default audit service via {@link AuditEventFactory#accessEvent(String)} and
+     * {@link AuditEventPublisher#isAuditing(String, String)} you can provide null or an empty string. We deliberately
+     * do not provide a convenience method with no realm to force implementers to consider providing the realm.
+     */
+    public static final String DEFAULT_AUDIT_REALM = null;
 
     /**
      * The OAuth2 audit context providers, responsible for finding details which can be audit logged from various

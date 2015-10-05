@@ -61,7 +61,7 @@ public final class SessionAuditor {
     }
 
     public void auditActivity(InternalSession session, EventName eventName) {
-        if (auditEventPublisher.isAuditing(ACTIVITY_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACTIVITY_TOPIC)) {
 
             String contextId = session.getProperty(Constants.AM_CTX_ID);
 

@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.forgerock.openam.utils.StringUtils.isBlank;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -41,30 +43,28 @@ public class AuditEventFactory {
     }
 
     /**
-     * Creates a new AMAccessAuditEventBuilder.
+     * Creates a new AMAccessAuditEventBuilder for the specified {@literal realm} and adds the realm to the event. If
+     * the {@literal realm} is either {@code null} or empty the it will not be added to the event.
      *
-     * @return AMAccessAuditEventBuilder
-     */
-    public AMAccessAuditEventBuilder accessEvent() {
-        if (auditServiceProvider.getDefaultAuditService().isResolveHostNameEnabled()) {
-            return new AMAccessAuditEventBuilder().withReverseDnsLookup();
-        } else {
-            return new AMAccessAuditEventBuilder();
-        }
-    }
-
-    /**
-     * Creates a new AMAccessAuditEventBuilder.
+     * Note that We deliberately do not provide a convenience method with no realm to force implementers to consider
+     * providing the realm. We must publish per realm wherever applicable.
      *
-     * @param realm The realm in which the audit event occurred.
+     * @param realm The realm in which the audit event occurred, or null if realm is not applicable.
      * @return AMAccessAuditEventBuilder
      */
     public AMAccessAuditEventBuilder accessEvent(String realm) {
-        if (auditServiceProvider.getAuditService(realm).isResolveHostNameEnabled()) {
-            return new AMAccessAuditEventBuilder().withReverseDnsLookup();
+        AMAccessAuditEventBuilder auditEventBuilder = new AMAccessAuditEventBuilder();
+        if (isBlank(realm)) {
+            if (auditServiceProvider.getDefaultAuditService().isResolveHostNameEnabled()) {
+                auditEventBuilder.withReverseDnsLookup();
+            }
         } else {
-            return new AMAccessAuditEventBuilder();
+            auditEventBuilder.realm(realm);
+            if (auditServiceProvider.getAuditService(realm).isResolveHostNameEnabled()) {
+                auditEventBuilder.withReverseDnsLookup();
+            }
         }
+        return auditEventBuilder;
     }
 
     /**

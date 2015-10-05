@@ -79,9 +79,9 @@ class CrestAuditor {
      * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     void auditAccessAttempt() throws AuditException {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                     .forHttpCrestRequest(context, request)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -100,11 +100,11 @@ class CrestAuditor {
      * captured in the debug logs but otherwise ignored.
      */
     void auditAccessSuccess() {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                     .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -127,11 +127,11 @@ class CrestAuditor {
      * @param message    A human-readable description of the error that occurred.
      */
     void auditAccessFailure(int resultCode, String message) {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                     .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())

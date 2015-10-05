@@ -192,7 +192,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
     }
 
     private void auditAccessMessage(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory, LogRecord record) {
-        if (!auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
+        if (!auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, AuditConstants.ACCESS_TOPIC)) {
             return;
         }
 
@@ -220,7 +220,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         String queryString = queryStringIndex > -1 ? resourceUrl.substring(queryStringIndex) : "";
         String path = resourceUrl.replace(queryString, "");
 
-        AuditEvent auditEvent = auditEventFactory.accessEvent()
+        AuditEvent auditEvent = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.POLICY_AGENT)

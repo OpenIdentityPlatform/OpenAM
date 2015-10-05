@@ -56,6 +56,8 @@ import org.testng.annotations.Test;
 
 public class AbstractHttpAccessAuditFilterTest {
 
+    private final String realm = "testRealm";
+
     private MockAccessAuditFilter auditFilter;
 
     @Mock
@@ -69,6 +71,7 @@ public class AbstractHttpAccessAuditFilterTest {
     public void setUp() {
         initMocks(this);
         when(auditServiceProvider.getDefaultAuditService()).thenReturn(auditService);
+        when(auditServiceProvider.getAuditService(realm)).thenReturn(auditService);
         AuditEventFactory eventFactory = new AuditEventFactory(auditServiceProvider);
 
         auditFilter = new MockAccessAuditFilter(eventPublisher, eventFactory);
@@ -198,13 +201,13 @@ public class AbstractHttpAccessAuditFilterTest {
     }
 
     private void disableAccessTopicAuditing() {
-        given(eventPublisher.isAuditing(anyString())).willReturn(true);
-        given(eventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)).willReturn(false);
+        given(eventPublisher.isAuditing(eq(realm), anyString())).willReturn(true);
+        given(eventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)).willReturn(false);
     }
 
     private void enableAccessTopicAuditing() {
-        given(eventPublisher.isAuditing(anyString())).willReturn(false);
-        given(eventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)).willReturn(true);
+        given(eventPublisher.isAuditing(eq(realm), anyString())).willReturn(false);
+        given(eventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)).willReturn(true);
     }
 
     private Handler mockHandler(Context context, Request request, Status status) {
@@ -252,6 +255,11 @@ public class AbstractHttpAccessAuditFilterTest {
     private class MockAccessAuditFilter extends AbstractHttpAccessAuditFilter {
         public MockAccessAuditFilter(AuditEventPublisher publisher, AuditEventFactory factory) {
             super(AUTHENTICATION, publisher, factory);
+        }
+
+        @Override
+        protected String getRealm(Context context) {
+            return realm;
         }
     }
 }

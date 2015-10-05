@@ -19,6 +19,7 @@ import static org.forgerock.openam.audit.AuditConstants.CONTEXTS;
 import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
 import static org.forgerock.json.JsonValue.array;
 import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.openam.audit.AuditConstants.EVENT_REALM;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -84,6 +85,15 @@ public final class AMAuditEventBuilderUtils {
     static void putContextIdFromSSOToken(JsonValue jsonValue, SSOToken ssoToken) {
         String ssoTokenContext = getContextFromSSOToken(ssoToken);
         putContexts(jsonValue, Collections.singletonMap(SESSION.toString(), ssoTokenContext));
+    }
+
+    /**
+     * Set "realm" audit log field.
+     *
+     * @param value String "realm" value.
+     */
+    static void putRealm(JsonValue jsonValue, String value) {
+        jsonValue.put(EVENT_REALM, value == null ? "" : value);
     }
 
     /**

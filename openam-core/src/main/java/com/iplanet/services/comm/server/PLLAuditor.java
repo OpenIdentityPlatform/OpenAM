@@ -78,9 +78,9 @@ public class PLLAuditor {
      * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     public void auditAccessAttempt() {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
 
-            AuditEvent auditEvent = auditEventFactory.accessEvent()
+            AuditEvent auditEvent = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -105,11 +105,11 @@ public class PLLAuditor {
         if (!accessAttemptAudited) {
             auditAccessAttempt();
         }
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AuditEvent auditEvent = auditEventFactory.accessEvent()
+            AuditEvent auditEvent = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -151,11 +151,11 @@ public class PLLAuditor {
         if (!accessAttemptAudited) {
             auditAccessAttempt();
         }
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AuditEvent auditEvent = auditEventFactory.accessEvent()
+            AuditEvent auditEvent = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())

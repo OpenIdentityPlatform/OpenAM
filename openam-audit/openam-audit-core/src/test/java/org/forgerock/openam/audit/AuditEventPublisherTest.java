@@ -72,7 +72,7 @@ public class AuditEventPublisherTest {
     @Test
     public void publishesProvidedAuditEventToAuditService() throws Exception {
         // Given
-        AuditEvent auditEvent = getAuditEvent();
+        AuditEvent auditEvent = getAuditEvent(null);
         givenDefaultAuditService();
 
         when(mockHandler.publishEvent(
@@ -88,12 +88,12 @@ public class AuditEventPublisherTest {
     @Test
     public void shouldSuppressExceptionsOnPublish() throws Exception {
         // Given
-        AuditEvent auditEvent = getAuditEvent();
+        AuditEvent auditEvent = getAuditEvent(FAILURE_SUPPRESSED_REALM);
         givenSuppressedFailureAuditService();
 
         // When
         try {
-            auditEventPublisher.publish(FAILURE_SUPPRESSED_REALM, "unknownTopic", auditEvent);
+            auditEventPublisher.publish("unknownTopic", auditEvent);
         } catch (AuditException e) {
             fail("Audit exceptions should be suppressed when publish fails.");
         }
@@ -102,11 +102,11 @@ public class AuditEventPublisherTest {
     @Test(expectedExceptions = AuditException.class)
     public void shouldNotSuppressExceptionsOnPublish() throws Exception {
         // Given
-        AuditEvent auditEvent = getAuditEvent();
+        AuditEvent auditEvent = getAuditEvent(FAILURE_NOT_SUPPRESSED_REALM);
         givenNonSuppressedFailureAuditService();
 
         // When
-        auditEventPublisher.publish(FAILURE_NOT_SUPPRESSED_REALM, "unknownTopic", auditEvent);
+        auditEventPublisher.publish("unknownTopic", auditEvent);
 
         // Then
         // expect exception
@@ -115,7 +115,7 @@ public class AuditEventPublisherTest {
     @Test(expectedExceptions = AuditException.class)
     public void shouldThrowExceptionWhenDefaultAuditServiceShutdown() throws Exception {
         // Given
-        AuditEvent auditEvent = getAuditEvent();
+        AuditEvent auditEvent = getAuditEvent(null);
         givenDefaultAuditService();
         auditServiceProvider.getDefaultAuditService().shutdown();
 
@@ -129,7 +129,7 @@ public class AuditEventPublisherTest {
     @Test(expectedExceptions = AuditException.class)
     public void shouldThrowExceptionWhenRealmAndDefaultAuditServiceShutdown() throws Exception {
         // Given
-        AuditEvent auditEvent = getAuditEvent();
+        AuditEvent auditEvent = getAuditEvent(FAILURE_NOT_SUPPRESSED_REALM);
         givenDefaultAuditService();
         auditServiceProvider.getDefaultAuditService().shutdown();
         givenNonSuppressedFailureAuditService();
@@ -145,7 +145,7 @@ public class AuditEventPublisherTest {
     @Test
     public void shouldFallBackToDefaultAuditServiceWhenRealmHasShutDown() throws Exception {
         // Given
-        AuditEvent auditEvent = getAuditEvent();
+        AuditEvent auditEvent = getAuditEvent("deadRealm");
         givenDefaultAuditService();
         when(mockHandler.publishEvent(
                 any(Context.class), eq("access"), auditEventCaptor.capture())).thenReturn(dummyPromise);
@@ -161,13 +161,13 @@ public class AuditEventPublisherTest {
         when(auditServiceProvider.getAuditService("deadRealm")).thenReturn(auditService);
 
         // When
-        auditEventPublisher.publish("deadRealm", "access", auditEvent);
+        auditEventPublisher.publish("access", auditEvent);
 
         // Then
         assertThat(auditEventCaptor.getValue()).isEqualTo(auditEvent.getValue());
     }
 
-    private AuditEvent getAuditEvent() {
+    private AuditEvent getAuditEvent(String realm) {
         return new AMAccessAuditEventBuilder()
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .transactionId(UUID.randomUUID().toString())
@@ -176,6 +176,7 @@ public class AuditEventPublisherTest {
                 .server("216.58.208.36", 80).resourceOperation("/some/path", "CREST", "READ")
                 .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
                 .response(SUCCESS, "200", 42, MILLISECONDS)
+                .realm(realm)
                 .toEvent();
     }
 

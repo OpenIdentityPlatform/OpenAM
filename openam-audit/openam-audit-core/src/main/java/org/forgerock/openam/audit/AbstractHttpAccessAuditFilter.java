@@ -86,9 +86,10 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
     }
 
     private void auditAccessAttempt(Request request, Context context) throws AuditException {
-        if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
+        String realm = getRealm(context);
+        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(context.asContext(RequestAuditContext.class).getRequestReceivedTime())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
@@ -102,12 +103,13 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
     }
 
     private void auditAccessSuccess(Request request, Context context, Response response) {
-        if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
+        String realm = getRealm(context);
+        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime();
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
@@ -122,14 +124,15 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
     }
 
     private void auditAccessFailure(Request request, Context context, Response response) {
-        if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
+        String realm = getRealm(context);
+        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());
             long elapsedTime = endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime();
             String responseDetail = response.getStatus().getReasonPhrase();
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
@@ -184,5 +187,14 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
     protected Map<String, String> getContextsForAccessOutcome(Response response) {
         return getAllAvailableContexts();
     }
+
+    /**
+     * Get the realm from the request context. If the realm is either {@code null} or empty the event will be published
+     * to the default audit service.
+     *
+     * @param context The request context.
+     * @return The realm.
+     */
+    protected abstract String getRealm(Context context);
 
 }

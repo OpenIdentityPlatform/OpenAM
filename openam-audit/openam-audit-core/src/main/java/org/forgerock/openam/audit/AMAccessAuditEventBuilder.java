@@ -157,6 +157,17 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         return eventName(name.toString());
     }
 
+    /**
+     * Provide value for "realm" audit log field.
+     *
+     * @param realm The "realm" value.
+     * @return this builder for method chaining.
+     */
+    public final AMAccessAuditEventBuilder realm(String realm) {
+        putRealm(jsonValue, realm);
+        return this;
+    }
+
     private Map<String, List<String>> getHeadersAsMap(HttpServletRequest request) {
         Map<String, List<String>> headers = new HashMap<>();
         Enumeration headerNamesEnumeration = request.getHeaderNames();

@@ -95,9 +95,9 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
     }
 
     private void auditAccessAttempt(Request request) throws AuditException {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                     .timestamp(request.getDate().getTime())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
@@ -112,12 +112,12 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
     }
 
     private void auditAccessSuccess(Request request, Response response) {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - request.getDate().getTime();
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
@@ -133,14 +133,14 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
     }
 
     private void auditAccessFailure(Request request, Response response) {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());
             long elapsedTime = endTime - request.getDate().getTime();
             String responseDetail = response.getStatus().getDescription();
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
