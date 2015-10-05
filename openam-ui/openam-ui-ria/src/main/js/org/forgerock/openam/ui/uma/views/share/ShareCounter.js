@@ -26,35 +26,35 @@
 define("org/forgerock/openam/ui/uma/views/share/ShareCounter", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView"
-], function($, AbstractView) {
+], function ($, AbstractView) {
     var ShareCounter = AbstractView.extend({
 
         template: "templates/uma/views/share/ShareCounter.html",
         element: "#shareCounter",
 
-        render: function(count, callback) {
+        render: function (count, callback) {
 
             this.data.shareCount = count;
             this.data.shareInfo = this.getShareInfo(count);
             this.data.shareIcon = this.getShareIcon(count);
 
-            this.parentRender(function() {
-                if(callback){callback();}
+            this.parentRender(function () {
+                if (callback) { callback(); }
             });
         },
 
 
-        getShareInfo: function(count) {
+        getShareInfo: function (count) {
             var options = count ? { count: count } : { context: "none" };
             return $.t("uma.share.info", options);
         },
 
-        getShareIcon: function(count) {
-            var shareIcon = 'fa fa-lock';
-            if (count === 1){
-                shareIcon = 'fa fa-user';
-            } else if (count > 1){
-                shareIcon = 'fa fa-users';
+        getShareIcon: function (count) {
+            var shareIcon = "fa fa-lock";
+            if (count === 1) {
+                shareIcon = "fa fa-user";
+            } else if (count > 1) {
+                shareIcon = "fa fa-users";
             }
             return shareIcon;
         }

@@ -24,21 +24,21 @@
 
 /*global define */
 
-define( "org/forgerock/openam/ui/uma/views/share/BaseShare", [
-        "org/forgerock/commons/ui/common/main/AbstractView",
-        "org/forgerock/openam/ui/uma/views/share/CommonShare"
-], function(AbstractView, CommonShare) {
+define("org/forgerock/openam/ui/uma/views/share/BaseShare", [
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/uma/views/share/CommonShare"
+], function (AbstractView, CommonShare) {
 
     var BaseShare = AbstractView.extend({
         template: "templates/uma/views/share/BaseShare.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
-        render: function(args, callback) {
+        render: function (args, callback) {
 
             var self = this;
             self.shareView = new CommonShare();
             self.shareView.element = "#commonShare";
             self.shareView.noBaseTemplate = true;
-            self.parentRender(function(){
+            self.parentRender(function () {
                 self.data.resourceSet = {};
                 self.shareView.render(args, callback);
             }, callback);

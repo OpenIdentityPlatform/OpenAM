@@ -28,10 +28,10 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function($, AbstractView, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator,
+], function ($, AbstractView, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator,
             BackgridUtils, CommonShare, Configuration, Constants, RealmHelper) {
     var BasePage = AbstractView.extend({
-        createCollection: function(url, queryFilters) {
+        createCollection: function (url, queryFilters) {
             var self = this;
 
             return Backbone.PageableCollection.extend({
@@ -43,8 +43,8 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                 }),
                 state: BackgridUtils.getState(),
                 parseState: BackgridUtils.parseState,
-                parseRecords: function(data) {
-                    if(data.result.length) {
+                parseRecords: function (data) {
+                    if (data.result.length) {
                         self.recordsPresent();
                     }
 
@@ -53,10 +53,10 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                 sync: BackgridUtils.sync
             });
         },
-        createLabelCollection: function(labelId) {
+        createLabelCollection: function (labelId) {
             var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.get("username") + "\""];
 
-            if(labelId) {
+            if (labelId) {
                 filters.push("labels eq \"" + labelId + "\"");
             }
 
@@ -65,10 +65,10 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                                                                           Configuration.loggedUser.get("username") +
                                                                           "/oauth2/resources/sets"), filters);
         },
-        createSetCollection: function(notResourceOwner) {
+        createSetCollection: function (notResourceOwner) {
             var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.get("username") + "\""];
 
-            if(notResourceOwner) {
+            if (notResourceOwner) {
                 filters[0] = "! " + filters[0];
             }
 
@@ -77,13 +77,13 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                                                                           Configuration.loggedUser.get("username") +
                                                                           "/oauth2/resources/sets"), filters);
         },
-        createColumns: function(pathToResource) {
+        createColumns: function (pathToResource) {
             return [{
                 name: "name",
                 label: $.t("uma.resources.grid.header.0"),
                 cell: BackgridUtils.UriExtCell,
                 headerCell: BackgridUtils.FilterHeaderCell,
-                href: function(rawValue, formattedValue, model){
+                href: function (rawValue, formattedValue, model) {
                     return "#uma/resources/" + pathToResource + "/" + model.get("_id");
                 },
                 editable: false
@@ -105,12 +105,12 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                 cell: Backgrid.Cell.extend({
                     className: "fa fa-share",
                     events: { "click": "share" },
-                    share: function() {
+                    share: function () {
                         var shareView = new CommonShare();
                         shareView.renderDialog(this.model.get("_id"));
                     },
                     render: function () {
-                        this.$el.attr({"title": $.t("uma.share.shareResource")});
+                        this.$el.attr({ "title": $.t("uma.share.shareResource") });
                         this.delegateEvents();
                         return this;
                     }
@@ -120,10 +120,10 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                 headerCell: BackgridUtils.ClassHeaderCell
             }];
         },
-        recordsPresent: function() {
+        recordsPresent: function () {
             // Override in child
         },
-        renderGrid: function(Collection, columns, callback) {
+        renderGrid: function (Collection, columns, callback) {
             var self = this, grid, paginator;
 
             this.data.collection = new Collection();
@@ -141,7 +141,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                 windowSize: 3
             });
 
-            this.parentRender(function() {
+            this.parentRender(function () {
                 self.$el.find(".backgrid-container").append(grid.render().el);
                 self.$el.find(".pagination-container").append(paginator.render().el);
 

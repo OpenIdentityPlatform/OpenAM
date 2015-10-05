@@ -27,7 +27,8 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
     "org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/commons/ui/common/main/Router"
-], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMADelegate, Router) {
+], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper,
+             PermissionsCell, UMADelegate, Router) {
     var EditRequest = AbstractView.extend({
         template: "templates/uma/views/request/EditRequestTemplate.html",
         events: {
@@ -36,7 +37,7 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
         },
 
         allowRequest: function () {
-            UMADelegate.approveRequest(this.model.get("_id"), this.model.get("permissions")).done(function() {
+            UMADelegate.approveRequest(this.model.get("_id"), this.model.get("permissions")).done(function () {
                 Router.routeTo(Router.configuration.routes.umaRequestList, {
                     args: [],
                     trigger: true
@@ -45,7 +46,7 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
         },
 
         denyRequest: function () {
-            UMADelegate.denyRequest(this.model.get("_id")).done(function() {
+            UMADelegate.denyRequest(this.model.get("_id")).done(function () {
                 Router.routeTo(Router.configuration.routes.umaRequestList, {
                     args: [],
                     trigger: true
@@ -63,7 +64,8 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
             id = args[0];
 
             RequestCollection = Backbone.Collection.extend({
-                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.get("username") + "/uma/pendingrequests/" + id)
+                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" +
+                     Configuration.loggedUser.get("username") + "/uma/pendingrequests/" + id)
             });
 
             columns = [{
@@ -106,12 +108,12 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
                 emptyText: $.t("console.common.noResults")
             });
 
-            this.parentRender(function() {
-                self.$el.find("#backgridContainer").append( grid.render().el );
-                self.data.requests.fetch({ reset: true, processData: false }).done(function(){
-                    self.model = self.data.requests.findWhere({_id: id});
+            this.parentRender(function () {
+                self.$el.find("#backgridContainer").append(grid.render().el);
+                self.data.requests.fetch({ reset: true, processData: false }).done(function () {
+                    self.model = self.data.requests.findWhere({ _id: id });
                     if (callback) { callback(); }
-                }).fail(function(){
+                }).fail(function () {
                     self.$el.find("button[data-permission]").prop("disabled", true);
                 });
             });

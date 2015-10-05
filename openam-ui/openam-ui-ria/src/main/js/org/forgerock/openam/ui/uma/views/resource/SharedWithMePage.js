@@ -17,10 +17,10 @@
 /*global define*/
 define("org/forgerock/openam/ui/uma/views/resource/SharedWithMePage", [
     "org/forgerock/openam/ui/uma/views/resource/BasePage"
-], function(BasePage) {
+], function (BasePage) {
     var SharedWithMePage = BasePage.extend({
         template: "templates/uma/views/resource/SharedWithMePageTemplate.html",
-        render: function(args, callback) {
+        render: function (args, callback) {
             this.renderGrid(this.createSetCollection(true), this.createColumns("sharedwithme"), callback);
         }
     });

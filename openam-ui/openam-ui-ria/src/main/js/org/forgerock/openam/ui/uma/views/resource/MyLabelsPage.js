@@ -41,34 +41,34 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
         deleteLabel: function () {
             var self = this,
                 buttons = [{
-                id: "ok",
-                label: $.t("common.form.ok"),
-                cssClass: "btn-primary btn-danger",
-                action: function (dialog) {
-                    dialog.enableButtons(false);
-                    dialog.getButton("ok").text($.t("common.form.working"));
+                    id: "ok",
+                    label: $.t("common.form.ok"),
+                    cssClass: "btn-primary btn-danger",
+                    action: function (dialog) {
+                        dialog.enableButtons(false);
+                        dialog.getButton("ok").text($.t("common.form.working"));
 
-                    UMADelegate.labels.remove(self.data.label._id).done(function () {
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "deleteLabelSuccess");
+                        UMADelegate.labels.remove(self.data.label._id).done(function () {
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "deleteLabelSuccess");
 
-                        dialog.close();
-                        Router.routeTo(Router.configuration.routes.umaResourcesMyResources, {
-                            trigger: true,
-                            args: []
+                            dialog.close();
+                            Router.routeTo(Router.configuration.routes.umaResourcesMyResources, {
+                                trigger: true,
+                                args: []
+                            });
+                        }).fail(function () {
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "deleteLabelFail");
+
+                            dialog.enableButtons(true);
+                            dialog.getButton("ok").text($.t("common.form.ok"));
                         });
-                    }).fail(function () {
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "deleteLabelFail");
-
-                        dialog.enableButtons(true);
-                        dialog.getButton("ok").text($.t("common.form.ok"));
-                    });
-                }
-            }, {
-                label: $.t("common.form.cancel"),
-                action: function (dialog) {
-                    dialog.close();
-                }
-            }];
+                    }
+                }, {
+                    label: $.t("common.form.cancel"),
+                    action: function (dialog) {
+                        dialog.close();
+                    }
+                }];
 
             BootstrapDialog.show({
                 type: BootstrapDialog.TYPE_DANGER,

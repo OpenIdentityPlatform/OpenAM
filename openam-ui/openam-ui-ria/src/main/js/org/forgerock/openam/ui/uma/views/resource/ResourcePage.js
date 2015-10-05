@@ -35,8 +35,8 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
 
     // jquery dependencies
     "selectize"
-], function ($, _, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare,
-             Constants, EventManager, LabelTreeNavigationView, Messages, Router, UIUtils, UMADelegate, UMAResourceSetWithPolicy) {
+], function ($, _, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants,
+             EventManager, LabelTreeNavigationView, Messages, Router, UIUtils, UMADelegate, UMAResourceSetWithPolicy) {
     function isUserLabel (label) {
         return label.type === "USER";
     }
@@ -308,7 +308,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 },
                 revoke: function () {
                     self.model.get("policy").get("permissions").remove(this.model);
-                    self.model.get("policy").save().done(function (){
+                    self.model.get("policy").save().done(function () {
                         self.onModelChange(self.model);
                     });
                 }

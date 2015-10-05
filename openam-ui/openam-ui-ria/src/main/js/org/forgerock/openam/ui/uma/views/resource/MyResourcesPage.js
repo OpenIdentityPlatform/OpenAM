@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function($, _, BootstrapDialog, BasePage, Configuration, Constants, EventManager, UMADelegate) {
+], function ($, _, BootstrapDialog, BasePage, Configuration, Constants, EventManager, UMADelegate) {
     var MyResourcesPage = BasePage.extend({
         template: "templates/uma/views/resource/MyResourcesPageTemplate.html",
         partials: [
@@ -33,23 +33,23 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
         events: {
             "click button#unshareAllResources": "unshareAllResources"
         },
-        recordsPresent: function() {
+        recordsPresent: function () {
             this.$el.find("button#unshareAllResources").prop("disabled", false);
         },
-        render: function(args, callback) {
+        render: function (args, callback) {
             var self = this,
                 labelId = args[1],
                 topLevel = args[1] === "";
 
             this.data.topLevel = topLevel;
 
-            if(topLevel) {
+            if (topLevel) {
                 this.renderGrid(this.createSetCollection(),
                                 this.createColumns("myresources/all"),
                                 callback);
             } else {
                 // Resolve label ID to name
-                UMADelegate.labels.get(labelId).done(function(data) {
+                UMADelegate.labels.get(labelId).done(function (data) {
                     var columns = self.createColumns("myresources/" + encodeURIComponent(data.id));
 
                     // Splice out the "Hosts" column
@@ -60,25 +60,25 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
                     self.renderGrid(self.createLabelCollection(labelId),
                                     columns,
                                     callback);
-                }).fail(function() {
+                }).fail(function () {
                     //
                 });
             }
         },
-        unshareAllResources: function() {
+        unshareAllResources: function () {
             var buttons = [{
                 id: "ok",
                 label: $.t("common.form.ok"),
                 cssClass: "btn-primary btn-danger",
-                action: function(dialog) {
+                action: function (dialog) {
                     dialog.enableButtons(false);
                     dialog.getButton("ok").text($.t("common.form.working"));
 
-                    UMADelegate.unshareAllResources().done(function() {
+                    UMADelegate.unshareAllResources().done(function () {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unshareAllResourcesSuccess");
 
                         dialog.close();
-                    }).fail(function() {
+                    }).fail(function () {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unshareAllResourcesFail");
 
                         dialog.enableButtons(true);
@@ -87,7 +87,7 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
                 }
             }, {
                 label: $.t("common.form.cancel"),
-                action: function(dialog) {
+                action: function (dialog) {
                     dialog.close();
                 }
             }];

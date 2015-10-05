@@ -42,7 +42,8 @@ define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
                 RequestsCollection;
 
             RequestsCollection = Backbone.PageableCollection.extend({
-                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.get("username") + "/uma/pendingrequests"),
+                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" +
+                     Configuration.loggedUser.get("username") + "/uma/pendingrequests"),
                 state: {
                     pageSize: 10,
                     sortKey: "user"
@@ -103,12 +104,13 @@ define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
                         "click button[data-permission=deny]": "deny"
                     },
                     allow: function () {
-                        UMADelegate.approveRequest(this.model.get("_id"), this.model.get("permissions")).done(function() {
+                        UMADelegate.approveRequest(this.model.get("_id"), this.model.get("permissions"))
+                        .done(function () {
                             self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
                         });
                     },
                     deny: function () {
-                        UMADelegate.denyRequest(this.model.get("_id")).done(function() {
+                        UMADelegate.denyRequest(this.model.get("_id")).done(function () {
                             self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
                         });
                     }
@@ -131,11 +133,11 @@ define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
                 windowSize: 3
             });
 
-            self.parentRender(function() {
-                self.$el.find("#backgridContainer").append( grid.render().el );
-                self.$el.find("#paginationContainer").append( paginator.render().el );
+            self.parentRender(function () {
+                self.$el.find("#backgridContainer").append(grid.render().el);
+                self.$el.find("#paginationContainer").append(paginator.render().el);
                 // TODO: DRY
-                self.data.requests.fetch({ reset: true, processData: false }).done(function(){
+                self.data.requests.fetch({ reset: true, processData: false }).done(function () {
                     if (callback) { callback(); }
                 });
             });
