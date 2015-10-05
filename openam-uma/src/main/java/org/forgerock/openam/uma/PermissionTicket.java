@@ -39,7 +39,7 @@ public class PermissionTicket implements UmaToken {
     private static final String CLIENT_CLIENT_ID = "clientClientId";
 
     @Field(field = CoreTokenField.BLOB, converter = JsonValueToJsonBytesConverter.class)
-    private JsonValue blob = json(object());
+    private JsonValue contents = json(object());
     @Field(field = CoreTokenField.STRING_ONE)
     private String realm;
     @Field(field = CoreTokenField.STRING_TWO)
@@ -58,7 +58,7 @@ public class PermissionTicket implements UmaToken {
         this.id = id;
         this.resourceSetId = resourceSetId;
         this.resourceServerClientId = resourceServerClientId;
-        blob.put(SCOPES, scopes);
+        contents.put(SCOPES, scopes);
     }
 
     public String getId() {
@@ -94,12 +94,12 @@ public class PermissionTicket implements UmaToken {
     }
 
     public Set<String> getScopes() {
-        JsonValue scopes = blob.get(SCOPES);
+        JsonValue scopes = contents.get(SCOPES);
         return scopes == null ? null : scopes.asSet(String.class);
     }
 
     public void setScopes(Set<String> scopes) {
-        blob.put(SCOPES, scopes);
+        contents.put(SCOPES, scopes);
     }
 
     public String getResourceServerClientId() {
@@ -111,11 +111,19 @@ public class PermissionTicket implements UmaToken {
     }
 
     public String getClientClientId() {
-        JsonValue value = blob.get(CLIENT_CLIENT_ID);
+        JsonValue value = contents.get(CLIENT_CLIENT_ID);
         return value == null ? null : value.asString();
     }
 
     public void setClientClientId(String clientClientId) {
-        blob.put(CLIENT_CLIENT_ID, clientClientId);
+        contents.put(CLIENT_CLIENT_ID, clientClientId);
+    }
+
+    public JsonValue getContents() {
+        return contents;
+    }
+
+    public void setContents(JsonValue contents) {
+        this.contents = contents;
     }
 }
