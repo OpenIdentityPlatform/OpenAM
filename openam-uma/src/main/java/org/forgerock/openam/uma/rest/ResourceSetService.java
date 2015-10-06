@@ -17,6 +17,7 @@
 package org.forgerock.openam.uma.rest;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Requests.newQueryRequest;
 import static org.forgerock.util.query.QueryFilter.and;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
@@ -42,7 +43,6 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -84,7 +84,8 @@ public class ResourceSetService {
      * @param policyService An instance of the UmaPolicyService.
      */
     @Inject
-    public ResourceSetService(ResourceSetStoreFactory resourceSetStoreFactory, UmaPolicyService policyService, CoreWrapper coreWrapper, UmaProviderSettingsFactory umaProviderSettingsFactory) {
+    public ResourceSetService(ResourceSetStoreFactory resourceSetStoreFactory, UmaPolicyService policyService,
+            CoreWrapper coreWrapper, UmaProviderSettingsFactory umaProviderSettingsFactory) {
         this.resourceSetStoreFactory = resourceSetStoreFactory;
         this.policyService = policyService;
         this.coreWrapper = coreWrapper;
@@ -102,13 +103,13 @@ public class ResourceSetService {
      * @return A Promise containing the Resource Set or a ResourceException.
      */
     Promise<ResourceSetDescription, ResourceException> getResourceSet(final Context context,
-                                                                      String realm, final String resourceSetId, String resourceOwnerId, final boolean augmentWithPolicy) {
+            String realm, final String resourceSetId, String resourceOwnerId, final boolean augmentWithPolicy) {
         return getResourceSet(realm, resourceSetId, resourceOwnerId)
                 .thenOnResult(new ResultHandler<ResourceSetDescription>() {
                     @Override
                     public void handleResult(ResourceSetDescription resourceSet) {
                         if (augmentWithPolicy) {
-                            augmentResourceSetWithPolicy(context, resourceSetId, resourceSet);
+                            augmentWithPolicy(context, resourceSetId, resourceSet);
                         }
                     }
                 });
@@ -122,11 +123,15 @@ public class ResourceSetService {
         return new Subject(false, principals, Collections.emptySet(), Collections.emptySet());
     }
 
-    private Promise<Collection<ResourceSetDescription>, ResourceException> getPolicies(final Context context, QueryRequest policyQuery, final String resourceOwnerId, final Set<ResourceSetDescription> resourceSets, final boolean augmentWithPolicies, final ResourceSetWithPolicyQuery query) {
+    private Promise<Collection<ResourceSetDescription>, ResourceException> getPolicies(final Context context,
+            QueryRequest policyQuery, final String resourceOwnerId, final Set<ResourceSetDescription> resourceSets,
+            final boolean augmentWithPolicies, final ResourceSetWithPolicyQuery query) {
         return policyService.queryPolicies(context, policyQuery)
-                .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
+                .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>,
+                        Collection<ResourceSetDescription>, ResourceException>() {
                     @Override
-                    public Promise<Collection<ResourceSetDescription>, ResourceException> apply(final Pair<QueryResponse, Collection<UmaPolicy>> result) {
+                    public Promise<Collection<ResourceSetDescription>, ResourceException> apply(
+                            final Pair<QueryResponse, Collection<UmaPolicy>> result) {
                         final Set<ResourceSetDescription> filteredResourceSets = new HashSet<>();
                         try {
                             String realm = context.asContext(RealmContext.class).getResolvedRealm();
@@ -185,8 +190,8 @@ public class ResourceSetService {
      * @return A Promise containing the Resource Sets or a ResourceException.
      */
     Promise<Collection<ResourceSetDescription>, ResourceException> getResourceSets(final Context context,
-                                                                                   String realm, final ResourceSetWithPolicyQuery query, final String resourceOwnerId,
-                                                                                   final boolean augmentWithPolicies) {
+            String realm, final ResourceSetWithPolicyQuery query, final String resourceOwnerId,
+            final boolean augmentWithPolicies) {
         final Set<ResourceSetDescription> resourceSets;
         try {
             resourceSets = resourceSetStoreFactory.create(realm).query(and(
@@ -196,22 +201,27 @@ public class ResourceSetService {
             return new InternalServerErrorException(e).asPromise();
         }
 
-        QueryRequest policyQuery = Requests.newQueryRequest("").setQueryId("searchAll");
+        QueryRequest policyQuery = newQueryRequest("").setQueryId("searchAll");
         policyQuery.setQueryFilter(QueryFilter.<JsonPointer>alwaysTrue());
         return getPolicies(context, policyQuery, resourceOwnerId, resourceSets, augmentWithPolicies, query)
-                .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, Collection<ResourceSetDescription>, ResourceException>() {
+                .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, Collection<ResourceSetDescription>,
+                        ResourceException>() {
                     @Override
-                    public Promise<Collection<ResourceSetDescription>, ResourceException> apply(final Collection<ResourceSetDescription> filteredResourceSets) {
+                    public Promise<Collection<ResourceSetDescription>, ResourceException> apply(
+                            final Collection<ResourceSetDescription> filteredResourceSets) {
                         Promise<Collection<ResourceSetDescription>, ResourceException> resourceSetsPromise;
                         if (query.getPolicyQuery() != null) {
-                            QueryRequest policyQuery = Requests.newQueryRequest("").setQueryFilter(query.getPolicyQuery());
+                            QueryRequest policyQuery = newQueryRequest("").setQueryFilter(query.getPolicyQuery());
                             resourceSetsPromise = policyService.queryPolicies(context, policyQuery)
-                                    .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
+                                    .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>,
+                                            Collection<ResourceSetDescription>, ResourceException>() {
                                         @Override
-                                        public Promise<Collection<ResourceSetDescription>, ResourceException> apply(Pair<QueryResponse, Collection<UmaPolicy>> result) throws ResourceException {
+                                        public Promise<Collection<ResourceSetDescription>, ResourceException> apply(
+                                                Pair<QueryResponse, Collection<UmaPolicy>> result) throws ResourceException {
                                             try {
-                                                return Promises.newResultPromise(combine(context, query, filteredResourceSets,
-                                                        result.getSecond(), augmentWithPolicies, resourceOwnerId));
+                                                return Promises.newResultPromise(combine(context, query,
+                                                        filteredResourceSets, result.getSecond(), augmentWithPolicies,
+                                                        resourceOwnerId));
                                             } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
                                                 return new InternalServerErrorException(e).asPromise();
                                             } catch (ServerException e) {
@@ -226,7 +236,7 @@ public class ResourceSetService {
                                 PromiseImpl<ResourceSetDescription, ResourceException> kicker = PromiseImpl.create();
                                 promises.add(kicker);
                                 for (ResourceSetDescription resourceSet : filteredResourceSets) {
-                                    promises.add(augmentResourceSetWithPolicy(context, resourceSet.getId(), resourceSet));
+                                    promises.add(augmentWithPolicy(context, resourceSet.getId(), resourceSet));
                                 }
                                 resourceSetsPromise = Promises.when(promises)
                                         .thenAsync(new AsyncFunction<List<ResourceSetDescription>, Collection<ResourceSetDescription>, ResourceException>() {
@@ -244,7 +254,7 @@ public class ResourceSetService {
                                         });
                                 kicker.handleResult(null);
                             } else {
-                                resourceSetsPromise = Promises.newResultPromise((Collection<ResourceSetDescription>) filteredResourceSets);
+                                resourceSetsPromise = Promises.newResultPromise(filteredResourceSets);
                             }
                         }
                         return resourceSetsPromise;
@@ -301,8 +311,8 @@ public class ResourceSetService {
         }
     }
 
-    private Promise<ResourceSetDescription, ResourceException> augmentResourceSetWithPolicy(Context context,
-                                                                                            final String resourceSetId, final ResourceSetDescription resourceSet) {
+    private Promise<ResourceSetDescription, ResourceException> augmentWithPolicy(Context context,
+            final String resourceSetId, final ResourceSetDescription resourceSet) {
         return policyService.readPolicy(context, resourceSetId)
                 .thenAsync(new AsyncFunction<UmaPolicy, ResourceSetDescription, ResourceException>() {
                     @Override
@@ -319,8 +329,8 @@ public class ResourceSetService {
     }
 
     private Collection<ResourceSetDescription> combine(Context context,
-                                                       ResourceSetWithPolicyQuery resourceSetWithPolicyQuery, Collection<ResourceSetDescription> resourceSets,
-                                                       Collection<UmaPolicy> policies, boolean augmentWithPolicies, String resourceOwnerId)
+            ResourceSetWithPolicyQuery resourceSetWithPolicyQuery, Collection<ResourceSetDescription> resourceSets,
+            Collection<UmaPolicy> policies, boolean augmentWithPolicies, String resourceOwnerId)
             throws org.forgerock.oauth2.core.exceptions.NotFoundException, ServerException {
 
         Map<String, ResourceSetDescription> resourceSetsById = new HashMap<String, ResourceSetDescription>();
@@ -345,7 +355,7 @@ public class ResourceSetService {
 
             if (augmentWithPolicies) {
                 for (ResourceSetDescription resourceSet : resourceSetsById.values()) {
-                    augmentResourceSetWithPolicy(context, resourceSet.getId(), resourceSet);
+                    augmentWithPolicy(context, resourceSet.getId(), resourceSet);
                 }
             }
 
@@ -371,69 +381,78 @@ public class ResourceSetService {
     private static final QueryFilterVisitor<Set<ResourceSetDescription>, Set<ResourceSetDescription>, String>
             RESOURCE_SET_QUERY_EVALUATOR =
             new BaseQueryFilterVisitor<Set<ResourceSetDescription>, Set<ResourceSetDescription>, String>() {
-        @Override
-        public Set<ResourceSetDescription> visitAndFilter(Set<ResourceSetDescription> resourceSetDescriptions,
-                List<QueryFilter<String>> list) {
-            for (QueryFilter<String> filter : list) {
-                resourceSetDescriptions.retainAll(filter.accept(this, resourceSetDescriptions));
-            }
+                @Override
+                public Set<ResourceSetDescription> visitAndFilter(Set<ResourceSetDescription> resourceSetDescriptions,
+                        List<QueryFilter<String>> list) {
+                    for (QueryFilter<String> filter : list) {
+                        resourceSetDescriptions.retainAll(filter.accept(this, resourceSetDescriptions));
+                    }
 
-            return resourceSetDescriptions;
-        }
+                    return resourceSetDescriptions;
+                }
 
-        @Override
-        public Set<ResourceSetDescription> visitBooleanLiteralFilter(
-                Set<ResourceSetDescription> resourceSetDescriptions, boolean value) {
-            if (value) {
-                return resourceSetDescriptions;
-            } else {
-                return Collections.emptySet();
-            }
-        }
+                @Override
+                public Set<ResourceSetDescription> visitOrFilter(Set<ResourceSetDescription> resourceSetDescriptions,
+                        List<QueryFilter<String>> list) {
+                    Set<ResourceSetDescription> matching = new HashSet<>(resourceSetDescriptions.size());
+                    for (QueryFilter<String> filter : list) {
+                        matching.addAll(filter.accept(this, resourceSetDescriptions));
+                    }
+                    return matching;
+                }
 
-        @Override
-        public Set<ResourceSetDescription> visitContainsFilter(Set<ResourceSetDescription> resourceSetDescriptions,
-                String fieldName, Object value) {
-            Set<ResourceSetDescription> results = new HashSet<>();
-
-            for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
-                if (fieldName.equals("name")) {
-                    if (resourceSetDescription.getName().toLowerCase().contains(((String) value).toLowerCase())) {
-                        results.add(resourceSetDescription);
+                @Override
+                public Set<ResourceSetDescription> visitBooleanLiteralFilter(
+                        Set<ResourceSetDescription> resourceSetDescriptions, boolean value) {
+                    if (value) {
+                        return resourceSetDescriptions;
+                    } else {
+                        return Collections.emptySet();
                     }
                 }
-            }
 
-            return results;
-        }
+                @Override
+                public Set<ResourceSetDescription> visitContainsFilter(
+                        Set<ResourceSetDescription> resourceSetDescriptions,String fieldName, Object value) {
+                    Set<ResourceSetDescription> results = new HashSet<>();
 
-        @Override
-        public Set<ResourceSetDescription> visitEqualsFilter(Set<ResourceSetDescription> resourceSetDescriptions,
-                String fieldName, Object value) {
-            Set<ResourceSetDescription> results = new HashSet<>();
-
-            for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
-                if (fieldName.equals(ResourceSetTokenField.RESOURCE_OWNER_ID)) {
-                    if (resourceSetDescription.getResourceOwnerId().equals(value)) {
-                        results.add(resourceSetDescription);
+                    for (ResourceSetDescription resourceSetDesc : resourceSetDescriptions) {
+                        if (fieldName.equals("name")) {
+                            if (resourceSetDesc.getName().toLowerCase().contains(((String) value).toLowerCase())) {
+                                results.add(resourceSetDesc);
+                            }
+                        }
                     }
-                } else if (fieldName.equals(ResourceSetTokenField.RESOURCE_SET_ID)) {
-                    if (resourceSetDescription.getId().equals(value)) {
-                        results.add(resourceSetDescription);
-                    }
+
+                    return results;
                 }
-            }
 
-            return results;
-        }
+                @Override
+                public Set<ResourceSetDescription> visitEqualsFilter(
+                        Set<ResourceSetDescription> resourceSetDescriptions, String fieldName, Object value) {
+                    Set<ResourceSetDescription> results = new HashSet<>();
 
-        @Override
-        public Set<ResourceSetDescription> visitNotFilter(Set<ResourceSetDescription> resourceSetDescriptions,
-                QueryFilter<String> queryFilter) {
-            Set<ResourceSetDescription> excludedResourceSets = queryFilter.accept(this, resourceSetDescriptions);
-            resourceSetDescriptions.removeAll(excludedResourceSets);
+                    for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
+                        if (fieldName.equals(ResourceSetTokenField.RESOURCE_OWNER_ID)) {
+                            if (resourceSetDescription.getResourceOwnerId().equals(value)) {
+                                results.add(resourceSetDescription);
+                            }
+                        } else if (fieldName.equals(ResourceSetTokenField.RESOURCE_SET_ID)) {
+                            if (resourceSetDescription.getId().equals(value)) {
+                                results.add(resourceSetDescription);
+                            }
+                        }
+                    }
 
-            return resourceSetDescriptions;
-        }
-    };
+                    return results;
+                }
+
+                @Override
+                public Set<ResourceSetDescription> visitNotFilter(Set<ResourceSetDescription> resourceSetDescriptions,
+                        QueryFilter<String> queryFilter) {
+                    Set<ResourceSetDescription> excluded = queryFilter.accept(this, resourceSetDescriptions);
+                    resourceSetDescriptions.removeAll(excluded);
+                    return resourceSetDescriptions;
+                }
+            };
 }
