@@ -243,11 +243,10 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     };
 
     obj.getRequirements = function (args) {
-        var ret = $.Deferred(),
-            hasRealmChanged = Configuration.globalData.auth.subrealm !== knownAuth.subrealm
-                || Configuration.globalData.auth.urlParams.realm !== knownAuth.urlParams.realm;
+        var ret = $.Deferred();
 
-        if (requirementList.length === 0 || hasRealmChanged) {
+        // if we don't have any requires yet, or if the realm changes.
+        if (requirementList.length === 0 || !_.isEqual(Configuration.globalData.auth, knownAuth)) {
 
             obj.begin(args).done(function (requirements) {
                 obj.handleRequirements(requirements);
