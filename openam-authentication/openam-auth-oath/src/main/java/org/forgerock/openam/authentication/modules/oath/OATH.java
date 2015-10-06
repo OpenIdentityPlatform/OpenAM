@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,10 +19,8 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- */
-
-/*
- * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
+ *
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.authentication.modules.oath;
@@ -51,10 +49,16 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.ResourceBundle;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.xml.bind.DatatypeConverter;
+
+import org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider;
+import org.forgerock.openam.authentication.modules.oath.plugins.SharedSecretProvider;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Implements the OATH specification. OATH uses a OTP to authenticate
@@ -70,37 +74,26 @@ public class OATH extends AMLoginModule {
 
     private String UUID = null;
     private String userName = null;
-
     private Map options = null;
     private Map sharedState = null;
     private ResourceBundle bundle = null;
 
-    //static attribute names
+    // static attribute names
     private static final String AUTHLEVEL = "iplanet-am-auth-oath-auth-level";
-    private static final String PASSWORD_LENGTH =
-            "iplanet-am-auth-oath-password-length";
-    private static final String SECRET_KEY_ATTRIBUTE_NAME =
-            "iplanet-am-auth-oath-secret-key-attribute";
-    private static final String WINDOW_SIZE =
-            "iplanet-am-auth-oath-hotp-window-size";
-    private static final String COUNTER_ATTRIBUTE_NAME =
-            "iplanet-am-auth-oath-hotp-counter-attribute";
-    private static final String TRUNCATION_OFFSET =
-            "iplanet-am-auth-oath-truncation-offset";
+    private static final String PASSWORD_LENGTH = "iplanet-am-auth-oath-password-length";
+    private static final String SECRET_KEY_ATTRIBUTE_NAME = "iplanet-am-auth-oath-secret-key-attribute";
+    private static final String WINDOW_SIZE = "iplanet-am-auth-oath-hotp-window-size";
+    private static final String COUNTER_ATTRIBUTE_NAME = "iplanet-am-auth-oath-hotp-counter-attribute";
+    private static final String TRUNCATION_OFFSET = "iplanet-am-auth-oath-truncation-offset";
     private static final String CHECKSUM = "iplanet-am-auth-oath-add-checksum";
-    private static final String TOTP_TIME_STEP =
-            "iplanet-am-auth-oath-size-of-time-step";
-    private static final String TOTP_STEPS_IN_WINDOW =
-            "iplanet-am-auth-oath-steps-in-window";
+    private static final String TOTP_TIME_STEP = "iplanet-am-auth-oath-size-of-time-step";
+    private static final String TOTP_STEPS_IN_WINDOW = "iplanet-am-auth-oath-steps-in-window";
     private static final String ALGORITHM = "iplanet-am-auth-oath-algorithm";
-    private static final String LAST_LOGIN_TIME_ATTRIBUTE_NAME =
-            "iplanet-am-auth-oath-last-login-time-attribute-name";
-    private static final String MIN_SECRET_KEY_LENGTH =
-            "iplanet-am-auth-oath-min-secret-key-length";
+    private static final String LAST_LOGIN_TIME_ATTRIBUTE_NAME = "iplanet-am-auth-oath-last-login-time-attribute-name";
+    private static final String MIN_SECRET_KEY_LENGTH = "iplanet-am-auth-oath-min-secret-key-length";
+    private static final String SHARED_SECRET_IMPLEMENTATION_CLASS = "forgerock-oath-sharedsecret-implementation-class";
 
-    private int MIN_SECRET_KEY_LENGTH_DEFAULT = 32;
-
-    //module attribute holders
+    // module attribute holders
     private int passLen = 0;
     private int minSecretKeyLength = 0;
     private String secretKeyAttrName = null;
@@ -117,7 +110,10 @@ public class OATH extends AMLoginModule {
     private static final int HOTP = 0;
     private static final int TOTP = 1;
     private static final int ERROR = 2;
+
+    private static final int MIN_PASSWORD_LENGTH = 6;
     private int algorithm = 0;
+    private String sharedSecretImplClass = null;
 
     protected String amAuthOATH = null;
 
@@ -171,32 +167,23 @@ public class OATH extends AMLoginModule {
         try {
             this.authLevel = CollectionHelper.getMapAttr(options, AUTHLEVEL);
             try {
-                this.passLen = Integer.parseInt(
-                        CollectionHelper.getMapAttr(options, PASSWORD_LENGTH));
+                this.passLen = Integer.parseInt(CollectionHelper.getMapAttr(options, PASSWORD_LENGTH));
             } catch (NumberFormatException e) {
                 passLen = 0;
             }
             try {
-                this.minSecretKeyLength = Integer.parseInt(
-                        CollectionHelper.getMapAttr(options, MIN_SECRET_KEY_LENGTH));
+                this.minSecretKeyLength = Integer.parseInt(CollectionHelper.getMapAttr(options, MIN_SECRET_KEY_LENGTH));
             } catch (NumberFormatException e) {
-                minSecretKeyLength = 0; //Default value has been delete, set to 0
+                minSecretKeyLength = 0;
             }
-            this.secretKeyAttrName = CollectionHelper.getMapAttr(
-                    options, SECRET_KEY_ATTRIBUTE_NAME);
-            this.windowSize = Integer.parseInt(CollectionHelper.getMapAttr(
-                    options, WINDOW_SIZE));
-            this.counterAttrName = CollectionHelper.getMapAttr(
-                    options, COUNTER_ATTRIBUTE_NAME);
-            this.truncationOffset = Integer.parseInt(
-                    CollectionHelper.getMapAttr(options, TRUNCATION_OFFSET));
-            this.totpTimeStep = Integer.parseInt(
-                    CollectionHelper.getMapAttr(options, TOTP_TIME_STEP));
-            this.totpStepsInWindow = Integer.parseInt(
-                    CollectionHelper.getMapAttr(options, TOTP_STEPS_IN_WINDOW));
-            this.loginTimeAttrName = CollectionHelper.getMapAttr(
-                    options, LAST_LOGIN_TIME_ATTRIBUTE_NAME);
-
+            this.secretKeyAttrName = CollectionHelper.getMapAttr(options, SECRET_KEY_ATTRIBUTE_NAME);
+            this.windowSize = Integer.parseInt(CollectionHelper.getMapAttr(options, WINDOW_SIZE));
+            this.counterAttrName = CollectionHelper.getMapAttr(options, COUNTER_ATTRIBUTE_NAME);
+            this.truncationOffset = Integer.parseInt(CollectionHelper.getMapAttr(options, TRUNCATION_OFFSET));
+            this.totpTimeStep = Integer.parseInt(CollectionHelper.getMapAttr(options, TOTP_TIME_STEP));
+            this.totpStepsInWindow = Integer.parseInt(CollectionHelper.getMapAttr(options, TOTP_STEPS_IN_WINDOW));
+            this.loginTimeAttrName = CollectionHelper.getMapAttr(options, LAST_LOGIN_TIME_ATTRIBUTE_NAME);
+            this.sharedSecretImplClass = CollectionHelper.getMapAttr(options, SHARED_SECRET_IMPLEMENTATION_CLASS);
 
             String algorithm = CollectionHelper.getMapAttr(options, ALGORITHM);
             if (algorithm.equalsIgnoreCase("HOTP")) {
@@ -204,7 +191,7 @@ public class OATH extends AMLoginModule {
             } else if (algorithm.equalsIgnoreCase("TOTP")) {
                 this.algorithm = TOTP;
             } else {
-                //this will be caught when it tries to check OTP
+                // this will be caught when it tries to check OTP
                 this.algorithm = ERROR;
             }
 
@@ -215,26 +202,23 @@ public class OATH extends AMLoginModule {
                 checksum = true;
             }
 
-            //set authentication level
+            // set authentication level
             if (authLevel != null) {
                 try {
                     setAuthLevel(Integer.parseInt(authLevel));
                 } catch (Exception e) {
-                    debug.error("OATH" + ".init() : " +
-                                    "Unable to set auth level " + authLevel,
-                            e);
+                    debug.error("OATH.init(): Unable to set auth level " + authLevel, e);
                 }
             }
         } catch (Exception e) {
-            debug.error("OATH" + ".init() : " +
-                    "Unable to get module attributes", e);
+            debug.error("OATH.init(): Unable to get module attributes", e);
         }
 
         //get username from previous authentication
         try {
             userName = (String) sharedState.get(getUserKey());
         } catch (Exception e) {
-            debug.error("OATH" + ".init() : " + "Unable to get username : ", e);
+            debug.error("OATH.init(): Unable to get username : ", e);
         }
 
     }
@@ -258,17 +242,14 @@ public class OATH extends AMLoginModule {
                 SSOTokenManager mgr = SSOTokenManager.getInstance();
                 InternalSession isess = getLoginState("OATH").getOldSession();
                 if (isess == null) {
-                    throw new AuthLoginException("amAuth", "noInternalSession",
-                            null);
+                    throw new AuthLoginException("amAuth", "noInternalSession", null);
                 }
                 SSOToken token = mgr.createSSOToken(isess.getID().toString());
                 UUID = token.getPrincipal().getName();
                 userName = token.getProperty("UserToken");
                 if (debug.messageEnabled()) {
-                    debug.message("OATH" + ".process() : " +
-                            "Username from SSOToken : " + userName);
+                    debug.message("OATH.process(): Username from SSOToken : " + userName);
                 }
-
                 if (userName == null || userName.length() == 0) {
                     throw new AuthLoginException("amAuth", "noUserName", null);
                 }
@@ -276,39 +257,47 @@ public class OATH extends AMLoginModule {
 
             switch (state) {
                 case ISAuthConstants.LOGIN_START:
-                    //process callbacks
-                    //callback[0] = Password CallBack (OTP)
-                    //callback[1] = Confirmation CallBack (Submit OTP)
+                    // process callbacks
+                    // callback[0] = Password CallBack (OTP)
+                    // callback[1] = Confirmation CallBack (Submit OTP)
                     if (callbacks == null || callbacks.length != 2) {
-                        throw new AuthLoginException(amAuthOATH,
-                                "authFailed",
-                                null);
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
                     }
 
-                    //get OTP
-                    String OTP = String.valueOf(((PasswordCallback)
-                            callbacks[0]).getPassword());
-                    if (OTP == null || OTP.length() == 0) {
-                        debug.error("OATH" +
-                                ".process() : " +
-                                "invalid OTP code");
+                    // check password length MUST be 6 or higher according to RFC
+                    if (passLen < MIN_PASSWORD_LENGTH) {
+                        debug.error("OATH.process(): Password length is less than " + MIN_PASSWORD_LENGTH);
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                    }
+
+                    // get OTP
+                    String OTP = String.valueOf(((PasswordCallback) callbacks[0]).getPassword());
+                    if (StringUtils.isEmpty(OTP)) {
+                        debug.error("OATH.process(): invalid OTP code");
                         setFailureID(userName);
-                        throw new InvalidPasswordException("amAuth",
-                                "invalidPasswd",
-                                null);
+                        throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
                     }
 
-                    //get Arrival time of the OTP
+                    if (minSecretKeyLength <= 0) {
+                        debug.error("OATH.process(): Min Secret Key Length is not a valid value");
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                    }
+
+                    if (StringUtils.isEmpty(secretKeyAttrName)) {
+                        debug.error("OATH.process():  secret key attribute name is empty");
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                    }
+
+                    // get Arrival time of the OTP
                     time = System.currentTimeMillis() / 1000L;
 
-                    //check HOTP
+                    // check HOTP
                     if (checkOTP(OTP)) {
                         return ISAuthConstants.LOGIN_SUCCEED;
                     } else {
-                        //the OTP is out of the window or incorect
+                        // the OTP is out of the window or incorrect
                         setFailureID(userName);
-                        throw new InvalidPasswordException("amAuth",
-                                "invalidPasswd", null);
+                        throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
                     }
             }
         } catch (SSOException e) {
@@ -356,95 +345,12 @@ public class OATH extends AMLoginModule {
         //get user id
         AMIdentity id = null;
         id = getIdentity(userName);
-
         if (id == null) {
-            //error message already printed in the getIdentity function
+            // error message already printed in the getIdentity function
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
 
-        Set<String> secretKeySet = null;
-        try {
-            if (secretKeyAttrName == null || secretKeyAttrName.isEmpty()) {
-                debug.error("OATH" +
-                        ".checkOTP() : " +
-                        "invalid secret key attribute name : ");
-                throw new AuthLoginException(amAuthOATH, "authFailed", null);
-            }
-
-            secretKeySet = id.getAttribute(secretKeyAttrName);
-        } catch (IdRepoException e) {
-            debug.error("OATH" +
-                            ".checkOTP() : " +
-                            "error getting secret key attribute : ",
-                    e);
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        } catch (SSOException e) {
-            debug.error("OATH" +
-                            ".checkOTP() : " +
-                            "error invalid repo id : " +
-                            id,
-                    e);
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        //check secretKey attribute
-        if (secretKeySet == null || secretKeySet.isEmpty()) {
-            //no secretkey
-            debug.error("OATH" +
-                    ".checkOTP() : " +
-                    "Secret key setting is empty or null");
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        String secretKey = null;
-        int counter = 0;
-
-        //get secret key
-        secretKey = (String) (secretKeySet.iterator().next());
-
-        //get rid of white space in string (messes witht he data converter)
-        secretKey = secretKey.replaceAll("\\s+", "");
-        //convert secretKey to lowercase
-        secretKey = secretKey.toLowerCase();
-        //make sure secretkey is even length
-        if ((secretKey.length() % 2) != 0) {
-            secretKey = "0" + secretKey;
-        }
-
-        if (minSecretKeyLength <= 0) {
-            debug.error("OATH" +
-                    ".checkOTP() : " +
-                    " Min Secret Key Length is not a valid value");
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        //check size of key
-        if (secretKey.isEmpty() || secretKey == null) {
-            debug.error("OATH" +
-                    ".checkOTP() : " +
-                    "Secret key is not a valid value");
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        //make sure secretkey is not smaller than minSecretKeyLength
-        if (secretKey.length() < minSecretKeyLength) {
-            debug.error("OATH" +
-                    ".checkOTP() : " +
-                    "Secret key of length " + secretKey.length() + " is less than the minimum secret key length");
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        //convert secretkey hex string to hex.
-        //byte [] secretKeyBytes = hexStrToBytes(secretKey);
-        byte[] secretKeyBytes = DatatypeConverter.parseHexBinary(secretKey);
-
-        //check password length MUST be 6 or higher according to RFC
-        if (passLen < 6) {
-            debug.error("OATH" +
-                    ".checkOTP() : " +
-                    "Password length is smaller than 6");
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
+        byte[] secretKeyBytes = getSharedSecret(id);
 
         String otpGen = null;
         try {
@@ -452,7 +358,7 @@ public class OATH extends AMLoginModule {
                 /*
                  * HOTP check section
                  */
-
+                int counter = 0;
                 Set<String> counterSet = null;
                 try {
                     if (counterAttrName == null || counterAttrName.isEmpty()) {
@@ -503,7 +409,7 @@ public class OATH extends AMLoginModule {
                     throw new AuthLoginException(amAuthOATH, "authFailed", null);
                 }
 
-                // we have to do counter+1 becasue counter is the last previous 
+                // we have to do counter+1 because counter is the last previous 
                 //accepted counter
                 counter++;
 
@@ -598,7 +504,7 @@ public class OATH extends AMLoginModule {
                 }
 
                 String passLenStr = Integer.toString(passLen);
-                otpGen = TOTPAlgorithm.generateTOTP(secretKey,
+                otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes,
                         Long.toHexString(localTime),
                         passLenStr);
                 if (otpGen.equals(otp)) {
@@ -611,7 +517,7 @@ public class OATH extends AMLoginModule {
                     long time2 = localTime - i;
 
                     //check time step after current time
-                    otpGen = TOTPAlgorithm.generateTOTP(secretKey,
+                    otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes,
                             Long.toHexString(time1),
                             passLenStr);
                     if (otpGen.equals(otp)) {
@@ -621,13 +527,13 @@ public class OATH extends AMLoginModule {
 
                     //check time step before current time
 
-                    otpGen = TOTPAlgorithm.generateTOTP(secretKey,
+                    otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes,
                             Long.toHexString(time2),
                             passLenStr);
                     if (otpGen.equals(otp) && sameWindow){
                         debug.error("OATH" +
                                 ".checkOTP() : " +
-                                "Loging in in the same window with a OTP that is older than the current times OTP");
+                                "Logging in in the same window with a OTP that is older than the current times OTP");
                         return false;
                     } else if(otpGen.equals(otp) && !sameWindow)  {
                         setLoginTime(id, time2);
@@ -652,10 +558,83 @@ public class OATH extends AMLoginModule {
     }
 
     /**
+     * Get the shared secret using the configured SharedSecretProvider plugin.
+     * @param id  the user we are trying to login
+     * @return the shared secret
+     * @throws AuthLoginException if unable to get shared secret or invoke shared secret provider.
+     */
+    private byte[] getSharedSecret(AMIdentity id) throws AuthLoginException {
+        String secretKey = null;
+        byte[] secretKeyBytes = null;
+        Set<String> secretKeySet = null;
+
+        try {
+            secretKeySet = id.getAttribute(secretKeyAttrName);
+        } catch (IdRepoException e) {
+            debug.error("OATH.getSharedSecret(): error getting secret key attribute: ", e);
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        } catch (SSOException e) {
+            debug.error("OATH.getSharedSecret(): error invalid repo id: " + id, e);
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+
+        // check secretKey attribute
+        if (!CollectionUtils.isEmpty(secretKeySet)) {
+            secretKey = secretKeySet.iterator().next();
+        }
+
+        // check size of key
+        if (StringUtils.isEmpty(secretKey)) {
+            debug.error("OATH.getSharedSecret(): Secret key is empty");
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+
+        SharedSecretProvider sharedSecretProvider = null;
+        try {
+            if (!StringUtils.isEmpty(sharedSecretImplClass)) {
+                sharedSecretProvider = Class.forName(sharedSecretImplClass)
+                        .asSubclass(SharedSecretProvider.class).newInstance();
+
+            } else {
+                //
+                debug.error("OATH.getSharedSecret(): SharedSecretProvider class is empty falling back to default implementation");
+                sharedSecretProvider = new DefaultSharedSecretProvider();
+            }
+            debug.message("Invoking SharedSecretProvider hook using:" + sharedSecretImplClass);
+            secretKeyBytes = sharedSecretProvider.getSharedSecret(secretKey);
+
+        } catch (ClassNotFoundException e) {
+            debug.error("OATH.getSharedSecret() Unable to find SharedSecretProvider Class:" + sharedSecretImplClass, e);
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        } catch (InstantiationException e) {
+            debug.error("OATH.getSharedSecret()", e);
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        } catch (IllegalAccessException e) {
+            debug.error("OATH.getSharedSecret()", e);
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+
+        if (null == secretKeyBytes) {
+            debug.error("OATH.getSharedSecret() SharedSecretProvider returned null value");
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+
+        // since the minkeyLength accounts is for a hex encoded format, we need to adjust the byte length
+        if ((secretKeyBytes.length*2) < minSecretKeyLength) {
+            debug.error("OATH.getSharedSecret(): Secret key of length " + (secretKeyBytes.length *2)
+                    + " is less than the minimum secret key length of " + minSecretKeyLength);
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+        return secretKeyBytes;
+    }
+
+
+    /**
      * Gets the AMIdentity of a user with username equal to uName.
      *
      * @param uName username of the user to get.
-     * @return The AMIdentity of user with username equal to uName.
+     * @return The AMIdentity of user with username equal to uName or null
+     * if error while trying to find user.
      */
     private AMIdentity getIdentity(String uName) {
         AMIdentity theID = null;
@@ -672,16 +651,17 @@ public class OATH extends AMLoginModule {
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }
-            if (results.isEmpty()) {
-                throw new IdRepoException("OATH.getIdentity : User " + uName + " is not found");
+
+            if (results == null || results.isEmpty()) {
+                throw new IdRepoException("OATH.getIdentity : User " + userName + " is not found");
             } else if (results.size() > 1) {
-                throw new IdRepoException("OATH.getIdentity : More than one user found for the userName " + uName);
+                throw new IdRepoException("OATH.getIdentity: More than one user found for the userName: " + userName);
             }
             theID = results.iterator().next();
         } catch (IdRepoException e) {
-            debug.error("OATH.getIdentity : error searching Identities with username : " + uName, e);
+            debug.error("OATH.getIdentity: error searching Identities with username : " + userName, e);
         } catch (SSOException e) {
-            debug.error("OATH.getIdentity : AuthOATH module exception : ", e);
+            debug.error("OATH.getIdentity: AuthOATH module exception : ", e);
         }
         return theID;
     }

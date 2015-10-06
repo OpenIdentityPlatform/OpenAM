@@ -7,18 +7,17 @@
  terms contained in, the Simplified BSD License set forth in Section
  4.c of the IETF Trust's Legal Provisions Relating to IETF Documents
  (http://trustee.ietf.org/license-info).
- */
-/**
- * Portions Copyrighted 2012 ForgeRock AS
+ *
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.oath;
 
 import java.lang.reflect.UndeclaredThrowableException;
-import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * This is an example implementation of the OATH
@@ -55,24 +54,6 @@ public class TOTPAlgorithm {
         }
     }
 
-    /**
-     * This method converts a HEX string to Byte[]
-     *
-     * @param hex the HEX string
-     * @return a byte array
-     */
-
-    private static byte[] hexStr2Bytes(String hex) {
-        // Adding one byte to get the right conversion
-        // Values starting with "0" can be converted
-        byte[] bArray = new BigInteger("10" + hex, 16).toByteArray();
-
-        // Copy all the REAL bytes, not the "first"
-        byte[] ret = new byte[bArray.length - 1];
-        for (int i = 0; i < ret.length; i++)
-            ret[i] = bArray[i + 1];
-        return ret;
-    }
 
     private static final int[] DIGITS_POWER
             // 0 1  2   3    4     5      6       7        8
@@ -82,14 +63,14 @@ public class TOTPAlgorithm {
      * This method generates a TOTP value for the given
      * set of parameters.
      *
-     * @param key          the shared secret, HEX encoded
+     * @param key          the shared secret HEX encoded
      * @param time         a value that reflects a time
      * @param returnDigits number of digits to return
      * @return a numeric String in base 10 that includes
      *         {@link truncationDigits} digits
      */
 
-    public static String generateTOTP(String key,
+    public static String generateTOTP(byte[] key,
                                       String time,
                                       String returnDigits) {
         return generateTOTP(key, time, returnDigits, "HmacSHA1");
@@ -100,14 +81,14 @@ public class TOTPAlgorithm {
      * This method generates a TOTP value for the given
      * set of parameters.
      *
-     * @param key          the shared secret, HEX encoded
+     * @param key          the shared secret
      * @param time         a value that reflects a time
      * @param returnDigits number of digits to return
      * @return a numeric String in base 10 that includes
      *         {@link truncationDigits} digits
      */
 
-    public static String generateTOTP256(String key,
+    public static String generateTOTP256(byte[] key,
                                          String time,
                                          String returnDigits) {
         return generateTOTP(key, time, returnDigits, "HmacSHA256");
@@ -117,14 +98,14 @@ public class TOTPAlgorithm {
      * This method generates a TOTP value for the given
      * set of parameters.
      *
-     * @param key          the shared secret, HEX encoded
+     * @param key          the shared secret
      * @param time         a value that reflects a time
      * @param returnDigits number of digits to return
      * @return a numeric String in base 10 that includes
      *         {@link truncationDigits} digits
      */
 
-    public static String generateTOTP512(String key,
+    public static String generateTOTP512(byte[] key,
                                          String time,
                                          String returnDigits) {
         return generateTOTP(key, time, returnDigits, "HmacSHA512");
@@ -135,7 +116,7 @@ public class TOTPAlgorithm {
      * This method generates a TOTP value for the given
      * set of parameters.
      *
-     * @param key          the shared secret, HEX encoded
+     * @param key          the shared secret
      * @param time         a value that reflects a time
      * @param returnDigits number of digits to return
      * @param crypto       the crypto function to use
@@ -143,7 +124,7 @@ public class TOTPAlgorithm {
      *         {@link truncationDigits} digits
      */
 
-    public static String generateTOTP(String key,
+    public static String generateTOTP(byte[] key,
                                       String time,
                                       String returnDigits,
                                       String crypto) {
@@ -157,9 +138,8 @@ public class TOTPAlgorithm {
             time = "0" + time;
 
         // Get the HEX in a Byte[]
-        byte[] msg = hexStr2Bytes(time);
-        byte[] k = hexStr2Bytes(key);
-        byte[] hash = hmac_sha(crypto, k, msg);
+        byte[] msg = DatatypeConverter.parseHexBinary(time);
+        byte[] hash = hmac_sha(crypto, key, msg);
 
         // put selected bytes into result int
         int offset = hash[hash.length - 1] & 0xf;
