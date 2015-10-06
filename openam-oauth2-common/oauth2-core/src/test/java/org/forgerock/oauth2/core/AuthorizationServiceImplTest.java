@@ -85,6 +85,7 @@ public class AuthorizationServiceImplTest {
         given(request.getLocale()).willReturn(Locale.ENGLISH);
         given(resourceOwnerSessionValidator.validate(request)).willReturn(resourceOwner);
         given(clientRegistrationStore.get(anyString(), eq(request))).willReturn(clientRegistration);
+        given(clientRegistration.getDisplayName(any(Locale.class))).willReturn("CLIENT_NAME");
         given(providerSettings.validateAuthorizationScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
                 .willReturn(validatedScope);
         given(providerSettings.isConsentSaved(eq(resourceOwner), anyString(), eq(validatedScope))).willReturn(false);

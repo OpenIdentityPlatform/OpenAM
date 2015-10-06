@@ -51,7 +51,7 @@
                     <#if response_type??>responseType: "${response_type?js_string}",</#if>
                     <#if client_id??>clientId: "${client_id?js_string}",</#if>
                     formTarget: "${(target!'.')?js_string}",
-                    <#if display_name??>displayName: "${display_name?js_string}",</#if>
+                    displayName: "${display_name?js_string}",
                     <#if user_name??>userName: "${user_name?js_string}",</#if>
                     <#if user_code??>userCode: "${user_code?js_string}",</#if>
                     displayScopes: ${display_scopes},

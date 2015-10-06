@@ -97,8 +97,13 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         final Request restletRequest = getRequest();
         OAuth2Request request = requestFactory.create(restletRequest);
 
-        DeviceCode deviceCode = tokenStore.readDeviceCode(request.<String>getParameter(OAuth2Constants.DeviceCode.USER_CODE),
-                request);
+        DeviceCode deviceCode;
+        try {
+            deviceCode = tokenStore.readDeviceCode(request.<String>getParameter(OAuth2Constants.DeviceCode.USER_CODE),
+                    request);
+        } catch (InvalidGrantException e) {
+            return getTemplateRepresentation(FORM, request, "not_found");
+        }
 
         if (deviceCode == null || deviceCode.isIssued()) {
             return getTemplateRepresentation(FORM, request, "not_found");

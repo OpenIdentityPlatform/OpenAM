@@ -100,8 +100,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             requestValidator.validateRequest(request);
         }
 
-        final ClientRegistration clientRegistration =
-                clientRegistrationStore.get(request.<String>getParameter(CLIENT_ID), request);
+        final String clientId = request.getParameter(CLIENT_ID);
+        final ClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
 
         final Set<String> scope = Utils.splitScope(request.<String>getParameter(SCOPE));
         //plugin point
@@ -133,7 +133,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             }
 
             final String clientName = clientRegistration.getDisplayName(locale);
-            final String clientDescription = clientRegistration.getDisplayDescription(locale);
+            if (clientName == null) {
+                throw new InvalidClientException("Display name has not been set.");
+            }
+            final String displayDescription = clientRegistration.getDisplayDescription(locale);
+            final String clientDescription = displayDescription == null ? "" : displayDescription;
             final Map<String, String> scopeDescriptions = getScopeDescriptions(validatedScope,
                     clientRegistration.getScopeDescriptions(locale));
             final Map<String, String> claimDescriptions = getClaimDescriptions(userInfo.getValues(),
