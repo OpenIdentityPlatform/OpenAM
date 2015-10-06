@@ -15,11 +15,12 @@
  */
 package org.forgerock.openam.rest.audit;
 
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableContexts;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.rest.service.RestletRealmRouter.REALM;
+import static org.forgerock.openam.utils.StringUtils.isBlank;
 import static org.restlet.ext.servlet.ServletUtils.getRequest;
 
 import org.forgerock.audit.AuditException;
@@ -95,9 +96,10 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
     }
 
     private void auditAccessAttempt(Request request) throws AuditException {
-        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
+        String realm = getRealmFromRequest(request);
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(request.getDate().getTime())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
@@ -112,12 +114,13 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
     }
 
     private void auditAccessSuccess(Request request, Response response) {
-        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
+        String realm = getRealmFromRequest(request);
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - request.getDate().getTime();
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
@@ -133,14 +136,15 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
     }
 
     private void auditAccessFailure(Request request, Response response) {
-        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
+        String realm = getRealmFromRequest(request);
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());
             long elapsedTime = endTime - request.getDate().getTime();
             String responseDetail = response.getStatus().getDescription();
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
@@ -160,6 +164,11 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
         if (servletRequest != null) {
             builder.forHttpServletRequest(servletRequest);
         }
+    }
+
+    private String getRealmFromRequest(Request request) {
+        String realm = (String) request.getAttributes().get(REALM);
+        return isBlank(realm) ? NO_REALM : realm;
     }
 
     /**

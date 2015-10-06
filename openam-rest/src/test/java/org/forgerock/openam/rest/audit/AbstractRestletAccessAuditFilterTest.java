@@ -24,10 +24,10 @@ import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditServiceBuilder;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.openam.audit.AMAuditService;
-import org.forgerock.openam.audit.DefaultAuditServiceProxy;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.AuditServiceProvider;
+import org.forgerock.openam.audit.DefaultAuditServiceProxy;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.restlet.Request;
@@ -39,6 +39,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AbstractRestletAccessAuditFilterTest {
 
@@ -72,6 +73,7 @@ public class AbstractRestletAccessAuditFilterTest {
         Representation representation = mock(Representation.class);
         when(request.getEntity()).thenReturn(representation);
         when(request.getDate()).thenReturn(new Date());
+        when(request.getAttributes()).thenReturn(new ConcurrentHashMap<String, Object>());
         when(representation.isTransient()).thenReturn(false);
         AuditRequestContext.putProperty(USER_ID, "User 1");
         when(eventPublisher.isAuditing(anyString(), anyString())).thenReturn(true);
@@ -81,6 +83,7 @@ public class AbstractRestletAccessAuditFilterTest {
         auditFilter.handle(request, response);
 
         // Then
+        verify(eventPublisher, times(1)).publish(anyString(), any(AuditEvent.class));
         verify(restlet, never()).handle(any(Request.class), any(Response.class));
         assertThat(response.getStatus()).isEqualTo(Status.SERVER_ERROR_INTERNAL);
     }
@@ -92,6 +95,7 @@ public class AbstractRestletAccessAuditFilterTest {
         Response response = new Response(request);
         Representation representation = mock(Representation.class);
         when(request.getEntity()).thenReturn(representation);
+        when(request.getAttributes()).thenReturn(new ConcurrentHashMap<String, Object>());
         when(representation.isTransient()).thenReturn(false);
         when(eventPublisher.isAuditing(anyString(), anyString())).thenReturn(false);
 
