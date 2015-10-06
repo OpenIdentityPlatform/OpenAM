@@ -27,12 +27,11 @@ import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
 import static org.forgerock.openam.audit.AuditConstants.Component.CONFIG;
 import static org.forgerock.openam.audit.AuditConstants.Component.USERS;
-import static org.forgerock.openam.audit.AuditConstants.DEFAULT_AUDIT_REALM;
+import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
 import static org.forgerock.openam.rest.Routers.ssoToken;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -364,7 +363,7 @@ public class RestRouterIT extends GuiceTestCase {
     }
 
     private void auditingOff() {
-        given(auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)).willReturn(false);
+        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)).willReturn(false);
     }
 
     private void mockDnsAlias(String alias, String realm) throws Exception {

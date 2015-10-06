@@ -27,7 +27,6 @@ import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
-import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
@@ -78,9 +77,9 @@ public class PLLAuditor {
      * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     public void auditAccessAttempt() {
-        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)) {
 
-            AuditEvent auditEvent = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+            AuditEvent auditEvent = auditEventFactory.accessEvent(NO_REALM)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -105,11 +104,11 @@ public class PLLAuditor {
         if (!accessAttemptAudited) {
             auditAccessAttempt();
         }
-        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AuditEvent auditEvent = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+            AuditEvent auditEvent = auditEventFactory.accessEvent(NO_REALM)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -151,11 +150,11 @@ public class PLLAuditor {
         if (!accessAttemptAudited) {
             auditAccessAttempt();
         }
-        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AuditEvent auditEvent = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+            AuditEvent auditEvent = auditEventFactory.accessEvent(NO_REALM)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())

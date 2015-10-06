@@ -15,8 +15,7 @@
  */
 package org.forgerock.openam.rest.fluent;
 
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.getTokenFromContext;
@@ -24,15 +23,15 @@ import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.getTok
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
-import org.forgerock.audit.events.AccessAuditEventBuilder;
-import org.forgerock.services.context.RequestAuditContext;
 import org.forgerock.json.resource.Request;
-import org.forgerock.services.context.Context;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.AuditInfoContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RequestAuditContext;
 import org.forgerock.util.Reject;
 
 /**
@@ -49,6 +48,7 @@ class CrestAuditor {
     private final Component component;
     private final Request request;
     private final long startTime;
+    private final String realm;
 
     /**
      * Create a new CrestAuditor.
@@ -71,6 +71,12 @@ class CrestAuditor {
         this.context = context;
         this.request = request;
         this.startTime = context.asContext(RequestAuditContext.class).getRequestReceivedTime();
+
+        if (context.containsContext(RealmContext.class)) {
+            this.realm = context.asContext(RealmContext.class).getResolvedRealm();
+        } else {
+            this.realm = NO_REALM;
+        }
     }
 
     /**
@@ -79,9 +85,9 @@ class CrestAuditor {
      * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     void auditAccessAttempt() throws AuditException {
-        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpCrestRequest(context, request)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -100,11 +106,11 @@ class CrestAuditor {
      * captured in the debug logs but otherwise ignored.
      */
     void auditAccessSuccess() {
-        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -127,11 +133,11 @@ class CrestAuditor {
      * @param message    A human-readable description of the error that occurred.
      */
     void auditAccessFailure(int resultCode, String message) {
-        if (auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())

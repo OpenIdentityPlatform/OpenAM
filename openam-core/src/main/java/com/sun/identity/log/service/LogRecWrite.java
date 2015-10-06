@@ -29,7 +29,6 @@
  */
 package com.sun.identity.log.service;
 
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AuditConstants.*;
 
@@ -48,7 +47,6 @@ import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
-import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
@@ -192,7 +190,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
     }
 
     private void auditAccessMessage(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory, LogRecord record) {
-        if (!auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, AuditConstants.ACCESS_TOPIC)) {
+        if (!auditEventPublisher.isAuditing(NO_REALM, AuditConstants.ACCESS_TOPIC)) {
             return;
         }
 
@@ -220,7 +218,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         String queryString = queryStringIndex > -1 ? resourceUrl.substring(queryStringIndex) : "";
         String path = resourceUrl.replace(queryString, "");
 
-        AuditEvent auditEvent = auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)
+        AuditEvent auditEvent = auditEventFactory.accessEvent(NO_REALM)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.POLICY_AGENT)

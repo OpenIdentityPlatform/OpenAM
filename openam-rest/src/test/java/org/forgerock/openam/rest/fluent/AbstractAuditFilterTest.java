@@ -20,7 +20,7 @@ import static org.forgerock.audit.events.AuditEventBuilder.EVENT_NAME;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Requests.*;
 import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
-import static org.forgerock.openam.audit.AuditConstants.DEFAULT_AUDIT_REALM;
+import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
 import static org.forgerock.openam.rest.fluent.JsonUtils.jsonFromFile;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -58,7 +58,6 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -197,7 +196,7 @@ public abstract class AbstractAuditFilterTest {
 
     private AuditEventFactory mockAuditEventFactory() {
         AuditEventFactory auditEventFactory = mock(AuditEventFactory.class);
-        when(auditEventFactory.accessEvent(DEFAULT_AUDIT_REALM)).thenAnswer(new Answer<AMAccessAuditEventBuilder>() {
+        when(auditEventFactory.accessEvent(NO_REALM)).thenAnswer(new Answer<AMAccessAuditEventBuilder>() {
             @Override
             public AMAccessAuditEventBuilder answer(InvocationOnMock invocation) throws Throwable {
                 return new AMAccessAuditEventBuilder();
@@ -207,11 +206,11 @@ public abstract class AbstractAuditFilterTest {
     }
 
     private void givenAccessAuditingEnabled() {
-        given(auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)).willReturn(true);
+        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)).willReturn(true);
     }
 
     private void givenAccessAuditingDisabled() {
-        given(auditEventPublisher.isAuditing(DEFAULT_AUDIT_REALM, ACCESS_TOPIC)).willReturn(false);
+        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)).willReturn(false);
     }
 
     private void givenAccessAuditingFails() throws AuditException {

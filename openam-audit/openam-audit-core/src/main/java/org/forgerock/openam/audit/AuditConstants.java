@@ -202,7 +202,7 @@ public final class AuditConstants {
      * {@link AuditEventPublisher#isAuditing(String, String)} you can provide null or an empty string. We deliberately
      * do not provide a convenience method with no realm to force implementers to consider providing the realm.
      */
-    public static final String DEFAULT_AUDIT_REALM = null;
+    public static final String NO_REALM = null;
 
     /**
      * The OAuth2 audit context providers, responsible for finding details which can be audit logged from various
