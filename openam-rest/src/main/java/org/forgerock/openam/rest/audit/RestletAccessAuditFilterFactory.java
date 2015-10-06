@@ -67,8 +67,8 @@ public final class RestletAccessAuditFilterFactory {
      */
     public Filter createFilter(Component component, Restlet restlet) {
         switch (component) {
-            /*case UMA:
-                return new UMAAccessAuditFilter(restlet, eventPublisher, eventFactory, providers);*/
+            case UMA:
+                return new UMAAccessAuditFilter(restlet, eventPublisher, eventFactory, providers);
             case OAUTH2:
                 return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, providers);
         }
