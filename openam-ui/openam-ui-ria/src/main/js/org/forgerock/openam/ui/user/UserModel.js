@@ -28,11 +28,9 @@ define("org/forgerock/openam/ui/user/UserModel", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/ServiceInvoker"
 ], function ($, _, AbstractModel, Configuration, Constants, EventManager, RealmHelper, Router, ServiceInvoker) {
-    var UserModel = AbstractModel.extend({
+    var baseUrl = Constants.host + "/" + Constants.context + "/json/__subrealm__/users",
+        UserModel = AbstractModel.extend({
         idAttribute: "id",
-
-        url:    Constants.host + "/" + Constants.context + "/json/" +
-                RealmHelper.decorateURIWithRealm("__subrealm__/users"),
 
         sync: function (method, model, options) {
             var clearPassword = _.bind(function () {
@@ -45,7 +43,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                 if (_.has(this.changed, "password")) {
                     // password changes have to occur via a special rest call
                     return ServiceInvoker.restCall({
-                        url: this.url + "/" + this.id + "?_action=changePassword",
+                        url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id + "?_action=changePassword"),
                         type: "POST",
                         data: JSON.stringify({
                             username: this.get("id"),
@@ -62,7 +60,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                             "data": JSON.stringify(
                                 _.pick(this.toJSON(), ["givenName","sn","mail","postalAddress","telephoneNumber"])
                             ),
-                            "url": this.url + "/" + this.id,
+                            "url": RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
                             "headers": {
                                 "If-Match": this.getMVCCRev()
                             }
@@ -71,8 +69,21 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     ));
                 }
             } else {
-                // defer to generic crest implementation
-                return AbstractModel.prototype.sync.call(this, method, model, options);
+                // The only other supported operation is read
+                return ServiceInvoker.restCall(_.extend(
+                    {
+                        "url" : RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                        "type": "GET"
+                    },
+                    options
+                )).then(function (response) {
+                    if (options.parse) {
+                        model.set(model.parse(response, options));
+                    } else {
+                        model.set(response);
+                    }
+                    return model.toJSON();
+                });
             }
         },
         parse: function (response, options) {
@@ -104,7 +115,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
         },
         getProfile: function (headers) {
             return ServiceInvoker.restCall({
-                url: this.url + "?_action=idFromSession",
+                url: RealmHelper.decorateURIWithRealm(baseUrl + "?_action=idFromSession"),
                 type: "POST",
                 errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
             }).then(
