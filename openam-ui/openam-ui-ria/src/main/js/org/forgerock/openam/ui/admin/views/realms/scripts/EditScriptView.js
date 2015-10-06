@@ -113,6 +113,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
             this.data.entity = _.pick(this.model.attributes,
                 "uuid", "name", "description", "language", "context", "script");
+            this.data.deleteBtnDisabled = !this.data.entity.name;
 
             if (!this.data.contexts) {
                 $.when(self.contextsPromise, self.contextSchemaPromise, self.languageSchemaPromise).done(
