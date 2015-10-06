@@ -23,6 +23,7 @@
  */
 package com.sun.identity.workflow;
 
+import static java.text.MessageFormat.format;
 import static java.util.Collections.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
@@ -156,7 +157,8 @@ public class ConfigureOAuth2 extends Task {
 
     private static final Debug DEBUG = Debug.getInstance("workflow");
 
-    private static final String SERVICE_NAME = "OAuth2Provider";
+    private static final String OAUTH2_SERVICE_NAME = "OAuth2Provider";
+    private static final String UMA_SERVICE_NAME = "UmaProvider";
 
     //params
     private static final String TYPE = "type";
@@ -177,6 +179,7 @@ public class ConfigureOAuth2 extends Task {
     public static final String MESSAGE = "oauth2.provider.configured";
     public static final String POLICY_CREATED = "oauth2.provider.policy.created";
     public static final String POLICY_EXISTS = "oauth2.provider.policy.exists";
+    public static final String UMA_SERVICE_CREATED = "oauth2.provider.created.uma";
 
     private final PolicyStoreProvider storeProvider;
 
@@ -208,7 +211,12 @@ public class ConfigureOAuth2 extends Task {
         attrValues.put(ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN, singleton(getString(params, IRTR)));
         attrValues.put(SCOPE_PLUGIN_CLASS, singleton(getString(params, SIC)));
 
-        createOAuth2Provider(token, realm, attrValues);
+        createProvider(OAUTH2_SERVICE_NAME, token, realm, attrValues);
+
+        final boolean createUmaService = "uma".equals(type);
+        if (createUmaService) {
+            createProvider(UMA_SERVICE_NAME, token, realm, Collections.<String, Set<String>>emptyMap());
+        }
 
         String policyURL = getRequestURL(params) + OAUTH2_AUTHORIZE_ENDPOINT;
 
@@ -255,8 +263,8 @@ public class ConfigureOAuth2 extends Task {
 
         String messageTemplate = getMessage(MESSAGE, locale);
 
-        return MessageFormat.format(messageTemplate, realm,
-                MessageFormat.format(getMessage(createPolicy ? POLICY_CREATED : POLICY_EXISTS, locale), POLICY_NAME));
+        return format(messageTemplate, createUmaService ? getMessage(UMA_SERVICE_CREATED, locale) : "", realm,
+                format(getMessage(createPolicy ? POLICY_CREATED : POLICY_EXISTS, locale), POLICY_NAME));
     }
 
     private Set<String> translate(String realm, Map<String, String> values) {
@@ -292,7 +300,7 @@ public class ConfigureOAuth2 extends Task {
 
     private Map<String, Set<String>> getDefaultOAuth2ProviderAttributes(SSOToken token) throws WorkflowException {
         try {
-            final ServiceSchema serviceSchema = new ServiceSchemaManager(SERVICE_NAME, token).getOrganizationSchema();
+            final ServiceSchema serviceSchema = new ServiceSchemaManager(OAUTH2_SERVICE_NAME, token).getOrganizationSchema();
             return SMSUtils.removeValidators(serviceSchema.getReadOnlyAttributeDefaults(), serviceSchema);
         } catch (SMSException e) {
             DEBUG.error("An error occurred while trying to read the default OAuth2 Provider settings.", e);
@@ -303,10 +311,10 @@ public class ConfigureOAuth2 extends Task {
         }
     }
 
-    private void createOAuth2Provider(SSOToken token, String realm, Map<String, Set<String>> attrValues)
+    private void createProvider(String serviceName, SSOToken token, String realm, Map<String, Set<String>> attrValues)
             throws WorkflowException {
         try {
-            new ServiceConfigManager(SERVICE_NAME, token).createOrganizationConfig(realm, attrValues);
+            new ServiceConfigManager(serviceName, token).createOrganizationConfig(realm, attrValues);
         } catch (SMSException e) {
             DEBUG.error("An error occurred while trying to create the OAuth2 Provider.", e);
             throw new WorkflowException("oauth2.provider.create.error", null);
