@@ -216,13 +216,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                         }
 
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                    })
-                    .fail(function (response) {
-                        _.extend(self.model.attributes, nonModifiedAttributes);
-                        Messages.addMessage({
-                            message: response.responseJSON.message,
-                            type: Messages.TYPE_DANGER
-                        });
                     });
             } else {
                 _.extend(this.model.attributes, nonModifiedAttributes);

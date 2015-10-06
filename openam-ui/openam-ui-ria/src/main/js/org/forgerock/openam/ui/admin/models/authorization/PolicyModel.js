@@ -18,8 +18,9 @@
 define("org/forgerock/openam/ui/admin/models/authorization/PolicyModel", [
     "underscore",
     "backbone",
-    "org/forgerock/openam/ui/common/util/URLHelper"
-], function (_, Backbone, URLHelper) {
+    "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/openam/ui/admin/utils/ModelUtils"
+], function (_, Backbone, URLHelper, ModelUtils) {
     return Backbone.Model.extend({
         idAttribute: "name",
         urlRoot: URLHelper.substitute("__api__/policies"),
@@ -49,14 +50,14 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicyModel", [
         },
 
         sync: function (method, model, options) {
+            options = options || {};
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");
             };
+            options.error = ModelUtils.errorHandler;
 
             if (model.id === null) {
                 method = "create";
-
-                options = options || {};
                 options.url = this.urlRoot() + "/?_action=create";
             }
 

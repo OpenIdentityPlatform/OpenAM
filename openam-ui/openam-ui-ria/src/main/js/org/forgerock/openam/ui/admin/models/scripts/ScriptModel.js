@@ -17,10 +17,10 @@
 /*global define*/
 define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
     "backbone",
-    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/util/Base64",
-    "org/forgerock/openam/ui/common/util/URLHelper"
-], function (Backbone, Messages, Base64, URLHelper) {
+    "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/openam/ui/admin/utils/ModelUtils"
+], function (Backbone, Base64, URLHelper, ModelUtils) {
     return Backbone.Model.extend({
         idAttribute: "_id",
         urlRoot: URLHelper.substitute("__api__/scripts"),
@@ -52,20 +52,14 @@ define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
         },
 
         sync: function (method, model, options) {
+            options = options || {};
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
             };
-
-            options.error = function (response) {
-                Messages.messages.addMessage({
-                    type: "error",
-                    message: JSON.parse(response.responseText).message
-                });
-            };
+            options.error = ModelUtils.errorHandler;
 
             method = method.toLowerCase();
-            if (method === "create") {
-                options = options || {};
+            if (method === "create" || model.id === null) {
                 options.url = this.urlRoot() + "/?_action=create";
             }
 

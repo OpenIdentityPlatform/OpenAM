@@ -277,12 +277,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                                 trigger: true
                             });
                         }
-                    })
-                    .fail(function (response) {
-                        Messages.messages.addMessage({
-                            message: JSON.parse(response.responseText).message,
-                            type: "error"
-                        });
                     });
             } else {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, this.model.validationError);
