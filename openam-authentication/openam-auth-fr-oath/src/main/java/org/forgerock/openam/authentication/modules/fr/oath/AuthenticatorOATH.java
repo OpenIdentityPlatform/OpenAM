@@ -40,6 +40,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -599,7 +600,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                 for (int i = 0; i <= windowSize; i++) {
                     otpGen = HOTPAlgorithm.generateOTP(secretKeyBytes, counter + i, passLen, checksum,
                             truncationOffset);
-                    if (otpGen.equals(otp)) {
+                    if (isEqual(otpGen, otp)) {
                         //OTP is correct set the counter value to counter+i (+1 for having been successful)
                         setCounterAttr(id, counter + i + 1, settings);
                         return true;
@@ -633,6 +634,11 @@ public class AuthenticatorOATH extends AMLoginModule {
                 //get Time Step
                 long localTime = (time / totpTimeStep) + (settings.getClockDriftSeconds() / totpTimeStep);
 
+                if(lastLoginTimeStep == localTime){
+                    debug.error("OATH.checkOTP(): Login failed attempting to use the same OTP in same Time Step: " + localTime);
+                    throw new InvalidPasswordException(amAuthOATH, "authFailed", null, userName, null);
+                }
+
                 boolean sameWindow = false;
 
                 //check if we are in the time window to prevent 2 logins within the window using the same OTP
@@ -648,7 +654,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                 String passLenStr = Integer.toString(passLen);
                 otpGen = TOTPAlgorithm.generateTOTP(secretKey, Long.toHexString(localTime), passLenStr);
 
-                if (otpGen.equals(otp)) {
+                if (isEqual(otpGen, otp)) {
                     setLoginTime(id, localTime, settings);
                     return true;
                 }
@@ -660,7 +666,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                     //check time step after current time
                     otpGen = TOTPAlgorithm.generateTOTP(secretKey, Long.toHexString(time1), passLenStr);
 
-                    if (otpGen.equals(otp)) {
+                    if (isEqual(otpGen, otp)) {
                         setLoginTime(id, time1, settings);
                         return true;
                     }
@@ -668,11 +674,11 @@ public class AuthenticatorOATH extends AMLoginModule {
                     //check time step before current time
                     otpGen = TOTPAlgorithm.generateTOTP(secretKey, Long.toHexString(time2), passLenStr);
 
-                    if (otpGen.equals(otp) && sameWindow) {
+                    if (isEqual(otpGen, otp) && sameWindow) {
                         debug.error("OATH.checkOTP() : Logging in in the same window with a OTP that is older " +
                                 "than the current times OTP");
                         return false;
-                    } else if (otpGen.equals(otp) && !sameWindow) {
+                    } else if (isEqual(otpGen, otp) && !sameWindow) {
                         setLoginTime(id, time2, settings);
                         return true;
                     }
@@ -789,5 +795,17 @@ public class AuthenticatorOATH extends AMLoginModule {
         settings.setClockDriftSeconds((int) drift * totpTimeStep);
         devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
                 Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
+    }
+
+    /**
+     * Perform time constant equality check.
+     * Both values should not be null.
+     *
+     * @param str1 first value
+     * @param str2 second vale
+     * @return true if values are equal
+     */
+    private boolean isEqual(String str1, String str2)   {
+        return MessageDigest.isEqual(str1.getBytes(), str2.getBytes());
     }
 }

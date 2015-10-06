@@ -50,10 +50,11 @@ import java.util.HashMap;
 import java.util.Collections;
 import java.util.ResourceBundle;
 
+import java.security.MessageDigest;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.PasswordCallback;
-import javax.xml.bind.DatatypeConverter;
 
 import org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider;
 import org.forgerock.openam.authentication.modules.oath.plugins.SharedSecretProvider;
@@ -419,7 +420,7 @@ public class OATH extends AMLoginModule {
                             passLen,
                             checksum,
                             truncationOffset);
-                    if (otpGen.equals(otp)) {
+                    if (isEqual(otpGen, otp)) {
                         //OTP is correct set the counter value to counter+i
                         setCounterAttr(id, counter + i);
                         return true;
@@ -478,8 +479,13 @@ public class OATH extends AMLoginModule {
                 long lastLoginTimeStep = lastLoginTimeInSeconds / totpTimeStep;
                 // get the current time step based on arrival time of OTP
                 long currentTimeStep = (timeInSeconds / totpTimeStep) + (lastClockDriftInSeconds / totpTimeStep);
-                boolean sameWindow = false;
 
+                if(lastLoginTimeStep == currentTimeStep){
+                    debug.error("OATH.checkOTP(): Login failed attempting to use the same OTP in same Time Step: " + currentTimeStep);
+                    throw new InvalidPasswordException(amAuthOATH, "authFailed", null, userName, null);
+                }
+
+                boolean sameWindow = false;
                 // check if we are in the time window to prevent 2
                 // logins within the window using the same OTP
                 if (lastLoginTimeStep >= (currentTimeStep - totpStepsInWindow)
@@ -499,7 +505,7 @@ public class OATH extends AMLoginModule {
 
                 String passLenStr = Integer.toString(passLen);
                 otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes, Long.toHexString(currentTimeStep), passLenStr);
-                if (otpGen.equals(otp)) {
+                if (isEqual(otpGen, otp)) {
                     setLoginTime(id, currentTimeStep);
                     return true;
                 }
@@ -510,18 +516,18 @@ public class OATH extends AMLoginModule {
 
                     // check time step after current time
                     otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes, Long.toHexString(timeInFutureStep), passLenStr);
-                    if (otpGen.equals(otp)) {
+                    if (isEqual(otpGen, otp)) {
                         setLoginTime(id, timeInFutureStep);
                         return true;
                     }
 
                     // check time step before current time
                     otpGen = TOTPAlgorithm.generateTOTP(secretKeyBytes, Long.toHexString(timeInPastStep), passLenStr);
-                    if (otpGen.equals(otp) && sameWindow) {
+                    if (isEqual(otpGen, otp) && sameWindow) {
                         debug.error("OATH.checkOTP(): "
-                                + "Logging in in the same window with a OTP that is older than the current OTP");
+                                + "Login the same window with a OTP that is older than the current OTP");
                         return false;
-                    } else if (otpGen.equals(otp) && !sameWindow) {
+                    } else if (isEqual(otpGen, otp) && !sameWindow) {
                         setLoginTime(id, timeInPastStep);
                         return true;
                     }
@@ -748,5 +754,17 @@ public class OATH extends AMLoginModule {
             debug.error("OATH.validateTOTPParameters(): Invalid settings : " + errorMessages.toString());
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
+    }
+
+    /**
+     * Perform time constant equality check.
+     * Both values should not be null.
+     *
+     * @param str1 first value
+     * @param str2 second vale
+     * @return true if values are equal
+     */
+    private boolean isEqual(String str1, String str2)   {
+         return MessageDigest.isEqual(str1.getBytes(), str2.getBytes());
     }
 }
