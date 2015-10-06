@@ -89,6 +89,23 @@
                         <Value>org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="forgerock-oath-observed-clock-drift-attribute-name"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a513">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-oath-maximum-clock-drift"
+                                 type="single"
+                                 syntax="number"
+                                 i18nKey="a514"
+                                 rangeStart="0" rangeEnd="2147483648">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oath-algorithm"
                                  type="single_choice"
                                  syntax="string"
@@ -213,6 +230,23 @@
                                      i18nKey="a512">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-oath-observed-clock-drift-attribute-name"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a513">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-oath-maximum-clock-drift"
+                                     type="single"
+                                     syntax="number"
+                                     i18nKey="a514"
+                                     rangeStart="0" rangeEnd="2147483648">
+                        <DefaultValues>
+                            <Value>0</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oath-algorithm"
