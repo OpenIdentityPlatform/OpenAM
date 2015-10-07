@@ -28,6 +28,7 @@ import static java.util.Collections.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import java.security.AccessController;
 import java.text.MessageFormat;
@@ -38,6 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.security.auth.Subject;
 
@@ -48,6 +50,7 @@ import org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler;
 import org.forgerock.oauth2.core.TokenResponseTypeHandler;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
+import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.openam.entitlement.rest.PolicyStore;
 import org.forgerock.openam.entitlement.rest.PolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
@@ -55,11 +58,16 @@ import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.IdTokenResponseTypeHandler;
+import org.forgerock.util.query.QueryFilter;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
+import com.sun.identity.entitlement.ApplicationType;
+import com.sun.identity.entitlement.ApplicationTypeManager;
+import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
@@ -175,7 +183,9 @@ public class ConfigureOAuth2 extends Task {
 
     //policy params
     private static final String POLICY_NAME = "OAuth2ProviderPolicy";
-    private static final String OAUTH2_AUTHORIZE_ENDPOINT = "/oauth2/authorize?*";
+    private static final String POLICY_RESOURCE_TYPE_NAME = "OAuth2";
+    private static final String POLICY_APPLICATION_NAME = "OAuth2";
+    private static final String OAUTH2_AUTHORIZE_ENDPOINT = "/oauth2{0}/authorize?*";
     public static final String MESSAGE = "oauth2.provider.configured";
     public static final String POLICY_CREATED = "oauth2.provider.policy.created";
     public static final String POLICY_EXISTS = "oauth2.provider.policy.exists";
@@ -218,23 +228,23 @@ public class ConfigureOAuth2 extends Task {
             createProvider(UMA_SERVICE_NAME, token, realm, Collections.<String, Set<String>>emptyMap());
         }
 
-        String policyURL = getRequestURL(params) + OAUTH2_AUTHORIZE_ENDPOINT;
+        String policyURL = getRequestURL(params) + format(OAUTH2_AUTHORIZE_ENDPOINT, "/".equals(realm) ? "" : realm);
 
         //check if policy exists
-        PolicyManager mgr;
         boolean createPolicy = false;
+
         try {
-            mgr = new PolicyManager(token, ROOT);
-            if (mgr.getPolicy(POLICY_NAME) == null) {
+            Subject adminSubject = SubjectUtils.createSuperAdminSubject();
+            PolicyStore policyStore = storeProvider.getPolicyStore(adminSubject, realm);
+            try {
+                if (policyStore.read(POLICY_NAME) == null) {
+                    createPolicy = true;
+                }
+            } catch (Exception e){
                 createPolicy = true;
             }
-        } catch (Exception e){
-            createPolicy = true;
-        }
 
-        if (createPolicy){
-
-            try {
+            if (createPolicy){
                 Privilege toStore = Privilege.getNewInstance();
 
                 Map<String, Boolean> actions = new HashMap<>();
@@ -244,21 +254,18 @@ public class ConfigureOAuth2 extends Task {
                 Entitlement entitlement = new Entitlement();
                 entitlement.setActionValues(actions);
                 entitlement.setResourceName(policyURL);
+                entitlement.setApplicationName(POLICY_APPLICATION_NAME);
 
-                Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-                toStore.setResourceTypeUuid(getUrlResourceTypeId(entitlement, adminSubject, realm));
+                toStore.setResourceTypeUuid(getUrlResourceTypeId(adminSubject, realm));
                 toStore.setSubject(new AuthenticatedUsers());
                 toStore.setName(POLICY_NAME);
                 toStore.setEntitlement(entitlement);
 
-                PolicyStore policyStore = storeProvider.getPolicyStore(adminSubject, ROOT);
                 policyStore.create(toStore);
-
-            } catch (EntitlementException e) {
-                DEBUG.error("ConfigureOAuth2.execute() : Unable to create policy", e);
-                throw new WorkflowException("oauth2.provider.policy.failed");
             }
-
+        } catch (EntitlementException e) {
+            DEBUG.error("ConfigureOAuth2.execute() : Unable to create policy", e);
+            throw new WorkflowException("oauth2.provider.policy.failed");
         }
 
         String messageTemplate = getMessage(MESSAGE, locale);
@@ -281,21 +288,43 @@ public class ConfigureOAuth2 extends Task {
         return result;
     }
 
-    private String getUrlResourceTypeId(Entitlement entitlement, Subject adminSubject, String realm)
+    private String getUrlResourceTypeId(Subject adminSubject, String realm)
             throws EntitlementException, WorkflowException {
 
-        ResourceTypeService resourceTypeService = InjectorHolder.getInstance(ResourceTypeService.class);
-        Application application = entitlement.getApplication(adminSubject, realm);
+        Application application = ApplicationManager.getApplication(adminSubject, realm, POLICY_APPLICATION_NAME);
+        if (application == null) {
+            ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(adminSubject,
+                    ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+            application = ApplicationManager.newApplication(POLICY_APPLICATION_NAME, applicationType);
+        }
+
         Set<String> resourceTypeIds = application.getResourceTypeUuids();
+        ResourceTypeService resourceTypeService = InjectorHolder.getInstance(ResourceTypeService.class);
         for (String id : resourceTypeIds) {
             ResourceType resourceType = resourceTypeService.getResourceType(adminSubject, realm, id);
-            if ("URL".equalsIgnoreCase(resourceType.getName())) {
+            if (POLICY_RESOURCE_TYPE_NAME.equalsIgnoreCase(resourceType.getName())) {
                 return id;
             }
         }
-        DEBUG.error("Could not find URL resource type on {} application. Found: {}", entitlement.getApplicationName(),
-                resourceTypeIds.toString());
-        throw new WorkflowException("oauth2.provider.resourceType.error", entitlement.getApplicationName());
+
+        QueryFilter<SmsAttribute> name = equalTo(SmsAttribute.newSearchableInstance("name"), POLICY_RESOURCE_TYPE_NAME);
+        Set<ResourceType> types = resourceTypeService.getResourceTypes(name, adminSubject, realm);
+        ResourceType resourceType;
+        if (types == null || types.isEmpty()) {
+            resourceType = ResourceType.builder()
+                    .addPatterns(asSet("*://*:*/*/authorize?*"))
+                    .addActions(new ImmutableMap.Builder<String, Boolean>().put("GET", true).put("POST", true).build())
+                    .setName(POLICY_RESOURCE_TYPE_NAME)
+                    .setUUID(UUID.randomUUID().toString())
+                    .build();
+            resourceType = resourceTypeService.saveResourceType(adminSubject, realm, resourceType);
+        } else {
+            resourceType = types.iterator().next();
+        }
+        application.addAllResourceTypeUuids(asSet(resourceType.getUUID()));
+        application.setEntitlementCombiner(DenyOverride.class);
+        ApplicationManager.saveApplication(adminSubject, realm, application);
+        return resourceType.getUUID();
     }
 
     private Map<String, Set<String>> getDefaultOAuth2ProviderAttributes(SSOToken token) throws WorkflowException {
