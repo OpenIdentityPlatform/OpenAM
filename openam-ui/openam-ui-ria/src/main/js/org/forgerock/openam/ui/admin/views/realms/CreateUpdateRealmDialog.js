@@ -80,7 +80,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                 }
 
                 data.schema.properties.parentPath["enum"] = options.allRealmPaths;
-                data.schema.properties.parentPath.options = { enum_titles: options.allRealmPaths };
+                data.schema.properties.parentPath.options = { "enum_titles": options.allRealmPaths };
 
                 BootstrapDialog.show({
                     title: $.t("console.realms.createUpdateRealmDialog." + i18nTitleKey, { realmPath: realmName }),

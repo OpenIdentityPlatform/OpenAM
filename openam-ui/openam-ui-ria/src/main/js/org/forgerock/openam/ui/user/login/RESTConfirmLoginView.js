@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
     "org/forgerock/commons/ui/common/util/CookieHelper"
-], function($, AbstractView, authNDelegate, conf, restLoginHelper, sessionDelegate, cookieHelper) {
+], function ($, AbstractView, authNDelegate, conf, restLoginHelper, sessionDelegate, cookieHelper) {
 
     var ConfirmLoginView = AbstractView.extend({
         template: "templates/openam/RESTConfirmLoginTemplate.html",
@@ -43,29 +43,30 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
             "click button#continueLogin": "continueLogin",
             "click button#logout": "logout"
         },
-        render: function(args, callback) {
-            this.parentRender(function() {
-               $('#menu').hide();
-               $('#user-nav').hide();
+        render: function (args, callback) {
+            this.parentRender(function () {
+                $("#menu").hide();
+                $("#user-nav").hide();
             });
         },
-        continueLogin: function(){
+        continueLogin: function () {
             var href = "#login/";
 
-            $('#menu').show();
-            $('#user-nav').show();
+            $("#menu").show();
+            $("#user-nav").show();
 
-            if(conf.globalData.auth.subRealm) {
+            if (conf.globalData.auth.subRealm) {
                 href += conf.globalData.auth.subRealm;
             }
             location.href = href;
             return false;
         },
-        logout: function(){
+        logout: function () {
             var tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
-            sessionDelegate.logout(tokenCookie).then(function(){
+            sessionDelegate.logout(tokenCookie).then(function () {
                 restLoginHelper.removeSessionCookie();
-                var realm = (conf.globalData.auth.passedInRealm) ? conf.globalData.auth.passedInRealm : conf.globalData.auth.subRealm;
+                var realm = (conf.globalData.auth.passedInRealm) ? conf.globalData.auth.passedInRealm :
+                                                                   conf.globalData.auth.subRealm;
                 location.href = "#login/" + realm + restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
             });
             return false;

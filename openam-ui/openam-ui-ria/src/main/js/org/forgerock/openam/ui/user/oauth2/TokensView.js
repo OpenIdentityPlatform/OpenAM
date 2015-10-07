@@ -32,9 +32,8 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "dataTable",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    'require'
-], function($, AbstractView, tokensDelegate, eventManager, constants, dataTable, i18nManager, require) {
-
+    "require"
+], function ($, AbstractView, tokensDelegate, eventManager, constants, dataTable, i18nManager, require) {
 
     var TokensView = AbstractView.extend({
         template: "templates/openam/oauth2/TokensTemplate.html",
@@ -46,40 +45,41 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
             "click input[type=submit]": "formSubmit"
         },
 
-        select: function(event) {
+        select: function (event) {
             event.stopPropagation();
         },
 
-        render: function(args, callback) {
-            this.parentRender(function() {
+        render: function (args, callback) {
+            this.parentRender(function () {
                 this.reloadData();
 
-                if(callback) {
+                if (callback) {
                     callback();
                 }
             });
         },
 
-        reloadData: function(){
+        reloadData: function () {
 
-            $('#tokensTable').dataTable( {
+            $("#tokensTable").dataTable({
                 "bProcessing": true,
                 "sAjaxSource": "",
-                "fnServerData": function(sUrl, aoData, fnCallback, oSettings) {
-                    tokensDelegate.getAllTokens(function(tokens) {
-                        var data = {aaData: tokens}, i, cleanScope, cleanDate;
+                "fnServerData": function (sUrl, aoData, fnCallback, oSettings) {
+                    tokensDelegate.getAllTokens(function (tokens) {
+                        var data = { aaData: tokens }, i, cleanScope, cleanDate;
 
-                        for(i = 0; i < data.aaData.length; i++) {
-                            data.aaData[i].selector = '<input name="selector" id="' + data.aaData[i].id + '" type="checkbox" />';
+                        for (i = 0; i < data.aaData.length; i++) {
+                            data.aaData[i].selector = '<input name="selector" id="' +
+                                                      data.aaData[i].id + '" type="checkbox" />';
 
-                            if (typeof data.aaData[i].scope !== 'undefined'){
+                            if (typeof data.aaData[i].scope !== "undefined") {
                                 cleanScope = data.aaData[i].scope;
                             } else {
-                                cleanScope = '-';
+                                cleanScope = "-";
                             }
-                            data.aaData[i].cleanScope = $('<span class="cleanScope" />').text(cleanScope).wrap('<p>').parent().html();
+                            data.aaData[i].cleanScope = $('<span class="cleanScope" />').text(cleanScope).wrap("<p>").parent().html();
                             cleanDate = new Date(Number(data.aaData[i].expireTime));
-                            data.aaData[i].cleanDate = $('<span class="cleanDate" />').text(cleanDate).wrap('<p>').parent().html();
+                            data.aaData[i].cleanDate = $('<span class="cleanDate" />').text(cleanDate).wrap("<p>").parent().html();
                         }
 
                         fnCallback(data);
@@ -116,46 +116,51 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                 },
                 "sDom": 'l<"deleteSelected">f<"clear">rt<"clear">ip<"clear">',
                 "sPaginationType": "full_numbers",
-                "fnInitComplete": function(oSettings, json) {
+                "fnInitComplete": function (oSettings, json) {
                     $(".deleteSelected").html('<input type="submit" class="button orange floatRight" value="' + $.t("common.form.deleteSelected") + '" >');
                 },
-                "fnRowCallback": function(row, data, displayindex) {
-                    $(row).children().not(':first').click(function(){
+                "fnRowCallback": function (row, data, displayindex) {
+                    $(row).children().not(":first").click(function () {
                         var id = data.id[0], htmlCode, table, temp = row, td;
-                        tokensDelegate.getTokenByID(function (tokenInfo){
+                        tokensDelegate.getTokenByID(function (tokenInfo) {
                             var output;
 
                             output = '<table width="100%" cellpadding="5" cellspacing="0" border="0" style="padding:25px;">';
-                            if (tokenInfo.realm){
-                                output += '<tr><td>' + $.t("templates.oauth.realm") + '</td><td>'+tokenInfo.realm+'</td></tr>';
+                            if (tokenInfo.realm) {
+                                output += "<tr><td>" + $.t("templates.oauth.realm") + "</td><td>" + tokenInfo.realm +
+                                          "</td></tr>";
                             }
-                            if (tokenInfo.refreshToken){
-                                output += '<tr><td>' + $.t("templates.oauth.refreshToken") + '</td><td>'+tokenInfo.refreshToken+'</td></tr>';
+                            if (tokenInfo.refreshToken) {
+                                output += "<tr><td>" + $.t("templates.oauth.refreshToken") + "</td><td>" +
+                                          tokenInfo.refreshToken + "</td></tr>";
                             }
-                            if (tokenInfo.redirectURI){
-                                output += '<tr><td>' + $.t("templates.oauth.redirectURI") + '</td><td>'+tokenInfo.redirectURI+'</td></tr>';
+                            if (tokenInfo.redirectURI) {
+                                output += "<tr><td>" + $.t("templates.oauth.redirectURI") + "</td><td>" +
+                                          tokenInfo.redirectURI + "</td></tr>";
                             }
-                            if (tokenInfo.userName){
-                                output += '<tr><td>' + $.t("templates.oauth.username") + '</td><td>'+tokenInfo.userName+'</td></tr>';
+                            if (tokenInfo.userName) {
+                                output += "<tr><td>" + $.t("templates.oauth.username") + "</td><td>" +
+                                          tokenInfo.userName + "</td></tr>";
                             }
-                            if (tokenInfo.parent){
-                                output += '<tr><td>' + $.t("templates.oauth.parent") + '</td><td>'+tokenInfo.parent+'</td></tr>';
+                            if (tokenInfo.parent) {
+                                output += "<tr><td>" + $.t("templates.oauth.parent") + "</td><td>" + tokenInfo.parent +
+                                          "</td></tr>";
                             }
-                            output += '</table>';
+                            output += "</table>";
 
 
                             td = $(temp).next().children(0);
-                            if (td.attr('class') === 'details'){
+                            if (td.attr("class") === "details") {
                                 td.html(output);
                             }
                         }, null, id);
 
-                        table = $('#tokensTable').dataTable();
+                        table = $("#tokensTable").dataTable();
 
-                        if ( table.fnIsOpen(row) ) {
-                            table.fnClose( row );
+                        if (table.fnIsOpen(row)) {
+                            table.fnClose(row);
                         } else {
-                            table.fnOpen( row, htmlCode, 'details' );
+                            table.fnOpen(row, htmlCode, "details");
                         }
                     });
                     return row;
@@ -163,21 +168,21 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
             });
         },
 
-        formSubmit: function(event) {
+        formSubmit: function (event) {
             var data = {};
 
             event.preventDefault();
             event.stopPropagation();
 
-            $("input:checked", $('#tokensTable').dataTable().fnGetNodes()).each(function(){
+            $("input:checked", $("#tokensTable").dataTable().fnGetNodes()).each(function () {
                 var id, td;
                 td = $(this);
-                id = td.attr('id');
+                id = td.attr("id");
                 tokensDelegate.deleteToken(
-                    function(id) {
+                    function (id) {
                         location.reload(true);
                     },
-                    function(id){
+                    function (id) {
 
                     },
                     id);

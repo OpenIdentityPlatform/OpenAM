@@ -33,22 +33,21 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager"
-], function(constants, AbstractDelegate, configuration, eventManager) {
-
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/frrest/oauth2/token");
+], function (constants, AbstractDelegate, configuration, eventManager) {
+    var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/frrest/oauth2/token");
 
     /**
      * Gets all the OAuth 2 tokens for a user
      * @param successCallback
      * @param errorCallback
      */
-    obj.getAllTokens = function(successCallback, errorCallback) {
+    obj.getAllTokens = function (successCallback, errorCallback) {
 
-         obj.serviceCall({ url: "/?_queryid=*", success: function(data) {
-            if(successCallback) {
-               successCallback(data.result);
+        obj.serviceCall({ url: "/?_queryid=*", success: function (data) {
+            if (successCallback) {
+                successCallback(data.result);
             }
-         }, error: errorCallback} );
+        }, error: errorCallback });
 
     };
 
@@ -58,43 +57,46 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
      * @param errorCallback error handler
      * @param id TokenID
      */
-    obj.deleteToken = function(successCallback, errorCallback, id) {
-
-        obj.serviceCall({ type: "DELETE", url: "/"+id, success: function(data) {
-            if(successCallback) {
+    obj.deleteToken = function (successCallback, errorCallback, id) {
+        obj.serviceCall({ type: "DELETE", url: "/" + id, success: function (data) {
+            if (successCallback) {
                 successCallback(id);
             }
-        }, error: errorCallback(id)} );
+        }, error: errorCallback(id) });
     };
+
     /**
      * Gets a token given a tokenID
      * @param successCallback success handler
      * @param errorCallback error handler
      * @param id TokenID
      */
-    obj.getTokenByID = function(successCallback, errorCallback, id) {
-
-        obj.serviceCall({ url: "/" + id, success: function(data) {
-            if(successCallback) {
+    obj.getTokenByID = function (successCallback, errorCallback, id) {
+        obj.serviceCall({ url: "/" + id, success: function (data) {
+            if (successCallback) {
                 successCallback(data);
             }
-        }, error: errorCallback} );
-
+        }, error: errorCallback });
     };
-
 
     /**
      * See AbstractDelegate.patchEntityDifferences
      */
-    obj.patchTokenDifferences = function(oldTokenData, newTokenData, successCallback, errorCallback, noChangesCallback) {
-        obj.patchEntityDifferences({id: oldTokenData._id, rev: oldTokenData._rev}, oldTokenData, newTokenData, successCallback, errorCallback, noChangesCallback);
+    obj.patchTokenDifferences = function (oldTokenData, newTokenData, successCallback, errorCallback, noChangesCallback) {
+        obj.patchEntityDifferences({
+            id: oldTokenData._id,
+            rev: oldTokenData._rev
+        }, oldTokenData, newTokenData, successCallback, errorCallback, noChangesCallback);
     };
 
     /**
      * See AbstractDelegate.patchEntity
      */
-    obj.patchSelectedTokenAttributes = function(id, rev, patchDefinitionObject, successCallback, errorCallback, noChangesCallback) {
-        obj.patchEntity({id: id, rev: rev}, patchDefinitionObject, successCallback, errorCallback, noChangesCallback);
+    obj.patchSelectedTokenAttributes = function (id, rev, patchDefinitionObject, successCallback, errorCallback, noChangesCallback) {
+        obj.patchEntity({
+            id: id,
+            rev: rev
+        }, patchDefinitionObject, successCallback, errorCallback, noChangesCallback);
     };
 
     return obj;

@@ -40,7 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
         },
 
         deleteBtnClick: function (e) {
-            if(e){
+            if (e) {
                 e.preventDefault();
             }
             this.deleteItem($(e.currentTarget).data().mapId);
@@ -114,7 +114,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             if (this.data.linkConfig.criteria.toLowerCase() === this.criteriaView.REQUIRED && this.parent.data.firstRequiredIndex === -1) {
                 this.parent.data.firstRequiredIndex = this.$el.index();
             }
-            if (this.parent.data.firstRequiredIndex > -1 && this.$el.index() > this.parent.data.firstRequiredIndex){
+            if (this.parent.data.firstRequiredIndex > -1 && this.$el.index() > this.parent.data.firstRequiredIndex) {
                 this.criteriaView.setPassThroughAndFailArrows(true);
             } else {
                 this.criteriaView.setPassThroughAndFailArrows(false);

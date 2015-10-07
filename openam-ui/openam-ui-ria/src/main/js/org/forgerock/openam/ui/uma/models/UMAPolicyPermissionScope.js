@@ -28,10 +28,10 @@ define("org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope", [
     "underscore",
     "backbone",
     "backbone-relational"
-], function($, _, Backbone, BackboneRelational) {
+], function ($, _, Backbone, BackboneRelational) {
     return Backbone.RelationalModel.extend({
-        parse: function(response) {
-            if(_.isUrl(response.id)) {
+        parse: function (response) {
+            if (_.isUrl(response.id)) {
                 response = this.resolve(response.id);
             } else {
                 response.name = response.id;
@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope", [
 
             return response;
         },
-        resolve: function(url) {
+        resolve: function (url) {
             var resolved = {
                 id: url,
                 name: url
@@ -49,17 +49,17 @@ define("org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope", [
             $.ajax({
                 async: false,
                 dataType: "json",
-                success: function(data) {
+                success: function (data) {
                     resolved.name = data.name;
-                    resolved.icon_uri = data.icon_uri;
+                    resolved["icon_uri"] = data.icon_uri;
                 },
                 url: url
             });
 
             return resolved;
         },
-        sync: function(method, model, options) {
-            options.beforeSend = function(xhr) {
+        sync: function (method, model, options) {
+            options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
             };
 

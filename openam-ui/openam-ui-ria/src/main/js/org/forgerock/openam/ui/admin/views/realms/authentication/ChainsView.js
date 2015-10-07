@@ -144,7 +144,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             SMSRealmDelegate.authentication.chains.all(this.data.realmPath).done(function(data) {
                 _.each(data.values.result, function(obj) {
                     // Add default chains to top of list.
-                    if ( obj.active) {
+                    if (obj.active) {
                         sortedChains.unshift(obj);
                     } else {
                         sortedChains.push(obj);

@@ -107,7 +107,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             if (dropbox.children(":not(.dragged)").length > 1) {
                 _.each(this.data.operators, function (obj) {
                     option = select.find('option[value="' + obj.title + '"]');
-                    option.prop("disabled", ( obj.config.properties.condition || obj.config.properties.subject ) ? true : false);
+                    option.prop("disabled", (obj.config.properties.condition || obj.config.properties.subject) ? true : false);
                 });
 
             } else {

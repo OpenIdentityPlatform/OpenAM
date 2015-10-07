@@ -17,6 +17,22 @@
          * --------------------------------------------------------------------------------
          */
 
+         /**
+          * Camel cased variable names.
+          *
+          * var apples_and_pears # bad
+          * var fruit {
+          *     apple_and_pears: true
+          * }
+          *
+          * var applesAndPears # good
+          * var fruit {
+          *     appleAndPears: true
+          * }
+          */
+         "camelcase": [2, {
+             "properties": "always"
+         }],
         /**
          * Require a capital letter for constructors.
          *
@@ -35,6 +51,24 @@
          * var fruit·=·"apples" # good
          */
         "no-multi-spaces": 2,
+        /**
+         * Space required after keywords.
+         *
+         * if(fruit) { # bad
+         * }else{
+         *
+         * if (fruit) { # good. Space before else is not enforced but recommended
+         * } else {
+         */
+        "space-after-keywords": [2, "always"],
+        /**
+         * Spaces not allowed in parentheses.
+         *
+         * fruit( "apple" ) # bad
+         *
+         * fruit("apple") # good
+         */
+        "space-in-parens": [2, "never"],
 
         /*
          * --------------------------------------------------------------------------------
@@ -46,22 +80,6 @@
          * --------------------------------------------------------------------------------
          */
 
-        /**
-         * Camel cased variable names.
-         *
-         * var apples_and_pears # bad
-         * var fruit {
-         *     apple_and_pears: true
-         * }
-         *
-         * var applesAndPears # good
-         * var fruit {
-         *     appleAndPears: true
-         * }
-         */
-        "camelcase": [1, {
-            "properties": "always"
-        }],
         /**
          * 4 space indent.
          *
@@ -115,16 +133,6 @@
          */
         "quotes": [1, "double", "avoid-escape"],
         /**
-         * Space required after keywords.
-         *
-         * if(fruit) { # bad
-         * }else{
-         *
-         * if (fruit) { # good. Space before else is not enforced but recommended
-         * } else {
-         */
-        "space-after-keywords": [1, "always"],
-        /**
          * Space required before opening block curly brace.
          *
          * if (fruit){ # bad
@@ -142,14 +150,6 @@
          * function () { # good
          */
         "space-before-function-paren": [1, "always"],
-        /**
-         * Spaces not allowed in parentheses.
-         *
-         * fruit( "apple" ) # bad
-         *
-         * fruit("apple") # good
-         */
-        "space-in-parens": [1, "never"],
         /**
          * Spaces required around infix operators
          *
