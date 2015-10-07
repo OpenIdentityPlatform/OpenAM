@@ -30,115 +30,116 @@ define("org/forgerock/openam/ui/user/UserModel", [
 ], function ($, _, AbstractModel, Configuration, Constants, EventManager, RealmHelper, Router, ServiceInvoker) {
     var baseUrl = Constants.host + "/" + Constants.context + "/json/__subrealm__/users",
         UserModel = AbstractModel.extend({
-        idAttribute: "id",
+            idAttribute: "id",
 
-        sync: function (method, model, options) {
-            var clearPassword = _.bind(function () {
-                delete this.currentPassword;
-                this.unset("password");
-                return this;
-            }, this);
+            sync: function (method, model, options) {
+                var clearPassword = _.bind(function () {
+                    delete this.currentPassword;
+                    this.unset("password");
+                    return this;
+                }, this);
 
-            if (method === "update" || method === "patch") {
-                if (_.has(this.changed, "password")) {
-                    // password changes have to occur via a special rest call
-                    return ServiceInvoker.restCall({
-                        url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id + "?_action=changePassword"),
-                        type: "POST",
-                        data: JSON.stringify({
-                            username: this.get("id"),
-                            currentpassword: this.currentPassword,
-                            userpassword: this.get("password")
-                        })
-                    }).then(clearPassword, clearPassword);
+                if (method === "update" || method === "patch") {
+                    if (_.has(this.changed, "password")) {
+                        // password changes have to occur via a special rest call
+                        return ServiceInvoker.restCall({
+                            url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id + "?_action=changePassword"),
+                            type: "POST",
+                            data: JSON.stringify({
+                                username: this.get("id"),
+                                currentpassword: this.currentPassword,
+                                userpassword: this.get("password")
+                            })
+                        }).then(clearPassword, clearPassword);
+                    } else {
+                        // overridden implementation for AM, due to the failures which would result
+                        // if unchanged attributes are included along with the request
+                        return ServiceInvoker.restCall(_.extend(
+                            {
+                                "type": "PUT",
+                                "data": JSON.stringify(
+                                    _.pick(this.toJSON(), ["givenName","sn","mail","postalAddress","telephoneNumber"])
+                                ),
+                                "url": RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                                "headers": {
+                                    "If-Match": this.getMVCCRev()
+                                }
+                            },
+                            options
+                        ));
+                    }
                 } else {
-                    // overridden implementation for AM, due to the failures which would result
-                    // if unchanged attributes are included along with the request
+                    // The only other supported operation is read
                     return ServiceInvoker.restCall(_.extend(
                         {
-                            "type": "PUT",
-                            "data": JSON.stringify(
-                                _.pick(this.toJSON(), ["givenName","sn","mail","postalAddress","telephoneNumber"])
-                            ),
-                            "url": RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
-                            "headers": {
-                                "If-Match": this.getMVCCRev()
-                            }
+                            "url" : RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                            "type": "GET"
                         },
                         options
-                    ));
+                    )).then(function (response) {
+                        model.clear();
+                        if (options.parse) {
+                            model.set(model.parse(response, options));
+                        } else {
+                            model.set(response);
+                        }
+                        return model.toJSON();
+                    });
                 }
-            } else {
-                // The only other supported operation is read
-                return ServiceInvoker.restCall(_.extend(
-                    {
-                        "url" : RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
-                        "type": "GET"
-                    },
-                    options
-                )).then(function (response) {
-                    if (options.parse) {
-                        model.set(model.parse(response, options));
+            },
+            parse: function (response, options) {
+                var user = {};
+
+                delete response.userPassword;
+
+                // many keys in response have single-element arrays for each property;
+                // translate these into a simpler map object, when possible
+                _.each(_.keys(response), function (property) {
+                    if (_.isArray(response[property]) && response[property].length === 1) {
+                        user[property] = response[property][0];
                     } else {
-                        model.set(response);
+                        user[property] = response[property];
                     }
-                    return model.toJSON();
                 });
-            }
-        },
-        parse: function (response, options) {
-            var user = {};
 
-            delete response.userPassword;
-
-            // many keys in response have single-element arrays for each property;
-            // translate these into a simpler map object, when possible
-            _.each(_.keys(response), function (property) {
-                if (_.isArray(response[property]) && response[property].length === 1) {
-                    user[property] = response[property][0];
-                } else {
-                    user[property] = response[property];
+                if (!_.has(user, "roles")) {
+                    user.roles = [];
+                } else if (_.isString(user.roles)) {
+                    user.roles = user.roles.split(",");
                 }
-            });
 
-            if (!_.has(user, "roles")) {
-                user.roles = [];
-            } else if (_.isString(user.roles)) {
-                user.roles = user.roles.split(",");
+                if (_.indexOf(user.roles, "ui-user") === -1) {
+                    user.roles.push("ui-user");
+                }
+
+                return user;
+            },
+            getProfile: function (headers) {
+                return ServiceInvoker.restCall({
+                    url: RealmHelper.decorateURIWithRealm(baseUrl + "?_action=idFromSession"),
+                    type: "POST",
+                    errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
+                }).then(
+                    _.bind(function (data) {
+                        Configuration.globalData.auth.successURL = data.successURL;
+                        Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
+                        Configuration.globalData.auth.subRealm = data.realm.slice(1);
+
+                        // keep track of the current realm as a future default value, following logout:
+                        Router.configuration.routes.login.defaults[0] = data.realm;
+                        this.set("id",data.id);
+                        return this.fetch().then(_.bind(function () {
+                            return this;
+                        }, this));
+                    }, this)
+                );
+            },
+            getProtectedAttributes: function () {
+                return ["password"].concat(Configuration.globalData.protectedUserAttributes);
+            },
+            setCurrentPassword: function (currentPassword) {
+                this.currentPassword = currentPassword;
             }
-
-            if (_.indexOf(user.roles, "ui-user") === -1) {
-                user.roles.push("ui-user");
-            }
-
-            return user;
-        },
-        getProfile: function (headers) {
-            return ServiceInvoker.restCall({
-                url: RealmHelper.decorateURIWithRealm(baseUrl + "?_action=idFromSession"),
-                type: "POST",
-                errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
-            }).then(
-                _.bind(function (data) {
-                    Configuration.globalData.auth.successURL = data.successURL;
-                    Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
-                    Configuration.globalData.auth.subRealm = data.realm.slice(1);
-
-                    // keep track of the current realm as a future default value, following logout:
-                    Router.configuration.routes.login.defaults[0] = data.realm;
-                    this.set("id",data.id);
-                    return this.fetch().then(_.bind(function () {
-                        return this;
-                    }, this));
-                }, this)
-            );
-        },
-        getProtectedAttributes: function () {
-            return ["password"].concat(Configuration.globalData.protectedUserAttributes);
-        },
-        setCurrentPassword: function (currentPassword) {
-            this.currentPassword = currentPassword;
-        }
-    });
+        });
     return new UserModel();
 });
