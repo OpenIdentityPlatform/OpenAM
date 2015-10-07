@@ -24,8 +24,9 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     "moment",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeableServerSideFilter",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, Backbone, Backgrid, moment, Messages, Router, UIUtils) {
+], function ($, _, Backbone, Backgrid, moment, Messages, Router, ThemeableServerSideFilter, UIUtils) {
     /**
      * @exports org/forgerock/openam/ui/common/util/BackgridUtils
      */
@@ -222,7 +223,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     obj.FilterHeaderCell = Backgrid.HeaderCell.extend({
         className: "filter-header-cell",
         render: function () {
-            var filter = new Backgrid.Extension.ServerSideFilter({
+            var filter = new Backgrid.Extension.ThemeableServerSideFilter({
                 name: this.column.get("name"),
                 placeholder: $.t("common.form.filter"),
                 collection: this.collection

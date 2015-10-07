@@ -22,7 +22,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "backbone",
     "backbone.paginator",
     "backgrid",
-    "backgrid.filter",
+    "backgrid-filter",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "backgrid.selectall",
     "org/forgerock/commons/ui/common/main/Configuration",

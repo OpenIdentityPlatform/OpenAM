@@ -37,7 +37,7 @@ require.config({
         "backbone-relational": "libs/backbone-relational-0.9.0-min",
 
         "backgrid"          : "libs/backgrid.min-0.3.5-min",
-        "backgrid.filter"   : "libs/backgrid-filter.min-0.3.5-min",
+        "backgrid-filter"   : "libs/backgrid-filter.min-0.3.5-min",
         "backgrid.paginator": "libs/backgrid-paginator-0.3.5-custom.min",
         "backgrid.selectall": "libs/backgrid-select-all-0.3.5-min",
 
@@ -85,7 +85,7 @@ require.config({
             deps: ["jquery", "underscore", "backbone"],
             exports: "Backgrid"
         },
-        "backgrid.filter": {
+        "backgrid-filter": {
             deps: ["backgrid"]
         },
         "backgrid.paginator": {

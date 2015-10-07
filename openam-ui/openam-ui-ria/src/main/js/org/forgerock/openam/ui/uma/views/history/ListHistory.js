@@ -30,7 +30,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "backbone",
     "backbone.paginator",
     "backgrid",
-    "backgrid.filter",
+    "backgrid-filter",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/main/Configuration",

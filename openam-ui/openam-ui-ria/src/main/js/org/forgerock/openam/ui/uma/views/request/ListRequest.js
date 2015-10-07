@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
     "backbone",
     "backbone.paginator",
     "backgrid",
-    "backgrid.filter",
+    "backgrid-filter",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
