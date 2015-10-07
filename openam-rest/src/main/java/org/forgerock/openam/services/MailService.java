@@ -57,7 +57,7 @@ public final class MailService extends AbstractRequestHandler {
 
     private static final String MAIL_SERVER_CLASS = "forgerockMailServerImplClassName";
     private static final String MAIL_SUBJECT = "forgerockEmailServiceSMTPSubject";
-    private static final String MAIL_MESSAGE = "forgerockEmailServiceSMTPMessage";
+    private static final String MAIL_BODY = "forgerockEmailServiceSMTPMessage";
 
 
     private final MailServerLoader mailServerLoader;
@@ -96,8 +96,14 @@ public final class MailService extends AbstractRequestHandler {
             throw new BadRequestException("to field is missing");
         }
 
+        String mimeType = jsonValue.get("type").asString();
+
+        if (isBlank(mimeType)) {
+            throw new BadRequestException("mime type needs to be specified");
+        }
+
         String subject = jsonValue.get("subject").asString();
-        String message = jsonValue.get("message").asString();
+        String body = jsonValue.get("body").asString();
 
         Map<String, Set<String>> mailConfigAttributes;
 
@@ -128,12 +134,12 @@ public final class MailService extends AbstractRequestHandler {
             subject = mailConfigAttributes.get(MAIL_SUBJECT).iterator().next();
         }
 
-        if (isBlank(message)) {
-            message = mailConfigAttributes.get(MAIL_MESSAGE).iterator().next();
+        if (isBlank(body)) {
+            body = mailConfigAttributes.get(MAIL_BODY).iterator().next();
         }
 
         try {
-            mailServer.sendHtmlEmail(to, subject, message);
+            mailServer.sendEmail(to, subject, body, mimeType);
         } catch (MessagingException e) {
             throw new InternalServerErrorException("Failed to send email", e);
         }

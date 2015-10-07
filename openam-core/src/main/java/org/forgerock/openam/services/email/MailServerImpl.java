@@ -52,6 +52,9 @@ public class MailServerImpl implements MailServer {
     private static String SUBJECT = "forgerockEmailServiceSMTPSubject";
     private static String MESSAGE = "forgerockEmailServiceSMTPMessage";
 
+    private static String HTML_MIME_TYPE = "text/html";
+    private static String PLAIN_MIME_TYPE = "text/plain";
+
     final static public String SERVICE_NAME = "MailServer";
     final static public String SERVICE_VERSION = "1.0";
 
@@ -167,7 +170,12 @@ public class MailServerImpl implements MailServer {
     @Override
     public void sendHtmlEmail(String from, String to, String subject, String message, Map options)
             throws MessagingException {
-        sendEmail(from, to, subject, message, options, true);
+        sendEmail(from, to, subject, message, HTML_MIME_TYPE, options);
+    }
+
+    @Override
+    public void sendEmail(String to, String subject, String message, String mimeType) throws MessagingException {
+        sendEmail(null, to, subject, message, mimeType, null);
     }
 
     @Override
@@ -178,10 +186,10 @@ public class MailServerImpl implements MailServer {
     @Override
     public void sendEmail(String from, String to, String subject, String message, Map options)
             throws MessagingException {
-        sendEmail(from, to, subject, message, options, false);
+        sendEmail(from, to, subject, message, PLAIN_MIME_TYPE, options);
     }
 
-    private void sendEmail(String from, String to, String subject, String message, Map options, boolean isHtml)
+    private void sendEmail(String from, String to, String subject, String message, String mimeType, Map options)
             throws MessagingException {
         if (to == null) {
             return;
@@ -199,21 +207,10 @@ public class MailServerImpl implements MailServer {
             tos[0] = to;
 
             if (smtpHostName == null || smtpHostPort == null) {
-                if (isHtml) {
-                    sendMail.postMail(tos, subject, message, from, "text/html", "UTF-8");
-                } else {
-                    sendMail.postMail(tos, subject, message, from);
-                }
+                sendMail.postMail(tos, subject, message, from, mimeType, "UTF-8");
             } else {
-                if (isHtml) {
-                    sendMail.postMail(tos, subject, message, from, "text/html", "UTF-8", smtpHostName,
-                            smtpHostPort, smtpUserName, smtpUserPassword,
-                            sslEnabled);
-                } else {
-                    sendMail.postMail(tos, subject, message, from, "text/plain", "UTF-8", smtpHostName,
-                            smtpHostPort, smtpUserName, smtpUserPassword,
-                            sslEnabled);
-                }
+                sendMail.postMail(tos, subject, message, from, mimeType, "UTF-8", smtpHostName,
+                        smtpHostPort, smtpUserName, smtpUserPassword, sslEnabled);
             }
             if (debug.messageEnabled()) {
                 debug.message(DEBUG_TAG + "Email sent to : " + to + ".");

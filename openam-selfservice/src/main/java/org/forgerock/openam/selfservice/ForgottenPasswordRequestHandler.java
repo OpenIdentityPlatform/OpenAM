@@ -79,6 +79,7 @@ final class ForgottenPasswordRequestHandler extends AbstractSelfServiceRequestHa
                 .setEmailSubject("Reset password email")
                 .setEmailMessage("<h3>This is your reset email.</h3>"
                         + "<h4><a href=\"%link%\">Email verification link</a></h4>")
+                .setEmailMimeType("text/html")
                 .setEmailVerificationLinkToken("%link%")
                 .setEmailVerificationLink(serverUrl.toString());
 

@@ -75,6 +75,7 @@ public final class UserRegistrationRequestHandler extends AbstractSelfServiceReq
                 .setEmailSubject("Register new account")
                 .setEmailMessage("<h3>This is your registration email.</h3>"
                         + "<h4><a href=\"%link%\">Email verification link</a></h4>")
+                .setEmailMimeType("text/html")
                 .setEmailVerificationLinkToken("%link%")
                 .setEmailVerificationLink(serverUrl.toString());
 

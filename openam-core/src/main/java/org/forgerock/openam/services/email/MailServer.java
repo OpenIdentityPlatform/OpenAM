@@ -24,8 +24,8 @@
 
 package org.forgerock.openam.services.email;
 
+import javax.mail.MessagingException;
 import java.util.Map;
-import javax.mail.*;
 
 public interface MailServer {
 
@@ -64,7 +64,7 @@ public interface MailServer {
      * @param options SMTPHostName, SMTPPort, SMTPUser, SMTPUserPassword
      * @throws MessagingException in case where the module was unable to send the e-mail
      */
-    public void sendEmail(String from, String to, String subject,
+    void sendEmail(String from, String to, String subject,
                           String message, Map options) throws MessagingException;
 
     /**
@@ -74,5 +74,23 @@ public interface MailServer {
      * @param message The content contained in the E-mail message
      * @throws MessagingException in the case where the module was unable to send the e-mail
      */
-    public void sendEmail(String to, String subject, String message) throws MessagingException;
+    void sendEmail(String to, String subject, String message) throws MessagingException;
+
+    /**
+     * Sends an email message using default MailServer settings.
+     *
+     * @param to
+     *         the address that the email message is sent
+     * @param subject
+     *         the E-mail subject
+     * @param message
+     *         the content contained in the email message
+     * @param mimeType
+     *         the mime type to be used for the email
+     *
+     * @throws MessagingException
+     *         in the case where the module was unable to send the email
+     */
+    void sendEmail(String to, String subject, String message, String mimeType) throws MessagingException;
+
 }
