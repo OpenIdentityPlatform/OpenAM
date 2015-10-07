@@ -66,7 +66,7 @@
                                  resourceName="selfRegistrationConfirmationUrl"
                                  i18nKey="a103">
                     <DefaultValues>
-                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#register/</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecurityForgotPasswordEnabled"
@@ -99,7 +99,7 @@
                                  resourceName="forgotPasswordConfirmationUrl"
                                  i18nKey="a106">
                     <DefaultValues>
-                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#passwordReset/</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecuritySuccessfulUserRegistrationDestination"

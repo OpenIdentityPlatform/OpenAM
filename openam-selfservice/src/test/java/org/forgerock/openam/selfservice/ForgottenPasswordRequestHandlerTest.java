@@ -22,7 +22,6 @@ import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAsse
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -33,8 +32,8 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.openam.services.baseurl.BaseURLProvider;
-import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.selfservice.config.ConsoleConfig;
+import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
 import org.forgerock.selfservice.core.ProcessContext;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStage;
@@ -72,6 +71,8 @@ public final class ForgottenPasswordRequestHandlerTest {
     private SnapshotTokenHandler tokenHandler;
     @Mock
     private ProcessStore processStore;
+    @Mock
+    private ConsoleConfigHandler configHandler;
 
     private HttpContext context;
 
@@ -82,19 +83,23 @@ public final class ForgottenPasswordRequestHandlerTest {
         context = new HttpContext(json(object(field("headers", Collections.emptyMap()),
                 field("parameters", Collections.emptyMap()))), null);
 
-        BaseURLProviderFactory baseURLProviderFactory = mock(BaseURLProviderFactory.class);
-        BaseURLProvider urlProvider = mock(BaseURLProvider.class);
-        given(baseURLProviderFactory.get("/")).willReturn(urlProvider);
-        given(urlProvider.getURL(context)).willReturn("http://host:port/path");
-
         forgottenPassword = new ForgottenPasswordRequestHandler(
-                stageFactory, tokenHandlerFactory, processStore, baseURLProviderFactory);
+                stageFactory, tokenHandlerFactory, processStore, configHandler);
     }
 
     @Test
     public void initialReadReturnsBasicRequirements() throws ResourceException {
         // When
         ReadRequest request = Requests.newReadRequest("/forgottenPassword");
+
+        ConsoleConfig config = new ConsoleConfig()
+                .getForgottenPassword()
+                .setEnabled(true)
+                .setEmailUrl("testurl")
+                .setTokenExpiry(123L)
+                .done();
+
+        given(configHandler.getConfig("/")).willReturn(config);
 
         given(stageFactory.get(isA(VerifyUserIdConfig.class))).willReturn(stage1);
 
@@ -120,6 +125,15 @@ public final class ForgottenPasswordRequestHandlerTest {
         // When
         ActionRequest request = Requests.newActionRequest("/forgottenPassword", "submitRequirements");
         request.setContent(json(object(field("input", object()))));
+
+        ConsoleConfig config = new ConsoleConfig()
+                .getForgottenPassword()
+                .setEnabled(true)
+                .setEmailUrl("testurl")
+                .setTokenExpiry(123L)
+                .done();
+
+        given(configHandler.getConfig("/")).willReturn(config);
 
         given(tokenHandlerFactory.get(isA(SnapshotTokenConfig.class))).willReturn(tokenHandler);
         given(stageFactory.get(isA(VerifyUserIdConfig.class))).willReturn(stage1);

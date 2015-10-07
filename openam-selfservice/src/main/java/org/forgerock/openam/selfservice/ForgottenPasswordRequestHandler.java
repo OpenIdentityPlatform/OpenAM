@@ -20,8 +20,8 @@ import com.sun.identity.shared.Constants;
 import org.forgerock.json.jose.jwe.EncryptionMethod;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
+import org.forgerock.openam.selfservice.config.ConsoleConfig;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStageFactory;
 import org.forgerock.selfservice.core.StorageType;
@@ -45,29 +45,21 @@ import java.util.HashSet;
  */
 final class ForgottenPasswordRequestHandler extends AbstractSelfServiceRequestHandler {
 
-    private final BaseURLProviderFactory baseURLProviderFactory;
-
     @Inject
     public ForgottenPasswordRequestHandler(ProgressStageFactory stageFactory,
             SnapshotTokenHandlerFactory tokenHandlerFactory, ProcessStore localStore,
-            BaseURLProviderFactory baseURLProviderFactory) {
-        super(stageFactory, tokenHandlerFactory, localStore);
-        this.baseURLProviderFactory = baseURLProviderFactory;
+            ConsoleConfigHandler configHandler) {
+        super(stageFactory, tokenHandlerFactory, localStore, configHandler);
     }
 
     @Override
-    protected ProcessInstanceConfig getServiceConfig(Context context, String realm) {
-        String baseUrl = baseURLProviderFactory
-                .get(realm)
-                .getURL(context.asContext(HttpContext.class));
+    protected boolean isServiceEnabled(ConsoleConfig config) {
+        return config.getForgottenPassword().isEnabled();
+    }
 
-        StringBuilder serverUrl = new StringBuilder(baseUrl);
-
-        if (baseUrl.charAt(baseUrl.length() - 1) != '/') {
-            serverUrl.append('/');
-        }
-
-        serverUrl.append("XUI/#passwordReset/&realm=").append(realm);
+    @Override
+    protected ProcessInstanceConfig getServiceConfig(ConsoleConfig config, Context context, String realm) {
+        String serverUrl = config.getForgottenPassword().getEmailUrl() + "&realm=" + realm;
 
         StageConfig verifyUserIdConfig = new VerifyUserIdConfig(new EmailAccountConfig())
                 .setQueryFields(new HashSet<>(Arrays.asList("uid", "mail")))
@@ -81,7 +73,7 @@ final class ForgottenPasswordRequestHandler extends AbstractSelfServiceRequestHa
                         + "<h4><a href=\"%link%\">Email verification link</a></h4>")
                 .setEmailMimeType("text/html")
                 .setEmailVerificationLinkToken("%link%")
-                .setEmailVerificationLink(serverUrl.toString());
+                .setEmailVerificationLink(serverUrl);
 
         StageConfig resetConfig = new ResetStageConfig()
                 .setIdentityServiceUrl("/users")
@@ -95,7 +87,7 @@ final class ForgottenPasswordRequestHandler extends AbstractSelfServiceRequestHa
         jwtTokenConfig.setJweAlgorithm(JweAlgorithm.RSAES_PKCS1_V1_5);
         jwtTokenConfig.setEncryptionMethod(EncryptionMethod.A128CBC_HS256);
         jwtTokenConfig.setJwsAlgorithm(JwsAlgorithm.HS256);
-        jwtTokenConfig.setTokenLifeTimeInSeconds(3L * 60L);
+        jwtTokenConfig.setTokenLifeTimeInSeconds(config.getForgottenPassword().getTokenExpiry());
 
         return new ProcessInstanceConfig()
                 .setStageConfigs(Arrays.asList(verifyUserIdConfig, resetConfig))

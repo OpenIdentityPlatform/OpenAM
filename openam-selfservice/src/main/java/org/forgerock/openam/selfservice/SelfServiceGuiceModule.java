@@ -24,6 +24,8 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
+import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
+import org.forgerock.openam.selfservice.config.ConsoleConfigHandlerImpl;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStageFactory;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
@@ -52,6 +54,7 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Override
     protected void configure() {
+        bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
         bind(ProcessStore.class).to(CTSProcessStoreImpl.class);
         bind(SnapshotTokenHandlerFactory.class).to(SnapshotTokenHandlerFactoryImpl.class);
 
@@ -74,7 +77,8 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Provides
     @Singleton
-    ProgressStageFactory getProgressStageFactory(@Named("SelfServiceConnectionFactory") ConnectionFactory connectionFactory) {
+    ProgressStageFactory getProgressStageFactory(
+            @Named("SelfServiceConnectionFactory") ConnectionFactory connectionFactory) {
         ProgressStageFactoryImpl stageFactory = new ProgressStageFactoryImpl();
         stageFactory.safePut(VerifyUserIdConfig.class, new VerifyUserIdStage(connectionFactory));
         stageFactory.safePut(ResetStageConfig.class, new ResetStage(connectionFactory));

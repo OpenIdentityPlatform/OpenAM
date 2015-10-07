@@ -18,11 +18,15 @@ package org.forgerock.openam.selfservice;
 import org.forgerock.json.resource.AbstractRequestHandler;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.selfservice.config.ConsoleConfig;
+import org.forgerock.openam.selfservice.config.ConsoleConfigChangeListener;
+import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
 import org.forgerock.selfservice.core.AnonymousProcessService;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStageFactory;
@@ -32,66 +36,107 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 import javax.inject.Inject;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Abstract request handler used to setup the self services.
  *
  * @since 13.0.0
  */
-public abstract class AbstractSelfServiceRequestHandler extends AbstractRequestHandler {
+abstract class AbstractSelfServiceRequestHandler
+        extends AbstractRequestHandler implements ConsoleConfigChangeListener {
 
     private final ProgressStageFactory stageFactory;
     private final SnapshotTokenHandlerFactory tokenHandlerFactory;
     private final ProcessStore localStore;
 
-    private final ConcurrentMap<String, RequestHandler> serviceCache;
+    private final Map<String, RequestHandler> serviceCache;
+    private final ConsoleConfigHandler consoleConfigHandler;
 
     @Inject
     public AbstractSelfServiceRequestHandler(ProgressStageFactory stageFactory,
-            SnapshotTokenHandlerFactory tokenHandlerFactory, ProcessStore localStore) {
+            SnapshotTokenHandlerFactory tokenHandlerFactory, ProcessStore localStore,
+            ConsoleConfigHandler consoleConfigHandler) {
         serviceCache = new ConcurrentHashMap<>();
 
         this.stageFactory = stageFactory;
         this.tokenHandlerFactory = tokenHandlerFactory;
         this.localStore = localStore;
+
+        this.consoleConfigHandler = consoleConfigHandler;
+        consoleConfigHandler.registerListener(this);
     }
 
     @Override
     public final Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
-        return getService(context).handleRead(context, request);
+        try {
+            return getService(context).handleRead(context, request);
+        } catch (NotSupportedException nsE) {
+            return nsE.asPromise();
+        }
     }
 
     @Override
     public final Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        return getService(context).handleAction(context, request);
+        try {
+            return getService(context).handleAction(context, request);
+        } catch (NotSupportedException nsE) {
+            return nsE.asPromise();
+        }
     }
 
-    private RequestHandler getService(Context context) {
+    private RequestHandler getService(Context context) throws NotSupportedException {
         String realm = RealmContext.getRealm(context);
-        RequestHandler result = serviceCache.get(realm);
+        RequestHandler service = serviceCache.get(realm);
 
-        if (result == null) {
-            result = createNewService(context, realm);
-            RequestHandler old = serviceCache.putIfAbsent(realm, result);
+        if (service == null) {
+            synchronized (serviceCache) {
+                service = serviceCache.get(realm);
 
-            if (old != null) {
-                result = old;
+                if (service == null) {
+                    service = createNewService(context, realm);
+                    serviceCache.put(realm, service);
+                }
             }
         }
 
-        return result;
+        return service;
     }
 
-    private RequestHandler createNewService(Context context, String realm) {
-        ProcessInstanceConfig config = getServiceConfig(context, realm);
-        return new AnonymousProcessService(config, stageFactory, tokenHandlerFactory, localStore);
+    private RequestHandler createNewService(Context context, String realm) throws NotSupportedException {
+        ConsoleConfig config = consoleConfigHandler.getConfig(realm);
+
+        if (!isServiceEnabled(config)) {
+            throw new NotSupportedException("Service not configured");
+        }
+
+        ProcessInstanceConfig serviceConfig = getServiceConfig(config, context, realm);
+        return new AnonymousProcessService(serviceConfig, stageFactory, tokenHandlerFactory, localStore);
+    }
+
+    @Override
+    public final void configUpdate(String realm) {
+        synchronized (serviceCache) {
+            serviceCache.remove(realm);
+        }
     }
 
     /**
-     * Provides the CUSS configuration for the appropriate flow.
+     * Determines whether the specific service is enabled.
      *
+     * @param config
+     *         the console config
+     *
+     * @return whether the service is enabled
+     */
+    protected abstract boolean isServiceEnabled(ConsoleConfig config);
+
+    /**
+     * Provides the self service configuration for the appropriate flow.
+     *
+     * @param config
+     *         the console config
      * @param context
      *         CREST context
      * @param realm
@@ -99,6 +144,6 @@ public abstract class AbstractSelfServiceRequestHandler extends AbstractRequestH
      *
      * @return service configuration
      */
-    protected abstract ProcessInstanceConfig getServiceConfig(Context context, String realm);
+    protected abstract ProcessInstanceConfig getServiceConfig(ConsoleConfig config, Context context, String realm);
 
 }
