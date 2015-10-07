@@ -116,12 +116,41 @@
                         <Value>default</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="forgerockRESTSecurityProtectedUserAttributes" 
+                <AttributeSchema name="forgerockRESTSecurityProtectedUserAttributes"
                                  type="list"
                                  syntax="string"
                                  resourceName="protectedUserAttributes"
                                  i18nKey="a108">
-                </AttributeSchema> 
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecurityQuestionsUserMustAnswer"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="50"
+                                 validator="RequiredValueValidator"
+                                 resourceName="kbaQuestionsUserMustAnswer"
+                                 i18nKey="a110">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecurityAnswersUserMustProvide"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="30"
+                                 validator="RequiredValueValidator"
+                                 resourceName="kbaAnswersUserMustProvide"
+                                 i18nKey="a111">
+                    <DefaultValues>
+                        <Value>3</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecurityKBAQuestions"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="kbaQuestions"
+                                 i18nKey="a109">
+                </AttributeSchema>
             </Organization>
         </Schema>
     </Service>

@@ -30,6 +30,7 @@ import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,8 +50,10 @@ public final class IdentityRestUtils {
     public static final String GROUP_TYPE = "group";
     public static final String AGENT_TYPE = "agent";
 
-    public final static String UNIVERSAL_ID = "universalid";
-    public final static String FIELD_MAIL = "mail";
+    public static final String UNIVERSAL_ID = "universalid";
+    public static final String FIELD_MAIL = "mail";
+
+    public static final String USER_KBA_ATTRIBUTE = "kbaInformation";
 
     public static final String USERNAME = "username";
 
@@ -92,20 +96,34 @@ public final class IdentityRestUtils {
     }
 
     /**
-     * Returns a JsonValue containing appropriate identity details.  Package private for IdentityResourceV2.
+     * Convert an {@link IdentityDetails} object into a {@link JsonValue}.  Package private for IdentityResourceV2.
      *
-     * @param details The IdentityDetails of a Resource
-     * @return The JsonValue Object
+     * @param details The IdentityDetails
+     * @return The JsonValue
      */
     public static JsonValue identityDetailsToJsonValue(IdentityDetails details) {
-        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>());
         try {
             result.put(USERNAME, details.getName());
             result.put("realm", details.getRealm());
             Map<String, Set<String>> attrs = asMap(details.getAttributes());
 
-            for (Map.Entry<String, Set<String>>aix : attrs.entrySet()) {
-                result.put(aix.getKey(), new ArrayList<>(aix.getValue()));
+            for (Map.Entry<String, Set<String>> entry : attrs.entrySet()) {
+
+                // Handle the KBA attribute especially.  This originally came from "outside" OpenAM and was passed to
+                // us as JSON.  We took the JSON and (via toString) turned it into text.  Now we take the text and
+                // turn it back into JSON.  This is all ok because we're not required to understand it, just pass it
+                // back and forth.
+                if (entry.getKey().equals(USER_KBA_ATTRIBUTE)) {
+                    List<Object> kbaChildren = new ArrayList<>();
+                    for (String kbaString : entry.getValue()) {
+                        JsonValue kbaValue = JsonValueBuilder.toJsonValue(kbaString);
+                        kbaChildren.add(kbaValue.getObject());
+                    }
+                    result.put(USER_KBA_ATTRIBUTE, kbaChildren.toArray(new Object[0]));
+                } else {
+                    result.put(entry.getKey(), entry.getValue());
+                }
             }
             return result;
         } catch (final Exception e) {

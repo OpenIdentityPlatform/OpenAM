@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -31,12 +31,14 @@ public class IdRepoServiceHelper extends AbstractUpgradeHelper {
     private static final String MEMBER_OF_ATTR = "sun-idrepo-ldapv3-config-memberof";
     private static final String MIN_POOL_SIZE = "sun-idrepo-ldapv3-config-connection_pool_min_size";
     private static final String USER_ATTR = "sun-idrepo-ldapv3-config-user-attributes";
+    private static final String USER_OBJECT_CLASS_ATTR = "sun-idrepo-ldapv3-config-user-objectclass";
 
     public IdRepoServiceHelper() {
         attributes.add(IdConstants.ID_REPO);
         attributes.add(MEMBER_OF_ATTR);
         attributes.add(MIN_POOL_SIZE);
         attributes.add(USER_ATTR);
+        attributes.add(USER_OBJECT_CLASS_ATTR);
     }
 
     @Override

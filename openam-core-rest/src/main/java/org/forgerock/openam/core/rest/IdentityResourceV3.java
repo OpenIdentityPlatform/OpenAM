@@ -27,7 +27,6 @@ import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -56,6 +55,7 @@ import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 
@@ -84,9 +84,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
 
     private static Debug logger = Debug.getInstance("frRest");
 
-    private static String FIELD_USERNAME = "username";
-    private static String FIELD_PASSWORD = "userPassword";
-    private static String FIELD_KBA = "kba";
+    private static final String FIELD_PASSWORD = "userPassword";
 
     /**
      * Creates a backend
@@ -153,7 +151,8 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
      */
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(final Context context,
-                                                                     final String resourceId, final ReadRequest request) {
+                                                                     final String resourceId,
+                                                                     final ReadRequest request) {
         return identityResourceV2.readInstance(context, resourceId, request);
     }
 

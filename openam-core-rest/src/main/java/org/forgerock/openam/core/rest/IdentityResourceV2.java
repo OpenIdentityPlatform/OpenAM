@@ -1280,8 +1280,16 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                     if (childValue.isString()) {
                         identityAttrList.put(s, Collections.singleton(childValue.asString()));
                     } else if (childValue.isList()) {
-                        ArrayList<String> tList = (ArrayList<String>) childValue.getObject();
-                        identityAttrList.put(s, new HashSet<>(tList));
+                        List<String> list = new ArrayList<>();
+                        for (Object item : childValue.asList()) {
+                            if (item instanceof Map) {
+                                JsonValue json = new JsonValue(item);
+                                list.add(json.toString());
+                            } else {
+                                list.add(item.toString());
+                            }
+                        }
+                        identityAttrList.put(s, new HashSet<>(list));
                     }
                 }
             } catch (Exception e) {

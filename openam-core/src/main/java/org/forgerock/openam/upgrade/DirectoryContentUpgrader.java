@@ -73,6 +73,10 @@ public class DirectoryContentUpgrader {
     private static final String DEVICE_PRINT_OC = "devicePrintProfilesContainer";
     private static final String OATH_DEVICE_OC = "oathDeviceProfilesContainer";
     private static final String OATH2FAENABLED = "oath2faEnabled";
+
+    // Knowledge Based Authentication information container - the object class for kbaInformation
+    private static final String KBA_INFO_OC = "kbaInformationContainer";
+
     private final List<Upgrader> upgraders = new ArrayList<Upgrader>();
     private final ConnectionFactory<Connection> connFactory;
     private final String baseDir;
@@ -109,6 +113,7 @@ public class DirectoryContentUpgrader {
             upgraders.add(new AddUmaPendingRequestsSchema());
             upgraders.add(new AddOATHDeviceSchema());
             upgraders.add(new OATH2FASchema());
+            upgraders.add(new AddKBAInformationSchema());
         }
         Connection conn = null;
         try {
@@ -375,6 +380,19 @@ public class DirectoryContentUpgrader {
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
             return !schema.hasObjectClass(DEVICE_PRINT_OC);
+        }
+    }
+
+    private class AddKBAInformationSchema implements Upgrader {
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/opendj/opendj_kba.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return !schema.hasObjectClass(KBA_INFO_OC);
         }
     }
 

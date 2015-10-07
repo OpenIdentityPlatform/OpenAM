@@ -31,9 +31,12 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceNotFoundException;
+import org.forgerock.openam.forgerockrest.utils.KbaQuestion;
 import org.forgerock.openam.rest.ServiceConfigUtils;
 
 import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class RestSecurity {
@@ -52,6 +55,9 @@ public class RestSecurity {
     private final static String FORGOT_PASSWORD_CONFIRMATION_URL = "forgerockRESTSecurityForgotPassConfirmationUrl";
     private final static String PROTECTED_USER_ATTRIBUTES = "forgerockRESTSecurityProtectedUserAttributes";
     private final static String SUCCESSFUL_USER_REGISTRATION_DESTINATION = "forgerockRESTSecuritySuccessfulUserRegistrationDestination";
+    private final static String KBA_QUESTIONS = "forgerockRESTSecurityKBAQuestions";
+    private final static String KBA_USER_MUST_ANSWER = "forgerockRESTSecurityQuestionsUserMustAnswer";
+    private final static String KBA_USER_MUST_PROVIDE = "forgerockRESTSecurityAnswersUserMustProvide";
 
     private final static String SERVICE_NAME = "RestSecurity";
     private final static String SERVICE_VERSION = "1.0";
@@ -118,11 +124,15 @@ public class RestSecurity {
         final Set<String> protectedUserAttributes;
         final String successfulUserRegistrationDestination;
         final Boolean twoFactorAuthEnabled;
+        final List<KbaQuestion> kbaQuestions;
+        final Long questionsUserMustAnswer;
+        final Long answersUserMustProvide;
 
         private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl,
                 Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, Boolean selfRegistration,
                 Boolean forgotPassword, Set<String> protectedUserAttributes,
-                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled) {
+                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled,
+                List<KbaQuestion> kbaQuestions, Long questionsUserMustAnswer, Long answersUserMustProvide) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
             this.selfRegistrationConfirmationUrl = selfRegistrationConfirmationUrl;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
@@ -132,6 +142,9 @@ public class RestSecurity {
             this.protectedUserAttributes = protectedUserAttributes;
             this.successfulUserRegistrationDestination = successfulUserRegistrationDestination;
             this.twoFactorAuthEnabled = twoFactorAuthEnabled;
+            this.kbaQuestions = kbaQuestions;
+            this.questionsUserMustAnswer = questionsUserMustAnswer;
+            this.answersUserMustProvide = answersUserMustProvide;
         }
     }
 
@@ -147,6 +160,23 @@ public class RestSecurity {
             Set<String> protectedUserAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
             String successfulUserRegistrationDestination = ServiceConfigUtils.getStringAttribute(serviceConfig, SUCCESSFUL_USER_REGISTRATION_DESTINATION);
             Boolean twoFactorAuthEnabled = ServiceConfigUtils.getBooleanAttribute(serviceConfig, TWO_FACTOR_AUTH_ENABLED);
+            List<KbaQuestion> kbaQuestions = new ArrayList<>();
+
+            Set<String> rawKbaQuestions = ServiceConfigUtils.getSetAttribute(serviceConfig, KBA_QUESTIONS);
+            for (String rawKbaQuestion : rawKbaQuestions) {
+                KbaQuestion kbaQuestion = new KbaQuestion(rawKbaQuestion);
+                kbaQuestions.add(kbaQuestion);
+            }
+            Long kbaQuestionsUserMustAnswer = ServiceConfigUtils.getLongAttribute(serviceConfig, KBA_USER_MUST_ANSWER);
+            Long kbaAnswersUserMustProvide = ServiceConfigUtils.getLongAttribute(serviceConfig, KBA_USER_MUST_PROVIDE);
+
+            // sanity check... the number of answers the user must provide cannot be greater than the number of
+            // questions they may have provided
+            if (kbaAnswersUserMustProvide > kbaQuestionsUserMustAnswer) {
+                kbaAnswersUserMustProvide = kbaQuestionsUserMustAnswer;
+                debug.warning("Have reset 'KBA answers user must provide' value since it was greater than the number of 'KBA questions the user must answer'");
+            }
+
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
                     selfRegistrationConfirmationUrl,
@@ -156,7 +186,10 @@ public class RestSecurity {
                     forgotPassword,
                     protectedUserAttributes,
                     successfulUserRegistrationDestination,
-                    twoFactorAuthEnabled);
+                    twoFactorAuthEnabled,
+                    kbaQuestions,
+                    kbaQuestionsUserMustAnswer,
+                    kbaAnswersUserMustProvide);
 
             setProviderConfig(newRestSecuritySettings);
             if (debug.messageEnabled()) {
@@ -210,9 +243,9 @@ public class RestSecurity {
             throw new ServiceNotFoundException(message);
         }
     }
-    
+
     public String getSelfRegistrationConfirmationUrl() {
-    	return restSecurityConfiguration.selfRegistrationConfirmationUrl;
+        return restSecurityConfiguration.selfRegistrationConfirmationUrl;
     }
 
     public boolean isForgotPassword() throws ServiceNotFoundException {
@@ -224,9 +257,9 @@ public class RestSecurity {
             throw new ServiceNotFoundException(message);
         }
     }
-    
+
     public String getForgotPasswordConfirmationUrl() {
-    	return restSecurityConfiguration.forgotPasswordConfirmationUrl;
+        return restSecurityConfiguration.forgotPasswordConfirmationUrl;
     }
     /**
      * Retrieves the Self-Registration CTS Token Life Time
@@ -242,13 +275,13 @@ public class RestSecurity {
             throw new ServiceNotFoundException(message);
         }
     }
-    
+
     public Set<String> getProtectedUserAttributes() {
         return restSecurityConfiguration.protectedUserAttributes;
     }
-    
+
     public String getSuccessfulUserRegistrationDestination() {
-    	return restSecurityConfiguration.successfulUserRegistrationDestination;
+        return restSecurityConfiguration.successfulUserRegistrationDestination;
     }
 
     /**
@@ -260,9 +293,21 @@ public class RestSecurity {
         if ((restSecurityConfiguration != null) && (restSecurityConfiguration.forgotPasswordTokenLifeTime != null)) {
             return restSecurityConfiguration.forgotPasswordTokenLifeTime;
         } else {
-            String message = "RestSecurity::Unable to get provider setting for : "+ FORGOT_PASSWORD_TOKEN_LIFE_TIME;
+            String message = "RestSecurity::Unable to get provider setting for : " + FORGOT_PASSWORD_TOKEN_LIFE_TIME;
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }
+    }
+
+    public List<KbaQuestion> getKbaQuestions() {
+        return restSecurityConfiguration.kbaQuestions;
+    }
+
+    public Long getQuestionsUserMustAnswer() {
+        return restSecurityConfiguration.questionsUserMustAnswer;
+    }
+
+    public Long getAnswersUserMustProvide() {
+        return restSecurityConfiguration.answersUserMustProvide;
     }
 }
