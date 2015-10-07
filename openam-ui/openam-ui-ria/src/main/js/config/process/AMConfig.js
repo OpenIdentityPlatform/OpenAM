@@ -140,41 +140,35 @@ define("config/process/AMConfig", [
         ],
         processDescription: function (event, _, Configuration, Navigation) {
             ThemeManager.getTheme(true);
+
             if (_.contains(Configuration.loggedUser.get("roles"), "ui-admin")) {
-                Navigation.addLink({
-                    "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
-                                                [encodeURIComponent("/")]),
-                    "name": $.t("console.common.topLevelRealm"),
-                    "cssClass": "dropdown-sub"
-                }, "admin", "realms");
-
-                Navigation.addLink({
-                    "url": "#realms",
-                    "name": $.t("config.AppConfiguration.Navigation.links.realms.viewAll"),
-                    "cssClass": "dropdown-sub"
-                }, "admin", "realms");
-
                 SMSGlobalDelegate.realms.all().done(function (data) {
-                    var urls = Navigation.configuration.links.admin.urls.realms.urls,
-                        realms = [];
+                    Navigation.addLink({
+                        "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
+                            [encodeURIComponent("/")]),
+                        "name": $.t("console.common.topLevelRealm"),
+                        "cssClass": "dropdown-sub"
+                    }, "admin", "realms");
 
                     _.forEach(data.result, function (realm) {
-                        if (realm.active === true && realm.path !== "/" && realms.length < 2) {
-                            realms.push({
+                        if (realm.active === true && realm.path !== "/") {
+                            Navigation.addLink({
                                 "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
-                                                            [encodeURIComponent(realm.path)]),
+                                    [encodeURIComponent(realm.path)]),
                                 "name": realm.name,
                                 "cssClass": "dropdown-sub"
-                            });
+                            }, "admin", "realms");
                         }
                     });
 
-                    urls.splice.apply(urls, [-1, 0].concat(realms));
+                    Navigation.addLink({
+                        "url": "#realms",
+                        "name": $.t("config.AppConfiguration.Navigation.links.realms.viewAll"),
+                        "cssClass": "dropdown-sub"
+                    }, "admin", "realms");
 
                     Navigation.reload();
                 });
-
-                Navigation.reload();
             }
         }
     }];
