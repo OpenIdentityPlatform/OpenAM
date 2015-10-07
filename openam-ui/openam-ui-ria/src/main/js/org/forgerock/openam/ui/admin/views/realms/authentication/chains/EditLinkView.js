@@ -32,13 +32,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
         show: function (obj) {
             this.data = obj.data;
             var self = this,
-                linkConfigOptionsDefaults = _.clone(obj.data.linkConfig.options),
-                linkConfig = self.data.linkConfig,
+                newLink = !self.data.linkConfig,
+                linkConfig = self.data.linkConfig || { module: "", options: {}, criteria: "" },
                 formData = self.data,
                 title = linkConfig.module ? $.t("console.authentication.editChains.editModule") : $.t("console.authentication.editChains.newModule");
-            if (!linkConfig.options) {
-                linkConfig.options = {};
-            }
 
             UIUtils.fillTemplateWithData(self.editLinkTemplate, {
                 linkConfig: linkConfig,
@@ -61,26 +58,25 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                             cssClass: "btn-primary",
                             id: "saveBtn",
                             action: function (dialog) {
-                                var moduleSelectize = dialog.getModalBody().find("#selectModule")[0].selectize,
-                                    criteriaValue = dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
+                                var moduleSelectize = dialog.getModalBody().find("#selectModule")[0].selectize;
 
                                 linkConfig.module = moduleSelectize.getValue();
-                                linkConfig.type = _.find(moduleSelectize.options, { _id: linkConfig.module }).type;
-                                linkConfig.options = self.data.linkConfig.options;
+                                linkConfig.type = _.find(moduleSelectize.options, { _id: moduleSelectize.getValue() }).type;
+                                linkConfig.criteria = dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
 
-                                obj.linkInfoView.render(linkConfig, _.find(formData.allModules, { _id: linkConfig.module }).typeDescription);
-                                obj.criteriaView.setCriteria(criteriaValue);
-                                obj.parent.setArrows();
+                                if (newLink) {
+                                    obj.data.linkConfig = linkConfig;
+                                    obj.parent.data.form.chainData.authChainConfiguration.push(linkConfig);
+                                    obj.parent.addItemToList(obj.element);
+                                }
+
+                                obj.render();
                                 dialog.close();
                             }
                         }, {
                             label: $.t("common.form.cancel"),
                             action: function (dialog) {
-                                if (!linkConfig.module) {
-                                    obj.deleteItem(self.data.id);
-                                } else {
-                                    self.data.linkConfig.options = linkConfigOptionsDefaults;
-                                }
+                                obj.parent.validateChain();
                                 dialog.close();
                             }
                         }],
@@ -91,10 +87,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                 options: formData.allModules,
                                 render: {
                                     item: function (item) {
-                                        return "<div>" + item._id + " <span class='dropdown-subtitle'>" + item.typeDescription + "</span></div>";
+                                        return "<div>" + item._id + " - <span class='text-muted'><em>" + item.typeDescription + "</em></span></div>";
                                     },
                                     option: function (item) {
-                                        return "<div><div>" + item._id + "</div><div class='dropdown-subtitle'>" + item.typeDescription + "</div></div>";
+                                        return "<div><div>" + item._id + "</div><div class='small text-muted'><em>" + item.typeDescription + "</em></div></div>";
                                     }
                                 },
                                 onChange: function (value) {
@@ -147,7 +143,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                             UIUtils.fillTemplateWithData(self.editLinkTableTemplate, {
                                 linkConfig: linkConfig
                             }, function (tableTemplate) {
-                                dialog.getModalBody().find('#editLinkOptions').html(tableTemplate);
+                                dialog.getModalBody().find("#editLinkOptions").html(tableTemplate);
                             });
                         }
 

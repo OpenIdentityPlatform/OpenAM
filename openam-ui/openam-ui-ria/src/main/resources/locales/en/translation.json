@@ -698,7 +698,7 @@
                 "failUrl" : "Failed Login URL",
                 "addUrl" : "Add URL",
                 "dropHere" : "Drop here",
-                "moduleHelp" : "Add modules to the authentication chain, and select the continuation and failure semantics with one of the following four flags: required, optional, requisite, or sufficient.",
+                "moduleHelp" : "Add authentication modules to build a process in which a user must pass credentials to all module instances.",
                 "processingClass": {
                     "title": "Post Authentication Processing Class",
                     "className": "Class Name",
@@ -709,7 +709,35 @@
                     "duplicateClass" : "A Class with the same name already exists",
                     "help" : "Specify the name of a Java class to execute at the end of the authentication process."
                 },
-                "criteria" : ["Required","Optional","Requisite","Sufficient"]
+                "criteria" : [
+                    {
+                        "title": "Required",
+                        "pass" : "Will advance to next module.",
+                        "fail" : "Will execute remaining modules but will ultimately fail."
+                    },
+                    {
+                        "title": "Optional",
+                        "pass" : "Will advance to next module",
+                        "fail" : "Will advance to next module"
+                    },
+                    {
+                        "title": "Requisite",
+                        "pass" : "Will advance to next module.",
+                        "fail" : "Will advance straight to failure URL"
+
+                    },
+                    {
+                        "title": "Sufficient",
+                        "pass" : "Will advance straight to success URL.",
+                        "fail" : "Will advance to next module"
+                    }
+                ],
+                "alerts" : {
+                    "atLeastOne" : "You must add at least one valid authentication module"
+                },
+                "lastCriteria" : "Will advance to success or failure URL",
+                "deletedChain": "Chain deleted successfully"
+
             }
         },
         "dashboard":{

@@ -20,8 +20,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/components/BootstrapDialog"
-], function($, _, AbstractView, BootstrapDialog) {
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
+    "handlebars"
+], function ($, _, AbstractView, BootstrapDialog, Handlebars) {
 
     var PostProcessView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/PostProcessTemplate.html",
@@ -32,44 +33,37 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
             "keyup  #newProcessClass": "change"
         },
         element: "#postProcessView",
+        partials: [
+            "partials/alerts/_Alert.html"
+        ],
 
-        add: function(e){
+        add: function (e) {
             var newProcessClass = this.$el.find("#newProcessClass").val().trim(),
-                invalidName = _.find(this.data.chainData.loginPostProcessClass, function(className) {
+                invalidName = _.find(this.data.chainData.loginPostProcessClass, function (className) {
                     return className === newProcessClass;
-                }),
-                alert;
-
-            if (invalidName){
-                // FIXME:  This needs to come from a template or partial. This is a temporay fix.
-                alert = "<div class='alert alert-warning' role='alert'>"+
-                            "<div class='media'>"+
-                                "<button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>×</span><span class='sr-only'>"+$.t("common.form.close")+"</span></button>"+
-                                "<div class='media-left' href='#'>"+
-                                    "<i class='fa fa-exclamation-circle'></i>"+
-                                "</div>"+
-                                "<div class='media-body'>"+ $.t("console.authentication.editChains.processingClass.duplicateClass") +"</div>"+
-                            "</div>"+
-                        "</div>";
-
-                this.$el.find("#alertContainer").html(alert);
+                });
+            if (invalidName) {
+                this.$el.find("#alertContainer").html(
+                    Handlebars.compile("{{> alerts/_Alert type='warning' " +
+                        "text='console.authentication.editChains.processingClass.duplicateClass'}}")
+                );
             } else {
                 this.data.chainData.loginPostProcessClass.push(newProcessClass);
                 this.render(this.data.chainData);
             }
         },
 
-        remove: function(e){
+        remove: function (e) {
             var index = $(e.currentTarget).closest("tr").index();
             this.data.chainData.loginPostProcessClass[index] = "";
             this.render(this.data.chainData);
         },
 
-        change: function(e){
+        change: function (e) {
             this.$el.find("#addBtn").prop("disabled", (e.currentTarget.value.length === 0));
         },
 
-        addClassNameDialog: function(){
+        addClassNameDialog: function () {
             var self = this,
                 promise = $.Deferred(),
                 newProcessClass = this.$el.find("#newProcessClass").val().trim();

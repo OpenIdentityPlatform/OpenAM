@@ -137,7 +137,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             BootstrapDialog.show({
                 title: $.t("console.authentication.modules.inUse.title"),
                 message: $.t("console.authentication.modules.inUse.message", { usedChains: data.moduleChains, moduleName: data.moduleName}),
-                type: BootstrapDialog.TYPE_DANGER,
                 buttons: [
                     {
                         label: $.t("common.form.cancel"),
@@ -147,7 +146,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                         }
                     },{
                         label: $.t("common.form.yes"),
-                        cssClass: "btn-danger",
+                        cssClass: "btn-primary",
                         action: function (dialog) {
                             Router.setUrl(event.currentTarget.href);
                             dialog.close();

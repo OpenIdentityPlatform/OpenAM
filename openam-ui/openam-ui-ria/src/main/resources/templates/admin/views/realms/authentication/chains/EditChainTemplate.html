@@ -1,4 +1,7 @@
-{{> headers/_TitleWithSubAndIcon title=form.chainData._id type="console.authentication.editChains.chains" icon="link" }}
+{{> headers/_TitleWithSubAndIcon title=form.chainData._id type="console.authentication.editChains.chains" icon="link"
+    buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
+
+<p class="page-description">{{t 'console.authentication.editChains.moduleHelp'}}</p>
 
 <div class="tab-menu">
     <ul class="nav nav-tabs" role="tablist">
@@ -7,73 +10,65 @@
     </ul>
 </div>
 
-<div class="panel panel-default fr-panel-tabbed">
-    <div class="panel-body tab-content">
+<div class="panel panel-default fr-panel-tab">
+
+    <div class="tab-content">
 
         <div role="tabpanel" class="tab-pane active" id="chains">
 
-            <a  data-toggle="popover"
-                data-placement="top"
-                data-trigger="focus"
-                data-content="{{t 'console.authentication.editChains.moduleHelp'}}"
-                tabindex="0"
-                title="Modules"
-                class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
+            <div class="panel-body">
+                <button type="button" id="addModuleLink" class="btn btn-primary"><i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}</button>
+            </div>
 
-            <button type="button" id="addModuleLink" class="btn btn-default"><i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}</button>
-            <div id="sortableContainer">
-                <ol id="sortable"></ol>
+            <div class="panel-footer">
+                <div class="panel-body">
+                    <div id="sortableContainer">
+                        <ol id="sortableAuthChain" class="list-unstyled hidden"></ol>
+                    </div>
+                    <div id="alertContainer"></div>
+                </div>
             </div>
 
         </div>
 
         <div role="tabpanel" class="tab-pane" id="settings">
 
-             <div class="block clearfix">
-                 <a data-toggle="popover"
-                    data-placement="top"
-                    data-trigger="focus"
-                    data-content="{{t 'console.authentication.editChains.redirectUrlsHelp'}}"
-                    tabindex="0"
-                    title="Modules"
-                    class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
+            <div class="panel-body">
 
-        	    <h3 class="block-header">{{t 'console.authentication.editChains.redirectUrls'}}</h3>
-                <div class="form-horizontal">
-                    <div class="form-group">
-                        <label for="loginSuccessUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.successUrl'}}</label>
-                        <div class="col-sm-6">
-                            <input id="loginSuccessUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}"  value="{{chainData.loginSuccessUrl.[0]}}">
+                <div class="block clearfix">
+                    <h3 class="block-header">{{t 'console.authentication.editChains.redirectUrls'}}</h3>
+                    <p class="panel-description">{{t 'console.authentication.editChains.redirectUrlsHelp'}}</p>
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="loginSuccessUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.successUrl'}}</label>
+                            <div class="col-sm-6">
+                                <input id="loginSuccessUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}"  value="{{chainData.loginSuccessUrl.[0]}}">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginFailureUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.failUrl'}}</label>
-                        <div class="col-sm-6">
-                            <input id="loginFailureUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}" value="{{chainData.loginFailureUrl.[0]}}">
+                        <div class="form-group">
+                            <label for="loginFailureUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.failUrl'}}</label>
+                            <div class="col-sm-6">
+                                <input id="loginFailureUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}" value="{{chainData.loginFailureUrl.[0]}}">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="block clearfix">
-                 <a data-toggle="popover"
-                    data-placement="top"
-                    data-trigger="focus"
-                    data-content="{{t 'console.authentication.editChains.processingClass.help'}}"
-                    tabindex="0"
-                    title="Modules"
-                    class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
 
-        	    <h3 class="block-header">{{t 'console.authentication.editChains.processingClass.title'}}</h3>
-                <table class="table" id="postProcessView"></table>
-            </div>
+                <div class="block clearfix">
+                    <h3 class="block-header">{{t 'console.authentication.editChains.processingClass.title'}}</h3>
+                    <p class="panel-description">{{t 'console.authentication.editChains.processingClass.help'}}</p>
+                    <table class="table" id="postProcessView"></table>
+                </div>
 
+            </div>
+            
         </div>
 
     </div>
 
     <div class="panel-footer clearfix">
         <div class="pull-right">
-            <button id="saveChanges" class="btn btn-primary" type="button">
+            <button id="saveChanges" class="btn btn-primary" type="button" disabled>
                 <span>{{t "common.form.saveChanges"}}</span>
             </button>
         </div>

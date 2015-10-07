@@ -22,132 +22,97 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/admin/views/realms/authentication/chains/CriteriaView",
-    "org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLinkView",
-    "org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkInfoView"
-], function ($, _, AbstractView, BootstrapDialog, UIUtils, CriteriaView, EditLinkView, LinkInfoView) {
+    "org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLinkView"
+], function ($, _, AbstractView, BootstrapDialog, UIUtils, EditLinkView) {
 
     var LinkView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/LinkTemplate.html",
-        mode: "append",
+        popoverTemplate: "templates/admin/views/realms/authentication/chains/PopoverTemplate.html",
+        mode: "replace",
         events: {
-            "dblclick .panel":     "editItem",
-            "click #editItem":     "editItem",
-            "show.bs.dropdown" :   "setBtnStates",
-            "click .move-btn":     "moveBtnClick",
-            "click #deleteBtn":    "deleteBtnClick",
-            "click .criteria-btn-container button": "selectCriteria"
+            "dblclick .panel": "editItem",
+            "click #editBtn": "editItem",
+            "click #deleteBtn": "deleteItem",
+            "change #selectCriteria": "selectCriteria",
+            "mouseenter .btn-auth-module-info": "showPopover",
+            "focusin  .btn-auth-module-info":   "showPopover",
+            "mouseleave .btn-auth-module-info": "hidePopover",
+            "focusout.btn-auth-module-info":    "hidePopover"
         },
 
-        deleteBtnClick: function (e) {
-            if (e) {
-                e.preventDefault();
-            }
-            this.deleteItem($(e.currentTarget).data().mapId);
-        },
-
-        deleteItem: function (mapId) {
+        deleteItem: function () {
             this.parent.data.form.chainData.authChainConfiguration.splice(this.$el.index(), 1);
-            this.parent.data.linkViewMap[mapId].remove();
-            this.parent.setArrows();
+            this.parent.validateChain();
             this.remove();
         },
 
         editItem: function (e) {
-            if (e) {
-                e.preventDefault();
-            }
             EditLinkView.show(this);
         },
 
-        moveBtnClick: function (e) {
-            e.preventDefault();
+        showPopover: function (e) {
+            var self = this,
+                popover = this.$el.find(".btn-auth-module-info").data("bs.popover"),
+                selected = this.$el.find("#selectCriteria option:selected"),
+                index = selected.index(),
+                data = { criteria : selected.val().toLowerCase() };
 
-            var direction = parseInt($(e.currentTarget).data().direction, 10),
-                chainlinks = this.$el.parent().children(".chain-link"),
-                originalIndex = this.$el.index(),
-                targetIndex = originalIndex + direction;
-
-            this.parent.sortChainData(originalIndex, targetIndex);
-
-            // The buttons contain the directions -1 for up and +1 for down.
-            if (direction === -1) {
-                this.$el.insertBefore(chainlinks.eq(targetIndex));
+            if (this.$el.index() >= this.parent.data.form.chainData.authChainConfiguration.length - 1) {
+                data.failText = $.t("console.authentication.editChains.lastCriteria");
+                data.passText = $.t("console.authentication.editChains.lastCriteria");
+                data.last = true;
             } else {
-                this.$el.insertAfter(chainlinks.eq(targetIndex));
+                data.failText = $.t("console.authentication.editChains.criteria." + index + ".fail");
+                data.passText = $.t("console.authentication.editChains.criteria." + index + ".pass");
             }
-            this.parent.setArrows();
+
+            UIUtils.fillTemplateWithData(self.popoverTemplate, data, function (data) {
+                popover.options.content = data;
+                popover.options.title = selected.text();
+                self.$el.find(".btn-auth-module-info").popover("show");
+            });
+
+        },
+
+        hidePopover: function (e) {
+            this.$el.find(".btn-auth-module-info").popover("hide");
+        },
+
+        selectCriteria: function () {
+            this.data.linkConfig.criteria = this.$el.find("#selectCriteria option:selected").val();
         },
 
         render: function () {
-            var self = this,
-                moduleName = null;
+            var self = this;
 
-            this.data.id = this.cid;
-
-            self.parentRender(function () {
-
-                self.criteriaView = new CriteriaView();
-                self.criteriaView.element = "#criteria-" + self.data.id;
-                self.criteriaView.render(self.data.linkConfig, self.data.allCriteria, self.data.id);
-
-                self.linkInfoView = new LinkInfoView();
-                self.linkInfoView.element = "#link-info-" + self.data.id;
-                moduleName = _.find(self.data.allModules, { _id : self.data.linkConfig.module });
-                if (self.data.linkConfig.module && moduleName) {
-                    // The server allows for deletion of modules that are in use within a chain. The chain itself
-                    // will still have a reference to the deleetd module.
-                    // Below we are checking if the module is present. If it isn't the typeDescription is left undefined
-                    self.data.typeDescription = moduleName.typeDescription;
-                }
-                self.linkInfoView.render(self.data.linkConfig, self.data.typeDescription);
-
-                if (!self.data.linkConfig.module && !self.data.linkConfig.criteria) {
-                    self.editItem();
-                } else {
-                    self.setArrows();
-                }
+            this.data.optionsLength = _.keys(this.data.linkConfig.options).length;
+            this.data.typeDescription = this.getModuleDesciption();
+            this.parentRender(function () {
+                self.$el.find(".btn-auth-module-info").popover({
+                    trigger : "manual",
+                    container : "body",
+                    html : "true",
+                    placement : "right",
+                    template: '<div class="popover am-link-popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+                });
             });
+
+            this.parent.validateChain();
         },
 
-        setArrows: function () {
-            if (this.data.linkConfig.criteria.toLowerCase() === this.criteriaView.REQUIRED && this.parent.data.firstRequiredIndex === -1) {
-                this.parent.data.firstRequiredIndex = this.$el.index();
-            }
-            if (this.parent.data.firstRequiredIndex > -1 && this.$el.index() > this.parent.data.firstRequiredIndex) {
-                this.criteriaView.setPassThroughAndFailArrows(true);
-            } else {
-                this.criteriaView.setPassThroughAndFailArrows(false);
-            }
-        },
+        getModuleDesciption: function () {
+            // The server allows for deletion of modules that are in use within a chain.
+            // The chain itself will still have a reference to the deleetd module.
+            // Below we are checking if the module is present. If it isn't the typeDescription is left blank;
+            var name = _.find(this.data.allModules, { _id : this.data.linkConfig.module });
 
-        setBtnStates: function () {
-            var numLinks = this.$el.parent().children(".chain-link").length - 1,
-                itemIndex = this.$el.index(),
-                moveUpBtn = this.$el.find("#moveUpLi"),
-                moveDownBtn = this.$el.find("#moveDownLi"),
-                deleteBtn = this.$el.find("#deleteBtn").parent();
-
-            moveUpBtn.removeClass("disabled");
-            moveDownBtn.removeClass("disabled");
-            deleteBtn.removeClass("disabled");
-
-            if (itemIndex === 0) {
-                moveUpBtn.addClass("disabled");
+            if (this.data.linkConfig.module && name) {
+                return name.typeDescription;
             }
-            if (itemIndex === numLinks) {
-                moveDownBtn.addClass("disabled");
-            }
-            if (numLinks < 1) {
-                deleteBtn.addClass("disabled");
-            }
-        },
 
-        selectCriteria: function (e) {
-            var criteria = $(e.currentTarget).data().criteria;
-            this.criteriaView.setCriteria(criteria);
-            this.parent.setArrows();
+            return;
         }
+
     });
 
     return LinkView;

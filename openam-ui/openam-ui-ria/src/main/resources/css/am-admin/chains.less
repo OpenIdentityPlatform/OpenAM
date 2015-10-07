@@ -1,0 +1,193 @@
+/*
+* The contents of this file are subject to the terms of the Common Development and
+* Distribution License (the License). You may not use this file except in compliance with the
+* License.
+*
+* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+* specific language governing permission and limitations under the License.
+*
+* When distributing Covered Software, include this CDDL Header Notice in each file and include
+* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+* Header, with the fields enclosed by brackets [] replaced by your own identifying
+* information: "Portions copyright [year] [name of copyright owner]".
+*
+* Copyright 2015 ForgeRock AS.
+*/
+
+ol#sortableAuthChain {
+    padding-left: 40px;
+    position: relative;
+
+    &:before {
+        border-left: 2px solid #ddd;
+        content: '';
+        position: absolute;
+        left: 0;
+        left: 10px;
+        height: 100%;
+        top: 0;
+    }
+
+    &:after {
+        content: '';
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 10px 8px 0 8px;
+        border-color: #ccc transparent transparent transparent;
+        left: 3px;
+        margin-top: -20px;
+        position: absolute;
+    }
+
+    li.chain-link .fa-cube {
+        color: #FFFFFF;
+        background:  @base-theme-color;
+        .icon-circle(44px);
+    }
+
+    li:not(.dragged) {
+        counter-increment: my-awesome-counter;
+    }
+
+    li.placeholder{
+        min-height: 128px;
+        position: relative;
+        display: block;
+        margin: 0;
+        padding: 0;
+        min-height: 128px;
+        background-color: #eee;
+        -webkit-box-shadow: inset 0px 0px 3px 0px rgba(0,0,0,0.24);
+        -moz-box-shadow: inset 0px 0px 3px 0px rgba(0,0,0,0.24);
+        box-shadow: inset 0px 0px 3px 0px rgba(0,0,0,0.24);
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        counter-increment: my-awesome-counter;
+    }
+
+
+
+    li:not(.dragged) .panel-card:before, .placeholder-inner:before {
+        content: counter(my-awesome-counter);
+        text-align: center;
+        font-weight: 600;
+        background-color: #fff;
+        width: 22px;
+        height: 22px;
+        border-radius: 40px;
+        display: block;
+        position: absolute;
+        left: -41px;
+        top: -1px;
+        border: 1px solid #ddd;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .placeholder-inner:before {
+        color: #fff;
+        background-color: @base-theme-color;
+        border-color:  @base-theme-color;
+    }
+
+    .am-link-popover {
+        width: 380px;
+        padding: 0 5px 5px;
+
+        .popover-title{
+            border: none;
+            color: @base-theme-color;
+            font-weight: bold;
+        }
+
+        img {
+            width: auto;
+            display: block;
+            margin: 0 auto;
+        }
+    }
+
+    .badge {
+        color: #555;
+        background-color: rgba(0,0,0,.1);
+    }
+
+    .module-options{
+        line-height: 34px;
+    }
+
+    .panel-default.panel-card {
+        position: relative;
+
+        &:hover, &:focus {
+            transition: border-color 0.5s;
+            border-color: darken(@base-theme-color, 5%);
+            .fa-cube{
+                background-color: darken(@base-theme-color, 5%);
+                transition: background-color 0.5s;
+            }
+            h3.media-heading {
+                color: darken(@base-theme-color, 5%);
+                transition: color 0.5s;
+            }
+        }
+
+        .media-heading {
+            margin-top: 3px;
+        }
+
+        h3.media-heading {
+            font-size: 18px;
+            margin-top: 5px;
+        }
+
+        a:focus {
+            text-decoration: none;
+        }
+
+        >.panel-footer {
+            position: absolute;
+            right: 3px;
+            top: 0;
+            z-index: 5;
+            border: none;
+            padding: 4px 0;
+            overflow: visible;
+
+            .btn-link {
+                color: #777;
+                padding: 6px 12px 6px 0px;
+            }
+        }
+
+        .select-group button {
+            padding: 6px 5px;
+            color: #777;
+            display: none;
+
+            &:hover, &:focus {
+                color: @base-theme-color;
+            }
+        }
+    }
+}
+
+@media (min-width: 768px) {
+    ol#sortableAuthChain {
+        > li.chain-link:before {
+            left: -41px;
+        }
+
+        .panel-default.panel-card .select-group {
+            select {
+                width: 66%;
+                display: inline-block;
+            }
+            button {
+                display: inline-block;
+            }
+        }
+    }
+}

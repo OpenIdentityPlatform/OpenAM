@@ -15,7 +15,7 @@
             <select id="selectCriteria" type="text" class="form-control" single value="{{linkConfig.module}}">
                 <option value="" selected disabled >{{t "common.form.select"}}...</option>
                 {{#each allCriteria}}
-                {{#each this}}<option value="{{@key}}" {{#equals ../../linkConfig.criteria @key}} selected{{/equals}}>{{this}}</option>{{/each}}
+                <option value="{{@key}}" {{#equals ../linkConfig.criteria @key}} selected{{/equals}}>{{this}}</option>
                 {{/each}}
             </select>
         </div>

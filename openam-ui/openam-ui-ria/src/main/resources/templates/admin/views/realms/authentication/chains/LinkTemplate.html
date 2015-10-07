@@ -1,21 +1,63 @@
-<div class="panel panel-default" data-id={{id}}>
+<div class="panel panel-default panel-card">
 
-    <div class="btn-group float-right">
-        <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-            <i class="fa fa-ellipsis-v"></i>
-        </button>
 
-        <ul class="dropdown-menu" role="menu">
-            <li><a href="#" id="editItem"><i class="fa fa-pencil"></i>{{t 'common.form.edit'}}</a></li>
-            <li id="moveUpLi"  ><a href="#" class="move-btn" data-direction="-1"><i class="fa fa-long-arrow-up"></i>{{t 'common.form.moveUp'}}</a></li>
-            <li id="moveDownLi"><a href="#" class="move-btn" data-direction="+1"><i class="fa fa-long-arrow-down"></i>{{t 'common.form.moveDown'}}</a></li>
-            <li class="divider"></li>
-            <li><a href="#" id="deleteBtn" data-map-id={{id}}><i class="fa fa-trash"></i>{{t 'common.form.delete'}}</a></li>
-        </ul>
+    <div class="panel-body">
+        <div class="form-group">
+            <div class="media">
+                <div class="media-left">
+                    <div class="circle-icon circle-icon-sm">
+                        <i class="fa fa-cube"></i>
+                    </div>
+                </div>
+                <div class="media-body">
+                    <h3 class="media-heading">{{linkConfig.module}}</h3>
+                    <div class="status text-muted">
+                        {{#if typeDescription}}
+                            {{typeDescription}}
+                        {{else}}
+                            {{linkConfig.type}}
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pull-right">
+            <div class="module-options">
+                {{t 'console.authentication.editChains.options'}} <span class="badge">{{optionsLength}}</span>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-xs-6 col-md-4">
+                <div class="select-group">
+                    <select class="form-control" id="selectCriteria">
+                        {{#each allCriteria}}
+                            <option value="{{@key}}" {{#equals ../linkConfig.criteria @key}}selected{{/equals}}>
+                                {{this}}
+                            </option>
+                        {{/each}}
+                    </select>
+                    <button type="button" class="btn btn-link btn-auth-module-info" title="" data-content="" data-original-title=""><i class="fa fa-info-circle"></i></button>
+                </div>
+            </div>
+
+        </div>
 
     </div>
 
-    <div id="link-info-{{id}}" class="panel-body"></div>
-    <div id="criteria-{{id}}"></div>
-
+    <div class="panel-footer">
+        <div class="btn-group">
+            <button type="button" class="btn btn-link">
+                <i class="fa fa-arrows "></i>
+            </button>
+            <button type="button" class="btn btn-link" id="editBtn">
+                <i class="fa fa-pencil "></i>
+            </button>
+            <button type="button" class="btn btn-link" id="deleteBtn">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
 </div>
