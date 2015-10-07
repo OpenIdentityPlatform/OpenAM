@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "backbone.paginator",
     "backgrid",
     "backgrid.filter",
-    "backgrid.paginator",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "backgrid.selectall",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -35,8 +35,9 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
-             Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script, SMSGlobalDelegate) {
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, BackgridSelectAll,
+             Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script,
+             SMSGlobalDelegate) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/scripts/ScriptsTemplate.html",
@@ -154,7 +155,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 emptyText: $.t("console.common.noResults")
             });
 
-            paginator = new Backgrid.Extension.Paginator({
+            paginator = new Backgrid.Extension.ThemeablePaginator({
                 collection: self.data.scripts,
                 windowSize: 3
             });
@@ -162,8 +163,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             this.parentRender(function () {
                 this.renderToolbar();
 
-                this.$el.find("#backgridContainer").append(grid.render().el);
-                this.$el.find("#paginationContainer").append(paginator.render().el);
+                this.$el.find(".backgrid-container").append(grid.render().el);
+                this.$el.find(".panel-body").append(paginator.render().el);
 
                 $.when(this.contextSchemaPromise, this.languageSchemaPromise).done(function (contSchema, langSchema) {
                     var languageSchema = langSchema[0] ? langSchema[0].properties.languages.items : undefined,
@@ -171,7 +172,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                     self.langMap = self.createMapBySchema(languageSchema);
                     self.contextMap = self.createMapBySchema(contextSchema);
 
-                    self.data.scripts.fetch({reset: true}).done(function () {
+                    self.data.scripts.fetch({ reset: true }).done(function () {
                         if (callback) {
                             callback();
                         }
@@ -186,7 +187,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 item,
                 onDestroy = function () {
                     self.data.selectedUUIDs = [];
-                    self.data.scripts.fetch({reset: true});
+                    self.data.scripts.fetch({ reset: true });
 
                     self.renderToolbar();
                 },
@@ -196,7 +197,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 },
                 onError = function (model, response, options) {
                     onDestroy();
-                    Messages.messages.addMessage({message: response.responseJSON.message, type: "error"});
+                    Messages.messages.addMessage({ message: response.responseJSON.message, type: "error" });
                 };
 
             for (; i < this.data.selectedUUIDs.length; i++) {

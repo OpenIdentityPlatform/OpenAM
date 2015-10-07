@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "backbone.paginator",
     "backgrid",
     "backgrid.filter",
-    "backgrid.paginator",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "backgrid.selectall",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, BackgridSelectAll,
              Configuration, EventManager, Router, Constants, BackgridUtils, URLHelper, PoliciesDelegate, PolicyModel,
              AbstractListView) {
 
@@ -145,19 +145,19 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                 emptyText: $.t("console.common.noResults")
             });
 
-            paginator = new Backgrid.Extension.Paginator({
+            paginator = new Backgrid.Extension.ThemeablePaginator({
                 collection: self.data.items,
                 windowSize: 3
             });
 
             this.bindDefaultHandlers();
 
-            this.data.items.fetch({reset: true}).done(function () {
+            this.data.items.fetch({ reset: true }).done(function () {
                 self.parentRender(function () {
 
                     if (self.data.items.length) {
                         self.renderToolbar();
-                        self.$el.find("#backgridContainer").append(grid.render().el);
+                        self.$el.find(".backgrid-container").append(grid.render().el);
                         self.$el.find("#paginationContainer").append(paginator.render().el);
                     }
 

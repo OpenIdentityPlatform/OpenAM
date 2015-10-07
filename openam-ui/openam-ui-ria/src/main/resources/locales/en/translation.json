@@ -338,6 +338,14 @@
                 "wrongDateFormat" : "Wrong format"
             }
         },
+        "grid": {
+            "pagination": {
+                "first": "First",
+                "previous": "Previous",
+                "next": "Next",
+                "last": "Last"
+            }
+        },
         "user" : {
             "passwordReset" : {
                 "title": "Reset Your Password",

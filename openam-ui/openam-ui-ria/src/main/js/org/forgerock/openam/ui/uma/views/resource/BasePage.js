@@ -22,14 +22,14 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
     "backbone.paginator",
     "backgrid",
     "backgrid.filter",
-    "backgrid.paginator",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/views/share/CommonShare",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, AbstractView, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator,
-            BackgridUtils, CommonShare, Configuration, Constants, RealmHelper) {
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator"
+], function ($, AbstractView, Backbone, BackbonePaginator, Backgrid, BackgridFilter,
+            BackgridUtils, CommonShare, Configuration, Constants, RealmHelper, ThemeablePaginator) {
     var BasePage = AbstractView.extend({
         createCollection: function (url, queryFilters) {
             var self = this;
@@ -136,14 +136,14 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                 emptyText: $.t("console.common.noResults")
             });
 
-            paginator = new Backgrid.Extension.Paginator({
+            paginator = new Backgrid.Extension.ThemeablePaginator({
                 collection: this.data.collection,
                 windowSize: 3
             });
 
             this.parentRender(function () {
                 self.$el.find(".backgrid-container").append(grid.render().el);
-                self.$el.find(".pagination-container").append(paginator.render().el);
+                self.$el.find(".panel-body").append(paginator.render().el);
 
                 self.data.collection.fetch({ reset: true, processData: false }).done(function () {
                     if (callback) {

@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     "backbone.paginator",
     "backgrid",
     "backgrid.filter",
-    "backgrid.paginator",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "backgrid.selectall",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
     "org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel",
     "org/forgerock/openam/ui/common/util/BackgridUtils"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, BackgridSelectAll,
              Messages, EventManager, Router, Constants, UIUtils, URLHelper, AbstractListView, ResourceTypeModel,
              BackgridUtils) {
 
@@ -131,7 +131,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 emptyText: $.t("console.common.noResults")
             });
 
-            paginator = new Backgrid.Extension.Paginator({
+            paginator = new Backgrid.Extension.ThemeablePaginator({
                 collection: self.data.items,
                 windowSize: 3
             });
@@ -141,10 +141,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             this.parentRender(function () {
                 this.renderToolbar();
 
-                this.$el.find("#backgridContainer").append(grid.render().el);
-                this.$el.find("#paginationContainer").append(paginator.render().el);
+                this.$el.find(".backgrid-container").append(grid.render().el);
+                this.$el.find(".panel-body").append(paginator.render().el);
 
-                this.data.items.fetch({reset: true}).done(function (xhr) {
+                this.data.items.fetch({ reset: true }).done(function (xhr) {
                     if (callback) {
                         callback();
                     }

@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
     "backbone.paginator",
     "backgrid",
     "backgrid.filter",
-    "backgrid.paginator",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "backgrid.selectall",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, BackgridSelectAll,
              Configuration, EventManager, Router, Constants, BackgridUtils, URLHelper, PolicySetModel, AbstractListView,
              PoliciesDelegate) {
     return AbstractListView.extend({
@@ -133,7 +133,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                 emptyText: $.t("console.common.noResults")
             });
 
-            paginator = new Backgrid.Extension.Paginator({
+            paginator = new Backgrid.Extension.ThemeablePaginator({
                 collection: self.data.items,
                 windowSize: 3
             });
@@ -143,10 +143,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
             this.parentRender(function () {
                 this.renderToolbar();
 
-                this.$el.find("#backgridContainer").append(grid.render().el);
-                this.$el.find("#paginationContainer").append(paginator.render().el);
+                this.$el.find(".backgrid-container").append(grid.render().el);
+                this.$el.find(".panel-body").append(paginator.render().el);
 
-                this.data.items.fetch({reset: true}).done(function () {
+                this.data.items.fetch({ reset: true }).done(function () {
                     if (callback) {
                         callback();
                     }
@@ -176,8 +176,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                         index = message ? message.indexOf(applicationNotFoundInRealm) : -1;
 
                     if (index > -1) {
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, {key: "policiesImportFailed",
-                            applicationName: message.slice(0, index)});
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, {
+                            key: "policiesImportFailed",
+                            applicationName: message.slice(0, index)
+                        });
                     } else {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploadFailed");
                     }

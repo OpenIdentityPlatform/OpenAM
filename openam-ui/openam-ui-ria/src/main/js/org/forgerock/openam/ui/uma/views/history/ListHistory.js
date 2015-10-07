@@ -31,14 +31,14 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "backbone.paginator",
     "backgrid",
     "backgrid.filter",
-    "backgrid.paginator",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator,
-            AbstractView, BackgridUtils, Configuration, Constants, RealmHelper) {
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator"
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, AbstractView, BackgridUtils, Configuration,
+             Constants, RealmHelper, ThemeablePaginator) {
     var HistoryView = AbstractView.extend({
         template: "templates/uma/views/history/ListHistory.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -52,7 +52,8 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
 
             collection = new (Backbone.PageableCollection.extend({
                 url: RealmHelper.decorateURIWithRealm("/" + Constants.context +
-                                                      "/json/__subrealm__/users/" + Configuration.loggedUser.get("username") +
+                                                      "/json/__subrealm__/users/" +
+                                                      Configuration.loggedUser.get("username") +
                                                       "/uma/auditHistory"),
                 state: {
                     pageSize: 10,
@@ -113,14 +114,14 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
 
             collection.on("backgrid:sort", BackgridUtils.doubleSortFix);
 
-            paginator = new Backgrid.Extension.Paginator({
+            paginator = new Backgrid.Extension.ThemeablePaginator({
                 collection: collection,
                 windowSize: 3
             });
 
             self.parentRender(function () {
                 self.$el.find("#backgridContainer").append(grid.render().el);
-                self.$el.find("#paginationContainer").append(paginator.render().el);
+                self.$el.find(".panel-body").append(paginator.render().el);
                 collection.fetch({ processData: false, reset: true });
             });
         }
