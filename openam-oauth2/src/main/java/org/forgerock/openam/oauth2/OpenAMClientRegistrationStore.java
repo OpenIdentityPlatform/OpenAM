@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.oauth2;
@@ -123,11 +124,11 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
 
             theID = results.iterator().next();
 
-            //if the client is deactivated return null
+            //if the client is deactivated throw InvalidClientException
             if (theID.isActive()){
                 return theID;
             } else {
-                return null;
+                throw new InvalidClientException("Client authentication failed");
             }
         } catch (SSOException e) {
             logger.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
