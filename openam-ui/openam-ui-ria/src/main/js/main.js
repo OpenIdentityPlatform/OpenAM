@@ -33,13 +33,13 @@ require.config({
         "autosizeInput": "libs/jquery.autosize.input.min",
 
         "backbone"           : "libs/backbone-1.1.2-min",
-        "backbone.paginator" : "libs/backbone-paginator.min",
-        "backbone-relational": "libs/backbone-relational",
+        "backbone.paginator" : "libs/backbone.paginator.min-2.0.2-min",
+        "backbone-relational": "libs/backbone-relational-0.9.0-min",
 
-        "backgrid"          : "libs/backgrid.min",
-        "backgrid.filter"   : "libs/backgrid-filter.min",
-        "backgrid.paginator": "libs/backgrid-paginator.min",
-        "backgrid.selectall": "libs/backgrid-select-all.min",
+        "backgrid"          : "libs/backgrid.min-0.3.5-min",
+        "backgrid.filter"   : "libs/backgrid-filter.min-0.3.5-min",
+        "backgrid.paginator": "libs/backgrid-paginator-0.3.5-custom.min",
+        "backgrid.selectall": "libs/backgrid-select-all-0.3.5-min",
 
         "bootstrap"               : "libs/bootstrap-3.3.5-custom",
         "bootstrap-datetimepicker": "libs/bootstrap-datetimepicker-4.14.30-min",
