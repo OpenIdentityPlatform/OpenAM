@@ -19,6 +19,7 @@ package org.forgerock.oauth2.restlet;
 import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.restlet.Context;
@@ -156,6 +157,10 @@ public class ExceptionHandler {
             return (OAuth2RestletException) throwable;
         } else if (throwable.getCause() instanceof OAuth2RestletException) {
             return (OAuth2RestletException) throwable.getCause();
+        } else if (throwable.getCause() instanceof OAuth2Exception) {
+            final OAuth2Exception exception = (OAuth2Exception) throwable.getCause();
+            return new OAuth2RestletException(exception.getStatusCode(), exception.getError(), exception.getMessage(),
+                    null);
         } else {
             final ServerException serverException = new ServerException(throwable);
             final OAuth2RestletException oauthException =

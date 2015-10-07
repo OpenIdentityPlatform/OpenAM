@@ -35,6 +35,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
@@ -75,6 +76,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
     private final Set<ResourceSetRegistrationListener> listeners;
     private final ResourceSetLabelRegistration labelRegistration;
     private final ExtensionFilterManager extensionFilterManager;
+    private final ExceptionHandler exceptionHandler;
 
     /**
      * Construct a new ResourceSetRegistrationEndpoint instance.
@@ -85,18 +87,20 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
      * @param listeners A {@code Set} of {@code ResourceSetRegistrationListener}s.
      * @param labelRegistration An instance of the {@code ResourceSetLabelRegistration}.
      * @param extensionFilterManager An instance of the {@code ExtensionFilterManager}.
+     * @param exceptionHandler An instance of the {@code ExceptionHandler}.
      */
     @Inject
     public ResourceSetRegistrationEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
             ResourceSetDescriptionValidator validator, OAuth2RequestFactory<Request> requestFactory,
             Set<ResourceSetRegistrationListener> listeners, ResourceSetLabelRegistration labelRegistration,
-            ExtensionFilterManager extensionFilterManager) {
+            ExtensionFilterManager extensionFilterManager, ExceptionHandler exceptionHandler) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.validator = validator;
         this.requestFactory = requestFactory;
         this.listeners = listeners;
         this.labelRegistration = labelRegistration;
         this.extensionFilterManager = extensionFilterManager;
+        this.exceptionHandler = exceptionHandler;
     }
 
     /**
@@ -241,6 +245,11 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         labelRegistration.updateLabelsForDeletedResourceSet(store.read(getResourceSetId()));
         store.delete(getResourceSetId(), getResourceOwnerId());
         return createEmptyResponse();
+    }
+
+    @Override
+    protected void doCatch(Throwable throwable) {
+        exceptionHandler.handle(throwable, getResponse());
     }
 
     private boolean isConditionalRequest() {

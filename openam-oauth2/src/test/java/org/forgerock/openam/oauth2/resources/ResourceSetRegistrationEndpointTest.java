@@ -48,6 +48,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
@@ -115,8 +116,10 @@ public class ResourceSetRegistrationEndpointTest {
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
         given(providerSettings.getResourceSetStore()).willReturn(store);
 
+        ExceptionHandler exceptionHandler = mock(ExceptionHandler.class);
+
         endpoint = spy(new ResourceSetRegistrationEndpoint(providerSettingsFactory, validator, requestFactory,
-                listeners, labelRegistration, extensionFilterManager));
+                listeners, labelRegistration, extensionFilterManager, exceptionHandler));
 
         Request request = mock(Request.class);
         ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC);
