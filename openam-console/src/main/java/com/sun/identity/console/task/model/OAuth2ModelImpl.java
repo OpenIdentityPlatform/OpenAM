@@ -29,7 +29,7 @@ import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
 
 /**
- * Default implementation of the social authentication model.
+ * Default implementation of the OAuth2 profiles model.
  */
 public class OAuth2ModelImpl extends AMModelBase implements OAuth2Model {
 
@@ -46,16 +46,19 @@ public class OAuth2ModelImpl extends AMModelBase implements OAuth2Model {
         }
     }
 
+    @Override
     public SortedSet<String> getRealms() throws AMConsoleException {
         final SortedSet<String> realms = new TreeSet<>(super.getRealmNames("/", "*"));
         realms.add("/");
         return realms;
     }
 
+    @Override
     public String getDisplayName() {
         return getLocalizedString(NAME_PREFIX + type);
     }
 
+    @Override
     public String getLocalizedHelpMessage() {
         return getLocalizedString(HELP_PREFIX + type);
     }

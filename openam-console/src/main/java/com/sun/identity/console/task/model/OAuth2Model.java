@@ -22,9 +22,9 @@ import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 
 /**
- * Model class for common tasks involved in configuring social authentication providers (Google, Facebook etc).
+ * Model class for common tasks involved in configuring OAuth2 profiles.
  *
- * @since 12.0.0
+ * @since 13.0.0
  */
 public interface OAuth2Model extends AMModel {
 
