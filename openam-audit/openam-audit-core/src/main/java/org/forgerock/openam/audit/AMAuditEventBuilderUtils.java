@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.openam.audit.AuditConstants.CONTEXTS;
 import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
 import static org.forgerock.json.JsonValue.array;
 import static org.forgerock.json.JsonValue.json;
@@ -44,6 +43,8 @@ public final class AMAuditEventBuilderUtils {
 
     private static final String COMPONENT = "component";
     private static final String EXTRA_INFO = "extraInfo";
+    private static final String CONTEXTS = "contexts";
+//    private static final String REALM = "realm";
 
     private AMAuditEventBuilderUtils() {
         throw new UnsupportedOperationException("Utils class; should not be instantiated.");

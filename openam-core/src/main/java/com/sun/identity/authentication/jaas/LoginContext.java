@@ -71,9 +71,10 @@ public class LoginContext {
     private boolean loginSucceeded = false;
     private CallbackHandler callbackHandler;
     private Map state = new HashMap();
-    private ModuleInfo[] moduleStack;
-    boolean success = false;
 
+    private ModuleInfo[] moduleStack;
+
+    boolean success = false;
     private static final Debug debug = Debug.getInstance("amJAAS");
 
     private void init(AppConfigurationEntry[] entries) throws LoginException {
@@ -90,7 +91,7 @@ public class LoginContext {
         }
     }
 
-    public LoginContext(AppConfigurationEntry[] entries, 
+    public LoginContext(AppConfigurationEntry[] entries,
         CallbackHandler callbackHandler) throws LoginException {
         init(entries);
         if (callbackHandler == null)
@@ -142,6 +143,10 @@ public class LoginContext {
         // module invoked in doPrivileged
         invoke(LOGOUT_METHOD);
     }
+
+//    public ModuleInfo[] getModuleStack() {
+//        return moduleStack;
+//    }
 
     public Subject getSubject() {
         if (!loginSucceeded && !subjectProvided)
@@ -344,6 +349,7 @@ public class LoginContext {
      * LoginModule information -
      *      incapsulates Configuration info and actual module instances.
      */
+//    public static class ModuleInfo {
     private static class ModuleInfo {
         AppConfigurationEntry entry;
         Object module;
@@ -352,5 +358,9 @@ public class LoginContext {
             this.entry = newEntry;
             this.module = newModule;
         }
+
+//        public Object getModule() {
+//            return module;
+//        }
     }
 }

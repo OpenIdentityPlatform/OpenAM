@@ -168,6 +168,11 @@ public final class AuditConstants {
     public static final String ACTIVITY_TOPIC = "activity";
 
     /**
+     * The topic to which events built using {@link AMAuthenticationAuditEventBuilder} should be routed.
+     */
+//    public static final String AUTHENTICATION_TOPIC = "authentication";
+
+    /**
      * SMS service name for the audit service.
      */
     public static final String SERVICE_NAME = "AuditService";

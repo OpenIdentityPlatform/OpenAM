@@ -40,23 +40,22 @@ import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 public class LogMessageProviderBase
     implements LogMessageProvider
@@ -79,6 +78,15 @@ public class LogMessageProviderBase
     public List getAllMessageIDs() {
         return messageIDs;
     }
+
+    /**
+     * Returns all hash message IDs. That is, the message IDs and their corresponding values.
+     *
+     * @return all hash message IDs.
+     */
+//    public Map<String, LogMessageID> getAllHashMessageIDs() {
+//        return hashMessageIDs;
+//    }
 
     /**
      * Returns Log Record. <code>null</code> is returned if there are no

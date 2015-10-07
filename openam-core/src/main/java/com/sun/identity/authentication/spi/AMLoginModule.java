@@ -32,19 +32,42 @@
 
 package com.sun.identity.authentication.spi;
 
+import com.iplanet.am.sdk.AMException;
+import com.iplanet.am.sdk.AMUser;
+import com.iplanet.am.sdk.AMUserPasswordValidation;
+import com.iplanet.am.util.Misc;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionConstraint;
+import com.iplanet.dpro.session.service.SessionCount;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import com.sun.identity.authentication.service.AMAuthErrorCode;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.service.AuthException;
+import com.sun.identity.authentication.service.LoginState;
+import com.sun.identity.authentication.service.LoginStateCallback;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.authentication.util.ISValidation;
+import com.sun.identity.common.AccountLockoutInfo;
+import com.sun.identity.common.AdministrationServiceListener;
+import com.sun.identity.common.DNUtils;
+import com.sun.identity.common.ISAccountLockout;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -60,42 +83,17 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.forgerock.openam.ldap.LDAPUtils;
-
-import com.iplanet.am.sdk.AMException;
-import com.iplanet.am.sdk.AMUser;
-import com.iplanet.am.sdk.AMUserPasswordValidation;
-import com.iplanet.am.util.Misc;
-import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionCount;
-import com.iplanet.dpro.session.service.SessionConstraint;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.service.AMAuthErrorCode;
-import com.sun.identity.authentication.service.AuthD;
-import com.sun.identity.authentication.service.AuthException;
-import com.sun.identity.authentication.service.LoginStateCallback;
-import com.sun.identity.authentication.service.LoginState;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.authentication.util.ISValidation;
-import com.sun.identity.common.AdministrationServiceListener;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.common.ISAccountLockout;
-import com.sun.identity.common.DNUtils;
-import com.sun.identity.common.AccountLockoutInfo;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * An abstract class which implements JAAS LoginModule, it provides
@@ -262,7 +260,8 @@ public abstract class AMLoginModule implements LoginModule {
      */
     protected static AMResourceBundleCache amCache =
         AMResourceBundleCache.getInstance();
-    
+
+//    AuthenticationAuditor authenticationAuditor;
     
     /**
      * Clone Callback[], and save it in the internal/external
@@ -2080,6 +2079,56 @@ public abstract class AMLoginModule implements LoginModule {
      * @param moduleName name of module
      */
     private void setSuccessModuleName(String moduleName) {
+        //-----------------------------------
+
+//        int authLevel = getAuthLevel();
+//        String ip = loginState.getClient();
+//        Principal modulePrincipal = getPrincipal();
+//        String principalName = null;
+//        if (modulePrincipal != null) {
+//            principalName = modulePrincipal.getName();
+//        }
+//
+//        Map<String, String> info = new HashMap<>();
+//        if (StringUtils.isNotEmpty(ip)) {
+//            info.put("ipAddress", ip);
+//        }
+//        String authLevelAsString = String.valueOf(authLevel);
+//        info.put("authLevel", authLevelAsString);
+//
+//        long time = Calendar.getInstance().getTimeInMillis();
+//
+//        authenticationAuditor = InjectorHolder.getInstance(AuthenticationAuditor.class);
+//
+//        AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
+//        builder.eventName("Successful authentication through module " + moduleName + " of class " + moduleClass)
+//                .transactionId(AuditRequestContext.getTransactionIdValue())
+//                .time(time)
+//                .entries(moduleName, "Successful authentication", info);
+//
+//        String orgDN = loginState.getOrgDN();
+//        String realmName = null;
+//        CoreWrapper cw = new CoreWrapper();
+//        if (orgDN != null) {
+//            realmName = cw.convertOrgNameToRealmName(orgDN);
+//            builder.realm(realmName);
+//        }
+//        if (principalName != null && orgDN != null) {
+//            String usersUniversalId = cw.getIdentity(principalName, realmName).getUniversalId();
+//            builder.authentication(usersUniversalId);
+//        } else if (principalName != null) {
+//            builder.authentication(principalName);
+//        }
+//
+//        try {
+//            authenticationAuditor.publish(builder.toEvent());
+//        } catch (AuditException e) {
+//            //Do nothing
+//            int i = 0;
+//        }
+
+        //-----------------------------------
+
         // get login state for this authentication session
         if (loginState == null) {
             loginState = getLoginState();
@@ -2266,6 +2315,56 @@ public abstract class AMLoginModule implements LoginModule {
      */
     
     private void setFailureModuleName(String moduleName) {
+        //-----------------------------------
+
+//        int authLevel = getAuthLevel();
+//        String ip = loginState.getClient();
+//        Principal modulePrincipal = getPrincipal();
+//        String principalName = null;
+//        if (modulePrincipal != null) {
+//            principalName = modulePrincipal.getName();
+//        }
+//
+//        Map<String, String> info = new HashMap<>();
+//        if (StringUtils.isNotEmpty(ip)) {
+//            info.put("ipAddress", ip);
+//        }
+//        String authLevelAsString = String.valueOf(authLevel);
+//        info.put("authLevel", authLevelAsString);
+//
+//        long time = Calendar.getInstance().getTimeInMillis();
+//
+//        authenticationAuditor = InjectorHolder.getInstance(AuthenticationAuditor.class);
+//
+//        AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
+//        builder.eventName("Failure to authenticate through module " + moduleName + " of class " + moduleClass)
+//                .transactionId(AuditRequestContext.getTransactionIdValue())
+//                .time(time)
+//                .entries(moduleName, "Failure to authenticate", info);
+//
+//        String orgDN = loginState.getOrgDN();
+//        String realmName = null;
+//        CoreWrapper cw = new CoreWrapper();
+//        if (orgDN != null) {
+//            realmName = cw.convertOrgNameToRealmName(orgDN);
+//            builder.realm(realmName);
+//        }
+//        if (principalName != null && orgDN != null) {
+//            String usersUniversalId = cw.getIdentity(principalName, realmName).getUniversalId();
+//            builder.authentication(usersUniversalId);
+//        } else if (principalName != null) {
+//            builder.authentication(principalName);
+//        }
+//
+//        try {
+//            authenticationAuditor.publish(builder.toEvent());
+//        } catch (AuditException e) {
+//            //Do nothing
+//            int i = 0;
+//        }
+
+        //-----------------------------------
+
         // get login state for this authentication session
         if (loginState == null) {
             loginState = getLoginState();
@@ -2766,4 +2865,12 @@ public abstract class AMLoginModule implements LoginModule {
         }
         return loginState.getAuthenticatedPrincipals();
     }
+
+//    public String getModuleClass() {
+//        return moduleClass;
+//    }
+//
+//    public String getModuleName() {
+//        return moduleName;
+//    }
 }

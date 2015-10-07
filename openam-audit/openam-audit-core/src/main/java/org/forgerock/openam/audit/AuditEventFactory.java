@@ -46,7 +46,7 @@ public class AuditEventFactory {
      * Creates a new AMAccessAuditEventBuilder for the specified {@literal realm} and adds the realm to the event. If
      * the {@literal realm} is either {@code null} or empty the it will not be added to the event.
      *
-     * Note that We deliberately do not provide a convenience method with no realm to force implementers to consider
+     * Note that we deliberately do not provide a convenience method with no realm to force implementers to consider
      * providing the realm. We must publish per realm wherever applicable.
      *
      * @param realm The realm in which the audit event occurred, or null if realm is not applicable.
@@ -70,10 +70,19 @@ public class AuditEventFactory {
     /**
      * Creates a new AMActivityAuditEventBuilder.
      *
-     * @return AMActivityAuditEventBuilder
+     * @return An AMActivityAuditEventBuilder.
      */
     public AMActivityAuditEventBuilder activityEvent() {
         return new AMActivityAuditEventBuilder();
     }
+
+    /**
+     * Creates a new AMAuthenticationAuditEventBuilder.
+     *
+     * @return An AMAuthenticationAuditEventBuilder.
+     */
+//    public AMAuthenticationAuditEventBuilder authenticationEvent() {
+//        return new AMAuthenticationAuditEventBuilder();
+//    }
 
 }
