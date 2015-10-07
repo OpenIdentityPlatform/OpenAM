@@ -23,11 +23,9 @@ import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
 import static org.forgerock.openam.rest.RestUtils.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.getIdentityServicesAttributes;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.getSSOToken;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.identityDetailsToJsonValue;
 
 import javax.mail.MessagingException;
 import javax.security.auth.callback.Callback;
@@ -127,6 +125,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     private static final String AM_ENCRYPTION_PWD = "am.encryption.pwd";
 
     private static final String SEND_NOTIF_TAG = "IdentityResource.sendNotification() :: ";
+    static final String REALM = "realm";
     private static Debug debug = Debug.getInstance("frRest");
 
     public static final String USER_TYPE = "user";
@@ -1273,6 +1272,12 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             identity.setType(objectType); //set type ex. user
             identity.setRealm(realm); //set realm
             identity.setName(jVal.get(USERNAME).asString());//set name from JsonValue object
+
+            if (AGENT_TYPE.equals(objectType)) {
+                jVal.remove(USERNAME);
+                jVal.remove(REALM);
+                jVal.remove(UNIVERSAL_ID);
+            }
 
             try {
                 for (String s : jVal.keys()) {

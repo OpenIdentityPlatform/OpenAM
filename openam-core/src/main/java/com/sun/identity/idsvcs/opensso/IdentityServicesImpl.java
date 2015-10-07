@@ -47,6 +47,7 @@ import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoDuplicateObjectException;
@@ -95,6 +96,8 @@ import org.forgerock.util.query.QueryFilter;
  * Web Service to provide security based on authentication and authorization support.
  */
 public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentityServicesImpl {
+
+    private static final String AGENT_TYPE_LOWER_CASE = IdConstants.AGENT_TYPE.toLowerCase();
 
     private final ExceptionMappingHandler<IdRepoException, IdServicesException> idServicesErrorHandler =
             InjectorHolder.getInstance(IdentityServicesExceptionMappingHandler.class);
@@ -809,12 +812,14 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
         String serverUrl = null;
         String agentUrl = null;
 
-        final String AGENT_TYPE = "agenttype";
         final String SERVER_URL = "serverurl";
         final String AGENT_URL = "agenturl";
         final String DEFAULT_AGENT_TYPE = "2.2_Agent";
 
-        Set<String> set = idAttrs.remove(AGENT_TYPE);
+        Set<String> set = idAttrs.remove(IdConstants.AGENT_TYPE);
+        if (set == null) {
+            set = idAttrs.remove(AGENT_TYPE_LOWER_CASE);
+        }
         if (set != null && !set.isEmpty()) {
             agentType = set.iterator().next();
         } else if (objectIdType.equals(IdType.AGENTONLY) || objectIdType.equals(IdType.AGENT)) {
