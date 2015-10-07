@@ -122,7 +122,7 @@ public final class IdentityRestUtils {
                     }
                     result.put(USER_KBA_ATTRIBUTE, kbaChildren.toArray(new Object[0]));
                 } else {
-                    result.put(entry.getKey(), entry.getValue());
+                    result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
                 }
             }
             return result;
