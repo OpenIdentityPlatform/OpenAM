@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012-14 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.common;
 
@@ -75,12 +75,19 @@ public class SystemTimerPool {
             // cause issues when doing a container restart.
             instance = new TimerPool("SystemTimerPool",
                 poolSize, false, Debug.getInstance("SystemTimerPool"));
-            shutdownMan.addShutdownListener(new ShutdownListener() {
-                public void shutdown() {
-                    instance.shutdown();
-                    instance = null;
-                }
-            });
+
+            try {
+                shutdownMan.addShutdownListener(new ShutdownListener() {
+                    public void shutdown() {
+                      instance.shutdown();
+                      instance = null;
+                    }
+                });
+            } catch(IllegalMonitorStateException e) {
+                instance.shutdown();
+                instance = null;
+                throw e;
+            }
         }
         return instance;
     }

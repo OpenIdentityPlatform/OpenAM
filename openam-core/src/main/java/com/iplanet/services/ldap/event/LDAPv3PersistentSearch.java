@@ -226,9 +226,13 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         if (!shutdown) {
             //we shouldn't try to restart psearch if we are in shutdown mode.
             retryTask = new RetryTask();
-            // Schedules the task for the exact second without any non-zero milliseconds
-            SystemTimerPool.getTimerPool().schedule(retryTask,
+            try {
+               // Schedules the task for the exact second without any non-zero milliseconds
+               SystemTimerPool.getTimerPool().schedule(retryTask,
                     new Date(System.currentTimeMillis() + retryInterval / 1000 * 1000));
+            } catch (IllegalMonitorStateException e) {
+                DEBUG.warning("PSearch was not restarted, application may be shutting down:", e);
+            }
         }
     }
 
