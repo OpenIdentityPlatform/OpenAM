@@ -75,7 +75,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
     /**
      * {@inheritDoc}
      */
-    public ResourceOwner authenticate(OAuth2Request request) throws NotFoundException {
+    public ResourceOwner authenticate(OAuth2Request request, boolean useSession) throws NotFoundException {
         SSOToken token = null;
         try {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
@@ -83,7 +83,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         } catch (Exception e){
             logger.warning("No SSO Token in request", e);
         }
-        if (token == null) {
+        if (token == null || !useSession) {
             final String username = request.getParameter(USERNAME);
             final char[] password = request.getParameter(PASSWORD) == null ? null :
                     request.<String>getParameter(PASSWORD).toCharArray();

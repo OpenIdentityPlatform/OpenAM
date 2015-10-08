@@ -66,7 +66,7 @@ public class TokenResponseType implements ResponseType {
         final String tokenType = (String) data.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
         final Set<String> scope = (Set<String>) data.get(OAuth2Constants.CoreTokenParams.SCOPE);
         final OAuth2Request request = requestFactory.create(Request.getCurrent());
-        final ResourceOwner resourceOwner = ownerAuthenticator.authenticate(request);
+        final ResourceOwner resourceOwner = ownerAuthenticator.authenticate(request, true);
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);
         final String redirectUri = (String) data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
         final String codeChallenge = (String) data.get(OAuth2Constants.Custom.CODE_CHALLENGE);

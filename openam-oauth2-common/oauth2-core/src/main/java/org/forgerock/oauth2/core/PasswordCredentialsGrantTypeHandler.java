@@ -78,7 +78,7 @@ public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
             requestValidator.validateRequest(request, clientRegistration);
         }
 
-        final ResourceOwner resourceOwner = resourceOwnerAuthenticator.authenticate(request);
+        final ResourceOwner resourceOwner = resourceOwnerAuthenticator.authenticate(request, false);
         if (resourceOwner == null) {
             logger.error("Unable to verify user");
             throw new InvalidGrantException();

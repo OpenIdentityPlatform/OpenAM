@@ -30,8 +30,9 @@ public interface ResourceOwnerAuthenticator {
      * against the OAuth2 provider's internal user store.
      *
      * @param request The OAuth2 request.
+     * @param useSession Use the session from the request
      * @throws NotFoundException if the requested realm doesn't exist
      * @return The authenticated ResourceOwner, or {@code null} if authentication failed.
      */
-    ResourceOwner authenticate(OAuth2Request request) throws NotFoundException;
+    ResourceOwner authenticate(OAuth2Request request, boolean useSession) throws NotFoundException;
 }

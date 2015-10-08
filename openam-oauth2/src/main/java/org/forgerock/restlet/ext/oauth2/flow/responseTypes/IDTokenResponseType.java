@@ -62,7 +62,7 @@ public class IDTokenResponseType implements ResponseType {
     public CoreToken createToken(org.forgerock.oauth2.core.Token accessToken, Map<String, Object> data) throws NotFoundException {
 
         final OAuth2Request request = requestFactory.create(Request.getCurrent());
-        final ResourceOwner resourceOwner = ownerAuthenticator.authenticate(request);
+        final ResourceOwner resourceOwner = ownerAuthenticator.authenticate(request, true);
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);
         final String nonce = (String) data.get(OAuth2Constants.Custom.NONCE);
         final String codeChallenge = (String) data.get(OAuth2Constants.Custom.CODE_CHALLENGE);
