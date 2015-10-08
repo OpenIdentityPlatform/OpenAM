@@ -150,13 +150,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
         if (queryResult.isCollection()) {
             int size = queryResult.asCollection().size();
             for (int ndx = 0; ndx < size; ndx++) {
-                JsonValue jsonInstanceConfig;
-                try {
-                    jsonInstanceConfig = JsonValueBuilder.toJsonValue(queryResult.get(ndx).asString());
-                } catch (JsonException e) {
-                    throw new STSPublishException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
-                }
-                final SoapSTSInstanceConfig soapSTSInstanceConfig = SoapSTSInstanceConfig.fromJson(jsonInstanceConfig);
+                final SoapSTSInstanceConfig soapSTSInstanceConfig = SoapSTSInstanceConfig.fromJson(queryResult.get(ndx));
                 /*
                 check for duplicates: duplicates cannot really be present because the combination of realm and deployment
                 uri constitutes the identity of the soap-sts instance, and duplicate entries will result in LDAP errors

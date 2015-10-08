@@ -18,10 +18,11 @@ package org.forgerock.openam.sts.publish.service;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -162,7 +163,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                 List<RestSTSInstanceConfig> publishedInstances = publisher.getPublishedInstances();
                 JsonObject jsonObject = JsonValueBuilder.jsonValue();
                 for (RestSTSInstanceConfig instanceConfig : publishedInstances) {
-                    jsonObject.put(instanceConfig.getDeploymentSubPath(), instanceConfig.toJson().toString());
+                    jsonObject.put(instanceConfig.getDeploymentSubPath(), mapStringToJson(instanceConfig.toJson().toString()));
                 }
                 /*
                 Note that the revision etag is not set, as this is not a resource which should really be cached.
@@ -179,15 +180,41 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                 }
                 RestSTSInstanceConfig instanceConfig =
                         publisher.getPublishedInstance(request.getResourcePath(), realm);
-                return newResultPromise(newResourceResponse(instanceConfig.getDeploymentSubPath(),
-                        Integer.toString(instanceConfig.hashCode()),
-                        JsonValueBuilder.jsonValue().put(instanceConfig.getDeploymentSubPath(), instanceConfig.toJson().toString()).build()));
+                return newResultPromise(newResourceResponse(
+                                instanceConfig.getDeploymentSubPath(),
+                                Integer.toString(instanceConfig.hashCode()),
+                                JsonValueBuilder.jsonValue().put(instanceConfig.getDeploymentSubPath(), mapStringToJson(instanceConfig.toJson().toString())).build()));
             }
         } catch (STSPublishException e) {
             String message = "Exception caught obtaining rest sts instance corresponding to id: " +
                     request.getResourcePath() + "; Exception: " + e;
             logger.error(message, e);
             return e.asPromise();
+        }
+    }
+
+    /*
+    A sub-optimal bit of business: I want to return json corresponding to published rest-sts instances from the GET. Published
+    rest-sts state is represented as instances of the RestSTSInstanceConfig class, which can emit a JsonValue corresponding to
+    encapsulated config by calling toJson. Unfortunately, it was not clear that to obtain the json representation of a JsonValue
+    requires calling getObject, and that this invocation will only return the top-level object encapsulated in JsonValue. However, if
+    the values in this top-level object (e.g. a Map) are also JsonValue objects, then calling toString on the Map will end up
+    calling toString on the encapsulated JsonValue instances, which will include information about the json pointer, transformers, etc.
+    Because RestSTSInstanceConfig encapsulates other config objects (SAML2Config, OpenIdConnectTokenConfig, ...), each of which
+    will return a JsonValue implementation from their toJson methods, and because the RestSTSInstanceConfig delegates to these
+    instances to obtain the complete configuration state, calling getObject on the top-level JsonValue returned by RestSTSInstanceConfig
+    will not result in proper json, again because some of the values encapsulated in this map are JsonValue objects.
+
+    The proper solution would be to change the signature of all of the toJson methods in the config hierarchy to return and Object
+    instance obtained from calling getObject on the generated JsonValue instance, but this is deemed too risky to undertake now.
+
+    So the interim solution is to marshal the json string back to a Map using Jackson.
+     */
+    private Map mapStringToJson(String jsonValueString) throws STSPublishException {
+        try {
+            return JsonValueBuilder.getObjectMapper().readValue(jsonValueString, Map.class);
+        } catch (IOException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR, "Exception caught mapping String to json: " + e.getMessage(), e);
         }
     }
 
