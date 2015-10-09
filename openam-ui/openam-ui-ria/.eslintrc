@@ -69,6 +69,16 @@
          * fruit("apple") # good
          */
         "space-in-parens": [2, "never"],
+        /**
+         * Spaces required around infix operators
+         *
+         * var numOfApples = 1+2-3 # bad
+         *
+         * var numOfApples = 1 + 2 - 3 # good
+         */
+        "space-infix-ops": [2, {
+            "int32Hint": false
+        }],
 
         /*
          * --------------------------------------------------------------------------------
@@ -150,16 +160,6 @@
          * function () { # good
          */
         "space-before-function-paren": [1, "always"],
-        /**
-         * Spaces required around infix operators
-         *
-         * var numOfApples = 1+2-3 # bad
-         *
-         * var numOfApples = 1 + 2 - 3 # good
-         */
-        "space-infix-ops": [1, {
-            "int32Hint": false
-        }],
         /**
          * Validates that JSDoc is syntactically correct.
          */

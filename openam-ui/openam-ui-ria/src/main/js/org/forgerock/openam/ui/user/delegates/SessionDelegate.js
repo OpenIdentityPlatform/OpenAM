@@ -29,7 +29,7 @@ define("org/forgerock/openam/ui/user/delegates/SessionDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
 ], function(constants, AbstractDelegate) {
 
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/sessions");
+    var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json/sessions");
 
     obj.isSessionValid = function (tokenCookie){
         return obj.serviceCall({
