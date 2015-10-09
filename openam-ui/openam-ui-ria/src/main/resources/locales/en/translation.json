@@ -736,8 +736,12 @@
                     "atLeastOne" : "You must add at least one valid authentication module"
                 },
                 "lastCriteria" : "Will advance to success or failure URL",
-                "deletedChain": "Chain deleted successfully"
-
+                "deletedChain": "Chain deleted successfully",
+                "deleteBtnTooltip": {
+                    "defaultAdminAuthChain": "This is the default authentication chain for Administrators.",
+                    "defaultOrgAuthChain": "This is the default authentication chain for Organizations.",
+                    "defaultAdminOrgAuthChain": "This is the default authentication chain for Administrators and Organizations."
+                }
             }
         },
         "dashboard":{

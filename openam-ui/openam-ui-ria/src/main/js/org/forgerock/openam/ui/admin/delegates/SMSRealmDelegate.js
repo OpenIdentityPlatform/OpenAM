@@ -62,6 +62,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     obj.serviceCall({ url: url })
                 ).then(function (chainsData, authenticationData) {
                     _.each(chainsData[0].result, function (chainData) {
+
                         if (chainData._id === authenticationData[0].adminAuthModule) {
                             chainData.defaultConfig = chainData.defaultConfig || {};
                             chainData.defaultConfig.adminAuthModule = true;
@@ -86,17 +87,27 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 });
             },
             get: function (realm, name) {
-                var moduleName;
+                var moduleName,
+                    url = scopedByRealm(realm, "authentication");
 
                 return $.when(
-                    obj.serviceCall({ url: scopedByRealm(realm, "authentication/chains/" + name) }),
-                    obj.serviceCall({ url: scopedByRealm(realm, "authentication/modules?_queryFilter=true") })
-                ).then(function (chainData, modulesData) {
+                    obj.serviceCall({ url: url }),
+                    obj.serviceCall({ url: url + "/chains/" + name }),
+                    obj.serviceCall({ url: url + "/modules?_queryFilter=true" })
+                ).then(function (authenticationData, chainData, modulesData) {
+
+                        if (chainData[0]._id === authenticationData[0].adminAuthModule) {
+                            chainData[0].adminAuthModule = true;
+                        }
+
+                        if (chainData[0]._id === authenticationData[0].orgConfig) {
+                            chainData[0].orgConfig = true;
+                        }
 
                     _.each(chainData[0].authChainConfiguration, function (chainLink, index) {
                         moduleName = _.find(modulesData[0].result, { _id: chainLink.module });
                         // The server allows for deletion of modules that are in use within a chain. The chain itself
-                        // will still have a reference to the deleetd module.
+                        // will still have a reference to the deleted module.
                         // Below we are checking if the module is present. If it isn't the type is left undefined
                         if (moduleName) {
                             chainLink.type = moduleName.type;
