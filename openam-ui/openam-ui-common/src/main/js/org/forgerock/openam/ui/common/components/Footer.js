@@ -22,7 +22,7 @@ define("org/forgerock/openam/ui/common/components/Footer", [
     "org/forgerock/openam/ui/common/delegates/ServerDelegate"
 ], function (_, Configuration, Footer, ServerDelegate) {
     function isAdmin() {
-        return Configuration.loggedUser && _.contains(Configuration.loggedUser.get("roles"), "ui-admin");
+        return Configuration.loggedUser && _.contains(Configuration.loggedUser.uiroles, "ui-admin");
     }
 
     var Component = Footer.extend({

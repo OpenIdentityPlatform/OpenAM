@@ -102,13 +102,15 @@ define("org/forgerock/openam/ui/user/UserModel", [
                 });
 
                 if (!_.has(user, "roles")) {
-                    user.roles = [];
+                    this.uiroles = [];
                 } else if (_.isString(user.roles)) {
-                    user.roles = user.roles.split(",");
+                    this.uiroles = user.roles.split(",");
+                } else {
+                    this.uiroles = user.roles;
                 }
 
                 if (_.indexOf(user.roles, "ui-user") === -1) {
-                    user.roles.push("ui-user");
+                    this.uiroles.push("ui-user");
                 }
 
                 return user;

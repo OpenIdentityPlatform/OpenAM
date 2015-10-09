@@ -140,7 +140,7 @@ define("config/process/AMConfig", [
         processDescription: function (event, _, Configuration, Navigation) {
             ThemeManager.getTheme(true);
 
-            if (_.contains(Configuration.loggedUser.get("roles"), "ui-admin")) {
+            if (_.contains(Configuration.loggedUser.uiroles, "ui-admin")) {
                 SMSGlobalDelegate.realms.all().done(function (data) {
                     Navigation.addLink({
                         "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,

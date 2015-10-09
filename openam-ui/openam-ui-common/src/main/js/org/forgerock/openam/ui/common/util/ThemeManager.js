@@ -181,7 +181,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
             }
 
             defaultTheme = ThemeConfiguration.themes[defaultThemeName];
-            isAdminUser = Configuration.loggedUser && _.contains(Configuration.loggedUser.get("roles"), "ui-admin");
+            isAdminUser = Configuration.loggedUser && _.contains(Configuration.loggedUser.uiroles, "ui-admin");
 
             theme = ThemeConfiguration.themes[themeName];
             theme = extendTheme(theme, defaultTheme);
