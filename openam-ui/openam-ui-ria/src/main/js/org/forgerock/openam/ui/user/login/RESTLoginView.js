@@ -39,6 +39,48 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
              Handlebars, i18nManager, Messages, ModuleLoader, RESTLoginHelper, RealmHelper, Router, SessionManager,
              UIUtils, URIUtils) {
 
+    function populateTemplate (view, populatedTemplate) {
+        // A rendered template will be a string; an error will be an object
+        if (typeof populatedTemplate === "string") {
+            view.template = "templates/openam/authn/" + view.reqs.stage + ".html";
+        } else {
+            view.template = view.genericTemplate;
+        }
+
+        view.data.showForgotPassword = false;
+        view.data.showRegister = false;
+        view.data.showSpacer = false;
+
+        if (Configuration.globalData.forgotPassword === "true") {
+            view.data.showForgotPassword = true;
+        }
+        if (Configuration.globalData.selfRegistration === "true") {
+            if (view.data.showForgotPassword) {
+                view.data.showSpacer = true;
+            }
+            view.data.showRegister = true;
+        }
+
+        if (Configuration.backgroundLogin) {
+            view.reloadData();
+            var args = {
+                title: $.t("common.form.sessionExpired"),
+                cssClass: "loginDialog",
+                closable: false,
+                message: $(populatedTemplate),
+                onshow: function (dialog) {
+                    view.element = dialog.$modal;
+                    dialog.$modalBody.find("form").removeClass("col-sm-6 col-sm-offset-3");
+                    view.rebind();
+                }
+            };
+            ModuleLoader.load("org/forgerock/commons/ui/common/components/BootstrapDialog")
+                .then(function (BootstrapDialog) {
+                    BootstrapDialog.show(args);
+                });
+        }
+    }
+
     var LoginView = AbstractView.extend({
 
         template: "templates/openam/RESTLoginTemplate.html",
@@ -277,58 +319,17 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 Configuration.globalData.auth.autoLoginAttempts++;
             } else {
                 // Attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                UIUtils.fillTemplateWithData(
+                UIUtils.compileTemplate(
                     "templates/openam/authn/" + reqs.stage + ".html",
-                    _.extend(Configuration.globalData, this.data),
-                     _.bind(function (populatedTemplate)
-                {
-                    // A rendered template will be a string; an error will be an object
-                    if (typeof populatedTemplate === "string") {
-                        this.template = "templates/openam/authn/" + reqs.stage + ".html";
-                    } else {
-                        this.template = this.genericTemplate;
-                    }
-
-                    this.data.showForgotPassword = false;
-                    this.data.showRegister = false;
-                    this.data.showSpacer = false;
-
-                    if (Configuration.globalData.forgotPassword === "true") {
-                        this.data.showForgotPassword = true;
-                    }
-                    if (Configuration.globalData.selfRegistration === "true") {
-                        if (this.data.showForgotPassword) {
-                            this.data.showSpacer = true;
-                        }
-                        this.data.showRegister = true;
-                    }
-
-                    if (Configuration.backgroundLogin) {
-                        this.reloadData();
-                        var self = this,
-                            args = {
-                                title: $.t("common.form.sessionExpired"),
-                                cssClass: "loginDialog",
-                                closable: false,
-                                message: $(populatedTemplate),
-                                onshow: function (dialog) {
-                                    self.element = dialog.$modal;
-                                    dialog.$modalBody.find("form").removeClass("col-sm-6 col-sm-offset-3");
-                                    self.rebind();
-                                }
-                            };
-                        ModuleLoader.load("org/forgerock/commons/ui/common/components/BootstrapDialog").then(function (BootstrapDialog) {
-                            BootstrapDialog.show(args);
-                        });
-                        return;
-                    }
-
-                    this.parentRender(_.bind(function () {
-                        this.reloadData();
-                        // Resolve a promise when all templates will be loaded
-                        promise.resolve();
+                    _.extend(Configuration.globalData, this.data))
+                    .always(_.partial(function (view, template) {
+                        populateTemplate(view, template);
+                        view.parentRender(_.bind(function () {
+                            view.reloadData();
+                            // Resolve a promise when all templates will be loaded
+                            promise.resolve();
+                        }, view));
                     }, this));
-                }, this));
             }
             return promise;
         },
