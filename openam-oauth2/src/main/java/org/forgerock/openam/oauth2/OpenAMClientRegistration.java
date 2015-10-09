@@ -191,16 +191,15 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         return "Bearer";
     }
 
-    private List<String[]> getDisplayName() {
-        Set<String> displayName = null;
+    private List<String[]> getDisplayName(String attributeName) {
         try {
-            displayName = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.NAME);
+            Set<String> displayName = amIdentity.getAttribute(attributeName);
+            return splitPipeDelimited(convertAttributeValues(displayName), "name").get("name");
         } catch (Exception e){
             logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.NAME, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.NAME +" from repository");
         }
-        return splitPipeDelimited(convertAttributeValues(displayName), "name").get("name");
     }
 
     @VisibleForTesting
@@ -229,19 +228,22 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
      * {@inheritDoc}
      */
     public String getDisplayName(Locale locale) {
-        return findLocaleSpecificString(getDisplayName(), locale);
+        List<String[]> displayName = getDisplayName(OAuth2Constants.OAuth2Client.NAME);
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = getDisplayName(OAuth2Constants.OAuth2Client.CLIENT_NAME);
+        }
+        return findLocaleSpecificString(displayName, locale);
     }
 
     private List<String[]> getDisplayDescription() {
-        Set<String> displayDescription = null;
         try {
-            displayDescription = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.DESCRIPTION);
+            Set<String> displayDescription = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.DESCRIPTION);
+            return splitPipeDelimited(convertAttributeValues(displayDescription), "name").get("name");
         } catch (Exception e){
             logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.DESCRIPTION, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.DESCRIPTION +" from repository");
         }
-        return splitPipeDelimited(convertAttributeValues(displayDescription), "name").get("name");
     }
 
     /**
