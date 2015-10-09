@@ -310,7 +310,8 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     self.model.get("policy").save().done(function () {
                         self.onModelChange(self.model);
                     });
-                }
+                },
+                className: "fr-col-btn-1"
             });
 
             /**
@@ -342,7 +343,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                         editable: false,
                         sortable: false,
                         headerCell: BackgridUtils.ClassHeaderCell.extend({
-                            className: "col-btn"
+                            className: "fr-col-btn-1"
                         })
                     }],
                     collection: collection,

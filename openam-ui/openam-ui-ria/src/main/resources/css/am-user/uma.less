@@ -215,40 +215,18 @@ span.item-button-panel {
             background-color: #fff;
             .transition(background, 0.2s, linear);
 
-            .backgrid-revoke-cell {
-                #revoke {
-                    display: none;
-                }
+            #revoke {
+                display: none;
+            }
 
-                #save, #cancel {
-                    display: block;
-                }
+            #save, #cancel {
+                display: block;
             }
         }
     }
 
-    .backgrid-revoke-cell {
-
-        [class^="fa-"], [class*=" fa-"] {
-            font-size: 12px;
-            padding: 13px 10px 13px 10px;
-
-            &:hover, &:focus{
-                color: darken(@base-theme-color, 5%);
-                cursor:pointer;
-            }
-        }
-
-        #save {
-            &:hover, &:focus{
-                // TODO: BOOTSTRAP: Removed due to build issues. Will need re-adding
-                //color: @color-success;
-            }
-        }
-
-        #save, #cancel {
-            display: none;
-        }
+    #save, #cancel {
+        display: none;
     }
 
     #advancedView {

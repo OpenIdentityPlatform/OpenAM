@@ -1,0 +1,29 @@
+.table {
+    thead th > a {
+        color: #000000;
+    }
+
+    tr.selected {
+        /* TODO: Use bootstrap variable */
+        background-color: #d9edf7;
+    }
+
+    &.table-hover > tbody > tr:hover.selected {
+        background-color: darken(#d9edf7, 5%);
+    }
+
+    .fr-col-btn-1,
+    .fr-col-btn-2 {
+        .btn-link {
+            color: #777;
+
+            &:disabled {
+                opacity: 0.3;
+            }
+
+            &:hover, &:focus {
+                color: @base-theme-color;
+            }
+        }
+    }
+}

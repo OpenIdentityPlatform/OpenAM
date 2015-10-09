@@ -44,91 +44,6 @@
      width:20px;
      text-align: center;
  }
- /* END of Candidate for Commons */
-
-
- /* Candidate for Commons - table */
-
- .table > tbody > tr > td {
-     vertical-align: middle;
- }
-
- .table > thead > tr > th {
-    background-color: transparent;
-    border-bottom: 2px solid #ddd;
-    border-radius: 4px 4px 0 0;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    margin-bottom: -1px;
-    padding: 10px 8px;
-    position: relative;
-    text-transform: uppercase;
-    vertical-align: bottom;
-}
-
-.table > thead > tr > th,
-.table > tbody > tr > th,
-.table > tfoot > tr > th
-.table > thead > tr > td,
-.table > tbody > tr > td,
-.table > tfoot > tr > td {
-    //FIXME: Needs to go into Bootstrap
-    border-color: #eee;
-}
-
-
-.table {
-
-    th.col-check, td.col-check {
-        width: 13px;
-        text-align:center;
-    }
-
-    th.col-btn {
-        width: auto;
-    }
-
-    th.col-btn-2, td.col-btn-2  {
-        width: 58px;
-        padding-left:0;
-    }
-
-    .btn-link {
-        color: #777;
-        padding: 1px 6px;
-
-        &:disabled {
-            opacity: 0.3;
-        }
-    }
-
-    // FIXME- We should be using Bootstrap classes like .success instead of .selected
-    > tbody > tr.selected{
-        background-color: #d9edf7;
-    }
-
-
-    .btn-link:hover, .btn-link:focus {
-        color: #555;
-    }
-
-    a:hover{
-        text-decoration:none;
-    }
-
-    >tbody>tr.tr-row>td{
-       padding-left:0;
-       border-top: none;
-       &:last-of-type{
-           padding-right:2px;
-       }
-    }
-
-    >tbody>tr>td{
-      vertical-align: middle;
-    }
-}
 
 .table-with-border-bottom {
     tbody>tr:last-of-type>td {
@@ -444,18 +359,5 @@ body, .modal-open {
 
     &:hover, &:focus {
       color: @base-theme-color;
-    }
-}
-
-.row-actions {
-    .btn-group .btn-link {
-        padding: 1px 6px;
-        color: #777;
-        border: none;
-        line-height: 1;
-
-        &:hover, &:focus {
-          color: @base-theme-color;
-        }
     }
 }

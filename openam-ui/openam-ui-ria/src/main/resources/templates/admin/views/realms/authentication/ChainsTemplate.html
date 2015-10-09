@@ -10,15 +10,15 @@
         <table class="table">
             <thead>
             <tr>
-                <th class="col-check"><input id="selectAll" type="checkbox" /></th>
+                <th class="select-all-header-cell"><input id="selectAll" type="checkbox" /></th>
                 <th>{{t 'console.authentication.chains.chainName'}}</th>
-                <th class="col-btn-2"></th>
+                <th class="fr-col-btn-2"></th>
             </tr>
             </thead>
             <tbody>
             {{#each sortedChains}}
             <tr class="sorted-chains {{#if defaultConfig}}default-config-row{{/if}}">
-                <td class="col-check"><input data-chain-name="{{_id}}" type="checkbox" {{#if defaultConfig}}disabled{{/if}}/></td>
+                <td class="select-row-cell"><input data-chain-name="{{_id}}" type="checkbox" {{#if defaultConfig}}disabled{{/if}}/></td>
                 <td>
                     <a class="edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmPath _id}}">{{_id}}</a>
                     {{#if defaultConfig}}
@@ -30,8 +30,8 @@
                     </div>
                     {{/if}}
                 </td>
-                <td class="col-btn-2">
-                    <div class="pull-right btn-group btn-group-xs">
+                <td class="fr-col-btn-2">
+                    <div class="btn-group">
                         <a class="btn btn-link edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmPath}}{{_id}}"><i class="fa fa-pencil"></i></a>
                         <button data-chain-name="{{_id}}" type="button" class="btn btn-link delete-chain-btn" {{#if defaultConfig}}disabled{{/if}}><i class="fa fa-close"></i></button>
                     </div>

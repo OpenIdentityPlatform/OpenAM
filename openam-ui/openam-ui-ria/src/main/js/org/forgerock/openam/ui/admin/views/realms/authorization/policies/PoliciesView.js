@@ -77,7 +77,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                 callback: function (e) {
                     var $target = $(e.target);
 
-                    if ($target.parents().hasClass("row-actions")) {
+                    if ($target.parents().hasClass("fr-col-btn-2")) {
                         return;
                     }
 
@@ -107,7 +107,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                 {
                     name: "",
                     cell: BackgridUtils.TemplateCell.extend({
-                        className: "row-actions",
+                        className: "fr-col-btn-2",
                         template: "templates/admin/backgrid/cell/RowActionsCell.html",
                         events: {
                             "click .edit-row-item": "editItem",

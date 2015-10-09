@@ -1,0 +1,79 @@
+.table {
+    /* Specificity must match Bootstrap's to override */
+    > tbody > tr > td,
+    > thead > tr > th {
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &.select-all-header-cell,
+        &.select-row-cell {
+            width: 13px;
+            text-align: center;
+        }
+
+        &.fr-col-btn-1,
+        &.fr-col-btn-2 {
+            padding-left: 0;
+
+            .btn-link {
+                padding: 1px 6px;
+                border: none;
+                line-height: 1;
+            }
+        }
+
+        &.fr-col-btn-1 {
+            width: auto;
+        }
+
+        &.fr-col-btn-2 {
+            width: 58px;
+        }
+    }
+
+    > tbody > tr > td {
+        vertical-align: middle;
+    }
+
+    > thead > tr > th {
+        text-transform: uppercase;
+
+        a {
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            display: block;
+        }
+    }
+
+    .sort-caret {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: .3em;
+        border: 0;
+        content: "";
+    }
+
+    .ascending .sort-caret {
+        vertical-align: baseline;
+        border-top: 0;
+        border-right: 4px solid transparent;
+        border-bottom: 4px solid #000;
+        border-left: 4px solid transparent
+    }
+
+    .descending .sort-caret {
+        vertical-align: super;
+        border-top: 4px solid #000;
+        border-right: 4px solid transparent;
+        border-bottom: 0;
+        border-left: 4px solid transparent
+    }
+
+    &.table-hover > tbody > tr {
+        cursor: pointer;
+    }
+}

@@ -5,7 +5,7 @@
         <tr>
             <th>{{t "common.form.key"}}</th>
             <th>{{t "common.form.value"}}</th>
-            <th class="col-check"></th>
+            <th class="fr-col-btn-1"></th>
         </tr>
     </thead>
     {{/if}}
@@ -14,8 +14,8 @@
         <tr>
             <td class="optionsKey">{{@key}}</td>
             <td class="optionsValue">{{this}}</td>
-            <td>
-                <div class="btn-group btn-group-sm pull-right">
+            <td class="fr-col-btn-1">
+                <div class="btn-group">
                     <button class="btn btn-link delete-option"><i class="fa fa-times"></i></button>
                 </div>
             </td>
@@ -31,8 +31,8 @@
                 <label class="sr-only" for="optionsKey">{{t "common.form.value"}}</label>
                 <input type="text" class="form-control" id="optionsValue" placeholder="{{t 'common.form.addValue'}}">
             </td>
-            <td>
-                <div class="btn-group pull-right">
+            <td class="fr-col-btn-1">
+                <div class="btn-group">
                     <button id="addOption" type="submit" class="btn btn-default"><i class="fa fa-plus"></i></button>
                 </div>
             </td>

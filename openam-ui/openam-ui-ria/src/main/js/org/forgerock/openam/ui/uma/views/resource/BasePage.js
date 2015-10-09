@@ -102,7 +102,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                 name: "share",
                 label: $.t("uma.resources.grid.header.3"),
                 cell: Backgrid.Cell.extend({
-                    className: "fa fa-share",
+                    className: "fr-col-btn-1 fa fa-share",
                     events: { "click": "share" },
                     share: function () {
                         var shareView = new CommonShare();
