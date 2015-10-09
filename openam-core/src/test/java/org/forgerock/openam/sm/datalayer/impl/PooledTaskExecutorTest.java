@@ -16,17 +16,18 @@
 
 package org.forgerock.openam.sm.datalayer.impl;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
+import javax.inject.Provider;
 import java.text.MessageFormat;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 
-import javax.inject.Provider;
-
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
@@ -35,24 +36,18 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
-import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.Test;
-
-import com.sun.identity.shared.debug.Debug;
 
 public class PooledTaskExecutorTest {
 
     @Test
     public void testExecute() throws Exception {
         // Given
-        ConnectionCount connectionCount = mock(ConnectionCount.class);
-        when(connectionCount.getConnectionCount(2, ConnectionType.RESOURCE_SETS)).thenReturn(2);
-
         ConnectionConfigFactory configFactory = mock(ConnectionConfigFactory.class);
         ConnectionConfig config = mock(ConnectionConfig.class);
-        when(configFactory.getConfig()).thenReturn(config);
+        when(configFactory.getConfig(any(ConnectionType.class))).thenReturn(config);
         when(config.getMaxConnections()).thenReturn(2);
 
         Debug debug = mock(Debug.class);
@@ -75,7 +70,7 @@ public class PooledTaskExecutorTest {
 
         // When
         final TaskExecutor executor = new PooledTaskExecutor(simpleTaskExecutorProvider, debug,
-                ConnectionType.RESOURCE_SETS, connectionCount, configFactory, semaphore);
+                ConnectionType.RESOURCE_SETS, configFactory, semaphore);
         LongTask longTask1 = new LongTask();
         TaskThread task1 = new TaskThread(1, executor, longTask1);
         LongTask longTask2 = new LongTask();

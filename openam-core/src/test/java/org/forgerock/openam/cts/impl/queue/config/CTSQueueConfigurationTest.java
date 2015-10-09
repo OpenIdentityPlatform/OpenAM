@@ -15,44 +15,41 @@
  */
 package org.forgerock.openam.cts.impl.queue.config;
 
-import static org.fest.assertions.Assertions.*;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.anyObject;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
 import java.util.Map;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
-import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.sun.identity.shared.debug.Debug;
 
 public class CTSQueueConfigurationTest {
 
     private CTSQueueConfiguration config;
     private ConnectionConfigFactory mockConfigFactory;
-    private ConnectionCount connectionCount;
     private ConnectionConfig mockConfig;
 
     @BeforeMethod
     public void setup() throws InvalidConfigurationException {
         mockConfigFactory = mock(ConnectionConfigFactory.class);
         mockConfig = mock(ConnectionConfig.class);
-        given(mockConfigFactory.getConfig()).willReturn(mockConfig);
+        given(mockConfigFactory.getConfig(any(ConnectionType.class))).willReturn(mockConfig);
         LdapDataLayerConfiguration dataLayerConfiguration = mock(LdapDataLayerConfiguration.class);
         given(dataLayerConfiguration.getStoreMode()).willReturn(StoreMode.DEFAULT);
         Map<ConnectionType, LdapDataLayerConfiguration> configMap = mock(Map.class);
         given(configMap.get(anyObject())).willReturn(dataLayerConfiguration);
-        connectionCount = new ConnectionCount(configMap);
-        config = new CTSQueueConfiguration(mockConfigFactory, connectionCount, mock(Debug.class));
+        config = new CTSQueueConfiguration(mockConfigFactory, mock(Debug.class));
     }
 
     @Test
@@ -73,5 +70,17 @@ public class CTSQueueConfigurationTest {
             result = e;
         }
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void shouldFindPowerOfTwo() {
+        int value = 64;
+        assertThat(CTSQueueConfiguration.findPowerOfTwo(value)).isEqualTo(value);
+    }
+
+    @Test
+    public void shouldFindPowerOfTwoLessThanStartingValue() {
+        int value = 20;
+        assertThat(CTSQueueConfiguration.findPowerOfTwo(value)).isEqualTo(16);
     }
 }

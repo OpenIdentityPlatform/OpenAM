@@ -28,6 +28,10 @@
             <label name="rootSuffixLabel" defaultValue="amconfig.org.forgerock.services.store.root.suffix" labelFor="cscorg-forgerock-services-resourcesets-store-root-suffix" />
             <cc name="cscorg-forgerock-services-resourcesets-store-root-suffix" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
+        <property required="true">
+            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.store.max.connections" labelFor="cscorg-forgerock-services-resourcesets-store-max-connections" />
+            <cc name="cscorg-forgerock-services-resourcesets-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
     </section>
     <section name="resourcesets-external-section" defaultValue="amconfig.org.forgerock.services.resourcesets.store.external.section">
         <property required="true">
@@ -48,10 +52,6 @@
             <cc name="cscorg-forgerock-services-resourcesets-store-password" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag"></cc>
         </property>
         <property required="true">
-            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.store.max.connections" labelFor="cscorg-forgerock-services-resourcesets-store-max-connections" />
-            <cc name="cscorg-forgerock-services-resourcesets-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
-        </property>
-        <property required="true">
             <label name="heartbeatLabel" defaultValue="amconfig.org.forgerock.services.store.heartbeat" labelFor="cscorg-forgerock-services-resourcesets-store-heartbeat" />
             <cc name="cscorg-forgerock-services-resourcesets-store-heartbeat" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
@@ -67,6 +67,10 @@
         <property required="true">
             <label name="rootSuffixLabel" defaultValue="amconfig.org.forgerock.services.store.root.suffix" labelFor="cscorg-forgerock-services-umaaudit-store-root-suffix" />
             <cc name="cscorg-forgerock-services-umaaudit-store-root-suffix" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+        <property required="true">
+            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.store.max.connections" labelFor="cscorg-forgerock-services-umaaudit-store-max-connections" />
+            <cc name="cscorg-forgerock-services-umaaudit-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
     </section>
     <section name="audit-external-section" defaultValue="amconfig.org.forgerock.services.umaaudit.store.external.section">
@@ -88,10 +92,6 @@
             <cc name="cscorg-forgerock-services-umaaudit-store-password" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag"></cc>
         </property>
         <property required="true">
-            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.store.max.connections" labelFor="cscorg-forgerock-services-umaaudit-store-max-connections" />
-            <cc name="cscorg-forgerock-services-umaaudit-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
-        </property>
-        <property required="true">
             <label name="heartbeatLabel" defaultValue="amconfig.org.forgerock.services.store.heartbeat" labelFor="cscorg-forgerock-services-umaaudit-store-heartbeat" />
             <cc name="cscorg-forgerock-services-umaaudit-store-heartbeat" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
@@ -107,6 +107,10 @@
         <property required="true">
             <label name="rootSuffixLabel" defaultValue="amconfig.org.forgerock.services.store.root.suffix" labelFor="cscorg-forgerock-services-uma-pendingrequests-store-root-suffix" />
             <cc name="cscorg-forgerock-services-uma-pendingrequests-store-root-suffix" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+        <property required="true">
+            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.store.max.connections" labelFor="cscorg-forgerock-services-uma-pendingrequests-store-max-connections" />
+            <cc name="cscorg-forgerock-services-uma-pendingrequests-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
     </section>
     <section name="pendingrequests-external-section" defaultValue="amconfig.org.forgerock.services.uma.pendingrequests.store.external.section">
@@ -126,10 +130,6 @@
         <property required="true">
             <label name="passwordLabel" defaultValue="amconfig.org.forgerock.services.store.password" labelFor="cscorg-forgerock-services-uma-pendingrequests-store-password" />
             <cc name="cscorg-forgerock-services-uma-pendingrequests-store-password" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag"></cc>
-        </property>
-        <property required="true">
-            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.store.max.connections" labelFor="cscorg-forgerock-services-uma-pendingrequests-store-max-connections" />
-            <cc name="cscorg-forgerock-services-uma-pendingrequests-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
         <property required="true">
             <label name="heartbeatLabel" defaultValue="amconfig.org.forgerock.services.store.heartbeat" labelFor="cscorg-forgerock-services-uma-pendingrequests-store-heartbeat" />

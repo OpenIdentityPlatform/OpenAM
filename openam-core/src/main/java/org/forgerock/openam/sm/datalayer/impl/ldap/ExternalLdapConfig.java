@@ -121,7 +121,7 @@ public class ExternalLdapConfig implements ConnectionConfig {
      * @return A positive number if valid, or -1.
      */
     public int getMaxConnections() {
-        return parseNumber(maxConnections.get());
+        return parseNumber(maxConnections.get(), INVALID, INVALID);
     }
 
     /**

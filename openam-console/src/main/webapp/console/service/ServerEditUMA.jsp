@@ -98,6 +98,7 @@
                 toggleField(fieldset.portFieldName, readonly);
                 toggleField(fieldset.loginIdFieldName, readonly);
                 toggleField(fieldset.passwordFieldName, readonly);
+                toggleField(fieldset.maxConnectionsFieldName, false);
                 toggleField(fieldset.heartbeat, readonly);
             }
 

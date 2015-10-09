@@ -16,25 +16,22 @@
 
 package org.forgerock.openam.sm.datalayer.impl;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import java.text.MessageFormat;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
-import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * This is a thread-safe, synchronous {@link TaskExecutor} that is implemented as a pool of
@@ -60,24 +57,20 @@ public class PooledTaskExecutor implements TaskExecutor {
      * Creates a new Executor pool.
      * @param simpleTaskExecutorProvider Creates new {@link SimpleTaskExecutor} instances for the pool.
      * @param debug Used for providing log output.
-     * @param connectionType The type of connection this executor is for. This is used to find the
-     *                       maximum pool size from the {@link ConnectionCount}.
-     * @param connectionCount Used to deduce the connections for this connection type given the maximum
-     *                        available to the underlying database.
+     * @param connectionType The type of connection this executor is for.
      * @param connectionConfig Provides the maximum number of connections to the underlying database.
      * @param semaphore Controls access to the pool.
      */
     @Inject
     public PooledTaskExecutor(Provider<SimpleTaskExecutor> simpleTaskExecutorProvider,
             @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug, ConnectionType connectionType,
-            ConnectionCount connectionCount, ConnectionConfigFactory connectionConfig,
+            ConnectionConfigFactory connectionConfig,
             @Named(SEMAPHORE) Semaphore semaphore) {
         this.simpleTaskExecutorProvider = simpleTaskExecutorProvider;
         this.debug = debug;
         this.semaphore = semaphore;
 
-        int max = connectionConfig.getConfig().getMaxConnections();
-        this.maximumPoolSize = connectionCount.getConnectionCount(max, connectionType);
+        this.maximumPoolSize = connectionConfig.getConfig(connectionType).getMaxConnections();
         if (maximumPoolSize < 1) {
             throw new IllegalStateException("No connections allocated for " + connectionType);
         }

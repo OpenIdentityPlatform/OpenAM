@@ -18,6 +18,10 @@ package org.forgerock.openam.sm;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.util.Set;
+
+import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
@@ -62,15 +66,17 @@ public class ConnectionConfigFactory {
      * The connection configuration will be validated before returning to the caller
      * to ensure there are no obvious errors with the configuration.
      *
+     * @param connectionType The connection type.
+     *
      * @return Non null configuration for that configuration type.
      *
      * @throws InvalidConfigurationException If there was a validation error with the configuration.
      */
-    public ConnectionConfig getConfig() throws InvalidConfigurationException {
+    public ConnectionConfig getConfig(ConnectionType connectionType) throws InvalidConfigurationException {
         ConnectionConfig configuration;
         switch (dataLayerConfiguration.getStoreMode()) {
             case DEFAULT:
-                configuration = smsConfiguration;
+                configuration = getDefaultConfiguration();
                 break;
             case EXTERNAL:
                 configuration = externalTokenConfig;
@@ -78,7 +84,61 @@ public class ConnectionConfigFactory {
             default:
                 throw new IllegalStateException();
         }
+        if (ConnectionType.CTS_REAPER.equals(connectionType)) {
+            configuration = wrapCtsReaperConfiguration(configuration);
+        }
         validator.validate(configuration);
         return configuration;
+    }
+
+    private ConnectionConfig getDefaultConfiguration() {
+        return new DelegatingConnectionConfig(smsConfiguration) {
+            @Override
+            public int getMaxConnections() {
+                int max = externalTokenConfig.getMaxConnections();
+                if (max < 0) {
+                    max = smsConfiguration.getMaxConnections();
+                }
+                return max;
+            }
+        };
+    }
+
+    private ConnectionConfig wrapCtsReaperConfiguration(ConnectionConfig configuration) {
+        return new DelegatingConnectionConfig(configuration) {
+            @Override
+            public int getMaxConnections() {
+                return 1;
+            }
+        };
+    }
+
+    private static abstract class DelegatingConnectionConfig implements ConnectionConfig {
+
+        private final ConnectionConfig delegateConnectionConfig;
+
+        private DelegatingConnectionConfig(ConnectionConfig delegateConnectionConfig) {
+            this.delegateConnectionConfig = delegateConnectionConfig;
+        }
+
+        @Override
+        public final Set<LDAPURL> getLDAPURLs() {
+            return delegateConnectionConfig.getLDAPURLs();
+        }
+
+        @Override
+        public final String getBindDN() {
+            return delegateConnectionConfig.getBindDN();
+        }
+
+        @Override
+        public final char[] getBindPassword() {
+            return delegateConnectionConfig.getBindPassword();
+        }
+
+        @Override
+        public final int getLdapHeartbeat() {
+            return delegateConnectionConfig.getLdapHeartbeat();
+        }
     }
 }

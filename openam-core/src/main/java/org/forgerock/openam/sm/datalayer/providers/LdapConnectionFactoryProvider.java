@@ -15,14 +15,14 @@
  */
 package org.forgerock.openam.sm.datalayer.providers;
 
-import static java.util.concurrent.TimeUnit.*;
-
-import java.text.MessageFormat;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.text.MessageFormat;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.sm.ConnectionConfig;
@@ -33,7 +33,6 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
-import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 import org.forgerock.openam.sm.datalayer.utils.TimeoutConfig;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.forgerock.opendj.ldap.Connection;
@@ -43,8 +42,6 @@ import org.forgerock.opendj.ldap.ResultHandler;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Responsible for generating ConnectionFactory instances. The instances generated are tailored to
@@ -65,7 +62,6 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
     // Injected
     private final TimeoutConfig timeoutConfig;
     private final ConnectionConfigFactory configFactory;
-    private final ConnectionCount count;
     private final Debug debug;
     private final ConnectionType connectionType;
 
@@ -74,18 +70,15 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
      *
      * @param connectionConfigFactory Required to resolve configuration parameters, non null.
      * @param timeoutConfig Timeout Configuration, Non null.
-     * @param count Connection Count logic, Non null.
      * @param debug Required for debugging.
      */
     @Inject
     public LdapConnectionFactoryProvider(ConnectionType connectionType,
             ConnectionConfigFactory connectionConfigFactory,
             TimeoutConfig timeoutConfig,
-            ConnectionCount count,
             @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug) {
         this.configFactory = connectionConfigFactory;
         this.timeoutConfig = timeoutConfig;
-        this.count = count;
         this.debug = debug;
         this.connectionType = connectionType;
     }
@@ -97,7 +90,7 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
      * @return {@inheritDoc}
      */
     public ConnectionFactory<Connection> createFactory() throws InvalidConfigurationException {
-        ConnectionConfig config = configFactory.getConfig();
+        ConnectionConfig config = configFactory.getConfig(connectionType);
         int timeout = timeoutConfig.getTimeout(connectionType);
 
         LDAPOptions options = new LDAPOptions();
@@ -113,7 +106,7 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
                 config.getLDAPURLs(),
                 config.getBindDN(),
                 config.getBindPassword(),
-                count.getConnectionCount(config.getMaxConnections(), connectionType),
+                config.getMaxConnections(),
                 config.getLdapHeartbeat(),
                 SECONDS.toString(),
                 options);

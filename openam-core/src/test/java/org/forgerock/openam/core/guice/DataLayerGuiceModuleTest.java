@@ -42,7 +42,6 @@ import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
-import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 import org.forgerock.openam.sm.utils.ConfigurationValidator;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -126,8 +125,8 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
 
             ConnectionConfigFactory connectionConfigFactory = mock(ConnectionConfigFactory.class);
             ConnectionConfig config = mock(ConnectionConfig.class);
-            when(connectionConfigFactory.getConfig()).thenReturn(config);
-            when(config.getMaxConnections()).thenReturn(11);
+            when(connectionConfigFactory.getConfig(any(ConnectionType.class))).thenReturn(config);
+            when(config.getMaxConnections()).thenReturn(10);
             bind(ConnectionConfigFactory.class).toInstance(connectionConfigFactory);
 
             bind(ObjectMapper.class).annotatedWith(Names.named("cts-json-object-mapper")).toInstance(new ObjectMapper());
@@ -136,9 +135,6 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
             when(labelsConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
             bind(Key.get(LdapDataLayerConfiguration.class, DataLayer.Types.typed(ConnectionType.UMA_LABELS)))
                     .toInstance(labelsConfiguration);
-
         }
-
     }
-
 }

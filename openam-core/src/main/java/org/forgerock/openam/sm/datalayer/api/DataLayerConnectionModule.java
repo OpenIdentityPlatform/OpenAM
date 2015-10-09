@@ -16,26 +16,20 @@
 
 package org.forgerock.openam.sm.datalayer.api;
 
-import java.util.concurrent.Semaphore;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import org.forgerock.openam.cts.impl.LdapAdapter;
-import org.forgerock.openam.sm.ConnectionConfigFactory;
-import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
-import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
-import org.forgerock.openam.sm.datalayer.impl.SimpleTaskExecutor;
-import org.forgerock.openam.sm.datalayer.impl.SimpleTaskExecutorFactory;
-import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
-import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
+import java.util.concurrent.Semaphore;
 
 import com.google.inject.Key;
 import com.google.inject.PrivateBinder;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provider;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import org.forgerock.openam.cts.impl.LdapAdapter;
+import org.forgerock.openam.sm.ConnectionConfigFactory;
+import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
+import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
+import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 
 public abstract class DataLayerConnectionModule extends PrivateModule {
 
@@ -139,20 +133,17 @@ public abstract class DataLayerConnectionModule extends PrivateModule {
 
         private final ConnectionConfigFactory connectionConfig;
         private final ConnectionType connectionType;
-        private final ConnectionCount connectionCount;
 
         @Inject
-        public SemaphoreProvider(ConnectionType connectionType, ConnectionCount connectionCount,
+        public SemaphoreProvider(ConnectionType connectionType,
                 ConnectionConfigFactory connectionConfig) {
             this.connectionType = connectionType;
-            this.connectionCount = connectionCount;
             this.connectionConfig = connectionConfig;
         }
 
         @Override
         public Semaphore get() {
-            int max = connectionConfig.getConfig().getMaxConnections();
-            int semaphoreSize = connectionCount.getConnectionCount(max, connectionType);
+            int semaphoreSize = connectionConfig.getConfig(connectionType).getMaxConnections();
             if (semaphoreSize < 1) {
                 throw new IllegalStateException("No connections allocated for " + connectionType);
             }

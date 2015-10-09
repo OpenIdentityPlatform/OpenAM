@@ -11,7 +11,7 @@
     Header, with the fields enclosed by brackets [] replaced by your own identifying
     information: "Portions copyright [year] [name of copyright owner]".
 
-    Copyright 2013 ForgeRock AS.
+    Copyright 2013-2015 ForgeRock AS.
 --%>
 
 <%@ page info="ServerEditCTS" language="java" %>
@@ -57,7 +57,7 @@
                 toggleField(portFieldName, readonly);
                 toggleField(loginIdFieldName, readonly);
                 toggleField(passwordFieldName, readonly);
-                toggleField(maxConnectionsFieldName, readonly);
+                toggleField(maxConnectionsFieldName, false);
                 toggleField(heartbeat, readonly);
             }
 

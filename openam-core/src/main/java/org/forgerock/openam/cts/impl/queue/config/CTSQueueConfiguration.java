@@ -15,22 +15,20 @@
  */
 package org.forgerock.openam.cts.impl.queue.config;
 
-import java.text.MessageFormat;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.text.MessageFormat;
 
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.impl.queue.QueueSelector;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
-import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
-
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * The CTS asynchronous feature has a number of configuration properties which allow an
@@ -45,20 +43,16 @@ public class CTSQueueConfiguration implements QueueConfiguration {
     public static final int DEFAULT_QUEUE_SIZE = 5000;
 
     private final ConnectionConfigFactory dataLayerConfig;
-    private final ConnectionCount connectionCount;
     private final Debug debug;
 
     /**
      * @param dataLayerConfig Required for resolving the number of connections available.
-     * @param connectionCount
      * @param debug Required for debugging.
      */
     @Inject
     public CTSQueueConfiguration(ConnectionConfigFactory dataLayerConfig,
-            ConnectionCount connectionCount,
             @Named(CoreTokenConstants.CTS_ASYNC_DEBUG) Debug debug) {
         this.dataLayerConfig = dataLayerConfig;
-        this.connectionCount = connectionCount;
         this.debug = debug;
     }
 
@@ -93,8 +87,8 @@ public class CTSQueueConfiguration implements QueueConfiguration {
     @Override
     public int getProcessors() throws DataLayerException {
         try {
-            int max = dataLayerConfig.getConfig().getMaxConnections();
-            return connectionCount.getConnectionCount(max, ConnectionType.CTS_ASYNC);
+            int max = dataLayerConfig.getConfig(ConnectionType.CTS_ASYNC).getMaxConnections();
+            return findPowerOfTwo(max - 1);
         } catch (IllegalArgumentException e) {
             throw new DataLayerException("Number of connections too low", e);
         } catch (InvalidConfigurationException e) {
@@ -102,10 +96,37 @@ public class CTSQueueConfiguration implements QueueConfiguration {
         }
     }
 
+    /**
+     * Not every even number is a power of two.
+     * @see <a href="http://en.wikipedia.org/wiki/Power_of_two#Fast_algorithm_to_check_if_a_positive_number_is_a_power_of_two">Wikipedia</a>
+     *
+     * @return true if the integer is a power of two.
+     */
+    private static boolean isPowerOfTwo(int value) {
+        return (value & (value - 1)) == 0;
+    }
+
+    /**
+     * Locate a power of two that is less than or equal to the given number.
+     *
+     * @see QueueSelector#select(String, int)
+     *
+     * @param value Starting value, must be positive.
+     * @return A valid power of two less than or equal to the given value. Not negative.
+     * @throws IllegalArgumentException If no power of two was found.
+     */
+    public static int findPowerOfTwo(int value) {
+        for (int ii = value; ii > 0; ii--) {
+            if (isPowerOfTwo(ii)) {
+                return ii;
+            }
+        }
+        throw new IllegalArgumentException("No power of two found.");
+    }
+
     private void debug(String format, Object... args) {
         if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_ASYNC_HEADER + format, args));
+            debug.message(CoreTokenConstants.DEBUG_ASYNC_HEADER + format, args);
         }
     }
 }

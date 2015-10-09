@@ -50,10 +50,20 @@ public class ConnectionConfigFactoryTest {
         when(mockDataLayerConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
 
         // when
-        ConnectionConfig config = factory.getConfig();
+        ConnectionConfig config = factory.getConfig(null);
+        config.getLDAPURLs();
+        config.getBindDN();
+        config.getBindPassword();
+        config.getLdapHeartbeat();
+        config.getMaxConnections();
 
         // then
-        assertThat(config).isSameAs(mockDataLayerConfig);
+        verify(mockDataLayerConfig).getLDAPURLs();
+        verify(mockDataLayerConfig).getBindDN();
+        verify(mockDataLayerConfig).getBindPassword();
+        verify(mockDataLayerConfig).getLdapHeartbeat();
+        verify(mockDataLayerConfig, never()).getMaxConnections();
+        verify(mockExternalCTSConfig).getMaxConnections();
     }
 
     @Test
@@ -64,7 +74,7 @@ public class ConnectionConfigFactoryTest {
         when(mockDataLayerConfiguration.getStoreMode()).thenReturn(StoreMode.EXTERNAL);
 
         // when
-        ConnectionConfig config = factory.getConfig();
+        ConnectionConfig config = factory.getConfig(null);
 
         // then
         assertThat(config).isSameAs(mockExternalCTSConfig);

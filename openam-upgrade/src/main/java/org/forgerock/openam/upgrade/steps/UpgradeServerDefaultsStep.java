@@ -161,10 +161,11 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
     public void perform() throws UpgradeException {
         try {
             UpgradeProgress.reportStart("upgrade.platformupdate");
+            existingDefaults = new HashMap(ServerConfiguration.getServerInstance(getAdminToken(),
+                    ServerConfiguration.DEFAULT_SERVER_CONFIG));
             Map<String, String> upgradedValues = new HashMap<String, String>(existingDefaults);
             upgradedValues.putAll(addedAttrs);
             upgradedValues.putAll(modifiedAttrs);
-            upgradedValues.putAll(getUpdatedDefaults());
             upgradedValues.keySet().removeAll(deletedAttrs);
 
             ServerConfiguration.upgradeServerInstance(getAdminToken(), DEFAULT_SERVER_CONFIG, DEFAULT_SERVER_ID,
