@@ -39,7 +39,7 @@
 
         <filter token="DATESTAMP" value="${war.time.stamp}"/>
         <filter token="VERSION" value="${version.set}"/>
-        <filter token="REVISION" value="${openam.svn.revision}"/>
+        <filter token="REVISION" value="${git.short.sha1}"/>
 
         <mkdir dir="${openam.temp.target}"/>
 

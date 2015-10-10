@@ -70,7 +70,7 @@
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                             <Version>${project.version}</Version>
                             <Create-On>${maven.build.timestamp}</Create-On>
-                            <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
+                            <Revision>${git.short.sha1}</Revision>
                             <!-- TODO Add License to Manifest -->
                             <License />
                             <Main-Class>${main.bootstrap.classname}</Main-Class>

@@ -483,9 +483,9 @@
 
     <!-- Source Control -->
     <scm>
-        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/</developerConnection>
-        <url>http://sources.forgerock.org/browse/openam/trunk</url>
+        <connection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</connection>
+        <developerConnection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</developerConnection>
+        <url>https://stash.forgerock.org/projects/OPENAM/repos/openam/browse</url>
     </scm>
 
     <!-- Dependency Management -->
@@ -2051,26 +2051,23 @@
     <!-- Build -->
     <build>
         <plugins>
-            <!-- <plugin>
-                <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
-                <artifactId>svn-revision-number-maven-plugin</artifactId>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>revision</goal>
-                        </goals>
                         <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <entries>
-                        <entry>
-                            <prefix>svn-revision</prefix>
-                        </entry>
-                    </entries>
+                    <buildNumberPropertyName>git.short.sha1</buildNumberPropertyName>
+                    <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                    <shortRevisionLength>10</shortRevisionLength>
                 </configuration>
-            </plugin> -->
-
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -2309,9 +2306,9 @@
                     <version>1.2</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
-                    <artifactId>svn-revision-number-maven-plugin</artifactId>
-                    <version>1.13</version>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
