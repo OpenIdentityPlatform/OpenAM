@@ -358,6 +358,9 @@ public class LoginViewBean extends AuthViewBeanBase {
                 if (logIntoDiffOrg) {
                     //session is already deleted, so we should just continue our login process
                     newOrgExist = true;
+                } else {
+                    ac = AuthUtils.getAuthContext(request, response, sessionID, sessionUpgrade, isBackPost);
+                    clearCookieAndDestroySession(ac);
                 }
             }
             if ((ssoToken != null) && !sessionUpgrade && !newOrgExist) {
