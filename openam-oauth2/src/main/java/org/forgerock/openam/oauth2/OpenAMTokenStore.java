@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -220,8 +221,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
 
-        final long currentTimeInSeconds = System.currentTimeMillis() / 1000;
-        final long exp = clientRegistration.getJwtTokenLifeTime(providerSettings) / 1000 + currentTimeInSeconds;
+        final long currentTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+        final long exp = TimeUnit.MILLISECONDS.toSeconds(clientRegistration.getJwtTokenLifeTime(providerSettings)) +
+                currentTimeInSeconds;
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
@@ -249,7 +251,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             tokenStore.create(json(object(
                     field(OAuth2Constants.CoreTokenParams.ID, set(opsId)),
                     field(OAuth2Constants.JWTTokenParams.LEGACY_OPS, set(ops)),
-                    field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(exp))))));
+                    field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(TimeUnit.SECONDS.toMillis(exp)
+                    ))))));
         } catch (CoreTokenException e) {
             logger.error("Unable to create id_token user session token", e);
             throw new ServerException("Could not create token in CTS");
