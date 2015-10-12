@@ -172,7 +172,7 @@ class SMDataLayer {
             if (idleTimeout == 0 && StringUtils.isNotBlank(SystemProperties.get(LDAP_CONN_IDLE_TIME_IN_SECS))) {
                 debug.error("SMDataLayer: Idle timeout could not be parsed, connection reaping is disabled");
             } else if (idleTimeout == 0) {
-                debug.error("SMDataLayer: Idle timeout is set to 0 - connection reaping is disabled");
+                debug.message("SMDataLayer: Idle timeout is set to 0 - connection reaping is disabled");
             }
             _ldapPool = Connections.newCachedConnectionPool(baseFactory, poolMin, poolMax,
                     idleTimeout, TimeUnit.SECONDS);
