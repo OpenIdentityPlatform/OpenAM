@@ -733,9 +733,9 @@
                     }
                 ],
                 "alerts" : {
-                    "atLeastOne" : "You must add at least one valid authentication module",
                     "reqdFailSuffPass" : "Warning: Succeeding a <strong>SUFFICIENT</strong> module after failing a <strong>REQUIRED</strong> module will immediately redirect to the failure URL, not the success URL."
                 },
+                "callToAction" : "You must add at least one authentication module",
                 "lastCriteria" : "Will advance to success or failure URL",
                 "deletedChain": "Chain deleted successfully",
                 "deleteBtnTooltip": {

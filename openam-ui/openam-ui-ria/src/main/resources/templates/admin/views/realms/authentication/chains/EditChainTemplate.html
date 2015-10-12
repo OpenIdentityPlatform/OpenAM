@@ -17,13 +17,21 @@
         <div role="tabpanel" class="tab-pane active" id="chains">
 
             <div class="panel-body">
-                <button type="button" id="addModuleLink" class="btn btn-primary"><i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}</button>
+                <button type="button" class="btn btn-primary add-new-module">
+                    <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
+                </button>
             </div>
 
             <div class="panel-footer">
                 <div class="panel-body">
                     <div id="sortableContainer">
                         <ol id="sortableAuthChain" class="list-unstyled hidden"></ol>
+                    </div>
+                    <div class="call-to-action-block hidden">
+                        <h3>{{t 'console.authentication.editChains.callToAction'}}</h3>
+                        <button type="button" class="btn btn-primary add-new-module">
+                            <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
+                        </button>
                     </div>
                     <div id="alertContainer"></div>
                 </div>
@@ -61,7 +69,7 @@
                 </div>
 
             </div>
-            
+
         </div>
 
     </div>

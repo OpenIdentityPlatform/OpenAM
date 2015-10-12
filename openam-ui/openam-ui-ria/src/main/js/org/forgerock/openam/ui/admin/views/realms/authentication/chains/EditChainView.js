@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
         events: {
             "click #saveChanges":   "saveChanges",
-            "click #addModuleLink": "addModuleLink",
+            "click .add-new-module": "addNewModule",
             "click #delete":        "deleteChain"
         },
         partials: [
@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             this.$el.find("ol#sortableAuthChain").append(element);
         },
 
-        addModuleLink: function (e) {
+        addNewModule: function (e) {
             if (e) {
                 e.preventDefault();
             }
@@ -244,12 +244,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                 config = this.data.form.chainData.authChainConfiguration;
 
             if (config.length === 0) {
-
                 invalid = true;
                 this.$el.find("#sortableAuthChain").addClass("hidden");
-                alert = Handlebars.compile("{{> alerts/_Alert type='warning' " +
-                    "text='console.authentication.editChains.alerts.atLeastOne'}}");
+                this.$el.find(".call-to-action-block").removeClass("hidden");
+
             } else {
+                this.$el.find(".call-to-action-block").addClass("hidden");
                 firstRequiredIndex = _.findIndex(config, { criteria: "REQUIRED" });
                 lastSufficentIndex = _.findLastIndex(config, { criteria: "SUFFICIENT" });
 
