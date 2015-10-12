@@ -16,24 +16,29 @@
 
 package org.forgerock.openam.uma.rest;
 
+import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
-import static org.forgerock.openam.uma.UmaConstants.AUTHORIZATION_REQUEST_ENDPOINT;
-import static org.forgerock.openam.uma.UmaConstants.PERMISSION_REQUEST_ENDPOINT;
-import static org.forgerock.openam.audit.AuditConstants.Component.UMA;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
+import static org.forgerock.openam.uma.UmaConstants.*;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditEventFactory;
+import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.rest.audit.RestletAccessAuditFilterFactory;
+import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
+import org.forgerock.openam.rest.audit.UMAAccessAuditFilter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
 import org.restlet.Restlet;
+import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import java.util.Set;
 
 /**
  * Guice Provider from getting the UMA HTTP router.
@@ -44,37 +49,47 @@ public class UmaRouterProvider implements Provider<Router> {
 
     private final RestRealmValidator realmValidator;
     private final CoreWrapper coreWrapper;
-    private final RestletAccessAuditFilterFactory restletAuditFactory;
+    private final AuditEventPublisher eventPublisher;
+    private final AuditEventFactory eventFactory;
+    private final Set<OAuth2AuditContextProvider> contextProviders;
 
     /**
      * Constructs a new RestEndpoints instance.
      *
      * @param realmValidator An instance of the RestRealmValidator.
      * @param coreWrapper An instance of the CoreWrapper.
-     * @param restletAuditFactory An instance of the RestletAccessAuditFilterFactory.
+     * @param eventPublisher The publisher responsible for logging the events.
+     * @param eventFactory The factory that can be used to create the events.
+     * @param contextProviders The OAuth2 audit context providers, responsible for finding details which can be audit
+     *                         logged from various tokens which may be attached to requests and/or responses.
      */
     @Inject
     public UmaRouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-            RestletAccessAuditFilterFactory restletAuditFactory) {
+            AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
+            @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS) Set<OAuth2AuditContextProvider> contextProviders) {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
-        this.restletAuditFactory = restletAuditFactory;
+        this.eventPublisher = eventPublisher;
+        this.eventFactory = eventFactory;
+        this.contextProviders = contextProviders;
     }
 
     @Override
     public Router get() {
         Router router = new RestletRealmRouter(realmValidator, coreWrapper);
-        router.attach("/permission_request",
-                restletAuditFactory.createFilter(UMA, getRestlet(PERMISSION_REQUEST_ENDPOINT)));
-        router.attach("/authz_request",
-                restletAuditFactory.createFilter(UMA, getRestlet(AUTHORIZATION_REQUEST_ENDPOINT)));
+        router.attach("/permission_request", auditWithUmaFilter(getRestlet(PERMISSION_REQUEST_ENDPOINT)));
+        router.attach("/authz_request", auditWithUmaFilter(getRestlet(AUTHORIZATION_REQUEST_ENDPOINT)));
         // Well-Known Discovery
-        router.attach("/.well-known/uma-configuration",
-                restletAuditFactory.createFilter(UMA, wrap(UmaWellKnownConfigurationEndpoint.class)));
+        router.attach("/.well-known/uma-configuration", auditWithUmaFilter(
+                        wrap(UmaWellKnownConfigurationEndpoint.class)));
         return router;
     }
 
     private Restlet getRestlet(String name) {
         return InjectorHolder.getInstance(Key.get(Restlet.class, Names.named(name)));
+    }
+
+    private Filter auditWithUmaFilter(Restlet restlet) {
+        return new UMAAccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders);
     }
 }

@@ -18,7 +18,7 @@ package org.forgerock.openam.oauth2.rest;
 
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
-import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH2;
+import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,11 +56,11 @@ public class OAuth2RestHttpRouteProvider implements HttpRouteProvider {
     public Set<HttpRoute> get() {
 
         rootRouter.route("token")
-                .auditAs(OAUTH2)
+                .auditAs(OAUTH)
                 .toCollection(TokenResource.class);
 
         rootRouter.route("client")
-                .auditAs(OAUTH2)
+                .auditAs(OAUTH)
                 .authorizeWith(AdminOnlyAuthzModule.class)
                 .toCollection(ClientResource.class);
 

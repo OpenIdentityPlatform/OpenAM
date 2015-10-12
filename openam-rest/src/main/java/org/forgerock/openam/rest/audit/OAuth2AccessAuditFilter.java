@@ -24,7 +24,7 @@ import java.util.Set;
 import static org.forgerock.openam.audit.AuditConstants.Component;
 
 /**
- * Responsible for logging access audit events for OAuth2 requests.
+ * Responsible for logging access audit events for OAuth2 and OIDC requests.
  *
  * @since 13.0.0
  */
@@ -41,6 +41,6 @@ public class OAuth2AccessAuditFilter extends OAuth2AbstractAccessAuditFilter {
      */
     public OAuth2AccessAuditFilter(Restlet restlet, AuditEventPublisher auditEventPublisher,
                                    AuditEventFactory auditEventFactory, Set<OAuth2AuditContextProvider> providers) {
-        super(Component.OAUTH2, restlet, auditEventPublisher, auditEventFactory, providers);
+        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, providers);
     }
 }

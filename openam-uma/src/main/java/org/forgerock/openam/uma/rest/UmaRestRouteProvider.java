@@ -16,8 +16,7 @@
 
 package org.forgerock.openam.uma.rest;
 
-import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH2;
-import static org.forgerock.openam.audit.AuditConstants.Component.UMA;
+import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH;
 
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
@@ -35,35 +34,35 @@ public class UmaRestRouteProvider extends AbstractRestRouteProvider {
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
 
         realmRouter.route("serverinfo/uma")
-                .auditAs(UMA)
+                .auditAs(OAUTH)
                 .toSingleton(UmaConfigurationResource.class);
 
         realmRouter.route("users/{user}/uma/policies")
-                .auditAs(UMA)
+                .auditAs(OAUTH)
                 .authorizeWith(UmaPolicyResourceAuthzFilter.class)
                 .through(UmaEnabledFilter.class)
                 .toCollection(UmaPolicyResource.class);
 
         realmRouter.route("users/{user}/uma/auditHistory")
-                .auditAs(UMA)
+                .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
                 .toCollection(AuditHistory.class);
 
         realmRouter.route("users/{user}/uma/pendingrequests")
-                .auditAs(UMA)
+                .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
                 .toCollection(PendingRequestResource.class);
 
         realmRouter.route("users/{user}/oauth2/resources/sets")
-                .auditAs(OAUTH2)
+                .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
                 .toCollection(ResourceSetResource.class);
 
         realmRouter.route("users/{user}/oauth2/resources/labels")
-                .auditAs(OAUTH2)
+                .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
                 .toCollection(UmaLabelResource.class);

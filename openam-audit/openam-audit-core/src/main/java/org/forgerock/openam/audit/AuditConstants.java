@@ -65,14 +65,10 @@ public final class AuditConstants {
     public enum Component {
         /** PLL audit event component. */
         PLL("PLL"),
-        /** OAuth2 audit event component. */
-        OAUTH2("OAuth2"),
+        /** OAuth2, OpenID Connect and UMA audit event components. */
+        OAUTH("OAuth"),
         /** CTS audit event component. */
         CTS("CTS"),
-        /** OpenID Connect audit event component. */
-        OPENID_CONNECT("OpenID Connect"),
-        /** UMA audit event component. */
-        UMA("UMA"),
         /** Policy Agent audit event component. */
         POLICY_AGENT("Policy Agent"),
         /** Authentication audit event component. */

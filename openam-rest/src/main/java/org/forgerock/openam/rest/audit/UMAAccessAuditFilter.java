@@ -45,7 +45,7 @@ public class UMAAccessAuditFilter extends OAuth2AbstractAccessAuditFilter {
      */
     public UMAAccessAuditFilter(Restlet restlet, AuditEventPublisher auditEventPublisher,
                                 AuditEventFactory auditEventFactory, Set<OAuth2AuditContextProvider> providers) {
-        super(Component.UMA, restlet, auditEventPublisher, auditEventFactory, providers);
+        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, providers);
     }
 
     /**

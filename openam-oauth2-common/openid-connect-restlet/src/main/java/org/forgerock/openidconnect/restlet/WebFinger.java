@@ -16,16 +16,30 @@
 
 package org.forgerock.openidconnect.restlet;
 
+import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
+
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.restlet.GuicedRestlet;
 import org.forgerock.oauth2.restlet.OAuth2StatusService;
+import org.forgerock.openam.audit.AuditEventFactory;
+import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.rest.audit.OAuth2AccessAuditFilter;
+import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
+import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
+
+import java.util.Set;
 
 /**
  * Sets up the OpenId Connect web finger endpoints and their handlers.
@@ -36,6 +50,9 @@ public class WebFinger extends Application {
 
     private final RestRealmValidator realmValidator;
     private final CoreWrapper coreWrapper;
+    private final AuditEventPublisher eventPublisher;
+    private final AuditEventFactory eventFactory;
+    private final Set<OAuth2AuditContextProvider> contextProviders;
 
     /**
      * Constructs a new WebFinger.
@@ -46,6 +63,10 @@ public class WebFinger extends Application {
     public WebFinger() {
         realmValidator = InjectorHolder.getInstance(RestRealmValidator.class);
         coreWrapper = InjectorHolder.getInstance(CoreWrapper.class);
+        eventPublisher = InjectorHolder.getInstance(AuditEventPublisher.class);
+        eventFactory = InjectorHolder.getInstance(AuditEventFactory.class);
+        contextProviders = InjectorHolder.getInstance(Key.get(new TypeLiteral<Set<OAuth2AuditContextProvider>>() {},
+                Names.named(OAUTH2_AUDIT_CONTEXT_PROVIDERS)));
 
         getMetadataService().setEnabled(true);
         getMetadataService().setDefaultMediaType(MediaType.APPLICATION_JSON);
@@ -65,8 +86,12 @@ public class WebFinger extends Application {
          * For now we only use webfinger for OpenID Connect. Once the standard is finalized
          * or we decide to use it for other tasks we dont need a full blown handler
          */
-        root.attach("/webfinger", new GuicedRestlet(getContext(), OpenIDConnectDiscovery.class));
+        root.attach("/webfinger", auditWithOAuthFilter(new GuicedRestlet(getContext(), OpenIDConnectDiscovery.class)));
 
         return root;
+    }
+
+    private Filter auditWithOAuthFilter(Restlet restlet) {
+        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders);
     }
 }

@@ -16,10 +16,11 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH2;
+import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import com.google.inject.Key;
@@ -35,8 +36,11 @@ import org.forgerock.oauth2.restlet.DeviceTokenResource;
 import org.forgerock.oauth2.restlet.TokenEndpointFilter;
 import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
+import org.forgerock.openam.audit.AuditEventFactory;
+import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.rest.audit.RestletAccessAuditFilterFactory;
+import org.forgerock.openam.rest.audit.OAuth2AccessAuditFilter;
+import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openidconnect.restlet.ConnectClientRegistration;
@@ -45,7 +49,10 @@ import org.forgerock.openidconnect.restlet.OpenIDConnectConfiguration;
 import org.forgerock.openidconnect.restlet.OpenIDConnectJWKEndpoint;
 import org.forgerock.openidconnect.restlet.UserInfo;
 import org.restlet.Restlet;
+import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
+
+import java.util.Set;
 
 /**
  * Guice Provider from getting the OAuth2 HTTP router.
@@ -56,21 +63,29 @@ public class OAuth2RouterProvider implements Provider<Router> {
 
     private final RestRealmValidator realmValidator;
     private final CoreWrapper coreWrapper;
-    private final RestletAccessAuditFilterFactory restletAuditFactory;
+    private final AuditEventPublisher eventPublisher;
+    private final AuditEventFactory eventFactory;
+    private final Set<OAuth2AuditContextProvider> contextProviders;
 
     /**
      * Constructs a new RestEndpoints instance.
      *
      * @param realmValidator An instance of the RestRealmValidator.
      * @param coreWrapper An instance of the CoreWrapper.
-     * @param restletAuditFactory An instance of the RestletAccessAuditFilterFactory.
+     * @param eventPublisher The publisher responsible for logging the events.
+     * @param eventFactory The factory that can be used to create the events.
+     * @param contextProviders The OAuth2 audit context providers, responsible for finding details which can
+     *                         be audit logged from various tokens which may be attached to requests and/or responses.
      */
     @Inject
     public OAuth2RouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-                                RestletAccessAuditFilterFactory restletAuditFactory) {
+            AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
+            @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS) Set<OAuth2AuditContextProvider> contextProviders) {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
-        this.restletAuditFactory = restletAuditFactory;
+        this.eventPublisher = eventPublisher;
+        this.eventFactory = eventFactory;
+        this.contextProviders = contextProviders;
     }
 
     @Override
@@ -79,33 +94,31 @@ public class OAuth2RouterProvider implements Provider<Router> {
 
         // Standard OAuth2 endpoints
 
-        router.attach("/authorize", restletAuditFactory.createFilter(OAUTH2,
-                new AuthorizeEndpointFilter(wrap(AuthorizeResource.class))));
-        router.attach("/access_token", restletAuditFactory.createFilter(OAUTH2,
-                new TokenEndpointFilter(new AccessTokenFlowFinder())));
-        router.attach("/tokeninfo", restletAuditFactory.createFilter(OAUTH2, wrap(ValidationServerResource.class)));
+        router.attach("/authorize", auditWithOAuthFilter(new AuthorizeEndpointFilter(wrap(AuthorizeResource.class))));
+        router.attach("/access_token", auditWithOAuthFilter(new TokenEndpointFilter(new AccessTokenFlowFinder())));
+        router.attach("/tokeninfo", auditWithOAuthFilter(wrap(ValidationServerResource.class)));
 
         // OAuth 2.0 Token Introspection Endpoint
 
-        router.attach("/introspect", restletAuditFactory.createFilter(OAUTH2, wrap(TokenIntrospectionResource.class)));
+        router.attach("/introspect", auditWithOAuthFilter(wrap(TokenIntrospectionResource.class)));
 
         // OpenID Connect endpoints
 
-        router.attach("/connect/register", wrap(ConnectClientRegistration.class));
-        router.attach("/userinfo", wrap(UserInfo.class));
-        router.attach("/connect/endSession", wrap(EndSession.class));
-        router.attach("/connect/jwk_uri", wrap(OpenIDConnectJWKEndpoint.class));
+        router.attach("/connect/register", auditWithOAuthFilter(wrap(ConnectClientRegistration.class)));
+        router.attach("/userinfo", auditWithOAuthFilter(wrap(UserInfo.class)));
+        router.attach("/connect/endSession", auditWithOAuthFilter(wrap(EndSession.class)));
+        router.attach("/connect/jwk_uri", auditWithOAuthFilter(wrap(OpenIDConnectJWKEndpoint.class)));
 
         // Resource Set Registration
 
         Restlet resourceSetRegistrationEndpoint = getRestlet(OAuth2Constants.Custom.RSR_ENDPOINT);
-        router.attach("/resource_set/{rsid}", restletAuditFactory.createFilter(OAUTH2, resourceSetRegistrationEndpoint));
-        router.attach("/resource_set", restletAuditFactory.createFilter(OAUTH2, resourceSetRegistrationEndpoint));
-        router.attach("/resource_set/", restletAuditFactory.createFilter(OAUTH2,resourceSetRegistrationEndpoint));
+        router.attach("/resource_set/{rsid}", auditWithOAuthFilter(resourceSetRegistrationEndpoint));
+        router.attach("/resource_set", auditWithOAuthFilter(resourceSetRegistrationEndpoint));
+        router.attach("/resource_set/", auditWithOAuthFilter(resourceSetRegistrationEndpoint));
 
         // OpenID Connect Discovery
 
-        router.attach("/.well-known/openid-configuration", wrap(OpenIDConnectConfiguration.class));
+        router.attach("/.well-known/openid-configuration", auditWithOAuthFilter(wrap(OpenIDConnectConfiguration.class)));
 
         // OAuth 2 Device Flow
 
@@ -118,5 +131,9 @@ public class OAuth2RouterProvider implements Provider<Router> {
 
     private Restlet getRestlet(String name) {
         return InjectorHolder.getInstance(Key.get(Restlet.class, Names.named(name)));
+    }
+
+    private Filter auditWithOAuthFilter(Restlet restlet) {
+        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders);
     }
 }
