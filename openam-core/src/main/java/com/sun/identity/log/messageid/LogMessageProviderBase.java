@@ -84,9 +84,9 @@ public class LogMessageProviderBase
      *
      * @return all hash message IDs.
      */
-//    public Map<String, LogMessageID> getAllHashMessageIDs() {
-//        return hashMessageIDs;
-//    }
+    public Map<String, LogMessageID> getAllHashMessageIDs() {
+        return hashMessageIDs;
+    }
 
     /**
      * Returns Log Record. <code>null</code> is returned if there are no

@@ -155,7 +155,7 @@ public final class AuditConstants {
     /**
      * The topic to which events built using {@link AMAuthenticationAuditEventBuilder} should be routed.
      */
-//    public static final String AUTHENTICATION_TOPIC = "authentication";
+    public static final String AUTHENTICATION_TOPIC = "authentication";
 
     /**
      * SMS service name for the audit service.

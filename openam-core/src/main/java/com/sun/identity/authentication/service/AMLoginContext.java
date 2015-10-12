@@ -40,8 +40,10 @@ import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfiguration;
 import com.sun.identity.authentication.config.AMConfigurationException;
+import com.sun.identity.authentication.jaas.LoginContext;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.service.DSAMECallbackHandler.DSAMECallbackHandlerError;
+import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthErrorCodeException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
@@ -59,6 +61,12 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.DNMapper;
+import org.forgerock.audit.AuditException;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder;
+import org.forgerock.openam.audit.AuthenticationAuditor;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.StringUtils;
 
 import javax.security.auth.Subject;
@@ -70,6 +78,8 @@ import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
 import java.text.MessageFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -142,7 +152,7 @@ public class AMLoginContext {
      */
     private ResourceBundle bundle;
 
-//    private AuthenticationAuditor authenticationAuditor;
+    private AuthenticationAuditor authenticationAuditor;
 
     static {
         // set the auth configuration programmatically.

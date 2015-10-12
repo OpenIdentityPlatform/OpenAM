@@ -38,7 +38,9 @@ public final class AMAuditEventBuilderUtils {
     private static Debug debug = Debug.getInstance(AuditConstants.DEBUG_NAME);
 
     private static final String COMPONENT = "component";
-//    private static final String REALM = "realm";
+    private static final String EXTRA_INFO = "extraInfo";
+    private static final String CONTEXTS = "contexts";
+    private static final String REALM = "realm";
 
     private AMAuditEventBuilderUtils() {
         throw new UnsupportedOperationException("Utils class; should not be instantiated.");

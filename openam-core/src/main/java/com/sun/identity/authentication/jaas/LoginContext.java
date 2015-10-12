@@ -144,9 +144,9 @@ public class LoginContext {
         invoke(LOGOUT_METHOD);
     }
 
-//    public ModuleInfo[] getModuleStack() {
-//        return moduleStack;
-//    }
+    public ModuleInfo[] getModuleStack() {
+        return moduleStack;
+    }
 
     public Subject getSubject() {
         if (!loginSucceeded && !subjectProvided)
@@ -349,8 +349,7 @@ public class LoginContext {
      * LoginModule information -
      *      incapsulates Configuration info and actual module instances.
      */
-//    public static class ModuleInfo {
-    private static class ModuleInfo {
+    public static class ModuleInfo {
         AppConfigurationEntry entry;
         Object module;
 
@@ -359,8 +358,8 @@ public class LoginContext {
             this.module = newModule;
         }
 
-//        public Object getModule() {
-//            return module;
-//        }
+        public Object getModule() {
+            return module;
+        }
     }
 }

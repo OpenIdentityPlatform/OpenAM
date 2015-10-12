@@ -81,8 +81,8 @@ public class AuditEventFactory {
      *
      * @return An AMAuthenticationAuditEventBuilder.
      */
-//    public AMAuthenticationAuditEventBuilder authenticationEvent() {
-//        return new AMAuthenticationAuditEventBuilder();
-//    }
+    public AMAuthenticationAuditEventBuilder authenticationEvent() {
+        return new AMAuthenticationAuditEventBuilder();
+    }
 
 }
