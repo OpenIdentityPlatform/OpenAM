@@ -55,7 +55,7 @@ define("org/forgerock/openam/ui/user/logout/RESTLogoutView", [
                 urlParams = LoginHelper.filterUrlParams(LoginHelper.getLoginUrlParams());
             }
 
-            Configuration.setProperty('loggedUser', null);
+            Configuration.setProperty("loggedUser", null);
             delete Configuration.gotoURL;
             EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
             Router.navigate(Router.getLink(Router.configuration.routes.login) + urlParams, {trigger: true});

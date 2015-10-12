@@ -15,12 +15,12 @@
  */
 
 /*global define */
-define('org/forgerock/openam/ui/admin/views/realms/agents/AgentsView', [
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole'
+define("org/forgerock/openam/ui/admin/views/realms/agents/AgentsView", [
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
 ], function (AbstractView, RedirectToLegacyConsole) {
     var AgentsView = AbstractView.extend({
-        template: 'templates/admin/views/realms/agents/AgentsTemplate.html',
+        template: "templates/admin/views/realms/agents/AgentsTemplate.html",
         render: function (args, callback) {
             RedirectToLegacyConsole.realm.agents(args[0]);
         }

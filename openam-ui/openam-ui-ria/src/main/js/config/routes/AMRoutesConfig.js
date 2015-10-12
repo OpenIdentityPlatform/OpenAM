@@ -15,9 +15,9 @@
  */
 
 /*global define*/
-define('config/routes/AMRoutesConfig', [], function () {
+define("config/routes/AMRoutesConfig", [], function () {
     return {
-        "continuePasswordReset": {
+        continuePasswordReset: {
             view: "org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView",
             url: /continuePasswordReset(\/[^\&]*)(\&.+)?/,
             pattern: "continuePasswordReset??",
@@ -25,7 +25,7 @@ define('config/routes/AMRoutesConfig', [], function () {
             defaults: ["/", ""],
             argumentNames: ["realm", "additionalParameters"]
         },
-        "continueSelfRegister": {
+        continueSelfRegister: {
             view: "org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView",
             url: /continueRegister(\/[^\&]*)(\&.+)?/,
             pattern: "continueRegister??",
@@ -33,25 +33,25 @@ define('config/routes/AMRoutesConfig', [], function () {
             defaults: ["/", ""],
             argumentNames: ["realm", "additionalParameters"]
         },
-        "confirmLogin": {
+        confirmLogin: {
             view: "org/forgerock/openam/ui/user/login/RESTConfirmLoginView",
             role: "ui-user",
             url: "confirmLogin/",
             forceUpdate: true
         },
-        "dashboard": {
+        dashboard: {
             view: "org/forgerock/openam/ui/dashboard/views/DashboardView",
             role: "ui-user",
             url: "dashboard/",
             forceUpdate: true
         },
-        "oauth2Tokens": {
+        oauth2Tokens: {
             view: "org/forgerock/openam/ui/user/oauth2/TokensView",
             role: "ui-user",
             url: "oauth2/tokens",
             forceUpdate: true
         },
-        "loggedOut" : {
+        loggedOut: {
             view: "org/forgerock/openam/ui/user/logout/RESTLogoutView",
             url: /loggedOut([^\&]+)?(&.+)?/,
             pattern: "loggedOut??",

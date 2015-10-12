@@ -129,6 +129,15 @@
          * function () { # good
          */
         "space-before-function-paren": [2, "always"],
+        /**
+         * Double quotes for string literals. Single quotes allowed to avoid escaping
+         *
+         * var string = 'this is a string' # bad
+         *
+         * var string = "this is a string" # good
+         * var string = 'this is a "string"' # good
+         */
+        "quotes": [2, "double", "avoid-escape"],
 
         /*
          * --------------------------------------------------------------------------------
@@ -151,15 +160,6 @@
          * { apples: true } # good
          */
         "object-curly-spacing": [1, "always"],
-        /**
-         * Double quotes for string literals. Single quotes allowed to avoid escaping
-         *
-         * var string = 'this is a string' # bad
-         *
-         * var string = "this is a string" # good
-         * var string = 'this is a "string"' # good
-         */
-        "quotes": [1, "double", "avoid-escape"],
         /**
          * Validates that JSDoc is syntactically correct.
          */

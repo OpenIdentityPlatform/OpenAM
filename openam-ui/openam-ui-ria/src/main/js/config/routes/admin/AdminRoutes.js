@@ -15,31 +15,31 @@
  */
 
 /*global define*/
-define('config/routes/admin/AdminRoutes', function () {
+define("config/routes/admin/AdminRoutes", function () {
     return {
-        'commonTasks': {
-            view: 'org/forgerock/openam/ui/admin/views/commonTasks/CommonTasksView',
+        commonTasks: {
+            view: "org/forgerock/openam/ui/admin/views/commonTasks/CommonTasksView",
             url: /^commonTasks\/?$/,
-            pattern: 'commonTasks',
-            role: 'ui-admin'
+            pattern: "commonTasks",
+            role: "ui-admin"
         },
-        'federation': {
-            view: 'org/forgerock/openam/ui/admin/views/federation/FederationView',
+        federation: {
+            view: "org/forgerock/openam/ui/admin/views/federation/FederationView",
             url: /^federation\/?$/,
-            pattern: 'federation',
-            role: 'ui-admin'
+            pattern: "federation",
+            role: "ui-admin"
         },
-        'configuration': {
-            view: 'org/forgerock/openam/ui/admin/views/configuration/ConfigurationView',
+        configuration: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/ConfigurationView",
             url: /^configuration\/?$/,
-            pattern: 'configuration',
-            role: 'ui-admin'
+            pattern: "configuration",
+            role: "ui-admin"
         },
-        'sessions': {
-            view: 'org/forgerock/openam/ui/admin/views/sessions/SessionsView',
+        sessions: {
+            view: "org/forgerock/openam/ui/admin/views/sessions/SessionsView",
             url: /^sessions\/?$/,
-            pattern: 'sessions',
-            role: 'ui-admin'
+            pattern: "sessions",
+            role: "ui-admin"
         }
     };
 });

@@ -31,9 +31,9 @@ define("config/main", [
     "./routes/CommonRoutesConfig",  // In FR-Commons
     "./routes/AMRoutesConfig",
     "./routes/UserRoutesConfig", // In FR-Commons
-    './routes/admin/AdminRoutes',
-    './routes/admin/RealmsRoutes',
-    './routes/user/UMARoutes',
+    "./routes/admin/AdminRoutes",
+    "./routes/admin/RealmsRoutes",
+    "./routes/user/UMARoutes",
 
     "./messages/CommonMessages",
     "./messages/UserMessages",

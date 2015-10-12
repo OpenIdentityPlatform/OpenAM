@@ -106,7 +106,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
             }
 
             var resourceBuilder = this.$el.find("#resourceBuilder"),
-                resourceStr = resourceBuilder.data().resource.replace("-*-", '̂'),
+                resourceStr = resourceBuilder.data().resource.replace("-*-", "̂"),
                 inputs = resourceBuilder.find("input"),
                 strLength = resourceStr.length,
                 resource = "",
@@ -124,8 +124,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
                 if (resourceStr[i] === "*") {
                     resource += inputs[count].value;
                     count++;
-                } else if (resourceStr[i] === '̂') {
-                    resource += inputs[count].value === '̂' ? "-*-" : inputs[count].value;
+                } else if (resourceStr[i] === "̂") {
+                    resource += inputs[count].value === "̂" ? "-*-" : inputs[count].value;
                     count++;
                 } else {
                     resource += resourceStr[i];

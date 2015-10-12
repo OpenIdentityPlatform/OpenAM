@@ -15,7 +15,7 @@
  */
 
 /*global define*/
-define('org/forgerock/openam/ui/admin/models/FormCollection', [
+define("org/forgerock/openam/ui/admin/models/FormCollection", [
     "underscore"
 ], function (_) {
     var obj = function FormCollection () {
