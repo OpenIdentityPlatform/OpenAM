@@ -143,6 +143,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
                 onDrop: function (item, container, _super, event) {
                     self.sortChainData(self.originalIndex, item.index());
+                    self.validateChain();
                     _super(item, container);
                 }
             });
@@ -237,13 +238,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
         validateChain: function () {
             var invalid = false,
-                alert = "";
-            if (this.data.form.chainData.authChainConfiguration.length === 0) {
+                alert = "",
+                firstRequiredIndex,
+                lastSufficentIndex,
+                config = this.data.form.chainData.authChainConfiguration;
+
+            if (config.length === 0) {
+
                 invalid = true;
                 this.$el.find("#sortableAuthChain").addClass("hidden");
                 alert = Handlebars.compile("{{> alerts/_Alert type='warning' " +
-                        "text='console.authentication.editChains.alerts.atLeastOne'}}");
+                    "text='console.authentication.editChains.alerts.atLeastOne'}}");
             } else {
+                firstRequiredIndex = _.findIndex(config, { criteria: "REQUIRED" });
+                lastSufficentIndex = _.findLastIndex(config, { criteria: "SUFFICIENT" });
+
+                if (firstRequiredIndex > -1 && lastSufficentIndex > -1 && firstRequiredIndex < lastSufficentIndex) {
+                    alert = Handlebars.compile("{{> alerts/_Alert type='warning' " +
+                        "text='console.authentication.editChains.alerts.reqdFailSuffPass'}}");
+                }
+
                 this.$el.find("#sortableAuthChain").removeClass("hidden");
             }
 

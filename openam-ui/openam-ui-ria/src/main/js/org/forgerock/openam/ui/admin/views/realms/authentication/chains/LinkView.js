@@ -80,6 +80,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
 
         selectCriteria: function () {
             this.data.linkConfig.criteria = this.$el.find("#selectCriteria option:selected").val();
+            this.parent.validateChain();
         },
 
         render: function () {
