@@ -96,13 +96,13 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     obj.serviceCall({ url: url + "/modules?_queryFilter=true" })
                 ).then(function (authenticationData, chainData, modulesData) {
 
-                        if (chainData[0]._id === authenticationData[0].adminAuthModule) {
-                            chainData[0].adminAuthModule = true;
-                        }
+                    if (chainData[0]._id === authenticationData[0].adminAuthModule) {
+                        chainData[0].adminAuthModule = true;
+                    }
 
-                        if (chainData[0]._id === authenticationData[0].orgConfig) {
-                            chainData[0].orgConfig = true;
-                        }
+                    if (chainData[0]._id === authenticationData[0].orgConfig) {
+                        chainData[0].orgConfig = true;
+                    }
 
                     _.each(chainData[0].authChainConfiguration, function (chainLink, index) {
                         moduleName = _.find(modulesData[0].result, { _id: chainLink.module });

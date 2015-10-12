@@ -150,9 +150,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                         self.data.options.availablePatterns = resourceType.patterns;
 
                         self.parentRender(function () {
-                            var promises = [], resolve = function () {
-                                return (promises[promises.length] = $.Deferred()).resolve;
-                            };
+                            var promises = [],
+                                resolve = function () {
+                                    return (promises[promises.length] = $.Deferred()).resolve;
+                                };
 
                             self.buildResourceTypeSelection();
 

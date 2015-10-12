@@ -90,16 +90,6 @@
          */
         "space-before-blocks": [2, "always"],
 
-        /*
-         * --------------------------------------------------------------------------------
-         * WARNING RULES
-         *
-         * These are rules that we want to turn into errors but can't yet because there are
-         * too many violations. As we fix the violations, we will transition them into
-         * error rules.
-         * --------------------------------------------------------------------------------
-         */
-
         /**
          * 4 space indent.
          *
@@ -109,7 +99,7 @@
          * function() { # good
          * ····var apples
          */
-        "indent": [1, 4, {
+        "indent": [2, 4, {
             /**
              * One level indent on switch cases.
              *
@@ -131,6 +121,16 @@
              */
             "VariableDeclarator": 1
         }],
+
+        /*
+         * --------------------------------------------------------------------------------
+         * WARNING RULES
+         *
+         * These are rules that we want to turn into errors but can't yet because there are
+         * too many violations. As we fix the violations, we will transition them into
+         * error rules.
+         * --------------------------------------------------------------------------------
+         */
         /**
          * Maximum line length of 120 characters.
          */

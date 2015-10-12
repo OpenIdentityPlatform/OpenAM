@@ -122,14 +122,14 @@ define("config/process/AMConfig", [
                                    encodeURIComponent(subRealm);
         }
     }, {
-            startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,
-            description: "",
-            dependencies: [
-                "org/forgerock/commons/ui/common/main/Router"
-            ],
-            processDescription: function(event, Router) {
-                Router.routeTo(Router.configuration.routes.profile, {trigger: true});
-            }
+        startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,
+        description: "",
+        dependencies: [
+            "org/forgerock/commons/ui/common/main/Router"
+        ],
+        processDescription: function(event, Router) {
+            Router.routeTo(Router.configuration.routes.profile, {trigger: true});
+        }
     }, {
         startEvent: Constants.EVENT_AUTHENTICATED,
         description: "",
