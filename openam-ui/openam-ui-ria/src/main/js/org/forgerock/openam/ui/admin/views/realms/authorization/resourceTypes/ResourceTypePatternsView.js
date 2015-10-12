@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListEditingView"
 ], function ($, _, AbstractView, StripedListEditingView) {
 
-    function ResourceTypePatternsView() {
+    function ResourceTypePatternsView () {
     }
 
     // TODO: Rename StripedListEditingView or rewrite to bootstrap table

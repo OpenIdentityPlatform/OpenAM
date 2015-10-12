@@ -162,7 +162,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
             this.render(this.data);
         },
 
-        showEditingResources: function() {
+        showEditingResources: function () {
             this.$el.find("li.editing").removeClass("hidden");
         },
 

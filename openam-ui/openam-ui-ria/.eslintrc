@@ -121,6 +121,14 @@
              */
             "VariableDeclarator": 1
         }],
+        /**
+         * Space required before function parenthesis.
+         *
+         * function() { # bad
+         *
+         * function () { # good
+         */
+        "space-before-function-paren": [2, "always"],
 
         /*
          * --------------------------------------------------------------------------------
@@ -152,14 +160,6 @@
          * var string = 'this is a "string"' # good
          */
         "quotes": [1, "double", "avoid-escape"],
-        /**
-         * Space required before function parenthesis.
-         *
-         * function() { # bad
-         *
-         * function () { # good
-         */
-        "space-before-function-paren": [1, "always"],
         /**
          * Validates that JSDoc is syntactically correct.
          */

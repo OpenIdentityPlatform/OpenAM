@@ -23,17 +23,17 @@ define("org/forgerock/openam/ui/dashboard/delegates/TrustedDevicesDelegate", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function($, _, AbstractDelegate, Configuration, Constants, RealmHelper) {
+], function ($, _, AbstractDelegate, Configuration, Constants, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
-    obj.getTrustedDevices = function() {
+    obj.getTrustedDevices = function () {
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + Configuration.loggedUser.get("uid") + "/devices/trusted/?_queryId=*"),
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
-    obj.deleteTrustedDevice = function(id) {
+    obj.deleteTrustedDevice = function (id) {
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + Configuration.loggedUser.get("uid") + "/devices/trusted/" + id),
             type: "DELETE",

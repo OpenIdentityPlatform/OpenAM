@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             "click .fa-close ": "deleteItem",
             "keyup .fa-close ": "deleteItem"
         },
-        render: function(data, el, callback) {
+        render: function (data, el, callback) {
             var self = this;
             _.extend(this.data, data);
             this.element = el;

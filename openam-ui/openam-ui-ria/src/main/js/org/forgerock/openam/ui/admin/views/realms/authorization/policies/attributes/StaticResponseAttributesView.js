@@ -22,7 +22,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListEditingView"
 ], function ($, _, AbstractView, StripedListEditingView) {
-    function StaticResponseAttributesView() {
+    function StaticResponseAttributesView () {
     }
 
     StaticResponseAttributesView.prototype = new StripedListEditingView();

@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                 uuid = $(event.currentTarget).closest("div[data-device-uuid]").attr("data-device-uuid"),
                 device = _.find(this.data.devices, {uuid: uuid});
 
-            UIUtils.fillTemplateWithData("templates/openam/dashboard/EditDeviceDialogTemplate.html", device, function(html) {
+            UIUtils.fillTemplateWithData("templates/openam/dashboard/EditDeviceDialogTemplate.html", device, function (html) {
                 BootstrapDialog.show({
                     title: device.deviceName,
                     message: $(html),
@@ -76,8 +76,8 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                             dialog.close();
                         }
                     }],
-                    onshown: function(dialog) {
-                        dialog.$modalBody.find(".recovery-codes-download").click(function() {
+                    onshown: function (dialog) {
+                        dialog.$modalBody.find(".recovery-codes-download").click(function () {
                             location.href = "data:text/plain," + encodeURIComponent(device.recoveryCodes.join("\r\n"));
                         });
 
@@ -97,7 +97,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
             var self = this;
             DeviceManagementDelegate.getDevices().done(function (devicesData) {
                 self.data.devices = devicesData.result;
-                self.parentRender(function() {
+                self.parentRender(function () {
                     if (callback) {
                         callback();
                     }

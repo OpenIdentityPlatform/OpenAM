@@ -25,9 +25,9 @@
 /*global define*/
 define("org/forgerock/openam/ui/uma/models/User", [
     'backbone'
-], function(Backbone) {
+], function (Backbone) {
     var User = Backbone.Model.extend({
-        initialize: function(username) {
+        initialize: function (username) {
             this.username = username;
         }
     });

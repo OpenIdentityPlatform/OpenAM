@@ -90,7 +90,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 operators = _.pluck(this.data.operators, "title"),
                 properties = null;
 
-            function buildListItem(data, container, parent) {
+            function buildListItem (data, container, parent) {
                 if (_.isArray(data) === false) {
                     data = [data];
                 }
@@ -316,7 +316,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             var editRuleView = this.getNewRule(),
                 self = this;
 
-            editRuleView.render(this.getProperties(), this.droppableParent, this.idCount, null, function onRuleRender() {
+            editRuleView.render(this.getProperties(), this.droppableParent, this.idCount, null, function onRuleRender () {
                 self.editStart(editRuleView.$el);
                 self.$el.find("ol#dropbox").nestingSortable("refresh");
             });

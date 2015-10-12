@@ -21,7 +21,7 @@ define("org/forgerock/openam/ui/dashboard/views/TrustedDevicesView", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/dashboard/delegates/TrustedDevicesDelegate"
-], function($, _, AbstractView, TrustedDevicesDelegate) {
+], function ($, _, AbstractView, TrustedDevicesDelegate) {
     var TrustedDevices = AbstractView.extend({
         template: "templates/openam/dashboard/TrustedDevicesTemplate.html",
         noBaseTemplate: true,
@@ -30,25 +30,25 @@ define("org/forgerock/openam/ui/dashboard/views/TrustedDevicesView", [
             "click  a.deleteDevice" : "deleteDevice"
         },
 
-        render: function() {
+        render: function () {
             var self = this;
 
             TrustedDevicesDelegate.getTrustedDevices().then(function (data) {
                 self.data.devices = data.result;
-                self.parentRender(function() {
+                self.parentRender(function () {
                     self.$el.find("[data-toggle=\"tooltip\"]").tooltip();
                 });
             });
         },
 
-        deleteDevice: function(event) {
+        deleteDevice: function (event) {
             event.preventDefault();
             var self = this;
 
-            TrustedDevicesDelegate.deleteTrustedDevice(event.currentTarget.id).then(function() {
+            TrustedDevicesDelegate.deleteTrustedDevice(event.currentTarget.id).then(function () {
                 console.log("Deleted trusted device");
                 self.render();
-            }, function() {
+            }, function () {
                 console.error("Failed to delete trusted device");
             });
         }

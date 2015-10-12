@@ -21,15 +21,15 @@ define("org/forgerock/openam/ui/dashboard/views/MyApplicationsView", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate"
-], function($, _, AbstractView, MyApplicationsDelegate) {
+], function ($, _, AbstractView, MyApplicationsDelegate) {
     var Applications = AbstractView.extend({
         template: "templates/openam/dashboard/MyApplicationsTemplate.html",
         noBaseTemplate: true,
         element: "#myApplicationsSection",
-        render: function() {
+        render: function () {
             var self = this;
 
-            MyApplicationsDelegate.getMyApplications().then(function(apps) {
+            MyApplicationsDelegate.getMyApplications().then(function (apps) {
                 if (apps.length > 0) {
                     self.data.apps = apps;
                 }

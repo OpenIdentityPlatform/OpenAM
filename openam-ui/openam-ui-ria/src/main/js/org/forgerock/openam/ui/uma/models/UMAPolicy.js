@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/uma/models/UMAPolicy", [
             return response;
         },
         sync: function (method, model, options) {
-            options.beforeSend = function(xhr) {
+            options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
             };
 

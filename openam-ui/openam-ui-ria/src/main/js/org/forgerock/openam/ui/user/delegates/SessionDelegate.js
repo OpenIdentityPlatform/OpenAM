@@ -27,7 +27,7 @@
 define("org/forgerock/openam/ui/user/delegates/SessionDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
-], function(constants, AbstractDelegate) {
+], function (constants, AbstractDelegate) {
 
     var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json/sessions");
 

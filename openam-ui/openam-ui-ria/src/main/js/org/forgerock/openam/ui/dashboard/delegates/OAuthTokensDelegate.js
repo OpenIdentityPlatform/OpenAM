@@ -21,17 +21,17 @@ define("org/forgerock/openam/ui/dashboard/delegates/OAuthTokensDelegate", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants"
-], function($, _, AbstractDelegate, Constants) {
+], function ($, _, AbstractDelegate, Constants) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/frrest/");
 
-    obj.getOAuthTokens = function() {
+    obj.getOAuthTokens = function () {
         return obj.serviceCall({
             url: "oauth2/token/?_queryId=access_token",
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
-    obj.deleteOAuthToken = function(id) {
+    obj.deleteOAuthToken = function (id) {
         return obj.serviceCall({
             url: "oauth2/token/" + id + "?_action=revoke",
             type: "POST",

@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
             this.data.selectedUserAttributes = args[0];
             this.data.allUserAttributes = [];
 
-            _.each(args[1], function(propertyName) {
+            _.each(args[1], function (propertyName) {
                 attr = {};
                 attr.propertyName = propertyName;
                 attr.selected = (_.find(self.data.selectedUserAttributes, function (obj) {
@@ -74,17 +74,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
             return data;
         },
 
-        initSelectize: function() {
+        initSelectize: function () {
             var self = this;
 
-            this.$el.find(".selectize").each(function() {
+            this.$el.find(".selectize").each(function () {
                 $(this).selectize({
                     plugins: ["restore_on_backspace"],
                     delimiter: ",",
                     persist: false,
                     create: false,
                     hideSelected: true,
-                    onChange: function(value) {
+                    onChange: function (value) {
                         self.data.selectedUserAttributes = value;
                     }
                 });

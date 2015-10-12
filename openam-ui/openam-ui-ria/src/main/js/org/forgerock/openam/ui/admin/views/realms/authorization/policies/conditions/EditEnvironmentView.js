@@ -207,7 +207,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 attributesWrapper,
                 htmlBuiltPromise = $.Deferred();
 
-            function buildScriptAttr() {
+            function buildScriptAttr () {
                 new ArrayAttr().render({
                     itemData: itemData, hiddenData: hiddenData, data: [hiddenData[itemData.type]],
                     title: "scriptId", dataSource: "scripts", multiple: false,

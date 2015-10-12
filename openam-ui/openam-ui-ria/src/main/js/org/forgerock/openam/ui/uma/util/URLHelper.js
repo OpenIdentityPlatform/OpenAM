@@ -27,10 +27,10 @@ define("org/forgerock/openam/ui/uma/util/URLHelper", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(Configuration, Constants, RealmHelper) {
+], function (Configuration, Constants, RealmHelper) {
     return {
-        substitute: function(url) {
-            return function() {
+        substitute: function (url) {
+            return function () {
                 var replacedUrl = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
                     .replace("__host__", Constants.host)
                     .replace("__context__", Constants.context)

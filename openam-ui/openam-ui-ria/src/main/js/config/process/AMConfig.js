@@ -127,7 +127,7 @@ define("config/process/AMConfig", [
         dependencies: [
             "org/forgerock/commons/ui/common/main/Router"
         ],
-        processDescription: function(event, Router) {
+        processDescription: function (event, Router) {
             Router.routeTo(Router.configuration.routes.profile, {trigger: true});
         }
     }, {

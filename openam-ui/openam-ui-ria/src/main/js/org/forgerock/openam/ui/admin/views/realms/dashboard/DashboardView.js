@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
             var self = this;
             CreateUpdateRealmDialog.show({
                 realmPath : this.data.realmPath,
-                callback : function() {
+                callback : function () {
                     self.render([self.data.realmPath]);
                 }
             });
