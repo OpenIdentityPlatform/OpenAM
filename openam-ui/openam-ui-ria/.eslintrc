@@ -52,45 +52,6 @@
          */
         "no-multi-spaces": 2,
         /**
-         * Space required after keywords.
-         *
-         * if(fruit) { # bad
-         * }else{
-         *
-         * if (fruit) { # good. Space before else is not enforced but recommended
-         * } else {
-         */
-        "space-after-keywords": [2, "always"],
-        /**
-         * Spaces not allowed in parentheses.
-         *
-         * fruit( "apple" ) # bad
-         *
-         * fruit("apple") # good
-         */
-        "space-in-parens": [2, "never"],
-        /**
-         * Spaces required around infix operators
-         *
-         * var numOfApples = 1+2-3 # bad
-         *
-         * var numOfApples = 1 + 2 - 3 # good
-         */
-        "space-infix-ops": [2, {
-            "int32Hint": false
-        }],
-        /**
-         * Space required before opening block curly brace.
-         *
-         * if (fruit){ # bad
-         *     function fruit(){}
-         *
-         * if (fruit) { # good
-         *     function fruit() {}
-         */
-        "space-before-blocks": [2, "always"],
-
-        /**
          * 4 space indent.
          *
          * function() { # bad
@@ -122,23 +83,6 @@
             "VariableDeclarator": 1
         }],
         /**
-         * Space required before function parenthesis.
-         *
-         * function() { # bad
-         *
-         * function () { # good
-         */
-        "space-before-function-paren": [2, "always"],
-        /**
-         * Double quotes for string literals. Single quotes allowed to avoid escaping
-         *
-         * var string = 'this is a string' # bad
-         *
-         * var string = "this is a string" # good
-         * var string = 'this is a "string"' # good
-         */
-        "quotes": [2, "double", "avoid-escape"],
-        /**
          * Maximum line length of 120 characters.
          */
         "max-len": [2, 120, 4],
@@ -150,6 +94,61 @@
          * { apples: true } # good
          */
         "object-curly-spacing": [2, "always"],
+        /**
+         * Double quotes for string literals. Single quotes allowed to avoid escaping
+         *
+         * var string = 'this is a string' # bad
+         *
+         * var string = "this is a string" # good
+         * var string = 'this is a "string"' # good
+         */
+        "quotes": [2, "double", "avoid-escape"],
+        /**
+         * Space required after keywords.
+         *
+         * if(fruit) { # bad
+         * }else{
+         *
+         * if (fruit) { # good. Space before else is not enforced but recommended
+         * } else {
+         */
+        "space-after-keywords": [2, "always"],
+        /**
+         * Space required before opening block curly brace.
+         *
+         * if (fruit){ # bad
+         *     function fruit(){}
+         *
+         * if (fruit) { # good
+         *     function fruit() {}
+         */
+        "space-before-blocks": [2, "always"],
+        /**
+         * Space required before function parenthesis.
+         *
+         * function() { # bad
+         *
+         * function () { # good
+         */
+        "space-before-function-paren": [2, "always"],
+        /**
+         * Spaces not allowed in parentheses.
+         *
+         * fruit( "apple" ) # bad
+         *
+         * fruit("apple") # good
+         */
+        "space-in-parens": [2, "never"],
+        /**
+         * Spaces required around infix operators
+         *
+         * var numOfApples = 1+2-3 # bad
+         *
+         * var numOfApples = 1 + 2 - 3 # good
+         */
+        "space-infix-ops": [2, {
+            "int32Hint": false
+        }],
 
         /*
          * --------------------------------------------------------------------------------
