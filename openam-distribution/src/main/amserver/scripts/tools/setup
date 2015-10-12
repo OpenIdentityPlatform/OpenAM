@@ -27,6 +27,8 @@
 
 # Portions Copyrighted 2010-2015 ForgeRock AS.
 
+TOOLS_HOME="."
+
 if [ -z "$JAVA_HOME" ]; then
   echo "Please define JAVA_HOME environment variable before running this program"
   echo "setup program will use the JVM defined in JAVA_HOME for all the CLI tools"
@@ -87,7 +89,7 @@ done
 
 CLASSPATH=""
 CLASSPATH="$CLASSPATH:${unix.setup.classpath}"
-CLASSPATH="$CLASSPATH:resources"
+CLASSPATH="$CLASSPATH:$TOOLS_HOME/resources"
 
 $JAVA_HOME/bin/java -D"load.config=yes" -D"help.print=$help_print" \
                       -D"path.AMConfig=$path_AMConfig" -D"path.debug=$path_debug" \

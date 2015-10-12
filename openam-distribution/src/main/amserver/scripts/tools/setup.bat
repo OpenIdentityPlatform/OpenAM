@@ -27,6 +27,7 @@
 :
 
 : Portions Copyrighted 2013-2015 ForgeRock AS.
+set TOOLS_HOME="."
 
 if not "%JAVA_HOME%" == "" goto checkJavaHome
 echo Please define JAVA_HOME environment variable before running this program
@@ -104,11 +105,9 @@ IF "%5" == "--debug" SET path_debug=%~6
 IF "%5" == "-p" SET path_AMConfig=%~6
 IF "%5" == "--path" SET path_AMConfig=%~6
 
-
-: lib/amserver.jar;lib/amadm_setup.jar;lib/opensso-sharedlib.jar;lib/opendj-server.jar;resources
 set CLASSPATH="@CONFIG_DIR@"
 set CLASSPATH="%CLASSPATH%;${windows.setup.classpath}"
-set CLASSPATH="%CLASSPATH%;resources"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%\resources"
 
 "%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "%CLASSPATH%" com.sun.identity.tools.bundles.Main %accept_license%
 

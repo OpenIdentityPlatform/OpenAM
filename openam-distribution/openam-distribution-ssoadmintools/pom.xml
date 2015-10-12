@@ -83,7 +83,7 @@
                         <configuration>
                             <fileSeparator>/</fileSeparator>
                             <pathSeparator>:</pathSeparator>
-                            <prefix>lib</prefix>
+                            <prefix>$TOOLS_HOME/lib</prefix>
                             <includeArtifactIds>${setupArtifactIDs}</includeArtifactIds>
                             <outputProperty>unix.setup.classpath</outputProperty>
                         </configuration>
@@ -97,7 +97,7 @@
                         <configuration>
                             <fileSeparator>\</fileSeparator>
                             <pathSeparator>;</pathSeparator>
-                            <prefix>lib</prefix>
+                            <prefix>%TOOLS_HOME%\lib</prefix>
                             <includeArtifactIds>${setupArtifactIDs}</includeArtifactIds>
                             <outputProperty>windows.setup.classpath</outputProperty>
                         </configuration>
