@@ -31,7 +31,7 @@ define("org/forgerock/openam/ui/user/delegates/SessionDelegate", [
 
     var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json/sessions");
 
-    obj.isSessionValid = function (tokenCookie){
+    obj.isSessionValid = function (tokenCookie) {
         return obj.serviceCall({
             type: "POST",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},

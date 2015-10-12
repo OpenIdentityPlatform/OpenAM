@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/user/logout/RESTLogoutView", [
 
             this.parentRender(callback);
         },
-        gotoLoginViewClick: function(e){
+        gotoLoginViewClick: function(e) {
             e.preventDefault();
             var urlParams = "";
             if (Configuration.globalData.auth.fullLoginURL) {

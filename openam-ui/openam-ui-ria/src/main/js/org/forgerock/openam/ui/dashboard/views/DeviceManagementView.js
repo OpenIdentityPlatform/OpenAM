@@ -76,8 +76,8 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                             dialog.close();
                         }
                     }],
-                    onshown: function(dialog){
-                        dialog.$modalBody.find(".recovery-codes-download").click(function(){
+                    onshown: function(dialog) {
+                        dialog.$modalBody.find(".recovery-codes-download").click(function() {
                             location.href = "data:text/plain," + encodeURIComponent(device.recoveryCodes.join("\r\n"));
                         });
 

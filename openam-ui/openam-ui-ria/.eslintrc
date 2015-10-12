@@ -79,6 +79,16 @@
         "space-infix-ops": [2, {
             "int32Hint": false
         }],
+        /**
+         * Space required before opening block curly brace.
+         *
+         * if (fruit){ # bad
+         *     function fruit(){}
+         *
+         * if (fruit) { # good
+         *     function fruit() {}
+         */
+        "space-before-blocks": [2, "always"],
 
         /*
          * --------------------------------------------------------------------------------
@@ -142,16 +152,6 @@
          * var string = 'this is a "string"' # good
          */
         "quotes": [1, "double", "avoid-escape"],
-        /**
-         * Space required before opening block curly brace.
-         *
-         * if (fruit){ # bad
-         *     function fruit(){}
-         *
-         * if (fruit) { # good
-         *     function fruit() {}
-         */
-        "space-before-blocks": [1, "always"],
         /**
          * Space required before function parenthesis.
          *

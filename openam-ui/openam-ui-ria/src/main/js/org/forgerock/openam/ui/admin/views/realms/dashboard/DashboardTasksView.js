@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView"
             this.parentRender(callback);
         },
 
-        cardClick: function(e){
+        cardClick: function(e) {
             e.preventDefault();
             var dataset = $(e.currentTarget).data();
             if (dataset.taskGroup) {
@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView"
             }
         },
 
-        commonTasksBtnClick: function(e){
+        commonTasksBtnClick: function(e) {
             e.preventDefault();
             this.data.taskGroup = {};
             this.data.taskGroup.tasks = this.data.allTasks;
