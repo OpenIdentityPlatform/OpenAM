@@ -30,3 +30,17 @@ $ grunt
 ```
 
 Grunt will then start watching the source and sync any changed files over to your server's webapp directory.
+
+### Unit Tests
+
+To get the unit tests to run automatically when you change source files, do:
+
+```
+$ grunt karma:dev
+```
+
+This will run karma and show test output as tests are run. _You should run this in addition to running grunt as shown
+above_.
+
+If you need to debug test failures, open [http://localhost:9876/debug.html](http://localhost:9876/debug.html) in your
+browser of choice and open the development tools. Test failures will be reported in the console.

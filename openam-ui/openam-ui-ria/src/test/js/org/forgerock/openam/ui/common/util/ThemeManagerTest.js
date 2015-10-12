@@ -14,169 +14,158 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define, QUnit*/
-
-define("org/forgerock/openam/ui/common/util/ThemeManagerTest", [
+define([
     "jquery",
     "underscore",
     "squire",
     "sinon",
     "org/forgerock/openam/ui/common/util/Constants"
 ], function ($, _, Squire, sinon, Constants) {
-    return {
-        executeAll: function () {
-            var ThemeManager, Configuration, Router, mock$, themeConfig, urlParams;
-            QUnit.module("org/forgerock/openam/ui/common/util/ThemeManager", {
-                setup: function () {
-                    var injector = new Squire();
+    var baseUrl = "toUrl:",
+        ThemeManager, Configuration, URIUtils, mock$, themeConfig, urlParams, sandbox;
+    describe("org/forgerock/openam/ui/common/util/ThemeManager", function () {
+        beforeEach(function (done) {
+            var injector = new Squire();
 
-                    themeConfig = {
-                        themes: {
-                            "default": {
-                                path: "",
-                                icon: "icon.png",
-                                stylesheets: ["a.css", "c.css"]
-                            },
-                            other: {
-                                name: "other",
-                                path: "",
-                                icon: "otherIcon.png",
-                                stylesheets: ["b.css"]
-                            }
-                        },
-                        mappings: [
-                            { theme: "other", realms: ["/b"] }
-                        ]
-                    };
+            themeConfig = {
+                themes: {
+                    "default": {
+                        path: "",
+                        icon: "icon.png",
+                        stylesheets: ["a.css", "c.css"]
+                    },
+                    other: {
+                        name: "other",
+                        path: "",
+                        icon: "otherIcon.png",
+                        stylesheets: ["b.css"]
+                    }
+                },
+                mappings: [
+                    { theme: "other", realms: ["/b"] }
+                ]
+            };
 
-                    urlParams = {};
+            urlParams = {};
 
-                    mock$ = sinon.spy(function () { return mock$; });
-                    mock$.remove = sinon.spy();
-                    mock$.appendTo = sinon.spy();
-                    mock$.Deferred = _.bind($.Deferred, $);
+            mock$ = sinon.spy(function () { return mock$; });
+            mock$.remove = sinon.spy();
+            mock$.appendTo = sinon.spy();
+            mock$.Deferred = _.bind($.Deferred, $);
 
-                    URIUtils = {
-                        getCurrentCompositeQueryString: sinon.stub().returns(""),
-                        parseQueryString: sinon.stub().returns(urlParams)
-                    };
+            sandbox = sinon.sandbox.create();
+            sandbox.stub(require, "toUrl", function (url) {
+                return baseUrl + url;
+            });
 
-                    QUnit.stop();
-                    injector
-                        .mock("jquery", mock$)
-                        .mock("config/ThemeConfiguration", themeConfig)
-                        .mock("org/forgerock/commons/ui/common/util/URIUtils", URIUtils)
-                        .store("org/forgerock/commons/ui/common/main/Configuration")
-                        .require(["org/forgerock/openam/ui/common/util/ThemeManager", "mocks"], function (d, mocks) {
-                            ThemeManager = d;
-                            Configuration = mocks.store["org/forgerock/commons/ui/common/main/Configuration"];
-                            Configuration.globalData = {
-                                theme: undefined,
-                                realm: "/"
-                            };
-                            QUnit.start();
-                        });
+            Configuration = {
+                globalData: {
+                    theme: undefined,
+                    realm: "/"
                 }
-            });
+            };
 
-            test("getTheme throws if theme configuration does not contain a theme object", function () {
+            URIUtils = {
+                getCurrentCompositeQueryString: sinon.stub().returns(""),
+                parseQueryString: sinon.stub().returns(urlParams)
+            };
+
+            injector
+                .mock("jquery", mock$)
+                .mock("config/ThemeConfiguration", themeConfig)
+                .mock("org/forgerock/commons/ui/common/util/URIUtils", URIUtils)
+                .mock("org/forgerock/commons/ui/common/main/Configuration", Configuration)
+                .require(["org/forgerock/openam/ui/common/util/ThemeManager"], function (d) {
+                    ThemeManager = d;
+                    done();
+                });
+        });
+
+        afterEach(function () {
+            sandbox.restore();
+        });
+
+        describe("getTheme", function () {
+            it("throws if theme configuration does not contain a theme object", function () {
                 delete themeConfig.themes;
-                throws(function () {
+                expect(function () {
                     ThemeManager.getTheme();
-                }, "Theme configuration must specify a themes object");
+                }).to.throw();
             });
-            test("getTheme throws if theme configuration does specify a default theme", function () {
+            it("throws if theme configuration does specify a default theme", function () {
                 delete themeConfig.themes.default;
-                throws(function () {
+                expect(function () {
                     ThemeManager.getTheme();
-                }, "Theme configuration must specify a default theme");
+                }).to.throw();
             });
-            test("getTheme returns a promise", function () {
-                QUnit.stop();
+            it("returns a promise", function (done) {
                 var result = ThemeManager.getTheme();
-                ok(result.then, "returned object has a then property");
+                expect(result.then).to.not.be.undefined;
                 result.then(function () {
-                    QUnit.start();
+                    done();
                 });
             });
-            test("getTheme places the selected theme onto the global data object", function () {
-                QUnit.stop();
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.default, "saved default theme");
-                    QUnit.start();
+            it("places the selected theme onto the global data object", function () {
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.default);
                 });
             });
-            test("getTheme selects the correct theme based on the realm", function () {
-                QUnit.stop();
+            it("selects the correct theme based on the realm", function () {
                 Configuration.globalData.realm = "/b";
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.other);
                 });
             });
-            test("getTheme selects the correct theme based on the realm", function () {
-                QUnit.stop();
+            it("selects the correct theme based on the realm", function () {
                 Configuration.globalData.realm = "/b";
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.other);
                 });
             });
-            test("getTheme selects the default theme if no realms match", function () {
-                QUnit.stop();
+            it("selects the default theme if no realms match", function () {
                 Configuration.globalData.realm = "/c";
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.default, "selected default theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.default);
                 });
             });
-            test("getTheme allows mappings to specify regular expressions to match realms", function () {
-                QUnit.stop();
+            it("allows mappings to specify regular expressions to match realms", function () {
                 themeConfig.mappings[0].realms[0] = /^\/hello.*/;
                 Configuration.globalData.realm = "/hello/world";
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.other);
                 });
             });
-            test("getTheme selects the correct theme based on the authentication chain", function () {
-                QUnit.stop();
+            it("selects the correct theme based on the authentication chain", function () {
                 urlParams.service = "test";
                 themeConfig.mappings.push({
                     theme: "other",
                     authenticationChains: ["test"]
                 });
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.other);
                 });
             });
-            test("getTheme selects the default theme if no authentication chains match", function () {
-                QUnit.stop();
+            it("selects the default theme if no authentication chains match", function () {
                 urlParams.service = "tester";
                 themeConfig.mappings.push({
                     theme: "other",
                     authenticationChains: ["test"]
                 });
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.default, "selected default theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.default);
                 });
             });
-            test("getTheme allows mappings to specify regular expressions to match authentication chains", function () {
-                QUnit.stop();
+            it("allows mappings to specify regular expressions to match authentication chains", function () {
                 urlParams.service = "tester";
                 themeConfig.mappings.push({
                     theme: "other",
                     authenticationChains: [/test/]
                 });
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.other);
                 });
             });
-            test("getTheme matches realms and authentication chains if both are specified in a mapping", function () {
-                QUnit.stop();
+            it("matches realms and authentication chains if both are specified in a mapping", function () {
                 Configuration.globalData.realm = "/a";
                 urlParams.service = "test";
                 // No match - wrong realm
@@ -197,13 +186,11 @@ define("org/forgerock/openam/ui/common/util/ThemeManagerTest", [
                     realms: ["/a"],
                     authenticationChains: ["test"]
                 });
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.other);
                 });
             });
-            test("getTheme won't match a mapping that needs an authentication chain if none is present", function () {
-                QUnit.stop();
+            it("won't match a mapping that needs an authentication chain if none is present", function () {
                 Configuration.globalData.realm = "/a";
                 // No match - wants an authentication chain but none is present
                 themeConfig.mappings.push({
@@ -216,43 +203,35 @@ define("org/forgerock/openam/ui/common/util/ThemeManagerTest", [
                     theme: "other",
                     realms: ["/a"]
                 });
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.other);
                 });
             });
-            test("getTheme matches a mapping that has an empty authentication chain if none is present", function () {
-                QUnit.stop();
+            it("matches a mapping that has an empty authentication chain if none is present", function () {
                 themeConfig.mappings.push({
                     theme: "other",
                     authenticationChains: [""]
                 });
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme, themeConfig.themes.other, "selected other theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.other);
                 });
             });
-            test("getTheme fills in any missing properties from selected theme with the default theme", function () {
-                QUnit.stop();
+            it("fills in any missing properties from selected theme with the default theme", function () {
                 Configuration.globalData.realm = "/b";
                 delete themeConfig.themes.other.stylesheets;
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme.stylesheets, themeConfig.themes.default.stylesheets,
-                        "stylesheets comes from default theme");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme.stylesheets)
+                        .to.deep.equal(themeConfig.themes.default.stylesheets);
                 });
             });
-            test("getTheme doesn't try to merge arrays in the selected theme with the default theme", function () {
-                QUnit.stop();
+            it("doesn't try to merge arrays in the selected theme with the default theme", function () {
                 Configuration.globalData.realm = "/b";
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme.stylesheets, themeConfig.themes.other.stylesheets,
-                        "stylesheets are unmerged");
-                    QUnit.start();
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme.stylesheets)
+                        .to.deep.equal(themeConfig.themes.other.stylesheets);
                 });
             });
-            test("getTheme updates src fields in the theme to be relative to the entry point", function () {
-                QUnit.stop();
+            it("updates src fields in the theme to be relative to the entry point", function () {
                 themeConfig.themes.default.settings = {
                     logo: {
                         src: "foo"
@@ -261,113 +240,91 @@ define("org/forgerock/openam/ui/common/util/ThemeManagerTest", [
                         src: "bar"
                     }
                 };
-                ThemeManager.getTheme().then(function () {
-                    deepEqual(Configuration.globalData.theme.settings, {
+                return ThemeManager.getTheme().then(function () {
+                    expect(Configuration.globalData.theme.settings).to.deep.equal({
                         logo: {
-                            src: "./foo"
+                            src: baseUrl + "foo"
                         },
                         loginLogo: {
-                            src: "./bar"
+                            src: baseUrl + "bar"
                         }
-                    }, "URLs are made relative");
-                    QUnit.start();
+                    });
                 });
             });
-            test("getTheme removes any existing CSS and favicons from the page", function () {
-                QUnit.stop();
-                expect(0);
-                ThemeManager.getTheme().then(function () {
-                    sinon.assert.calledWith(mock$, "link");
+            it("removes any existing CSS and favicons from the page", function () {
+                return ThemeManager.getTheme().then(function () {
+                    expect(mock$).to.be.calledWith("link");
                     sinon.assert.calledOnce(mock$.remove);
-                    QUnit.start();
                 });
             });
-            test("getTheme adds the favicon to the page", function () {
-                QUnit.stop();
-                expect(0);
-                ThemeManager.getTheme().then(function () {
-                    sinon.assert.calledWith(mock$, "<link/>", {
+            it("adds the favicon to the page", function () {
+                return ThemeManager.getTheme().then(function () {
+                    expect(mock$).to.be.calledWith("<link/>", {
                         rel: "icon",
                         type: "image/x-icon",
-                        href: "./icon.png"
+                        href: baseUrl + "icon.png"
                     });
-                    sinon.assert.calledWith(mock$.appendTo, "head");
-                    QUnit.start();
+                    expect(mock$.appendTo).to.be.calledWith("head");
                 });
             });
-            test("getTheme adds the alternate favicon to the page", function () {
-                QUnit.stop();
-                expect(0);
-                ThemeManager.getTheme().then(function () {
-                    sinon.assert.calledWith(mock$, "<link/>", {
+            it("adds the alternate favicon to the page", function () {
+                return ThemeManager.getTheme().then(function () {
+                    expect(mock$).to.be.calledWith("<link/>", {
                         rel: "shortcut icon",
                         type: "image/x-icon",
-                        href: "./icon.png"
+                        href: baseUrl + "icon.png"
                     });
-                    sinon.assert.calledWith(mock$.appendTo, "head");
-                    QUnit.start();
+                    expect(mock$.appendTo).to.be.calledWith("head");
                 });
             });
-            test("getTheme adds any stylesheets to the page", function () {
-                QUnit.stop();
-                expect(0);
-                ThemeManager.getTheme().then(function () {
-                    sinon.assert.calledWith(mock$, "<link/>", {
+            it("adds any stylesheets to the page", function () {
+                return ThemeManager.getTheme().then(function () {
+                    expect(mock$).to.be.calledWith("<link/>", {
                         rel: "stylesheet",
                         type: "text/css",
-                        href: "./a.css"
+                        href: baseUrl + "a.css"
                     });
-                    sinon.assert.calledWith(mock$, "<link/>", {
+                    expect(mock$).to.be.calledWith("<link/>", {
                         rel: "stylesheet",
                         type: "text/css",
-                        href: "./c.css"
+                        href: baseUrl + "c.css"
                     });
-                    sinon.assert.calledWith(mock$.appendTo, "head");
-                    QUnit.start();
+                    expect(mock$.appendTo).to.be.calledWith("head");
                 });
             });
-            test("getTheme doesn't update the page if the theme hasn't changed since the last call", function () {
-                QUnit.stop();
-                expect(0);
-                ThemeManager.getTheme().then(function () {
+            it("doesn't update the page if the theme hasn't changed since the last call", function () {
+                return ThemeManager.getTheme().then(function () {
                     mock$.reset();
                     return ThemeManager.getTheme();
                 }).then(function () {
-                    sinon.assert.notCalled(mock$);
-                    QUnit.start();
+                    expect(mock$).to.not.be.called;
                 });
             });
-            test("getTheme always updates the page if force is true", function () {
-                QUnit.stop();
-                expect(0);
-                ThemeManager.getTheme().then(function () {
+            it("always updates the page if force is true", function () {
+                return ThemeManager.getTheme().then(function () {
                     mock$.reset();
                     return ThemeManager.getTheme(true);
                 }).then(function () {
-                    sinon.assert.called(mock$);
-                    QUnit.start();
+                    expect(mock$).to.be.called;
                 });
             });
-            test("getTheme overrides the theme's stylesheets if the user is an admin", function () {
-                QUnit.stop();
-                expect(0);
+            it("overrides the theme's stylesheets if the user is an admin", function () {
                 Configuration.loggedUser = {
                     uiroles: "ui-admin"
                 };
-                ThemeManager.getTheme().then(function () {
-                    sinon.assert.calledWith(mock$, "<link/>", {
+                return ThemeManager.getTheme().then(function () {
+                    expect(mock$).to.be.calledWith("<link/>", {
                         rel: "stylesheet",
                         type: "text/css",
-                        href: "./" + Constants.DEFAULT_STYLESHEETS[0]
+                        href: baseUrl + Constants.DEFAULT_STYLESHEETS[0]
                     });
-                    sinon.assert.calledWith(mock$, "<link/>", {
+                    expect(mock$).to.be.calledWith("<link/>", {
                         rel: "stylesheet",
                         type: "text/css",
-                        href: "./" + Constants.DEFAULT_STYLESHEETS[1]
+                        href: baseUrl + Constants.DEFAULT_STYLESHEETS[1]
                     });
-                    QUnit.start();
                 });
             });
-        }
-    };
+        });
+    });
 });

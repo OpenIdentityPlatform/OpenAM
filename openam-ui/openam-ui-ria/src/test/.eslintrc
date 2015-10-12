@@ -1,9 +1,16 @@
 {
     "env": {
+        "mocha": true
+    },
+    "globals": {
+        "expect": true
+    },
+    "rules": {
         /**
-         * Remove when "amd" is re-enabled in the root .eslintrc
+         * Chai's expect syntax creates seemingly useless expressions. e.g.
+         *
+         * expect(foo).to.be.null;
          */
-        "amd": true,
-        "qunit": true
+        "no-unused-expressions": 0
     }
 }

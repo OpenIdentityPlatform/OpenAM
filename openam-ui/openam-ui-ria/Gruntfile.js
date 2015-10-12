@@ -17,7 +17,8 @@
 /* global module, require, process */
 
 var _ = require("lodash"),
-    mavenSrcPath = "/src/main/js";
+    mavenSrcPath = "/src/main/js",
+    mavenTestPath = "/src/test/js";
 
 function mavenProjectSource (projectDir) {
     return [
@@ -28,7 +29,7 @@ function mavenProjectSource (projectDir) {
 
 function mavenProjectTestSource (projectDir) {
     return [
-        projectDir + "/src/test/js",
+        projectDir + mavenTestPath,
         projectDir + "/src/test/resources"
     ];
 }
@@ -36,6 +37,7 @@ function mavenProjectTestSource (projectDir) {
 module.exports = function (grunt) {
     var compositionDirectory = "target/composed",
         compiledDirectory = "target/compiled",
+        testClassesDirectory = "target/test-classes",
         forgeRockCommonsDirectory = process.env.FORGEROCK_UI_SRC + "/forgerock-ui-commons",
         forgeRockUiDirectory = process.env.FORGEROCK_UI_SRC + "/forgerock-ui-user",
         targetVersion = grunt.option("target-version") || "dev",
@@ -57,9 +59,7 @@ module.exports = function (grunt) {
             mavenProjectTestSource(".")
         ]),
         testInputDirs = _.flatten([
-            compiledDirectory,
-            mavenProjectTestSource("."),
-            "target/test-classes/libs"
+            mavenProjectTestSource(".")
         ]),
         nonCompiledFiles = [
             "**/*.html",
@@ -74,8 +74,7 @@ module.exports = function (grunt) {
             "**/*.otf",
             "css/bootstrap-3.3.5-custom.css"
         ],
-        serverDeployDirectory = process.env.OPENAM_HOME + "/XUI",
-        testDeployDirectory = process.env.OPENAM_HOME + "/../openam-test";
+        serverDeployDirectory = process.env.OPENAM_HOME + "/XUI";
 
     grunt.initConfig({
         copy: {
@@ -117,11 +116,23 @@ module.exports = function (grunt) {
             lint: {
                 src: [
                     "." + mavenSrcPath + "/**/*.js",
-                    "!." + mavenSrcPath + "/libs/**/*.js"
+                    "!." + mavenSrcPath + "/libs/**/*.js",
+                    "." + mavenTestPath + "/**/*.js"
                 ],
                 options: {
                     format: require.resolve("eslint-formatter-warning-summary")
                 }
+            }
+        },
+        karma: {
+            options: {
+                configFile: "karma.conf.js"
+            },
+            build: {
+                singleRun: true,
+                reporters: "progress"
+            },
+            dev: {
             }
         },
         less: {
@@ -147,12 +158,6 @@ module.exports = function (grunt) {
                     relativeUrls: true
                 }
             }
-        },
-        /**
-         * Run qunit tests.
-         */
-        qunit: {
-            test: testDeployDirectory + "/qunit.html"
         },
         replace: {
             /**
@@ -225,6 +230,20 @@ module.exports = function (grunt) {
                 compareUsing: "md5"
             },
             /**
+             * Copy the test source files into the test-classes target directory.
+             */
+            test: {
+                files: testInputDirs.map(function (inputDirectory) {
+                    return {
+                        cwd: inputDirectory,
+                        src: ["**"],
+                        dest: testClassesDirectory
+                    };
+                }),
+                verbose: true,
+                compareUsing: "md5" // Avoids spurious syncs of touched, but otherwise unchanged, files (e.g. CSS)
+            },
+            /**
              * Copy the compiled files to the server deploy directory.
              */
             server: {
@@ -235,21 +254,6 @@ module.exports = function (grunt) {
                 }],
                 verbose: true,
                 compareUsing: "md5" // Avoids spurious syncs of touched, but otherwise unchanged, files (e.g. CSS)
-            },
-            /**
-             * Copy the compiled files, along with the test source files and dependencies, to the server deploy
-             * directory.
-             */
-            testServer: {
-                files: testInputDirs.map(function (inputDirectory) {
-                    return {
-                        cwd: inputDirectory,
-                        src: ["**"],
-                        dest: testDeployDirectory
-                    };
-                }),
-                verbose: true,
-                compareUsing: "md5" // Avoids spurious syncs of touched, but otherwise unchanged, files (e.g. CSS)
             }
         },
         watch: {
@@ -257,52 +261,22 @@ module.exports = function (grunt) {
              * Redeploy whenever any source files change.
              */
             source: {
-                files: watchCompositionDirs.map(function (dir) {
-                    return dir + "/**";
-                }),
-                tasks: ["deploy"]
-            },
-            /**
-             * Deploy and run the tests whenever any source files change.
-             */
-            test: {
                 files: watchCompositionDirs.concat(testWatchDirs).map(function (dir) {
                     return dir + "/**";
                 }),
-                tasks: ["test"]
-            }
-        },
-        /**
-         * Generates OS notifications when the watch passes or fails.
-         */
-        notify_hooks: {
-            options: {
-                enabled: true,
-                title: "OpenAM XUI Tests"
+                tasks: ["deploy"]
             }
         }
     });
 
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-less");
-    grunt.loadNpmTasks("grunt-contrib-qunit");
     grunt.loadNpmTasks("grunt-contrib-requirejs");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-eslint");
-    grunt.loadNpmTasks("grunt-notify");
+    grunt.loadNpmTasks("grunt-karma");
     grunt.loadNpmTasks("grunt-sync");
     grunt.loadNpmTasks("grunt-text-replace");
-
-    /**
-     * Resync the compiled directory and deploy and run the tests.
-     */
-    grunt.registerTask("test", [
-        "sync:compose",
-        "replace",
-        "sync:compiled",
-        "sync:testServer",
-        "qunit"
-    ]);
 
     /**
      * Resync the compiled directory and deploy to the web server.
@@ -312,6 +286,7 @@ module.exports = function (grunt) {
         "less",
         "replace",
         "sync:compiled",
+        "sync:test",
         "sync:server"
     ]);
 
@@ -324,7 +299,8 @@ module.exports = function (grunt) {
         "requirejs",
         "less",
         "replace",
-        "copy:compiled"
+        "copy:compiled",
+        "karma:build"
     ]);
 
     grunt.registerTask("dev", ["copy:compose", "deploy", "watch"]);
