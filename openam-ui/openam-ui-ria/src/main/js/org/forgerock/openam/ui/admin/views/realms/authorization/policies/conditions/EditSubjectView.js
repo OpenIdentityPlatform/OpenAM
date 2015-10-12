@@ -130,7 +130,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 itemData = {},
                 hiddenData,
                 selectedType = e.target.value,
-                schema = _.find(this.data.subjects, {title: selectedType}) || {},
+                schema = _.find(this.data.subjects, { title: selectedType }) || {},
                 delay = self.$el.find(".field-float-pattern").length > 0 ? 500 : 0;
 
             if (this.$el.data().itemData && this.$el.data().itemData.type === selectedType) {
@@ -139,7 +139,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             } else {
                 itemData = self.setDefaultJsonValues(schema);
                 self.$el.data("itemData", itemData);
-                hiddenData = itemData.type === self.IDENTITY_RESOURCE ? {"users": {}, "groups": {}} : {};
+                hiddenData = itemData.type === self.IDENTITY_RESOURCE ? { "users": {}, "groups": {} } : {};
                 self.$el.data("hiddenData", hiddenData);
             }
 
@@ -217,7 +217,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         },
 
         setDefaultJsonValues: function (schema) {
-            var itemData = {type: schema.title};
+            var itemData = { type: schema.title };
             _.map(schema.config.properties, function (value, key) {
 
                 switch (value.type) {
@@ -257,7 +257,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         },
 
         getUIDsFromUniversalValues: function (values) {
-            var returnObj = { users: {}, groups: {}},
+            var returnObj = { users: {}, groups: {} },
                 endIndex = -1,
                 startIndex = String("id=").length;
 

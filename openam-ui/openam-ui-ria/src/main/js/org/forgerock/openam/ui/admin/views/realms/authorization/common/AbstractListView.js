@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
             var self = this,
                 item = self.data.items.get(id),
                 onSuccess = function (model, response, options) {
-                    self.data.items.fetch({reset: true});
+                    self.data.items.fetch({ reset: true });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
                     if (callback) {
@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
                     }
                 },
                 onError = function (model, response, options) {
-                    self.data.items.fetch({reset: true});
+                    self.data.items.fetch({ reset: true });
                     Messages.messages.addMessage({
                         message: response.responseJSON.message,
                         type: Messages.TYPE_DANGER

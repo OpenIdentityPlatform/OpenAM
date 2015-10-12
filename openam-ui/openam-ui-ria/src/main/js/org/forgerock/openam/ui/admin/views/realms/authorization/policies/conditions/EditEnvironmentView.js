@@ -147,7 +147,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 itemData = {},
                 hiddenData = {},
                 selectedType = e.target.value,
-                schema = _.find(this.data.conditions, {title: selectedType}) || {},
+                schema = _.find(this.data.conditions, { title: selectedType }) || {},
                 delay = self.$el.find(".field-float-pattern").length > 0 ? 500 : 0,
                 helperText;
 
@@ -231,9 +231,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             if (itemData.type === "SimpleTime") {
                 attributesWrapper = '<div class="clearfix clear-left" id="conditionAttrTimeDate"></div>';
-                new TimeAttr().render({itemData: itemData}, itemDataEl);
-                new DayAttr().render({itemData: itemData}, itemDataEl);
-                new DateAttr().render({itemData: itemData}, itemDataEl);
+                new TimeAttr().render({ itemData: itemData }, itemDataEl);
+                new DayAttr().render({ itemData: itemData }, itemDataEl);
+                new DateAttr().render({ itemData: itemData }, itemDataEl);
 
                 if (!itemData.enforcementTimeZone) {
                     itemData.enforcementTimeZone = "GMT";
@@ -316,7 +316,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         },
 
         setDefaultJsonValues: function (schema) {
-            var itemData = {type: schema.title};
+            var itemData = { type: schema.title };
             _.map(schema.config.properties, function (value, key) {
                 switch (value.type) {
                     case "string":

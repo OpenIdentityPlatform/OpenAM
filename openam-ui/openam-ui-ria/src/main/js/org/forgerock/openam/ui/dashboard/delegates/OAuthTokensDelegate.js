@@ -27,7 +27,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/OAuthTokensDelegate", [
     obj.getOAuthTokens = function () {
         return obj.serviceCall({
             url: "oauth2/token/?_queryId=access_token",
-            headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"}
+            headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/OAuthTokensDelegate", [
         return obj.serviceCall({
             url: "oauth2/token/" + id + "?_action=revoke",
             type: "POST",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 

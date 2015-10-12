@@ -88,7 +88,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     }
                 };
 
-                _.extend(options, {plugins: ["restore_on_backspace"]});
+                _.extend(options, { plugins: ["restore_on_backspace"] });
                 $item.selectize(options);
             });
         }

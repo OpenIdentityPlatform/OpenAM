@@ -65,7 +65,7 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
 
             if (params.token) {
                 this.submitDelegate(params, function () {
-                    Router.routeTo(continueRoute, {args: [realmPath], trigger: true});
+                    Router.routeTo(continueRoute, { args: [realmPath], trigger: true });
                 });
                 return;
             }

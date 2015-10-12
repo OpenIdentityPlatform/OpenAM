@@ -134,7 +134,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             if (!this.localEntity || _.contains(operators, this.localEntity.type) === false) {
                 properties = _.clone(this.localEntity);
-                this.localEntity = {type: "AND"};
+                this.localEntity = { type: "AND" };
                 this.localEntity[this.properties] = [properties];
             }
 
@@ -166,7 +166,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     self.setInactive(self.buttons.addOperator, false);
 
                     item.focus();
-                    item.css({width: item.width()}).addClass("dragged");
+                    item.css({ width: item.width() }).addClass("dragged");
                     $("body").addClass("dragging");
 
                     if (!container.options.drop && item.hasClass("rule")) {
@@ -195,7 +195,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     animeAttrs = clonedItem.position();
                     animeAttrs.width = clonedItem.outerWidth() - 10;
                     item.addClass("dropped");
-                    clonedItem.animate({"height": newHeight }, 300, "linear");
+                    clonedItem.animate({ "height": newHeight }, 300, "linear");
                     item.animate(animeAttrs, 300, function () {
 
                         clonedItem.detach();

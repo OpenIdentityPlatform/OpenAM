@@ -79,7 +79,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 delete item.config.type;
             });
 
-            if (!_.find(this.data.operators, {title: "AND"})) {
+            if (!_.find(this.data.operators, { title: "AND" })) {
                 this.data.operators.push(this.typeAND);
             }
 

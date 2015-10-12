@@ -56,12 +56,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
         },
 
         tabs: [
-            {name: "resources", attr: ["resourceTypeUuid", "resources"]},
-            {name: "actions", attr: ["actionValues"]},
-            {name: "subjects", attr: ["subject"]},
-            {name: "environments", attr: ["condition"]},
-            {name: "responseAttributes", action: "getAllResponseAttributes"},
-            {name: "settings", attr: ["name", "description"]}
+            { name: "resources", attr: ["resourceTypeUuid", "resources"] },
+            { name: "actions", attr: ["actionValues"] },
+            { name: "subjects", attr: ["subject"] },
+            { name: "environments", attr: ["condition"] },
+            { name: "responseAttributes", action: "getAllResponseAttributes" },
+            { name: "settings", attr: ["name", "description"] }
         ],
 
         render: function (args, callback) {
@@ -75,7 +75,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             this.data.policySetName = args[1];
 
             // This piece of information is necessary both when creating new and editing existing policy
-            this.policySetModelPromise = new PolicySetModel({name: this.data.policySetName}).fetch();
+            this.policySetModelPromise = new PolicySetModel({ name: this.data.policySetName }).fetch();
             this.resourceTypesPromise = PoliciesDelegate.listResourceTypes();
 
             if (policyName) {
@@ -84,7 +84,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 this.allUserAttributesPromise = PoliciesDelegate.getAllUserAttributes();
 
                 this.template = "templates/admin/views/realms/authorization/policies/EditPolicyTemplate.html";
-                this.model = new PolicyModel({name: policyName});
+                this.model = new PolicyModel({ name: policyName });
                 this.listenTo(this.model, "sync", this.renderPolicy);
                 this.model.fetch();
             } else {
@@ -133,8 +133,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                             return _.contains(policySet.resourceTypeUuids, item.uuid);
                         });
 
-                        self.staticAttributes = _.where(self.model.attributes.resourceAttributes, {type: "Static"});
-                        self.userAttributes = _.where(self.model.attributes.resourceAttributes, {type: "User"});
+                        self.staticAttributes = _.where(self.model.attributes.resourceAttributes, { type: "Static" });
+                        self.userAttributes = _.where(self.model.attributes.resourceAttributes, { type: "User" });
                         self.allUserAttributes = _.sortBy(allUserAttributes[0].result);
 
                         self.data.options.availableEnvironments =
@@ -198,7 +198,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             var availableActions = [];
             if (resourceType) {
                 _.each(resourceType.actions, function (val, key) {
-                    availableActions.push({action: key, value: val});
+                    availableActions.push({ action: key, value: val });
                 });
             }
             return availableActions;
@@ -207,7 +207,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
         changeResourceType: function (value) {
             this.data.entity.resourceTypeUuid = value;
 
-            var resourceType = _.find(this.data.options.availableResourceTypes, {uuid: value});
+            var resourceType = _.find(this.data.options.availableResourceTypes, { uuid: value });
 
             this.data.options.availableActions = this.getAvailableActionsForResourceType(resourceType);
             this.data.options.availablePatterns = resourceType ? resourceType.patterns : [];

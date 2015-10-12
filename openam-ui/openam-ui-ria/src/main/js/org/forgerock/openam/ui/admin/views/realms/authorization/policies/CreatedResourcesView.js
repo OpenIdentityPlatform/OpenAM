@@ -68,7 +68,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
                                 var resources = self.$el.find("#populateResource");
                                 resources.html(content);
 
-                                resources.find("input").autosizeInput({space: 19});
+                                resources.find("input").autosizeInput({ space: 19 });
                                 resources.find("input:eq(0)").focus().select();
                             });
                     }

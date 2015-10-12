@@ -128,7 +128,7 @@ define("config/process/AMConfig", [
             "org/forgerock/commons/ui/common/main/Router"
         ],
         processDescription: function (event, Router) {
-            Router.routeTo(Router.configuration.routes.profile, {trigger: true});
+            Router.routeTo(Router.configuration.routes.profile, { trigger: true });
         }
     }, {
         startEvent: Constants.EVENT_AUTHENTICATED,

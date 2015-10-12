@@ -94,7 +94,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                         cache: true
                                     }).done(function (data) {
                                         _.each(data.timezones, function (value) {
-                                            selectize.addOption({value: value, text: value});
+                                            selectize.addOption({ value: value, text: value });
                                         });
                                     });
                                 },
@@ -140,7 +140,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                 title = this.$input.parent().find("label").data().title;
                                 itemData = view.data.itemData;
                                 itemData[title] = value ? value : [];
-                            }});
+                            }
+                        });
                         if ($item.prev("label").data("title") === "dnsName") {
                             options.createFilter = function (text) {
                                 return text.indexOf("*") === -1 || text.lastIndexOf("*") === 0;
@@ -148,7 +149,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                         }
                     }
 
-                    _.extend(options, {plugins: ["restore_on_backspace"]});
+                    _.extend(options, { plugins: ["restore_on_backspace"] });
                     $item.selectize(options);
                 });
 
@@ -163,7 +164,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             PoliciesDelegate.queryIdentities($(item).data().source, query)
                 .done(function (data) {
                     _.each(data.result, function (value) {
-                        selectize.addOption({value: value, text: value});
+                        selectize.addOption({ value: value, text: value });
                     });
                     callback(data.result);
                 }).error(function (e) {
@@ -185,7 +186,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             PoliciesDelegate.getDataByType($(item).data().source)
                 .done(function (data) {
                     _.each(data.result, function (value) {
-                        selectize.addOption({value: value._id, text: value.name});
+                        selectize.addOption({ value: value._id, text: value.name });
                     });
                     callback(data.result);
                 }).error(function (e) {

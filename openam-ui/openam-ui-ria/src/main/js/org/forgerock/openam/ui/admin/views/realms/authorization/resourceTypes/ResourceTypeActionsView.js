@@ -83,7 +83,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
 
             var editing = this.$el.find(".editing"),
                 actionName = editing.find(".form-control").val(),
-                pending = {"name": actionName, "value": true},
+                pending = { "name": actionName, "value": true },
                 duplicateIndex = -1,
                 counter = 0,
                 self = this;
@@ -120,7 +120,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             var $target = $(e.target),
                 actionName = $target.closest("tr").find(".action-name").text().trim();
 
-            this.data.actions = _.without(this.data.actions, _.find(this.data.actions, {name: actionName}));
+            this.data.actions = _.without(this.data.actions, _.find(this.data.actions, { name: actionName }));
             this.updateEntity();
             this.renderActionsTable();
         },

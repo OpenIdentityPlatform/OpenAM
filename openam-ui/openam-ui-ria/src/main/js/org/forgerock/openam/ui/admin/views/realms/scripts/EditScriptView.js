@@ -245,7 +245,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             if (syncRequired && uuid) {
                 // edit existing script
                 this.stopListening(this.model);
-                this.model = new Script({_id: uuid});
+                this.model = new Script({ _id: uuid });
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else if (!uuid) {
@@ -380,7 +380,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 this.data.entity.language = "";
                 promise.resolve();
             } else {
-                defaultScript = new Script({_id: selectedContext.defaultScript});
+                defaultScript = new Script({ _id: selectedContext.defaultScript });
                 this.listenTo(defaultScript, "sync", function (model, response) {
                     self.data.entity.script = model.attributes.script;
                     self.data.entity.language = model.attributes.language;

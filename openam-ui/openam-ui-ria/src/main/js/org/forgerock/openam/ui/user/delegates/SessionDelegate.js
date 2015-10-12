@@ -34,20 +34,20 @@ define("org/forgerock/openam/ui/user/delegates/SessionDelegate", [
     obj.isSessionValid = function (tokenCookie) {
         return obj.serviceCall({
             type: "POST",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
             data: {},
             url: "/" + tokenCookie + "?_action=validate",
-            errorsHandlers: {"Bad Request": {status: 400}}
+            errorsHandlers: { "Bad Request": { status: 400 } }
         });
     };
 
     obj.logout = function (tokenCookie) {
         return obj.serviceCall({
             type: "POST",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
             data: "{}",
             url: "/" + tokenCookie + "?_action=logout",
-            errorsHandlers: {"Bad Request": {status: 400}}
+            errorsHandlers: { "Bad Request": { status: 400 } }
         });
     };
 

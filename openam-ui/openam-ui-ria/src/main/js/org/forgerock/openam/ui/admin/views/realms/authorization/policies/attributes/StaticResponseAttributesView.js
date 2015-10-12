@@ -75,7 +75,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
             key = data.attrKey.toString(),
             val = data.attrVal.toString();
 
-        return _.without(this.data.items, _.find(this.data.items, {propertyName: key, propertyValues: val}));
+        return _.without(this.data.items, _.find(this.data.items, { propertyName: key, propertyValues: val }));
     };
 
     StaticResponseAttributesView.prototype.splitAttrs = function (attrs) {
@@ -110,7 +110,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
             self = this;
 
         _.each(groupedByName, function (value, key) {
-            attribute = {type: self.attrType};
+            attribute = { type: self.attrType };
             attribute.propertyName = key;
             attribute.propertyValues = [];
             for (i = 0, length = value.length; i < length; i++) {

@@ -69,7 +69,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
 
             if (policySetName) {
                 this.template = "templates/admin/views/realms/authorization/policySets/EditPolicySetTemplate.html";
-                this.model = new PolicySetModel({name: policySetName});
+                this.model = new PolicySetModel({ name: policySetName });
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
@@ -141,12 +141,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                         self.data.entity.applicationType = self.APPLICATION_TYPE;
                         self.processConditions(self.data, envConditions[0].result, subjConditions[0].result);
                         self.data.entity.entitlementCombiner = decisionCombiners[0].result[0].title;
-                        _.extend(self.data, {options: populateAvailableResourceTypes(resourceTypes[0].result)});
+                        _.extend(self.data, { options: populateAvailableResourceTypes(resourceTypes[0].result) });
                         parentRenderCallback();
                     });
             } else {
                 this.resourceTypesPromise.done(function (resourceTypes) {
-                    _.extend(self.data, {options: populateAvailableResourceTypes(resourceTypes.result)});
+                    _.extend(self.data, { options: populateAvailableResourceTypes(resourceTypes.result) });
                     parentRenderCallback();
                 });
             }

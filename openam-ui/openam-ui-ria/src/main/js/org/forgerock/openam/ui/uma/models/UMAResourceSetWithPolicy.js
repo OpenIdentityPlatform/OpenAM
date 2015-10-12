@@ -57,7 +57,7 @@ define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
             response.policy.policyId = response._id;
 
             response.scopes = _.map(response.scopes, function (scope) {
-                return {id: scope};
+                return { id: scope };
             });
 
             return response;

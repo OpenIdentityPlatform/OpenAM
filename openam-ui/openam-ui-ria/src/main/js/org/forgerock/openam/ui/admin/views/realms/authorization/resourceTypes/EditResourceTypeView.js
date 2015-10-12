@@ -39,9 +39,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             "click #delete": "deleteResourceType"
         },
         tabs: [
-            {name: "patterns", attr: ["patterns"]},
-            {name: "actions", attr: ["actions"]},
-            {name: "settings", attr: ["name", "description"]}
+            { name: "patterns", attr: ["patterns"] },
+            { name: "actions", attr: ["actions"] },
+            { name: "settings", attr: ["name", "description"] }
         ],
 
         onModelSync: function (model, response) {
@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             if (uuid) {
                 this.template =
                     "templates/admin/views/realms/authorization/resourceTypes/EditResourceTypeTemplate.html";
-                this.model = new ResourceTypeModel({uuid: uuid});
+                this.model = new ResourceTypeModel({ uuid: uuid });
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
@@ -83,7 +83,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
 
             data.actions = [];
             _.each(this.data.entity.actions, function (v, k) {
-                data.actions.push({name: k, value: v});
+                data.actions.push({ name: k, value: v });
             });
             data.actions.sort();
 
@@ -204,7 +204,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
                 onError = function (model, response, options) {
-                    Messages.messages.addMessage({message: response.responseJSON.message, type: "error"});
+                    Messages.messages.addMessage({ message: response.responseJSON.message, type: "error" });
                 };
 
             this.model.destroy({
