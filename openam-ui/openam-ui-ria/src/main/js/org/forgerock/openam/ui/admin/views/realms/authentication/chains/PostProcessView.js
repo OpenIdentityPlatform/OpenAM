@@ -73,7 +73,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
             } else {
                 BootstrapDialog.show({
                     title: $.t("console.authentication.editChains.processingClass.addClassNameDialog.title"),
-                    message: $.t("console.authentication.editChains.processingClass.addClassNameDialog.message", { newClassName: newProcessClass }),
+                    message: $.t("console.authentication.editChains.processingClass.addClassNameDialog.message",
+                        { newClassName: newProcessClass }),
                     closable: false,
                     buttons: [
                         {

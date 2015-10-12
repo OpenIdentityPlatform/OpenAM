@@ -88,7 +88,8 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
             UMADelegate.labels.get(labelId).then(function (result) {
                 self.data.label = result;
                 if (result) {
-                    self.renderGrid(self.createLabelCollection(labelId), self.createColumns("mylabels/" + labelId), callback);
+                    self.renderGrid(self.createLabelCollection(labelId), self.createColumns("mylabels/" + labelId),
+                        callback);
                 } else {
                     self.parentRender(callback);
                 }

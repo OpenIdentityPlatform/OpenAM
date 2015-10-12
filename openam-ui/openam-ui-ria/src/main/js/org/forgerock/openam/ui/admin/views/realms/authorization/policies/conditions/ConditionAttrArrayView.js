@@ -120,7 +120,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                         return obj === item;
                                     });
 
-                                    view.data.itemData.subjectValues = _.without(view.data.itemData.subjectValues, universalid);
+                                    view.data.itemData.subjectValues = _.without(view.data.itemData.subjectValues,
+                                        universalid);
                                     delete view.data.hiddenData[type][universalid];
                                 }
                             });

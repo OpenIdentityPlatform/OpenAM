@@ -82,7 +82,8 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
     /**
      * See AbstractDelegate.patchEntityDifferences
      */
-    obj.patchTokenDifferences = function (oldTokenData, newTokenData, successCallback, errorCallback, noChangesCallback) {
+    obj.patchTokenDifferences = function (oldTokenData, newTokenData, successCallback, errorCallback,
+                                          noChangesCallback) {
         obj.patchEntityDifferences({
             id: oldTokenData._id,
             rev: oldTokenData._rev
@@ -92,7 +93,8 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
     /**
      * See AbstractDelegate.patchEntity
      */
-    obj.patchSelectedTokenAttributes = function (id, rev, patchDefinitionObject, successCallback, errorCallback, noChangesCallback) {
+    obj.patchSelectedTokenAttributes = function (id, rev, patchDefinitionObject, successCallback, errorCallback,
+                                                 noChangesCallback) {
         obj.patchEntity({
             id: id,
             rev: rev

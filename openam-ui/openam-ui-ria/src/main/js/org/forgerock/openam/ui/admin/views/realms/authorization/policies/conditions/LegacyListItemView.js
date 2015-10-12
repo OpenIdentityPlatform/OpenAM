@@ -32,7 +32,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             var self = this;
 
-            UIUtils.fillTemplateWithData("templates/admin/views/realms/authorization/policies/conditions/LegacyListItem.html",
+            UIUtils.fillTemplateWithData(
+                "templates/admin/views/realms/authorization/policies/conditions/LegacyListItem.html",
                 this.data,
                 function (tpl) {
                     self.setElement("#legacy_" + itemID);

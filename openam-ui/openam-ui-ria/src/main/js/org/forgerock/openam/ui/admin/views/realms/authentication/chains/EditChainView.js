@@ -169,12 +169,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                         };
 
                         if (self.data.form.chainData.adminAuthModule && self.data.form.chainData.orgConfig) {
-                            popoverOpt.content = $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminOrgAuthChain");
+                            popoverOpt.content =
+                                $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminOrgAuthChain");
                         } else {
                             if (self.data.form.chainData.adminAuthModule) {
-                                popoverOpt.content = $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminAuthChain");
+                                popoverOpt.content =
+                                    $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminAuthChain");
                             } else {
-                                popoverOpt.content = $.t("console.authentication.editChains.deleteBtnTooltip.defaultOrgAuthChain");
+                                popoverOpt.content =
+                                    $.t("console.authentication.editChains.deleteBtnTooltip.defaultOrgAuthChain");
                             }
                         }
 
@@ -215,7 +218,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             chainData.loginFailureUrl[0] = this.$el.find("#loginFailureUrl").val();
 
             PostProcessView.addClassNameDialog().then(function () {
-                var promise = SMSRealmDelegate.authentication.chains.update(self.data.realmPath, chainData._id, chainData);
+                var promise = SMSRealmDelegate.authentication.chains.update(self.data.realmPath, chainData._id,
+                    chainData);
                 promise.fail(function (error) {
                     Messages.addMessage({
                         type: Messages.TYPE_DANGER,

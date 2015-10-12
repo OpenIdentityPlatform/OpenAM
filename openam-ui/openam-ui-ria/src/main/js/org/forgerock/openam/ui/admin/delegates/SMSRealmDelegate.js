@@ -157,7 +157,8 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
             exists: function (realm, name) {
                 var promise = $.Deferred(),
                     request = obj.serviceCall({
-                        url: scopedByRealm(realm, 'authentication/modules?_queryFilter=_id eq "' + name + '"&_fields=_id')
+                        url: scopedByRealm(realm, 'authentication/modules?_queryFilter=_id eq "' + name +
+                            '"&_fields=_id')
                     });
 
                 request.done(function (data) {

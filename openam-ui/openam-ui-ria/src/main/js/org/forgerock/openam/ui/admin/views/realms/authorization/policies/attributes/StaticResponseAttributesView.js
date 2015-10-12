@@ -38,7 +38,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
         this.events["change input"] = this.checkedRequired.bind(this);
         this.events["keyup input"] = this.checkedRequired.bind(this);
 
-        this.baseRender(this.data, "templates/admin/views/realms/authorization/policies/attributes/StaticAttributesTemplate.html", el, callback);
+        this.baseRender(this.data,
+            "templates/admin/views/realms/authorization/policies/attributes/StaticAttributesTemplate.html",
+            el, callback);
     };
 
     StaticResponseAttributesView.prototype.getPendingItem = function (e) {
@@ -64,7 +66,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
     };
 
     StaticResponseAttributesView.prototype.isExistingItem = function (itemPending, itemFromCollection) {
-        return itemFromCollection.propertyName === itemPending.propertyName && itemFromCollection.propertyValues === itemPending.propertyValues;
+        return itemFromCollection.propertyName === itemPending.propertyName &&
+            itemFromCollection.propertyValues === itemPending.propertyValues;
     };
 
     StaticResponseAttributesView.prototype.getCollectionWithout = function (e) {

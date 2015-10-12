@@ -62,7 +62,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             }
 
             if (uuid) {
-                this.template = "templates/admin/views/realms/authorization/resourceTypes/EditResourceTypeTemplate.html";
+                this.template =
+                    "templates/admin/views/realms/authorization/resourceTypes/EditResourceTypeTemplate.html";
                 this.model = new ResourceTypeModel({uuid: uuid});
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();

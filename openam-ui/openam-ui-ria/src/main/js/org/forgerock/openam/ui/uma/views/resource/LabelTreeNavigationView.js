@@ -26,7 +26,8 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
         template: "templates/uma/views/resource/LabelTreeNavigationTemplate.html",
         partials: [ "templates/uma/views/resource/_NestedList.html" ],
         findActiveNavItem: function (fragment) {
-            var isCurrentRouteForResource = Router.currentRoute === Router.configuration.routes.umaResourcesMyLabelsResource,
+            var myLabelsRoute = Router.configuration.routes.umaResourcesMyLabelsResource,
+                isCurrentRouteForResource = Router.currentRoute === myLabelsRoute,
                 subFragment = (isCurrentRouteForResource) ? _.initial(fragment.split("/")).join("/") : fragment,
                 anchor = this.$el.find(".sidenav ol > li > a[href='#" + subFragment + "']"),
                 parentOls;

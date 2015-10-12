@@ -121,7 +121,8 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             BootstrapDialog.show({
                 title: $.t("console.realms.warningDialog.title", { realmName: realm.name }),
                 type: BootstrapDialog.TYPE_DANGER,
-                message: realm.active ? $.t("console.realms.warningDialog.activeMessage") : $.t("console.realms.warningDialog.inactiveMessage"),
+                message: realm.active ? $.t("console.realms.warningDialog.activeMessage") :
+                    $.t("console.realms.warningDialog.inactiveMessage"),
                 buttons: buttons
             });
 

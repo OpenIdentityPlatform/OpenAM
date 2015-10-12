@@ -51,7 +51,9 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
 
     obj.unshareAllResources = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.get("username")) + "/oauth2/resource/sets?_action=revokeAll"),
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                encodeURIComponent(Configuration.loggedUser.get("username")) +
+                "/oauth2/resource/sets?_action=revokeAll"),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         });
@@ -59,7 +61,9 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
 
     obj.approveRequest = function (id, permissions) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.get("username")) + "/uma/pendingrequests/" + id + "?_action=approve"),
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                encodeURIComponent(Configuration.loggedUser.get("username")) + "/uma/pendingrequests/" + id +
+                "?_action=approve"),
             type: "POST",
             data: JSON.stringify({
                 scopes: permissions
@@ -69,7 +73,9 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
 
     obj.denyRequest = function (id) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.get("username")) + "/uma/pendingrequests/" + id + "?_action=deny"),
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                encodeURIComponent(Configuration.loggedUser.get("username")) + "/uma/pendingrequests/" + id +
+                "?_action=deny"),
             type: "POST"
         });
     };
@@ -78,12 +84,16 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
     obj.labels = {
         all: function () {
             return obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.get("username")) + "/oauth2/resources/labels?_queryFilter=true")
+                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                    encodeURIComponent(Configuration.loggedUser.get("username")) +
+                    "/oauth2/resources/labels?_queryFilter=true")
             });
         },
         create: function (name, type) {
             return obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.get("username")) + "/oauth2/resources/labels?_action=create"),
+                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                    encodeURIComponent(Configuration.loggedUser.get("username")) +
+                    "/oauth2/resources/labels?_action=create"),
                 type: "POST",
                 data: JSON.stringify({
                     name: name,
@@ -102,7 +112,9 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
         },
         getByName: function (name) {
             return obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.get("username")) + "/oauth2/resources/labels?_queryFilter=true")
+                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                    encodeURIComponent(Configuration.loggedUser.get("username")) +
+                    "/oauth2/resources/labels?_queryFilter=true")
             }).then(function (data) {
                 data = !_.any(data.result, function (label) { return label.name.toLowerCase() === name; });
             });

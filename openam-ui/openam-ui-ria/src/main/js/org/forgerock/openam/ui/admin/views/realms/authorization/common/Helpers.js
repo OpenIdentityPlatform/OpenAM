@@ -22,8 +22,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Helpers"
 
     Handlebars.registerHelper("policyEditorResourceHelper", function () {
         var result = this.options.newPattern.replace("-*-", "̂");
-        result = result.replace(/\*/g, '<input class="form-control" required type="text" value="*" placeholder="*" />');
-        result = result.replace("̂", '<input class="form-control" required type="text" value="-*-" placeholder="-*-" pattern="[^\/]+" />');
+        result = result.replace(/\*/g,
+            '<input class="form-control" required type="text" value="*" placeholder="*" />');
+        result = result.replace("̂",
+            '<input class="form-control" required type="text" value="-*-" placeholder="-*-" pattern="[^\/]+" />');
 
         return new Handlebars.SafeString(result);
     });

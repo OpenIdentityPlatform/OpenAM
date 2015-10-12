@@ -164,9 +164,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                             CreatedResourcesView.render(self.data, resolve());
 
                             self.staticAttrsView = new StaticResponseAttributesView();
-                            self.staticAttrsView.render(self.data.entity, self.staticAttributes, "#staticAttrs", resolve());
+                            self.staticAttrsView.render(self.data.entity, self.staticAttributes, "#staticAttrs",
+                                resolve());
 
-                            SubjectResponseAttributesView.render([self.userAttributes, self.allUserAttributes], resolve());
+                            SubjectResponseAttributesView.render([self.userAttributes, self.allUserAttributes],
+                                resolve());
 
                             $.when.apply($, promises).done(function () {
                                 if (self.renderCallback) {

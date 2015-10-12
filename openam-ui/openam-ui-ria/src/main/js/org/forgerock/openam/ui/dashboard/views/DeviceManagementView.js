@@ -54,43 +54,45 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                 uuid = $(event.currentTarget).closest("div[data-device-uuid]").attr("data-device-uuid"),
                 device = _.find(this.data.devices, {uuid: uuid});
 
-            UIUtils.fillTemplateWithData("templates/openam/dashboard/EditDeviceDialogTemplate.html", device, function (html) {
-                BootstrapDialog.show({
-                    title: device.deviceName,
-                    message: $(html),
-                    cssClass: "device-details",
-                    closable: false,
-                    buttons: [{
-                        label: $.t("common.form.save"),
-                        action: function (dialog) {
-                            statusDevice = dialog.$modalBody.find("[name=\"deviceSkip\"]").is(":checked");
-                            DeviceManagementDelegate.setDeviceSkippable(statusDevice).done(function (data) {
-                                self.render();
+            UIUtils.fillTemplateWithData("templates/openam/dashboard/EditDeviceDialogTemplate.html", device,
+                function (html) {
+                    BootstrapDialog.show({
+                        title: device.deviceName,
+                        message: $(html),
+                        cssClass: "device-details",
+                        closable: false,
+                        buttons: [{
+                            label: $.t("common.form.save"),
+                            action: function (dialog) {
+                                statusDevice = dialog.$modalBody.find("[name=\"deviceSkip\"]").is(":checked");
+                                DeviceManagementDelegate.setDeviceSkippable(statusDevice).done(function (data) {
+                                    self.render();
+                                    dialog.close();
+                                });
+                            }
+                        }, {
+                            label: $.t("common.form.close"),
+                            cssClass: "btn-primary",
+                            action: function (dialog) {
                                 dialog.close();
+                            }
+                        }],
+                        onshown: function (dialog) {
+                            dialog.$modalBody.find(".recovery-codes-download").click(function () {
+                                location.href = "data:text/plain," +
+                                    encodeURIComponent(device.recoveryCodes.join("\r\n"));
+                            });
+
+                            dialog.$modalBody.find("[data-toggle=\"popover\"]").popover({
+                                content: $.t("openam.deviceManagement.deviceDetailsDialog.help"),
+                                placement: "bottom",
+                                title: $.t("openam.deviceManagement.deviceDetailsDialog.skip"),
+                                trigger: "focus"
                             });
                         }
-                    }, {
-                        label: $.t("common.form.close"),
-                        cssClass: "btn-primary",
-                        action: function (dialog) {
-                            dialog.close();
-                        }
-                    }],
-                    onshown: function (dialog) {
-                        dialog.$modalBody.find(".recovery-codes-download").click(function () {
-                            location.href = "data:text/plain," + encodeURIComponent(device.recoveryCodes.join("\r\n"));
-                        });
+                    });
 
-                        dialog.$modalBody.find("[data-toggle=\"popover\"]").popover({
-                            content: $.t("openam.deviceManagement.deviceDetailsDialog.help"),
-                            placement: "bottom",
-                            title: $.t("openam.deviceManagement.deviceDetailsDialog.skip"),
-                            trigger: "focus"
-                        });
-                    }
                 });
-
-            });
         },
 
         render: function (callback) {

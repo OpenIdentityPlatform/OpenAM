@@ -415,7 +415,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
         showUploadButton: function () {
             // Show the Upload button for modern browsers only. Documented feature.
-            // File: Chrome 13; Firefox (Gecko) 3.0 (1.9) (non standard), 7 (7) (standard); Internet Explorer 10.0; Opera 11.5; Safari (WebKit) 6.0
+            // File: Chrome 13; Firefox (Gecko) 3.0 (1.9) (non standard), 7 (7) (standard); Internet Explorer 10.0;
+            //       Opera 11.5; Safari (WebKit) 6.0
             // FileReader: Firefox (Gecko) 3.6 (1.9.2);	Chrome 7; Internet Explorer 10; Opera 12.02; Safari 6.0.2
             if (window.File && window.FileReader && window.FileList) {
                 this.$el.find("#upload").show();

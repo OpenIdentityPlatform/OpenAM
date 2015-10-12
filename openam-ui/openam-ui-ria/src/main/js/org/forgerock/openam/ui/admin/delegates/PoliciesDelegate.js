@@ -65,21 +65,24 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
 
     obj.queryIdentities = function (name, query) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + name + "?_queryId=" + query + "*"),
+            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + name + "?_queryId=" +
+                query + "*"),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.getUniversalId = function (name, type) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + type + "/" + name + "?_fields=universalid"),
+            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + type + "/" + name +
+                "?_fields=universalid"),
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=2.0"}
         });
     };
 
     obj.getDataByType = function (type) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + type + "?_queryFilter=true"),
+            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + type +
+                "?_queryFilter=true"),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
@@ -109,7 +112,8 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
 
     obj.listResourceTypes = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/resourcetypes?_queryFilter=true"),
+            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() +
+                "/resourcetypes?_queryFilter=true"),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };

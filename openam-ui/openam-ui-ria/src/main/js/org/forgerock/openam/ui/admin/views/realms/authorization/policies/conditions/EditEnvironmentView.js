@@ -39,7 +39,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         },
         data: {},
         i18n: {
-            "condition": { "key": "console.authorization.policies.edit.conditionTypes.", "title": ".title", "props": ".props." }
+            "condition": {
+                "key": "console.authorization.policies.edit.conditionTypes.",
+                "title": ".title",
+                "props": ".props."
+            }
         },
         SCRIPT_RESOURCE: "Script",
 
@@ -102,15 +106,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 type = mergedData.type;
                 itemToDisplay = {};
                 if (type === self.SCRIPT_RESOURCE) {
-                    itemToDisplay["console.common.type"] = $.t(self.i18n.condition.key + type + self.i18n.condition.title);
+                    itemToDisplay["console.common.type"] = $.t(self.i18n.condition.key + type +
+                        self.i18n.condition.title);
                     PoliciesDelegate.getScriptById(mergedData.scriptId).done(function (script) {
-                        itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + "scriptId"] = script.name;
+                        itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + "scriptId"] =
+                            script.name;
                         self.setListItemHtml(item, itemToDisplay);
                     });
                 } else {
                     _.each(mergedData, function (val, key) {
                         if (key === "type") {
-                            itemToDisplay["console.common.type"] = $.t(self.i18n.condition.key + type + self.i18n.condition.title);
+                            itemToDisplay["console.common.type"] = $.t(self.i18n.condition.key + type +
+                                self.i18n.condition.title);
                         } else {
                             itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + key] = val;
                         }
@@ -125,12 +132,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         setListItemHtml: function (item, itemToDisplay) {
             var self = this;
 
-            UIUtils.fillTemplateWithData("templates/admin/views/realms/authorization/policies/conditions/ListItem.html", {
-                data: itemToDisplay
-            }, function (tpl) {
-                item.find(".item-data").html(tpl);
-                self.setElement("#" + item.attr("id"));
-            });
+            UIUtils.fillTemplateWithData(
+                "templates/admin/views/realms/authorization/policies/conditions/ListItem.html", {
+                    data: itemToDisplay
+                }, function (tpl) {
+                    item.find(".item-data").html(tpl);
+                    self.setElement("#" + item.attr("id"));
+                });
         },
 
         changeType: function (e) {
@@ -186,12 +194,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             switch (schema.title) {
                 case "IPv4": // fall through
                 case "IPv6":
-                    helperText.title = Handlebars.helpers.t("console.authorization.policies.edit.conditionTypes.ipHelperTitle");
-                    helperText.content = Handlebars.helpers.t("console.authorization.policies.edit.conditionTypes.ipHelperContent");
+                    helperText.title =
+                        Handlebars.helpers.t("console.authorization.policies.edit.conditionTypes.ipHelperTitle");
+                    helperText.content =
+                        Handlebars.helpers.t("console.authorization.policies.edit.conditionTypes.ipHelperContent");
                     break;
                 case "SimpleTime":
-                    helperText.title = Handlebars.helpers.t("console.authorization.policies.edit.conditionTypes.SimpleTime.helperTitle");
-                    helperText.content = Handlebars.helpers.t("console.authorization.policies.edit.conditionTypes.SimpleTime.helperContent");
+                    helperText.title =
+                        Handlebars.helpers.t(
+                            "console.authorization.policies.edit.conditionTypes.SimpleTime.helperTitle");
+                    helperText.content =
+                        Handlebars.helpers.t(
+                            "console.authorization.policies.edit.conditionTypes.SimpleTime.helperContent");
                     break;
                 default:
                     break;

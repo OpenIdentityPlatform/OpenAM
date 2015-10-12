@@ -30,7 +30,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             "change select.type-selection": "changeType"
         },
         data: {},
-        subjectI18n: { "key": "console.authorization.policies.edit.subjectTypes.", "title": ".title", "props": ".props." },
+        subjectI18n: {
+            "key": "console.authorization.policies.edit.subjectTypes.",
+            "title": ".title",
+            "props": ".props."
+        },
         IDENTITY_RESOURCE: "Identity",
 
         render: function (schema, element, itemID, itemData, callback) {
@@ -52,7 +56,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 self.setElement("#subject_" + itemID);
 
                 if (itemData) {
-                    delete itemData.name; // Temporary fix: The name attribute is being added by the server after the policy is created.
+                    // Temporary fix: The name attribute is being added by the server after the policy is created.
+                    delete itemData.name;
 
                     if (itemData.type === self.IDENTITY_RESOURCE) { // client side fix for 'Identity'
                         self.$el.data("hiddenData", self.getUIDsFromUniversalValues(itemData.subjectValues));
@@ -90,10 +95,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
                 _.each(mergedData, function (val, key) {
                     if (key === "type") {
-                        itemToDisplay["console.common.type"] = $.t(self.subjectI18n.key + type + self.subjectI18n.title);
+                        itemToDisplay["console.common.type"] = $.t(self.subjectI18n.key + type +
+                            self.subjectI18n.title);
                     } else {
                         if (type === self.IDENTITY_RESOURCE) {
-                            if (key !== "subjectValues") { // Do not display the Identities subject values, but display the merged hidden data instead.
+                            // Do not display the Identities subject values, but display the merged hidden data instead.
+                            if (key !== "subjectValues") {
                                 list = "";
                                 _.forOwn(val, function (prop) {
                                     list += prop + " ";
@@ -108,12 +115,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 });
             }
 
-            UIUtils.fillTemplateWithData("templates/admin/views/realms/authorization/policies/conditions/ListItem.html", {
-                data: itemToDisplay
-            }, function (tpl) {
-                item.find(".item-data").html(tpl);
-                self.setElement("#" + item.attr("id"));
-            });
+            UIUtils.fillTemplateWithData(
+                "templates/admin/views/realms/authorization/policies/conditions/ListItem.html", {
+                    data: itemToDisplay
+                }, function (tpl) {
+                    item.find(".item-data").html(tpl);
+                    self.setElement("#" + item.attr("id"));
+                });
         },
 
         changeType: function (e) {

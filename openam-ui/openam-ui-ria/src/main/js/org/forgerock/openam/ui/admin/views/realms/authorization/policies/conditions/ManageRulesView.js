@@ -316,10 +316,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             var editRuleView = this.getNewRule(),
                 self = this;
 
-            editRuleView.render(this.getProperties(), this.droppableParent, this.idCount, null, function onRuleRender () {
-                self.editStart(editRuleView.$el);
-                self.$el.find("ol#dropbox").nestingSortable("refresh");
-            });
+            editRuleView.render(this.getProperties(), this.droppableParent, this.idCount, null,
+                function onRuleRender () {
+                    self.editStart(editRuleView.$el);
+                    self.$el.find("ol#dropbox").nestingSortable("refresh");
+                });
 
             this.idCount++;
         },

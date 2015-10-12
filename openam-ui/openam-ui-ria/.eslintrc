@@ -138,6 +138,10 @@
          * var string = 'this is a "string"' # good
          */
         "quotes": [2, "double", "avoid-escape"],
+        /**
+         * Maximum line length of 120 characters.
+         */
+        "max-len": [2, 120, 4],
 
         /*
          * --------------------------------------------------------------------------------
@@ -148,10 +152,6 @@
          * error rules.
          * --------------------------------------------------------------------------------
          */
-        /**
-         * Maximum line length of 120 characters.
-         */
-        "max-len": [1, 120, 4],
         /**
          * Spaces inside of curly braces.
          *

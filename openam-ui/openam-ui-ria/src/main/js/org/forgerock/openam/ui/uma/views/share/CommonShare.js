@@ -257,16 +257,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                     }
 
                     self.enableOrDisableShareButton();
-
-                    // TODO: Disable resolving of user
-                    // UMADelegate.getUser(value)
-                    // .done(function (data) {
-                    //     var universalID = data.universalid[0],
-                    //         existing = self.parentModel.get('policy').get("permissions").Where({ subject: universalID }),
-                    //         model = existing ? existing : UMAPolicyPermission.OrCreate( { subject: universalID } );
-                    //
-                    //     self.setModel(model);
-                    // });
                 }
             });
         },

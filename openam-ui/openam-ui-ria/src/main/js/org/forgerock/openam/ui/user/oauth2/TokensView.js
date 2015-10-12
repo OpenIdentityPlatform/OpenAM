@@ -77,9 +77,11 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                             } else {
                                 cleanScope = "-";
                             }
-                            data.aaData[i].cleanScope = $('<span class="cleanScope" />').text(cleanScope).wrap("<p>").parent().html();
+                            data.aaData[i].cleanScope = $('<span class="cleanScope" />').text(cleanScope).wrap("<p>")
+                                .parent().html();
                             cleanDate = new Date(Number(data.aaData[i].expireTime));
-                            data.aaData[i].cleanDate = $('<span class="cleanDate" />').text(cleanDate).wrap("<p>").parent().html();
+                            data.aaData[i].cleanDate = $('<span class="cleanDate" />').text(cleanDate).wrap("<p>")
+                                .parent().html();
                         }
 
                         fnCallback(data);
@@ -117,7 +119,8 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                 "sDom": 'l<"deleteSelected">f<"clear">rt<"clear">ip<"clear">',
                 "sPaginationType": "full_numbers",
                 "fnInitComplete": function (oSettings, json) {
-                    $(".deleteSelected").html('<input type="submit" class="button orange floatRight" value="' + $.t("common.form.deleteSelected") + '" >');
+                    $(".deleteSelected").html('<input type="submit" class="button orange floatRight" value="' +
+                        $.t("common.form.deleteSelected") + '" >');
                 },
                 "fnRowCallback": function (row, data, displayindex) {
                     $(row).children().not(":first").click(function () {
@@ -125,7 +128,8 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                         tokensDelegate.getTokenByID(function (tokenInfo) {
                             var output;
 
-                            output = '<table width="100%" cellpadding="5" cellspacing="0" border="0" style="padding:25px;">';
+                            output = '<table width="100%" cellpadding="5" cellspacing="0" border="0" ' +
+                                'style="padding:25px;">';
                             if (tokenInfo.realm) {
                                 output += "<tr><td>" + $.t("templates.oauth.realm") + "</td><td>" + tokenInfo.realm +
                                           "</td></tr>";

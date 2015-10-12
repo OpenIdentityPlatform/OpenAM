@@ -35,7 +35,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
 
         this.data.items = actions || [];
 
-        this.baseRender(this.data, "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesPatternsTemplate.html", el, callback);
+        this.baseRender(this.data,
+            "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesPatternsTemplate.html",
+            el, callback);
     };
 
     ResourceTypePatternsView.prototype.getPendingItem = function (e) {
