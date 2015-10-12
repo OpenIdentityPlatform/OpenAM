@@ -15,10 +15,6 @@
  */
 package org.forgerock.openam.selfservice.config;
 
-import static org.forgerock.openam.rest.ServiceConfigUtils.getBooleanAttribute;
-import static org.forgerock.openam.rest.ServiceConfigUtils.getLongAttribute;
-import static org.forgerock.openam.rest.ServiceConfigUtils.getStringAttribute;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
@@ -45,13 +41,6 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ConsoleConfigHandlerImpl.class);
 
-    private final static String REGISTRATION_ENABLED = "forgerockRESTSecuritySelfRegistrationEnabled";
-    private final static String REGISTRATION_EMAIL_URL = "forgerockRESTSecuritySelfRegConfirmationUrl";
-    private final static String REGISTRATION_TOKEN_EXPIRY = "forgerockRESTSecuritySelfRegTokenTTL";
-    private final static String FORGOTTEN_PASSWORD_ENABLED = "forgerockRESTSecurityForgotPasswordEnabled";
-    private final static String FORGOTTEN_PASSWORD_EMAIL_URL = "forgerockRESTSecurityForgotPassConfirmationUrl";
-    private final static String FORGOTTEN_PASSWORD_TOKEN_EXPIRY = "forgerockRESTSecurityForgotPassTokenTTL";
-
     private final static String SERVICE_NAME = "RestSecurity";
     private final static String SERVICE_VERSION = "1.0";
 
@@ -74,24 +63,14 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
     }
 
     @Override
-    public ConsoleConfig getConfig(String realm) {
-        PropertyHelper helper = getServiceConfig(realm);
-        return new ConsoleConfig()
-                .getForgottenPassword()
-                    .setEnabled(helper.getBoolean(FORGOTTEN_PASSWORD_ENABLED))
-                    .setEmailUrl(helper.getString(FORGOTTEN_PASSWORD_EMAIL_URL))
-                    .setTokenExpiry(helper.getLong(FORGOTTEN_PASSWORD_TOKEN_EXPIRY))
-                    .done()
-                .getUserRegistration()
-                    .setEnabled(helper.getBoolean(REGISTRATION_ENABLED))
-                    .setEmailUrl(helper.getString(REGISTRATION_EMAIL_URL))
-                    .setTokenExpiry(helper.getLong(REGISTRATION_TOKEN_EXPIRY))
-                    .done();
+    @SuppressWarnings("unchecked")
+    public <C extends ConsoleConfig> C getConfig(String realm, ConsoleConfigExtractor<C> extractor) {
+        return extractor.extract(getServiceConfig(realm).getAttributes());
     }
 
-    private PropertyHelper getServiceConfig(String realm) {
+    private ServiceConfig getServiceConfig(String realm) {
         try {
-            return new PropertyHelper(configManager.getOrganizationConfig(realm, null));
+            return configManager.getOrganizationConfig(realm, null);
         } catch (SMSException | SSOException e) {
             throw new ConfigRetrievalException("Unable to retrieve organisation config", e);
         }
@@ -133,46 +112,6 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
         public void globalConfigChanged(String serviceName, String version,
                 String groupName, String serviceComponent, int type) {
             // Do nothing
-        }
-
-    }
-
-    private final static class PropertyHelper {
-
-        private final ServiceConfig serviceConfig;
-
-        private PropertyHelper(ServiceConfig serviceConfig) {
-            this.serviceConfig = serviceConfig;
-        }
-
-        boolean getBoolean(String propertyKey) {
-            Boolean value = getBooleanAttribute(serviceConfig, propertyKey);
-
-            if (value == null) {
-                throw new NullPointerException("SMS framework should not return null values");
-            }
-
-            return value;
-        }
-
-        long getLong(String propertyKey) {
-            Long value = getLongAttribute(serviceConfig, propertyKey);
-
-            if (value == null) {
-                throw new NullPointerException("SMS framework should not return null values");
-            }
-
-            return value;
-        }
-
-        String getString(String propertyKey) {
-            String value = getStringAttribute(serviceConfig, propertyKey);
-
-            if (value == null) {
-                throw new NullPointerException("SMS framework should not return null values");
-            }
-
-            return value;
         }
 
     }

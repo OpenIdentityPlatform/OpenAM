@@ -17,17 +17,36 @@
 package org.forgerock.openam.selfservice.config;
 
 /**
- * Represents console configuration for a given self service.
+ * Represents forgotten password console configuration.
  *
  * @since 13.0.0
  */
-public interface ConsoleConfig {
+public final class UserRegistrationConsoleConfig implements CommonConsoleConfig {
 
-    /**
-     * Gets the class name for the service configuration provider.
-     *
-     * @return the config provider class name
-     */
-    String getConfigProviderClass();
+    private final CommonConsoleConfig commonConfig;
+
+    UserRegistrationConsoleConfig(CommonConsoleConfig commonConfig) {
+        this.commonConfig = commonConfig;
+    }
+
+    @Override
+    public String getConfigProviderClass() {
+        return commonConfig.getConfigProviderClass();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return commonConfig.isEnabled();
+    }
+
+    @Override
+    public String getEmailUrl() {
+        return commonConfig.getEmailUrl();
+    }
+
+    @Override
+    public long getTokenExpiry() {
+        return commonConfig.getTokenExpiry();
+    }
 
 }

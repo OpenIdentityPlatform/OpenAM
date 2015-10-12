@@ -18,6 +18,7 @@ package org.forgerock.openam.selfservice;
 import org.forgerock.json.resource.AbstractRequestHandler;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
@@ -26,14 +27,15 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.selfservice.config.ConsoleConfig;
 import org.forgerock.openam.selfservice.config.ConsoleConfigChangeListener;
+import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
-import org.forgerock.selfservice.core.AnonymousProcessService;
-import org.forgerock.selfservice.core.ProcessStore;
-import org.forgerock.selfservice.core.ProgressStageFactory;
+import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
+import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
-import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -44,45 +46,52 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @since 13.0.0
  */
-abstract class AbstractSelfServiceRequestHandler
+final class SelfServiceRequestHandler<C extends ConsoleConfig>
         extends AbstractRequestHandler implements ConsoleConfigChangeListener {
 
-    private final ProgressStageFactory stageFactory;
-    private final SnapshotTokenHandlerFactory tokenHandlerFactory;
-    private final ProcessStore localStore;
+    private static final Logger logger = LoggerFactory.getLogger(SelfServiceRequestHandler.class);
 
     private final Map<String, RequestHandler> serviceCache;
+    private final AnonymousProcessServiceFactory serviceFactory;
     private final ConsoleConfigHandler consoleConfigHandler;
+    private final ConsoleConfigExtractor<C> configExtractor;
+    private final ServiceConfigProviderFactory providerFactory;
 
     @Inject
-    public AbstractSelfServiceRequestHandler(ProgressStageFactory stageFactory,
-            SnapshotTokenHandlerFactory tokenHandlerFactory, ProcessStore localStore,
-            ConsoleConfigHandler consoleConfigHandler) {
+    public SelfServiceRequestHandler(AnonymousProcessServiceFactory serviceFactory,
+            ConsoleConfigHandler consoleConfigHandler, ConsoleConfigExtractor<C> configExtractor,
+            ServiceConfigProviderFactory providerFactory) {
+
         serviceCache = new ConcurrentHashMap<>();
-
-        this.stageFactory = stageFactory;
-        this.tokenHandlerFactory = tokenHandlerFactory;
-        this.localStore = localStore;
-
+        this.serviceFactory = serviceFactory;
         this.consoleConfigHandler = consoleConfigHandler;
+        this.configExtractor = configExtractor;
+        this.providerFactory = providerFactory;
+
         consoleConfigHandler.registerListener(this);
     }
 
     @Override
-    public final Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         try {
             return getService(context).handleRead(context, request);
         } catch (NotSupportedException nsE) {
             return nsE.asPromise();
+        } catch (RuntimeException rE) {
+            logger.error("Unable to handle read", rE);
+            return new InternalServerErrorException("Unable to handle read", rE).asPromise();
         }
     }
 
     @Override
-    public final Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         try {
             return getService(context).handleAction(context, request);
         } catch (NotSupportedException nsE) {
             return nsE.asPromise();
+        } catch (RuntimeException rE) {
+            logger.error("Unable to handle action", rE);
+            return new InternalServerErrorException("Unable to handle action", rE).asPromise();
         }
     }
 
@@ -105,14 +114,15 @@ abstract class AbstractSelfServiceRequestHandler
     }
 
     private RequestHandler createNewService(Context context, String realm) throws NotSupportedException {
-        ConsoleConfig config = consoleConfigHandler.getConfig(realm);
+        C consoleConfig = consoleConfigHandler.getConfig(realm, configExtractor);
+        ServiceConfigProvider<C> configProvider = providerFactory.getProvider(consoleConfig);
 
-        if (!isServiceEnabled(config)) {
+        if (!configProvider.isServiceEnabled(consoleConfig)) {
             throw new NotSupportedException("Service not configured");
         }
 
-        ProcessInstanceConfig serviceConfig = getServiceConfig(config, context, realm);
-        return new AnonymousProcessService(serviceConfig, stageFactory, tokenHandlerFactory, localStore);
+        ProcessInstanceConfig serviceConfig = configProvider.getServiceConfig(consoleConfig, context, realm);
+        return serviceFactory.getService(serviceConfig);
     }
 
     @Override
@@ -121,29 +131,5 @@ abstract class AbstractSelfServiceRequestHandler
             serviceCache.remove(realm);
         }
     }
-
-    /**
-     * Determines whether the specific service is enabled.
-     *
-     * @param config
-     *         the console config
-     *
-     * @return whether the service is enabled
-     */
-    protected abstract boolean isServiceEnabled(ConsoleConfig config);
-
-    /**
-     * Provides the self service configuration for the appropriate flow.
-     *
-     * @param config
-     *         the console config
-     * @param context
-     *         CREST context
-     * @param realm
-     *         the current realm
-     *
-     * @return service configuration
-     */
-    protected abstract ProcessInstanceConfig getServiceConfig(ConsoleConfig config, Context context, String realm);
 
 }

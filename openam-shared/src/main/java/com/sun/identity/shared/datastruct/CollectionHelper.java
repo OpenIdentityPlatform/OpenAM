@@ -28,18 +28,17 @@
  */
 package com.sun.identity.shared.datastruct;
 
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class contains various Collection manipulation methods.
@@ -207,6 +206,27 @@ public class CollectionHelper {
         } catch (NumberFormatException nfe) {
             debug.error("Unable to parse " + name + "=" + valueString, nfe);
             return defaultValue;
+        }
+    }
+
+    /**
+     * Given the map attempts to return the named value as a long.
+     *
+     * @param map
+     *         the map
+     * @param name
+     *         the named value
+     *
+     * @return the corresponding long value
+     *
+     * @throws ValueNotFoundException
+     *         should the value fail to parse
+     */
+    public static long getLongMapAttrThrows(Map<String, Set<String>> map, String name) throws ValueNotFoundException {
+        try {
+            return Long.parseLong(getMapAttr(map, name));
+        } catch (NumberFormatException nfe) {
+            throw new ValueNotFoundException("No value found for key '" + name + "'.");
         }
     }
 

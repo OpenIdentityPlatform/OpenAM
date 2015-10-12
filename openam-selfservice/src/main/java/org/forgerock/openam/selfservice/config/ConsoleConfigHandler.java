@@ -30,7 +30,7 @@ public interface ConsoleConfigHandler {
      *
      * @return associated config
      */
-    ConsoleConfig getConfig(String realm);
+    <C extends ConsoleConfig> C getConfig(String realm, ConsoleConfigExtractor<C> extractor);
 
     /**
      * Registers the passed listener for config changes.

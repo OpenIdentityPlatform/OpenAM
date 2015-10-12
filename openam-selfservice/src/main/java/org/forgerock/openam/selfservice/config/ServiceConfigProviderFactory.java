@@ -17,17 +17,22 @@
 package org.forgerock.openam.selfservice.config;
 
 /**
- * Represents console configuration for a given self service.
+ * Factory delivers up service configuration providers based of the passed console configuration.
  *
  * @since 13.0.0
  */
-public interface ConsoleConfig {
+public interface ServiceConfigProviderFactory {
 
     /**
-     * Gets the class name for the service configuration provider.
+     * Retrieves an instance of a service configuration provider based on the passed console configuration.
      *
-     * @return the config provider class name
+     * @param config
+     *         console configuration
+     * @param <C>
+     *         the console configuration type
+     *
+     * @return an instance of a service configuration provider
      */
-    String getConfigProviderClass();
+    <C extends ConsoleConfig> ServiceConfigProvider<C> getProvider(C config);
 
 }

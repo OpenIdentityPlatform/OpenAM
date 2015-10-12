@@ -69,6 +69,15 @@
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#register/</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySelfRegServiceConfigClass"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="selfRegistrationServiceConfigClass"
+                                 i18nKey="a120">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.selfservice.config.DefaultUserRegistrationConfigProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecurityForgotPasswordEnabled"
                                  type="single"
                                  syntax="boolean"
@@ -100,6 +109,15 @@
                                  i18nKey="a106">
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#passwordReset/</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassServiceConfigClass"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="forgotPasswordServiceConfigClass"
+                                 i18nKey="a121">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.selfservice.config.DefaultForgottenPasswordConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecuritySuccessfulUserRegistrationDestination"

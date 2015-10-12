@@ -16,18 +16,27 @@
 
 package org.forgerock.openam.selfservice.config;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
- * Represents console configuration for a given self service.
+ * Responsible for extracting console configuration instance from the collection of passed console attribute values.
+ *
+ * @param <C>
+ *         the console configuration type
  *
  * @since 13.0.0
  */
-public interface ConsoleConfig {
+public interface ConsoleConfigExtractor<C extends ConsoleConfig> {
 
     /**
-     * Gets the class name for the service configuration provider.
+     * Given the console attribute values, extract out the configuration instance.
      *
-     * @return the config provider class name
+     * @param consoleAttributes
+     *         console attribute values
+     *
+     * @return a console configuration instance
      */
-    String getConfigProviderClass();
+    C extract(Map<String, Set<String>> consoleAttributes);
 
 }

@@ -17,17 +17,31 @@
 package org.forgerock.openam.selfservice.config;
 
 /**
- * Represents console configuration for a given self service.
+ * Represents common console configuration used by all self services.
  *
  * @since 13.0.0
  */
-public interface ConsoleConfig {
+public interface CommonConsoleConfig extends ConsoleConfig {
 
     /**
-     * Gets the class name for the service configuration provider.
+     * Whether the service is enabled.
      *
-     * @return the config provider class name
+     * @return whether the service is enabled
      */
-    String getConfigProviderClass();
+    boolean isEnabled();
+
+    /**
+     * Gets the url to be used within the email.
+     *
+     * @return the email url
+     */
+    String getEmailUrl();
+
+    /**
+     * Gets the token expiry time in seconds.
+     *
+     * @return the token expiry time
+     */
+    long getTokenExpiry();
 
 }

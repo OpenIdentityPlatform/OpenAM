@@ -18,9 +18,13 @@ package org.forgerock.openam.selfservice;
 
 import static org.forgerock.openam.rest.Routers.ssoToken;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
+import org.forgerock.openam.selfservice.config.ForgottenPasswordConsoleConfig;
+import org.forgerock.openam.selfservice.config.UserRegistrationConsoleConfig;
 
 /**
  * Provides routes for the user self service services.
@@ -37,7 +41,8 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                         ssoToken()
                                 .exceptRead()
                                 .exceptActions("submitRequirements"))
-                .toRequestHandler(RoutingMode.STARTS_WITH, ForgottenPasswordRequestHandler.class);
+                .toRequestHandler(RoutingMode.STARTS_WITH, Key
+                        .get(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>(){}));
 
         realmRouter
                 .route("/userRegistration")
@@ -45,7 +50,8 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                         ssoToken()
                                 .exceptRead()
                                 .exceptActions("submitRequirements"))
-                .toRequestHandler(RoutingMode.STARTS_WITH, UserRegistrationRequestHandler.class);
+                .toRequestHandler(RoutingMode.STARTS_WITH, Key
+                        .get(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>(){}));
     }
 
 }
