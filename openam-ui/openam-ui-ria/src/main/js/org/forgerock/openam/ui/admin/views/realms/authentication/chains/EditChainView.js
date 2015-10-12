@@ -161,19 +161,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
                 self.parentRender(function () {
 
-                    if (self.data.form.chainData.adminAuthModule || self.data.form.chainData.orgConfig){
+                    if (self.data.form.chainData.adminAuthModule || self.data.form.chainData.orgConfig) {
                         var popoverOpt = {
                             trigger : "hover",
                             container : "body",
                             placement : "top"
                         };
 
-                        (self.data.form.chainData.adminAuthModule && self.data.form.chainData.orgConfig) ?
-                            popoverOpt.content = $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminOrgAuthChain") :
-                            (self.data.form.chainData.adminAuthModule ?
-                                popoverOpt.content = $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminAuthChain") :
-                                popoverOpt.content = $.t("console.authentication.editChains.deleteBtnTooltip.defaultOrgAuthChain")
-                            );
+                        if (self.data.form.chainData.adminAuthModule && self.data.form.chainData.orgConfig) {
+                            popoverOpt.content = $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminOrgAuthChain");
+                        } else {
+                            if (self.data.form.chainData.adminAuthModule) {
+                                popoverOpt.content = $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminAuthChain");
+                            } else {
+                                popoverOpt.content = $.t("console.authentication.editChains.deleteBtnTooltip.defaultOrgAuthChain");
+                            }
+                        }
 
                         // popever doesn't work in case button has disabled attribute
                         self.$el.find("#delete").addClass("disabled").popover(popoverOpt);
