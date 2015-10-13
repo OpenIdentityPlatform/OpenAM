@@ -2142,9 +2142,9 @@ public abstract class AMLoginModule implements LoginModule {
                 authentication = principalName;
             }
 
-            auditor.handleEvent(null, "Successful authentication through module " + moduleName + " of class " + moduleClass,
-                    AuditRequestContext.getTransactionIdValue(), authentication,
-                    realmName, time, contextsMap, entries);
+            auditor.handleEvent(null, "Successful authentication through module " + moduleName + " of class " +
+                            moduleClass, AuditRequestContext.getTransactionIdValue(), authentication,
+                            realmName, time, contextsMap, entries);
         }
 
         //-----------------------------------
