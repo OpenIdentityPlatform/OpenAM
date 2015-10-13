@@ -117,7 +117,7 @@
                                  rangeEnd="1000"
                                  type="single" >
                     <DefaultValues>
-                        <Value>10</Value>
+                        <Value>20</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -132,7 +132,11 @@
                                      isSearchable="no"
                                      syntax="string"
                                      type="single" >
+                         <DefaultValues>
+                            <Value>/127.0.0.1</Value>
+                        </DefaultValues>                                    
                     </AttributeSchema>
+                        
                     <AttributeSchema name="clientSecret"
                                      i18nKey="b-client-secret-label"
                                      isSearchable="no"
@@ -144,6 +148,7 @@
                             </DefaultValuesClassName>
                         </DefaultValues>
                     </AttributeSchema>
+                    
                     <AttributeSchema name="clientPacketsLogged"
                                      type="single_choice"
                                      syntax="string"
@@ -172,7 +177,12 @@
                                      isSearchable="no"
                                      syntax="string"
                                      type="list" >
+                        <DefaultValues>
+                            <Value>realm=/</Value>
+                            <Value>chain=ldapService</Value>
+                        </DefaultValues>
                     </AttributeSchema>
+
                 </SubSchema>
             </Global>
             <!--
