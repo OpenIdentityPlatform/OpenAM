@@ -76,7 +76,6 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
     private static final String DEFAULT_APPLICATION_TYPE = "web";
 
     private static final String REGISTRATION_CLIENT_URI = "registration_client_uri";
-    private static final String ISSUED_AT = "client_id_issued_at";
     private static final String EXPIRES_AT = "client_secret_expires_at";
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
@@ -443,7 +442,6 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
 
         response.put(REGISTRATION_CLIENT_URI,
                 deploymentUrl + "/oauth2/connect/register?client_id=" + client.getClientID());
-        response.put(ISSUED_AT, System.currentTimeMillis() / 1000);
 
         response.put(EXPIRES_AT, 0);
 
@@ -539,10 +537,12 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
             }
 
             //remove the client fields that don't need to be reported.
-            client.remove(CLIENT_SECRET.getType());
             client.remove(REGISTRATION_ACCESS_TOKEN.getType());
 
-            return new JsonValue(convertClientReadResponseFormat(client.asMap()));
+            final JsonValue response = new JsonValue(convertClientReadResponseFormat(client.asMap()));
+            response.put(EXPIRES_AT, 0);
+
+            return response;
         } else {
             logger.error("ConnectClientRegistration.readRequest(): No client id sent");
             throw new InvalidRequestException();

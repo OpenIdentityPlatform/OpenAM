@@ -105,9 +105,9 @@ public class Client extends JsonValue {
      */
     public enum SubjectType {
         /** Pairwise Subject Type. */
-        PAIRWISE("Pairwise"), 
+        PAIRWISE("pairwise"),
         /** Public Subject Type. */
-        PUBLIC("Public");
+        PUBLIC("public");
 
         private String type;
 

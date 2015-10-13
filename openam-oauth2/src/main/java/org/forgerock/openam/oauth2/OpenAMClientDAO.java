@@ -337,17 +337,19 @@ public class OpenAMClientDAO implements ClientDAO {
         ClientBuilder clientBuilder = new ClientBuilder();
 
         clientBuilder.setAccessToken(getSingleAttribute(clientAttributeMap, ACCESS_TOKEN));
-        clientBuilder.setAllowedGrantScopes(new ArrayList<String>(getSetAttribute(clientAttributeMap, SCOPES)));
-        clientBuilder.setClientName(new ArrayList<String>(getSetAttribute(clientAttributeMap, CLIENT_NAME)));
+        clientBuilder.setAllowedGrantScopes(new ArrayList<>(getSetAttribute(clientAttributeMap, SCOPES)));
+        clientBuilder.setClientName(new ArrayList<>(getSetAttribute(clientAttributeMap, CLIENT_NAME)));
+        clientBuilder.setClientSecret(getSingleAttribute(clientAttributeMap, USERPASSWORD));
         clientBuilder.setClientSessionURI(getSingleAttribute(clientAttributeMap, CLIENT_SESSION_URI));
         clientBuilder.setClientType(getSingleAttribute(clientAttributeMap, CLIENT_TYPE));
-        clientBuilder.setDefaultGrantScopes(new ArrayList<String>(getSetAttribute(clientAttributeMap, DEFAULT_SCOPES)));
-        clientBuilder.setDisplayDescription(new ArrayList<String>(getSetAttribute(clientAttributeMap, DESCRIPTION)));
-        clientBuilder.setDisplayName(new ArrayList<String>(getSetAttribute(clientAttributeMap, NAME)));
+        clientBuilder.setContacts(new ArrayList<>(getSetAttribute(clientAttributeMap, CONTACTS)));
+        clientBuilder.setDefaultGrantScopes(new ArrayList<>(getSetAttribute(clientAttributeMap, DEFAULT_SCOPES)));
+        clientBuilder.setDisplayDescription(new ArrayList<>(getSetAttribute(clientAttributeMap, DESCRIPTION)));
+        clientBuilder.setDisplayName(new ArrayList<>(getSetAttribute(clientAttributeMap, NAME)));
         clientBuilder.setIdTokenSignedResponseAlgorithm(getSingleAttribute(clientAttributeMap, IDTOKEN_SIGNED_RESPONSE_ALG));
-        clientBuilder.setRedirectionURIs(new ArrayList<String>(getSetAttribute(clientAttributeMap, REDIRECT_URI)));
-        clientBuilder.setPostLogoutRedirectionURIs(new ArrayList<String>(getSetAttribute(clientAttributeMap, POST_LOGOUT_URI)));
-        clientBuilder.setResponseTypes(new ArrayList<String>(getSetAttribute(clientAttributeMap, RESPONSE_TYPES)));
+        clientBuilder.setRedirectionURIs(new ArrayList<>(getSetAttribute(clientAttributeMap, REDIRECT_URI)));
+        clientBuilder.setPostLogoutRedirectionURIs(new ArrayList<>(getSetAttribute(clientAttributeMap, POST_LOGOUT_URI)));
+        clientBuilder.setResponseTypes(new ArrayList<>(getSetAttribute(clientAttributeMap, RESPONSE_TYPES)));
         clientBuilder.setDefaultMaxAgeEnabled(Boolean.valueOf(getSingleAttribute(clientAttributeMap, DEFAULT_MAX_AGE_ENABLED)));
         clientBuilder.setTokenEndpointAuthMethod(getSingleAttribute(clientAttributeMap, TOKEN_ENDPOINT_AUTH_METHOD));
         clientBuilder.setSubjectType(getSingleAttribute(clientAttributeMap, SUBJECT_TYPE));
