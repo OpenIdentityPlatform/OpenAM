@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
 
 define("org/forgerock/openam/ui/user/delegates/SessionDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",

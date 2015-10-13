@@ -14,7 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define */
 
 define("org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView", [
     "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView"

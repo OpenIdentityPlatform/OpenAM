@@ -14,7 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define, require */
 define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
     "underscore",
     "jquery",

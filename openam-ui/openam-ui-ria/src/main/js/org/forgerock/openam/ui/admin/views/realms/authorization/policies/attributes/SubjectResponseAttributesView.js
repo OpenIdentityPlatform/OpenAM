@@ -15,7 +15,6 @@
  */
 
 
-/*global define*/
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/SubjectResponseAttributesView", [
     "jquery",

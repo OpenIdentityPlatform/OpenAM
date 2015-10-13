@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
 
 define("config/main", [
     "./errorhandlers/CommonErrorHandlers",

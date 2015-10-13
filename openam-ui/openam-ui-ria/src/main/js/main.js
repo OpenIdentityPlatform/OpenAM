@@ -14,7 +14,6 @@
  * Portions copyright 2011-2015 ForgeRock AS.
  */
 
-/*global require, define, window */
 require.config({
     map: {
         "*" : {

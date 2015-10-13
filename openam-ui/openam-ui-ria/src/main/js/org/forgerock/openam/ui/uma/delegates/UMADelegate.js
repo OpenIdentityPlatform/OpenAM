@@ -14,7 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define */
 define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
     "jquery",
     "underscore",

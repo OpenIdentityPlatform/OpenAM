@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
 
 define("org/forgerock/openam/ui/user/login/RESTLoginDialog", [
     "org/forgerock/commons/ui/common/main/AbstractView",

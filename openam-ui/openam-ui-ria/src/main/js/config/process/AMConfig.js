@@ -14,7 +14,6 @@
  * Portions copyright 2011-2015 ForgeRock AS.
  */
 
-/*global define, window */
 define("config/process/AMConfig", [
     "jquery",
     "underscore",

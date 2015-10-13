@@ -26,7 +26,6 @@
  * "Portions Copyrighted 2011-2013 ForgeRock Inc"
  */
 
-/*global define */
 
 define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",

@@ -15,7 +15,6 @@
  */
 
 
-  /*global define */
 
 define("org/forgerock/openam/ui/user/UserModel", [
     "jquery",

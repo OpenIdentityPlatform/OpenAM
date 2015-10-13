@@ -16,7 +16,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define */
 define("org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate", [
     "underscore",
     "org/forgerock/commons/ui/common/util/Constants",

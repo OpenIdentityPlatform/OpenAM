@@ -14,7 +14,6 @@
  * Portions copyright 2014-2015 ForgeRock AS.
  */
 
-/*global define, FileReader*/
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/PolicySetsView", [
     "jquery",

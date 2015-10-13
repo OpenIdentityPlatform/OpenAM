@@ -2,10 +2,7 @@
     "root": true,
     "extends": "eslint-config-forgerock",
     "env": {
-        /**
-         * AMD is commented out as this will hide the error of forgetting to add a global directive
-         */
-        // "amd": true,
+        "amd": true,
         "browser": true
     },
     "rules": {

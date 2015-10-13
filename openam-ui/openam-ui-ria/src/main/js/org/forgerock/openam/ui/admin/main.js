@@ -14,7 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
 define([
     "./delegates/SMSDelegateUtils",
     "./delegates/SMSGlobalDelegate",

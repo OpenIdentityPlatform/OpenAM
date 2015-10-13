@@ -14,7 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
 define("config/routes/admin/RealmsRoutes", function () {
     var scopedByRealm = function (fragment) {
             return new RegExp("^realms\/([^\/]+)\/" + fragment + "$");

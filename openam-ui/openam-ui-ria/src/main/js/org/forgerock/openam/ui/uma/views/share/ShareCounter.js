@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
 define("org/forgerock/openam/ui/uma/views/share/ShareCounter", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView"

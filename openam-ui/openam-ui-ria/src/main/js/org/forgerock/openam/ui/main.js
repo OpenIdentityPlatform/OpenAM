@@ -14,7 +14,6 @@
  * Portions copyright 2015 ForgeRock AS.
  */
 
-/*global define */
 
 
 define("org/forgerock/openam/ui/main", [

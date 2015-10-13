@@ -14,7 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
 define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",

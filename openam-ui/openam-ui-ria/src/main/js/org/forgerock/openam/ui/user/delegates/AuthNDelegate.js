@@ -14,7 +14,6 @@
  * Portions copyright 2011-2015 ForgeRock AS.
  */
 
-/*global define, window */
 define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     "jquery",
     "underscore",
