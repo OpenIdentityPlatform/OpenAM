@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putComponent;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putContexts;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putRealm;
 
@@ -101,6 +102,17 @@ public class AMAuthenticationAuditEventBuilder extends
                 map.put("result", result);
                 map.put("info", info);
                 entries(Collections.singletonList(map));
+                return this;
+        }
+
+        /**
+         * Provide value for "component" audit log field.
+         *
+         * @param value one of the predefined names from {@link AuditConstants.Component}
+         * @return this builder for method chaining.
+         */
+        public AMAuthenticationAuditEventBuilder component(AuditConstants.Component value) {
+                putComponent(jsonValue, value.toString());
                 return this;
         }
 }

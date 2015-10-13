@@ -63,4 +63,7 @@ public class AuthenticationAuditor {
         eventPublisher.publish(AuditConstants.AUTHENTICATION_TOPIC, auditEvent);
     }
 
+    public boolean isAuditing(String realm, String topic) {
+        return eventPublisher.isAuditing(realm, topic);
+    }
 }

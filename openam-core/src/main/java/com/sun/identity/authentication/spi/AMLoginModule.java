@@ -36,6 +36,7 @@ import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMUser;
 import com.iplanet.am.sdk.AMUserPasswordValidation;
 import com.iplanet.am.util.Misc;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionConstraint;
 import com.iplanet.dpro.session.service.SessionCount;
@@ -67,10 +68,8 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.audit.AuditException;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder;
-import org.forgerock.openam.audit.AuthenticationAuditor;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.LegacyAuthenticationEventAuditor;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.core.CoreWrapper;
@@ -271,6 +270,7 @@ public abstract class AMLoginModule implements LoginModule {
         AMResourceBundleCache.getInstance();
 
     LegacyAuthenticationEventAuditor auditor;
+    private static final String SESSION_ID = "sessionId";
     
     /**
      * Clone Callback[], and save it in the internal/external
@@ -2094,45 +2094,58 @@ public abstract class AMLoginModule implements LoginModule {
             auditor = InjectorHolder.getInstance(LegacyAuthenticationEventAuditor.class);
         }
 
-        int authLevel = getAuthLevel();
-        String ip = loginState.getClient();
-        Principal modulePrincipal = getPrincipal();
-        String principalName = null;
-        if (modulePrincipal != null) {
-            principalName = modulePrincipal.getName();
-        }
-
-        List<?> entries;
-        Map<String, String> info = new HashMap<>();
-        if (StringUtils.isNotEmpty(ip)) {
-            info.put("ipAddress", ip);
-        }
-        String authLevelAsString = String.valueOf(authLevel);
-        info.put("authLevel", authLevelAsString);
-        Map<String, Object> map = new HashMap<>();
-        map.put("moduleId", moduleName);
-        map.put("result", "Successful authentication");
-        map.put("info", info);
-        entries = Collections.singletonList(map);
-
-        long time = Calendar.getInstance().getTimeInMillis();
-
+        CoreWrapper cw = new CoreWrapper();
         String orgDN = loginState.getOrgDN();
         String realmName = null;
-        CoreWrapper cw = new CoreWrapper();
         if (orgDN != null) {
             realmName = cw.convertOrgNameToRealmName(orgDN);
         }
-        String authentication = null;
-        if (principalName != null && orgDN != null) {
-            authentication = cw.getIdentity(principalName, realmName).getUniversalId();
-        } else if (principalName != null) {
-            authentication = principalName;
-        }
+        if (auditor.isAuditing(realmName, AuditConstants.AUTHENTICATION_TOPIC) || StringUtils.isEmpty(realmName)) {
+            int authLevel = getAuthLevel();
+            String ip = loginState.getClient();
+            Principal modulePrincipal = getPrincipal();
+            String principalName = null;
+            if (modulePrincipal != null) {
+                principalName = modulePrincipal.getName();
+            }
 
-        auditor.handleEvent(null, "Successful authentication through module " + moduleName + " of class " + moduleClass,
-                AuditRequestContext.getTransactionIdValue(), authentication,
-                realmName, time, null, entries);
+            List<?> entries;
+            Map<String, String> info = new HashMap<>();
+            if (StringUtils.isNotEmpty(ip)) {
+                info.put("ipAddress", ip);
+            }
+            String authLevelAsString = String.valueOf(authLevel);
+            info.put("authLevel", authLevelAsString);
+            Map<String, Object> map = new HashMap<>();
+            map.put("moduleId", moduleName);
+            map.put("result", "Successful authentication");
+            map.put("info", info);
+            entries = Collections.singletonList(map);
+
+            long time = Calendar.getInstance().getTimeInMillis();
+
+            String sessionId = AuditRequestContext.getProperty(SESSION_ID);
+            InternalSession session = AuthD.getSession(new SessionID(sessionId));
+            String sessionContext = null;
+            if (session != null) {
+                sessionContext = session.getProperty(Constants.AM_CTX_ID);
+            }
+            Map<String, String> contextsMap = new HashMap<>();
+            if (StringUtils.isNotEmpty(sessionContext)) {
+                contextsMap.put(AuditConstants.Context.SESSION.toString(), sessionContext);
+            }
+
+            String authentication = null;
+            if (principalName != null && orgDN != null) {
+                authentication = cw.getIdentity(principalName, realmName).getUniversalId();
+            } else if (principalName != null) {
+                authentication = principalName;
+            }
+
+            auditor.handleEvent(null, "Successful authentication through module " + moduleName + " of class " + moduleClass,
+                    AuditRequestContext.getTransactionIdValue(), authentication,
+                    realmName, time, contextsMap, entries);
+        }
 
         //-----------------------------------
 
@@ -2328,45 +2341,61 @@ public abstract class AMLoginModule implements LoginModule {
             auditor = InjectorHolder.getInstance(LegacyAuthenticationEventAuditor.class);
         }
 
-        int authLevel = getAuthLevel();
-        String ip = loginState.getClient();
-        Principal modulePrincipal = getPrincipal();
-        String principalName = null;
-        if (modulePrincipal != null) {
-            principalName = modulePrincipal.getName();
-        }
-
-        List<?> entries;
-        Map<String, String> info = new HashMap<>();
-        if (StringUtils.isNotEmpty(ip)) {
-            info.put("ipAddress", ip);
-        }
-        String authLevelAsString = String.valueOf(authLevel);
-        info.put("authLevel", authLevelAsString);
-        Map<String, Object> map = new HashMap<>();
-        map.put("moduleId", moduleName);
-        map.put("result", "Failure to authenticate");
-        map.put("info", info);
-        entries = Collections.singletonList(map);
-
-        long time = Calendar.getInstance().getTimeInMillis();
-
+        CoreWrapper cw = new CoreWrapper();
         String orgDN = loginState.getOrgDN();
         String realmName = null;
-        CoreWrapper cw = new CoreWrapper();
         if (orgDN != null) {
             realmName = cw.convertOrgNameToRealmName(orgDN);
         }
-        String authentication = null;
-        if (principalName != null && orgDN != null) {
-            authentication = cw.getIdentity(principalName, realmName).getUniversalId();
-        } else if (principalName != null) {
-            authentication = principalName;
-        }
 
-        auditor.handleEvent(null, "Failure to authenticate through module " + moduleName + " of class " + moduleClass,
-                AuditRequestContext.getTransactionIdValue(), authentication,
-                realmName, time, null, entries);
+        if (auditor.isAuditing(realmName, AuditConstants.AUTHENTICATION_TOPIC) || StringUtils.isEmpty(realmName)) {
+            int authLevel = getAuthLevel();
+            String ip = loginState.getClient();
+            Principal modulePrincipal = getPrincipal();
+            String principalName = null;
+            if (modulePrincipal != null) {
+                principalName = modulePrincipal.getName();
+            }
+
+            List<?> entries;
+            Map<String, String> info = new HashMap<>();
+            if (StringUtils.isNotEmpty(ip)) {
+                info.put("ipAddress", ip);
+            }
+            String authLevelAsString = String.valueOf(authLevel);
+            info.put("authLevel", authLevelAsString);
+            Map<String, Object> map = new HashMap<>();
+            map.put("moduleId", moduleName);
+            map.put("result", "Failure to authenticate");
+            map.put("info", info);
+            entries = Collections.singletonList(map);
+
+            long time = Calendar.getInstance().getTimeInMillis();
+
+            String sessionId = AuditRequestContext.getProperty(SESSION_ID);
+            InternalSession session = AuthD.getSession(new SessionID(sessionId));
+            String sessionContext = null;
+            if (session != null) {
+                sessionContext = session.getProperty(Constants.AM_CTX_ID);
+            }
+            Map<String, String> contextsMap = new HashMap<>();
+            if (StringUtils.isNotEmpty(sessionContext)) {
+                contextsMap.put(AuditConstants.Context.SESSION.toString(), sessionContext);
+            }
+
+            String authentication = null;
+            if (principalName != null && orgDN != null) {
+                authentication = cw.getIdentity(principalName, realmName).getUniversalId();
+            } else if (principalName != null) {
+                authentication = principalName;
+            } else {
+                authentication = "Unknown user";
+            }
+
+            auditor.handleEvent(null, "Failure to authenticate through module " + moduleName + " of class " +
+                            moduleClass, AuditRequestContext.getTransactionIdValue(), authentication,
+                            realmName, time, contextsMap, entries);
+        }
 
         //-----------------------------------
 

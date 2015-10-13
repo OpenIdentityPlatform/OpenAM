@@ -66,11 +66,8 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.audit.AuditException;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder;
 import org.forgerock.openam.audit.AuditConstants;
-import org.forgerock.openam.audit.AuthenticationAuditor;
 import org.forgerock.openam.audit.LegacyAuthenticationEventAuditor;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.core.CoreWrapper;
@@ -717,48 +714,51 @@ public class AuthD implements ConfigurationListener {
 
             CoreWrapper cw = new CoreWrapper();
             String realmName = cw.convertOrgNameToRealmName(orgDN);
-            String messageName = messageId.toString();
 
-            LogMessageProviderBase provider = null;
-            if (logStatus) {
-                try {
-                    provider = (LogMessageProviderBase) MessageProviderFactory.getProvider("Authentication");
-                } catch (IOException e) {
-                    e.printStackTrace();
+            if (auditor.isAuditing(realmName, AuditConstants.AUTHENTICATION_TOPIC)) {
+                String messageName = messageId.toString();
+
+                LogMessageProviderBase provider = null;
+                if (logStatus) {
+                    try {
+                        provider = (LogMessageProviderBase) MessageProviderFactory.getProvider("Authentication");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-            String description = "Logout";
-            if (provider != null) {
-                description = provider.getAllHashMessageIDs().get(messageName).getDescription();
-            }
+                String description = "Logout";
+                if (provider != null) {
+                    description = provider.getAllHashMessageIDs().get(messageName).getDescription();
+                }
 
-            long time = Calendar.getInstance().getTimeInMillis();
+                long time = Calendar.getInstance().getTimeInMillis();
 
-            Map<String, String> contexts = null;
-            if (StringUtils.isNotEmpty(contextId)) {
-                contexts = new HashMap<>();
-                contexts.put(AuditConstants.Context.SESSION.toString(), contextId);
+                Map<String, String> contexts = null;
+                if (StringUtils.isNotEmpty(contextId)) {
+                    contexts = new HashMap<>();
+                    contexts.put(AuditConstants.Context.SESSION.toString(), contextId);
+                }
+
+                AMIdentity identity = cw.getIdentity(userDN, realmName);
+                String authentication = null;
+                if (identity != null) {
+                    authentication = identity.getUniversalId();
+                }
+
+                List<?> entries;
+                Map<String, String> info = new HashMap<>();
+                if (StringUtils.isNotEmpty(client)) {
+                    info = Collections.singletonMap("ipAddress", client);
+                }
+                Map<String, Object> map = new HashMap<>();
+                map.put("moduleId", authMethName);
+                map.put("result", "Logged out");
+                map.put("info", info);
+                entries = Collections.singletonList(map);
+
+                auditor.handleEvent(messageName, description, AuditRequestContext.getTransactionIdValue(), authentication,
+                        realmName, time, contexts, entries);
             }
-
-            AMIdentity identity = cw.getIdentity(userDN, realmName);
-            String authentication = null;
-            if (identity != null) {
-                authentication = identity.getUniversalId();
-            }
-
-            List<?> entries;
-            Map<String, String> info = new HashMap<>();
-            if (StringUtils.isNotEmpty(client)) {
-                info = Collections.singletonMap("ipAddress", client);
-            }
-            Map<String, Object> map = new HashMap<>();
-            map.put("moduleId", authMethName);
-            map.put("result", "Logged out");
-            map.put("info", info);
-            entries = Collections.singletonList(map);
-
-            auditor.handleEvent(messageName, description, AuditRequestContext.getTransactionIdValue(), authentication,
-                    realmName, time, contexts, entries);
 
             //----------------------------------
 
@@ -803,50 +803,52 @@ public class AuthD implements ConfigurationListener {
                     auditor = InjectorHolder.getInstance(LegacyAuthenticationEventAuditor.class);
                 }
 
-                // Logout audit logging is already handled by the logLogout method, but that calls here for legacy
-                // purposes, so we must ensure to not log a second time if we are dealing with a logout message.
-                if (!auditor.isLogoutEvent(messageName)) {
-                    CoreWrapper cw = new CoreWrapper();
-                    String orgName = (String) ssoProperties.get("Domain");
-                    String realmName = cw.convertOrgNameToRealmName(orgName);
-                    String userName = (String) ssoProperties.get("LoginID");
-                    String description = provider.getAllHashMessageIDs().get(messageName).getDescription();
-                    String contextID = (String) ssoProperties.get("ContextID");
+                CoreWrapper cw = new CoreWrapper();
+                String orgName = (String) ssoProperties.get("Domain");
+                String realmName = cw.convertOrgNameToRealmName(orgName);
+                if (auditor.isAuditing(realmName)) {
+                    // Logout audit logging is already handled by the logLogout method, but that calls here for legacy
+                    // purposes, so we must ensure to not log a second time if we are dealing with a logout message.
+                    if (!auditor.isLogoutEvent(messageName)) {
+                        String userName = (String) ssoProperties.get("LoginID");
+                        String description = provider.getAllHashMessageIDs().get(messageName).getDescription();
+                        String contextID = (String) ssoProperties.get("ContextID");
 
-                    long time = Calendar.getInstance().getTimeInMillis();
+                        long time = Calendar.getInstance().getTimeInMillis();
 
-                    Map<String, String> contexts = null;
-                    if (StringUtils.isNotEmpty(contextID)) {
-                        contexts = new HashMap<>();
-                        contexts.put(AuditConstants.Context.SESSION.toString(), contextID);
-                    }
-
-                    AMIdentity identity = cw.getIdentity(userName, realmName);
-                    String authentication = null;
-                    if (identity != null) {
-                        authentication = identity.getUniversalId();
-                    }
-
-                    String moduleName = (String) ssoProperties.get("ModuleName");
-
-                    // If we have a moduleName, then we got here as the result of the end of an auth chain being
-                    // reached, either successfully or unsuccessfully.
-                    List<?> entries = null;
-                    if (StringUtils.isNotEmpty(moduleName)) {
-                        Map<String, String> info = new HashMap<>();
-                        String ip = (String) ssoProperties.get("IPAddr");
-                        if (StringUtils.isNotEmpty(ip)) {
-                            info = Collections.singletonMap("ipAddress", ip);
+                        Map<String, String> contexts = null;
+                        if (StringUtils.isNotEmpty(contextID)) {
+                            contexts = new HashMap<>();
+                            contexts.put(AuditConstants.Context.SESSION.toString(), contextID);
                         }
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("moduleId", moduleName);
-                        map.put("result", "Finished auth chain");
-                        map.put("info", info);
-                        entries = Collections.singletonList(map);
-                    }
 
-                    auditor.handleEvent(messageName, description, AuditRequestContext.getTransactionIdValue(),
-                            authentication, realmName, time, contexts, entries);
+                        AMIdentity identity = cw.getIdentity(userName, realmName);
+                        String authentication = null;
+                        if (identity != null) {
+                            authentication = identity.getUniversalId();
+                        }
+
+                        String moduleName = (String) ssoProperties.get("ModuleName");
+
+                        // If we have a moduleName, then we got here as the result of the end of an auth chain being
+                        // reached, either successfully or unsuccessfully.
+                        List<?> entries = null;
+                        if (StringUtils.isNotEmpty(moduleName)) {
+                            Map<String, String> info = new HashMap<>();
+                            String ip = (String) ssoProperties.get("IPAddr");
+                            if (StringUtils.isNotEmpty(ip)) {
+                                info = Collections.singletonMap("ipAddress", ip);
+                            }
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("moduleId", moduleName);
+                            map.put("result", "Finished auth chain");
+                            map.put("info", info);
+                            entries = Collections.singletonList(map);
+                        }
+
+                        auditor.handleEvent(messageName, description, AuditRequestContext.getTransactionIdValue(),
+                                authentication, realmName, time, contexts, entries);
+                    }
                 }
 
                 //----------------------------------

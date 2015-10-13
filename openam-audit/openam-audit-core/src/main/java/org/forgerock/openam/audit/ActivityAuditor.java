@@ -35,7 +35,7 @@ public class ActivityAuditor {
      * Guice injected constructor for creating an <code>ActivityAuditor</code> instance.
      *
      * @param eventPublisher The publisher responsible for logging the events.
-     * @param eventFactory The factory that can be used to create the events.
+     * @param eventFactory   The factory that can be used to create the events.
      */
     @Inject
     public ActivityAuditor(AuditEventPublisher eventPublisher, AuditEventFactory eventFactory) {
@@ -63,4 +63,7 @@ public class ActivityAuditor {
         eventPublisher.publish(AuditConstants.AUTHENTICATION_TOPIC, auditEvent);
     }
 
+    public boolean isAuditing(String realm, String topic) {
+        return eventPublisher.isAuditing(realm, topic);
+    }
 }

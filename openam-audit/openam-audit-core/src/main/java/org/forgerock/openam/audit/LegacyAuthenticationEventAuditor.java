@@ -55,15 +55,16 @@ public class LegacyAuthenticationEventAuditor {
      * AuthenticationLogMessageIDs.xml
      *
      *
-     * @param description
-     * @param messageName
+     * @param eventDescription
+     * @param eventName
      * @param transactionId
      * @param authentication
      * @param time
      * @param contexts
-     * @param entries @return
+     * @param entries
+     * @return
      */
-    public boolean handleEvent(String messageName, String description, String transactionId, String authentication,
+    public boolean handleEvent(String eventName, String eventDescription, String transactionId, String authentication,
                                String realmName, long time, Map<String, String> contexts, List<?> entries) {
         Reject.ifNull(transactionId, "The transactionId field cannot be null");
         Reject.ifNull(authentication, "The authentication field cannot be null");
@@ -72,28 +73,21 @@ public class LegacyAuthenticationEventAuditor {
         boolean isAuthenticationEvent = true;
 
         //Determine if event is an activity event ONLY.
-        if (StringUtils.isNotEmpty(messageName)) {
-            if ("CHANGE_USER_PASSWORD_SUCCEEDED".equals(messageName)) {
+        if (StringUtils.isNotEmpty(eventName)) {
+            if ("CHANGE_USER_PASSWORD_SUCCEEDED".equals(eventName)) {
                 isActivityEvent = true;
                 isAuthenticationEvent = false;
             }
         }
-
-        //Determine if event is an activity AND authentication event.
-//        if (StringUtils.isNotEmpty(messageName)) {
-//            if ("CHANGE_USER_PASSWORD_SUCCEEDED".equals(messageName)) {
-//                isActivityEvent = true;
-//            }
-//        }
         //(any remaining events are purely authentication events)
 
         if (isAuthenticationEvent) {
-            return handleAuthenticationEvent(description, transactionId, authentication, realmName, time, contexts,
+            return handleAuthenticationEvent(eventDescription, transactionId, authentication, realmName, time, contexts,
                     entries);
         }
 
         if (isActivityEvent) {
-            return handleActivityEvent(description, transactionId, authentication, realmName, time, contexts);
+            return handleActivityEvent(eventDescription, transactionId, authentication, realmName, time, contexts);
         }
 
         return false;
@@ -102,17 +96,20 @@ public class LegacyAuthenticationEventAuditor {
     private boolean handleAuthenticationEvent(String description, String transactionId, String authentication,
                                               String realmName, long time, Map<String, String> contexts,
                                               List<?> entries) {
-        boolean couldHandleEvent = false;
+        boolean couldHandleEvent = true;
 
         AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
 
-        builder.transactionId(transactionId).authentication(authentication).timestamp(time);
+        builder.transactionId(transactionId)
+                .authentication(authentication)
+                .timestamp(time)
+                .component(AuditConstants.Component.AUTHENTICATION);
 
         if (StringUtils.isNotEmpty(description)) {
             builder.eventName(description);
         }
         if (StringUtils.isNotEmpty(realmName)) {
-            builder.eventName(realmName);
+            builder.realm(realmName);
         }
         if (contexts != null && !contexts.isEmpty()) {
             builder.contexts(contexts);
@@ -136,13 +133,16 @@ public class LegacyAuthenticationEventAuditor {
 
         AMActivityAuditEventBuilder builder = activityAuditor.activityEvent();
 
-        builder.transactionId(transactionId).authentication(authentication).timestamp(time);
+        builder.transactionId(transactionId)
+                .authentication(authentication)
+                .timestamp(time)
+                .component(AuditConstants.Component.AUTHENTICATION);
 
         if (StringUtils.isNotEmpty(description)) {
             builder.eventName(description);
         }
         if (StringUtils.isNotEmpty(realmName)) {
-            builder.eventName(realmName);
+            builder.realm(realmName);
         }
         if (contexts != null && !contexts.isEmpty()) {
             builder.contexts(contexts);
@@ -180,4 +180,18 @@ public class LegacyAuthenticationEventAuditor {
         return isLogoutEvent;
     }
 
+    public boolean isAuditing(String realm, String topic) {
+        if (AuditConstants.AUTHENTICATION_TOPIC.equals(topic)) {
+            return (authenticationAuditor.isAuditing(realm, topic));
+        } else if (AuditConstants.ACTIVITY_TOPIC.equals(topic)) {
+            return (activityAuditor.isAuditing(realm, topic));
+        }
+
+        return false;
+    }
+
+    public boolean isAuditing(String realm) {
+        return (authenticationAuditor.isAuditing(realm, AuditConstants.AUTHENTICATION_TOPIC) ||
+                activityAuditor.isAuditing(realm, AuditConstants.ACTIVITY_TOPIC));
+    }
 }

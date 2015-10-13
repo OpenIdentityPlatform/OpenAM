@@ -61,4 +61,15 @@ public final class AMActivityAuditEventBuilder extends ActivityAuditEventBuilder
     public AMActivityAuditEventBuilder eventName(AuditConstants.EventName name) {
         return eventName(name.toString());
     }
+
+    /**
+     * Provide value for "realm" audit log field.
+     *
+     * @param value Value that should be stored in the 'realm' audit log field.
+     * @return this builder for method chaining.
+     */
+    public AMActivityAuditEventBuilder realm(String value) {
+        putRealm(jsonValue, value);
+        return this;
+    }
 }
