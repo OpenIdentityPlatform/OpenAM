@@ -32,7 +32,7 @@
  */
 package org.forgerock.openam.radius.common.packet;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.forgerock.openam.radius.common.Attribute;
 import org.forgerock.openam.radius.common.AttributeType;
@@ -64,7 +64,7 @@ public class VendorSpecificAttribute extends Attribute {
     public VendorSpecificAttribute(byte[] octets) {
         super(octets);
         id = OctetUtils.toIntVal(octets);
-        str = new String(octets, 6, octets.length - 6, Charset.forName("utf-8"));
+        str = new String(octets, 6, octets.length - 6, StandardCharsets.UTF_8);
     }
 
     /**
@@ -76,7 +76,7 @@ public class VendorSpecificAttribute extends Attribute {
     public VendorSpecificAttribute(int identifier, String text) {
         super(VendorSpecificAttribute.toOctets(identifier, text));
         id = identifier;
-        str = new String(super.getOctets(), 6, super.getOctets().length - 6, Charset.forName("utf-8"));
+        str = new String(super.getOctets(), 6, super.getOctets().length - 6, StandardCharsets.UTF_8);
     }
 
     /**
@@ -88,7 +88,7 @@ public class VendorSpecificAttribute extends Attribute {
      * @return the octets for the on-the-wire bytes
      */
     private static final byte[] toOctets(int identifier, String text) {
-        byte[] s = text.getBytes(Charset.forName("utf-8"));
+        byte[] s = text.getBytes(StandardCharsets.UTF_8);
         // use utility code to make it easier for us and copy in those pieces
         byte[] base = OctetUtils.toOctets(AttributeType.VENDOR_SPECIFIC, identifier);
         int maxTextSpace = Attribute.MAX_ATTRIBUTE_LENGTH - base.length;

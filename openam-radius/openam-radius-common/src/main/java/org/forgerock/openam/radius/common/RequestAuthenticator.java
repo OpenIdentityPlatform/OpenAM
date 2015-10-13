@@ -32,6 +32,8 @@
  */
 package org.forgerock.openam.radius.common;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -53,6 +55,7 @@ public class RequestAuthenticator implements Authenticator {
      * @param rand   in instance of SecureRandom as the source of randomness.
      * @param secret the secret shared between a radius client and server.
      * @throws NoSuchAlgorithmException if the MD5 algorithm is not available.
+     * @throws UnsupportedEncodingException 
      */
     public RequestAuthenticator(SecureRandom rand, String secret)
             throws NoSuchAlgorithmException {
@@ -61,7 +64,7 @@ public class RequestAuthenticator implements Authenticator {
 
         final MessageDigest md5 = MessageDigest.getInstance("MD5");
         md5.update(authenticator);
-        md5.update(secret.getBytes());
+        md5.update(secret.getBytes(StandardCharsets.UTF_8));
         octets = md5.digest();
     }
 

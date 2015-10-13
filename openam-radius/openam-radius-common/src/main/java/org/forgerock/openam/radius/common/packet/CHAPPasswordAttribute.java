@@ -33,6 +33,7 @@
 package org.forgerock.openam.radius.common.packet;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.forgerock.openam.radius.common.Attribute;
 import org.forgerock.openam.radius.common.AttributeType;
@@ -79,7 +80,7 @@ public class CHAPPasswordAttribute extends Attribute {
      */
     private static final byte[] toOctets(String password, int identifier) {
         byte[] octets = new byte[19];
-        byte[] s = password.getBytes(Charset.forName("utf-8"));
+        byte[] s = password.getBytes(StandardCharsets.UTF_8);
 
         // this is not part of rfc 2865 but added to for consistency rather than leaving random values in the unused
         // portion of the array and to prevent an array index out of bounds exception

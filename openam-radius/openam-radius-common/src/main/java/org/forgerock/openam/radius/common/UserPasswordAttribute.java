@@ -33,6 +33,7 @@
 package org.forgerock.openam.radius.common;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -102,9 +103,8 @@ public class UserPasswordAttribute extends Attribute {
     private static final byte[] toOctets(Authenticator ra, String secret, String password) {
         byte[] bytes;
         try {
-            bytes = convert(password.getBytes(), Direction.ENCRYPT, secret, ra);
+            bytes = convert(password.getBytes(StandardCharsets.UTF_8), Direction.ENCRYPT, secret, ra);
         } catch (final IOException e) {
-            e.printStackTrace();
             return new byte[] { (byte) AttributeType.USER_PASSWORD.getTypeCode(), 2 }; // empty string password
         }
         final byte[] octets = new byte[bytes.length + 2];
@@ -138,7 +138,7 @@ public class UserPasswordAttribute extends Attribute {
         } catch (final NoSuchAlgorithmException e) {
             throw new IOException(e.getMessage());
         }
-        md5.update(secret.getBytes());
+        md5.update(secret.getBytes(StandardCharsets.UTF_8));
         md5.update(ra.getOctets());
         byte[] sum = md5.digest();
 
@@ -153,7 +153,7 @@ public class UserPasswordAttribute extends Attribute {
         for (int i = 0; i < ret.length; i++) {
             if ((i % 16) == 0) {
                 md5.reset();
-                md5.update(secret.getBytes());
+                md5.update(secret.getBytes(StandardCharsets.UTF_8));
             }
             if (i < up.length) {
                 ret[i] = (byte) (sum[i % 16] ^ up[i]);

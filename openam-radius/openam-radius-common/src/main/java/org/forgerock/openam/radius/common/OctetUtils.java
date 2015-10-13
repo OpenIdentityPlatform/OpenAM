@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.radius.common;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class centralizes much of the conversion code that is repeated throughout many attributes that have the same
@@ -125,7 +127,7 @@ public final class OctetUtils {
      * @return the on-the-wire byte representation
      */
     public static final byte[] toOctets(AttributeType type, String str) {
-        final byte[] s = str.getBytes();
+        final byte[] s = str.getBytes(StandardCharsets.UTF_8);
         byte[] octets;
 
         /*
