@@ -26,7 +26,6 @@
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
-
 package com.sun.identity.saml2.common;
 
 import com.sun.identity.cot.COTConstants;
@@ -952,7 +951,18 @@ public interface SAML2Constants {
          "com.sun.identity.saml.xmlsig.transformAlg";
     public String XMLSIG_ALGORITHM =
          "com.sun.identity.saml.xmlsig.xmlSigAlgorithm";
-    
+    /**
+     * Property name for the global default query signature algorithm for RSA keys.
+     */
+    public String QUERY_SIGNATURE_ALGORITHM_RSA = "org.forgerock.openam.saml2.query.signature.alg.rsa";
+    /**
+     * Property name for the global default query signature algorithm for DSA keys.
+     */
+    public String QUERY_SIGNATURE_ALGORITHM_DSA = "org.forgerock.openam.saml2.query.signature.alg.dsa";
+    /**
+     * Property name for the global default query signature algorithm for EC keys.
+     */
+    public String QUERY_SIGNATURE_ALGORITHM_EC = "org.forgerock.openam.saml2.query.signature.alg.ec";
     public String DSA = "DSA";
     public String RSA = "RSA";      
 

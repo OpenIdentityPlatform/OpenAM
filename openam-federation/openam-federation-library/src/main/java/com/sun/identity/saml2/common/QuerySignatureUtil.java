@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,20 +24,25 @@
  *
  * $Id: QuerySignatureUtil.java,v 1.2 2008/06/25 05:47:45 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.common;
 
+import java.security.GeneralSecurityException;
 import java.util.StringTokenizer;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.InvalidKeyException;
 import java.security.cert.X509Certificate;
+
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.identity.saml.common.SAMLConstants;
+import org.apache.xml.security.Init;
+import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.signature.XMLSignature;
+
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -45,6 +50,12 @@ import java.security.NoSuchAlgorithmException;
  * sign query string and to verify signature on query string
  */
 public class QuerySignatureUtil {
+
+    private static final String SIGNATURE = "Signature";
+
+    static {
+        Init.init();
+    }
 
     private QuerySignatureUtil() {
     }
@@ -56,10 +67,7 @@ public class QuerySignatureUtil {
      * @return String signed query string
      * @exception SAML2Exception if the signing fails
      */
-    public static String sign(
-        String queryString,
-        PrivateKey privateKey
-    ) throws SAML2Exception {
+    public static String sign(String queryString, PrivateKey privateKey) throws SAML2Exception {
         
         String classMethod =
             "QuerySignatureUtil.sign: ";
@@ -79,63 +87,53 @@ public class QuerySignatureUtil {
                 "Input query string:\n" +
                 queryString);
         }
-        String alg = privateKey.getAlgorithm();
-        Signature sig = null;
-        String algURI = null;
-        if (alg.equals("RSA")) {
-            try {
-                sig = Signature.getInstance(
-                    SAML2Constants.SHA1_WITH_RSA);
-                algURI = SAMLConstants.ALGO_ID_SIGNATURE_RSA;
-            } catch (NoSuchAlgorithmException nsae) {
-                throw new SAML2Exception(nsae);
-            }
-        } else if (alg.equals("DSA")) {
-            try {
-                sig = Signature.getInstance(
-                    SAML2Constants.SHA1_WITH_DSA);
-                algURI = SAMLConstants.ALGO_ID_SIGNATURE_DSA;
-            } catch (NoSuchAlgorithmException nsae) {
-                throw new SAML2Exception(nsae);
-            }
+
+        final String querySigAlg;
+        final String alg = privateKey.getAlgorithm();
+        if ("RSA".equals(alg)) {
+            //Defaulting to RSA-SHA1 for the sake of interoperability
+            querySigAlg = SystemPropertiesManager.get(SAML2Constants.QUERY_SIGNATURE_ALGORITHM_RSA,
+                    XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1);
+        } else if ("DSA".equals(alg)) {
+            //Oracle JDK7 doesn't support SHA256WithDSA
+            querySigAlg = SystemPropertiesManager.get(SAML2Constants.QUERY_SIGNATURE_ALGORITHM_DSA,
+                    XMLSignature.ALGO_ID_SIGNATURE_DSA);
+        } else if ("EC".equals(alg)) {
+            querySigAlg = SystemPropertiesManager.get(SAML2Constants.QUERY_SIGNATURE_ALGORITHM_EC,
+                    XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA512);
         } else {
-            SAML2Utils.debug.error(
-                classMethod +
-                "Algorithm not supported: " + alg
-            );
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString(
-                    "algorithmNotSupported")
-            );
+            SAML2Utils.debug.error(classMethod + "Private Key algorithm not supported: " + alg);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("algorithmNotSupported"));
         }
+
+        Signature sig;
+        try {
+            sig = Signature.getInstance(JCEMapper.translateURItoJCEID(querySigAlg));
+        } catch (NoSuchAlgorithmException nsae) {
+            throw new SAML2Exception(nsae);
+        }
+
         if(queryString.charAt(queryString.length()-1)
            != '&'){
             queryString = queryString + "&";
         }
-        queryString += SAML2Constants.SIG_ALG + "=" +
-            URLEncDec.encode(algURI);
+        queryString += SAML2Constants.SIG_ALG + "=" + URLEncDec.encode(querySigAlg);
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message(
                 classMethod +
                 "Final string to be signed:\n" +
                 queryString);
-        }       
+        }
+
+        byte[] sigBytes;
         try {
             sig.initSign(privateKey);
-        } catch (InvalidKeyException ike) {
-            throw new SAML2Exception(ike);
-        }
-        try {
             sig.update(queryString.getBytes());
-        } catch (SignatureException se1) {
-            throw new SAML2Exception(se1);
-        }
-        byte[] sigBytes = null;
-        try {
             sigBytes = sig.sign();
-        } catch (SignatureException se2) {
-            throw new SAML2Exception(se2);
+        } catch (GeneralSecurityException gse) {
+            throw new SAML2Exception(gse);
         }
+
         if (sigBytes == null ||
             sigBytes.length == 0) {
             SAML2Utils.debug.error(
@@ -286,31 +284,16 @@ public class QuerySignatureUtil {
         signature = decoder.decode(encSigValue);
 
         // get Signature instance based on algorithm
-        Signature sig = null;
-        if (sigAlgValue.equals(
-            SAMLConstants.ALGO_ID_SIGNATURE_DSA)) {
-            try {
-                sig = Signature.getInstance(
-                    SAML2Constants.SHA1_WITH_DSA);
-            } catch (NoSuchAlgorithmException nsae) {
-                throw new SAML2Exception(nsae);
-            }
-        } else if (sigAlgValue.equals(
-            SAMLConstants.ALGO_ID_SIGNATURE_RSA)) {
-            try {
-                sig = Signature.getInstance(
-                    SAML2Constants.SHA1_WITH_RSA);
-            } catch (NoSuchAlgorithmException nsae) {
-                throw new SAML2Exception(nsae);
-            }
-        } else {
-            SAML2Utils.debug.error(
-                classMethod +
-                "Signature algorithm not supported.");
-            throw new SAML2Exception( 
-                SAML2Utils.bundle.getString(
-                    "algNotSupported")
-            );              
+        if (!SIGNATURE.equals(JCEMapper.getAlgorithmClassFromURI(sigAlgValue))) {
+            SAML2Utils.debug.error(classMethod + "Signature algorithm " + sigAlgValue + " is not supported.");
+            throw new SAML2Exception(SAML2Utils.bundle.getString("algNotSupported"));
+        }
+
+        Signature sig;
+        try {
+            sig = Signature.getInstance(JCEMapper.translateURItoJCEID(sigAlgValue));
+        } catch (NoSuchAlgorithmException nsae) {
+            throw new SAML2Exception(nsae);
         }
         // now verify signature
         try {
@@ -332,15 +315,3 @@ public class QuerySignatureUtil {
         return result;
     }
 }
-    
-
-
-
-
-
-
-
-
-
-
-

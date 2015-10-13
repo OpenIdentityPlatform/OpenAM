@@ -1718,8 +1718,8 @@ public class AuthClientUtils {
                 } else {
                     String value = request.getParameter(parameter);
                     if (StringUtils.isNotEmpty(value)) {
-                       if (parameter.equals(RedirectUrlValidator.GOTO) ||
-                               parameter.equals(RedirectUrlValidator.GOTO_ON_FAIL)) {
+                       if (encoded && (parameter.equals(RedirectUrlValidator.GOTO)
+                               || parameter.equals(RedirectUrlValidator.GOTO_ON_FAIL))) {
                     	   // Again this will be the case when browser back
                     	   // button is used and the form is posted with the
                     	   // base64 encoded parameters including goto
