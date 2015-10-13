@@ -758,69 +758,6 @@ public class AMLoginContext {
         }
         debug.message("Came to before if Failed loop");
 
-        //-------------------------------------- Not sure this one is used...
-
-//        authenticationAuditor = InjectorHolder.getInstance(AuthenticationAuditor.class);
-//
-//        CoreWrapper cw = new CoreWrapper();
-//        String realmName = cw.convertOrgNameToRealmName(loginState.getOrgDN());
-//        String ip = loginState.getClient();
-//
-//        LoginContext.ModuleInfo[] moduleStack = jaasLoginContext.getModuleStack();
-//        for (LoginContext.ModuleInfo moduleInfo : moduleStack) {
-//            Object module = moduleInfo.getModule();
-//            try {
-//                module.getClass().asSubclass(AMLoginModule.class);
-//
-//                AMLoginModule amLoginModule = (AMLoginModule) module;
-//
-//                String moduleName = amLoginModule.getModuleName();
-//                String moduleClass = amLoginModule.getModuleClass();
-//                int authLevel = amLoginModule.getAuthLevel();
-//
-//                String description;
-//                String modulePassOrFailMessage =
-//                        "Authentication module named " + moduleName +
-//                        " of class " + moduleClass;
-//                int state = amLoginModule.getCurrentState();
-//                if (state != ISAuthConstants.LOGIN_SUCCEED) {
-//                    modulePassOrFailMessage += " failed.";
-//                    description = "FAILURE";
-//                } else {
-//                    modulePassOrFailMessage += " succeeded.";
-//                    description = "SUCCESS";
-//                }
-//
-//                Map<String, String> info = new HashMap<>();
-//                if (StringUtils.isNotEmpty(ip)) {
-//                    info.put("ipAddress", ip);
-//                }
-//                String authLevelAsString = String.valueOf(authLevel);
-//                info.put("authLevel", authLevelAsString);
-//
-//                long time = Calendar.getInstance().getTimeInMillis();
-//
-//                AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
-//                builder.eventName(modulePassOrFailMessage)
-//                        .transactionId(AuditRequestContext.getTransactionIdValue())
-//                        .realm(realmName)
-//                        .time(time)
-//                        .entries(moduleName, description, info);
-//
-//                try {
-//                    authenticationAuditor.publish(builder.toEvent());
-//                } catch (AuditException e) {
-//                    //Do nothing
-//                    int i = 0;
-//                }
-//            } catch (ClassCastException cce) {
-//                //Do nothing
-//                int i = 0;
-//            }
-//        }
-
-        //--------------------------------------
-
         if (isFailed) {
             if (MonitoringUtil.isRunning()) {
                 if (authImpl == null) {
