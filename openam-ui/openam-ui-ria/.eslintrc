@@ -31,6 +31,40 @@
              "properties": "always"
          }],
         /**
+         * Require commas to appear at the end of lines instead of the start.
+         *
+         * var a = 3 # bad
+         *   , b = 4;
+         *
+         * var a = 3, # good
+         *     b = 4;
+         */
+        "comma-style": 2,
+        /**
+         * Require newline before the dot if a property access is split over lines.
+         *
+         * var a = universe. # bad
+         *     galaxy;
+         *
+         * var a = universe # good
+         *     .galaxy;
+         */
+        "dot-location": [2, "property"],
+        /**
+         * Make sure for-in loops check hasOwnProperty.
+         *
+         * for (key in foo) { # bad
+         *   doSomething(key);
+         * }
+         *
+         * for (key in foo) { # good
+         *   if (Object.prototype.hasOwnProperty.call(foo, key)) {
+         *     doSomething(key);
+         *   }
+         * }
+         */
+        "guard-for-in": 2,
+        /**
          * 4 space indent.
          *
          * function() { # bad
@@ -76,6 +110,94 @@
             "capIsNew": false
         }],
         /**
+         * Require parentheses when invoking a constructor with no arguments.
+         *
+         * var a = new A; # bad
+         *
+         * var a = new A(); # good
+         */
+        "new-parens": 2,
+        /**
+         * Disallow the use of alert, confirm, and prompt.
+         *
+         * alert("hi"); # bad
+         */
+        "no-alert": 2,
+        /**
+         * Disallow use of bitwise operators.
+         *
+         * var x = y | z; # bad
+         */
+        "no-bitwise": 2,
+        /**
+         * Disallow the exception parameter name being the same as a variable in the outer scope.
+         *
+         * var err = "x"; # bad
+         * try {} catch (err) {}
+         */
+        "no-catch-shadow": 2,
+        /**
+         * Disallow use of the continue statement.
+         *
+         * while (i < 10) { # bad
+         *   if (i % 2 === 0) {
+         *     continue;
+         *   }
+         * }
+         */
+        "no-continue": 2,
+        /**
+         * Disallow a duplicate case label.
+         *
+         * switch (foo) { # bad
+         *   case 1:
+         *   case 1:
+         *     i++;
+         * }
+         */
+        "no-duplicate-case": 2,
+        /**
+         * Disallow the use of empty character classes in regular expressions.
+         *
+         * var foo = /^abc[]/; # bad
+         */
+        "no-empty-character-class": 2,
+        /**
+         * Disallow adding to native types.
+         *
+         * Object.prototype.extra = 55; # bad
+         */
+        "no-extend-native": 2,
+        /**
+         * Disallow invalid regular expression strings in the RegExp constructor.
+         *
+         * RegExp('[') # bad
+         */
+        "no-invalid-regexp": 2,
+        /**
+         * Disallow whitespace characters that aren't spaces or tabs outside of strings and comments.
+         *
+         * function <NBSP>thing() { # bad
+         */
+        "no-irregular-whitespace": 2,
+        /**
+         * Disallow use of labelled statements
+         *
+         * outer: # bad
+         * while (true) {
+         *   break outer;
+         * }
+         */
+        "no-labels": 2,
+        /**
+         * Disallow mixed spaces and tabs for indentation.
+         *
+         * \t....var a = 3; # bad
+         *
+         * ........var a = 3; # good
+         */
+        "no-mixed-spaces-and-tabs": 2,
+        /**
          * Multiple spaces not allowed.
          *
          * var fruit···=··"apples" # bad
@@ -83,6 +205,28 @@
          * var fruit·=·"apples" # good
          */
         "no-multi-spaces": 2,
+        /**
+         * Disallow use of multiline strings.
+         *
+         * var x = "Line 1 \ # bad
+         *          Line 2";
+         *
+         * var x = "Line 1" + # good
+         *         "Line 2";
+         */
+        "no-multi-str": 2,
+        /**
+         * Disallow reassignments of native objects.
+         *
+         * Object = 3; # bad
+         */
+        "no-native-reassign": 2,
+        /**
+         * Disallow use of the void operator.
+         *
+         * return void 0; # bad
+         */
+        "no-void": 2,
         /**
          * Spaces inside of curly braces.
          *
@@ -100,6 +244,17 @@
          * var string = 'this is a "string"' # good
          */
         "quotes": [2, "double", "avoid-escape"],
+        /**
+         * Require a space or newline after a semicolon and not before.
+         *
+         * for (i = 0 ;i < 10;i++) { # bad
+         *
+         * for (i = 0; i < 10; i++) { # good
+         */
+        "semi-spacing": [2, {
+            "before": false,
+            "after": true
+        }],
         /**
          * Space required after keywords.
          *
@@ -146,6 +301,22 @@
         "space-infix-ops": [2, {
             "int32Hint": false
         }],
+        /**
+         * Disallow a space after a unary operator.
+         *
+         * var a = ! b; # bad
+         *
+         * var a = !b; # good
+         */
+        "space-unary-ops": 2,
+        /**
+         * Disallow comparisons with the constant on the left-hand side.
+         *
+         * var a = (2 === b); # bad
+         *
+         * var a = (b === 2); # good
+         */
+        "yoda": [2, "never"],
 
         /*
          * --------------------------------------------------------------------------------
@@ -156,6 +327,102 @@
          * error rules.
          * --------------------------------------------------------------------------------
          */
+        /**
+         * Disallow spacing at the start or end of an array literal.
+         *
+         * var a = [ 1, 2 ]; # bad
+         *
+         * var a = [1, 2]; # good
+         */
+        "array-bracket-spacing": [1, "never"],
+        /**
+         * Require spacing inside of single line blocks.
+         *
+         * function () {return 1;} # bad
+         *
+         * function () { return 1; } # good
+         */
+        "block-spacing": [1, "always"],
+        /**
+         * Enforce "stroustrup" style braces.
+         *
+         * if (a) # bad
+         * {
+         * }
+         *
+         * if (a) { # good
+         * }
+         */
+        "brace-style": [1, "stroustrup"],
+        /**
+         * Require a space after a comma and disallow a space before a comma.
+         *
+         * var a = [1,2 ,3]; # bad
+         *
+         * var a = [1, 2, 3]; # good
+         */
+        "comma-spacing": [1, {
+            "before": false,
+            "after": true
+        }],
+        /**
+         * Require a line break at the end of a file.
+         */
+        "eol-last": 1,
+        /**
+         * Require consistent use of line break characters within a file.
+         */
+        "linebreak-style": 1,
+        /**
+         * Disallow if as the only statement in a else block.
+         *
+         * if (a) { # bad
+         * } else {
+         *   if (b) {
+         *   }
+         * }
+         *
+         * if (a) { # good
+         * } else if (b) {
+         * }
+         */
+        "no-lonely-if": 1,
+        /**
+         * Disallow 3 or more consecutive empty lines.
+         */
+        "no-multiple-empty-lines": 1,
+        /**
+         * Disallow trailing whitespace at the end of lines.
+         *
+         * var a = 3;···· # bad
+         */
+        "no-trailing-spaces": 1,
+        /**
+         * Disallow declaration of variables that are not used in the code.
+         */
+        "no-unused-vars": 1,
+        /**
+         * Require operators to appear at the end of lines if split across multple lines.
+         *
+         * var a = b # bad
+         *     + c;
+         *
+         * var a = b + # good
+         *     c;
+         */
+        "operator-linebreak": 1,
+        /**
+         * Require a space before certain keywords.
+         *
+         * if (a) { # bad
+         * }else {
+         * }
+         *
+         * if (a) { # good
+         * } else {
+         * }
+         */
+        "space-before-keywords": 1,
         /**
          * Validates that JSDoc is syntactically correct.
          */
@@ -180,17 +447,24 @@
          * --------------------------------------------------------------------------------
          * DISABLED RULES
          *
-         * These are rules we want to evaluate and promote to warnings.
+         * Rules we'd like to enable but can't for various reasons.
          * --------------------------------------------------------------------------------
          */
+
+
         /**
-         * no-alert
-         * no-unused-vars
-         * array-bracket-spacing (no space)
-         * brace-style (else on the same line)
-         * comma-spacing "one, two"
-         * no-mixed-spaces-and-tabs
-         * no-multiple-empty-lines (max=2)
+         * Disallow the use of console.
+         *
+         * TODO: Need an abstraction for logging before we can enable this.
          */
+        //"no-console": 0
+        /**
+         * Disallow reassignment of function parameters.
+         *
+         * function (a) { # bad
+         *   a = 3;
+         * }
+         */
+        //"no-param-reassign": 0
     }
 }
