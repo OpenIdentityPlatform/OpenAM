@@ -94,8 +94,11 @@ public class OpenAMOpenIDConnectProvider implements OpenIDConnectProvider {
             String sessionId = idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.OPS).asSet(String.class)
                     .iterator().next();
 
-            final SSOToken token = tokenManager.createSSOToken(sessionId);
-            tokenManager.destroyToken(token);
+            // for some grant type, there is no OpenAM session associated with a id_token
+            if (sessionId != null) {
+                final SSOToken token = tokenManager.createSSOToken(sessionId);
+                tokenManager.destroyToken(token);
+            }
         } catch (CoreTokenException e) {
             logger.error("Unable to get id_token meta data", e);
             throw new ServerException("Unable to get id_token meta data");

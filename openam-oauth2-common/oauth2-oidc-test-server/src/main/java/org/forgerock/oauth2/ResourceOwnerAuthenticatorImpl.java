@@ -37,7 +37,7 @@ public class ResourceOwnerAuthenticatorImpl implements ResourceOwnerAuthenticato
         this.userStore = userStore;
     }
 
-    public ResourceOwner authenticate(OAuth2Request request) {
+    public ResourceOwner authenticate(OAuth2Request request, boolean useSession) {
 
         final String username = request.getParameter("username");
         final char[] password = request.getParameter("password") == null ? null :

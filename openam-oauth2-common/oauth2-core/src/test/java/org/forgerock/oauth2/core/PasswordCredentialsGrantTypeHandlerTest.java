@@ -74,7 +74,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(resourceOwnerAuthenticator.authenticate(request)).willReturn(resourceOwner);
+        given(resourceOwnerAuthenticator.authenticate(request, false)).willReturn(resourceOwner);
         given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");
         given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class),
                 eq(request))).willReturn(validatedScope);
@@ -103,7 +103,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         ResourceOwner resourceOwner = null;
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
-        given(resourceOwnerAuthenticator.authenticate(request)).willReturn(resourceOwner);
+        given(resourceOwnerAuthenticator.authenticate(request, false)).willReturn(resourceOwner);
 
         //When
         grantTypeHandler.handle(request);
@@ -125,7 +125,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(resourceOwnerAuthenticator.authenticate(request)).willReturn(resourceOwner);
+        given(resourceOwnerAuthenticator.authenticate(request, false)).willReturn(resourceOwner);
         given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");
         given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class),
                 eq(request))).willReturn(validatedScope);
@@ -160,7 +160,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(resourceOwnerAuthenticator.authenticate(request)).willReturn(resourceOwner);
+        given(resourceOwnerAuthenticator.authenticate(request, false)).willReturn(resourceOwner);
         given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");
         given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class),
                 eq(request))).willReturn(validatedScope);

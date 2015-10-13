@@ -81,7 +81,7 @@ public class PasswordCredentialsGrantTypeHandler implements GrantTypeHandler {
             requestValidator.validateRequest(request, clientRegistration);
         }
 
-        final ResourceOwner resourceOwner = resourceOwnerAuthenticator.authenticate(request);
+        final ResourceOwner resourceOwner = resourceOwnerAuthenticator.authenticate(request, false);
         if (resourceOwner == null) {
             logger.error("Unable to verify user");
             throw new InvalidGrantException();
@@ -99,9 +99,8 @@ public class PasswordCredentialsGrantTypeHandler implements GrantTypeHandler {
                     resourceOwner.getId(), null, validatedScope, request);
         }
 
-        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
-                resourceOwner.getId(), clientRegistration.getClientId(), null, validatedScope, refreshToken, null,
-                request);
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null, resourceOwner.getId(),
+                clientRegistration.getClientId(), null, validatedScope, refreshToken, null, request);
 
         if (refreshToken != null) {
             accessToken.addExtraData(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getTokenId());
