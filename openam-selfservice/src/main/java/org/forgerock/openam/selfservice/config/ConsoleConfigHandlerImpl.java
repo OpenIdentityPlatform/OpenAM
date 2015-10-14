@@ -29,6 +29,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -63,9 +65,9 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <C extends ConsoleConfig> C getConfig(String realm, ConsoleConfigExtractor<C> extractor) {
-        return extractor.extract(getServiceConfig(realm).getAttributes());
+        final Map<String, Set<String>> attributes = getServiceConfig(realm).getAttributes();
+        return extractor.extract(attributes);
     }
 
     private ServiceConfig getServiceConfig(String realm) {
