@@ -16,18 +16,18 @@
 
 package org.forgerock.openam.selfservice.config;
 
-import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.services.context.Context;
 
 /**
- * Provides self service configuration instances based of the passed console configuration instance.
+ * Provides self service instances based of the passed console configuration instance.
  *
  * @param <C>
- *     the console configuration type
+ *         the console configuration type
  *
  * @since 13.0.0
  */
-public interface ServiceConfigProvider<C extends ConsoleConfig> {
+public interface ServiceProvider<C extends ConsoleConfig> {
 
 
     /**
@@ -41,7 +41,7 @@ public interface ServiceConfigProvider<C extends ConsoleConfig> {
     boolean isServiceEnabled(C config);
 
     /**
-     * Provides the self service configuration for the appropriate flow.
+     * Provides the self service for the appropriate flow.
      *
      * @param config
      *         the console config
@@ -50,8 +50,8 @@ public interface ServiceConfigProvider<C extends ConsoleConfig> {
      * @param realm
      *         the current realm
      *
-     * @return service configuration
+     * @return service
      */
-    ProcessInstanceConfig getServiceConfig(C config, Context context, String realm);
+    RequestHandler getService(C config, Context context, String realm);
 
 }

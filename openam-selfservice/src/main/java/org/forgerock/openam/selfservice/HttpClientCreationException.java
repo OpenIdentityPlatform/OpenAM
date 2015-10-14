@@ -14,25 +14,25 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice;
 
 /**
- * Factory delivers up service configuration providers based of the passed console configuration.
+ * Represents failure to create a http client.
  *
  * @since 13.0.0
  */
-public interface ServiceConfigProviderFactory {
+public class HttpClientCreationException extends RuntimeException {
 
     /**
-     * Retrieves an instance of a service configuration provider based on the passed console configuration.
+     * Constructs a new http client creation failure exception.
      *
-     * @param config
-     *         console configuration
-     * @param <C>
-     *         the console configuration type
-     *
-     * @return an instance of a service configuration provider
+     * @param message
+     *         message
+     * @param cause
+     *         umderlying cause
      */
-    <C extends ConsoleConfig> ServiceConfigProvider<C> getProvider(C config);
+    public HttpClientCreationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

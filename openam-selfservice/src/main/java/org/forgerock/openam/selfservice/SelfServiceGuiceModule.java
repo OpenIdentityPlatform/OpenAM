@@ -23,31 +23,26 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.http.Client;
+import org.forgerock.http.HttpApplicationException;
+import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
+import org.forgerock.openam.selfservice.config.BasicStageConfigVisitor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandlerImpl;
 import org.forgerock.openam.selfservice.config.ForgottenPasswordConsoleConfig;
 import org.forgerock.openam.selfservice.config.ForgottenPasswordExtractor;
-import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
-import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactoryImpl;
+import org.forgerock.openam.selfservice.config.ServiceProviderFactory;
+import org.forgerock.openam.selfservice.config.ServiceProviderFactoryImpl;
 import org.forgerock.openam.selfservice.config.UserRegistrationConsoleConfig;
 import org.forgerock.openam.selfservice.config.UserRegistrationExtractor;
 import org.forgerock.selfservice.core.ProcessStore;
-import org.forgerock.selfservice.core.ProgressStageFactory;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
-import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
-import org.forgerock.selfservice.stages.email.VerifyEmailAccountStage;
-import org.forgerock.selfservice.stages.email.VerifyUserIdConfig;
-import org.forgerock.selfservice.stages.email.VerifyUserIdStage;
-import org.forgerock.selfservice.stages.registration.UserRegistrationConfig;
-import org.forgerock.selfservice.stages.registration.UserRegistrationStage;
-import org.forgerock.selfservice.stages.reset.ResetStage;
-import org.forgerock.selfservice.stages.reset.ResetStageConfig;
-import org.forgerock.selfservice.stages.user.UserDetailsConfig;
-import org.forgerock.selfservice.stages.user.UserDetailsStage;
+import org.forgerock.selfservice.stages.CommonConfigVisitor;
+import org.forgerock.selfservice.stages.SelfService;
 
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
@@ -63,61 +58,62 @@ public final class SelfServiceGuiceModule extends PrivateModule {
     @Override
     protected void configure() {
         bind(ProcessStore.class).to(CTSProcessStoreImpl.class);
-        bind(AnonymousProcessServiceFactory.class);
         bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
         bind(SnapshotTokenHandlerFactory.class).to(SnapshotTokenHandlerFactoryImpl.class);
-        bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
+        bind(ServiceProviderFactory.class).to(ServiceProviderFactoryImpl.class);
+        bind(CommonConfigVisitor.class).to(BasicStageConfigVisitor.class);
 
         bind(new TypeLiteral<ConsoleConfigExtractor<UserRegistrationConsoleConfig>>() {})
                 .to(UserRegistrationExtractor.class);
         bind(new TypeLiteral<ConsoleConfigExtractor<ForgottenPasswordConsoleConfig>>() {})
                 .to(ForgottenPasswordExtractor.class);
 
+        try {
+            bind(Client.class)
+                    .annotatedWith(SelfService.class)
+                    .toInstance(new Client(new HttpClientHandler()));
+        } catch (HttpApplicationException haE) {
+            throw new HttpClientCreationException("Unable to create http client", haE);
+        }
+
         // Registration CREST services
         expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() {});
         expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() {});
+
+        // These have been exposed so they can be accessible to
+        // reflection based instantiated service provider instances.
+        expose(ProcessStore.class);
+        expose(SnapshotTokenHandlerFactory.class);
+        expose(CommonConfigVisitor.class);
     }
 
     @Provides
     @Singleton
     SelfServiceRequestHandler<UserRegistrationConsoleConfig> getUserRegistrationService(
-            AnonymousProcessServiceFactory serviceFactory, ConsoleConfigHandler configHandler,
+            ConsoleConfigHandler configHandler,
             ConsoleConfigExtractor<UserRegistrationConsoleConfig> configExtractor,
-            ServiceConfigProviderFactory configProviderFactory) {
+            ServiceProviderFactory configProviderFactory) {
 
-        return new SelfServiceRequestHandler<>(serviceFactory, configHandler, configExtractor, configProviderFactory);
+        return new SelfServiceRequestHandler<>(configHandler, configExtractor, configProviderFactory);
     }
 
     @Provides
     @Singleton
     SelfServiceRequestHandler<ForgottenPasswordConsoleConfig> getForgottenPasswordService(
-            AnonymousProcessServiceFactory serviceFactory, ConsoleConfigHandler configHandler,
+            ConsoleConfigHandler configHandler,
             ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> configExtractor,
-            ServiceConfigProviderFactory configProviderFactory) {
+            ServiceProviderFactory configProviderFactory) {
 
-        return new SelfServiceRequestHandler<>(serviceFactory, configHandler, configExtractor, configProviderFactory);
+        return new SelfServiceRequestHandler<>(configHandler, configExtractor, configProviderFactory);
     }
 
     @Provides
     @Singleton
-    @Named("SelfServiceConnectionFactory")
+    @SelfService
     ConnectionFactory getConnectionFactory(@Named("InternalCrestRouter") Router router,
             PrivilegedAction<SSOToken> ssoTokenPrivilegedAction) {
         ConnectionFactory internalConnectionFactory = newInternalConnectionFactory(router);
         return new ElevatedConnectionFactoryWrapper(internalConnectionFactory, ssoTokenPrivilegedAction);
-    }
-
-    @Provides
-    @Singleton
-    ProgressStageFactory getProgressStageFactory(
-            @Named("SelfServiceConnectionFactory") ConnectionFactory connectionFactory) {
-        ProgressStageFactoryImpl stageFactory = new ProgressStageFactoryImpl();
-        stageFactory.safePut(VerifyUserIdConfig.class, new VerifyUserIdStage(connectionFactory));
-        stageFactory.safePut(ResetStageConfig.class, new ResetStage(connectionFactory));
-        stageFactory.safePut(VerifyEmailAccountConfig.class, new VerifyEmailAccountStage(connectionFactory));
-        stageFactory.safePut(UserRegistrationConfig.class, new UserRegistrationStage(connectionFactory));
-        stageFactory.safePut(UserDetailsConfig.class, new UserDetailsStage(connectionFactory));
-        return stageFactory;
     }
 
 }

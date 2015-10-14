@@ -16,54 +16,60 @@
 
 package org.forgerock.openam.selfservice.config;
 
+import com.google.inject.Injector;
+
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Factory delivers up service configuration providers based of the passed console configuration
- * by using reflection to instantiate an instance based of the configuration provider class name.
+ * Factory delivers up service providers based of the passed console configuration
+ * by using reflection to instantiate an instance based of the provider class name.
  *
  * @since 13.0.0
  */
 @Singleton
-public final class ServiceConfigProviderFactoryImpl implements ServiceConfigProviderFactory {
+public final class ServiceProviderFactoryImpl implements ServiceProviderFactory {
 
-    private final ConcurrentMap<String, ServiceConfigProvider<?>> providers;
+    private final ConcurrentMap<String, ServiceProvider<?>> providers;
+    private final Injector injector;
 
     /**
-     * Constructs a new service config provider factory instance.
+     * Constructs a new service provider factory instance.
      */
-    public ServiceConfigProviderFactoryImpl() {
+    @Inject
+    public ServiceProviderFactoryImpl(Injector injector) {
         providers = new ConcurrentHashMap<>();
+        this.injector = injector;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <C extends ConsoleConfig> ServiceConfigProvider<C> getProvider(C config) {
+    public <C extends ConsoleConfig> ServiceProvider<C> getProvider(C config) {
         String providerClassName = config.getConfigProviderClass();
-        ServiceConfigProvider<?> provider = providers.get(providerClassName);
+        ServiceProvider<?> provider = providers.get(providerClassName);
 
         if (provider == null) {
             provider = constructNewProvider(providerClassName);
-            ServiceConfigProvider<?> old = providers.putIfAbsent(providerClassName, provider);
+            ServiceProvider<?> old = providers.putIfAbsent(providerClassName, provider);
 
             if (old != null) {
                 provider = old;
             }
         }
 
-        return (ServiceConfigProvider<C>) provider;
+        return (ServiceProvider<C>) provider;
     }
 
-    private ServiceConfigProvider<?> constructNewProvider(String className) {
+    private ServiceProvider<?> constructNewProvider(String className) {
         try {
-            Class<? extends ServiceConfigProvider> providerClass = Class
+            Class<? extends ServiceProvider> providerClass = Class
                     .forName(className)
-                    .asSubclass(ServiceConfigProvider.class);
+                    .asSubclass(ServiceProvider.class);
 
-            return providerClass.newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            return injector.getInstance(providerClass);
+        } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Unknown class name for provider", e);
         }
     }
