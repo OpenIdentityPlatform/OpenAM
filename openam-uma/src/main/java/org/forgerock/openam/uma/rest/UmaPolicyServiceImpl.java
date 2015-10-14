@@ -75,6 +75,7 @@ import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.uma.extensions.ResourceDelegationFilter;
 import org.forgerock.openam.utils.Config;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Function;
@@ -133,12 +134,15 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         this.extensionFilterManager = extensionFilterManager;
     }
 
-    private JsonValue resolveUsernameToUID(final Context context, JsonValue policy) {
+    private JsonValue resolveUsernameToUID(final Context context, JsonValue policy) throws BadRequestException {
         final String resourceOwnerName = contextHelper.getUserId(context);
         final String resourceOwnerUserUid = contextHelper.getUserUid(context);
 
         for (JsonValue permission : policy.get("permissions")) {
             final String userName = permission.get("subject").asString();
+            if (StringUtils.isBlank(userName)) {
+                throw new BadRequestException("Subject cannot be a blank string");
+            }
             String userUid = contextHelper.getUserUid(context, userName);
 
             if (userUid != null) {
