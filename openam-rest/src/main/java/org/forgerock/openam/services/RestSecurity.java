@@ -172,6 +172,7 @@ public class RestSecurity {
     private synchronized void setProviderConfig(RestSecurityConfiguration newSettings) {
         restSecurityConfiguration = newSettings;
     }
+
     /**
      * Default Constructor
      * @param realm in which Rest Security service shall be created

@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.selfservice.config;
 
+import java.util.Locale;
 import org.forgerock.util.Reject;
 
 import java.util.HashMap;
@@ -38,6 +39,8 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
     private final Map<String, Map<String, String>> securityQuestions;
     private final String configProviderClass;
     private final long tokenExpiry;
+    private final Map<Locale, String> subjectTranslations;
+    private final Map<Locale, String> messageTranslations;
 
     protected CommonConsoleConfig(Builder builder) {
         configProviderClass = builder.configProviderClass;
@@ -51,6 +54,8 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
         verificationUrl = builder.verificationUrl;
         kbaEnabled = builder.kbaEnabled;
         securityQuestions = builder.securityQuestions;
+        subjectTranslations = builder.subjectTranslations;
+        messageTranslations = builder.messageTranslations;
     }
 
     @Override
@@ -149,6 +154,24 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
         return securityQuestions;
     }
 
+    /**
+     * Gets the map of locales to subject strings.
+     *
+     * @return the map of locales to subject text strings.
+     */
+    public Map<Locale, String> getSubjectTranslations() {
+        return subjectTranslations;
+    }
+
+    /**
+     * Gets the map of locales to email body text strings.
+     *
+     * @return the map of locales to email body text strings.
+     */
+    public Map<Locale, String> getMessageTranslations() {
+        return messageTranslations;
+    }
+
     abstract static class Builder<C extends ConsoleConfig, B extends Builder<C, B>> {
 
         private boolean enabled;
@@ -162,9 +185,13 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
         private final Map<String, Map<String, String>> securityQuestions;
         private String configProviderClass;
         private long tokenExpiry;
+        private final Map<Locale, String> subjectTranslations;
+        private final Map<Locale, String> messageTranslations;
 
         protected Builder() {
             securityQuestions = new HashMap<>();
+            subjectTranslations = new HashMap<>();
+            messageTranslations = new HashMap<>();
         }
 
         B setConfigProviderClass(String configProviderClass) {
@@ -222,12 +249,24 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
             return getThis();
         }
 
+        B setSubjectTranslations(Map<Locale, String> subjectTranslations) {
+            this.subjectTranslations.putAll(subjectTranslations);
+            return getThis();
+        }
+
+        B setMessageTranslations(Map<Locale, String> messageTranslations) {
+            this.messageTranslations.putAll(messageTranslations);
+            return getThis();
+        }
+
         C build() {
             Reject.ifNull(configProviderClass, "Config provide class name required");
             Reject.ifFalse(tokenExpiry > 0, "Token expiry must be greater than zero");
 
             if (emailVerificationEnabled) {
                 Reject.ifNull(emailUrl, "Email verification url required");
+                Reject.ifTrue(this.subjectTranslations.isEmpty(), "Subject translations are missing");
+                Reject.ifTrue(this.messageTranslations.isEmpty(), "Message translations are missing");
             }
 
             if (captchaEnabled) {
@@ -244,7 +283,5 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
         abstract B getThis();
 
         abstract C internalBuild();
-
     }
-
 }

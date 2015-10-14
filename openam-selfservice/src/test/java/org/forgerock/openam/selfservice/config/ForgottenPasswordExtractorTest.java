@@ -20,8 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,6 +52,10 @@ public final class ForgottenPasswordExtractorTest {
         consoleAttributes.put("forgerockRESTSecurityCaptchaSiteKey", Collections.singleton("someKey"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaSecretKey", Collections.singleton("someSecret"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaVerificationUrl", Collections.singleton("someUrl"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassSubjectText",
+                new HashSet<String>(Arrays.asList("en|The Subject!", "fr|Le Sujet!")));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailText",
+                new HashSet<String>(Arrays.asList("de|Hallo Welt!", "fr|Bonjour Monde!")));
 
         // When
         ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> extractor = new ForgottenPasswordExtractor();
@@ -67,6 +74,12 @@ public final class ForgottenPasswordExtractorTest {
         assertThat(config.getCaptchaSiteKey()).isEqualTo("someKey");
         assertThat(config.getCaptchaSecretKey()).isEqualTo("someSecret");
         assertThat(config.getCaptchaVerificationUrl()).isEqualTo("someUrl");
+        assertThat(config.getSubjectTranslations()).hasSize(2);
+        assertThat(config.getSubjectTranslations()).containsKey(Locale.ENGLISH);
+        assertThat(config.getSubjectTranslations()).containsKey(Locale.FRENCH);
+        assertThat(config.getMessageTranslations()).hasSize(2);
+        assertThat(config.getMessageTranslations()).containsKey(Locale.GERMAN);
+        assertThat(config.getMessageTranslations()).containsKey(Locale.FRENCH);
     }
 
 }

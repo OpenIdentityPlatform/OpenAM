@@ -64,11 +64,9 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
             Reject.ifFalse(minQuestionsToAnswer > 0);
             return new ForgottenPasswordConsoleConfig(this);
         }
-
     }
 
     static ForgottenPasswordBuilder newBuilder() {
         return new ForgottenPasswordBuilder();
     }
-
 }

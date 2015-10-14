@@ -64,11 +64,9 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
             Reject.ifFalse(minAnswersToProvide > 0);
             return new UserRegistrationConsoleConfig(this);
         }
-
     }
 
     static UserRegistrationBuilder newBuilder() {
         return new UserRegistrationBuilder();
     }
-
 }

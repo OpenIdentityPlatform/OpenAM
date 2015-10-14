@@ -66,6 +66,7 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
 
     @Override
     public <C extends ConsoleConfig> C getConfig(String realm, ConsoleConfigExtractor<C> extractor) {
+        @SuppressWarnings("unchecked")
         final Map<String, Set<String>> attributes = getServiceConfig(realm).getAttributes();
         return extractor.extract(attributes);
     }

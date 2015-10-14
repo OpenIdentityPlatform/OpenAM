@@ -66,9 +66,8 @@ public final class DefaultUserRegistrationConfigProvider implements ServiceConfi
             String serverUrl = config.getEmailUrl() + "&realm=" + realm;
             stages.add(new VerifyEmailAccountConfig()
                     .setEmailServiceUrl("/email")
-                    .setSubject("Register new account")
-                    .setMessage("<h3>This is your registration email.</h3>"
-                            + "<h4><a href=\"%link%\">Email verification link</a></h4>")
+                    .setSubjectTranslations(config.getSubjectTranslations())
+                    .setMessageTranslations(config.getMessageTranslations())
                     .setMimeType("text/html")
                     .setVerificationLinkToken("%link%")
                     .setVerificationLink(serverUrl));

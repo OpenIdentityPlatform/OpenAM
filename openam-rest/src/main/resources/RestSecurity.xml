@@ -50,6 +50,7 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecuritySelfRegTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
@@ -60,6 +61,7 @@
                         <Value>900</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecuritySelfRegConfirmationUrl"
                                  type="single"
                                  syntax="url"
@@ -84,6 +86,7 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityForgotPassTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
@@ -94,6 +97,7 @@
                         <Value>900</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityForgotPassConfirmationUrl"
                                  type="single"
                                  syntax="url"
@@ -139,6 +143,7 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityForgotPassEmailVerificationEnabled"
                                  type="single"
                                  syntax="boolean"
@@ -166,6 +171,7 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityForgotPassCaptchaEnabled"
                                  type="single"
                                  syntax="boolean"
@@ -179,18 +185,21 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityCaptchaSiteKey"
                                  type="single"
                                  syntax="string"
                                  resourceName="captchaSiteKey"
                                  i18nKey="a152">
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityCaptchaSecretKey"
                                  type="single"
                                  syntax="string"
                                  resourceName="captchaSecretKey"
                                  i18nKey="a153">
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityCaptchaVerificationUrl"
                                  type="single"
                                  syntax="string"
@@ -214,6 +223,7 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityForgotPassKbaEnabled"
                                  type="single"
                                  syntax="boolean"
@@ -227,6 +237,7 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityKBAQuestions"
                                  type="list"
                                  syntax="string"
@@ -239,6 +250,7 @@
                         <Value>4|en|What is your mother's maiden name?</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityQuestionsUserMustAnswer"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="50"
@@ -249,6 +261,7 @@
                         <Value>1</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityAnswersUserMustProvide"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="30"
@@ -269,6 +282,7 @@
                         <Value>org.forgerock.openam.selfservice.config.DefaultUserRegistrationConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerockRESTSecurityForgotPassServiceConfigClass"
                                  type="single"
                                  syntax="string"
@@ -278,6 +292,51 @@
                         <Value>org.forgerock.openam.selfservice.config.DefaultForgottenPasswordConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecuritySelfRegSubjectText"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="registrationSubjectText"
+                                 i18nKey="a400">
+                    <DefaultValues>
+                        <Value>en|Registration email</Value>
+                        <Value>fr|Inscription e-mail</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecuritySelfRegEmailText"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="registrationEmailText"
+                                 i18nKey="a410">
+                    <DefaultValues>
+                        <Value>en|Click on this <a href="%link%">link</a> to register</Value>
+                        <Value>fr|Cliquez sur ce <a href="%link%">lien</a> pour vous inscrire</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecurityForgotPassSubjectText"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="forgottenPasswordSubjectText"
+                                 i18nKey="a420">
+                    <DefaultValues>
+                        <Value>en|Forgotten password email</Value>
+                        <Value>fr|Mot de passe oublié email</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecurityForgotPassEmailText"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="forgottenPasswordEmailText"
+                                 i18nKey="a430">
+                    <DefaultValues>
+                        <Value>en|Click on this <a href="%link%">link</a> to reset your password</Value>
+                        <Value>fr|Cliquez sur ce <a href="%link%">lien</a> pour réinitialiser votre mot de passe</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
             </Organization>
         </Schema>
     </Service>

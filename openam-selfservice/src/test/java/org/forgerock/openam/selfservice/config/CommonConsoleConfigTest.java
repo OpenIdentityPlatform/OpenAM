@@ -18,7 +18,11 @@ package org.forgerock.openam.selfservice.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+
+import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Unit test for {@link CommonConsoleConfig}.
@@ -27,6 +31,14 @@ import org.testng.annotations.Test;
  */
 public final class CommonConsoleConfigTest {
 
+    HashMap<Locale, String> map;
+
+    @BeforeTest
+    public void init() {
+        map = new HashMap<>();
+        map.put(Locale.ENGLISH, "hello world");
+    }
+
     @Test
     public void successfullyCreatesInstance() {
         // When
@@ -34,12 +46,16 @@ public final class CommonConsoleConfigTest {
                 .setEnabled(true)
                 .setConfigProviderClass("abc")
                 .setTokenExpiry(123L)
+                .setMessageTranslations(map)
+                .setSubjectTranslations(map)
                 .build();
 
         // Then
         assertThat(config.isEnabled()).isTrue();
         assertThat(config.getConfigProviderClass()).isEqualTo("abc");
         assertThat(config.getTokenExpiry()).isEqualTo(123L);
+        assertThat(config.getMessageTranslations().size() == 1);
+        assertThat(config.getSubjectTranslations().size() == 1);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -70,6 +86,8 @@ public final class CommonConsoleConfigTest {
                 .setConfigProviderClass("abc")
                 .setTokenExpiry(123L)
                 .setEmailVerificationEnabled(true)
+                .setMessageTranslations(map)
+                .setSubjectTranslations(map)
                 .build();
     }
 
@@ -81,6 +99,8 @@ public final class CommonConsoleConfigTest {
                 .setConfigProviderClass("abc")
                 .setTokenExpiry(123L)
                 .setCaptchaEnabled(true)
+                .setMessageTranslations(map)
+                .setSubjectTranslations(map)
                 .build();
     }
 
@@ -92,6 +112,66 @@ public final class CommonConsoleConfigTest {
                 .setConfigProviderClass("abc")
                 .setTokenExpiry(123L)
                 .setKbaEnabled(true)
+                .setMessageTranslations(map)
+                .setSubjectTranslations(map)
+                .build();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void failsWithSubjectTranslationsIsNull() {
+        // When
+        new MockConfigBuilder()
+                .setEnabled(true)
+                .setConfigProviderClass("abc")
+                .setEmailUrl("someurl")
+                .setTokenExpiry(123L)
+                .setMessageTranslations(map)
+                .setEmailVerificationEnabled(true)
+                .build();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void failsWithSubjectTranslationsIsEmpty() {
+        // When
+        HashMap<Locale, String> emptyMap = new HashMap<>();
+
+        new MockConfigBuilder()
+                .setEnabled(true)
+                .setConfigProviderClass("abc")
+                .setEmailUrl("someurl")
+                .setTokenExpiry(123L)
+                .setEmailVerificationEnabled(true)
+                .setMessageTranslations(map)
+                .setSubjectTranslations(emptyMap)
+                .build();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void failsWithMessageTranslationsIsNull() {
+        // When
+        new MockConfigBuilder()
+                .setEnabled(true)
+                .setConfigProviderClass("abc")
+                .setEmailUrl("someurl")
+                .setTokenExpiry(123L)
+                .setEmailVerificationEnabled(true)
+                .setSubjectTranslations(map)
+                .build();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void failsWithBodyTextMapIsEmpty() {
+        // When
+        HashMap<Locale, String> emptyMap = new HashMap<>();
+
+        new MockConfigBuilder()
+                .setEnabled(true)
+                .setConfigProviderClass("abc")
+                .setEmailUrl("someurl")
+                .setTokenExpiry(123L)
+                .setEmailVerificationEnabled(true)
+                .setSubjectTranslations(map)
+                .setMessageTranslations(emptyMap)
                 .build();
     }
 
@@ -115,7 +195,5 @@ public final class CommonConsoleConfigTest {
         MockConfig internalBuild() {
             return new MockConfig(this);
         }
-
     }
-
 }

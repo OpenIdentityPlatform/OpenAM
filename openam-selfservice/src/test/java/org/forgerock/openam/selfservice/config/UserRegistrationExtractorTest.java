@@ -20,8 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +40,14 @@ public final class UserRegistrationExtractorTest {
         // Given
         Map<String, Set<String>> consoleAttributes = new HashMap<>();
 
+        Set<String> subjectTranslations = new HashSet<>();
+        subjectTranslations.add("it|Italian");
+        subjectTranslations.add("fr|French");
+
+        Set<String> messageTranslations = new HashSet<>();
+        messageTranslations.add("da|Danish");
+        messageTranslations.add("es|Spanish");
+
         consoleAttributes.put("forgerockRESTSecuritySelfRegistrationEnabled", Collections.singleton("true"));
         consoleAttributes.put("forgerockRESTSecuritySelfRegEmailVerificationEnabled", Collections.singleton("true"));
         consoleAttributes.put("forgerockRESTSecuritySelfRegConfirmationUrl", Collections.singleton("someurl"));
@@ -49,6 +60,8 @@ public final class UserRegistrationExtractorTest {
         consoleAttributes.put("forgerockRESTSecurityCaptchaSiteKey", Collections.singleton("someKey"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaSecretKey", Collections.singleton("someSecret"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaVerificationUrl", Collections.singleton("someUrl"));
+        consoleAttributes.put("forgerockRESTSecuritySelfRegSubjectText", subjectTranslations);
+        consoleAttributes.put("forgerockRESTSecuritySelfRegEmailText", messageTranslations);
 
         // When
         ConsoleConfigExtractor<UserRegistrationConsoleConfig> extractor = new UserRegistrationExtractor();
@@ -67,6 +80,11 @@ public final class UserRegistrationExtractorTest {
         assertThat(config.getCaptchaSiteKey()).isEqualTo("someKey");
         assertThat(config.getCaptchaSecretKey()).isEqualTo("someSecret");
         assertThat(config.getCaptchaVerificationUrl()).isEqualTo("someUrl");
+        assertThat(config.getSubjectTranslations()).hasSize(2);
+        assertThat(config.getSubjectTranslations()).containsKey(Locale.ITALIAN);
+        assertThat(config.getSubjectTranslations()).containsKey(Locale.FRENCH);
+        assertThat(config.getMessageTranslations()).hasSize(2);
+        assertThat(config.getMessageTranslations()).containsKey(Locale.forLanguageTag("da"));
+        assertThat(config.getMessageTranslations()).containsKey(Locale.forLanguageTag("es"));
     }
-
 }

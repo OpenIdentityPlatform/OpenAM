@@ -70,8 +70,7 @@ public final class ServiceConfigProviderFactoryImpl implements ServiceConfigProv
 
             return injector.getInstance(providerClass);
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Unknown class name for provider", e);
+            throw new IllegalArgumentException("Unknown class name " + className + " for provider", e);
         }
     }
-
 }

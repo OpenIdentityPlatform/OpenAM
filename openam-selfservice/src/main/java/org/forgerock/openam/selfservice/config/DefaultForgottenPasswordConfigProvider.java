@@ -13,7 +13,6 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.selfservice.config;
 
 import com.iplanet.am.util.SystemProperties;
@@ -74,9 +73,8 @@ public final class DefaultForgottenPasswordConfigProvider implements ServiceConf
             String serverUrl = config.getEmailUrl() + "&realm=" + realm;
             stages.add(new VerifyEmailAccountConfig()
                     .setEmailServiceUrl("/email")
-                    .setSubject("Reset password email")
-                    .setMessage("<h3>This is your reset email.</h3>"
-                            + "<h4><a href=\"%link%\">Email verification link</a></h4>")
+                    .setSubjectTranslations(config.getSubjectTranslations())
+                    .setMessageTranslations(config.getMessageTranslations())
                     .setMimeType("text/html")
                     .setVerificationLinkToken("%link%")
                     .setVerificationLink(serverUrl));
@@ -109,5 +107,4 @@ public final class DefaultForgottenPasswordConfigProvider implements ServiceConf
                 .setSnapshotTokenConfig(jwtTokenConfig)
                 .setStorageType(StorageType.STATELESS);
     }
-
 }

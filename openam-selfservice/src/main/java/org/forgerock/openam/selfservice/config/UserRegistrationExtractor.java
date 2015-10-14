@@ -22,6 +22,7 @@ import static com.sun.identity.shared.datastruct.CollectionHelper.getLongMapAttr
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapSetThrows;
+import static com.sun.identity.shared.datastruct.CollectionHelper.getLocaleMapAttrThrows;
 import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.CAPTCHA_SECRET_KEY;
 import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.CAPTCHA_SITE_KEY;
 import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.CAPTCHA_VERIFICATION_URL;
@@ -48,6 +49,8 @@ public final class UserRegistrationExtractor implements ConsoleConfigExtractor<U
     private final static String KBA_ENABLED_KEY = "forgerockRESTSecuritySelfRegKbaEnabled";
     private final static String MIN_ANSWERS_TO_PROVIDE_KEY = "forgerockRESTSecurityAnswersUserMustProvide";
     private final static String CAPTCHA_ENABLED_KEY = "forgerockRESTSecuritySelfRegCaptchaEnabled";
+    private final static String SUBJECT_MAP = "forgerockRESTSecuritySelfRegSubjectText";
+    private final static String BODY_TEXT_MAP = "forgerockRESTSecuritySelfRegEmailText";
 
     @Override
     public UserRegistrationConsoleConfig extract(Map<String, Set<String>> consoleAttributes) {
@@ -66,6 +69,8 @@ public final class UserRegistrationExtractor implements ConsoleConfigExtractor<U
                     .setMinAnswersToProvide(getIntMapAttrThrows(consoleAttributes, MIN_ANSWERS_TO_PROVIDE_KEY))
                     .setTokenExpiry(getLongMapAttrThrows(consoleAttributes, TOKEN_EXPIRY_KEY))
                     .setConfigProviderClass(getMapAttrThrows(consoleAttributes, SERVICE_CONFIG_CLASS_KEY))
+                    .setSubjectTranslations(getLocaleMapAttrThrows(consoleAttributes, SUBJECT_MAP))
+                    .setMessageTranslations(getLocaleMapAttrThrows(consoleAttributes, BODY_TEXT_MAP))
                     .build();
 
         } catch (ValueNotFoundException e) {
