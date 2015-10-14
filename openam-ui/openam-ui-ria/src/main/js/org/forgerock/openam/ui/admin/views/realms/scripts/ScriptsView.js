@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "backgrid",
     "backgrid-filter",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
-    "backgrid.selectall",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeableSelectAllCell",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, BackgridSelectAll,
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, ThemeableSelectAllCell,
              Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script,
              SMSGlobalDelegate) {
 
@@ -78,50 +78,44 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 return this;
             };
 
-            columns = [
-                {
-                    name: "",
-                    cell: "select-row",
-                    headerCell: "select-all"
-                },
-                {
-                    name: "name",
-                    label: $.t("console.scripts.list.grid.0"),
-                    cell: "string",
-                    headerCell: BackgridUtils.FilterHeaderCell,
-                    sortType: "toggle",
-                    editable: false
-                },
-                {
-                    name: "context",
-                    label: $.t("console.scripts.list.grid.1"),
-                    cell: Backgrid.StringCell.extend({
-                        map: "contextMap",
-                        render: renderTranslatedCell
-                    }),
-                    headerCell: BackgridUtils.FilterHeaderCell,
-                    sortType: "toggle",
-                    editable: false
-                },
-                {
-                    name: "language",
-                    label: $.t("console.scripts.list.grid.2"),
-                    cell: Backgrid.StringCell.extend({
-                        map: "langMap",
-                        render: renderTranslatedCell
-                    }),
-                    headerCell: BackgridUtils.FilterHeaderCell,
-                    sortType: "toggle",
-                    editable: false
-                },
-                {
-                    name: "description",
-                    label: $.t("console.scripts.list.grid.3"),
-                    cell: "string",
-                    sortable: false,
-                    editable: false
-                }
-            ];
+            columns = [{
+                name: "",
+                cell: ThemeableSelectAllCell,
+                headerCell: "select-all"
+            }, {
+                name: "name",
+                label: $.t("console.scripts.list.grid.0"),
+                cell: "string",
+                headerCell: BackgridUtils.FilterHeaderCell,
+                sortType: "toggle",
+                editable: false
+            }, {
+                name: "context",
+                label: $.t("console.scripts.list.grid.1"),
+                cell: Backgrid.StringCell.extend({
+                    map: "contextMap",
+                    render: renderTranslatedCell
+                }),
+                headerCell: BackgridUtils.FilterHeaderCell,
+                sortType: "toggle",
+                editable: false
+            }, {
+                name: "language",
+                label: $.t("console.scripts.list.grid.2"),
+                cell: Backgrid.StringCell.extend({
+                    map: "langMap",
+                    render: renderTranslatedCell
+                }),
+                headerCell: BackgridUtils.FilterHeaderCell,
+                sortType: "toggle",
+                editable: false
+            }, {
+                name: "description",
+                label: $.t("console.scripts.list.grid.3"),
+                cell: "string",
+                sortable: false,
+                editable: false
+            }];
 
             ClickableRow = BackgridUtils.ClickableRow.extend({
                 callback: function (e) {

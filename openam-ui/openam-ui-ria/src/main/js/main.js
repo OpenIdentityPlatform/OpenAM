@@ -38,7 +38,7 @@ require.config({
         "backgrid"          : "libs/backgrid.min-0.3.5-min",
         "backgrid-filter"   : "libs/backgrid-filter.min-0.3.5-min",
         "backgrid.paginator": "libs/backgrid-paginator-0.3.5-custom.min",
-        "backgrid.selectall": "libs/backgrid-select-all-0.3.5-min",
+        "backgrid-selectall": "libs/backgrid-select-all-0.3.5-min",
 
         "bootstrap"               : "libs/bootstrap-3.3.5-custom",
         "bootstrap-datetimepicker": "libs/bootstrap-datetimepicker-4.14.30-min",
@@ -90,7 +90,7 @@ require.config({
         "backgrid.paginator": {
             deps: ["backgrid", "backbone.paginator"]
         },
-        "backgrid.selectall": {
+        "backgrid-selectall": {
             deps: ["backgrid"]
         },
 

@@ -23,7 +23,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "backgrid",
     "backgrid-filter",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
-    "backgrid.selectall",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
@@ -33,10 +32,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, BackgridSelectAll,
-             Configuration, EventManager, Router, Constants, BackgridUtils, URLHelper, PoliciesDelegate, PolicyModel,
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, Configuration,
+             EventManager, Router, Constants, BackgridUtils, URLHelper, PoliciesDelegate, PolicyModel,
              AbstractListView) {
-
     var PoliciesView = AbstractListView.extend({
         element: "#policiesPanel",
         template: "templates/admin/views/realms/authorization/policies/PoliciesTemplate.html",

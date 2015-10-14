@@ -23,7 +23,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     "backgrid",
     "backgrid-filter",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
-    "backgrid.selectall",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
@@ -33,10 +32,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
     "org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel",
     "org/forgerock/openam/ui/common/util/BackgridUtils"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, BackgridSelectAll,
-             Messages, EventManager, Router, Constants, UIUtils, URLHelper, AbstractListView, ResourceTypeModel,
-             BackgridUtils) {
-
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, Messages, EventManager,
+             Router, Constants, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesTemplate.html",
         // Used in AbstractListView
