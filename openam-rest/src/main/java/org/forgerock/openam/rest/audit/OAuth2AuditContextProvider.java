@@ -15,11 +15,11 @@
 */
 package org.forgerock.openam.rest.audit;
 
-import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditConstants.TrackingIdKey;
 import org.restlet.Request;
 
 /**
- * A provider which provides user id and context details for auditing purposes. Providers will draw these details
+ * A provider which provides user id and tracking details for auditing purposes. Providers will draw these details
  * from different sources, such as OAuth2 access tokens and SSO session tokens.
  *
  * @since 13.0.0
@@ -42,13 +42,12 @@ public interface OAuth2AuditContextProvider {
      * @param request The request.
      * @return The user id, if it is available.
      */
-    String getContext(Request request);
+    String getTrackingId(Request request);
 
     /**
-     * Get the {@link AuditConstants.Context} key identifying the specific type of context being looked for by the
-     * provider.
+     * Get the {@link TrackingIdKey} key identifying the specific type of context being looked for by the provider.
      *
      * @return The key.
      */
-    AuditConstants.Context getContextKey();
+    TrackingIdKey getTrackingIdKey();
 }

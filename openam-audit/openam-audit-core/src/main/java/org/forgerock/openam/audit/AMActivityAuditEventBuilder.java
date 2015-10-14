@@ -20,49 +20,12 @@ import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.ActivityAuditEventBuilder;
 
-import java.util.Collections;
-import java.util.Map;
-
 /**
  * Builder for OpenAM audit access events.
  *
  * @since 13.0.0
  */
 public final class AMActivityAuditEventBuilder extends ActivityAuditEventBuilder<AMActivityAuditEventBuilder> {
-
-    /**
-     * Provide value for "extraInfo" audit log field.
-     *
-     * @param values String sequence of values that should be stored in the 'extraInfo' audit log field.
-     * @return this builder for method chaining.
-     */
-    public AMActivityAuditEventBuilder extraInfo(String... values) {
-        putExtraInfo(jsonValue, values);
-        return this;
-    }
-
-    /**
-     * Provide value for "contextId" audit log field.
-     *
-     * @param contexts Map "contexts" value.
-     * @return this builder for method chaining.
-     */
-    public AMActivityAuditEventBuilder contexts(Map<String, String> contexts) {
-        putContexts(jsonValue, contexts);
-        return this;
-    }
-
-    /**
-     * Provide single value which will be used in "contexts" audit log field.
-     *
-     * @param context Context key which will be used in the "contexts" audit log field.
-     * @param contextId Context key which will be used in the "contexts" audit log field.
-     * @return this builder for method chaining.
-     */
-    public AMActivityAuditEventBuilder context(AuditConstants.Context context, String contextId) {
-        putContexts(jsonValue, Collections.singletonMap(context.toString(), contextId));
-        return this;
-    }
 
     /**
      * Provide value for "component" audit log field.
@@ -76,14 +39,14 @@ public final class AMActivityAuditEventBuilder extends ActivityAuditEventBuilder
     }
 
     /**
-     * Sets contextId from property of {@link SSOToken}, if the provided
+     * Sets trackingId from property of {@link SSOToken}, if the provided
      * <code>SSOToken</code> is not <code>null</code>.
      *
-     * @param ssoToken The SSOToken from which the contextId value will be retrieved.
+     * @param ssoToken The SSOToken from which the trackingId value will be retrieved.
      * @return this builder
      */
-    public AMActivityAuditEventBuilder contextFromSSOToken(SSOToken ssoToken) {
-        putContextIdFromSSOToken(jsonValue, ssoToken);
+    public AMActivityAuditEventBuilder trackingIdFromSSOToken(SSOToken ssoToken) {
+        trackingId(getTrackingIdFromSSOToken(ssoToken));
         return this;
     }
 

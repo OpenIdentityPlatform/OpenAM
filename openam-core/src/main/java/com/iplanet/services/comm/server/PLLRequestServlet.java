@@ -133,7 +133,6 @@ public class PLLRequestServlet extends HttpServlet {
 
             RequestSet set = RequestSet.parseXML(xml);
             String svcid = set.getServiceID();
-            auditor.setService(svcid);
             if(!AUTH_SVC_ID.equalsIgnoreCase(svcid)) {
                 if (PLLServer.pllDebug.messageEnabled()) {
                     PLLServer.pllDebug.message("\nReceived RequestSet XML :\n" + xml);

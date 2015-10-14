@@ -123,30 +123,19 @@ public final class AuditConstants {
     }
 
     /**
-     * Predefined components for context id keys.
+     * Predefined tracking ID types.
      */
-    public enum Context {
-        /** Session token context, for use with session tokens. */
-        SESSION("Session token"),
-        /** OAuth2 grant code context, for use with OAuth2, OIDC and UMA. */
-        OAUTH2_GRANT("OAuth2 grant code"),
-        /** OAuth2 refresh code context, for use with OAuth2, OIDC and UMA. */
-        OAUTH2_REFRESH("OAuth2 refresh token"),
-        /** OAuth2 access code context, for use with OAuth2, OIDC and UMA. */
-        OAUTH2_ACCESS("OAuth2 access token"),
-        /** Auth token context for use during authentication. */
-        AUTH("Auth token");
-
-        private final String name;
-
-        Context(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
+    public enum TrackingIdKey {
+        /** Tracking ID for authenticated Session. */
+        SESSION,
+        /** Tracking ID for OAuth2 grant code, for use with OAuth2, OIDC and UMA. */
+        OAUTH2_GRANT,
+        /** Tracking ID for OAuth2 refresh code, for use with OAuth2, OIDC and UMA. */
+        OAUTH2_REFRESH,
+        /** Tracking ID for OAuth2 access code, for use with OAuth2, OIDC and UMA. */
+        OAUTH2_ACCESS,
+        /** Tracking ID for Session used during authentication. */
+        AUTH
     }
 
     /**
@@ -190,11 +179,6 @@ public final class AuditConstants {
     /**
      * The Context IDs.
      */
-    public static final String CONTEXTS = "contexts";
-
-    /**
-     * The Context IDs.
-     */
     public static final String USERNAME_AUDIT_CONTEXT_KEY = "username";
 
     /**
@@ -214,6 +198,11 @@ public final class AuditConstants {
      * tokens which may be attached to requests and/or responses.
      */
     public static final String OAUTH2_AUDIT_CONTEXT_PROVIDERS = "oauth2AuditContextProviders";
+
+    /**
+     * The field name to use when adding a "reason" string to the /response/detail object of an access event.
+     */
+    public static final String ACCESS_RESPONSE_DETAIL_REASON = "reason";
 
     private AuditConstants() {
         // Prevent instantiation

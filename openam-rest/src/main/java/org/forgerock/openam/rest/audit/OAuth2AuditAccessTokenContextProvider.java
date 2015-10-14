@@ -22,11 +22,11 @@ import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditConstants.TrackingIdKey;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
 
-import static org.forgerock.openam.audit.AuditConstants.Context.OAUTH2_ACCESS;
+import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_ACCESS;
 
 /**
  * A provider which provides user id and context details for auditing purposes. This provider draws its details
@@ -73,17 +73,17 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
      * {@inheritDoc}
      */
     @Override
-    public String getContext(Request request) {
-        String context;
+    public String getTrackingId(Request request) {
+        String trackingId;
 
-        context = getContextFromAccessTokenFromAuthorizationHeader(request);
-        if (context != null) {
-            return context;
+        trackingId = getTrackingIdFromAccessTokenFromAuthorizationHeader(request);
+        if (trackingId != null) {
+            return trackingId;
         }
 
-        context = getContextFromAccessTokenFromRequest(request);
-        if (context != null) {
-            return context;
+        trackingId = getTrackingIdFromAccessTokenFromRequest(request);
+        if (trackingId != null) {
+            return trackingId;
         }
 
         return null;
@@ -93,7 +93,7 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
      * {@inheritDoc}
      */
     @Override
-    public AuditConstants.Context getContextKey() {
+    public TrackingIdKey getTrackingIdKey() {
         return OAUTH2_ACCESS;
     }
 
@@ -119,26 +119,26 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
         return userId;
     }
 
-    private String getContextFromAccessTokenFromAuthorizationHeader(Request request) {
-        String contextId = null;
+    private String getTrackingIdFromAccessTokenFromAuthorizationHeader(Request request) {
+        String trackingId = null;
 
         AccessToken accessToken = retrieveAccessTokenFromChallengeResponse(request);
         if (accessToken != null) {
-            contextId = getContextFromToken(accessToken);
+            trackingId = getTrackingIdFromToken(accessToken);
         }
 
-        return contextId;
+        return trackingId;
     }
 
-    private String getContextFromAccessTokenFromRequest(Request request) {
-        String contextId = null;
+    private String getTrackingIdFromAccessTokenFromRequest(Request request) {
+        String trackingId = null;
 
         AccessToken accessToken = retrieveAccessTokenFromRequest(request);
         if (accessToken != null) {
-            contextId = getContextFromToken(accessToken);
+            trackingId = getTrackingIdFromToken(accessToken);
         }
 
-        return contextId;
+        return trackingId;
     }
 
     private AccessToken retrieveAccessTokenFromChallengeResponse(Request request) {

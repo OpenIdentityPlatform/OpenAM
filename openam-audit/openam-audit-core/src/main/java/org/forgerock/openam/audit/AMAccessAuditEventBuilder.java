@@ -30,7 +30,6 @@ import org.forgerock.http.protocol.Request;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -44,40 +43,6 @@ import java.util.Map;
 public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessAuditEventBuilder> {
 
     /**
-     * Provide value for "extraInfo" audit log field.
-     *
-     * @param values String sequence of values that should be stored in the 'extraInfo' audit log field.
-     * @return this builder for method chaining.
-     */
-    public AMAccessAuditEventBuilder extraInfo(String... values) {
-        putExtraInfo(jsonValue, values);
-        return this;
-    }
-
-    /**
-     * Provide value for "contexts" audit log field.
-     *
-     * @param contexts Map "contexts" value.
-     * @return this builder for method chaining.
-     */
-    public AMAccessAuditEventBuilder contexts(Map<String, String> contexts) {
-        putContexts(jsonValue, contexts);
-        return this;
-    }
-
-    /**
-     * Provide single value which will be used in "contexts" audit log field.
-     *
-     * @param context Context key which will be used in the "contexts" audit log field.
-     * @param contextId Context key which will be used in the "contexts" audit log field.
-     * @return this builder for method chaining.
-     */
-    public AMAccessAuditEventBuilder context(AuditConstants.Context context, String contextId) {
-        putContexts(jsonValue, Collections.singletonMap(context.toString(), contextId));
-        return this;
-    }
-
-    /**
      * Provide value for "component" audit log field.
      *
      * @param value one of the predefined names from {@link AuditConstants.Component}
@@ -89,14 +54,14 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
     }
 
     /**
-     * Sets contextId from property of {@link SSOToken}, iff the provided
+     * Adds trackingId from property of {@link SSOToken}, if the provided
      * <code>SSOToken</code> is not <code>null</code>.
      *
-     * @param ssoToken The SSOToken from which the contextId value will be retrieved.
+     * @param ssoToken The SSOToken from which the trackingId value will be retrieved.
      * @return this builder
      */
-    public AMAccessAuditEventBuilder contextIdFromSSOToken(SSOToken ssoToken) {
-        putContextIdFromSSOToken(jsonValue, ssoToken);
+    public AMAccessAuditEventBuilder trackingIdFromSSOToken(SSOToken ssoToken) {
+        trackingId(getTrackingIdFromSSOToken(ssoToken));
         return this;
     }
 

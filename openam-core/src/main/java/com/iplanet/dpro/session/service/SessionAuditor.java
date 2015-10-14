@@ -70,9 +70,10 @@ public final class SessionAuditor {
                     .eventName(eventName)
                     .component(Component.SESSION)
                     .authentication(session.getProperty(Constants.UNIVERSAL_IDENTIFIER))
-                    .context(Context.SESSION, contextId)
+                    .trackingId(contextId)
                     .runAs(getUserId(getAdminToken()))
-                    .resourceOperation(contextId, "", getCrudType(eventName))
+                    .objectId(contextId)
+                    .operation(getCrudType(eventName))
                     .toEvent();
             auditEventPublisher.tryPublish(ACTIVITY_TOPIC, auditEvent);
 

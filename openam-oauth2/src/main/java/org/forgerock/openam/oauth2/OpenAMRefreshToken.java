@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUDIT_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.oauth2.core.Utils.*;
 
 import java.util.Collections;
@@ -195,7 +195,7 @@ public class OpenAMRefreshToken extends RefreshToken {
      * @param auditId The audit id.
      */
     protected void setAuditId(String auditId) {
-        setStringProperty(AUDIT_ID, auditId);
+        setStringProperty(AUDIT_TRACKING_ID, auditId);
     }
 
     /**
@@ -204,6 +204,6 @@ public class OpenAMRefreshToken extends RefreshToken {
      * @return The audit id.
      */
     public String getAuditId() {
-        return getStringProperty(AUDIT_ID);
+        return getStringProperty(AUDIT_TRACKING_ID);
     }
 }

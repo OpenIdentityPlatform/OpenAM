@@ -17,16 +17,16 @@ package org.forgerock.openam.core.rest.authn;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getContextFromSSOToken;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getTrackingIdFromSSOToken;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
 import static org.forgerock.openam.audit.AuditConstants.*;
-import static org.forgerock.openam.audit.AuditConstants.Context.*;
+import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.*;
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
 import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -74,7 +74,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
     }
 
     @Override
-    protected Map<String, String> getContextsForAccessAttempt(Request request) {
+    protected Set<String> getTrackingIdsForAccessAttempt(Request request) {
         try {
             String jsonString = request.getEntity().getString();
             if (isNotEmpty(jsonString)) {
@@ -87,7 +87,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
             //Do nothing
         }
 
-        return super.getContextsForAccessAttempt(request);
+        return super.getTrackingIdsForAccessAttempt(request);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
     }
 
     @Override
-    protected Map<String, String> getContextsForAccessOutcome(Response response) {
+    protected Set<String> getTrackingIdsForAccessOutcome(Response response) {
         String tokenId = AuditRequestContext.getProperty(TOKEN_ID);
         String sessionId = AuditRequestContext.getProperty(SESSION_ID);
         String authId = AuditRequestContext.getProperty(AUTH_ID);
@@ -120,7 +120,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
             populateContextFromAuthId(authId);
         }
 
-        return super.getContextsForAccessOutcome(response);
+        return super.getTrackingIdsForAccessOutcome(response);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
         try {
             SSOToken token = SSOTokenManager.getInstance().createSSOToken(tokenId);
             AuditRequestContext.putProperty(USER_ID, getUserId(token));
-            AuditRequestContext.putProperty(SESSION.toString(), getContextFromSSOToken(token));
+            AuditRequestContext.putProperty(SESSION.toString(), getTrackingIdFromSSOToken(token));
         } catch (SSOException e) {
             debug.warning("No SSO Token found when trying to audit an authentication request.");
         }

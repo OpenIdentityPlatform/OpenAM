@@ -6,13 +6,8 @@
   "authentication": {
     "id": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
   },
-  "contexts": {"Session token" : "value"},
   "runAs": "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org",
-  "resourceOperation": {
-    "uri": "/sessions/uniqueSessionAlias",
-    "protocol": "wat?",
-    "operation": {
-      "method": "CREATE"
-    }
-  }
+  "objectId": "/sessions/uniqueSessionAlias",
+  "operation": "CREATE",
+  "trackingIds": ["12345"]
 }

@@ -205,7 +205,7 @@ public class SessionRequestHandler implements RequestHandler {
              */
             requesterSession = sessionCache.getSession(sid);
             auditor.setAuthenticationId(requesterSession.getClientID());
-            auditor.setContextId(requesterSession.getProperty(Constants.AM_CTX_ID));
+            auditor.setTrackingId(requesterSession.getProperty(Constants.AM_CTX_ID));
             auditor.auditAccessAttempt();
 
             /* common processing by groups of methods */

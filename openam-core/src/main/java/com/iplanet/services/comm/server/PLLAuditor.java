@@ -18,9 +18,11 @@ package com.iplanet.services.comm.server;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
-import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
 
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
@@ -28,6 +30,8 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -47,9 +51,8 @@ public class PLLAuditor {
     private final HttpServletRequest httpServletRequest;
 
     private long startTime;
-    private String service;
     private String method;
-    private String contextId;
+    private String trackingId;
     private String authenticationId;
     private Component component;
     private boolean accessAttemptAudited;
@@ -67,7 +70,6 @@ public class PLLAuditor {
         this.auditEventPublisher = auditEventPublisher;
         this.auditEventFactory = auditEventFactory;
         this.httpServletRequest = httpServletRequest;
-        this.service = "unknown";
         this.reset();
     }
 
@@ -84,10 +86,10 @@ public class PLLAuditor {
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
-                    .component(Component.PLL)
+                    .component(component)
                     .authentication(authenticationId)
-                    .resourceOperation(service, PLL, method)
-                    .context(SESSION, contextId)
+                    .request(PLL, method)
+                    .trackingId(trackingId)
                     .toEvent();
             auditEventPublisher.tryPublish(ACCESS_TOPIC, auditEvent);
         }
@@ -113,11 +115,11 @@ public class PLLAuditor {
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
-                    .component(Component.PLL)
+                    .component(component)
                     .response(SUCCESS, "", elapsedTime, MILLISECONDS)
                     .authentication(authenticationId)
-                    .resourceOperation(service, PLL, method)
-                    .context(SESSION, contextId)
+                    .request(PLL, method)
+                    .trackingId(trackingId)
                     .toEvent();
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, auditEvent);
@@ -154,16 +156,17 @@ public class PLLAuditor {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
+            final JsonValue detail = json(object(field(ACCESS_RESPONSE_DETAIL_REASON, message)));
             AuditEvent auditEvent = auditEventFactory.accessEvent(NO_REALM)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
-                    .component(Component.PLL)
-                    .responseWithDetail(FAILURE, errorCode == null ? "" : errorCode, elapsedTime, MILLISECONDS, message)
+                    .component(component)
+                    .responseWithDetail(FAILURE, errorCode == null ? "" : errorCode, elapsedTime, MILLISECONDS, detail)
                     .authentication(authenticationId)
-                    .resourceOperation(service, PLL, method)
-                    .context(SESSION, contextId)
+                    .request(PLL, method)
+                    .trackingId(trackingId)
                     .toEvent();
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, auditEvent);
@@ -179,15 +182,8 @@ public class PLLAuditor {
         startTime = System.currentTimeMillis();
         method = "unknown";
         authenticationId = "";
-        contextId = "";
+        trackingId = "";
         component = Component.PLL;
-    }
-
-    /**
-     * @param service Identifies the {@link RequestHandler} invoked.
-     */
-    public void setService(String service) {
-        this.service = service;
     }
 
     /**
@@ -205,26 +201,26 @@ public class PLLAuditor {
     }
 
     /**
-     * Provide SSOToken of originating client in order to lookup session contextId and realm.
+     * Provide SSOToken of originating client in order to lookup session trackingId and realm.
      *
      * If the current server is not the 'home server' for the session, obtaining an SSOToken can itself
      * lead to PLL communication between servers; therefore, it's worth considering whether or not this
      * method should be used on a case-by-case basis. When obtaining an SSOToken may not be appropriate,
-     * the setDomain and setContextId methods may be useful alternatives if this information is available
+     * the setDomain and setTrackingId methods may be useful alternatives if this information is available
      * via other means.
      *
-     * @param ssoToken SSOToken of the originating client from which the session contextId and realm are obtained.
+     * @param ssoToken SSOToken of the originating client from which the session trackingId and realm are obtained.
      */
     public void setSsoToken(SSOToken ssoToken) {
-        this.contextId = getContextFromSSOToken(ssoToken);
+        this.trackingId = getTrackingIdFromSSOToken(ssoToken);
         this.authenticationId = getUserId(ssoToken);
     }
 
     /**
-     * @param contextId Unique alias of session.
+     * @param trackingId Unique alias of session.
      */
-    public void setContextId(String contextId) {
-        this.contextId = contextId;
+    public void setTrackingId(String trackingId) {
+        this.trackingId = trackingId;
     }
 
     /**

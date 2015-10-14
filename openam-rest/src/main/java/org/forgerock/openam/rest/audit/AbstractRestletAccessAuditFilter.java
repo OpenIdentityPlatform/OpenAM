@@ -17,14 +17,19 @@ package org.forgerock.openam.rest.audit;
 
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
-import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableContexts;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableTrackingIds;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.rest.service.RestletRealmRouter.REALM;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 import static org.restlet.ext.servlet.ServletUtils.getRequest;
 
 import org.forgerock.audit.AuditException;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -38,6 +43,7 @@ import org.restlet.routing.Filter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Responsible for logging access audit events for restlet requests.
@@ -105,7 +111,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
                     .authentication(getUserIdForAccessAttempt(request))
-                    .contexts(getContextsForAccessAttempt(request));
+                    .trackingIds(getTrackingIdsForAccessAttempt(request));
 
             addHttpData(request, builder);
 
@@ -126,7 +132,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(request, response))
-                    .contexts(getContextsForAccessOutcome(request, response))
+                    .trackingIds(getTrackingIdsForAccessOutcome(request, response))
                     .response(SUCCESS, "", elapsedTime, MILLISECONDS);
 
             addHttpData(request, builder);
@@ -142,7 +148,8 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
             long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());
             long elapsedTime = endTime - request.getDate().getTime();
-            String responseDetail = response.getStatus().getDescription();
+            JsonValue responseDetail = json(object(
+                    field(ACCESS_RESPONSE_DETAIL_REASON, response.getStatus().getDescription())));
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(endTime)
@@ -150,7 +157,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(request, response))
-                    .contexts(getContextsForAccessOutcome(request, response))
+                    .trackingIds(getTrackingIdsForAccessOutcome(request, response))
                     .responseWithDetail(FAILURE, responseCode, elapsedTime, MILLISECONDS, responseDetail);
 
             addHttpData(request, builder);
@@ -183,13 +190,13 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
     }
 
     /**
-     * Retrieve the context IDs for an access attempt.
+     * Retrieve the tracking IDs for an access attempt.
      *
      * @param request the restlet request
-     * @return the context IDs
+     * @return the tracking IDs
      */
-    protected Map<String, String> getContextsForAccessAttempt(Request request) {
-        return getAllAvailableContexts();
+    protected Set<String> getTrackingIdsForAccessAttempt(Request request) {
+        return getAllAvailableTrackingIds();
     }
 
     /**
@@ -204,12 +211,12 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
     }
 
     /**
-     * Retrieve the Context IDs for an access outcome.
+     * Retrieve the tracking IDs for an access outcome.
      *
      * @param response the restlet response
-     * @return the context IDs
+     * @return the tracking IDs
      */
-    protected Map<String, String> getContextsForAccessOutcome(Request request, Response response) {
-        return getAllAvailableContexts();
+    protected Set<String> getTrackingIdsForAccessOutcome(Request request, Response response) {
+        return getAllAvailableTrackingIds();
     }
 }

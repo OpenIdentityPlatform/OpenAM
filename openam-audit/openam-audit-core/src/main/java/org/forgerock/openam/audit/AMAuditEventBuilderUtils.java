@@ -15,9 +15,6 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
-import static org.forgerock.json.JsonValue.array;
-import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.openam.audit.AuditConstants.EVENT_REALM;
 
 import com.iplanet.sso.SSOException;
@@ -28,9 +25,8 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.utils.StringUtils;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Collection of static helper methods for use by AM AuditEventBuilders.
@@ -42,8 +38,6 @@ public final class AMAuditEventBuilderUtils {
     private static Debug debug = Debug.getInstance(AuditConstants.DEBUG_NAME);
 
     private static final String COMPONENT = "component";
-    private static final String EXTRA_INFO = "extraInfo";
-    private static final String CONTEXTS = "contexts";
 //    private static final String REALM = "realm";
 
     private AMAuditEventBuilderUtils() {
@@ -57,35 +51,6 @@ public final class AMAuditEventBuilderUtils {
      */
     static void putComponent(JsonValue jsonValue, String value) {
         jsonValue.put(COMPONENT, value == null ? "" : value);
-    }
-
-    /**
-     * Set "contexts" audit log field.
-     *
-     * @param value Map "contexts" value.
-     */
-    static void putContexts(JsonValue jsonValue, Map<String, String> value) {
-        jsonValue.put(CONTEXTS, value == null ? new HashMap<String, String>() : value);
-    }
-
-    /**
-     * Set "extraInfo" audit log field.
-     *
-     * @param values String sequence of values that should be stored in the 'extraInfo' audit log field.
-     */
-    static void putExtraInfo(JsonValue jsonValue, String... values) {
-        jsonValue.put(EXTRA_INFO, json(array(values)));
-    }
-
-    /**
-     * Sets "contextId" audit log field from property of {@link SSOToken}, iff the provided
-     * <code>SSOToken</code> is not <code>null</code>.
-     *
-     * @param ssoToken The SSOToken from which the contextId value will be retrieved.
-     */
-    static void putContextIdFromSSOToken(JsonValue jsonValue, SSOToken ssoToken) {
-        String ssoTokenContext = getContextFromSSOToken(ssoToken);
-        putContexts(jsonValue, Collections.singletonMap(SESSION.toString(), ssoTokenContext));
     }
 
     /**
@@ -103,7 +68,7 @@ public final class AMAuditEventBuilderUtils {
      * @param ssoToken The SSOToken from which the contextId value will be retrieved.
      * @return contextId for SSOToken or empty string if undefined.
      */
-    public static String getContextFromSSOToken(SSOToken ssoToken) {
+    public static String getTrackingIdFromSSOToken(SSOToken ssoToken) {
         return getSSOTokenProperty(ssoToken, Constants.AM_CTX_ID, "");
     }
 
@@ -131,23 +96,23 @@ public final class AMAuditEventBuilderUtils {
     }
 
     /**
-     * Get all available {@link AuditConstants.Context} values from the possible list of
-     * {@link AuditConstants.Context} values, from the {@link AuditRequestContext}.
+     * Get all available {@link AuditConstants.TrackingIdKey} values from the possible list of
+     * {@link AuditConstants.TrackingIdKey} values, from the {@link AuditRequestContext}.
      *
-     * @return All the available {@link AuditConstants.Context} values.
+     * @return All the available {@link AuditConstants.TrackingIdKey} values.
      */
-    public static Map<String, String> getAllAvailableContexts() {
-        Map<String, String> map = new HashMap<>();
+    public static Set<String> getAllAvailableTrackingIds() {
+        Set<String> trackingIdValues = new LinkedHashSet<>();
 
-        for (AuditConstants.Context context : AuditConstants.Context.values()) {
-            String contextKey = context.toString();
-            String contextValue = AuditRequestContext.getProperty(contextKey);
-            if (StringUtils.isNotEmpty(contextValue)) {
-                map.put(contextKey, contextValue);
+        for (AuditConstants.TrackingIdKey trackingIdKey : AuditConstants.TrackingIdKey.values()) {
+            String contextKey = trackingIdKey.toString();
+            String trackingIdValue = AuditRequestContext.getProperty(contextKey);
+            if (StringUtils.isNotEmpty(trackingIdValue)) {
+                trackingIdValues.add(trackingIdValue);
             }
         }
 
-        return map;
+        return trackingIdValues;
     }
 
 }

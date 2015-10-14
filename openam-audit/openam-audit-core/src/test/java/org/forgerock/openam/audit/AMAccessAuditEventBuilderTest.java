@@ -39,13 +39,12 @@ public class AMAccessAuditEventBuilderTest {
                 .component(Component.CREST)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
                 .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
-                .contexts(Collections.singletonMap(Context.SESSION.toString(), "value"))
+                .trackingId("12345")
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
-                .resourceOperation("/some/path", "CREST", "READ")
+                .request("CREST", "READ")
                 .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
                 .response(SUCCESS, "200", 42, MILLISECONDS)
-                .extraInfo("extra", "info")
                 .toEvent();
 
         assertJsonValue(accessEvent.getValue(), "/access-event.json");
@@ -59,13 +58,12 @@ public class AMAccessAuditEventBuilderTest {
                 .component(Component.CREST)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
                 .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
-                .context(Context.SESSION, "value")
+                .trackingId("12345")
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
-                .resourceOperation("/some/path", "CREST", "READ")
+                .request("CREST", "READ")
                 .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
                 .response(SUCCESS, "200", 42, MILLISECONDS)
-                .extraInfo("extra", "info")
                 .toEvent();
 
         assertJsonValue(accessEvent.getValue(), "/access-event.json");

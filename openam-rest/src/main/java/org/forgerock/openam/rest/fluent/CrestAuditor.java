@@ -17,14 +17,19 @@ package org.forgerock.openam.rest.fluent;
 
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.getTokenFromContext;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Request;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -137,13 +142,14 @@ class CrestAuditor {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
+            JsonValue detail = json(object(field(ACCESS_RESPONSE_DETAIL_REASON, message)));
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .responseWithDetail(FAILURE, Integer.toString(resultCode), elapsedTime, MILLISECONDS, message);
+                    .responseWithDetail(FAILURE, Integer.toString(resultCode), elapsedTime, MILLISECONDS, detail);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
@@ -152,6 +158,6 @@ class CrestAuditor {
 
     private void addSessionDetailsFromSSOTokenContext(AMAccessAuditEventBuilder builder, Context context) {
         SSOToken callerToken = getTokenFromContext(context, debug);
-        builder.contextIdFromSSOToken(callerToken);
+        builder.trackingIdFromSSOToken(callerToken);
     }
 }

@@ -22,11 +22,11 @@ import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditConstants.TrackingIdKey;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
 
-import static org.forgerock.openam.audit.AuditConstants.Context.OAUTH2_REFRESH;
+import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_REFRESH;
 
 /**
  * A provider which provides user id and context details for auditing purposes. This provider draws its details
@@ -73,17 +73,17 @@ public class OAuth2AuditRefreshTokenContextProvider extends OAuth2AuditOAuth2Tok
      * {@inheritDoc}
      */
     @Override
-    public String getContext(Request request) {
-        String context;
+    public String getTrackingId(Request request) {
+        String trackingId;
 
-        context = getContextFromRefreshTokenFromAuthorizationHeader(request);
-        if (context != null) {
-            return context;
+        trackingId = getTrackingIdFromRefreshTokenFromAuthorizationHeader(request);
+        if (trackingId != null) {
+            return trackingId;
         }
 
-        context = getContextFromRefreshTokenFromRequest(request);
-        if (context != null) {
-            return context;
+        trackingId = getTrackingIdFromRefreshTokenFromRequest(request);
+        if (trackingId != null) {
+            return trackingId;
         }
 
         return null;
@@ -93,7 +93,7 @@ public class OAuth2AuditRefreshTokenContextProvider extends OAuth2AuditOAuth2Tok
      * {@inheritDoc}
      */
     @Override
-    public AuditConstants.Context getContextKey() {
+    public TrackingIdKey getTrackingIdKey() {
         return OAUTH2_REFRESH;
     }
 
@@ -119,26 +119,26 @@ public class OAuth2AuditRefreshTokenContextProvider extends OAuth2AuditOAuth2Tok
         return userId;
     }
 
-    private String getContextFromRefreshTokenFromAuthorizationHeader(Request request) {
-        String contextId = null;
+    private String getTrackingIdFromRefreshTokenFromAuthorizationHeader(Request request) {
+        String trackingId = null;
 
         RefreshToken refreshToken = retrieveRefreshTokenFromChallengeResponse(request);
         if (refreshToken != null) {
-            contextId = getContextFromToken(refreshToken);
+            trackingId = getTrackingIdFromToken(refreshToken);
         }
 
-        return contextId;
+        return trackingId;
     }
 
-    private String getContextFromRefreshTokenFromRequest(Request request) {
-        String contextId = null;
+    private String getTrackingIdFromRefreshTokenFromRequest(Request request) {
+        String trackingId = null;
 
         RefreshToken refreshToken = retrieveRefreshTokenFromRequest(request);
         if (refreshToken != null) {
-            contextId = getContextFromToken(refreshToken);
+            trackingId = getTrackingIdFromToken(refreshToken);
         }
 
-        return contextId;
+        return trackingId;
     }
 
     private RefreshToken retrieveRefreshTokenFromChallengeResponse(Request request) {

@@ -80,7 +80,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.utils.ClientUtils;
 
@@ -278,7 +277,7 @@ public class AuthXMLHandler implements RequestHandler {
 
         auditor.setMethod(getMethodName(requestType));
         auditor.setAuthenticationId(getAuthenticationId(loginState));
-        auditor.setContextId(getContextId(loginState));
+        auditor.setTrackingId(getContextId(loginState));
         auditor.auditAccessAttempt();
 
         String params = authXMLRequest.getParams();
@@ -738,7 +737,7 @@ public class AuthXMLHandler implements RequestHandler {
         }
 
         auditor.setAuthenticationId(getAuthenticationId(loginState));
-        auditor.setContextId(getContextId(loginState));
+        auditor.setTrackingId(getContextId(loginState));
 
         return authResponse;
     }

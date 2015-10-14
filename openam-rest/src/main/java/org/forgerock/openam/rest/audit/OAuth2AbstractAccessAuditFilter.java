@@ -24,7 +24,6 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 
-import java.util.Map;
 import java.util.Set;
 
 import static org.forgerock.openam.audit.AuditConstants.USER_ID;
@@ -74,10 +73,10 @@ public abstract class OAuth2AbstractAccessAuditFilter extends AbstractRestletAcc
      * {@inheritDoc}
      */
     @Override
-    protected Map<String, String> getContextsForAccessAttempt(Request request) {
-        putContextsInAuditRequestContext(request);
+    protected Set<String> getTrackingIdsForAccessAttempt(Request request) {
+        putTrackingIdsIntoAuditRequestContext(request);
 
-        return super.getContextsForAccessAttempt(request);
+        return super.getTrackingIdsForAccessAttempt(request);
     }
 
     /**
@@ -99,10 +98,10 @@ public abstract class OAuth2AbstractAccessAuditFilter extends AbstractRestletAcc
      * {@inheritDoc}
      */
     @Override
-    protected Map<String, String> getContextsForAccessOutcome(Request request, Response response) {
-        putContextsInAuditRequestContext(request);
+    protected Set<String> getTrackingIdsForAccessOutcome(Request request, Response response) {
+        putTrackingIdsIntoAuditRequestContext(request);
 
-        return super.getContextsForAccessOutcome(request, response);
+        return super.getTrackingIdsForAccessOutcome(request, response);
     }
 
     private void putUserIdInAuditRequestContext(Request request) {
@@ -117,12 +116,12 @@ public abstract class OAuth2AbstractAccessAuditFilter extends AbstractRestletAcc
         return;
     }
 
-    private void putContextsInAuditRequestContext(Request request) {
+    private void putTrackingIdsIntoAuditRequestContext(Request request) {
         for (OAuth2AuditContextProvider provider : providers) {
-            String context = provider.getContext(request);
+            String trackingId = provider.getTrackingId(request);
 
-            if (context != null) {
-                AuditRequestContext.putProperty(provider.getContextKey().toString(), context);
+            if (trackingId != null) {
+                AuditRequestContext.putProperty(provider.getTrackingIdKey().toString(), trackingId);
             }
         }
     }

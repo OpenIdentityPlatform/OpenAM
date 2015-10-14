@@ -77,16 +77,16 @@ public class OpenAMAccessToken extends AccessToken {
      * @param nonce             The nonce.
      * @param realm             The realm.
      * @param claims            The requested claims.
-     * @param auditId The audit id, used for tracking tokens throughout the audit logs.
+     * @param auditTrackingId   The tracking ID, used for tracking tokens throughout the audit logs.
      */
     public OpenAMAccessToken(String id, String authorizationCode, String resourceOwnerId, String clientId,
                              String redirectUri, Set<String> scope, long expiryTime, String refreshTokenId,
                              String tokenName, String grantType, String nonce, String realm, String claims,
-                             String auditId) {
+                             String auditTrackingId) {
         super(id, authorizationCode, resourceOwnerId, clientId, redirectUri, scope, expiryTime, refreshTokenId,
                 tokenName, grantType, nonce);
         setRealm(realm);
-        setAuditId(auditId);
+        setAuditTrackingId(auditTrackingId);
 
         if (!StringUtils.isBlank(claims)) {
             setClaims(claims);
@@ -366,8 +366,8 @@ public class OpenAMAccessToken extends AccessToken {
      *
      * @param auditId The audit id.
      */
-    protected void setAuditId(String auditId) {
-        setStringProperty(AUDIT_ID, auditId);
+    protected void setAuditTrackingId(String auditId) {
+        setStringProperty(AUDIT_TRACKING_ID, auditId);
     }
 
     /**
@@ -375,8 +375,8 @@ public class OpenAMAccessToken extends AccessToken {
      *
      * @return The audit id.
      */
-    public String getAuditId() {
-        return getStringProperty(AUDIT_ID);
+    public String getAuditTrackingId() {
+        return getStringProperty(AUDIT_TRACKING_ID);
     }
 
     /**

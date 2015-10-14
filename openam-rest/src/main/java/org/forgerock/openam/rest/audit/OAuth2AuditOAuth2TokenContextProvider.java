@@ -27,8 +27,8 @@ import org.forgerock.openam.core.CoreWrapper;
  */
 public abstract class OAuth2AuditOAuth2TokenContextProvider implements OAuth2AuditContextProvider {
 
-    protected String getContextFromToken(JsonValue accessToken) {
-        return getAccessTokenProperty(OAuth2Constants.CoreTokenParams.AUDIT_ID, accessToken);
+    protected String getTrackingIdFromToken(JsonValue accessToken) {
+        return getAccessTokenProperty(OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID, accessToken);
     }
 
     protected String getAccessTokenProperty(String propertyName, JsonValue accessToken) {
@@ -41,7 +41,7 @@ public abstract class OAuth2AuditOAuth2TokenContextProvider implements OAuth2Aud
         }
 
         if (accessToken.get(propertyName).isString()) {
-            accessToken.get(propertyName).toString();
+            accessToken.get(propertyName).toString(); // TODO: Return this value?
         }
 
         return null;

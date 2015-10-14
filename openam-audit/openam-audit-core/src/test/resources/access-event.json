@@ -6,7 +6,6 @@
   "authentication": {
     "id": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org"
   },
-  "contexts": {"Session token" : "value"},
   "client": {
     "host": null,
     "ip": "172.16.101.7",
@@ -17,12 +16,9 @@
     "ip": "216.58.208.36",
     "port": 80
   },
-  "resourceOperation": {
-    "uri": "/some/path",
+  "request": {
     "protocol": "CREST",
-    "operation": {
-      "method": "READ"
-    }
+    "operation": "READ"
   },
   "http": {
     "method": "GET",
@@ -36,5 +32,5 @@
     "elapsedTime": 42,
     "elapsedTimeUnits": "ms"
   },
-  "extraInfo": [ "extra", "info" ]
+  "trackingIds": ["12345"]
 }

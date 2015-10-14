@@ -224,9 +224,9 @@ public class LogRecWrite implements LogOperation, ParseOutput {
                 .component(Component.POLICY_AGENT)
                 .authentication(clientId)
                 .http("UNKNOWN", path, queryString, Collections.<String, List<String>>emptyMap())
-                .resourceOperation(logExtracts.getResourceUrl(), "HTTP", "UNKNOWN")
+                .request("HTTP", "UNKNOWN")
                 .client(clientIp)
-                .context(Context.SESSION, contextId)
+                .trackingId(contextId)
                 .response(null, logExtracts.getStatus(), -1, MILLISECONDS)
                 .toEvent();
 

@@ -19,7 +19,7 @@ package org.forgerock.openam.audit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
-import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
+import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.SESSION;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_ATTEMPT;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_OUTCOME;
 import static org.forgerock.openam.audit.AuditConstants.USER_ID;
@@ -234,7 +234,7 @@ public class AbstractHttpAccessAuditFilterTest {
         assertThat(auditEvent).stringAt("eventName").isEqualTo(AM_ACCESS_OUTCOME.toString());
         assertThat(auditEvent).stringAt("response/status").isEqualTo("FAILURE");
         assertThat(auditEvent).longAt("response/elapsedTime").isNotNull();
-        assertThat(auditEvent).stringAt("response/detail").isNotNull();
+        assertThat(auditEvent).stringAt("response/detail/reason").isNotNull();
     }
 
     private void verifyAccessAuditEvent(JsonValue auditEvent) {
@@ -242,7 +242,7 @@ public class AbstractHttpAccessAuditFilterTest {
         assertThat(auditEvent).stringAt("transactionId").isNotNull();
         assertThat(auditEvent).stringAt("component").isEqualTo(AUTHENTICATION.toString());
         assertThat(auditEvent).stringAt("authentication/id").isEqualTo("USER_ID");
-        assertThat(auditEvent).hasObject("contexts").contains(SESSION.toString(), "value");
+        assertThat(auditEvent).hasArray("trackingIds").contains("value");
         assertThat(auditEvent).stringAt("client/host").isEqualTo("");
         assertThat(auditEvent).stringAt("client/ip").isEqualTo("REMOTE_ADDRESS");
         assertThat(auditEvent).integerAt("client/port").isEqualTo(9000);

@@ -19,11 +19,11 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.Constants;
-import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditConstants.TrackingIdKey;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 
-import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
+import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.SESSION;
 
 /**
  * A provider which provides user id and context details for auditing purposes. This provider draws its details
@@ -50,12 +50,12 @@ public class OAuth2AuditSSOTokenContextProvider implements OAuth2AuditContextPro
      * {@inheritDoc}
      */
     @Override
-    public String getContext(Request request) {
-        String context;
+    public String getTrackingId(Request request) {
+        String trackingId;
 
-        context = getContextFromSSOSessionToken(request);
-        if (context != null) {
-            return context;
+        trackingId = getTrackingIdFromSSOSessionToken(request);
+        if (trackingId != null) {
+            return trackingId;
         }
 
         return null;
@@ -65,7 +65,7 @@ public class OAuth2AuditSSOTokenContextProvider implements OAuth2AuditContextPro
      * {@inheritDoc}
      */
     @Override
-    public AuditConstants.Context getContextKey() {
+    public TrackingIdKey getTrackingIdKey() {
         return SESSION;
     }
 
@@ -84,19 +84,19 @@ public class OAuth2AuditSSOTokenContextProvider implements OAuth2AuditContextPro
         return userId;
     }
 
-    private String getContextFromSSOSessionToken(Request request) {
-        String contextId = null;
+    private String getTrackingIdFromSSOSessionToken(Request request) {
+        String trackingId = null;
 
         SSOToken token = getSSOToken(request);
         if (token != null) {
             try {
-                contextId = token.getProperty(Constants.AM_CTX_ID);
+                trackingId = token.getProperty(Constants.AM_CTX_ID);
             } catch (SSOException e) {
                 //Do nothing
             }
         }
 
-        return contextId;
+        return trackingId;
     }
 
     private SSOToken getSSOToken(Request request) {

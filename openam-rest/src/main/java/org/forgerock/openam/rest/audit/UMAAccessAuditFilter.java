@@ -22,10 +22,9 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 
-import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableContexts;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableTrackingIds;
 import static org.forgerock.openam.audit.AuditConstants.Component;
 import static org.forgerock.openam.audit.AuditConstants.USER_ID;
 
@@ -68,7 +67,7 @@ public class UMAAccessAuditFilter extends OAuth2AbstractAccessAuditFilter {
      * {@link AuditRequestContext}.
      */
     @Override
-    protected Map<String, String> getContextsForAccessOutcome(Request request, Response response) {
-        return getAllAvailableContexts();
+    protected Set<String> getTrackingIdsForAccessOutcome(Request request, Response response) {
+        return getAllAvailableTrackingIds();
     }
 }

@@ -8,17 +8,8 @@
         "component": {
           "type": "string"
         },
-        "contexts": {
-          "type": "object"
-        },
         "realm": {
           "type": "string"
-        },
-        "extraInfo": {
-          "type": "array",
-          "items": {
-            "id": "auto-generated-schema-525"
-          }
         }
       }
     }
@@ -32,17 +23,8 @@
         "component": {
           "type": "string"
         },
-        "contexts": {
-          "type": "object"
-        },
         "realm": {
           "type": "string"
-        },
-        "extraInfo": {
-          "type": "array",
-          "items": {
-            "id": "auto-generated-schema-525"
-          }
         }
       }
     }
@@ -56,17 +38,8 @@
         "component": {
           "type": "string"
         },
-        "contexts": {
-          "type": "object"
-        },
         "realm": {
           "type": "string"
-        },
-        "extraInfo": {
-          "type": "array",
-          "items": {
-            "id": "auto-generated-schema-525"
-          }
         }
       }
     }
@@ -80,17 +53,8 @@
         "component": {
           "type": "string"
         },
-        "contexts": {
-          "type": "object"
-        },
         "realm": {
           "type": "string"
-        },
-        "extraInfo": {
-          "type": "array",
-          "items": {
-            "id": "auto-generated-schema-525"
-          }
         }
       }
     }
