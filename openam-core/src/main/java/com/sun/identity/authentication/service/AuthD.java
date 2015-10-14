@@ -96,6 +96,8 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGIN_CHAIN_OUTCOME;
+import static org.forgerock.openam.audit.AuditConstants.EventOutcome.AM_LOGOUT_SUCCESS;
 import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
 
 /**
@@ -752,12 +754,12 @@ public class AuthD implements ConfigurationListener {
                 }
                 Map<String, Object> map = new HashMap<>();
                 map.put("moduleId", authMethName);
-                map.put("result", "Logged out");
+                map.put("result", AM_LOGOUT_SUCCESS.toString());
                 map.put("info", info);
                 entries = Collections.singletonList(map);
 
-                auditor.handleEvent(messageName, description, AuditRequestContext.getTransactionIdValue(), authentication,
-                        realmName, time, contexts, entries);
+                auditor.handleEvent(messageName, description, AuditRequestContext.getTransactionIdValue(),
+                        authentication, realmName, time, contexts, entries);
             }
 
             //----------------------------------
@@ -841,7 +843,8 @@ public class AuthD implements ConfigurationListener {
                             }
                             Map<String, Object> map = new HashMap<>();
                             map.put("moduleId", moduleName);
-                            map.put("result", "Finished auth chain");
+                            String result = AM_LOGIN_CHAIN_OUTCOME.toString();
+                            map.put("result", result);
                             map.put("info", info);
                             entries = Collections.singletonList(map);
                         }

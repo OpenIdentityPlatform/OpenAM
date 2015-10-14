@@ -103,6 +103,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGIN_MODULE_OUTCOME;
+import static org.forgerock.openam.audit.AuditConstants.EventOutcome.AM_LOGIN_MODULE_OUTCOME_SUCCESS;
+import static org.forgerock.openam.audit.AuditConstants.EventOutcome.AM_LOGIN_MODULE_OUTCOME_FAILURE;
+
 /**
  * An abstract class which implements JAAS LoginModule, it provides
  * methods to access OpenAM services and the module
@@ -2118,7 +2122,8 @@ public abstract class AMLoginModule implements LoginModule {
             info.put("authLevel", authLevelAsString);
             Map<String, Object> map = new HashMap<>();
             map.put("moduleId", moduleName);
-            map.put("result", "Successful authentication");
+            String result = AM_LOGIN_MODULE_OUTCOME_SUCCESS + ": Module " + moduleName + " of class " + moduleClass;
+            map.put("result", result);
             map.put("info", info);
             entries = Collections.singletonList(map);
 
@@ -2142,9 +2147,8 @@ public abstract class AMLoginModule implements LoginModule {
                 authentication = principalName;
             }
 
-            auditor.handleEvent(null, "Successful authentication through module " + moduleName + " of class " +
-                            moduleClass, AuditRequestContext.getTransactionIdValue(), authentication,
-                            realmName, time, contextsMap, entries);
+            auditor.handleEvent(null, AM_LOGIN_MODULE_OUTCOME.toString(), AuditRequestContext.getTransactionIdValue(),
+                    authentication, realmName, time, contextsMap, entries);
         }
 
         //-----------------------------------
@@ -2366,7 +2370,8 @@ public abstract class AMLoginModule implements LoginModule {
             info.put("authLevel", authLevelAsString);
             Map<String, Object> map = new HashMap<>();
             map.put("moduleId", moduleName);
-            map.put("result", "Failure to authenticate");
+            String result = AM_LOGIN_MODULE_OUTCOME_FAILURE + ": Module " + moduleName + " of class " + moduleClass;
+            map.put("result", result);
             map.put("info", info);
             entries = Collections.singletonList(map);
 
@@ -2383,7 +2388,7 @@ public abstract class AMLoginModule implements LoginModule {
                 contextsMap.put(AuditConstants.Context.SESSION.toString(), sessionContext);
             }
 
-            String authentication = null;
+            String authentication;
             if (principalName != null && orgDN != null) {
                 authentication = cw.getIdentity(principalName, realmName).getUniversalId();
             } else if (principalName != null) {
@@ -2392,9 +2397,8 @@ public abstract class AMLoginModule implements LoginModule {
                 authentication = "Unknown user";
             }
 
-            auditor.handleEvent(null, "Failure to authenticate through module " + moduleName + " of class " +
-                            moduleClass, AuditRequestContext.getTransactionIdValue(), authentication,
-                            realmName, time, contextsMap, entries);
+            auditor.handleEvent(null, AM_LOGIN_MODULE_OUTCOME.toString(), AuditRequestContext.getTransactionIdValue(),
+                    authentication, realmName, time, contextsMap, entries);
         }
 
         //-----------------------------------

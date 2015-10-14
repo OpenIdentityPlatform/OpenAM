@@ -143,6 +143,47 @@ public final class AuditConstants {
     }
 
     /**
+     * Types of audit event.
+     */
+    public enum Event {
+        /** Events for the outcome of the auth process */
+        AM_LOGIN_MODULE_OUTCOME("AM_LOGIN_MODULE_OUTCOME"),
+        AM_LOGIN_CHAIN_OUTCOME("AM_LOGIN_CHAIN_OUTCOME");
+
+        private final String name;
+
+        Event(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    /**
+     * Outcomes of types of audit event.
+     */
+    public enum EventOutcome {
+        /** The result of events for the outcome of the auth process */
+        AM_LOGIN_MODULE_OUTCOME_SUCCESS("SUCCESS"),
+        AM_LOGIN_MODULE_OUTCOME_FAILURE("FAILURE"),
+        AM_LOGOUT_SUCCESS("SUCCESS");
+
+        private final String name;
+
+        EventOutcome(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    /**
      * The topic to which events built using {@link AMAccessAuditEventBuilder} should be routed.
      */
     public static final String ACCESS_TOPIC = "access";
