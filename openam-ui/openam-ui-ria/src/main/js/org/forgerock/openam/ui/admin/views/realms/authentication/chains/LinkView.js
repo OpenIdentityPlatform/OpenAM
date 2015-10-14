@@ -20,23 +20,23 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLinkView"
-], function ($, _, AbstractView, BootstrapDialog, UIUtils, EditLinkView) {
+    "handlebars",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function ($, _, AbstractView, BootstrapDialog, Handlebars, UIUtils) {
 
     var LinkView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/LinkTemplate.html",
         popoverTemplate: "templates/admin/views/realms/authentication/chains/PopoverTemplate.html",
         mode: "replace",
+        partials : ["templates/admin/views/realms/authentication/chains/_CriteriaFooter.html"],
         events: {
-            "dblclick .panel": "editItem",
             "click #editBtn": "editItem",
             "click #deleteBtn": "deleteItem",
             "change #selectCriteria": "selectCriteria",
-            "mouseenter .btn-auth-module-info": "showPopover",
-            "focusin  .btn-auth-module-info":   "showPopover",
-            "mouseleave .btn-auth-module-info": "hidePopover",
-            "focusout.btn-auth-module-info":    "hidePopover"
+            "mouseenter .auth-criteria-info": "showPopover",
+            "focusin    .auth-criteria-info": "showPopover",
+            "mouseleave .auth-criteria-info": "hidePopover",
+            "focusout   .auth-criteria-info": "hidePopover"
         },
 
         deleteItem: function () {
@@ -46,40 +46,46 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
         },
 
         editItem: function (e) {
-            EditLinkView.show(this);
+            this.parent.editItem(this);
         },
 
         showPopover: function (e) {
             var self = this,
-                popover = this.$el.find(".btn-auth-module-info").data("bs.popover"),
+                popover = this.$el.find(".auth-criteria-info").data("bs.popover"),
                 selected = this.$el.find("#selectCriteria option:selected"),
                 index = selected.index(),
-                data = { criteria : selected.val().toLowerCase() };
-
-            if (this.$el.index() >= this.parent.data.form.chainData.authChainConfiguration.length - 1) {
-                data.failText = $.t("console.authentication.editChains.lastCriteria");
-                data.passText = $.t("console.authentication.editChains.lastCriteria");
-                data.last = true;
-            } else {
-                data.failText = $.t("console.authentication.editChains.criteria." + index + ".fail");
-                data.passText = $.t("console.authentication.editChains.criteria." + index + ".pass");
-            }
+                data = {
+                    criteria : selected.val().toLowerCase(),
+                    passText : $.t("console.authentication.editChains.criteria." + index + ".passText"),
+                    failText : $.t("console.authentication.editChains.criteria." + index + ".failText")
+                };
 
             UIUtils.fillTemplateWithData(self.popoverTemplate, data, function (data) {
                 popover.options.content = data;
                 popover.options.title = selected.text();
-                self.$el.find(".btn-auth-module-info").popover("show");
+                self.$el.find(".auth-criteria-info").popover("show");
             });
 
         },
 
         hidePopover: function (e) {
-            this.$el.find(".btn-auth-module-info").popover("hide");
+            this.$el.find(".auth-criteria-info").popover("hide");
+        },
+
+        renderArrows: function () {
+            var config = this.parent.data.form.chainData.authChainConfiguration,
+                html = Handlebars.compile(
+                    "{{> templates/admin/views/realms/authentication/chains/_CriteriaFooter type='" +
+                    this.data.linkConfig.criteria + "'}}"
+                );
+
+            this.$el.find(".criteria-view").html(html);
         },
 
         selectCriteria: function () {
             this.data.linkConfig.criteria = this.$el.find("#selectCriteria option:selected").val();
             this.parent.validateChain();
+            this.renderArrows();
         },
 
         render: function () {
@@ -87,8 +93,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
 
             this.data.optionsLength = _.keys(this.data.linkConfig.options).length;
             this.data.typeDescription = this.getModuleDesciption();
+            this.parent.validateChain();
+
             this.parentRender(function () {
-                self.$el.find(".btn-auth-module-info").popover({
+                self.renderArrows();
+                self.$el.find(".auth-criteria-info").popover({
                     trigger : "manual",
                     container : "body",
                     html : "true",
@@ -97,8 +106,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
                         '<h3 class="popover-title"></h3><div class="popover-content"></div></div>'
                 });
             });
-
-            this.parent.validateChain();
         },
 
         getModuleDesciption: function () {
@@ -110,7 +117,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             if (this.data.linkConfig.module && name) {
                 return name.typeDescription;
             }
-
             return;
         }
 

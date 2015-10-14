@@ -1,0 +1,53 @@
+<div class="row">
+    <div class="col-xs-6">
+
+        {{#equals type 'REQUIRED'}}
+        <div class="panel-arrow-down panel-arrow-fail text-danger text-center">
+            {{t 'common.form.fail'}} <span class="badge badge-danger"><i class="fa fa-flag"></i></span>
+            <div class="panel-arrow">
+                <div class="panel-arrow-square"></div>
+                <div class="panel-arrow-triangle"></div>
+            </div>
+        </div>
+        {{/equals}}
+
+        {{#equals type 'SUFFICIENT'}}
+        <div class="panel-arrow-down panel-arrow-fail text-muted text-center">
+            {{t 'common.form.continue'}}
+            <div class="panel-arrow">
+                <div class="panel-arrow-square"></div>
+                <div class="panel-arrow-triangle"></div>
+            </div>
+        </div>
+        {{/equals}}
+
+        {{#equals type 'OPTIONAL'}}
+        <div class="panel-arrow-down panel-arrow-fail text-muted text-center">
+            {{t 'common.form.continue'}}
+            <div class="panel-arrow">
+                <div class="panel-arrow-square"></div>
+                <div class="panel-arrow-triangle"></div>
+            </div>
+        </div>
+        {{/equals}}
+
+        {{#equals type 'REQUISITE'}}
+        <div class="panel-arrow-left panel-arrow-fail text-danger text-center">
+            {{t 'common.form.fail'}} <span class="badge badge-danger"><i class="fa fa-flag"></i></span>
+            <div class="panel-arrow">
+                <div class="panel-arrow-square"></div>
+                <div class="panel-arrow-triangle"></div>
+            </div>
+        </div>
+        {{/equals}}
+    </div>
+    <div class="col-xs-6">
+        <div class="{{#equals type 'SUFFICIENT'}}panel-arrow-right{{else}} panel-arrow-down{{/equals}} panel-arrow-success text-success text-center">
+            {{t 'common.form.success'}} <span class="badge badge-success"><i class="fa fa-flag"></i></span>
+            <div class="panel-arrow">
+                <div class="panel-arrow-square"></div>
+                <div class="panel-arrow-triangle"></div>
+            </div>
+        </div>
+    </div>
+</div>

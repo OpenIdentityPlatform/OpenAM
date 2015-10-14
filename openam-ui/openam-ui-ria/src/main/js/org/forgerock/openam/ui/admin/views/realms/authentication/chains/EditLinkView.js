@@ -28,8 +28,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
     var EditLinkView = AbstractView.extend({
         editLinkTemplate: "templates/admin/views/realms/authentication/chains/EditLinkTemplate.html",
         editLinkTableTemplate: "templates/admin/views/realms/authentication/chains/EditLinkTableTemplate.html",
-        show: function (obj) {
-            this.data = obj.data;
+        show: function (view) {
+            this.data = view.data;
             var self = this,
                 newLink = !self.data.linkConfig,
                 linkConfig = self.data.linkConfig || { module: "", options: {}, criteria: "" },
@@ -68,18 +68,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                     dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
 
                                 if (newLink) {
-                                    obj.data.linkConfig = linkConfig;
-                                    obj.parent.data.form.chainData.authChainConfiguration.push(linkConfig);
-                                    obj.parent.addItemToList(obj.element);
+                                    view.data.linkConfig = linkConfig;
+                                    view.parent.data.form.chainData.authChainConfiguration.push(linkConfig);
+                                    view.parent.addItemToList(view.element);
                                 }
 
-                                obj.render();
+                                view.render();
                                 dialog.close();
                             }
                         }, {
                             label: $.t("common.form.cancel"),
                             action: function (dialog) {
-                                obj.parent.validateChain();
+                                view.parent.validateChain();
                                 dialog.close();
                             }
                         }],
@@ -123,7 +123,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                     dialog.options.refreshOptionsTab(dialog);
                                     dialog.options.validateDialog(dialog);
                                 }
-                                //TODO add an error message when options are empty
                             });
 
                             dialog.getModalBody().on("click", ".delete-option", function (e) {

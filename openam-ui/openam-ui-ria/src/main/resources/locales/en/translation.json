@@ -296,6 +296,7 @@
             "filter": "Filter...",
             "pass" : "Pass",
             "fail" : "Fail",
+            "success" : "Success",
             "allow": "Allow",
             "deny": "Deny",
             "notApplicable": "n/a",
@@ -712,28 +713,28 @@
                 "criteria" : [
                     {
                         "title": "Required",
-                        "pass" : "Will advance to next module.",
-                        "fail" : "Will execute remaining modules but will ultimately fail."
+                        "passText" : "Pass this module and you will get a pass flag, and continue in the chain.",
+                        "failText" : "Fail this module and you will get a fail flag, and continue in the chain."
                     },
                     {
                         "title": "Optional",
-                        "pass" : "Will advance to next module",
-                        "fail" : "Will advance to next module"
+                        "passText" : "Pass this module and you will get a pass flag, and continue in the chain.",
+                        "failText" : "Fail this module and you will continue in the chain."
                     },
                     {
                         "title": "Requisite",
-                        "pass" : "Will advance to next module.",
-                        "fail" : "Will advance straight to failure URL"
+                        "passText" : "Pass this module and you will get a pass flag, and continue in the chain.",
+                        "failText" : "Fail this module and you will get a fail flag, and exit the chain."
 
                     },
                     {
                         "title": "Sufficient",
-                        "pass" : "Will advance straight to success URL.",
-                        "fail" : "Will advance to next module"
+                        "passText" : "Pass this module and you will get a pass flag, and exit the chain.",
+                        "failText" : "Fail this module and you will continue in the chain."
                     }
                 ],
                 "alerts" : {
-                    "reqdFailSuffPass" : "Warning: Succeeding a <strong>SUFFICIENT</strong> module after failing a <strong>REQUIRED</strong> module will immediately redirect to the failure URL, not the success URL."
+                    "reqdFailSuffPass" : "Warning: Passing a <strong>SUFFICIENT</strong> module after failing a <strong>REQUIRED</strong> module will continue through the chain, not redirect to the success URL."
                 },
                 "callToAction" : "You must add at least one authentication module",
                 "lastCriteria" : "Will advance to success or failure URL",
@@ -742,7 +743,8 @@
                     "defaultAdminAuthChain": "This is the default authentication chain for Administrators.",
                     "defaultOrgAuthChain": "This is the default authentication chain for Organizations.",
                     "defaultAdminOrgAuthChain": "This is the default authentication chain for Administrators and Organizations."
-                }
+                },
+                "legend" : ["Successful authentication requires:","At least one PASS flag", "No FAIL flags"]
             }
         },
         "dashboard":{

@@ -14,180 +14,431 @@
 * Copyright 2015 ForgeRock AS.
 */
 
-ol#sortableAuthChain {
-    padding-left: 40px;
-    position: relative;
+#editChainView{
 
-    &:before {
-        border-left: 2px solid #ddd;
-        content: '';
-        position: absolute;
-        left: 0;
-        left: 10px;
-        height: 100%;
-        top: 0;
-    }
-
-    &:after {
-        content: '';
-        width: 0;
-        height: 0;
-        border-style: solid;
-        border-width: 10px 8px 0 8px;
-        border-color: #ccc transparent transparent transparent;
-        left: 3px;
-        margin-top: -20px;
-        position: absolute;
-    }
-
-    li.chain-link .fa-cube {
-        color: #FFFFFF;
-        background:  @base-theme-color;
-        .icon-circle(44px);
-    }
-
-    li:not(.dragged) {
-        counter-increment: my-awesome-counter;
-    }
-
-    li.placeholder{
-        min-height: 128px;
-        position: relative;
-        display: block;
-        margin: 0;
-        padding: 0;
-        min-height: 128px;
-        background-color: #eee;
-        -webkit-box-shadow: inset 0px 0px 3px 0px rgba(0,0,0,0.24);
-        -moz-box-shadow: inset 0px 0px 3px 0px rgba(0,0,0,0.24);
-        box-shadow: inset 0px 0px 3px 0px rgba(0,0,0,0.24);
-        margin-bottom: 20px;
-        border: 1px solid transparent;
-        border-radius: 4px;
-        counter-increment: my-awesome-counter;
-    }
-
-
-
-    li:not(.dragged) .panel-card:before, .placeholder-inner:before {
-        content: counter(my-awesome-counter);
-        text-align: center;
-        font-weight: 600;
-        background-color: #fff;
-        width: 22px;
-        height: 22px;
-        border-radius: 40px;
-        display: block;
-        position: absolute;
-        left: -41px;
-        top: -1px;
-        border: 1px solid #ddd;
-        font-size: 13px;
-        color: #666;
-    }
-
-    .placeholder-inner:before {
-        color: #fff;
-        background-color: @base-theme-color;
-        border-color:  @base-theme-color;
-    }
-
-    .badge {
-        color: #555;
-        background-color: rgba(0,0,0,.1);
-    }
-
-    .module-options{
+    .text-valign-middle{
         line-height: 34px;
     }
 
-    .panel-default.panel-card {
+    #chainsLegend span {
+        margin: 0 0 0 13px;
+    }
+
+    ol#sortableAuthChain {
+        padding: 0 34px 0 60px;
         position: relative;
+        margin-bottom: 50px;
 
-        &:hover, &:focus {
-            transition: border-color 0.5s;
-            border-color: darken(@base-theme-color, 5%);
-            .fa-cube{
-                background-color: darken(@base-theme-color, 5%);
-                transition: background-color 0.5s;
-            }
-            h3.media-heading {
-                color: darken(@base-theme-color, 5%);
-                transition: color 0.5s;
-            }
-        }
-
-        .media-heading {
-            margin-top: 3px;
-        }
-
-        h3.media-heading {
-            font-size: 18px;
-            margin-top: 5px;
-        }
-
-        a:focus {
-            text-decoration: none;
-        }
-
-        >.panel-footer {
+        &:before {
+            border-left: 2px solid #ddd;
+            content: '';
             position: absolute;
-            right: 3px;
+            left: 0;
+            left: 10px;
+            bottom: 0;
             top: 0;
-            z-index: 5;
-            border: none;
-            padding: 4px 0;
-            overflow: visible;
-
-            .btn-link {
-                color: #777;
-                padding: 6px 12px 6px 0px;
-            }
         }
 
-        .select-group button {
-            padding: 6px 5px;
-            color: #777;
-            display: none;
+        &:after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 8px 0 8px;
+            border-color: #ccc transparent transparent transparent;
+            left: 3px;
+            margin-top: -50px;
+            position: absolute;
+        }
+
+        li.chain-link .fa-cube {
+            color: #fff;
+            background:  @base-theme-color;
+            .icon-circle(44px);
+        }
+
+        li.chain-link.dragged{
+            padding-right: 34px;
+        }
+
+        li.chain-link:not(.dragged) {
+            counter-increment: auth-chains-counter;
+        }
+
+        li.placeholder{
+            min-height: 171px;
+            position: relative;
+            display: block;
+            margin: 0 0 40px;
+            padding: 0;
+            background-color: #eee;
+            -webkit-box-shadow: inset 0px 0px 3px 0px rgba(0,0,0,0.24);
+            -moz-box-shadow: inset 0px 0px 3px 0px rgba(0,0,0,0.24);
+            box-shadow: inset 0px 0px 3px 0px rgba(0,0,0,0.24);
+            border: 1px solid transparent;
+            border-radius: 4px;
+            counter-increment: auth-chains-counter;
+        }
+
+
+
+        li:not(.dragged) .panel-card:before, .placeholder-inner:before {
+            content: counter(auth-chains-counter);
+            text-align: center;
+            font-weight: 600;
+            background-color: #fff;
+            width: 22px;
+            height: 22px;
+            border-radius: 40px;
+            display: block;
+            position: absolute;
+            left: -61px;
+            top: -1px;
+            border: 1px solid #ddd;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .placeholder-inner:before {
+            color: #fff;
+            background-color: @base-theme-color;
+            border-color:  @base-theme-color;
+        }
+
+        .badge {
+            color: #555;
+            background-color: rgba(0,0,0,.1);
+        }
+
+        .panel-default.panel-card {
+            position: relative;
+            margin-bottom: 40px;
 
             &:hover, &:focus {
-                color: @base-theme-color;
+                .transition(border-color, 0.3s);
+                border-color: #bbb;
+                .fa-cube{
+                    background-color: darken(@base-theme-color, 5%);
+                    .transition(background-color 0.3s);
+                }
+                h3.media-heading {
+                    color: darken(@base-theme-color, 5%);
+                    .transition(color, 0.3s);
+                }
+            }
+
+            .media-heading {
+                margin-top: 3px;
+            }
+
+            h3.media-heading {
+                font-size: 18px;
+                margin-top: 5px;
+            }
+
+            >.panel-menu {
+                position: absolute;
+                right: 3px;
+                top: 0;
+                z-index: 5;
+                border: none;
+                padding: 4px 0;
+                overflow: visible;
+
+                .btn-link {
+                    color: #777;
+                    padding: 6px 12px 6px 0px;
+                }
+            }
+
+            .select-group button {
+                padding: 6px 5px;
+                color: #777;
+                display: inline-block;
+
+                &:hover, &:focus {
+                    color: @base-theme-color;
+                }
+            }
+            .select-group select {
+                display: inline-block;
             }
         }
-    }
-}
 
-.am-link-popover {
-    width: 380px;
-    padding: 0 5px 5px;
-
-    .popover-title{
-        border: none;
-        color: @base-theme-color;
-        font-weight: bold;
-    }
-
-    img {
-        width: auto;
-        display: block;
-        margin: 0 auto;
-    }
-}
-
-@media (min-width: 768px) {
-    ol#sortableAuthChain {
-        > li.chain-link:before {
-            left: -41px;
+        //Arrows and Criteria
+        .panel-footer {
+            background-color: @background-color;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0;
         }
 
-        .panel-default.panel-card .select-group {
-            select {
+        .panel-arrow-success, .panel-arrow-fail {
+            padding: 10px 0;
+            line-height: 20px;
+        }
+        .panel-arrow-success{
+            border-left: 1px solid #ddd;
+        }
+
+        .panel-arrow {
+            position: absolute;
+            margin:0;
+        }
+
+        .auth-panel-arrow-down {
+            margin: 0 50%;
+            left: -27px;
+
+            .panel-arrow-square {
+                width: 42px;
+                height: 10px;
+                background-color: #f7f7f7;
+                margin: 0 auto;
+                bottom: -10px;
+                border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+                position: relative;
+                z-index: 4;
+                .transition(border-color, 0.3s);
+            }
+
+            .panel-arrow-triangle {
+                width: 0;
+                height: 0;
+                border-left: 30px solid transparent;
+                border-right: 30px solid transparent;
+                border-top: 26px solid #ddd;
+                margin: 9px auto;
+                position: relative;
+                z-index: 3;
+                .transition(border-top-color, 0.3s);
+
+                &:after {
+                	content: '';
+                    width: 0;
+                    height: 0;
+                    border-left: 27px solid transparent;
+                    border-right: 27px solid transparent;
+                    border-top: 24px solid #f7f7f7;
+                    margin: 0 auto;
+                    position: absolute;
+                    top: -25px;
+                    left: -27px;
+                }
+            }
+        }
+
+        .auth-panel-arrow-left {
+            left: 13px;
+            bottom: 0;
+
+            .panel-arrow-triangle {
+                width: 0;
+                height: 0;
+                margin: -14px -39px;
+                position: relative;
+                z-index: 3;
+                border-top: 34px solid transparent;
+                border-bottom: 34px solid transparent;
+                border-right: 29px solid #ddd;
+                border-left: inherit;
+                .transition(border-right-color, 0.3s);
+
+                &:after {
+                    content: '';
+                    width: 0;
+                    height: 0;
+                    margin: 0 auto;
+                    position: absolute;
+                    top: -31px;
+                    left: 2px;
+                    border-top: 31px solid transparent;
+                    border-bottom: 31px solid transparent;
+                    border-right: 26px solid #f7f7f7;
+                    border-left: inherit;
+                }
+            }
+
+            .panel-arrow-square {
+                width: 14px;
+                height: 42px;
+                background-color: #f7f7f7;
+                margin: 0 0 0 0;
+                bottom: -1px;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                position: absolute;
+                z-index: 4;
+                left: -11px;
+
+                .transition(border-color, 0.3s);
+
+                &:after {
+                    content: '';
+                    width: 4px;
+                    height: 1px;
+                    background-color: #ddd;
+                    margin: 0;
+                    top: -1px;
+                    position: absolute;
+                    z-index: 4;
+                    left: 11px;
+                    display: block;
+                }
+            }
+        }
+
+        .auth-panel-arrow-right {
+            right: 13px;
+            bottom: 0;
+
+            .panel-arrow-square {
+                width: 14px;
+                height: 42px;
+                background-color: #f7f7f7;
+                margin: 0 0 0 0;
+                bottom: -1px;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                position: absolute;
+                z-index: 4;
+                right: -11px;
+                .transition(border-color, 0.3s);
+
+                &:after {
+                    content: '';
+                    width: 4px;
+                    height: 1px;
+                    background-color: #ddd;
+                    margin: 0;
+                    top: -1px;
+                    position: absolute;
+                    z-index: 4;
+                    right: 11px;
+                    display: block;
+                }
+            }
+            .panel-arrow-triangle {
+                width: 0;
+                height: 0;
+                margin: 0;
+                position: absolute;
+                top: -53px;
+                right: -39px;
+                z-index: 3;
+                border-top: 34px solid transparent;
+                border-bottom: 34px solid transparent;
+                border-left: 29px solid #ddd;
+                .transition(border-color-left, 0.3s);
+
+                &:after {
+                    content: '';
+                    width: 0;
+                    height: 0;
+                    margin: 0 auto;
+                    position: absolute;
+                    top: -31px;
+                    left: -28px;
+                    border-top: 31px solid transparent;
+                    border-bottom: 31px solid transparent;
+                    border-left: 27px solid #f7f7f7;
+                }
+            }
+
+        }
+
+        li.chain-link {
+
+            &:last-of-type {
+                .panel-card {
+                    .panel-arrow-down .panel-arrow {
+                        .auth-panel-arrow-down;
+                    }
+                    .panel-arrow-right .panel-arrow {
+                        .auth-panel-arrow-down;
+                    }
+                    .panel-arrow-left .panel-arrow {
+                        .auth-panel-arrow-down;
+                    }
+
+                    &:hover, &:focus {
+                        .panel-arrow-down,
+                        .panel-arrow-right,
+                        .panel-arrow-left {
+                            .panel-arrow .panel-arrow-triangle {
+                                border-top-color: #bbb;
+                            }
+                            .panel-arrow .panel-arrow-square {
+                                border-color: #bbb;
+                            }
+                        }
+                    }
+                }
+            }
+
+            &:not(:last-of-type) {
+                .panel-card {
+                    .panel-arrow-down .panel-arrow {
+                        .auth-panel-arrow-down;
+                    }
+                    .panel-arrow-right .panel-arrow {
+                        .auth-panel-arrow-right;
+                    }
+                    .panel-arrow-left .panel-arrow {
+                        .auth-panel-arrow-left;
+                    }
+
+                    &:hover, &:focus {
+                        .panel-arrow-right .panel-arrow .panel-arrow-triangle {
+                            border-left-color: #bbb;
+                        }
+                        .panel-arrow-left .panel-arrow .panel-arrow-triangle {
+                            border-right-color: #bbb;
+                        }
+                        .panel-arrow-down .panel-arrow .panel-arrow-triangle {
+                            border-top-color: #bbb;
+                        }
+                        .panel-arrow-down,
+                        .panel-arrow-right,
+                        .panel-arrow-left  {
+                            .panel-arrow .panel-arrow-square {
+                                border-color: #bbb;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    .badge-danger, ol#sortableAuthChain .badge-danger {
+        background-color: #a3342e;
+        color: #fff;
+    }
+
+    .badge-success, ol#sortableAuthChain .badge-success {
+        background-color: #3a776c;
+        color: #fff;
+    }
+
+    @media (min-width: 768px) {
+        ol#sortableAuthChain {
+            > li.chain-link:before {
+                left: -61px;
+            }
+
+            .panel-default.panel-card .select-group select {
                 width: 66%;
-                display: inline-block;
-            }
-            button {
-                display: inline-block;
             }
         }
     }
+}
+
+body.dragging ol#sortableAuthChain &:before {
+    bottom: 20px;
 }

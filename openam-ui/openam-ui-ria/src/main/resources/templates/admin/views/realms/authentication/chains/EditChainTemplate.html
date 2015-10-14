@@ -12,7 +12,7 @@
 
 <div class="panel panel-default fr-panel-tab">
 
-    <div class="tab-content">
+    <div class="tab-content" id="editChainView">
 
         <div role="tabpanel" class="tab-pane active" id="chains">
 
@@ -20,6 +20,13 @@
                 <button type="button" class="btn btn-primary add-new-module">
                     <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
                 </button>
+                <div id="chainsLegend" class="pull-right text-valign-middle">
+                    {{t 'console.authentication.editChains.legend.0'}}
+                    <span class="badge badge-success"><i class="fa fa-flag"></i></span>
+                    {{t 'console.authentication.editChains.legend.1'}}
+                    <span class="badge badge-danger"><i class="fa fa-flag"></i> </span>
+                    {{t 'console.authentication.editChains.legend.2'}}
+                </div>
             </div>
 
             <div class="panel-footer">

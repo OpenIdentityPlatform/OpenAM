@@ -18,6 +18,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLinkView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "handlebars",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkView",
@@ -28,53 +29,28 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
     // jquery dependencies
     "sortable"
-], function ($, _, AbstractView, FormHelper, Handlebars, LinkView, Messages,
+], function ($, _, AbstractView, EditLinkView, FormHelper, Handlebars, LinkView, Messages,
              PostProcessView, Router, SMSRealmDelegate) {
-    var EditChainView = AbstractView.extend({
-        template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
-        events: {
-            "click #saveEditChain":   "saveChain",
-            "click #saveSettings":   "saveSettings",
-            "click .add-new-module": "addNewModule",
-            "click #delete":        "deleteChain"
-        },
-        partials: [
-            "partials/alerts/_Alert.html",
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
-        ],
 
-        addItemToList: function (element) {
-            this.$el.find("ol#sortableAuthChain").append(element);
-        },
-
-        addNewModule: function (e) {
-            if (e) {
-                e.preventDefault();
-            }
-            var index = this.data.form.chainData.authChainConfiguration.length,
-                linkView = this.createLinkView(index);
-            linkView.editItem();
-        },
-
-        createLinkView: function (index) {
+    var createLinkView = function (index, view) {
             var linkView = new LinkView();
 
-            /**
-             * A new list item is being dynamically created and added to the current EditChainView as a child View.
-             * In order to do this we must create the element here, parent and pass it to the child so that it has
-             * something to render inside of.
-             */
+             /**
+              * A new list item is being dynamically created and added to the current EditChainView as a child View.
+              * In order to do this we must create the element here, parent and pass it to the child so that it has
+              * something to render inside of.
+              */
             linkView.el = $("<li class='chain-link' />");
             linkView.element = linkView.el;
-            linkView.parent = this;
+            linkView.parent = view;
 
             linkView.data = {
-                // Each linkview instance requires allCriteria and allModules to render. These values are never changed
-                // Because multiple instances require this same data, I grab it only in this parent view, then pass it
-                // on to to all the child linkview instances.
+                 // Each linkview instance requires allCriteria and allModules to render. These values are never changed
+                 // Because multiple instances require this same data, I grab it only in this parent view, then pass it
+                 // on to to all the child linkview instances.
                 typeDescription : "",
-                allModules : this.data.allModules,
-                linkConfig : this.data.form.chainData.authChainConfiguration[index],
+                allModules : view.data.allModules,
+                linkConfig : view.data.form.chainData.authChainConfiguration[index],
                 allCriteria : {
                     REQUIRED : $.t("console.authentication.editChains.criteria.0.title"),
                     OPTIONAL : $.t("console.authentication.editChains.criteria.1.title"),
@@ -86,39 +62,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             return linkView;
         },
 
-        deleteChain: function (event) {
-            if ($(event.currentTarget).hasClass("disabled")) { return false; }
-            var self = this;
+        initSortable = function (self) {
 
-            SMSRealmDelegate.authentication.chains.remove(
-                self.data.realmPath,
-                self.data.form.chainData._id)
-            .then(function () {
-                Messages.addMessage({
-                    type: Messages.TYPE_INFO,
-                    message: $.t("console.authentication.editChains.deletedChain")
-                });
-                Router.routeTo(Router.configuration.routes.realmsAuthenticationChains, {
-                    args: [encodeURIComponent(self.data.realmPath)],
-                    trigger: true
-                });
-            },function (e) {
-                Messages.addMessage({
-                    type: Messages.TYPE_DANGER,
-                    response: e
-                });
-            });
-        },
-
-        initSortable: function () {
-            var self = this;
-
-            this.$el.find("ol#sortableAuthChain").nestingSortable({
+            self.$el.find("ol#sortableAuthChain").nestingSortable({
                 exclude:"li:not(.chain-link)",
                 delay: 100,
                 vertical: true,
                 placeholder: "<li class='placeholder'><div class='placeholder-inner'></div></i>",
-                tolerance: 0,
 
                 onDrag: function (item, position) {
                     item.css({
@@ -147,7 +97,59 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     _super(item, container);
                 }
             });
+        };
+
+    return AbstractView.extend({
+        template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
+        events: {
+            "click #saveEditChain":  "saveChain",
+            "click #saveSettings":   "saveSettings",
+            "click .add-new-module": "addNewModule",
+            "click #delete":         "deleteChain"
         },
+        partials: [
+            "partials/alerts/_Alert.html",
+            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+        ],
+
+        addItemToList: function (element) {
+            this.$el.find("ol#sortableAuthChain").append(element);
+        },
+
+        addNewModule: function () {
+            var index = this.data.form.chainData.authChainConfiguration.length,
+                linkView = createLinkView(index, this);
+            this.editItem(linkView);
+        },
+
+        editItem: function (linkview) {
+            EditLinkView.show(linkview);
+        },
+
+        deleteChain: function (event) {
+            if ($(event.currentTarget).hasClass("disabled")) { return false; }
+            var self = this;
+
+            SMSRealmDelegate.authentication.chains.remove(
+                self.data.realmPath,
+                self.data.form.chainData._id)
+            .then(function () {
+                Messages.addMessage({
+                    type: Messages.TYPE_INFO,
+                    message: $.t("console.authentication.editChains.deletedChain")
+                });
+                Router.routeTo(Router.configuration.routes.realmsAuthenticationChains, {
+                    args: [encodeURIComponent(self.data.realmPath)],
+                    trigger: true
+                });
+            },function (e) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: e
+                });
+            });
+        },
+
 
         render: function (args, callback) {
             var self = this;
@@ -181,24 +183,23 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                                     $.t("console.authentication.editChains.deleteBtnTooltip.defaultOrgAuthChain");
                             }
                         }
-
-                        // popever doesn't work in case button has disabled attribute
+                        // popover doesn't work in case button has disabled attribute
                         self.$el.find("#delete").addClass("disabled").popover(popoverOpt);
                     }
 
                     if (self.data.form.chainData.authChainConfiguration.length > 0) {
 
                         _.each(self.data.form.chainData.authChainConfiguration, function (linkConfig, index) {
-                            var linkView = self.createLinkView(index);
-                            linkView.render();
+                            var linkView = createLinkView(index, self);
                             self.addItemToList(linkView.element);
+                            linkView.render();
                         });
 
                     } else {
                         self.validateChain();
                     }
 
-                    self.initSortable();
+                    initSortable(self);
                     PostProcessView.render(self.data.form.chainData);
                 });
 
@@ -289,7 +290,5 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         }
 
     });
-
-    return EditChainView;
 
 });
