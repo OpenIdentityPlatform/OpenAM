@@ -248,7 +248,7 @@ public class SmsRealmProvider implements RequestHandler {
         Map<String, Set> attributes = new HashMap<>();
 
         String activeValue;
-        if (realmDetails.get("active").asBoolean()) {
+        if (realmDetails.get("active").defaultTo(true).asBoolean()) {
             activeValue = ACTIVE_VALUE;
         } else {
             activeValue = INACTIVE_VALUE;
