@@ -37,6 +37,14 @@
                 </div>
             </div>
 
+            <div class="panel-footer clearfix">
+                <div class="pull-right">
+                    <button id="saveEditChain" class="btn btn-primary" type="button" disabled>
+                        <span>{{t "common.form.saveChanges"}}</span>
+                    </button>
+                </div>
+            </div>
+
         </div>
 
         <div role="tabpanel" class="tab-pane" id="settings">
@@ -50,13 +58,13 @@
                         <div class="form-group">
                             <label for="loginSuccessUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.successUrl'}}</label>
                             <div class="col-sm-6">
-                                <input id="loginSuccessUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}"  value="{{chainData.loginSuccessUrl.[0]}}">
+                                <input id="loginSuccessUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}"  value="{{form.chainData.loginSuccessUrl.[0]}}">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="loginFailureUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.failUrl'}}</label>
                             <div class="col-sm-6">
-                                <input id="loginFailureUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}" value="{{chainData.loginFailureUrl.[0]}}">
+                                <input id="loginFailureUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}" value="{{form.chainData.loginFailureUrl.[0]}}">
                             </div>
                         </div>
                     </div>
@@ -68,18 +76,18 @@
                     <table class="table" id="postProcessView"></table>
                 </div>
 
+                <div class="panel-footer clearfix">
+                    <div class="pull-right">
+                        <button id="saveSettings" class="btn btn-primary" type="button">
+                            <span>{{t "common.form.saveChanges"}}</span>
+                        </button>
+                    </div>
+                </div>
+
             </div>
 
         </div>
 
-    </div>
-
-    <div class="panel-footer clearfix">
-        <div class="pull-right">
-            <button id="saveChanges" class="btn btn-primary" type="button" disabled>
-                <span>{{t "common.form.saveChanges"}}</span>
-            </button>
-        </div>
     </div>
 
 </div>
