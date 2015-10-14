@@ -44,6 +44,15 @@ import java.util.Set;
  * sts, as specified by the ws-security-policy bindings. Note that this keystore state does not pertain to the keystore
  * state related to generating SAML2 assertions, which is defined in SAML2Config.
  *
+ * Note that the encryptionKeyAlias and encryptionKeyPassword fields in this class, and the corresponding methods, would
+ * best be renamed decryptionKeyAlias and decryptionKeyPassword, as they are referenced by the CXF CallbackHandler via the
+ * WSPasswordCallback.DECRYPT constant, indicating their use in an asymmetric binding, where messages from client to server
+ * are encrypted with the recipient's public key, thus requiring the private key for decryption. The SoapSTSCallbackHandler is
+ * solicited to provide the password for this private key, using state set in this class.
+ *
+ * Also note that in an asymmetric binding, the client's Cert is included in the request, so that the sts can encrypt
+ * messages back to the client using the associated public key, thus not requiring any associated configuration state in
+ * this class.
  */
 public class SoapSTSKeystoreConfig {
     /*

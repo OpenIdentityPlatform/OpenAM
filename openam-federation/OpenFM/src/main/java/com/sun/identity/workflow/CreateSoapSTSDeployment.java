@@ -179,7 +179,7 @@ public class CreateSoapSTSDeployment extends Task {
     Method is package-private so test class can subclass.
      */
     @VisibleForTesting
-    JarInputStream getJarInputStream() throws WorkflowException {
+    protected JarInputStream getJarInputStream() throws WorkflowException {
         final Path baseDirectory = getDeploymentBaseDirectory();
         try (DirectoryStream<Path> jars = Files.newDirectoryStream(baseDirectory, SOAP_STS_SERVER_JAR_FILE_PREFIX + "*.war")) {
             for (Path jar : jars) {
@@ -197,7 +197,7 @@ public class CreateSoapSTSDeployment extends Task {
      Method is package-private so test class can subclass.
      */
     @VisibleForTesting
-    JarOutputStream getJarOutputStream(Path outputJarPath, Manifest inputWarManifest) throws WorkflowException {
+    protected JarOutputStream getJarOutputStream(Path outputJarPath, Manifest inputWarManifest) throws WorkflowException {
         try {
             return new JarOutputStream(Files.newOutputStream(outputJarPath, StandardOpenOption.CREATE_NEW), inputWarManifest);
         } catch (IOException e) {
@@ -209,7 +209,7 @@ public class CreateSoapSTSDeployment extends Task {
      Method is package-private so test class can subclass.
      */
     @VisibleForTesting
-    String getCompletionMessage(Locale locale, Path outputJarPath) {
+    protected String getCompletionMessage(Locale locale, Path outputJarPath) {
         String messageTemplate = getMessage("soap.sts.deployment.workflow.complete", locale);
         return MessageFormat.format(messageTemplate, outputJarPath.toString());
     }
@@ -274,7 +274,7 @@ public class CreateSoapSTSDeployment extends Task {
     package-private so test class can subclass
      */
     @VisibleForTesting
-    Path getOutputJarFilePath(String realm) throws WorkflowException {
+    protected Path getOutputJarFilePath(String realm) throws WorkflowException {
         try {
             final Path realmPath = Paths.get(getDeploymentBaseDirectory().toString(), realm);
             Files.createDirectories(realmPath);
@@ -314,7 +314,7 @@ public class CreateSoapSTSDeployment extends Task {
     Method is package-private so test class can subclass.
      */
     @VisibleForTesting
-    String getAMSessionIdCookieNameForDeployment() {
+    protected String getAMSessionIdCookieNameForDeployment() {
         return SystemPropertiesManager.get(Constants.AM_COOKIE_NAME);
     }
 
@@ -411,7 +411,7 @@ public class CreateSoapSTSDeployment extends Task {
     Method is package-private so test class can subclass.
      */
     @VisibleForTesting
-    InputStream getInputStreamForKeystoreFileOrCustomWsdlFile(String fileName) throws IOException {
+    protected InputStream getInputStreamForKeystoreFileOrCustomWsdlFile(String fileName) throws IOException {
         final Path filePath = Paths.get(getDeploymentBaseDirectory().toString(), fileName);
         return Files.newInputStream(filePath, StandardOpenOption.READ);
     }

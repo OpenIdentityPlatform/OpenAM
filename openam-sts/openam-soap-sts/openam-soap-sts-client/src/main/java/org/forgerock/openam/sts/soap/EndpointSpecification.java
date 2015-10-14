@@ -39,6 +39,14 @@ public class EndpointSpecification {
                 AMSTSConstants.STANDARD_STS_SERVICE_NAME);
     }
 
+    public QName getServiceQName() {
+        return serviceQName;
+    }
+
+    public QName getPortQName() {
+        return portQName;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this ==  other) {

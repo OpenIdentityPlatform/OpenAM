@@ -55,17 +55,32 @@ public class TokenSpecification {
     final Element onBehalfOf;
     final X509Certificate holderOfKeyCertificate;
 
-    private TokenSpecification(String tokenType, String keyType, Element onBehalfOf, X509Certificate holderOfKeyCertificate) {
+    public TokenSpecification(String tokenType, String keyType, Element onBehalfOf, X509Certificate holderOfKeyCertificate) {
         this.keyType = keyType;
         this.tokenType = tokenType;
         this.onBehalfOf = onBehalfOf;
         this.holderOfKeyCertificate = holderOfKeyCertificate;
     }
 
-    private TokenSpecification(String tokenType, String keyType, Element onBehalfOf) {
+    public TokenSpecification(String tokenType, String keyType, Element onBehalfOf) {
         this(tokenType, keyType, onBehalfOf, NULL_HOLDER_OF_KEY_CERTIFICATE);
     }
 
+    public String getTokenType() {
+        return tokenType;
+    }
+
+    public String getKeyType() {
+        return keyType;
+    }
+
+    public Element getOnBehalfOf() {
+        return onBehalfOf;
+    }
+
+    public X509Certificate getHolderOfKeyCertificate() {
+        return holderOfKeyCertificate;
+    }
 
     /**
      * @return A TokenSpecification instance with the state necessary to generate a SAML2 bearer assertion
@@ -140,7 +155,7 @@ public class TokenSpecification {
      * @return A UsernameToken element to be used as the OnBehalfOf Element in a RequestSecurityToken defining the ISSUE
      * operation invocation.
      */
-    private static Element usernameTokenOnBehalfOfElement(String username, String password) {
+    public static Element usernameTokenOnBehalfOfElement(String username, String password) {
         WSSecUsernameToken unt = new WSSecUsernameToken();
         unt.setUserInfo(username, password);
         unt.setPasswordType(WSConstants.PASSWORD_TEXT);

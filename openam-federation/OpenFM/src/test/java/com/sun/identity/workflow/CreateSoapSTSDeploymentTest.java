@@ -218,7 +218,7 @@ public class CreateSoapSTSDeploymentTest {
      */
     private class MyCreateSoapSTSDeployment extends CreateSoapSTSDeployment {
         @Override
-        JarInputStream getJarInputStream() throws WorkflowException {
+        protected JarInputStream getJarInputStream() throws WorkflowException {
             try {
                 return new JarInputStream(getClass().getResourceAsStream(inputWarFilePath.toString()));
             } catch (IOException e) {
@@ -227,7 +227,7 @@ public class CreateSoapSTSDeploymentTest {
         }
 
         @Override
-        JarOutputStream getJarOutputStream(Path outputWarFilePath, Manifest inputWarManifest) throws WorkflowException {
+        protected JarOutputStream getJarOutputStream(Path outputWarFilePath, Manifest inputWarManifest) throws WorkflowException {
             try {
                 return new JarOutputStream(Files.newOutputStream(outputWarFilePath, StandardOpenOption.WRITE), inputWarManifest);
             } catch (IOException e) {
@@ -236,22 +236,22 @@ public class CreateSoapSTSDeploymentTest {
         }
 
         @Override
-        Path getOutputJarFilePath(String realm) throws WorkflowException {
+        protected Path getOutputJarFilePath(String realm) throws WorkflowException {
             return outputWarFile.toPath();
         }
 
         @Override
-        String getCompletionMessage(Locale locale, Path outputJarPath) {
+        protected String getCompletionMessage(Locale locale, Path outputJarPath) {
             return "bobo";
         }
 
         @Override
-        String getAMSessionIdCookieNameForDeployment() {
+        protected String getAMSessionIdCookieNameForDeployment() {
             return AM_SESSION_COOKIE_NAME;
         }
 
         @Override
-        InputStream getInputStreamForKeystoreFileOrCustomWsdlFile(String fileName) throws IOException {
+        protected InputStream getInputStreamForKeystoreFileOrCustomWsdlFile(String fileName) throws IOException {
             if (WSDL_FILE_NAMES_PARAM_VALUE.equals(fileName)) {
                 return getClass().getResourceAsStream(customWsdlFilePath.toString());
             } else if (KEYSTORE_FILE_NAMES_PARAM_VALUE.equals(fileName)) {
