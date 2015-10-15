@@ -1,0 +1,25 @@
+.sidenav {
+
+    a {
+        color: #666;
+        text-decoration: none;
+    }
+
+    li.active > a, a:hover {
+        color: @base-theme-color;
+        .fa {
+            color: #666;
+        }
+    }
+
+    .sidenav-submenu li span {
+        color: #999;
+        &:hover {
+            color: #444;
+        }
+    }
+
+    ol > li > a:hover {
+        text-decoration: none;
+    }
+}

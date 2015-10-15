@@ -1,0 +1,59 @@
+.sidenav {
+
+    a {
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    ol > li > a {
+        padding: 0 0 15px 0;
+        display: block;
+
+        > .fa {
+            margin-right: 5px;
+            width: 20px;
+            text-align: center;
+        }
+    }
+
+    .sidenav-submenu {
+        li {
+            a {
+                padding: 0 0 10px 0;
+                display: inline-block;
+            }
+
+            a.no-arrow {
+                margin-left: 15px;
+            }
+
+            span {
+                cursor:pointer;
+                .fa-icon();
+                width: 11px;
+                transform-origin: 10% 50%;
+                i {
+                    transition: all 0.3s ease-out;
+                }
+            }
+
+            span[aria-expanded="true"] i{
+                -webkit-transform: rotate(90deg);
+                -moz-transform: rotate(90deg);
+                -o-transform: rotate(90deg);
+                -ms-transform: rotate(90deg);
+                transform: rotate(90deg);
+            }
+
+            &:last-of-type {
+                padding-bottom:10px;
+            }
+        }
+
+        margin: 0 0 0 20px;
+    }
+
+    > ol > li > ol.sidenav-submenu {
+        margin: 0 0 0 28px;
+    }
+}

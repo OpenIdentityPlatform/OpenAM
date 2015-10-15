@@ -61,12 +61,6 @@
 
 /* END of Candidate for Commons */
 
-.page-header .fa-question-circle {
-    font-size: 15px;
-    vertical-align: top;
-    color:grey;
-}
-
 .remember-forgot{
     padding: 0 0 0;
     .pull-right, .pull-left, .checkbox {
@@ -75,13 +69,6 @@
 }
 
 #login-base, .bootstrap-dialog.loginDialog {
-    .page-header {
-        h1 {
-            text-transform: uppercase;
-            font-size: 20px;
-            letter-spacing: 1px;
-        }
-    }
 
     .btn-group-justified {
         padding-top: 5px;
@@ -105,9 +92,7 @@
     margin-left: 0;
 }
 
-.modal-dialog .modal-body .page-header {
-    margin: 0 0 20px;
-}
+
 
 .bootstrap-dialog.loginDialog {
     .container {
@@ -139,33 +124,6 @@ body, .modal-open {
     }
 }
 
-.page-header-min {
-
-    margin-bottom: 40px;
-
-    h3 {
-        border: none;
-        font-size: 14px;
-        text-transform: uppercase;
-        font-weight: 600;
-        letter-spacing: 1px;
-        color: #666;
-        padding: 30px 0 10px;
-        margin-top: 0;
-        border-bottom: 1px solid #ddd;
-        margin-bottom: 0;
-
-        a {
-            color: #666;
-
-            &:hover, &:focus {
-                //color: @base-theme-color;
-                text-decoration: none;
-            }
-        }
-    }
-}
-
 .multiple-panels {
     border: 1px solid #ddd;
 
@@ -192,7 +150,6 @@ body, .modal-open {
 }
 
 
-
 /* Candidate for Commons, copied from OpenIDM */
 .panel-collapse {
     h4.panel-title {
@@ -213,104 +170,8 @@ body, .modal-open {
     }
 }
 
-.sidenav {
-
-    a {
-        color: #666;
-        //transition: color 0.1s linear;
-        text-decoration: none;
-        font-size: 13px;
-        cursor: pointer;
-    }
-
-    li.active > a, a:hover {
-        .fa {
-            color: #666;
-        }
-    }
-
-    ol > li > a {
-        padding: 0 0 15px 0;
-        display: block;
-        &:hover {
-            text-decoration: none;
-        }
-
-        > .fa {
-            margin-right: 5px;
-            width: 20px;
-            text-align: center;
-        }
-    }
-
-    .sidenav-submenu {
-        li {
-            a {
-                padding: 0 0 10px 0;
-                display: inline-block;
-            }
-
-            a.no-arrow {
-                margin-left: 15px;
-            }
-
-            span {
-                cursor:pointer;
-                .fa-icon();
-                color: #999;
-                width: 11px;
-                transform-origin: 10% 50%;
-
-                i {
-                    transition: all 0.3s ease-out;
-                }
-
-                &:hover{
-                    color: #444;
-                }
-
-            }
-
-            span[aria-expanded="true"] i{
-                -webkit-transform: rotate(90deg);
-                -moz-transform: rotate(90deg);
-                -o-transform: rotate(90deg);
-                -ms-transform: rotate(90deg);
-                transform: rotate(90deg);
-            }
-
-            &:last-of-type {
-                padding-bottom:10px;
-            }
-        }
-
-        margin: 0 0 0 20px;
-    }
-
-    > ol > li > ol.sidenav-submenu {
-        margin: 0 0 0 28px;
-    }
-}
-
 #sidePageContent {
     margin-top:-6px;
-
-    .page-header{
-        margin: 0 0 11px;
-        border-bottom:none;
-    }
-
-    .raised-page-header-button-group {
-         margin-top: -8px;
-    }
-
-    .shallow-page-header-button-group {
-         margin-top: 10px;
-    }
-
-    .deep-page-header-button-group {
-         margin-top: 44px;
-    }
 }
 
 .open > .dropdown-toggle.btn-default {

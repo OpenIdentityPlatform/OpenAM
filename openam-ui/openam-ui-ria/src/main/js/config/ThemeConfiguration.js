@@ -19,7 +19,7 @@ define("config/ThemeConfiguration", {
         // There must be a theme named "default".
         "default": {
             // An ordered list of URLs to stylesheets that will be applied to every page.
-            stylesheets: ["css/bootstrap-3.3.5-custom.css", "css/theme.css", "css/structure.css"],
+            stylesheets: ["css/bootstrap-3.3.5-custom.css", "css/structure.css", "css/theme.css"],
             // A path that is prepended to every relative URL when fetching resources (including images, stylesheets and
             // HTML template files).
             path: "",
