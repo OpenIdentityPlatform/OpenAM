@@ -318,7 +318,7 @@
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <arguments>prod --target-version=${version}</arguments>
+                            <arguments>prod --target-version=${project.version}</arguments>
                         </configuration>
                     </execution>
                 </executions>
