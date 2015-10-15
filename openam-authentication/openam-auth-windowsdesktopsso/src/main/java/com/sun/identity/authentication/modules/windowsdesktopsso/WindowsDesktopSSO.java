@@ -282,12 +282,17 @@ public class WindowsDesktopSSO extends AMLoginModule {
                     }
                     GSSName user = context.getSrcName();
                     final String userPrincipalName = user.toString();
+                    boolean foundTrustedRealm = false;
                     for (final String trustedRealm : trustedRealms) {
-                        if (!isTokenTrusted(userPrincipalName, trustedRealm)) {
-                            debug.error("Kerberos token for " + userPrincipalName + " not trusted");
-                            final String[] data = {userPrincipalName};
-                            throw new AuthLoginException(amAuthWindowsDesktopSSO, "untrustedToken", data);
+                        if (isTokenTrusted(userPrincipalName, trustedRealm)) {
+                            foundTrustedRealm = true;
+                            break;
                         }
+                    }
+                    if (!foundTrustedRealm) {
+                        debug.error("Kerberos token for " + userPrincipalName + " not trusted");
+                        final String[] data = {userPrincipalName};
+                        throw new AuthLoginException(amAuthWindowsDesktopSSO, "untrustedToken", data);
                     }
                     
                     // Check if the user account from the Kerberos ticket exists 
