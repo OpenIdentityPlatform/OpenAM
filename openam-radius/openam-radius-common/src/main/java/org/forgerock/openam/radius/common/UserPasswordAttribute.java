@@ -203,7 +203,7 @@ public class UserPasswordAttribute extends Attribute {
                 break;
             }
         }
-        return new String(clearText, 0, i);
+        return new String(clearText, 0, i, StandardCharsets.UTF_8);
     }
 
     /**
