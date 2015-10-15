@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
 
     obj.deleteDevice = function (uuid) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm("users/" +
+            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" +
                                                      Configuration.loggedUser.get("uid") +
                                                      "/devices/2fa/oath/" +
                                                      uuid),
@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
         var skipOption = {};
         skipOption.value = statusDevice;
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("users/" +
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
                                                   Configuration.loggedUser.get("uid") +
                                                   "/devices/2fa/oath/?_action=skip"),
             data: JSON.stringify(skipOption),
@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
     };
 
     obj.getDevices = function () {
-        var path = "users/" + Configuration.loggedUser.get("uid") + "/devices/2fa/oath/";
+        var path = "__subrealm__/users/" + Configuration.loggedUser.get("uid") + "/devices/2fa/oath/";
         return $.when(
             obj.serviceCall({
                 url: RealmHelper.decorateURIWithSubRealm(path + "?_queryFilter=true")
