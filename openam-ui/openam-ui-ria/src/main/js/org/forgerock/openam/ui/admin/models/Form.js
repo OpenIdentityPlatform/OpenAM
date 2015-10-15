@@ -47,9 +47,10 @@ define("org/forgerock/openam/ui/admin/models/Form", [
          */
         $(element).find("input:password").attr("placeholder", $.t("common.form.unchanged"));
 
-        $(element).find(".help-block").addClass("hidden-lg hidden-md").each(function () {
+        $(element).find(".help-block").addClass("hidden-lg hidden-md hidden-sm").each(function () {
             var group = $(this).parent(),
-                element = $('<a class="btn info-button visible-lg-inline-block visible-md-inline-block" ' +
+                element = $('<a class="btn info-button visible-lg-inline-block' +
+                    ' visible-md-inline-block visible-sm-inline-block" ' +
                     'tabindex="0" data-toggle="popover" data-trigger="focus"><i class="fa fa-info-circle"></i></a>');
 
             $(group).append(element);
