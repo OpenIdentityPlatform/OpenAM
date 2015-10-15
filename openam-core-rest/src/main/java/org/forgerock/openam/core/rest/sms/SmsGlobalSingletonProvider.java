@@ -36,6 +36,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
@@ -82,6 +83,8 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
             } catch (SSOException e) {
                 debug.warning("::SmsCollectionProvider:: SSOException on create", e);
                 return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
+            } catch (ResourceException e) {
+                return e.asPromise();
             }
         }
         return super.handleUpdate(serverContext, updateRequest);

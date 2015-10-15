@@ -47,6 +47,7 @@ import com.sun.identity.sm.ServiceSchema;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -257,7 +258,7 @@ public class SmsJsonConverter {
      * @param jsonValue
      * @return Map representation of jsonValue
      */
-    public Map<String, Set<String>> fromJson(JsonValue jsonValue) {
+    public Map<String, Set<String>> fromJson(JsonValue jsonValue) throws JsonException, BadRequestException {
         if (!initialised) {
             init();
         }
@@ -273,6 +274,10 @@ public class SmsJsonConverter {
             // Ignore _id field used to name resource when creating
             if (ResourceResponse.FIELD_CONTENT_ID.equals(attributeName)) {
                 continue;
+            }
+
+            if(shouldNotBeUpdated(attributeName)) {
+                throw new BadRequestException("Invalid attribute, '" + attributeName + "', specified");
             }
 
             if (shouldBeIgnored(attributeName)) {
@@ -315,6 +320,11 @@ public class SmsJsonConverter {
         final AttributeSchema attributeSchema = schema.getAttributeSchema(attributeName);
         return attributeSchema == null || StringUtils.isBlank(attributeSchema.getI18NKey()) || hiddenAttributeNames.contains
                 (attributeName);
+    }
+
+    private boolean shouldNotBeUpdated(String attributeName) {
+        final AttributeSchema attributeSchema = schema.getAttributeSchema(attributeName);
+        return attributeSchema == null || hiddenAttributeNames.contains(attributeName);
     }
 
     private AttributeSchemaConverter getAttributeConverter(String attributeName) {

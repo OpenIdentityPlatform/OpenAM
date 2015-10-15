@@ -170,7 +170,7 @@ public class SmsJsonConverterTest {
     }
 
     @Test
-    public void convertFromJson() throws SMSException {
+    public void convertFromJson() throws Exception {
         //Given
         given(serviceSchema.validateAttributes(Matchers.<Map>anyObject())).willReturn(true);
 
@@ -235,7 +235,7 @@ public class SmsJsonConverterTest {
     }
 
     @Test(expectedExceptions = JsonException.class)
-    public void invalidValuesToMap() throws SMSException {
+    public void invalidValuesToMap() throws Exception {
         //Given
         given(serviceSchema.validateAttributes(Matchers.<Map>anyObject())).willReturn(false);
 

@@ -127,7 +127,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     }
 
     private void updateDynamicAttributes(Context context, JsonValue value) throws SMSException, SSOException,
-            IdRepoException {
+            IdRepoException, ResourceException {
         Map<String, Set<String>> dynamic = dynamicConverter.fromJson(value.get("dynamic"));
         if (SchemaType.GLOBAL.equals(type)) {
             dynamicSchema.setAttributeDefaults(dynamic);
@@ -156,6 +156,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
             } catch (IdRepoException e) {
                 debug.warning("::SmsCollectionProvider:: IdRepoException on create", e);
                 return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
+            } catch (ResourceException e) {
+                return e.asPromise();
             }
         }
         try {
@@ -169,7 +171,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
-        } catch (NotFoundException e) {
+        } catch (ResourceException e) {
             return e.asPromise();
         }
     }
@@ -210,8 +212,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,
             CreateRequest createRequest) {
-        Map<String, Set<String>> attrs = convertFromJson(createRequest.getContent());
         try {
+            Map<String, Set<String>> attrs = convertFromJson(createRequest.getContent());
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
             ServiceConfig config;
             if (subSchemaPath.isEmpty()) {
@@ -233,6 +235,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
+        } catch (ResourceException e) {
+            return e.asPromise();
         }
     }
 
@@ -326,7 +330,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         return value;
     }
 
-    private Map<String, Set<String>> convertFromJson(JsonValue value) {
+    private Map<String, Set<String>> convertFromJson(JsonValue value) throws ResourceException {
         preprocessJsonValue(value);
         return converter.fromJson(value);
     }

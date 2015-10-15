@@ -95,8 +95,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         JsonValue content = request.getContent();
-        Map<String, Set<String>> attrs = converter.fromJson(content);
         try {
+            Map<String, Set<String>> attrs = converter.fromJson(content);
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
             String name = content.get("_id").asString();
@@ -128,7 +128,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
-        } catch (NotFoundException e) {
+        } catch (ResourceException e) {
             return e.asPromise();
         }
     }
@@ -206,8 +206,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId, UpdateRequest request) {
         JsonValue content = request.getContent();
-        Map<String, Set<String>> attrs = converter.fromJson(content);
         try {
+            Map<String, Set<String>> attrs = converter.fromJson(content);
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
             ServiceConfig node = checkedInstanceSubConfig(context, resourceId, config);
@@ -224,7 +224,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on update", e);
             return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
-        } catch (NotFoundException e) {
+        } catch (ResourceException e) {
             return e.asPromise();
         }
     }
