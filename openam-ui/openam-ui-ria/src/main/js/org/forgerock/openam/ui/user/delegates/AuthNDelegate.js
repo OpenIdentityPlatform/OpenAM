@@ -247,10 +247,16 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             || _.get(auth, "urlParams.realm") !== _.get(knownAuth, "urlParams.realm");
     }
 
+    function hasAuthIndexChanged () {
+        var auth = Configuration.globalData.auth;
+        return _.get(auth, "urlParams.authIndexType") !== _.get(knownAuth, "urlParams.authIndexType")
+            || _.get(auth, "urlParams.authIndexValue") !== _.get(knownAuth, "urlParams.authIndexValue");
+    }
+
     obj.getRequirements = function (args) {
         var ret = $.Deferred();
 
-        if (requirementList.length === 0 || hasRealmChanged()) {
+        if (requirementList.length === 0 || hasRealmChanged() || hasAuthIndexChanged()) {
 
             obj.begin(args).done(function (requirements) {
                 obj.handleRequirements(requirements);
