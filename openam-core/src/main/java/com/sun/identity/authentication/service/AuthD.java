@@ -96,9 +96,11 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGIN_CHAIN_OUTCOME;
-import static org.forgerock.openam.audit.AuditConstants.EventOutcome.AM_LOGOUT_SUCCESS;
+import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
+import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGIN_CHAIN_COMPLETED;
+import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGOUT;
 import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
+import static org.forgerock.openam.audit.AuditConstants.Context.AUTH;
 
 /**
  * This class is used to initialize the Authentication service and retrieve 
@@ -754,11 +756,11 @@ public class AuthD implements ConfigurationListener {
                 }
                 Map<String, Object> map = new HashMap<>();
                 map.put("moduleId", authMethName);
-                map.put("result", AM_LOGOUT_SUCCESS.toString());
+                map.put("result", description);
                 map.put("info", info);
                 entries = Collections.singletonList(map);
 
-                auditor.handleEvent(messageName, description, AuditRequestContext.getTransactionIdValue(),
+                auditor.audit(messageName, AM_LOGOUT.toString(), AuditRequestContext.getTransactionIdValue(),
                         authentication, realmName, time, contexts, entries);
             }
 
@@ -815,13 +817,22 @@ public class AuthD implements ConfigurationListener {
                         String userName = (String) ssoProperties.get("LoginID");
                         String description = provider.getAllHashMessageIDs().get(messageName).getDescription();
                         String contextID = (String) ssoProperties.get("ContextID");
+                        String LoginIDSid = (String) ssoProperties.get("LoginIDSid");
 
                         long time = Calendar.getInstance().getTimeInMillis();
 
                         Map<String, String> contexts = null;
                         if (StringUtils.isNotEmpty(contextID)) {
                             contexts = new HashMap<>();
-                            contexts.put(AuditConstants.Context.SESSION.toString(), contextID);
+                            contexts.put(AUTH.toString(), contextID);
+                        }
+                        if (StringUtils.isNotEmpty(LoginIDSid)) {
+                            InternalSession session = AuthD.getSession(new SessionID(LoginIDSid));
+                            String sessionContext = null;
+                            if (session != null) {
+                                sessionContext = session.getProperty(Constants.AM_CTX_ID);
+                                contexts.put(SESSION.toString(), sessionContext);
+                            }
                         }
 
                         AMIdentity identity = cw.getIdentity(userName, realmName);
@@ -843,13 +854,13 @@ public class AuthD implements ConfigurationListener {
                             }
                             Map<String, Object> map = new HashMap<>();
                             map.put("moduleId", moduleName);
-                            String result = AM_LOGIN_CHAIN_OUTCOME.toString();
-                            map.put("result", result);
+                            map.put("result", description);
+                            description = AM_LOGIN_CHAIN_COMPLETED.toString();
                             map.put("info", info);
                             entries = Collections.singletonList(map);
                         }
 
-                        auditor.handleEvent(messageName, description, AuditRequestContext.getTransactionIdValue(),
+                        auditor.audit(messageName, description, AuditRequestContext.getTransactionIdValue(),
                                 authentication, realmName, time, contexts, entries);
                     }
                 }

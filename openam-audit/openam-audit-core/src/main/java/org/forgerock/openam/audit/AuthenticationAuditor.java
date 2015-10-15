@@ -24,6 +24,8 @@ import javax.inject.Singleton;
 /**
  * Delegate auditor responsible for creating and publishing authentication audit events. This is a separate delegate
  * class so that it can be used by objects which are instantiated before Guice dependencies are resolved.
+ *
+ * @since 13.0.0
  */
 @Singleton
 public class AuthenticationAuditor {
@@ -32,7 +34,7 @@ public class AuthenticationAuditor {
     private final AuditEventFactory eventFactory;
 
     /**
-     * Guice injected constructor for creating an <code>AuthenticationAuditor</code> instance.
+     * Guice injected constructor for creating an {@link AuthenticationAuditor} instance.
      *
      * @param eventPublisher The publisher responsible for logging the events.
      * @param eventFactory The factory that can be used to create the events.
@@ -44,9 +46,9 @@ public class AuthenticationAuditor {
     }
 
     /**
-     * Shutting up damn checkstyle.
+     * Obtain a builder for an authentication event.
      *
-     * @return stuff
+     * @return An instance of {@link AMAuthenticationAuditEventBuilder}.
      */
     public AMAuthenticationAuditEventBuilder authenticationEvent() {
         AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent();
@@ -55,14 +57,22 @@ public class AuthenticationAuditor {
     }
 
     /**
-     * Shutting up damn checkstyle.
+     * Publish an audit event for the authentication topic.
      *
-     * @throws AuditException
+     * @param auditEvent The event to audit.
+     * @throws AuditException if an exception occurs while trying to publish the audit event.
      */
     public void publish(AuditEvent auditEvent) throws AuditException {
         eventPublisher.publish(AuditConstants.AUTHENTICATION_TOPIC, auditEvent);
     }
 
+    /**
+     * Reports whether or not this auditor is logging audit events for the specified realm and topic.
+     *
+     * @param realm The realm.
+     * @param topic The topic.
+     * @return true if the topic is being audited for the specified realm, false otherwise.
+     */
     public boolean isAuditing(String realm, String topic) {
         return eventPublisher.isAuditing(realm, topic);
     }

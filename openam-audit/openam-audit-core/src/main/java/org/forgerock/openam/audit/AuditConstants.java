@@ -146,9 +146,12 @@ public final class AuditConstants {
      * Types of audit event.
      */
     public enum Event {
-        /** Events for the outcome of the auth process */
-        AM_LOGIN_MODULE_OUTCOME("AM_LOGIN_MODULE_OUTCOME"),
-        AM_LOGIN_CHAIN_OUTCOME("AM_LOGIN_CHAIN_OUTCOME");
+        /** Event for auth process module completion. */
+        AM_LOGIN_MODULE_COMPLETED("AM_LOGIN_MODULE_COMPLETED"),
+        /** Event for auth process module chain completion. */
+        AM_LOGIN_CHAIN_COMPLETED("AM_LOGIN_CHAIN_COMPLETED"),
+        /** Event for logout. */
+        AM_LOGOUT("AM_LOGOUT");
 
         private final String name;
 
@@ -166,10 +169,10 @@ public final class AuditConstants {
      * Outcomes of types of audit event.
      */
     public enum EventOutcome {
-        /** The result of events for the outcome of the auth process */
+        /** Successful outcome of an auth module. */
         AM_LOGIN_MODULE_OUTCOME_SUCCESS("SUCCESS"),
-        AM_LOGIN_MODULE_OUTCOME_FAILURE("FAILURE"),
-        AM_LOGOUT_SUCCESS("SUCCESS");
+        /** Unsuccessful outcome of an auth module. */
+        AM_LOGIN_MODULE_OUTCOME_FAILURE("FAILURE");
 
         private final String name;
 

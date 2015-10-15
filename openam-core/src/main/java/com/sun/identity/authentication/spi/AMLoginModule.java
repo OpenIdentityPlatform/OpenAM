@@ -103,9 +103,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGIN_MODULE_OUTCOME;
+import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGIN_MODULE_COMPLETED;
 import static org.forgerock.openam.audit.AuditConstants.EventOutcome.AM_LOGIN_MODULE_OUTCOME_SUCCESS;
 import static org.forgerock.openam.audit.AuditConstants.EventOutcome.AM_LOGIN_MODULE_OUTCOME_FAILURE;
+import static org.forgerock.openam.audit.AuditConstants.Context.AUTH;
 
 /**
  * An abstract class which implements JAAS LoginModule, it provides
@@ -275,6 +276,7 @@ public abstract class AMLoginModule implements LoginModule {
 
     LegacyAuthenticationEventAuditor auditor;
     private static final String SESSION_ID = "sessionId";
+    private static final String SHARED_STATE_USERNAME_KEY = "javax.security.auth.login.name";
     
     /**
      * Clone Callback[], and save it in the internal/external
@@ -2120,24 +2122,28 @@ public abstract class AMLoginModule implements LoginModule {
             }
             String authLevelAsString = String.valueOf(authLevel);
             info.put("authLevel", authLevelAsString);
+            info.put("moduleName", moduleName);
+            info.put("moduleClass", moduleClass);
             Map<String, Object> map = new HashMap<>();
             map.put("moduleId", moduleName);
-            String result = AM_LOGIN_MODULE_OUTCOME_SUCCESS + ": Module " + moduleName + " of class " + moduleClass;
+            String result = AM_LOGIN_MODULE_OUTCOME_SUCCESS.toString();
             map.put("result", result);
             map.put("info", info);
             entries = Collections.singletonList(map);
 
             long time = Calendar.getInstance().getTimeInMillis();
 
-            String sessionId = AuditRequestContext.getProperty(SESSION_ID);
-            InternalSession session = AuthD.getSession(new SessionID(sessionId));
-            String sessionContext = null;
-            if (session != null) {
-                sessionContext = session.getProperty(Constants.AM_CTX_ID);
-            }
+            String sessionId = getSessionId();
             Map<String, String> contextsMap = new HashMap<>();
-            if (StringUtils.isNotEmpty(sessionContext)) {
-                contextsMap.put(AuditConstants.Context.SESSION.toString(), sessionContext);
+            if (sessionId != null) {
+                InternalSession session = AuthD.getSession(new SessionID(sessionId));
+                String sessionContext = null;
+                if (session != null) {
+                    sessionContext = session.getProperty(Constants.AM_CTX_ID);
+                }
+                if (StringUtils.isNotEmpty(sessionContext)) {
+                    contextsMap.put(AUTH.toString(), sessionContext);
+                }
             }
 
             String authentication = null;
@@ -2147,7 +2153,7 @@ public abstract class AMLoginModule implements LoginModule {
                 authentication = principalName;
             }
 
-            auditor.handleEvent(null, AM_LOGIN_MODULE_OUTCOME.toString(), AuditRequestContext.getTransactionIdValue(),
+            auditor.audit(null, AM_LOGIN_MODULE_COMPLETED.toString(), AuditRequestContext.getTransactionIdValue(),
                     authentication, realmName, time, contextsMap, entries);
         }
 
@@ -2368,36 +2374,46 @@ public abstract class AMLoginModule implements LoginModule {
             }
             String authLevelAsString = String.valueOf(authLevel);
             info.put("authLevel", authLevelAsString);
+            info.put("moduleName", moduleName);
+            info.put("moduleClass", moduleClass);
             Map<String, Object> map = new HashMap<>();
             map.put("moduleId", moduleName);
-            String result = AM_LOGIN_MODULE_OUTCOME_FAILURE + ": Module " + moduleName + " of class " + moduleClass;
+            String result = AM_LOGIN_MODULE_OUTCOME_FAILURE.toString();
             map.put("result", result);
             map.put("info", info);
             entries = Collections.singletonList(map);
 
             long time = Calendar.getInstance().getTimeInMillis();
 
-            String sessionId = AuditRequestContext.getProperty(SESSION_ID);
-            InternalSession session = AuthD.getSession(new SessionID(sessionId));
-            String sessionContext = null;
-            if (session != null) {
-                sessionContext = session.getProperty(Constants.AM_CTX_ID);
-            }
+            String sessionId = getSessionId();
             Map<String, String> contextsMap = new HashMap<>();
-            if (StringUtils.isNotEmpty(sessionContext)) {
-                contextsMap.put(AuditConstants.Context.SESSION.toString(), sessionContext);
+            if (sessionId != null) {
+                InternalSession session = AuthD.getSession(new SessionID(sessionId));
+                String sessionContext = null;
+                if (session != null) {
+                    sessionContext = session.getProperty(Constants.AM_CTX_ID);
+                }
+                if (StringUtils.isNotEmpty(sessionContext)) {
+                    contextsMap.put(AUTH.toString(), sessionContext);
+                }
             }
 
             String authentication;
+            String name = null;
+            if (sharedState.containsKey(SHARED_STATE_USERNAME_KEY)) {
+                name = (String) sharedState.get(SHARED_STATE_USERNAME_KEY);
+            }
             if (principalName != null && orgDN != null) {
                 authentication = cw.getIdentity(principalName, realmName).getUniversalId();
             } else if (principalName != null) {
                 authentication = principalName;
+            } else if (StringUtils.isNotEmpty(name)) {
+                authentication = name;
             } else {
                 authentication = "Unknown user";
             }
 
-            auditor.handleEvent(null, AM_LOGIN_MODULE_OUTCOME.toString(), AuditRequestContext.getTransactionIdValue(),
+            auditor.audit(null, AM_LOGIN_MODULE_COMPLETED.toString(), AuditRequestContext.getTransactionIdValue(),
                     authentication, realmName, time, contextsMap, entries);
         }
 
