@@ -31,24 +31,6 @@
              "properties": "always"
          }],
         /**
-         * Require a capital letter for constructors.
-         *
-         * var f = Foo(); # bad
-         *
-         * var f = new Foo(); # good
-         */
-        "new-cap": [2, {
-            "capIsNew": false
-        }],
-        /**
-         * Multiple spaces not allowed.
-         *
-         * var fruit···=··"apples" # bad
-         *
-         * var fruit·=·"apples" # good
-         */
-        "no-multi-spaces": 2,
-        /**
          * 4 space indent.
          *
          * function() { # bad
@@ -83,6 +65,24 @@
          * Maximum line length of 120 characters.
          */
         "max-len": [2, 120, 4],
+        /**
+         * Require a capital letter for constructors.
+         *
+         * var f = Foo(); # bad
+         *
+         * var f = new Foo(); # good
+         */
+        "new-cap": [2, {
+            "capIsNew": false
+        }],
+        /**
+         * Multiple spaces not allowed.
+         *
+         * var fruit···=··"apples" # bad
+         *
+         * var fruit·=·"apples" # good
+         */
+        "no-multi-spaces": 2,
         /**
          * Spaces inside of curly braces.
          *
