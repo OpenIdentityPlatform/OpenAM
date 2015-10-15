@@ -63,7 +63,7 @@ public class ActivityAuditor {
      * @throws AuditException if an exception occurs while trying to publish the audit event.
      */
     public void publish(AuditEvent auditEvent) throws AuditException {
-        eventPublisher.publish(AuditConstants.AUTHENTICATION_TOPIC, auditEvent);
+        eventPublisher.publish(AuditConstants.ACTIVITY_TOPIC, auditEvent);
     }
 
     /**

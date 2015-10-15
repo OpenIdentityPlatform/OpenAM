@@ -25,7 +25,7 @@ import org.forgerock.audit.events.ActivityAuditEventBuilder;
  *
  * @since 13.0.0
  */
-public final class AMActivityAuditEventBuilder extends ActivityAuditEventBuilder<AMActivityAuditEventBuilder> {
+public class AMActivityAuditEventBuilder extends ActivityAuditEventBuilder<AMActivityAuditEventBuilder> {
 
     /**
      * Provide value for "component" audit log field.
