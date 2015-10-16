@@ -19,6 +19,7 @@ package org.forgerock.openam.core.rest.authn.callbackhandlers;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -27,8 +28,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -110,5 +114,31 @@ public class RestAuthRedirectCallbackHandlerTest {
 
         //Then
         assertThat(redirectCb).isEqualTo(redirectCallback);
+    }
+
+    @Test
+    public void shouldSerialiseToJsonCorrectly() throws Exception {
+        // Given
+        RedirectCallback redirectCallback = mock(RedirectCallback.class);
+        final Map<String, String> redirectData = Collections.singletonMap("foo", "bar");
+        given(redirectCallback.getRedirectUrl()).willReturn("REDIRECT_URL");
+        given(redirectCallback.getMethod()).willReturn("REDIRECT_METHOD");
+        given(redirectCallback.getRedirectData()).willReturn(redirectData);
+
+        // When
+        // Round-trip via Jackson to ensure actual JSON produced by CREST would be correct. OPENAM-7143.
+        String json = JsonValueBuilder.getObjectMapper().writeValueAsString(
+                restAuthRedirectCallbackHandler.convertToJson(redirectCallback, 1).getObject());
+        JsonValue parsed = JsonValueBuilder.toJsonValue(json);
+
+        // Then
+        assertThat(parsed).stringAt("/type").isEqualTo("RedirectCallback");
+        assertThat(parsed).hasArray("/output").hasSize(3);
+        assertThat(parsed).hasObject("/output/0").containsExactly(entry("name", "redirectUrl"),
+                entry("value", "REDIRECT_URL"));
+        assertThat(parsed).hasObject("/output/1").containsExactly(entry("name", "redirectMethod"),
+                entry("value", "REDIRECT_METHOD"));
+        assertThat(parsed).hasObject("/output/2").containsExactly(entry("name", "redirectData"),
+                entry("value", redirectData));
     }
 }

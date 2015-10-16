@@ -72,7 +72,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
 
         JsonValue jsonValue = json(object(
                 field("type", CALLBACK_NAME),
-                field("output", callbacksJson)
+                field("output", callbacksJson.getObject())
         ));
 
         if (callback.getRedirectData() != null) {
