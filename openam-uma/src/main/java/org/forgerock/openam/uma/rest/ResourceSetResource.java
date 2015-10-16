@@ -543,7 +543,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 umaLabelsStore.update(realm, userId, label);
             }
 
-            return resourceSetService.getResourceSet(context, realm, resourceId, userId, false)
+            return resourceSetService.getResourceSet(context, realm, resourceId, userId, augmentWithPolicies(request))
                     .thenAsync(new AsyncFunction<ResourceSetDescription, ResourceResponse, ResourceException>() {
                         @Override
                         public Promise<ResourceResponse, ResourceException> apply(ResourceSetDescription result) {
