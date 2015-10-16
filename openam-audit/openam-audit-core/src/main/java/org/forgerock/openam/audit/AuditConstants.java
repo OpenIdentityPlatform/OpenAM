@@ -111,8 +111,9 @@ public final class AuditConstants {
         /** Record audit event component. */
         RECORD("Record"),
         /** Audit audit event component. */
-        AUDIT("Audit");
-
+        AUDIT("Audit"),
+        /** RADIUS server component. */
+        RADIUS("Radius");
         private final String name;
 
         Component(String name) {
@@ -138,7 +139,9 @@ public final class AuditConstants {
         /** Tracking ID for OAuth2 access code, for use with OAuth2, OIDC and UMA. */
         OAUTH2_ACCESS,
         /** Tracking ID for Session used during authentication. */
-        AUTH
+        AUTH,
+        /** Radius Access Request. */
+        RADIUS_ACCESS_REQUEST
     }
 
     /**

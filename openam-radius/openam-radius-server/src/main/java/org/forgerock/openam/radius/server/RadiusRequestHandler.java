@@ -20,22 +20,29 @@ package org.forgerock.openam.radius.server;
 
 import java.nio.ByteBuffer;
 
-import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.openam.radius.common.AccessReject;
 import org.forgerock.openam.radius.common.AccessRequest;
 import org.forgerock.openam.radius.common.Packet;
 import org.forgerock.openam.radius.common.PacketFactory;
 import org.forgerock.openam.radius.common.PacketType;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
+import org.forgerock.openam.radius.server.events.AuthRequestAcceptedEvent;
+import org.forgerock.openam.radius.server.events.AuthRequestChallengedEvent;
+import org.forgerock.openam.radius.server.events.AuthRequestRejectedEvent;
 import org.forgerock.openam.radius.server.spi.AccessRequestHandler;
 import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.ResultHandler;
+import org.joda.time.DateTime;
 
 import com.sun.identity.shared.debug.Debug;
 
 /**
  * Handles valid (ie: from approved clients) incoming radius access-request packets passing responsibility for
- * generating a response to the client's declared handler class.
+ * generating a response to the client's declared handler class. The handler results are returned to the request thread
+ * via a promise. This allows a catastrophic failure in one off the handler threads to affect a shutdown of the listener
+ * thread and the executors. It also allows for retrying of requests that fail for temporary reasons (e.g. network
+ * connection issues) although this is not yet implemented.
  */
 public class RadiusRequestHandler implements Runnable {
 
@@ -49,17 +56,7 @@ public class RadiusRequestHandler implements Runnable {
     /**
      * The ResponseContext object providing access to client handlerConfig, receiving channel, and remote user identity.
      */
-    private final RadiusRequestContext reqCtx;
-
-    /**
-     * Name of the client from which the packet was received.
-     */
-    private final String clientName;
-
-    /**
-     * Name of the access request handler class that is to handle this request.
-     */
-    private final String accessRequestHandlerClassName;
+    private final RadiusRequestContext requestContext;
 
     /**
      * If an exception occurs while handling this request then an exception will be thrown which will be made available
@@ -67,10 +64,26 @@ public class RadiusRequestHandler implements Runnable {
      */
     private volatile RadiusProcessingException exception;
 
-    private final ResultHandler<RadiusAuthResult> resultHandler;
+    /**
+     * The success handler of the promise that may be used to pass results back to the RadiusRequestListener thread.
+     */
+    private final ResultHandler<RadiusResponse> resultHandler;
 
+    /**
+     * The exception handler of the promise that is used to pass exceptions back to the RadiusRequestListener thread.
+     */
     private final ExceptionHandler<RadiusProcessingException> errorHandler;
 
+    /**
+     * The event bus is used by handlers and by this class to notify listeners of events occurring with the lifetime of
+     * a radius request.
+     */
+    private final EventBus eventBus;
+
+    /**
+     * factory that will attempt to construct the access request handler class.
+     */
+    private AccessRequestHandlerFactory accessRequestHandlerFactory;
 
     /**
      * Constructs a request handler.
@@ -80,15 +93,18 @@ public class RadiusRequestHandler implements Runnable {
      * @param buffer
      *            an {@code ByteBuffer} containing the bytes received by a radius handler.
      */
-    public RadiusRequestHandler(final RadiusRequestContext reqCtx, final ByteBuffer buffer,
-            final ResultHandler<RadiusAuthResult> resultHandler,
-            ExceptionHandler<RadiusProcessingException> errorHandler) {
-        this.reqCtx = reqCtx;
-        this.clientName = reqCtx.getClientConfig().getName();
-        this.accessRequestHandlerClassName = reqCtx.getClientConfig().getAccessRequestHandlerClass().getName();
+    public RadiusRequestHandler(AccessRequestHandlerFactory accessRequestHandlerFactory,
+            final RadiusRequestContext reqCtx, final ByteBuffer buffer,
+            final ResultHandler<RadiusResponse> resultHandler,
+            ExceptionHandler<RadiusProcessingException> errorHandler, EventBus eventBus) {
+        LOG.message("Entering RadiusRequestHandler.RadiusRequestHandler()");
+        this.requestContext = reqCtx;
         this.buffer = buffer;
         this.resultHandler = resultHandler;
         this.errorHandler = errorHandler;
+        this.eventBus = eventBus;
+        this.accessRequestHandlerFactory = accessRequestHandlerFactory;
+        LOG.message("Leaving RadiusRequestHandler.RadiusRequestHandler()");
     }
 
     /**
@@ -97,93 +113,98 @@ public class RadiusRequestHandler implements Runnable {
      * @return the name of the client from which the packet was received.
      */
     public String getClientName() {
-        return clientName;
-    }
-
-    private String getAccessRequestHandlerClassName() {
-        return this.accessRequestHandlerClassName;
+        return requestContext.getClientName();
     }
 
     @Override
     public void run() {
         try {
-
+            LOG.message("Entering RadiusRequestHandler.run();");
             final Packet requestPacket = getValidPacket(buffer);
             if (requestPacket == null) {
+                LOG.message("Leaving RadiusRequestHandler.run(); no requestPacket");
                 return;
             }
 
             // grab the items from the request that we'll need in the RadiusResponseHandler at send time
-            reqCtx.setRequestId(requestPacket.getIdentifier());
-            reqCtx.setRequestAuthenticator(requestPacket.getAuthenticator());
+            requestContext.setRequestId(requestPacket.getIdentifier());
+            requestContext.setRequestAuthenticator(requestPacket.getAuthenticator());
 
             final AccessRequest accessRequest = createAccessRequest(requestPacket);
             if (accessRequest == null) {
-                LOG.message("Packet received was not an AccessRequest packet.");
+                LOG.message("Leaving RadiusRequestHandler.run(); Packet received was not an AccessRequest packet.");
                 return;
             }
 
             // Instantiate an instance of the AccessRequestHandler class specified in the configuration for this
             // client.
-            final AccessRequestHandler accessRequestHandler = getAccessRequestHandler(reqCtx);
+            final AccessRequestHandler accessRequestHandler = accessRequestHandlerFactory
+                    .getAccessRequestHandler(requestContext);
             if (accessRequestHandler == null) {
+                LOG.message("Leaving RadiusRequestHandler.run(); Could not obtain Access Request Handler.");
                 return;
             }
 
-            // Lets create the RadiusResponseHandler
-            final RadiusResponseHandler receiver = new RadiusResponseHandler(reqCtx);
+            /////////////////////////////////////////////////////////////
+            // Hand responsibility over to the client specific handler.
+            // final RadiusResponseHandler receiver = new RadiusResponseHandler(requestContext);
+
+            final RadiusRequest request = new RadiusRequest(accessRequest);
+            final RadiusResponse response = new RadiusResponse();
+
             try {
-                final RadiusAuthResult result = accessRequestHandler.handle(accessRequest, receiver);
-                result.setFinalPacketType(receiver.getFinalPacketTypeSent());
-                resultHandler.handleResult(result);
+                // The handler will form the response.
+                accessRequestHandler.handle(request, response, requestContext);
+                postHandledEvent(request, response, requestContext);
+                // Send the response to the client.
+                Packet responsePacket = response.getResponsePacket();
+                requestContext.send(responsePacket);
+
+                resultHandler.handleResult(response);
             } catch (final RadiusProcessingException rre) {
                 // So the processing of the request failed. Is the error recoverable or does the RADIUS server
                 // need to shutdown?
-                handleResponseException(rre, reqCtx, accessRequest, receiver);
+                handleResponseException(rre, requestContext);
             }
 
         } catch (final Exception t) {
-            final StringBuilder sb = new StringBuilder("Exception occured in handle() method of handler class '")
-                    .append(getAccessRequestHandlerClassName()).append("' for RADIUS client '").append(getClientName())
+            final StringBuilder sb = new StringBuilder(
+                    "Exception occured while handling radius request for RADIUS client '").append(getClientName())
                     .append("'. Rejecting access.");
             LOG.error(sb.toString(), t);
 
-            this.sendAccessReject(reqCtx);
+            this.sendAccessReject(requestContext);
             return;
         }
     }
 
-    /**
-     * Factory that creates and returns and instance of the AccessRequestHandler class defined in the config for a
-     * specific radius client. If the class could not be created then a log message is made.
-     *
-     * @return an instance of an <code>AccessRequestHandler</code> object or null if it could not be created.
-     */
-    private AccessRequestHandler getAccessRequestHandler(RadiusRequestContext reqCtx) {
-        AccessRequestHandler accessRequestHandler = null;
-        try {
-            final Class accessRequestHandlerClass = reqCtx.getClientConfig().getAccessRequestHandlerClass();
-            accessRequestHandler = (AccessRequestHandler) InjectorHolder.getInstance(accessRequestHandlerClass);
-        } catch (final Exception e) {
-            final StringBuilder sb = new StringBuilder("Unable to instantiate declared handler class '")
-                    .append(getAccessRequestHandlerClassName()).append("' for RADIUS client '")
-                    .append("'. Rejecting access.");
-            LOG.error(sb.toString(), e);
-            sendAccessReject(reqCtx);
-        }
+    private void postHandledEvent(RadiusRequest request, RadiusResponse response, RadiusRequestContext requestContext) {
+        LOG.message("Entering RadiusRequestHandler.postHandledEvent()");
 
-        try {
-            accessRequestHandler.init(reqCtx.getClientConfig().getHandlerConfig());
-        } catch (final Exception e) {
-            final StringBuilder sb = new StringBuilder("Unable to initialize declared handler class '")
-                    .append(getAccessRequestHandlerClassName()).append("' for RADIUS client '")
-                    .append("'. Rejecting access.");
-            LOG.error(sb.toString(), e);
-            accessRequestHandler = null;
-            sendAccessReject(reqCtx);
-        }
+        // Calculate and set the time to service the response.
+        response.setTimeToServiceRequestInMilliSeconds(
+                DateTime.now().getMillis() - request.getStartTimestampInMillis());
 
-        return accessRequestHandler;
+        Packet responsePacket = response.getResponsePacket();
+        if (responsePacket != null) {
+            switch (responsePacket.getType()) {
+            case ACCESS_ACCEPT:
+                eventBus.post(new AuthRequestAcceptedEvent(request, response, requestContext));
+                break;
+            case ACCESS_CHALLENGE:
+                eventBus.post(new AuthRequestChallengedEvent(request, response, requestContext));
+                break;
+            case ACCESS_REJECT:
+                eventBus.post(new AuthRequestRejectedEvent(request, response, requestContext));
+                break;
+            case ACCOUNTING_RESPONSE:
+                break;
+            default:
+                LOG.warning("Unexpected type of responsePacket;", responsePacket.getType().toString());
+                break;
+            }
+        }
+        LOG.message("Leaving RadiusRequestHandler.postHandledEvent()");
     }
 
     /**
@@ -204,7 +225,7 @@ public class RadiusRequestHandler implements Runnable {
                     .append(getClientName()).append("' but unable to cast to AccessRequest. Rejecting access.");
             LOG.error(sb.toString(), c);
             try {
-                reqCtx.send(new AccessReject());
+                requestContext.send(new AccessReject());
             } catch (final RadiusProcessingException e) {
                 LOG.warning("Failed to send AccessReject() response to client.");
             }
@@ -220,6 +241,7 @@ public class RadiusRequestHandler implements Runnable {
      * @return the radius request packet, or null if the packet could not be created.
      */
     private Packet getValidPacket(ByteBuffer buffer2) {
+        LOG.message("Entering RadiusRequestHandler.getValidPacket()");
         // parse into a packet object
         Packet requestPacket = null;
 
@@ -227,8 +249,8 @@ public class RadiusRequestHandler implements Runnable {
             requestPacket = PacketFactory.toPacket(buffer2);
 
             // log packet if client handlerConfig indicates
-            if (reqCtx.getClientConfig().isLogPackets()) {
-                reqCtx.logPacketContent(requestPacket, "\nPacket from " + getClientName() + ":");
+            if (requestContext.getClientConfig().isLogPackets()) {
+                requestContext.logPacketContent(requestPacket, "\nPacket from " + getClientName() + ":");
             }
 
             // verify packet type
@@ -238,30 +260,21 @@ public class RadiusRequestHandler implements Runnable {
         } catch (final Exception e) {
             LOG.error("Unable to parse packet received from RADIUS client '" + getClientName() + "'. Dropping.", e);
         }
+        LOG.message("Leaving RadiusRequestHandler.getValidPacket()");
         return requestPacket;
     }
 
     /**
-     * When a <code>RadiusProcessingException</code> is thrown during the processing of a radius request the volatile
+     * Sets the handler's exception. If the exception is only temporary we can have a go at sending an access reject
+     * response, if the exception is only a temporary failure then this method will try to send
      *
-     * @param accessRequest
-     * @param receiver
      * @param rre
      */
-    private void handleResponseException(RadiusProcessingException rre, RadiusRequestContext reqCtx,
-            AccessRequest accessRequest, RadiusResponseHandler receiver) {
-        final StringBuilder sb = new StringBuilder("Failed to process a radius request using Access Handler '")
-                .append(getAccessRequestHandlerClassName()).append("' for RADIUS client '").append("'");
-        switch (rre.getNature()) {
-        case TEMPORARY_FAILURE:
+    private void handleResponseException(RadiusProcessingException rre, RadiusRequestContext reqCtx) {
+        final StringBuilder sb = new StringBuilder("Failed to process a radius request for RADIUS client '");
+        LOG.error(sb.toString());
+        if (rre.getNature() == RadiusProcessingExceptionNature.TEMPORARY_FAILURE) {
             sendAccessReject(reqCtx);
-        case CATASTROPHIC:
-        case INVALID_RESPONSE:
-            setException(rre);
-            break;
-        default:
-            LOG.warning("Unrecognised RadiusResponseException nature.");
-            break;
         }
         // Propagate the exception back to the Request Listener.
         errorHandler.handleException(rre);
@@ -280,20 +293,5 @@ public class RadiusRequestHandler implements Runnable {
         } catch (final RadiusProcessingException e1) {
             LOG.warning("Failed to send AccessReject() response to client.");
         }
-    }
-
-    /**
-     * @return the exception
-     */
-    public synchronized RadiusProcessingException getException() {
-        return exception;
-    }
-
-    /**
-     * @param exception
-     *            the exception to set
-     */
-    private synchronized void setException(RadiusProcessingException exception) {
-        this.exception = exception;
     }
 }

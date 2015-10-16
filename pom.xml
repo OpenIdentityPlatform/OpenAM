@@ -1727,6 +1727,11 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons.guava</groupId>
+                <artifactId>forgerock-guava-eventbus</artifactId>
+                <version>${forgerock.guava.version}</version>
+            </dependency>            
+            <dependency>
+                <groupId>org.forgerock.commons.guava</groupId>
                 <artifactId>forgerock-guava-collect</artifactId>
                 <version>${forgerock.guava.version}</version>
             </dependency>

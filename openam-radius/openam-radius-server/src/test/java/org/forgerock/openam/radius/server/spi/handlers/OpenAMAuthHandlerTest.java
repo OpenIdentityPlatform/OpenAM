@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.radius.server.spi.handlers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -28,19 +29,21 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
-import org.forgerock.openam.radius.common.AccessAccept;
+import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.openam.radius.common.AccessRequest;
 import org.forgerock.openam.radius.common.AttributeSet;
 import org.forgerock.openam.radius.common.Authenticator;
+import org.forgerock.openam.radius.common.Packet;
 import org.forgerock.openam.radius.common.UserNameAttribute;
 import org.forgerock.openam.radius.common.UserPasswordAttribute;
 import org.forgerock.openam.radius.server.RadiusProcessingException;
-import org.forgerock.openam.radius.server.RadiusResponseHandler;
-import org.forgerock.openam.radius.server.spi.handlers.OpenAMAuthHandler;
+import org.forgerock.openam.radius.server.RadiusRequest;
+import org.forgerock.openam.radius.server.RadiusRequestContext;
+import org.forgerock.openam.radius.server.RadiusResponse;
 import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolder;
+import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolder.AuthPhase;
 import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolderCache;
 import org.forgerock.openam.radius.server.spi.handlers.amhandler.OpenAMAuthFactory;
-import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolder.AuthPhase;
 import org.testng.annotations.Test;
 
 import com.sun.identity.authentication.AuthContext;
@@ -86,7 +89,10 @@ public class OpenAMAuthHandlerTest {
         when(ctxHolderCache.createCachedContextHolder()).thenReturn(holder);
         when(ctxHolderCache.get(isA(String.class))).thenReturn(holder);
 
-        final OpenAMAuthHandler handler = new OpenAMAuthHandler(ctxHolderFactory, ctxHolderCache);
+        EventBus eventBus = new EventBus();
+
+        final OpenAMAuthHandler handler = new OpenAMAuthHandler(ctxHolderFactory, ctxHolderCache, eventBus);
+
         handler.init(props);
         final Authenticator authenticator = mock(Authenticator.class);
         when(authenticator.getOctets()).thenReturn("authenticator".getBytes());
@@ -99,18 +105,34 @@ public class OpenAMAuthHandlerTest {
         // when(mockAttrSet.getAttributeAt(0)).thenReturn(mockStateAttribute);
         when(mockAttrSet.getAttributeAt(0)).thenReturn(mockUserPasswordAttribute);
         when(mockAttrSet.getAttributeAt(1)).thenReturn(mockUsernameAttribute);
-        final AccessRequest mockRequest = mock(AccessRequest.class);
-        when(mockRequest.getAttributeSet()).thenReturn(mockAttrSet);
-        final RadiusResponseHandler respHandler = mock(RadiusResponseHandler.class);
-        when(respHandler.extractPassword(mockUserPasswordAttribute)).thenReturn(PASSWORD);
 
+        final AccessRequest mockRequestPacket = mock(AccessRequest.class);
+        when(mockRequestPacket.getAttributeSet()).thenReturn(mockAttrSet);
+
+        RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
+        when(reqCtx.getRequestAuthenticator()).thenReturn((mock(Authenticator.class)));
+        when(reqCtx.getClientSecret()).thenReturn("victoria");
+
+        RadiusResponse response = new RadiusResponse();
+        Packet mockPacket = mock(Packet.class);
+        when(mockPacket.getIdentifier()).thenReturn((short) 1);
+        RadiusRequest request = mock(RadiusRequest.class);
+        when(request.getRequestPacket()).thenReturn(mockPacket);
+        UserNameAttribute userName = mock(UserNameAttribute.class);
+        when(userName.getName()).thenReturn("Fred");
+        UserPasswordAttribute userPassword = mock(UserPasswordAttribute.class);
+        when(userPassword.extractPassword(isA(Authenticator.class), isA(String.class))).thenReturn("password");
+        when(request.getAttribute(UserPasswordAttribute.class)).thenReturn(userPassword);
+        when(request.getAttribute(UserNameAttribute.class)).thenReturn(userName);
+
+        String password = userPassword.extractPassword(reqCtx.getRequestAuthenticator(), reqCtx.getClientSecret());
+        assertThat(password).isNotNull();
         // when
-        handler.handle(mockRequest, respHandler);
+        handler.handle(request, response, reqCtx);
 
         // then
         verify(authContext, times(1)).login(AuthContext.IndexType.SERVICE, TEST_CHAIN);
         verify(ctxHolderFactory, times(1)).getAuthContext(TEST_REALM);
-        verify(respHandler, times(1)).send(isA(AccessAccept.class));
         verify(holder, times(3)).getCallbacks();
         verify(holder, times(1)).setAuthPhase(ContextHolder.AuthPhase.TERMINATED);
         verify(authContext, times(1)).logout();

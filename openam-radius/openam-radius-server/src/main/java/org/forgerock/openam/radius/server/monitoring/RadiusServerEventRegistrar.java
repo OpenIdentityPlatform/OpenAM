@@ -21,22 +21,29 @@ package org.forgerock.openam.radius.server.monitoring;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.forgerock.guava.common.eventbus.EventBus;
+import org.forgerock.guava.common.eventbus.Subscribe;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
+import org.forgerock.openam.radius.server.events.AuthRequestAcceptedEvent;
+import org.forgerock.openam.radius.server.events.AuthRequestReceivedEvent;
+import org.forgerock.openam.radius.server.events.AuthRequestRejectedEvent;
+import org.forgerock.openam.radius.server.events.PacketProcessedEvent;
+import org.forgerock.openam.radius.server.events.PacketReceivedEvent;
 
 import com.sun.identity.shared.debug.Debug;
 
 /**
  * Collates information for JMX reporting and monitoring.
  */
-public class RadiusServerEventRegistrar implements RadiusServerEventMonitorMXBean, RadiusServerEventRegistrator {
+public class RadiusServerEventRegistrar implements RadiusServerEventRegistrator, RadiusServerEventMonitorMXBean {
 
     // private static Logger logger = LoggerFactory.getLogger(RadiusServerConstants.RADIUS_SERVER_LOGGER);
-    private static final Debug logger = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
-
-    private final ObjectName registeredName;
+    private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
     private final AtomicLong noOfPacketsReceived = new AtomicLong();
     private final AtomicLong noOFPacketsAccepted = new AtomicLong();
@@ -47,28 +54,39 @@ public class RadiusServerEventRegistrar implements RadiusServerEventMonitorMXBea
     /**
      * Constructor
      */
-    public RadiusServerEventRegistrar() {
-        logger.message("Entering RadiusServerEventRegistrar() constructor");
+    @Inject
+    public RadiusServerEventRegistrar(@Named("RadiusEventBus") EventBus eventBus) {
+        LOG.message("Entering RadiusServerEventRegistrar.RadiusServerEventRegistrar");
+        LOG.message("RadiusServerEventRegistrar - Registering with EventBus hashCode; " + eventBus.hashCode());
+        eventBus.register(this);
+
         ObjectName name = null;
         try {
             final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
             final String procName = ManagementFactory.getRuntimeMXBean().getName();
             name = new ObjectName("OpenAM" + ":type=RadiusServer");
-            if (!server.isRegistered(name)) {
-                ManagementFactory.getPlatformMBeanServer().registerMBean(this, name);
-                logger.message("Registered MBean with name '{}'", procName);
-            } else {
-                logger.message("MBean with name " + name + " is already registered.");
+            if (server.isRegistered(name)) {
+                LOG.message("MBean with name " + name + " is already registered. Unregistering.");
+                server.unregisterMBean(name);
             }
+
+            server.registerMBean(this, name);
+            LOG.message("Registered MBean with name '{}'", name.toString());
+
         } catch (final Exception e) {
-            logger.error("Unable to register MBean", e);
+            LOG.error("Unable to register MBean", e);
         }
-        registeredName = name;
-        logger.message("Leaving RadiusServiceEntryRegistrar()");
+
+        LOG.message("Leaving RadiusServiceEntryRegistrar()");
     }
 
-    public String getRegiseredName() {
-        return this.registeredName.toString();
+    ///////////////////
+    // Packets Received
+
+    @Subscribe
+    public void packetReceived(PacketReceivedEvent receivedEvent) {
+        LOG.message("RadiusServerEventRegistrar.packetReceived() called by EventBus");
+        packetReceived();
     }
 
     /*
@@ -77,7 +95,9 @@ public class RadiusServerEventRegistrar implements RadiusServerEventMonitorMXBea
      */
     @Override
     public long packetReceived() {
-        return noOfPacketsReceived.incrementAndGet();
+        long total = noOfPacketsReceived.incrementAndGet();
+        LOG.message("RadiusServerEventRegistrar.packetReceived() - total now " + total);
+        return total;
     }
 
     /* (non-Javadoc)
@@ -85,15 +105,18 @@ public class RadiusServerEventRegistrar implements RadiusServerEventMonitorMXBea
      */
     @Override
     public long getNumberOfPacketsRecieved() {
-        return noOfPacketsReceived.get();
+        long total = noOfPacketsReceived.get();
+        LOG.message("RadiusServerEventRegistrar.getNumberOfPacketsRecieved() returning " + total);
+        return total;
     }
 
-    /* (non-Javadoc)
-     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerMonitoring#getNumberOfAcceptedPackets()
-     */
-    @Override
-    public long getNumberOfAcceptedPackets() {
-        return noOFPacketsAccepted.get();
+    ////////////////////
+    // Packets accepted.
+
+    @Subscribe
+    public void packetAccepted(AuthRequestReceivedEvent receivedRadiusEvent) {
+        LOG.message("RadiusServerEventRegistrar.packetAccepted() called by EventBus");
+        this.packetAccepted();
     }
 
     /*
@@ -102,7 +125,29 @@ public class RadiusServerEventRegistrar implements RadiusServerEventMonitorMXBea
      */
     @Override
     public long packetAccepted() {
-        return noOFPacketsAccepted.incrementAndGet();
+        long total = noOFPacketsAccepted.incrementAndGet();
+        LOG.message("RadiusServerEventRegistrar.packetAccepted() - total now " + total);
+        return total;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerMonitoring#getNumberOfAcceptedPackets()
+     */
+    @Override
+    public long getNumberOfAcceptedPackets() {
+        long total = noOFPacketsAccepted.get();
+        LOG.message("RadiusServerEventRegistrar.getNumberOfAcceptedPackets() returning " + total);
+        return total;
+    }
+
+    /////////////////////
+    // Packets processed.
+
+    @Subscribe
+    public void packetProcessed(PacketProcessedEvent ppe) {
+        LOG.message("RadiusServerEventRegistrar.packetProcessed() called by EventBus");
+        packetProcessed();
     }
 
     /*
@@ -111,7 +156,9 @@ public class RadiusServerEventRegistrar implements RadiusServerEventMonitorMXBea
      */
     @Override
     public long packetProcessed() {
-        return this.noOfPacketsProcessed.incrementAndGet();
+        long total = noOfPacketsProcessed.incrementAndGet();
+        LOG.message("RadiusServerEventRegistrar.packetProcessed() - total now " + total);
+        return total;
     }
 
     /*
@@ -120,16 +167,30 @@ public class RadiusServerEventRegistrar implements RadiusServerEventMonitorMXBea
      */
     @Override
     public long getNumberOfPacketsProcessed() {
-        return this.noOfPacketsProcessed.get();
+        long total = noOfPacketsProcessed.get();
+        LOG.message("RadiusServerEventRegistrar.getNumberOfPacketsProcessed() returning " + total);
+        return total;
     }
+
+    /////////////////////
+    // Requests Accepted.
 
     /*
      * (non-Javadoc)
      * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrator#authRequestAccepted()
      */
+    @Subscribe
+    public void authRequestAccepted(AuthRequestAcceptedEvent acceptedEvent) {
+        LOG.message("RadiusServerEventRegistrar.authRequestAccepted() called by EventBus");
+        authRequestAccepted();
+    }
+
     @Override
     public long authRequestAccepted() {
-        return noOfAuthRequestsAccepted.incrementAndGet();
+        long total = noOfAuthRequestsAccepted.incrementAndGet();
+        LOG.message("ID: " + this.hashCode()
+                + "RadiusServerEventRegistrar.authRequestAccepted() - incrementing. Total accepted " + total);
+        return total;
     }
 
     /*
@@ -139,7 +200,18 @@ public class RadiusServerEventRegistrar implements RadiusServerEventMonitorMXBea
      */
     @Override
     public long getNumberOfAuthRequestsAccepted() {
-        return noOfAuthRequestsAccepted.get();
+        long total = noOfAuthRequestsAccepted.get();
+        LOG.message("RadiusServerEventRegistrar.getNumberOfAuthRequestsAccepted() - returning " + total);
+        return total;
+    }
+
+    /////////////////////
+    // Requests Rejected.
+
+    @Subscribe
+    public void authRequestRejected(AuthRequestRejectedEvent event) {
+        LOG.message("Entering RadiusServerEventRegistrar.authRequestRejected()");
+        authRequestRejected();
     }
 
     /*

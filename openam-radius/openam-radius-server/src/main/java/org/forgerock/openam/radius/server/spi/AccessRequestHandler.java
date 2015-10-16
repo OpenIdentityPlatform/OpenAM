@@ -17,10 +17,10 @@ package org.forgerock.openam.radius.server.spi;
 
 import java.util.Properties;
 
-import org.forgerock.openam.radius.common.AccessRequest;
-import org.forgerock.openam.radius.server.RadiusAuthResult;
 import org.forgerock.openam.radius.server.RadiusProcessingException;
-import org.forgerock.openam.radius.server.RadiusResponseHandler;
+import org.forgerock.openam.radius.server.RadiusRequest;
+import org.forgerock.openam.radius.server.RadiusRequestContext;
+import org.forgerock.openam.radius.server.RadiusResponse;
 
 /**
  * Defines the interface for handlers of incoming Access-Request packets. The current infrastructure allows for
@@ -39,6 +39,7 @@ public interface AccessRequestHandler {
     /**
      * Passes to the handler configuration parameters declared in OpenAM's admin console for the client's declared
      * handler class.
+     * @param ipAddress - the ipAddress of the client from which the access request was received.
      *
      * @param config
      *            - the handler configuration parameters.
@@ -54,12 +55,16 @@ public interface AccessRequestHandler {
      *
      * @param request
      *            the access request
+     * @param response
+     *            - the response to be sent to the client.
      * @param context
-     *            the context in which the request is being made.
+     *            - provides methods that the handler can use to obtain information about the context in which the
+     *            request was made, for example the name and IP address of the client from which the request was
+     *            received.
      * @return void
      * @throws RadiusProcessingException
      *             when a response to the request can not be sent.
      */
-    public RadiusAuthResult handle(AccessRequest request, RadiusResponseHandler context)
+    public void handle(RadiusRequest request, RadiusResponse response, RadiusRequestContext context)
             throws RadiusProcessingException;
 }

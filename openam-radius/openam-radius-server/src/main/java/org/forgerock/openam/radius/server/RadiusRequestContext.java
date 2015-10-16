@@ -259,8 +259,8 @@ public class RadiusRequestContext {
      *
      * @return the request identifier
      */
-    public short getRequestId() {
-        return this.requestId;
+    public String getRequestId() {
+        return Short.toString(this.requestId);
     }
 
     /**
@@ -299,6 +299,20 @@ public class RadiusRequestContext {
      */
     public InetSocketAddress getSource() {
         return this.source;
+    }
+
+    /**
+     * @return the name of the client from which this request was made.
+     */
+    public String getClientName() {
+        return getClientConfig().getName();
+    }
+
+    /**
+     * @return the client secret for the client from which the request was made.
+     */
+    public String getClientSecret() {
+        return getClientConfig().getSecret();
     }
 
 }
