@@ -264,25 +264,31 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             var invalid = false,
                 alert = "",
                 firstRequiredIndex,
-                lastSufficentIndex,
+                sufficentIndex,
                 config = this.data.form.chainData.authChainConfiguration;
+
 
             if (config.length === 0) {
                 invalid = true;
                 this.$el.find("#sortableAuthChain").addClass("hidden");
+                this.$el.find("#lowerAuthChainsLegend").addClass("hidden");
                 this.$el.find(".call-to-action-block").removeClass("hidden");
+
 
             } else {
                 this.$el.find(".call-to-action-block").addClass("hidden");
                 firstRequiredIndex = _.findIndex(config, { criteria: "REQUIRED" });
-                lastSufficentIndex = _.findLastIndex(config, { criteria: "SUFFICIENT" });
+                sufficentIndex = _.findIndex(_.drop(config, firstRequiredIndex), { criteria: "SUFFICIENT" });
 
-                if (firstRequiredIndex > -1 && lastSufficentIndex > -1 && firstRequiredIndex < lastSufficentIndex) {
+                if (firstRequiredIndex > -1 && sufficentIndex > -1
+                    && firstRequiredIndex < sufficentIndex
+                    && config.length - 1 > sufficentIndex) {
                     alert = Handlebars.compile("{{> alerts/_Alert type='warning' " +
                         "text='console.authentication.editChains.alerts.reqdFailSuffPass'}}");
                 }
 
                 this.$el.find("#sortableAuthChain").removeClass("hidden");
+                this.$el.find("#lowerAuthChainsLegend").removeClass("hidden");
             }
 
             this.$el.find("#alertContainer").html(alert);

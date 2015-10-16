@@ -20,7 +20,7 @@
                 <button type="button" class="btn btn-primary add-new-module">
                     <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
                 </button>
-                <div id="chainsLegend" class="pull-right text-valign-middle">
+                <div class="pull-right text-valign-middle auth-chains-legend">
                     {{t 'console.authentication.editChains.legend.0'}}
                     <span class="badge badge-success"><i class="fa fa-flag"></i></span>
                     {{t 'console.authentication.editChains.legend.1'}}
@@ -39,6 +39,20 @@
                         <button type="button" class="btn btn-primary add-new-module">
                             <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
                         </button>
+                    </div>
+
+                    <div id="lowerAuthChainsLegend" class="hidden">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="text-center auth-chains-legend">
+                                    {{t 'console.authentication.editChains.legend.0'}}
+                                    <span class="badge badge-success"><i class="fa fa-flag"></i></span>
+                                    {{t 'console.authentication.editChains.legend.1'}}
+                                    <span class="badge badge-danger"><i class="fa fa-flag"></i> </span>
+                                    {{t 'console.authentication.editChains.legend.2'}}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div id="alertContainer"></div>
                 </div>

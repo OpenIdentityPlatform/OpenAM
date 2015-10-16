@@ -734,7 +734,7 @@
                     }
                 ],
                 "alerts" : {
-                    "reqdFailSuffPass" : "Warning: Passing a <strong>SUFFICIENT</strong> module after failing a <strong>REQUIRED</strong> module will continue through the chain, not redirect to the success URL."
+                    "reqdFailSuffPass" : "Warning: Passing a SUFFICIENT module after the failing a REQUIRED module will continue through the chain and will not exit at that point. Consider using REQUISITE instead of REQUIRED."
                 },
                 "callToAction" : "You must add at least one authentication module",
                 "lastCriteria" : "Will advance to success or failure URL",
