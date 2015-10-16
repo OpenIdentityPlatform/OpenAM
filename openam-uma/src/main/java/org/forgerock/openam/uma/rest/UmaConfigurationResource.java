@@ -21,9 +21,15 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
+import java.security.AccessController;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -37,8 +43,10 @@ import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaSettings;
 import org.forgerock.openam.uma.UmaSettingsFactory;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 public class UmaConfigurationResource implements SingletonResourceProvider {
@@ -65,22 +73,40 @@ public class UmaConfigurationResource implements SingletonResourceProvider {
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest request) {
 
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
-        UmaSettings settings = settingsFactory.create(realm);
-
-        try {
-            JsonValue config = json(object(
-                    field("version", settings.getVersion()),
-                    field("resharingMode", settings.getResharingMode())));
-
-            return newResultPromise(newResourceResponse("UmaConfiguration", Integer.toString(config.hashCode()), config));
-        } catch (ServerException e) {
-            logger.error("Failed to get UMA Configuration", e);
-            return new InternalServerErrorException("Failed to get UMA Configuration", e).asPromise();
+        if (!isUmaEnabled(realm)) {
+            JsonValue config = json(object(field("enabled", false)));
+            return newResultPromise(newResourceResponse("UmaConfiguration", Integer.toString(config.hashCode()),
+                    config));
+        } else {
+            UmaSettings settings = settingsFactory.create(realm);
+            try {
+                JsonValue config = json(object(
+                        field("enabled", true),
+                        field("version", settings.getVersion()),
+                        field("resharingMode", settings.getResharingMode())));
+                return newResultPromise(newResourceResponse("UmaConfiguration", Integer.toString(config.hashCode()),
+                        config));
+            } catch (ServerException e) {
+                logger.error("Failed to get UMA Configuration", e);
+                return new InternalServerErrorException("Failed to get UMA Configuration", e).asPromise();
+            }
         }
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, UpdateRequest request) {
         return new NotSupportedException().asPromise();
+    }
+
+    private boolean isUmaEnabled(String realm) {
+        try {
+            final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            final ServiceConfigManager serviceConfigManager = new ServiceConfigManager(token, UmaConstants.SERVICE_NAME,
+                    UmaConstants.SERVICE_VERSION);
+            return serviceConfigManager.getOrganizationConfig(realm, null).exists();
+        } catch (Exception e) {
+            logger.message("Could not access realm config", e);
+            return false;
+        }
     }
 }

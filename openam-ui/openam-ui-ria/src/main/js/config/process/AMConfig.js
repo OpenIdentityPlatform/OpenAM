@@ -21,9 +21,10 @@ define("config/process/AMConfig", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/openam/ui/common/util/ThemeManager",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, ThemeManager, URIUtils) {
+], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, UMADelegate, ThemeManager, URIUtils) {
     return [{
         startEvent: Constants.EVENT_LOGOUT,
         description: "used to override common logout event",
@@ -167,6 +168,13 @@ define("config/process/AMConfig", [
                     }, "admin", "realms");
 
                     Navigation.reload();
+                });
+            } else {
+                UMADelegate.getUmaConfig().then(function (umaConfiguration) {
+                    if (umaConfiguration.enabled) {
+                        delete Navigation.configuration.links.user.urls.uma.cssClass;
+                        Navigation.reload();
+                    }
                 });
             }
         }

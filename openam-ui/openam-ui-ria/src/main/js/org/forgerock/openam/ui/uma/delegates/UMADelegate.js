@@ -25,27 +25,15 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
     obj.getUmaConfig = function () {
-        var promise = $.Deferred(),
-            request;
-
-        if (!Configuration.globalData.auth.uma || !Configuration.globalData.auth.uma.resharingMode) {
-            request = obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/uma"),
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            });
-            request.done(function (data) {
-                Configuration.globalData.auth.uma = Configuration.globalData.auth.uma || {};
-                Configuration.globalData.auth.uma.resharingMode = data.resharingMode;
-
-                promise.resolve();
-            }).error(function () {
-                promise.resolve();
-            });
-        } else {
-            promise.resolve();
-        }
-
-        return promise;
+        return obj.serviceCall({
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/uma"),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+        }).then(function (data) {
+            Configuration.globalData.auth.uma = Configuration.globalData.auth.uma || {};
+            Configuration.globalData.auth.uma.enabled = data.enabled;
+            Configuration.globalData.auth.uma.resharingMode = data.resharingMode;
+            return data;
+        });
     };
 
     obj.unshareAllResources = function () {

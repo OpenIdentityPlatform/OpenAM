@@ -174,6 +174,7 @@ define("config/AppConfiguration", [
                                 "icon": "fa fa-user",
                                 "name": "config.AppConfiguration.Navigation.links.uma",
                                 "dropdown" : true,
+                                "cssClass": "hidden",
                                 "urls": {
                                     "listResource": {
                                         "url": "#uma/resources/",
