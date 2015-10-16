@@ -70,6 +70,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.LegacyAuthenticationEventAuditor;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.audit.model.Entry;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
@@ -749,16 +750,16 @@ public class AuthD implements ConfigurationListener {
                     authentication = identity.getUniversalId();
                 }
 
-                List<?> entries;
+                List<Entry> entries;
                 Map<String, String> info = new HashMap<>();
                 if (StringUtils.isNotEmpty(client)) {
                     info = Collections.singletonMap("ipAddress", client);
                 }
-                Map<String, Object> map = new HashMap<>();
-                map.put("moduleId", authMethName);
-                map.put("result", description);
-                map.put("info", info);
-                entries = Collections.singletonList(map);
+                Entry entry = new Entry();
+                entry.setModuleId(authMethName);
+                entry.setResult(description);
+                entry.setInfo(info);
+                entries = Collections.singletonList(entry);
 
                 auditor.audit(messageName, AM_LOGOUT.toString(), AuditRequestContext.getTransactionIdValue(),
                         authentication, realmName, time, contexts, entries);
@@ -845,19 +846,21 @@ public class AuthD implements ConfigurationListener {
 
                         // If we have a moduleName, then we got here as the result of the end of an auth chain being
                         // reached, either successfully or unsuccessfully.
-                        List<?> entries = null;
+                        List<Entry> entries = null;
                         if (StringUtils.isNotEmpty(moduleName)) {
-                            Map<String, String> info = new HashMap<>();
+                            Map<String, String> info = null;
                             String ip = (String) ssoProperties.get("IPAddr");
                             if (StringUtils.isNotEmpty(ip)) {
                                 info = Collections.singletonMap("ipAddress", ip);
                             }
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("moduleId", moduleName);
-                            map.put("result", description);
+                            Entry entry = new Entry();
+                            entry.setModuleId(moduleName);
+                            entry.setResult(description);
                             description = AM_LOGIN_CHAIN_COMPLETED.toString();
-                            map.put("info", info);
-                            entries = Collections.singletonList(map);
+                            if (info != null) {
+                                entry.setInfo(info);
+                            }
+                            entries = Collections.singletonList(entry);
                         }
 
                         auditor.audit(messageName, description, AuditRequestContext.getTransactionIdValue(),

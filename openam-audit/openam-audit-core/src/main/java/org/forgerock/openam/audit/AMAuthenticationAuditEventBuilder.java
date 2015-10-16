@@ -16,6 +16,8 @@
 package org.forgerock.openam.audit;
 
 import org.forgerock.audit.events.AuthenticationAuditEventBuilder;
+import org.forgerock.openam.audit.model.Entry;
+import org.forgerock.openam.utils.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,7 +88,7 @@ public class AMAuthenticationAuditEventBuilder extends
      * @param entries Entries that should be stored in the 'entries' audit log field.
      * @return this builder for method chaining.
      */
-    public AMAuthenticationAuditEventBuilder entries(List<?> entries) {
+    public AMAuthenticationAuditEventBuilder entryList(List<Entry> entries) {
         super.entries(entries);
         return this;
     }
@@ -94,16 +96,22 @@ public class AMAuthenticationAuditEventBuilder extends
     /**
      * Provide a single value for the "entries" audit log field.
      *
-     * @param moduleId The "moduleId" field for the single "entries" entry in the audit logs.
-     * @param result   The "result" field for the single "entries" entry in the audit logs.
-     * @param info     The "info" field for the single "entries" entry in the audit logs.
+     * @param entry The single entry object representing the fields to be audited in the "entries"
+     *              field in the audit logs.
      * @return this builder for method chaining.
      */
-    public AMAuthenticationAuditEventBuilder entries(String moduleId, String result, Map<String, String> info) {
+    public AMAuthenticationAuditEventBuilder entry(Entry entry) {
         Map<String, Object> map = new HashMap<>();
-        map.put("moduleId", moduleId);
-        map.put("result", result);
-        map.put("info", info);
+        if (StringUtils.isNotEmpty(entry.getModuleId())) {
+            map.put("moduleId", entry.getModuleId());
+        }
+        if (StringUtils.isNotEmpty(entry.getResult())) {
+            map.put("result", entry.getResult());
+        }
+        Map<String, String> info = entry.getInfo();
+        if (info != null && !info.isEmpty()) {
+            map.put("info", info);
+        }
         entries(Collections.singletonList(map));
         return this;
     }

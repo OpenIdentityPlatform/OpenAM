@@ -72,6 +72,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.LegacyAuthenticationEventAuditor;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.audit.model.Entry;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -2115,7 +2116,7 @@ public abstract class AMLoginModule implements LoginModule {
                 principalName = modulePrincipal.getName();
             }
 
-            List<?> entries;
+            List<Entry> entries;
             Map<String, String> info = new HashMap<>();
             if (StringUtils.isNotEmpty(ip)) {
                 info.put("ipAddress", ip);
@@ -2124,12 +2125,12 @@ public abstract class AMLoginModule implements LoginModule {
             info.put("authLevel", authLevelAsString);
             info.put("moduleName", moduleName);
             info.put("moduleClass", moduleClass);
-            Map<String, Object> map = new HashMap<>();
-            map.put("moduleId", moduleName);
+            Entry entry = new Entry();
+            entry.setModuleId(moduleName);
             String result = AM_LOGIN_MODULE_OUTCOME_SUCCESS.toString();
-            map.put("result", result);
-            map.put("info", info);
-            entries = Collections.singletonList(map);
+            entry.setResult(result);
+            entry.setInfo(info);
+            entries = Collections.singletonList(entry);
 
             long time = Calendar.getInstance().getTimeInMillis();
 
@@ -2367,7 +2368,7 @@ public abstract class AMLoginModule implements LoginModule {
                 principalName = modulePrincipal.getName();
             }
 
-            List<?> entries;
+            List<Entry> entries;
             Map<String, String> info = new HashMap<>();
             if (StringUtils.isNotEmpty(ip)) {
                 info.put("ipAddress", ip);
@@ -2376,12 +2377,12 @@ public abstract class AMLoginModule implements LoginModule {
             info.put("authLevel", authLevelAsString);
             info.put("moduleName", moduleName);
             info.put("moduleClass", moduleClass);
-            Map<String, Object> map = new HashMap<>();
-            map.put("moduleId", moduleName);
+            Entry entry = new Entry();
+            entry.setModuleId(moduleName);
             String result = AM_LOGIN_MODULE_OUTCOME_FAILURE.toString();
-            map.put("result", result);
-            map.put("info", info);
-            entries = Collections.singletonList(map);
+            entry.setResult(result);
+            entry.setInfo(info);
+            entries = Collections.singletonList(entry);
 
             long time = Calendar.getInstance().getTimeInMillis();
 

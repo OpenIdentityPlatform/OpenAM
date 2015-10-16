@@ -16,11 +16,14 @@
 package org.forgerock.openam.audit;
 
 import org.forgerock.audit.AuditException;
+import org.forgerock.openam.audit.model.Entry;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +82,7 @@ public class LegacyAuthenticationEventAuditor {
      * @return true if the event was handled, false if there was some sort of problem.
      */
     public boolean audit(String eventName, String eventDescription, String transactionId, String authentication,
-                         String realmName, long time, Map<String, String> contexts, List<?> entries) {
+                         String realmName, long time, Map<String, String> contexts, List<Entry> entries) {
         Reject.ifNull(transactionId, "The transactionId field cannot be null");
         Reject.ifNull(authentication, "The authentication field cannot be null");
         Reject.ifNull(eventDescription, "The eventDescription field cannot be null");
@@ -110,7 +113,7 @@ public class LegacyAuthenticationEventAuditor {
 
     private boolean auditAuthenticationEvent(String description, String transactionId, String authentication,
                                              String realmName, long time, Map<String, String> contexts,
-                                             List<?> entries) {
+                                             List<Entry> entries) {
         boolean couldHandleEvent = true;
 
         AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
@@ -130,7 +133,15 @@ public class LegacyAuthenticationEventAuditor {
             builder.contexts(contexts);
         }
         if (entries != null && !entries.isEmpty()) {
-            builder.entries(entries);
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (Entry entry : entries) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("moduleId", entry.getModuleId());
+                map.put("result", entry.getResult());
+                map.put("info", entry.getInfo());
+                list.add(map);
+            }
+            builder.entries(list);
         }
 
         try {
