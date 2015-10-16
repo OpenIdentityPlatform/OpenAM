@@ -18,8 +18,8 @@ public class LegacyAuthenticationEventAuditorTest {
 
     LegacyAuthenticationEventAuditor auditor;
 
-    AuthenticationAuditor authenticationAuditor = mock(AuthenticationAuditor.class);
-    ActivityAuditor activityAuditor = mock(ActivityAuditor.class);
+    AuthenticationAuditor authenticationAuditor;
+    ActivityAuditor activityAuditor;
     AMAuthenticationAuditEventBuilder authenticationBuilder = mock(AMAuthenticationAuditEventBuilder.class);
     AMActivityAuditEventBuilder activityBuilder = mock(AMActivityAuditEventBuilder.class);
 
@@ -30,46 +30,13 @@ public class LegacyAuthenticationEventAuditorTest {
     private static final String LOGOUT_EVENT_5 = "LOGOUT_LEVEL";
     private static final String LOGOUT_EVENT_6 = "LOGOUT_MODULE_INSTANCE";
 
+    private static final String TEST_REALM = "TEST_REALM";
+
     @BeforeMethod
     public void setUp() throws Exception {
+        authenticationAuditor = mock(AuthenticationAuditor.class);
+        activityAuditor = mock(ActivityAuditor.class);
         auditor = new LegacyAuthenticationEventAuditor(authenticationAuditor, activityAuditor);
-
-//        when(authenticationBuilder.transactionId(any(String.class))).thenReturn(authenticationBuilder);
-//        when(authenticationBuilder.authentication(any(String.class))).thenReturn(authenticationBuilder);
-//        when(authenticationBuilder.timestamp(any(Long.class))).thenReturn(authenticationBuilder);
-//        when(authenticationBuilder.component(any(AuditConstants.Component.class))).thenReturn(authenticationBuilder);
-//        when(authenticationBuilder.eventName(any(String.class))).thenReturn(authenticationBuilder);
-//        when(authenticationBuilder.realm(any(String.class))).thenReturn(authenticationBuilder);
-//        when(authenticationBuilder.contexts(any(Map.class))).thenReturn(authenticationBuilder);
-//        when(authenticationBuilder.entries(any(List.class))).thenReturn(authenticationBuilder);
-//        when(authenticationAuditor.authenticationEvent()).thenReturn(authenticationBuilder);
-//
-//        when(activityBuilder.transactionId(any(String.class))).thenReturn(activityBuilder);
-//        when(activityBuilder.authentication(any(String.class))).thenReturn(activityBuilder);
-//        when(activityBuilder.timestamp(any(Long.class))).thenReturn(activityBuilder);
-//        when(activityBuilder.component(any(AuditConstants.Component.class))).thenReturn(activityBuilder);
-//        when(activityBuilder.eventName(any(String.class))).thenReturn(activityBuilder);
-//        when(activityBuilder.realm(any(String.class))).thenReturn(activityBuilder);
-//        when(activityBuilder.contexts(any(Map.class))).thenReturn(activityBuilder);
-//        when(activityAuditor.activityEvent()).thenReturn(activityBuilder);
-    }
-
-    @Test
-    public void shouldAuditEvent() throws Exception {
-
-        String eventName = null;
-        String eventDescription = null;
-        String transactionId = "a";
-        String authentication = "b";
-        String realmName = null;
-        long time = 1;
-        Map<String, String> contexts = null;
-        List<?> entries = null;
-        auditor.audit(eventName, eventDescription, transactionId, authentication, realmName, time, contexts, entries);
-
-        verify(authenticationAuditor, times(1)).authenticationEvent();
-        verify(authenticationAuditor, times(1)).publish(any(AuditEvent.class));
-        verifyNoMoreInteractions(authenticationAuditor);
     }
 
     @Test
@@ -150,27 +117,90 @@ public class LegacyAuthenticationEventAuditorTest {
     }
 
     @Test
-    public void shouldReturnTrueForRealmAndTopicAuditing() throws Exception {
+    public void shouldReturnTrueForRealmAndAuthenticationTopicAuditing() throws Exception {
+        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
 
+        boolean result = auditor.isAuditing(TEST_REALM, AuditConstants.AUTHENTICATION_TOPIC);
+
+        assertEquals(true, result);
+        verify(authenticationAuditor, times(1)).isAuditing(TEST_REALM, AuditConstants.AUTHENTICATION_TOPIC);
+        verifyNoMoreInteractions(authenticationAuditor);
+        verifyNoMoreInteractions(activityAuditor);
     }
 
     @Test
-    public void shouldReturnFalseForRealmAndTopicAuditing() throws Exception {
+    public void shouldReturnTrueForRealmAndActivityTopicAuditing() throws Exception {
+        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
 
+        boolean result = auditor.isAuditing(TEST_REALM, AuditConstants.ACTIVITY_TOPIC);
+
+        assertEquals(true, result);
+        verify(activityAuditor, times(1)).isAuditing(TEST_REALM, AuditConstants.ACTIVITY_TOPIC);
+        verifyNoMoreInteractions(authenticationAuditor);
+        verifyNoMoreInteractions(activityAuditor);
     }
 
     @Test
-    public void shouldReturnTrueForRealmAuditingWhenOneTopicIsBeingAudited() throws Exception {
+    public void shouldReturnFalseForRealmAndAuthenticationTopicAuditing() throws Exception {
+        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
 
+        boolean result = auditor.isAuditing(TEST_REALM, AuditConstants.AUTHENTICATION_TOPIC);
+
+        assertEquals(false, result);
+        verify(authenticationAuditor, times(1)).isAuditing(TEST_REALM, AuditConstants.AUTHENTICATION_TOPIC);
+        verifyNoMoreInteractions(authenticationAuditor);
+        verifyNoMoreInteractions(activityAuditor);
+    }
+
+    @Test
+    public void shouldReturnFalseForRealmAndActivityTopicAuditing() throws Exception {
+        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
+
+        boolean result = auditor.isAuditing(TEST_REALM, AuditConstants.ACTIVITY_TOPIC);
+
+        assertEquals(false, result);
+        verify(activityAuditor, times(1)).isAuditing(TEST_REALM, AuditConstants.ACTIVITY_TOPIC);
+        verifyNoMoreInteractions(authenticationAuditor);
+        verifyNoMoreInteractions(activityAuditor);
+    }
+
+    @Test
+    public void shouldReturnTrueForRealmAuditingWhenAuthenticationTopicIsBeingAudited() throws Exception {
+        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
+        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
+
+        boolean result = auditor.isAuditing(TEST_REALM);
+
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void shouldReturnTrueForRealmAuditingWhenActivityTopicIsBeingAudited() throws Exception {
+        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
+        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
+
+        boolean result = auditor.isAuditing(TEST_REALM);
+
+        assertEquals(true, result);
     }
 
     @Test
     public void shouldReturnTrueForRealmAuditingWhenBothTopicsAreBeingAudited() throws Exception {
+        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
+        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
 
+        boolean result = auditor.isAuditing(TEST_REALM);
+
+        assertEquals(true, result);
     }
 
     @Test
     public void shouldReturnFalseForRealmAuditing() throws Exception {
+        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
+        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
 
+        boolean result = auditor.isAuditing(TEST_REALM);
+
+        assertEquals(false, result);
     }
 }

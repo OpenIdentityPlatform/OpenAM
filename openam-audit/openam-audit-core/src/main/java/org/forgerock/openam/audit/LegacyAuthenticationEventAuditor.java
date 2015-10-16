@@ -69,7 +69,7 @@ public class LegacyAuthenticationEventAuditor {
      * @param eventName The description of the event which occurred (see {@code AuthenticationLogMessageIDs.xml}
      *                         'name' attribute of each logmessage element.
      * @param eventDescription The description of the event which occurred (see {@code AuthenticationLogMessageIDs.xml}
-     *                         'description' attribute of each logmessage element.
+     *                         'description' attribute of each logmessage element. Cannot be null.
      * @param transactionId The transaction id for the audit event. Cannot be null.
      * @param authentication The authentication details for the audit event. Cannot be null.
      * @param realmName The realm name for the audit event. May be null.
@@ -82,6 +82,7 @@ public class LegacyAuthenticationEventAuditor {
                          String realmName, long time, Map<String, String> contexts, List<?> entries) {
         Reject.ifNull(transactionId, "The transactionId field cannot be null");
         Reject.ifNull(authentication, "The authentication field cannot be null");
+        Reject.ifNull(eventDescription, "The eventDescription field cannot be null");
 
         boolean isActivityEvent = false;
         boolean isAuthenticationEvent = true;
