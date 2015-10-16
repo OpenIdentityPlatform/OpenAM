@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
                 encodeURIComponent(Configuration.loggedUser.get("username")) +
-                "/oauth2/resource/sets?_action=revokeAll"),
+                "/oauth2/resources/sets?_action=revokeAll"),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         });
