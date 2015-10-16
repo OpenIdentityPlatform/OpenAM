@@ -293,6 +293,22 @@ public class TokenResource implements CollectionResourceProvider {
         try {
             JsonValue response;
             Map<String, Object> query = new HashMap<String, Object>();
+            String id = queryRequest.getQueryId();
+            String queryString = "";
+
+            if (id.equals("access_token")) {
+                queryString = "tokenName=access_token";
+            } else{
+                queryString = id;
+            }
+
+            String[] constraints = queryString.split("\\,");
+            for (String constraint : constraints) {
+                String[] params = constraint.split("=");
+                if (params.length == 2) {
+                    query.put(params[0], params[1]);
+                }
+            }
 
             //get uid of submitter
             AMIdentity uid;
@@ -308,23 +324,6 @@ public class TokenResource implements CollectionResourceProvider {
                             "for requesting user.");
                 }
                 handler.handleError(new PermanentException(401, "Unauthorized", e));
-            }
-
-            String id = queryRequest.getQueryId();
-            String queryString;
-
-            if (id.equals("access_token")) {
-                queryString = "tokenName=access_token";
-            } else {
-                queryString = id;
-            }
-
-            String[] constraints = queryString.split("\\,");
-            for (String constraint : constraints) {
-                String[] params = constraint.split("=");
-                if (params.length == 2) {
-                    query.put(params[0], params[1]);
-                }
             }
 
             response = tokenStore.query(query, TokenFilter.Type.AND);
