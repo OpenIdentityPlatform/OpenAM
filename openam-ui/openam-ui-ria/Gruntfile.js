@@ -64,7 +64,7 @@ module.exports = function (grunt) {
             compiledDirectory,
             mavenProjectTestSource("."),
             mavenProjectTestSource(amCommonsDirectory),
-            "target/test-classes/lib"
+            "target/test-classes/libs"
         ]),
         nonCompiledFiles = [
             "**/*.html",

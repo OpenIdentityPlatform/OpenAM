@@ -20,8 +20,8 @@ require.config({
     paths: {
         jquery: "libs/jquery-2.1.1-min",
         "bootstrap-dialog": "libs/bootstrap-dialog-1.34.4-min",
-        sinon: "libs/sinon-1.15.4",
-        squire: "libs/squire-0.2.0"
+        sinon: "sinon-1.15.4",
+        squire: "squire-0.2.0"
     },
     shim: {
         sinon: {
