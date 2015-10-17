@@ -243,7 +243,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
 
     function hasRealmChanged () {
         var auth = Configuration.globalData.auth;
-        return auth.subrealm !== knownAuth.subrealm
+        return auth.subRealm !== knownAuth.subRealm
             || _.get(auth, "urlParams.realm") !== _.get(knownAuth, "urlParams.realm");
     }
     function hasAuthIndexChanged () {
