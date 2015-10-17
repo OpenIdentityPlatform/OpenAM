@@ -105,7 +105,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
 
                             UIUtils.fillTemplateWithData(
                                 "templates/admin/views/realms/authorization/policySets/PolicySetSettingsTemplate.html",
-                                self.data, function (tpl) {
+                                self.data,
+                                function (tpl) {
                                     self.$el.find("#policySetSettings").append(tpl);
                                     self.populateResourceTypes();
 

@@ -271,7 +271,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
             ScriptsDelegate.validateScript(script).done(function (result) {
                 UIUtils.fillTemplateWithData("templates/admin/views/realms/scripts/ScriptValidationTemplate.html",
-                    result, function (tpl) {
+                    result,
+                    function (tpl) {
                         self.$el.find("#validation").html(tpl);
                     });
             });
@@ -326,7 +327,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                     onshow: function () {
                         var dialog = this;
                         UIUtils.fillTemplateWithData("templates/admin/views/realms/scripts/ChangeContextTemplate.html",
-                            self.data, function (tpl) {
+                            self.data,
+                            function (tpl) {
                                 dialog.message.append(tpl);
                                 self.data.newScript = false;
                             });

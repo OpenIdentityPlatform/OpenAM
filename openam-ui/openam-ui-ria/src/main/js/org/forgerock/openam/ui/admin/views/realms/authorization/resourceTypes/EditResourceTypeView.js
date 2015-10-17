@@ -111,7 +111,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             var self = this;
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/resourceTypes/ResourceTypeSettingsTemplate.html",
-                this.data, function (tpl) {
+                this.data,
+                function (tpl) {
                     self.$el.find("#resTypeSetting").html(tpl);
                 });
         },

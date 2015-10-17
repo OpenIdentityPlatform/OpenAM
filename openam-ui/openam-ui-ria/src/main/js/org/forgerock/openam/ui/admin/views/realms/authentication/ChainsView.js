@@ -46,8 +46,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
 
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authentication/chains/AddChainTemplate.html",
-                self.data, function (html) {
-
+                self.data,
+                function (html) {
                     BootstrapDialog.show({
                         title: $.t("console.authentication.chains.createNewChain"),
                         message: $(html),

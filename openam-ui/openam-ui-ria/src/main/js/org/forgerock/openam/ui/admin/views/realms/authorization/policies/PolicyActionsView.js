@@ -71,7 +71,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
             var self = this;
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/policies/PolicyAvailableActionsTemplate.html",
-                this.data, function (tpl) {
+                this.data,
+                function (tpl) {
                     self.$el.find("#availableActions").html(tpl);
                     if (callback) {
                         callback();
@@ -83,7 +84,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
             var self = this;
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/common/ActionsTableTemplate.html",
-                { "items": this.data.selectedActions }, function (tpl) {
+                { "items": this.data.selectedActions },
+                function (tpl) {
                     self.$el.find("#selectedActions").html(tpl);
                     self.$el.find("button.add-item").prop("disabled", true);
                     if (callback) {

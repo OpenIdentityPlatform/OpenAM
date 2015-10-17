@@ -117,7 +117,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/policies/conditions/ListItem.html", {
                     data: itemToDisplay
-                }, function (tpl) {
+                },
+                function (tpl) {
                     item.find(".item-data").html(tpl);
                     self.setElement("#" + item.attr("id"));
                 });

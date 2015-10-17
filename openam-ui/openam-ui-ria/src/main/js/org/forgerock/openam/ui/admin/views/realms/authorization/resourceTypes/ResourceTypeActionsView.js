@@ -50,7 +50,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             var self = this;
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/common/ActionsTableTemplate.html",
-                { "items": this.data.actions }, function (tpl) {
+                { "items": this.data.actions },
+                function (tpl) {
                     self.$el.find("#createdActions").html(tpl);
                     if (callback) {
                         callback();
