@@ -14,7 +14,6 @@
  * Portions copyright 2011-2015 ForgeRock AS.
  */
 
-
 define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "jquery",
     "underscore",
@@ -23,19 +22,17 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/user/UserModel",
     "org/forgerock/commons/ui/common/main/ViewManager"
-], function ($, _, AbstractConfigurationAware, AuthNDelegate, CookieHelper, Configuration, Constants, Router,
-            SessionDelegate, URIUtils, UserModel, ViewManager) {
+], function ($, _, AbstractConfigurationAware, AuthNDelegate, CookieHelper, Configuration, Constants, SessionDelegate,
+             URIUtils, UserModel, ViewManager) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
         var self = this;
         AuthNDelegate.getRequirements().done(function (requirements) {
-
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
 
@@ -51,41 +48,37 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 });
             }
 
-            AuthNDelegate
-                .submitRequirements(populatedRequirements)
-                .then(function (result) {
-                    if (result.hasOwnProperty("tokenId")) {
-                        obj.getLoggedUser(function (user) {
-                            Configuration.setProperty("loggedUser", user);
-                            self.setSuccessURL(result.tokenId).then(function () {
-                                successCallback(user);
-                                AuthNDelegate.resetProcess();
-                            });
-                        }, errorCallback);
-                    } else if (result.hasOwnProperty("authId")) {
-                        // re-render login form for next set of required inputs
-                        if (ViewManager.currentView === "LoginView") {
-                            ViewManager.refresh();
-                        } else {
-                            // TODO: If using a module chain with autologin the user is
-                            // currently routed to the first login screen.
-                            var href = "#login",
-                                realm = Configuration.globalData.auth.subRealm;
-                            if (realm) {
-                                href += "/" + realm;
-                            }
-                            location.href = href;
-                        }
-                    }
-                },
-                function (failedStage, errorMsg) {
-                    if (failedStage > 1) {
-                        // re-render login form, sending back to the start of the process.
+            AuthNDelegate.submitRequirements(populatedRequirements).then(function (result) {
+                if (result.hasOwnProperty("tokenId")) {
+                    obj.getLoggedUser(function (user) {
+                        Configuration.setProperty("loggedUser", user);
+                        self.setSuccessURL(result.tokenId).then(function () {
+                            successCallback(user);
+                            AuthNDelegate.resetProcess();
+                        });
+                    }, errorCallback);
+                } else if (result.hasOwnProperty("authId")) {
+                    // re-render login form for next set of required inputs
+                    if (ViewManager.currentView === "LoginView") {
                         ViewManager.refresh();
+                    } else {
+                        // TODO: If using a module chain with autologin the user is
+                        // currently routed to the first login screen.
+                        var href = "#login",
+                            realm = Configuration.globalData.auth.subRealm;
+                        if (realm) {
+                            href += "/" + realm;
+                        }
+                        location.href = href;
                     }
-                    errorCallback(errorMsg);
-                });
-
+                }
+            }, function (failedStage, errorMsg) {
+                if (failedStage > 1) {
+                    // re-render login form, sending back to the start of the process.
+                    ViewManager.refresh();
+                }
+                errorCallback(errorMsg);
+            });
         });
     };
 
@@ -105,7 +98,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     obj.getLoginUrlParams = function () {
         var url = Configuration.globalData.auth.fullLoginURL;
         return URIUtils.parseQueryString(url.substring(url.indexOf("?") + 1));
-
     };
 
     obj.setSuccessURL = function (tokenId) {
@@ -114,18 +106,16 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
             url = Configuration.globalData.auth.successURL,
             context = "";
         if (urlParams && urlParams.goto) {
-            AuthNDelegate
-                .setGoToUrl(tokenId, urlParams.goto)
-                .then(function (data) {
-                    if (data.successURL.indexOf("/") === 0 &&
-                        data.successURL.indexOf("/" + Constants.context) !== 0) {
-                        context = "/" + Constants.context;
-                    }
-                    Configuration.globalData.auth.urlParams.goto = context + data.successURL;
-                    promise.resolve();
-                }, function () {
-                    promise.reject();
-                });
+            AuthNDelegate.setGoToUrl(tokenId, urlParams.goto).then(function (data) {
+                if (data.successURL.indexOf("/") === 0 &&
+                    data.successURL.indexOf("/" + Constants.context) !== 0) {
+                    context = "/" + Constants.context;
+                }
+                Configuration.globalData.auth.urlParams.goto = context + data.successURL;
+                promise.resolve();
+            }, function () {
+                promise.reject();
+            });
         } else {
             if (url !== Constants.CONSOLE_PATH || _.contains(Configuration.loggedUser.uiroles, "ui-admin")) {
                 if (!Configuration.globalData.auth.urlParams) {
