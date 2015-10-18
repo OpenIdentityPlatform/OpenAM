@@ -228,15 +228,15 @@ public class ServiceSchemaModifications {
     }
 
     private SubSchemaModificationWrapper getSubSchemaAdditionsRecursive(String schemaName,
-                                                                     String compoundName,
-                                                                     ServiceSchemaImpl newSchema,
-                                                                     ServiceSchemaImpl existingSchema)
-    throws SMSException {
+                                                                        String compoundName,
+                                                                        ServiceSchemaImpl newSchema,
+                                                                        ServiceSchemaImpl existingSchema)
+            throws SMSException {
         SubSchemaModificationWrapper subSchemaAddedResult = new SubSchemaModificationWrapper()  ;
 
         if (!newSchema.getSubSchemaNames().isEmpty()) {
             for (String subSchemaName : (Set<String>) newSchema.getSubSchemaNames()) {
-                if (!(existingSchema.getSubSchemaNames().contains(subSchemaName))) {
+                if (existingSchema == null || !(existingSchema.getSubSchemaNames().contains(subSchemaName))) {
                     subSchemaAddedResult.put(compoundName + "/" + subSchemaName,
                             new NewSubSchemaWrapper(serviceName,
                                                     subSchemaName,
