@@ -96,7 +96,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         String resourceId = resourceId();
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
-            JsonValue result = withExtraAttributes(serverContext, convertToJson(config));
+            String realm = realmFor(serverContext);
+            JsonValue result = withExtraAttributes(realm, convertToJson(realm, config));
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
@@ -109,8 +110,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         }
     }
 
-    protected Map<String, Set<String>> getDynamicAttributes(Context context) {
-        return AuthD.getAuth().getOrgServiceAttributes(realmFor(context), serviceName);
+    protected Map<String, Set<String>> getDynamicAttributes(String realm) {
+        return AuthD.getAuth().getOrgServiceAttributes(realm, serviceName);
     }
 
     /**
@@ -119,20 +120,21 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * @param value The {@code JsonValue} to augment.
      * @return The same {@code JsonValue} after is has been augmented.
      */
-    protected JsonValue withExtraAttributes(Context context, JsonValue value) {
+    protected JsonValue withExtraAttributes(String realm, JsonValue value) {
         if (dynamicConverter != null) {
-            value.add("dynamic", dynamicConverter.toJson(getDynamicAttributes(context)).getObject());
+            value.add("dynamic", dynamicConverter.toJson(realm, getDynamicAttributes(realm)).getObject());
         }
         return value;
     }
 
     private void updateDynamicAttributes(Context context, JsonValue value) throws SMSException, SSOException,
             IdRepoException, ResourceException {
-        Map<String, Set<String>> dynamic = dynamicConverter.fromJson(value.get("dynamic"));
+        String realm = realmFor(context);
+        Map<String, Set<String>> dynamic = dynamicConverter.fromJson(realm, value.get("dynamic"));
         if (SchemaType.GLOBAL.equals(type)) {
             dynamicSchema.setAttributeDefaults(dynamic);
         } else {
-            AuthD.getAuth().setOrgServiceAttributes(realmFor(context), serviceName, dynamic);
+            AuthD.getAuth().setOrgServiceAttributes(realm, serviceName, dynamic);
         }
     }
 
@@ -162,8 +164,9 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         }
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
-            saveConfigAttributes(config, convertFromJson(updateRequest.getContent()));
-            JsonValue result = withExtraAttributes(serverContext, convertToJson(config));
+            String realm = realmFor(serverContext);
+            saveConfigAttributes(config, convertFromJson(updateRequest.getContent(), realm));
+            JsonValue result = withExtraAttributes(realm, convertToJson(realm, config));
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
@@ -212,22 +215,23 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,
             CreateRequest createRequest) {
+        final String realm = realmFor(serverContext);
         try {
-            Map<String, Set<String>> attrs = convertFromJson(createRequest.getContent());
+            Map<String, Set<String>> attrs = convertFromJson(createRequest.getContent(), realm);
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
             ServiceConfig config;
             if (subSchemaPath.isEmpty()) {
                 if (type == SchemaType.GLOBAL) {
                     config = scm.createGlobalConfig(attrs);
                 } else {
-                    config = scm.createOrganizationConfig(realmFor(serverContext), attrs);
+                    config = scm.createOrganizationConfig(realm, attrs);
                 }
             } else {
                 ServiceConfig parent = parentSubConfigFor(serverContext, scm);
                 parent.addSubConfig(resourceId(), lastSchemaNodeName(), -1, attrs);
                 config = parent.getSubConfig(lastSchemaNodeName());
             }
-            JsonValue result = withExtraAttributes(serverContext, convertToJson(config));
+            JsonValue result = withExtraAttributes(realm, convertToJson(realm, config));
             return newResultPromise(newResourceResponse(resourceId(), String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
@@ -316,11 +320,11 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         return result;
     }
 
-    protected JsonValue convertToJson(ServiceConfig config) {
+    protected JsonValue convertToJson(String realm, ServiceConfig config) {
         if (config == null) {
             return json(object());
         } else {
-            return converter.toJson(config.getAttributes());
+            return converter.toJson(realm, config.getAttributes());
         }
     }
 
@@ -330,9 +334,9 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         return value;
     }
 
-    private Map<String, Set<String>> convertFromJson(JsonValue value) throws ResourceException {
+    private Map<String, Set<String>> convertFromJson(JsonValue value, String realm) throws ResourceException {
         preprocessJsonValue(value);
-        return converter.fromJson(value);
+        return converter.fromJson(realm, value);
     }
 
     protected void saveConfigAttributes(ServiceConfig config, Map<String, Set<String>> attributes) throws SSOException,

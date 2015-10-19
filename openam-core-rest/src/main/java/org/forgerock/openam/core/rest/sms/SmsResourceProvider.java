@@ -119,7 +119,8 @@ abstract class SmsResourceProvider {
      * @return The resolved realm.
      */
     protected String realmFor(Context context) {
-        return context.asContext(RealmContext.class).getResolvedRealm();
+        return context.containsContext(RealmContext.class) ?
+                context.asContext(RealmContext.class).getResolvedRealm() : null;
     }
 
     /**

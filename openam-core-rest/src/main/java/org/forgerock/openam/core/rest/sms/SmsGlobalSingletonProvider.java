@@ -98,7 +98,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    protected JsonValue convertToJson(ServiceConfig config) {
+    protected JsonValue convertToJson(String realm, ServiceConfig config) {
         return converter.toJson(schema.getAttributeDefaults());
     }
 
@@ -110,16 +110,11 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
      * @return {@inheritDoc}
      */
     @Override
-    protected JsonValue withExtraAttributes(Context context, JsonValue value) {
+    protected JsonValue withExtraAttributes(String realm, JsonValue value) {
         if (organizationSchema != null) {
             value.add("defaults", organizationConverter.toJson(organizationSchema.getAttributeDefaults()).getObject());
         }
-        return super.withExtraAttributes(context, value);
-    }
-
-    @Override
-    protected Map<String, Set<String>> getDynamicAttributes(Context context) {
-        return dynamicSchema.getAttributeDefaults();
+        return super.withExtraAttributes(null, value);
     }
 
     @Override

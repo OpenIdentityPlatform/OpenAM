@@ -95,8 +95,9 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         JsonValue content = request.getContent();
+        final String realm = realmFor(context);
         try {
-            Map<String, Set<String>> attrs = converter.fromJson(content);
+            Map<String, Set<String>> attrs = converter.fromJson(realm, content);
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
             String name = content.get("_id").asString();
@@ -115,7 +116,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                     .then(new Function<Void, ResourceResponse, ResourceException>() {
                         @Override
                         public ResourceResponse apply(Void aVoid) {
-                            JsonValue result = getJsonValue(created);
+                            JsonValue result = getJsonValue(realm, created);
                             return newResourceResponse(created.getName(), String.valueOf(result.hashCode()), result);
                         }
                     });
@@ -185,7 +186,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             ServiceConfig config = parentSubConfigFor(context, scm);
             ServiceConfig item = checkedInstanceSubConfig(context, resourceId, config);
 
-            JsonValue result = getJsonValue(item);
+            JsonValue result = getJsonValue(realmFor(context), item);
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on read", e);
@@ -206,14 +207,15 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId, UpdateRequest request) {
         JsonValue content = request.getContent();
+        String realm = realmFor(context);
         try {
-            Map<String, Set<String>> attrs = converter.fromJson(content);
+            Map<String, Set<String>> attrs = converter.fromJson(realm, content);
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
             ServiceConfig node = checkedInstanceSubConfig(context, resourceId, config);
 
             node.setAttributes(attrs);
-            JsonValue result = getJsonValue(node);
+            JsonValue result = getJsonValue(realm, node);
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (ServiceNotFoundException e) {
             debug.warning("::SmsCollectionProvider:: ServiceNotFoundException on update", e);
@@ -249,17 +251,14 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         }
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
+            String realm = realmFor(context);
             if (subSchemaPath.isEmpty()) {
                 Set<String> instanceNames = new TreeSet<String>(scm.getInstanceNames());
-                String realm = null;
-                if (type == SchemaType.ORGANIZATION) {
-                    realm = realmFor(context);
-                }
                 for (String instanceName : instanceNames) {
                     ServiceConfig config = type == SchemaType.GLOBAL ? scm.getGlobalConfig(instanceName) :
                             scm.getOrganizationConfig(realm, instanceName);
                     if (config != null) {
-                        JsonValue value = getJsonValue(config);
+                        JsonValue value = getJsonValue(realm, config);
                         handler.handleResource(newResourceResponse(instanceName, String.valueOf(value.hashCode()), value));
                     }
                 }
@@ -267,7 +266,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                 ServiceConfig config = parentSubConfigFor(context, scm);
                 Set<String> names = config.getSubConfigNames("*", lastSchemaNodeName());
                 for (String configName : names) {
-                    JsonValue value = getJsonValue(config.getSubConfig(configName));
+                    JsonValue value = getJsonValue(realm, config.getSubConfig(configName));
                     handler.handleResource(newResourceResponse(configName, String.valueOf(value.hashCode()), value));
                 }
             }
@@ -286,8 +285,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * Returns the JsonValue representation of the ServiceConfig using the {@link #converter}. Adds a {@code _id}
      * property for the name of the config.
      */
-    private JsonValue getJsonValue(ServiceConfig result) {
-        JsonValue value = converter.toJson(result.getAttributes());
+    private JsonValue getJsonValue(String realm, ServiceConfig result) {
+        JsonValue value = converter.toJson(realm, result.getAttributes());
         value.add("_id", result.getName());
         return value;
     }

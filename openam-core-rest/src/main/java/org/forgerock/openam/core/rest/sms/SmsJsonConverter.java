@@ -126,87 +126,104 @@ public class SmsJsonConverter {
     }
 
     /**
-     * Will validate the Map representation of the service configuration against the serviceSchema and return a
+     * Will validate the Map representation of the service configuration against the global serviceSchema and return a
      * corresponding JSON representation
      *
-     * @param attributeValuePairs
+     * @param attributeValuePairs The schema attribute values.
      * @return Json representation of attributeValuePairs
      */
     public JsonValue toJson(Map<String, Set<String>> attributeValuePairs) {
+        return toJson(null, attributeValuePairs);
+    }
+
+    /**
+     * Will validate the Map representation of the service configuration against the serviceSchema and return a
+     * corresponding JSON representation
+     *
+     * @param attributeValuePairs The schema attribute values.
+     * @param realm The realm, or null if global.
+     * @return Json representation of attributeValuePairs
+     */
+    public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs) {
         if (!initialised) {
             init();
         }
-
-        JsonValue parentJson = json(new HashMap<String, Object>());
-
+        final boolean validAttributes;
         try {
-            if (schema.validateAttributes(attributeValuePairs)) {
-                for (String attributeName : attributeValuePairs.keySet()) {
-                    String jsonResourceName = attributeNameToResourceName.get(attributeName);
-
-                    String name;
-                    if (jsonResourceName != null) {
-                        name = jsonResourceName;
-                    } else {
-                        name = attributeName;
-                    }
-
-                    AttributeSchema attributeSchema = schema.getAttributeSchema(attributeName);
-
-                    if (shouldBeIgnored(attributeName)) {
-                        continue;
-                    }
-
-                    AttributeSchema.Type type = attributeSchema.getType();
-                    final Set<String> object = attributeValuePairs.get(attributeName);
-
-                    Object jsonAttributeValue = null;
-
-                    if (type == null) {
-                        throw new JsonException("Type not defined.");
-                    }
-
-                    AttributeSchemaConverter attributeSchemaConverter = attributeSchemaConverters.get(name);
-
-                    if (isASingleValue(type)) {
-                        if (!object.isEmpty()) {
-                            jsonAttributeValue = attributeSchemaConverter.toJson(object.iterator().next());
-                        }
-                    } else if (containsMultipleValues(type)) {
-                        if (isAMap(attributeSchema.getUIType())) {
-                            Map<String, Object> map = new HashMap<String, Object>();
-
-                            Iterator<String> itr = object.iterator();
-                            while (itr.hasNext()) {
-                                Pair<String, String> entry = nameValueParser.parse(itr.next());
-                                map.put(entry.getFirst(), attributeSchemaConverter.toJson(entry.getSecond()));
-                            }
-                            jsonAttributeValue = map;
-                        } else {
-                            List<Object> list = new ArrayList<Object>();
-
-                            Iterator<String> itr = object.iterator();
-                            while (itr.hasNext()) {
-                                list.add(attributeSchemaConverter.toJson(itr.next()));
-                            }
-                            jsonAttributeValue = list;
-                        }
-                    }
-
-                    String sectionName = attributeNameToSection.get(attributeName);
-                    if (sectionName != null) {
-                        parentJson.putPermissive(new JsonPointer("/" + sectionName + "/" + name), jsonAttributeValue);
-                    } else {
-                        parentJson.put(name, jsonAttributeValue);
-                    }
-                }
+            if (realm == null) {
+                validAttributes = schema.validateAttributes(attributeValuePairs);
             } else {
-                throw new JsonException("Invalid attributes");
+                validAttributes = schema.validateAttributes(attributeValuePairs, realm);
             }
         } catch (SMSException e) {
             throw new JsonException("Unable to validate attributes", e);
         }
 
+        JsonValue parentJson = json(new HashMap<String, Object>());
+
+        if (validAttributes) {
+            for (String attributeName : attributeValuePairs.keySet()) {
+                String jsonResourceName = attributeNameToResourceName.get(attributeName);
+
+                String name;
+                if (jsonResourceName != null) {
+                    name = jsonResourceName;
+                } else {
+                    name = attributeName;
+                }
+
+                AttributeSchema attributeSchema = schema.getAttributeSchema(attributeName);
+
+                if (shouldBeIgnored(attributeName)) {
+                    continue;
+                }
+
+                AttributeSchema.Type type = attributeSchema.getType();
+                final Set<String> object = attributeValuePairs.get(attributeName);
+
+                Object jsonAttributeValue = null;
+
+                if (type == null) {
+                    throw new JsonException("Type not defined.");
+                }
+
+                AttributeSchemaConverter attributeSchemaConverter = attributeSchemaConverters.get(name);
+
+                if (isASingleValue(type)) {
+                    if (!object.isEmpty()) {
+                        jsonAttributeValue = attributeSchemaConverter.toJson(object.iterator().next());
+                    }
+                } else if (containsMultipleValues(type)) {
+                    if (isAMap(attributeSchema.getUIType())) {
+                        Map<String, Object> map = new HashMap<String, Object>();
+
+                        Iterator<String> itr = object.iterator();
+                        while (itr.hasNext()) {
+                            Pair<String, String> entry = nameValueParser.parse(itr.next());
+                            map.put(entry.getFirst(), attributeSchemaConverter.toJson(entry.getSecond()));
+                        }
+                        jsonAttributeValue = map;
+                    } else {
+                        List<Object> list = new ArrayList<Object>();
+
+                        Iterator<String> itr = object.iterator();
+                        while (itr.hasNext()) {
+                            list.add(attributeSchemaConverter.toJson(itr.next()));
+                        }
+                        jsonAttributeValue = list;
+                    }
+                }
+
+                String sectionName = attributeNameToSection.get(attributeName);
+                if (sectionName != null) {
+                    parentJson.putPermissive(new JsonPointer("/" + sectionName + "/" + name), jsonAttributeValue);
+                } else {
+                    parentJson.put(name, jsonAttributeValue);
+                }
+            }
+        } else {
+            throw new JsonException("Invalid attributes");
+        }
         return parentJson;
     }
 
@@ -252,18 +269,30 @@ public class SmsJsonConverter {
     }
 
     /**
-     * Will validate the Json representation of the service configuration against the serviceSchema and return a
-     * corresponding Map representation
+     * Will validate the Json representation of the service configuration against the global serviceSchema,
+     * and return a corresponding Map representation.
      *
-     * @param jsonValue
+     * @param jsonValue The request body.
      * @return Map representation of jsonValue
      */
     public Map<String, Set<String>> fromJson(JsonValue jsonValue) throws JsonException, BadRequestException {
+        return fromJson(null, jsonValue);
+    }
+
+    /**
+     * Will validate the Json representation of the service configuration against the serviceSchema for a realm,
+     * and return a corresponding Map representation.
+     *
+     * @param jsonValue The request body.
+     * @param realm The realm, or null if global.
+     * @return Map representation of jsonValue
+     */
+    public Map<String, Set<String>> fromJson(String realm, JsonValue jsonValue) throws JsonException, BadRequestException {
         if (!initialised) {
             init();
         }
 
-        Map<String, Set<String>> result = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> result = new HashMap<>();
         if (jsonValue == null || jsonValue.isNull()) {
             return result;
         }
@@ -285,7 +314,7 @@ public class SmsJsonConverter {
             }
 
             final Object attributeValue = translatedAttributeValuePairs.get(attributeName);
-            HashSet<String> value = new HashSet<String>();
+            HashSet<String> value = new HashSet<>();
 
             AttributeSchemaConverter attributeSchemaConverter = getAttributeConverter(attributeName);
 
@@ -306,7 +335,9 @@ public class SmsJsonConverter {
         }
 
         try {
-            if (result.isEmpty() || schema.validateAttributes(result)) {
+            if (result.isEmpty() ||
+                    (realm == null && schema.validateAttributes(result)) ||
+                    (realm != null && schema.validateAttributes(result, realm))) {
                 return result;
             } else {
                 throw new JsonException("Invalid attributes");
