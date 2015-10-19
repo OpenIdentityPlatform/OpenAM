@@ -951,55 +951,6 @@ public class SPACSUtils {
         }
 
         if (resp != null) {
-            // verify signature in Response
-            boolean needPOSTResponseSigned =
-                SAML2Utils.wantPOSTResponseSigned(
-                    orgName,hostEntityId,SAML2Constants.SP_ROLE);
-            String idpEntityID = null;
-            Issuer issuer = resp.getIssuer();
-            if (issuer != null) {
-                idpEntityID = issuer.getValue();
-            } else {
-                List assertions = resp.getAssertion();
-                if ((assertions != null) && (!assertions.isEmpty())) {
-                    for (Iterator iter = assertions.iterator();
-                                  iter.hasNext(); ) {
-                        Assertion assertion = (Assertion)iter.next();
-                        idpEntityID = assertion.getIssuer().getValue();
-                        break;
-                    }
-                }
-            }
-            IDPSSODescriptorElement idp = null;
-            try {
-                idp = metaManager.getIDPSSODescriptor(orgName,idpEntityID);
-            } catch (SAML2MetaException se) {
-                String[] data = {orgName,hostEntityId,idpEntityID};
-                LogUtil.error(Level.INFO,
-                              LogUtil.IDP_META_NOT_FOUND,
-                              data,
-                              null);
-                SAMLUtils.sendError(request, response,
-                    response.SC_INTERNAL_SERVER_ERROR,
-                    "failedToGetIDPSSODescriptor", se.getMessage());
-                throw se;
-           }
-           if (needPOSTResponseSigned) {
-               Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(idp, idpEntityID,
-                       SAML2Constants.IDP_ROLE);
-                if (!resp.isSigned() || !resp.isSignatureValid(verificationCerts)) {
-                    SAML2Utils.debug.error(classMethod +
-                         " Signature in Response is invalid "); 
-                    String[] data = { orgName , hostEntityId , idpEntityID };
-                    LogUtil.error(Level.INFO,
-                        LogUtil.POST_RESPONSE_INVALID_SIGNATURE,data,null);
-                    SAMLUtils.sendError(request, response,
-                        response.SC_INTERNAL_SERVER_ERROR, "invalidSignature",
-                        SAML2Utils.bundle.getString("invalidSignature"));
-                    throw new SAML2Exception(
-                       SAML2Utils.bundle.getString("invalidSignInResponse"));
-               }
-            }
             String[] data = {""};
             if (LogUtil.isAccessLoggable(Level.FINE)) {
                 data[0] = resp.toXMLString();
