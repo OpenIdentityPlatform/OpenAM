@@ -1,3 +1,8 @@
+.backgrid-container {
+    /* Prevents tables from overflowing when the container is too thin. This can and does happen. */
+    overflow: auto;
+}
+
 .table {
     /* Specificity must match Bootstrap's to override */
     > tbody > tr > td,
