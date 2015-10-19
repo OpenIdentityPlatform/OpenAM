@@ -31,11 +31,12 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
     "org/forgerock/openam/ui/admin/delegates/ScriptsDelegate",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "libs/codemirror/mode/groovy/groovy",
     "libs/codemirror/mode/javascript/javascript",
     "libs/codemirror/addon/display/fullscreen"
 ], function ($, _, BootstrapDialog, CodeMirror, ChangesPending, Messages, AbstractView, EventManager, Router, Base64,
-             Constants, UIUtils, Script, ScriptsDelegate, SMSGlobalDelegate) {
+             Constants, UIUtils, Script, ScriptsDelegate, SMSGlobalDelegate, FormHelper) {
 
     return AbstractView.extend({
         initialize: function (options) {
@@ -54,7 +55,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             "click #changeContext": "openDialog",
             "change input[name=language]": "onChangeLanguage",
             "click #saveChanges": "submitForm",
-            "click #delete": "deleteScript",
+            "click #delete": "onDeleteClick",
             "click #editFullScreen": "editFullScreen",
             "click .full-screen-bar button": "exitFullScreen",
             "change [data-field]": "checkChanges"
@@ -465,9 +466,14 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             return result;
         },
 
-        deleteScript: function (e) {
+        onDeleteClick: function (e) {
             e.preventDefault();
 
+            FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.scripts.edit.script") },
+                _.bind(this.deleteScript, this));
+        },
+
+        deleteScript: function () {
             var self = this,
                 onSuccess = function (model, response, options) {
                     Router.routeTo(Router.configuration.routes.realmsScripts, {

@@ -33,10 +33,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/SubjectResponseAttributesView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageSubjectsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageEnvironmentsView",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "selectize"
 ], function ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, PolicyModel, PolicySetModel,
              PoliciesDelegate, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
-             SubjectResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView) {
+             SubjectResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView, FormHelper) {
     return AbstractView.extend({
         partials: [
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
@@ -45,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
         events: {
             "click input[name=submitForm]": "submitForm",
             "change #availableResTypes": "changeResourceType",
-            "click #delete": "deletePolicy"
+            "click #delete": "onDeleteClick"
         },
 
         getAllResponseAttributes: function () {
@@ -285,9 +286,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             }
         },
 
-        deletePolicy: function (e) {
+        onDeleteClick: function (e) {
             e.preventDefault();
 
+            FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.authorization.common.policy") },
+                _.bind(this.deletePolicy, this));
+        },
+
+        deletePolicy: function () {
             var self = this,
                 onSuccess = function (model, response, options) {
                     Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {

@@ -648,7 +648,9 @@
             "description": "Description",
             "type": "Type",
             "editFullScreen": "Edit Fullscreen",
-            "exitFullScreen": "Exit Fullscreen"
+            "exitFullScreen": "Exit Fullscreen",
+            "confirmDelete": "Confirm delete",
+            "confirmDeleteText": "Are you sure that you want to delete this __type__?"
         },
         "authentication": {
             "settings": {

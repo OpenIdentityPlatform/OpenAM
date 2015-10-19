@@ -25,9 +25,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypePatternsView",
-    "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypeActionsView"
+    "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypeActionsView",
+    "org/forgerock/openam/ui/admin/utils/FormHelper"
 ], function ($, _, Messages, AbstractView, EventManager, Router, Constants, UIUtils, ResourceTypeModel,
-             ResourceTypePatternsView, ResourceTypeActionsView) {
+             ResourceTypePatternsView, ResourceTypeActionsView, FormHelper) {
 
     return AbstractView.extend({
         partials: [
@@ -35,7 +36,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
         ],
         events: {
             "click #saveChanges": "submitForm",
-            "click #delete": "deleteResourceType"
+            "click #delete": "onDeleteClick"
         },
         tabs: [
             { name: "patterns", attr: ["patterns"] },
@@ -192,9 +193,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             }
         },
 
-        deleteResourceType: function (e) {
+        onDeleteClick: function (e) {
             e.preventDefault();
 
+            FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.authorization.common.resourceType") },
+                _.bind(this.deleteResourceType, this));
+        },
+
+        deleteResourceType: function () {
             var self = this,
                 onSuccess = function (model, response, options) {
                     Router.routeTo(Router.configuration.routes.realmsResourceTypes, {

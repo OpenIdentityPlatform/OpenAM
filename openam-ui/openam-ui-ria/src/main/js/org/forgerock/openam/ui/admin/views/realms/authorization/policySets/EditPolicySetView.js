@@ -22,6 +22,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/PoliciesView",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -29,7 +30,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "selectize"
-], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesDelegate, Messages, AbstractView,
+], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesDelegate, FormHelper, Messages, AbstractView,
              EventManager, Router, Constants, UIUtils) {
     return AbstractView.extend({
         partials: [
@@ -39,7 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
         validationFields: ["name", "resourceTypeUuids"],
         events: {
             "click #saveChanges": "submitForm",
-            "click #delete": "deletePolicySet"
+            "click #delete": "onDeleteClick"
         },
 
         initialize: function (options) {
@@ -223,9 +224,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             }
         },
 
-        deletePolicySet: function (e) {
+        onDeleteClick: function (e) {
             e.preventDefault();
 
+            FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.authorization.common.policySet") },
+                _.bind(this.deletePolicySet, this));
+        },
+
+        deletePolicySet: function () {
             var self = this,
                 onSuccess = function (model, response, options) {
                     Router.routeTo(Router.configuration.routes.realmsPolicySets, {

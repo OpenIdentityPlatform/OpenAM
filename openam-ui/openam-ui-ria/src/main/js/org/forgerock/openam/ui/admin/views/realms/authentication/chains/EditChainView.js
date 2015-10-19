@@ -26,7 +26,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostProcessView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
-
     // jquery dependencies
     "sortable"
 ], function ($, _, AbstractView, EditLinkView, FormHelper, Handlebars, LinkView, Messages,
@@ -105,7 +104,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             "click #saveEditChain":  "saveChain",
             "click #saveSettings":   "saveSettings",
             "click .add-new-module": "addNewModule",
-            "click #delete":         "deleteChain"
+            "click #delete":         "onDeleteClick"
         },
         partials: [
             "partials/alerts/_Alert.html",
@@ -126,8 +125,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             EditLinkView.show(linkview);
         },
 
-        deleteChain: function (event) {
-            if ($(event.currentTarget).hasClass("disabled")) { return false; }
+        onDeleteClick: function (e) {
+            e.preventDefault();
+            if ($(e.currentTarget).hasClass("disabled")) { return false; }
+
+            FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.authentication.modules.chain") },
+                _.bind(this.deleteChain, this));
+        },
+
+        deleteChain: function () {
             var self = this;
 
             SMSRealmDelegate.authentication.chains.remove(
