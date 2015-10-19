@@ -156,9 +156,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 }, obj.removeSessionCookie);
             } else {
                 obj.removeSessionCookie();
-                if (errorCallback) {
-                    errorCallback();
-                }
+                successCallback();
             }
         }, function () {
             if (errorCallback) {
