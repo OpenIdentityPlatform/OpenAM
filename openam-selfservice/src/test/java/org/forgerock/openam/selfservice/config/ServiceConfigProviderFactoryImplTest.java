@@ -21,36 +21,37 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import com.google.inject.Injector;
-import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
+import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.services.context.Context;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * Unit test for {@link ServiceProviderFactoryImpl}.
+ * Unit test for {@link ServiceConfigProviderFactoryImpl}.
  *
  * @since 13.0.0
  */
-public final class ServiceProviderFactoryImplTest {
+public final class ServiceConfigProviderFactoryImplTest {
 
-    private ServiceProviderFactory providerFactory;
+    private ServiceConfigProviderFactory providerFactory;
     private Injector injector;
 
     @BeforeMethod
     public void setUp() {
         injector = mock(Injector.class);
-        providerFactory = new ServiceProviderFactoryImpl(injector);
+        providerFactory = new ServiceConfigProviderFactoryImpl(injector);
     }
 
     @Test
     public void retrievesValidProviderInstance() {
         // Given
         MockConfig config = new MockConfig();
-        MockProvider provider = new MockProvider();
-        given(injector.getInstance(MockProvider.class)).willReturn(provider);
+        MockConfigProvider provider = new MockConfigProvider();
+        given(injector.getInstance(MockConfigProvider.class)).willReturn(provider);
 
         // When
-        ServiceProvider<MockConfig> providerResult = providerFactory.getProvider(config);
+        ServiceConfigProvider<MockConfig> providerResult = providerFactory.getProvider(config);
 
         // Then
         assertThat(providerResult).isEqualTo(provider);
@@ -60,12 +61,12 @@ public final class ServiceProviderFactoryImplTest {
     public void retrievesSameInstance() {
         // Given
         MockConfig config = new MockConfig();
-        MockProvider provider = new MockProvider();
-        given(injector.getInstance(MockProvider.class)).willReturn(provider);
+        MockConfigProvider provider = new MockConfigProvider();
+        given(injector.getInstance(MockConfigProvider.class)).willReturn(provider);
 
         // When
-        ServiceProvider<MockConfig> providerResultA = providerFactory.getProvider(config);
-        ServiceProvider<MockConfig> providerResultB = providerFactory.getProvider(config);
+        ServiceConfigProvider<MockConfig> providerResultA = providerFactory.getProvider(config);
+        ServiceConfigProvider<MockConfig> providerResultB = providerFactory.getProvider(config);
 
         // Then
         assertThat(providerResultA).isEqualTo(provider);
@@ -76,12 +77,12 @@ public final class ServiceProviderFactoryImplTest {
 
         @Override
         public String getConfigProviderClass() {
-            return MockProvider.class.getName();
+            return MockConfigProvider.class.getName();
         }
 
     }
 
-    static final class MockProvider implements ServiceProvider<MockConfig> {
+    static final class MockConfigProvider implements ServiceConfigProvider<MockConfig> {
 
         @Override
         public boolean isServiceEnabled(MockConfig config) {
@@ -89,7 +90,8 @@ public final class ServiceProviderFactoryImplTest {
         }
 
         @Override
-        public RequestHandler getService(MockConfig config, Context context, String realm) {
+        public ProcessInstanceConfig<CustomSupportConfigVisitor> getServiceConfig(
+                MockConfig config, Context context, String realm) {
             return null;
         }
 

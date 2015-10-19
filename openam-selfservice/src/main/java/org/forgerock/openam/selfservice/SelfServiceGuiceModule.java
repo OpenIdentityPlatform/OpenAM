@@ -35,10 +35,12 @@ import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandlerImpl;
 import org.forgerock.openam.selfservice.config.ForgottenPasswordConsoleConfig;
 import org.forgerock.openam.selfservice.config.ForgottenPasswordExtractor;
-import org.forgerock.openam.selfservice.config.ServiceProviderFactory;
-import org.forgerock.openam.selfservice.config.ServiceProviderFactoryImpl;
+import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
+import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactoryImpl;
 import org.forgerock.openam.selfservice.config.UserRegistrationConsoleConfig;
 import org.forgerock.openam.selfservice.config.UserRegistrationExtractor;
+import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
+import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitorImpl;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
 import org.forgerock.selfservice.stages.CommonConfigVisitor;
@@ -60,8 +62,10 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         bind(ProcessStore.class).to(CTSProcessStoreImpl.class);
         bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
         bind(SnapshotTokenHandlerFactory.class).to(SnapshotTokenHandlerFactoryImpl.class);
-        bind(ServiceProviderFactory.class).to(ServiceProviderFactoryImpl.class);
+        bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
         bind(CommonConfigVisitor.class).to(BasicStageConfigVisitor.class);
+        bind(CustomSupportConfigVisitor.class).to(CustomSupportConfigVisitorImpl.class);
+        bind(SelfServiceFactory.class).to(SelfServiceFactoryImpl.class);
 
         bind(new TypeLiteral<ConsoleConfigExtractor<UserRegistrationConsoleConfig>>() {})
                 .to(UserRegistrationExtractor.class);
@@ -79,32 +83,29 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         // Registration CREST services
         expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() {});
         expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() {});
-
-        // These have been exposed so they can be accessible to
-        // reflection based instantiated service provider instances.
-        expose(ProcessStore.class);
-        expose(SnapshotTokenHandlerFactory.class);
-        expose(CommonConfigVisitor.class);
+        // Exposed to be accessible to custom progress stages
+        expose(ConnectionFactory.class).annotatedWith(SelfService.class);
+        expose(Client.class).annotatedWith(SelfService.class);
     }
 
     @Provides
     @Singleton
     SelfServiceRequestHandler<UserRegistrationConsoleConfig> getUserRegistrationService(
-            ConsoleConfigHandler configHandler,
+            SelfServiceFactory serviceFactory, ConsoleConfigHandler configHandler,
             ConsoleConfigExtractor<UserRegistrationConsoleConfig> configExtractor,
-            ServiceProviderFactory configProviderFactory) {
+            ServiceConfigProviderFactory configProviderFactory) {
 
-        return new SelfServiceRequestHandler<>(configHandler, configExtractor, configProviderFactory);
+        return new SelfServiceRequestHandler<>(serviceFactory, configHandler, configExtractor, configProviderFactory);
     }
 
     @Provides
     @Singleton
     SelfServiceRequestHandler<ForgottenPasswordConsoleConfig> getForgottenPasswordService(
-            ConsoleConfigHandler configHandler,
+            SelfServiceFactory serviceFactory, ConsoleConfigHandler configHandler,
             ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> configExtractor,
-            ServiceProviderFactory configProviderFactory) {
+            ServiceConfigProviderFactory configProviderFactory) {
 
-        return new SelfServiceRequestHandler<>(configHandler, configExtractor, configProviderFactory);
+        return new SelfServiceRequestHandler<>(serviceFactory, configHandler, configExtractor, configProviderFactory);
     }
 
     @Provides

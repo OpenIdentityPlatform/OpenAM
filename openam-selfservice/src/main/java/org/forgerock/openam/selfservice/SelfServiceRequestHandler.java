@@ -29,8 +29,10 @@ import org.forgerock.openam.selfservice.config.ConsoleConfig;
 import org.forgerock.openam.selfservice.config.ConsoleConfigChangeListener;
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
-import org.forgerock.openam.selfservice.config.ServiceProvider;
-import org.forgerock.openam.selfservice.config.ServiceProviderFactory;
+import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
+import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
+import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
+import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.slf4j.Logger;
@@ -51,9 +53,10 @@ final class SelfServiceRequestHandler<C extends ConsoleConfig>
     private static final Logger logger = LoggerFactory.getLogger(SelfServiceRequestHandler.class);
 
     private final Map<String, RequestHandler> serviceCache;
+    private final SelfServiceFactory serviceFactory;
     private final ConsoleConfigHandler consoleConfigHandler;
     private final ConsoleConfigExtractor<C> configExtractor;
-    private final ServiceProviderFactory providerFactory;
+    private final ServiceConfigProviderFactory providerFactory;
 
     /**
      * Constructs a new self service.
@@ -66,10 +69,11 @@ final class SelfServiceRequestHandler<C extends ConsoleConfig>
      *         service provider factory
      */
     @Inject
-    public SelfServiceRequestHandler(ConsoleConfigHandler consoleConfigHandler,
-            ConsoleConfigExtractor<C> configExtractor, ServiceProviderFactory providerFactory) {
+    public SelfServiceRequestHandler(SelfServiceFactory serviceFactory, ConsoleConfigHandler consoleConfigHandler,
+            ConsoleConfigExtractor<C> configExtractor, ServiceConfigProviderFactory providerFactory) {
 
         serviceCache = new ConcurrentHashMap<>();
+        this.serviceFactory = serviceFactory;
         this.consoleConfigHandler = consoleConfigHandler;
         this.configExtractor = configExtractor;
         this.providerFactory = providerFactory;
@@ -121,13 +125,16 @@ final class SelfServiceRequestHandler<C extends ConsoleConfig>
 
     private RequestHandler createNewService(Context context, String realm) throws NotSupportedException {
         C consoleConfig = consoleConfigHandler.getConfig(realm, configExtractor);
-        ServiceProvider<C> serviceProvider = providerFactory.getProvider(consoleConfig);
+        ServiceConfigProvider<C> serviceConfigProvider = providerFactory.getProvider(consoleConfig);
 
-        if (!serviceProvider.isServiceEnabled(consoleConfig)) {
+        if (!serviceConfigProvider.isServiceEnabled(consoleConfig)) {
             throw new NotSupportedException("Service not configured");
         }
 
-        return serviceProvider.getService(consoleConfig, context, realm);
+        ProcessInstanceConfig<CustomSupportConfigVisitor> serviceConfig =
+                serviceConfigProvider.getServiceConfig(consoleConfig, context, realm);
+
+        return serviceFactory.getService(serviceConfig);
     }
 
     @Override

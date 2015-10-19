@@ -30,43 +30,43 @@ import java.util.concurrent.ConcurrentMap;
  * @since 13.0.0
  */
 @Singleton
-public final class ServiceProviderFactoryImpl implements ServiceProviderFactory {
+public final class ServiceConfigProviderFactoryImpl implements ServiceConfigProviderFactory {
 
-    private final ConcurrentMap<String, ServiceProvider<?>> providers;
+    private final ConcurrentMap<String, ServiceConfigProvider<?>> providers;
     private final Injector injector;
 
     /**
      * Constructs a new service provider factory instance.
      */
     @Inject
-    public ServiceProviderFactoryImpl(Injector injector) {
+    public ServiceConfigProviderFactoryImpl(Injector injector) {
         providers = new ConcurrentHashMap<>();
         this.injector = injector;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <C extends ConsoleConfig> ServiceProvider<C> getProvider(C config) {
+    public <C extends ConsoleConfig> ServiceConfigProvider<C> getProvider(C config) {
         String providerClassName = config.getConfigProviderClass();
-        ServiceProvider<?> provider = providers.get(providerClassName);
+        ServiceConfigProvider<?> provider = providers.get(providerClassName);
 
         if (provider == null) {
             provider = constructNewProvider(providerClassName);
-            ServiceProvider<?> old = providers.putIfAbsent(providerClassName, provider);
+            ServiceConfigProvider<?> old = providers.putIfAbsent(providerClassName, provider);
 
             if (old != null) {
                 provider = old;
             }
         }
 
-        return (ServiceProvider<C>) provider;
+        return (ServiceConfigProvider<C>) provider;
     }
 
-    private ServiceProvider<?> constructNewProvider(String className) {
+    private ServiceConfigProvider<?> constructNewProvider(String className) {
         try {
-            Class<? extends ServiceProvider> providerClass = Class
+            Class<? extends ServiceConfigProvider> providerClass = Class
                     .forName(className)
-                    .asSubclass(ServiceProvider.class);
+                    .asSubclass(ServiceConfigProvider.class);
 
             return injector.getInstance(providerClass);
         } catch (ClassNotFoundException e) {

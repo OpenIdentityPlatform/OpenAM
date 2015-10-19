@@ -14,25 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
-
 /**
- * Factory delivers up service providers based of the passed console configuration.
- *
- * @since 13.0.0
+ * Contains classes for handling custom progress stages.
  */
-public interface ServiceProviderFactory {
-
-    /**
-     * Retrieves an instance of a service provider based on the passed console configuration.
-     *
-     * @param config
-     *         console configuration
-     * @param <C>
-     *         the console configuration type
-     *
-     * @return an instance of a service provider
-     */
-    <C extends ConsoleConfig> ServiceProvider<C> getProvider(C config);
-
-}
+package org.forgerock.openam.selfservice.config.custom;

@@ -16,42 +16,23 @@
 
 package org.forgerock.openam.selfservice.config;
 
-import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.services.context.Context;
-
 /**
- * Provides self service instances based of the passed console configuration instance.
- *
- * @param <C>
- *         the console configuration type
+ * Factory delivers up service config providers based of the passed console configuration.
  *
  * @since 13.0.0
  */
-public interface ServiceProvider<C extends ConsoleConfig> {
-
-
-    /**
-     * Determines whether the specific service is enabled.
-     *
-     * @param config
-     *         the console config
-     *
-     * @return whether the service is enabled
-     */
-    boolean isServiceEnabled(C config);
+public interface ServiceConfigProviderFactory {
 
     /**
-     * Provides the self service for the appropriate flow.
+     * Retrieves an instance of a service config provider based on the passed console configuration.
      *
      * @param config
-     *         the console config
-     * @param context
-     *         CREST context
-     * @param realm
-     *         the current realm
+     *         console configuration
+     * @param <C>
+     *         the console configuration type
      *
-     * @return service
+     * @return an instance of a service config provider
      */
-    RequestHandler getService(C config, Context context, String realm);
+    <C extends ConsoleConfig> ServiceConfigProvider<C> getProvider(C config);
 
 }

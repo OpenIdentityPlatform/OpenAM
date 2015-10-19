@@ -75,7 +75,7 @@
                                  resourceName="selfRegistrationServiceConfigClass"
                                  i18nKey="a120">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.selfservice.config.DefaultUserRegistrationProvider</Value>
+                        <Value>org.forgerock.openam.selfservice.config.DefaultUserRegistrationConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecurityForgotPasswordEnabled"
@@ -117,7 +117,7 @@
                                  resourceName="forgotPasswordServiceConfigClass"
                                  i18nKey="a121">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.selfservice.config.DefaultForgottenPasswordProvider</Value>
+                        <Value>org.forgerock.openam.selfservice.config.DefaultForgottenPasswordConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecuritySuccessfulUserRegistrationDestination"
