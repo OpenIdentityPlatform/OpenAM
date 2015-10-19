@@ -59,7 +59,7 @@ public class ApplicationTypesResourceTest {
 
         testResource = new ApplicationTypesResource(mockApplicationTypeManager, mockDebug) {
             @Override
-            protected List<JsonValue> jsonify(List<ApplicationTypeWrapper> types) {
+            protected List<ResourceResponse> getResourceResponses(List<ApplicationTypeWrapper> types) {
                 return null;
             }
         };

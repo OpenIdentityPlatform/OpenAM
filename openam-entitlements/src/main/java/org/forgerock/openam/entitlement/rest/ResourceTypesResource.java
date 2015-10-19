@@ -24,10 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.EntitlementException;
@@ -289,21 +286,20 @@ public class ResourceTypesResource extends RealmAwareResource {
                 filterResults = queryFilter.accept(new DataQueryFilterVisitor(), configData);
             }
 
-            Collection<JsonValue> results = new ArrayList<>();
+            List<ResourceResponse> results = new ArrayList<>();
             for (String uuid : filterResults) {
                 ResourceType resourceType = resourceTypeService.getResourceType(subject, realm, uuid);
-                results.add(new JsonResourceType(resourceType).toJsonValue());
+                results.add(newResourceResponse(resourceType.getUUID(), null,
+                        new JsonResourceType(resourceType).toJsonValue()));
             }
 
             QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-            return QueryResponsePresentation.perform(handler, request, results, new JsonPointer("uuid"));
+            return QueryResponsePresentation.perform(handler, request, results);
 
         } catch (EntitlementException ee) {
             if (logger.errorEnabled()) {
-                logger.error("ResourceTypesResource :: QUERY by "
-                             + principalName
-                             + ": Caused EntitlementException: ",
-                             ee);
+                logger.error("ResourceTypesResource :: QUERY by " + principalName
+                        + ": Caused EntitlementException: ", ee);
             }
             return exceptionMappingHandler.handleError(context, request, ee).asPromise();
         } catch (QueryException e) {

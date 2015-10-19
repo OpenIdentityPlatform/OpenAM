@@ -58,11 +58,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Endpoint for the ApplicationsResource.
@@ -352,7 +348,7 @@ public class ApplicationsResource extends RealmAwareResource {
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
 
         try {
-            Collection<JsonValue> results = new ArrayList<>();
+            List<ResourceResponse> results = new ArrayList<>();
             final Set<String> appNames = query(request, mySubject, realm);
             for (String appName : appNames) {
                 final Application application = appManager.getApplication(mySubject, realm, appName);
@@ -362,11 +358,12 @@ public class ApplicationsResource extends RealmAwareResource {
                     continue;
                 }
 
-                results.add(createApplicationWrapper(application, appTypeManagerWrapper).toJsonValue());
+                ApplicationWrapper wrapper = createApplicationWrapper(application, appTypeManagerWrapper);
+                results.add(newResourceResponse(wrapper.getName(), null, wrapper.toJsonValue()));
             }
 
             QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-            return QueryResponsePresentation.perform(handler, request, results, new JsonPointer("name"));
+            return QueryResponsePresentation.perform(handler, request, results);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: QUERY by " + principalName +

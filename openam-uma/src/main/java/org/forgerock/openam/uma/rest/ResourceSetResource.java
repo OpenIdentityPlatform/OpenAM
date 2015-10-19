@@ -195,12 +195,13 @@ public class ResourceSetResource implements CollectionResourceProvider {
                     @Override
                     public Promise<QueryResponse, ResourceException> apply(Collection<ResourceSetDescription> resourceSets) {
                         try {
-                            Collection<JsonValue> values = new ArrayList<>();
+                            List<ResourceResponse> resources = new ArrayList<>();
                             for (ResourceSetDescription resourceSet : resourceSets) {
-                                values.add(getResourceSetJson(resourceSet, userId));
+                                resources.add(newResource(resourceSet.getId(),
+                                        getResourceSetJson(resourceSet, userId)));
                             }
                             QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-                            return QueryResponsePresentation.perform(handler, request, values, new JsonPointer(ID));
+                            return QueryResponsePresentation.perform(handler, request, resources);
                         } catch (ResourceException e) {
                             return e.asPromise();
                         }

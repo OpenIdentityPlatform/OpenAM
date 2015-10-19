@@ -29,7 +29,6 @@ import java.util.TreeSet;
 import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.services.context.Context;
-import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -64,8 +63,6 @@ import org.forgerock.util.promise.Promise;
 public class DecisionCombinersResource implements CollectionResourceProvider {
 
     private final static String JSON_OBJ_TITLE = "title";
-
-    private final JsonPointer JSON_POINTER_TO_TITLE = new JsonPointer(JSON_OBJ_TITLE);
 
     private final Debug debug;
     private final EntitlementRegistry entitlementRegistry;
@@ -131,8 +128,8 @@ public class DecisionCombinersResource implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
-        final Set<String> combinerTypeNames = new TreeSet<String>();
-        List<JsonValue> combinerTypes = new ArrayList<JsonValue>();
+        final Set<String> combinerTypeNames = new TreeSet<>();
+        List<ResourceResponse> combinerTypes = new ArrayList<>();
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
@@ -153,12 +150,15 @@ public class DecisionCombinersResource implements CollectionResourceProvider {
             final JsonValue json = jsonify(combinerTypeName);
 
             if (json != null) {
-                combinerTypes.add(json);
+                if (json != null) {
+                    String id = json.get(JSON_OBJ_TITLE).asString();
+                    combinerTypes.add(newResourceResponse(id, null, json));
+                }
             }
         }
 
         QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-        return QueryResponsePresentation.perform(handler, request, combinerTypes, JSON_POINTER_TO_TITLE);
+        return QueryResponsePresentation.perform(handler, request, combinerTypes);
     }
 
     /**

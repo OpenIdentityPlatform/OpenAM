@@ -25,8 +25,6 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.services.context.Context;
-import org.forgerock.json.JsonPointer;
-import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -52,7 +50,6 @@ import org.forgerock.util.promise.Promise;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -221,13 +218,13 @@ public final class PolicyResource implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         try {
-            Collection<JsonValue> results = new ArrayList<>();
+            List<ResourceResponse> results = new ArrayList<>();
             for (Privilege policy: policyStoreProvider.getPolicyStore(context).query(request)) {
-                results.add(policyParser.printPolicy(policy));
+                results.add(policyResource(policy));
             }
 
             QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-            return QueryResponsePresentation.perform(handler, request, results, new JsonPointer("name"));
+            return QueryResponsePresentation.perform(handler, request, results);
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: QUERY : Error querying policy collection.", ex);
             return resourceErrorHandler.handleError(context, request, ex).asPromise();

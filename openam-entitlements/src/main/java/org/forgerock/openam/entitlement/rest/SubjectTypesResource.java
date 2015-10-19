@@ -18,6 +18,7 @@ package org.forgerock.openam.entitlement.rest;
 
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.util.promise.Promises.*;
+
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,6 @@ import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.LogicalSubject;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.services.context.Context;
-import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -71,8 +71,6 @@ public class SubjectTypesResource implements CollectionResourceProvider {
     private final static String JSON_OBJ_TITLE = "title";
     private final static String JSON_OBJ_LOGICAL = "logical";
     private final static String JSON_OBJ_CONFIG = "config";
-
-    private static final JsonPointer JSON_POINTER_TO_TITLE = new JsonPointer(JSON_OBJ_TITLE);
 
     private final static ObjectMapper mapper = new ObjectMapper().registerModule(new JsonEntitlementConditionModule());
     private final Debug debug;
@@ -156,8 +154,8 @@ public class SubjectTypesResource implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
-        final Set<String> subjectTypeNames = new TreeSet<String>();
-        List<JsonValue> subjectTypes = new ArrayList<JsonValue>();
+        final Set<String> subjectTypeNames = new TreeSet<>();
+        List<ResourceResponse> subjectTypes = new ArrayList<>();
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
@@ -179,12 +177,13 @@ public class SubjectTypesResource implements CollectionResourceProvider {
                     LogicalSubject.class.isAssignableFrom(subjectClass));
 
             if (json != null) {
-                subjectTypes.add(json);
+                String id = json.get(JSON_OBJ_TITLE).asString();
+                subjectTypes.add(newResourceResponse(id, null, json));
             }
         }
 
         QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-        return QueryResponsePresentation.perform(handler, request, subjectTypes, JSON_POINTER_TO_TITLE);
+        return QueryResponsePresentation.perform(handler, request, subjectTypes);
     }
 
     /**
@@ -211,7 +210,9 @@ public class SubjectTypesResource implements CollectionResourceProvider {
         final JsonValue json = jsonify(subjectClass, resourceId,
                 LogicalSubject.class.isAssignableFrom(subjectClass));
 
-        final ResourceResponse resource = newResourceResponse(resourceId, String.valueOf(System.currentTimeMillis()), json);
+        final ResourceResponse resource = newResourceResponse(resourceId,
+                String.valueOf(System.currentTimeMillis()), json);
+
         return newResultPromise(resource);
     }
 

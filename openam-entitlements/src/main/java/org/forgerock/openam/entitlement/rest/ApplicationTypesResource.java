@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.entitlement.rest;
 
-import static org.forgerock.json.resource.ResourceException.getException;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -161,7 +160,7 @@ public class ApplicationTypesResource extends SubjectAwareResource {
 
         //select
         final Set<String> appTypeNames =  typeManager.getApplicationTypeNames(mySubject);
-        List<ApplicationTypeWrapper> appTypes = new LinkedList<ApplicationTypeWrapper>();
+        List<ApplicationTypeWrapper> appTypes = new LinkedList<>();
 
         for (String appTypeName : appTypeNames) {
             final ApplicationType type = typeManager.getApplicationType(mySubject, appTypeName);
@@ -176,33 +175,25 @@ public class ApplicationTypesResource extends SubjectAwareResource {
             }
         }
 
-        final List<JsonValue> jsonifiedAppTypes = jsonify(appTypes);
+        final List<ResourceResponse> applicationsList = getResourceResponses(appTypes);
 
         QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-        return QueryResponsePresentation.perform(handler, request, jsonifiedAppTypes, JSON_POINTER_TO_NAME);
+        return QueryResponsePresentation.perform(handler, request, applicationsList);
     }
 
-    /**
-     * Takes a set of ApplicationTypes and returns their Json representation in JsonValue.
-     *
-     * @param types The ApplicationTypes whose values to look up and return in the JsonValue
-     * @return a {@link JsonValue} object representing the provided {@link Set}
-     */
-    protected List<JsonValue> jsonify(List<ApplicationTypeWrapper> types) {
+    protected List<ResourceResponse> getResourceResponses(List<ApplicationTypeWrapper> appTypes) {
+        final List<ResourceResponse> applicationsList = new ArrayList<>();
 
-        final List<JsonValue> applicationsList = new ArrayList<JsonValue>();
-
-        for (ApplicationTypeWrapper entry : types) {
+        for (ApplicationTypeWrapper entry : appTypes) {
             try {
-                applicationsList.add(entry.toJsonValue());
+                applicationsList.add(newResourceResponse(entry.getName(), null, entry.toJsonValue()));
             } catch (IOException e) {
                 if (debug.warningEnabled()) {
-                    debug.warning("ApplicationTypesResource :: JSONIFY - Error applying " +
+                    debug.warning("ApplicationTypesResource :: getResourceResponses - Error applying " +
                             "jsonification to the ApplicationType class representation.", e);
                 }
             }
         }
-
         return applicationsList;
     }
 

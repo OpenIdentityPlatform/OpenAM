@@ -17,10 +17,11 @@
 package org.forgerock.openam.uma.rest;
 
 import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import com.google.inject.Inject;
@@ -28,7 +29,6 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -87,13 +87,14 @@ public class AuditHistory implements CollectionResourceProvider {
             return new InternalServerErrorException(e).asPromise();
         }
 
-        Collection<JsonValue> results = new ArrayList<>();
+        List<ResourceResponse> results = new ArrayList<>();
         for (UmaAuditEntry entry : history) {
-            results.add(entry.asJson());
+            JsonValue result = entry.asJson();
+            results.add(newResourceResponse(entry.getId(), String.valueOf(result.hashCode()), result));
         }
 
         QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-        return QueryResponsePresentation.perform(handler, request, results, new JsonPointer(UmaAuditEntry.ID));
+        return QueryResponsePresentation.perform(handler, request, results);
     }
 
     private AMIdentity getIdentity(Context context) {

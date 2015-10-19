@@ -24,10 +24,9 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.forgerock.services.context.Context;
-import org.forgerock.json.JsonPointer;
-import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -43,7 +42,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
-import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.util.AsyncFunction;
@@ -165,11 +163,11 @@ public class UmaPolicyResource implements CollectionResourceProvider {
                 .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>, QueryResponse, ResourceException>() {
                     @Override
                     public Promise<QueryResponse, ResourceException> apply(Pair<QueryResponse, Collection<UmaPolicy>> result) {
-                        Collection<JsonValue> values = new ArrayList<>();
+                        List<ResourceResponse> values = new ArrayList<>();
                         for (UmaPolicy policy : result.getSecond()) {
-                            values.add(policy.asJson());
+                            values.add(newResourceResponse(policy.getId(), null, policy.asJson()));
                         }
-                        return QueryResponsePresentation.perform(handler, request, values, new JsonPointer(UmaConstants.UmaPolicy.POLICY_ID_KEY));
+                        return QueryResponsePresentation.perform(handler, request, values);
                     }
                 });
     }

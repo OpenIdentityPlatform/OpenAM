@@ -70,14 +70,11 @@ public class QueryResponsePresentation {
      *
      * @param handler Non null QueryResourceHandler which will receive the results from the query.
      * @param request Non null QueryRequest required to determine how results should be processed before returning.
-     * @param values Non null, possibly empty collection of JsonValue results from a query.
-     * @param idField Non null, the field within the JsonValue which indicates the ID of the item.
+     * @param resources Non null, possibly empty list of ResourceResponse results from a query.
      * @return Non null Promise containing the QueryResponse which includes a count of the results remaining.
      */
     public static Promise<QueryResponse, ResourceException> perform(QueryResourceHandler handler, QueryRequest request,
-                                                             Collection<JsonValue> values, JsonPointer idField) {
-
-        List<ResourceResponse> resources = convertJsonValues(values, idField);
+                                                             List<ResourceResponse> resources) {
 
         if (isSortingRequested(request)) {
             resources = sortItems(request, resources);
@@ -90,44 +87,6 @@ public class QueryResponsePresentation {
         int handledCount = handleResources(handler, resources);
         QueryResponse response = generateQueryResponse(request, resources.size(), handledCount);
         return Promises.newResultPromise(response);
-    }
-
-    /**
-     * Converts the JsonValue into a {@link ResourceResponse}.
-     *
-     *
-     * Note: A more stable, but expensive option would be to use the following:
-     * <code>Hash.hash(jsonValue.toString())</code>
-     * However this would require serialising the JsonValue to string just for a
-     * hashcode. For the moment, we've considered the current implementation to
-     * be a reasonable alternative.
-     *
-     * @param values
-     * @param idField
-     * @return
-     */
-    private static List<ResourceResponse> convertJsonValues(Collection<JsonValue> values, final JsonPointer idField) {
-        Function<JsonValue, ResourceResponse, IllegalStateException> convert =
-                new Function<JsonValue, ResourceResponse, IllegalStateException>() {
-            public ResourceResponse apply(JsonValue jsonValue) {
-                String id;
-                try {
-                    id = jsonValue.get(idField).asString();
-                } catch (NullPointerException e) {
-                    id = null;
-                }
-
-                String revision;
-                if (jsonValue != null && jsonValue.getObject() != null) {
-                    revision = String.valueOf(jsonValue.getObject().hashCode());
-                } else {
-                    revision = null;
-                }
-
-                return newResourceResponse(id, revision, jsonValue);
-            }
-        };
-        return CollectionUtils.transformList(values, convert);
     }
 
     /**

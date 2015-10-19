@@ -21,15 +21,8 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.CountPolicy;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.SortKey;
+import org.forgerock.json.resource.*;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
@@ -40,8 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueryResponsePresentationTest {
-
-    public static final JsonPointer NAME_POINTER = new JsonPointer("name");
 
     private QueryResourceHandler mockHandler;
     private ArgumentCaptor<ResourceResponse> captor;
@@ -58,31 +49,15 @@ public class QueryResponsePresentationTest {
 
     @Test
     public void shouldHandleEachQueryItem() throws Exception {
-        QueryResponsePresentation.perform(mockHandler, makeEmptyQueryRequest(), makeJsonValues("abc,def,ghj"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, makeEmptyQueryRequest(), makeResourceResponses("abc,def,ghj"));
         verify(mockHandler, times(3)).handleResource(any(ResourceResponse.class));
     }
 
     @Test
     public void shouldHonourQueryResourceHandler() {
         given(mockHandler.handleResource(captor.capture())).willReturn(false);
-        QueryResponsePresentation.perform(mockHandler, makeEmptyQueryRequest(), makeJsonValues("abc,def,ghj"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, makeEmptyQueryRequest(), makeResourceResponses("abc,def,ghj"));
         verify(mockHandler, times(1)).handleResource(any(ResourceResponse.class)); // handler called first time only.
-    }
-
-    // Conversion Tests
-
-    @Test
-    public void shouldUsePointerForIDInResourceResponse() {
-        JsonPointer pointer = new JsonPointer("name");
-        QueryResponsePresentation.perform(mockHandler, makePagedQueryRequest(1, 0), makeJsonValues("abc,def,ghj"), pointer);
-        assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("abc");
-    }
-
-    @Test
-    public void shouldLeaveIDNullIfPointerIncorrect() {
-        JsonPointer pointer = new JsonPointer("wibble");
-        QueryResponsePresentation.perform(mockHandler, makePagedQueryRequest(1, 0), makeJsonValues("abc,def,ghj"), pointer);
-        assertThat(extractId(captor.getAllValues(), 0)).isNull();
     }
 
     // Paging Tests
@@ -90,20 +65,20 @@ public class QueryResponsePresentationTest {
     @Test
     public void shouldHandlePageOfResults() throws Exception {
         QueryRequest request = makePagedQueryRequest(1, 0); // page size 1
-        QueryResponsePresentation.perform(mockHandler, request, makeJsonValues("abc,def,ghj"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, request, makeResourceResponses("abc,def,ghj"));
         assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("abc");
     }
 
     @Test
     public void shouldHandlePagingOffset()  {
         QueryRequest request = makePagedQueryRequest(1, 1);
-        QueryResponsePresentation.perform(mockHandler, request, makeJsonValues("abc,def,ghj"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, request, makeResourceResponses("abc,def,ghj"));
         assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("def");
     }
 
     @Test
     public void shouldHandlePagingOffset2()  {
-        QueryResponsePresentation.perform(mockHandler, makePagedQueryRequest(1, 2), makeJsonValues("abc,def,ghj"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, makePagedQueryRequest(1, 2), makeResourceResponses("abc,def,ghj"));
         assertThat(captor.getAllValues().size()).isEqualTo(1);
         assertThat(captor.getValue().getId()).isEqualTo("ghj");
     }
@@ -111,21 +86,21 @@ public class QueryResponsePresentationTest {
     @Test
     public void shouldOnlyUseOffsetIfPageSizeProvided()  {
         QueryRequest request = makePagedQueryRequest(0, 1);
-        QueryResponsePresentation.perform(mockHandler, request, makeJsonValues("abc,def,ghj"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, request, makeResourceResponses("abc,def,ghj"));
         assertThat(extractId(captor.getAllValues(), 0)).isNotEqualTo("def");
     }
 
     @Test
     public void shouldNotApplyPagingIfNoPagingDetailsProvided() {
         QueryRequest request = makePagedQueryRequest(0, 0);
-        QueryResponsePresentation.perform(mockHandler, request, makeJsonValues("abc,def,ghj"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, request, makeResourceResponses("abc,def,ghj"));
         assertThat(captor.getAllValues().size()).isEqualTo(3);
     }
 
     @Test
     public void shouldIgnoreNegativeOffsetDuringPagingRequest() {
         QueryRequest request = makePagedQueryRequest(1, -1);
-        QueryResponsePresentation.perform(mockHandler, request, makeJsonValues("abc,def,ghj"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, request, makeResourceResponses("abc,def,ghj"));
         assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("abc");
     }
 
@@ -135,7 +110,7 @@ public class QueryResponsePresentationTest {
     public void shouldMarkPagingPolicyAsEXACTWhenPagingDetailsProvided() throws ResourceException {
         QueryRequest pagedRequest = makePagedQueryRequest(1, 0);
         Promise<QueryResponse, ResourceException> result =
-                QueryResponsePresentation.perform(mockHandler, pagedRequest, makeJsonValues("abc,def,ghj"), NAME_POINTER);
+                QueryResponsePresentation.perform(mockHandler, pagedRequest, makeResourceResponses("abc,def,ghj"));
         assertThat(result.getOrThrowUninterruptibly().getTotalPagedResultsPolicy()).isEqualTo(CountPolicy.EXACT);
     }
 
@@ -143,7 +118,7 @@ public class QueryResponsePresentationTest {
     public void shouldCountTotalPagedResultsFromQuery() throws ResourceException {
         QueryRequest pagedRequest = makePagedQueryRequest(1, 0);
         Promise<QueryResponse, ResourceException> result =
-                QueryResponsePresentation.perform(mockHandler, pagedRequest, makeJsonValues("abc,def,ghj"), NAME_POINTER);
+                QueryResponsePresentation.perform(mockHandler, pagedRequest, makeResourceResponses("abc,def,ghj"));
         assertThat(result.getOrThrowUninterruptibly().getTotalPagedResults()).isEqualTo(3);
     }
 
@@ -151,7 +126,7 @@ public class QueryResponsePresentationTest {
     public void shouldCountRemainingPagedResultsFromQueryUsingDeprecatedFlag() throws ResourceException {
         QueryRequest deprecatedRequest = makeDeprecatedQueryRequest(1, 0);
         Promise<QueryResponse, ResourceException> result =
-                QueryResponsePresentation.perform(mockHandler, deprecatedRequest, makeJsonValues("abc,def,ghj"), NAME_POINTER);
+                QueryResponsePresentation.perform(mockHandler, deprecatedRequest, makeResourceResponses("abc,def,ghj"));
         assertThat(result.getOrThrowUninterruptibly().getRemainingPagedResults()).isEqualTo(2);
     }
 
@@ -159,7 +134,7 @@ public class QueryResponsePresentationTest {
     public void shouldCountRemainingPagedResultsWhenPageOffsetSpecifiedAndDeprecatedEnabled() throws ResourceException {
         QueryRequest deprecatedRequest = makeDeprecatedQueryRequest(1, 1);
         Promise<QueryResponse, ResourceException> result =
-                QueryResponsePresentation.perform(mockHandler, deprecatedRequest, makeJsonValues("abc,def,ghj"), NAME_POINTER);
+                QueryResponsePresentation.perform(mockHandler, deprecatedRequest, makeResourceResponses("abc,def,ghj"));
         assertThat(result.getOrThrowUninterruptibly().getRemainingPagedResults()).isEqualTo(1);
     }
 
@@ -168,14 +143,14 @@ public class QueryResponsePresentationTest {
     @Test
     public void shouldSortResultsBeforeHandling()  {
         QueryRequest sortedRequest = makeSortedQueryRequest("^name");
-        QueryResponsePresentation.perform(mockHandler, sortedRequest, makeJsonValues("ghj,def,abc"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, sortedRequest, makeResourceResponses("ghj,def,abc"));
         assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("abc");
     }
 
     @Test
     public void shouldSortResultsUsingMultiLevelSort() {
         QueryRequest multiLevelRequest = makeSortedQueryRequest("^name", "^place");
-        QueryResponsePresentation.perform(mockHandler, multiLevelRequest, makeJsonValues("weasel->forest,badger->town,badger->village"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, multiLevelRequest, makeResourceResponses("weasel->forest,badger->town,badger->village"));
         assertThat(captor.getAllValues().get(0).getContent().get("name").asString()).isEqualTo("badger");
         assertThat(captor.getAllValues().get(0).getContent().get("place").asString()).isEqualTo("town");
     }
@@ -183,7 +158,7 @@ public class QueryResponsePresentationTest {
     @Test
     public void shouldSortResultsUsingMultiLevelWithDescending() {
         QueryRequest descendingRequest = makeSortedQueryRequest("^name", "place");
-        QueryResponsePresentation.perform(mockHandler, descendingRequest, makeJsonValues("weasel->forest,badger->town,badger->village"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, descendingRequest, makeResourceResponses("weasel->forest,badger->town,badger->village"));
         assertThat(captor.getAllValues().get(0).getContent().get("name").asString()).isEqualTo("badger");
         assertThat(captor.getAllValues().get(0).getContent().get("place").asString()).isEqualTo("village");
     }
@@ -191,21 +166,21 @@ public class QueryResponsePresentationTest {
     @Test
     public void shouldLeaveResultsUnsortedIfErrorDuringSorting() {
         QueryRequest incorrectRequest = makeSortedQueryRequest("^wibble");
-        QueryResponsePresentation.perform(mockHandler, incorrectRequest, makeJsonValues("weasel->forest,badger->town,badger->village"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, incorrectRequest, makeResourceResponses("weasel->forest,badger->town,badger->village"));
         assertThat(captor.getAllValues().get(0).getContent().get("name").asString()).isEqualTo("weasel");
     }
 
     @Test
     public void shouldSortUsingNullValues()  {
         QueryRequest sortedRequest = makeSortedQueryRequest("^name");
-        QueryResponsePresentation.perform(mockHandler, sortedRequest, makeJsonValues("NULL,ferret,badger"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, sortedRequest, makeResourceResponses("NULL,ferret,badger"));
         assertThat(extractId(captor.getAllValues(), 0)).isNull();
     }
 
     @Test
     public void shouldSortMultiLevelUsingNullValues()  {
         QueryRequest sortedRequest = makeSortedQueryRequest("name", "^place");
-        QueryResponsePresentation.perform(mockHandler, sortedRequest, makeJsonValues("weasel->NULL,weasel->woods,badger->forrest"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, sortedRequest, makeResourceResponses("weasel->NULL,weasel->woods,badger->forrest"));
         assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("weasel");
         assertThat(captor.getAllValues().get(0).getContent().get("place").asString()).isNull();
     }
@@ -213,7 +188,7 @@ public class QueryResponsePresentationTest {
     @Test
     public void shouldSortMultiLevelUsingNullValues2()  {
         QueryRequest sortedRequest = makeSortedQueryRequest("name", "place");
-        QueryResponsePresentation.perform(mockHandler, sortedRequest, makeJsonValues("weasel->NULL,weasel->woods,badger->forrest"), NAME_POINTER);
+        QueryResponsePresentation.perform(mockHandler, sortedRequest, makeResourceResponses("weasel->NULL,weasel->woods,badger->forrest"));
         assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("weasel");
         assertThat(captor.getAllValues().get(0).getContent().get("place").asString()).isEqualTo("woods");
     }
@@ -257,8 +232,8 @@ public class QueryResponsePresentationTest {
     }
 
     /**
-     * A simple mapping function that takes an encoded string and converts this
-     * to a JsonValue.
+     * A simple mapping function that takes encoded strings and converts them
+     * to ResourceResponses.
      *
      * Format:
      *
@@ -277,11 +252,11 @@ public class QueryResponsePresentationTest {
      * }
      * </code>
      *
-     * The symbol NULL will be replaced with null.
+     * The symbol NULL will be replaced with null. The id of the resource is set to name.
      */
-    private static List<JsonValue> makeJsonValues(String format) {
-        List<JsonValue> values = new ArrayList<>();
-        for (String item : format.split(",")) {
+    private static List<ResourceResponse> makeResourceResponses(String raw) {
+        List<ResourceResponse> responses = new ArrayList<>();
+        for (String item : raw.split(",")) {
             String name;
             String place;
             if (item.contains("->")) {
@@ -300,9 +275,11 @@ public class QueryResponsePresentationTest {
                 place = null;
             }
 
-            values.add(JsonValueBuilder.jsonValue().put("name", name).put("place", place).build());
+            JsonValue value  = JsonValueBuilder.jsonValue().put("name", name).put("place", place).build();
+            responses.add(Responses.newResourceResponse(name, null, value));
         }
-        return values;
+
+        return responses;
     }
 
     private static String extractId(List<ResourceResponse> results, int position) {

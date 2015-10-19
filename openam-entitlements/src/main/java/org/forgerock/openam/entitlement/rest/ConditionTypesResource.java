@@ -164,8 +164,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
-        final Set<String> conditionTypeNames = new TreeSet<String>();
-        List<JsonValue> conditionTypes = new ArrayList<JsonValue>();
+        final Set<String> conditionTypeNames = new TreeSet<>();
+        List<ResourceResponse> conditionTypes = new ArrayList<>();
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
@@ -187,12 +187,12 @@ public class ConditionTypesResource implements CollectionResourceProvider {
                     LogicalCondition.class.isAssignableFrom(conditionClass));
 
             if (json != null) {
-                conditionTypes.add(json);
+                conditionTypes.add(newResourceResponse(json.get(JSON_OBJ_TITLE).asString(), null, json));
             }
         }
 
         QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-        return QueryResponsePresentation.perform(handler, request, conditionTypes, JSON_POINTER_TO_TITLE);
+        return QueryResponsePresentation.perform(handler, request, conditionTypes);
     }
 
     /**

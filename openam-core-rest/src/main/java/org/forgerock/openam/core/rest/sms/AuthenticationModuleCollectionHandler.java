@@ -17,18 +17,12 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.*;
-import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.AccessController;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -42,6 +36,7 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -109,6 +104,8 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
             AMAuthenticationManager mgr = new AMAuthenticationManager(ssoToken, realm);
             Set<AMAuthenticationInstance> moduleInstances = mgr.getAuthenticationInstances();
 
+            List<ResourceResponse> resourceResponses = new ArrayList<>();
+
             for (AMAuthenticationInstance instance : moduleInstances) {
                 String name = instance.getName();
                 if (searchForId == null || searchForId.equalsIgnoreCase(name)) {
@@ -120,7 +117,8 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
                                 field(ResourceResponse.FIELD_CONTENT_ID, name),
                                 field("typeDescription", typeDescription),
                                 field("type", type)));
-                        handler.handleResource(newResourceResponse(name, String.valueOf(result.hashCode()), result));
+
+                        resourceResponses.add(newResourceResponse(name, String.valueOf(result.hashCode()), result));
                     } catch (AMConfigurationException ex) {
                         debug.error("AuthenticationModuleCollectionHandler.handleQuery(): Invalid auth module " +
                                 "instance configuration: {}", name);
@@ -133,7 +131,7 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
                 }
             }
 
-            return newResultPromise(newQueryResponse());
+            return QueryResponsePresentation.perform(handler, request, resourceResponses);
 
         } catch (AMConfigurationException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: AMConfigurationException on create", e);

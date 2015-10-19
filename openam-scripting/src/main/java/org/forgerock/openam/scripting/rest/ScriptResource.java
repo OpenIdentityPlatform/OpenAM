@@ -24,7 +24,6 @@ import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -175,13 +174,14 @@ public class ScriptResource extends RealmAwareResource {
                 configs = serviceFactory.create(getContextSubject(context), getRealm(context)).get(stringQueryFilter);
             }
 
-            Collection<JsonValue> results = new ArrayList<>();
+            List<ResourceResponse> results = new ArrayList<>();
             for (ScriptConfiguration configuration : configs) {
-                results.add(asJson(configuration));
+                String id = configuration.getId();
+                results.add(newResourceResponse(id, null, asJson(configuration)));
             }
 
             QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
-            return QueryResponsePresentation.perform(resultHandler, request, results, new JsonPointer(JSON_UUID));
+            return QueryResponsePresentation.perform(resultHandler, request, results);
         } catch (ScriptException se) {
             return exceptionMappingHandler.handleError(context, request, se).asPromise();
         }
