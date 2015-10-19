@@ -49,12 +49,15 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSNotificationManager;
 import com.sun.identity.sm.SMSObjectListener;
 import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.collect.Maps;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.http.routing.RoutingMode;
@@ -89,7 +92,7 @@ import org.forgerock.util.promise.Promise;
  * and resource providers are updated accordingly.
  * @since 13.0.0
  */
-public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
+public class SmsRequestHandler implements RequestHandler, SMSObjectListener, ServiceListener {
 
     static final String COT_CONFIG_SERVICE = "sunFMCOTConfigService";
     static final String IDFF_METADATA_SERVICE = "sunFMIDFFMetadataService";
@@ -210,6 +213,16 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         createServices();
         addSpecialCaseRoutes();
         SMSNotificationManager.getInstance().registerCallbackHandler(this);
+        registerServiceListener();
+    }
+
+    private void registerServiceListener() throws SSOException, SMSException {
+        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        ServiceConfigManager serviceConfigManager = new ServiceConfigManager(ISAuthConstants.AUTH_SERVICE_NAME, token);
+        if (serviceConfigManager.addListener(this) == null) {
+            debug.error("Could not add listener to ServiceConfigManager instance. Auth Module " +
+                    "changes will not be dynamically updated");
+        }
     }
 
     private void addSpecialCaseRoutes() {
@@ -318,6 +331,23 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             debug.error("Could not recreate SMS REST services", e);
         } catch (SMSException e) {
             debug.error("Could not recreate SMS REST services", e);
+        }
+    }
+
+    @Override
+    public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent,
+            int type) {
+        if (ISAuthConstants.AUTH_SERVICE_NAME.equals(serviceName)) {
+            SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            refreshServiceRoute(SMSObjectListener.MODIFY, serviceName, version);
+            for (String authModuleService : AMAuthenticationManager.getAuthenticationServiceNames()) {
+                try {
+                    refreshServiceRoute(SMSObjectListener.MODIFY, authModuleService,
+                            new ServiceSchemaManager(authModuleService, token).getVersion());
+                } catch (SMSException | SSOException e) {
+                    debug.warning("Could not refresh service: {} as could not work out its version", authModuleService);
+                }
+            }
         }
     }
 
@@ -638,4 +668,16 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             return serviceName.equals(name);
         }
     }
+
+    @Override
+    public void schemaChanged(String serviceName, String version) {
+        // no-op
+    }
+
+    @Override
+    public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
+            String serviceComponent, int type) {
+        // no-op
+    }
+
 }
