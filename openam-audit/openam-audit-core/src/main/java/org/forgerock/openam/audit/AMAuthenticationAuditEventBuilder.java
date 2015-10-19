@@ -26,7 +26,6 @@ import java.util.Map;
 
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putComponent;
 
-import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putContexts;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putRealm;
 
 /**
@@ -36,29 +35,6 @@ import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putRealm;
  */
 public class AMAuthenticationAuditEventBuilder extends
         AuthenticationAuditEventBuilder<AMAuthenticationAuditEventBuilder> {
-
-    /**
-     * Provide value for "contexts" audit log field.
-     *
-     * @param contexts Map "contexts" value.
-     * @return this builder for method chaining.
-     */
-    public AMAuthenticationAuditEventBuilder contexts(Map<String, String> contexts) {
-        putContexts(jsonValue, contexts);
-        return this;
-    }
-
-    /**
-     * Provide single value which will be used in "contexts" audit log field.
-     *
-     * @param context   Context key which will be used in the "contexts" audit log field.
-     * @param contextId Context key which will be used in the "contexts" audit log field.
-     * @return this builder for method chaining.
-     */
-    public AMAuthenticationAuditEventBuilder context(AuditConstants.Context context, String contextId) {
-        putContexts(jsonValue, Collections.singletonMap(context.toString(), contextId));
-        return this;
-    }
 
     /**
      * Provide value for "realm" audit log field.

@@ -107,7 +107,6 @@ import java.util.Set;
 import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGIN_MODULE_COMPLETED;
 import static org.forgerock.openam.audit.AuditConstants.EventOutcome.AM_LOGIN_MODULE_OUTCOME_SUCCESS;
 import static org.forgerock.openam.audit.AuditConstants.EventOutcome.AM_LOGIN_MODULE_OUTCOME_FAILURE;
-import static org.forgerock.openam.audit.AuditConstants.Context.AUTH;
 
 /**
  * An abstract class which implements JAAS LoginModule, it provides
@@ -2095,8 +2094,6 @@ public abstract class AMLoginModule implements LoginModule {
      * @param moduleName name of module
      */
     private void setSuccessModuleName(String moduleName) {
-        //-----------------------------------
-
         if (auditor == null) {
             auditor = InjectorHolder.getInstance(LegacyAuthenticationEventAuditor.class);
         }
@@ -2135,7 +2132,7 @@ public abstract class AMLoginModule implements LoginModule {
             long time = Calendar.getInstance().getTimeInMillis();
 
             String sessionId = getSessionId();
-            Map<String, String> contextsMap = new HashMap<>();
+            Set<String> trackingIds = null;
             if (sessionId != null) {
                 InternalSession session = AuthD.getSession(new SessionID(sessionId));
                 String sessionContext = null;
@@ -2143,7 +2140,8 @@ public abstract class AMLoginModule implements LoginModule {
                     sessionContext = session.getProperty(Constants.AM_CTX_ID);
                 }
                 if (StringUtils.isNotEmpty(sessionContext)) {
-                    contextsMap.put(AUTH.toString(), sessionContext);
+                    trackingIds = new HashSet<>();
+                    trackingIds.add(sessionContext);
                 }
             }
 
@@ -2155,10 +2153,8 @@ public abstract class AMLoginModule implements LoginModule {
             }
 
             auditor.audit(null, AM_LOGIN_MODULE_COMPLETED.toString(), AuditRequestContext.getTransactionIdValue(),
-                    authentication, realmName, time, contextsMap, entries);
+                    authentication, realmName, time, trackingIds, entries);
         }
-
-        //-----------------------------------
 
         // get login state for this authentication session
         if (loginState == null) {
@@ -2346,8 +2342,6 @@ public abstract class AMLoginModule implements LoginModule {
      */
     
     private void setFailureModuleName(String moduleName) {
-        //-----------------------------------
-
         if (auditor == null) {
             auditor = InjectorHolder.getInstance(LegacyAuthenticationEventAuditor.class);
         }
@@ -2387,7 +2381,7 @@ public abstract class AMLoginModule implements LoginModule {
             long time = Calendar.getInstance().getTimeInMillis();
 
             String sessionId = getSessionId();
-            Map<String, String> contextsMap = new HashMap<>();
+            Set<String> trackingIds = null;
             if (sessionId != null) {
                 InternalSession session = AuthD.getSession(new SessionID(sessionId));
                 String sessionContext = null;
@@ -2395,7 +2389,8 @@ public abstract class AMLoginModule implements LoginModule {
                     sessionContext = session.getProperty(Constants.AM_CTX_ID);
                 }
                 if (StringUtils.isNotEmpty(sessionContext)) {
-                    contextsMap.put(AUTH.toString(), sessionContext);
+                    trackingIds = new HashSet<>();
+                    trackingIds.add(sessionContext);
                 }
             }
 
@@ -2415,10 +2410,8 @@ public abstract class AMLoginModule implements LoginModule {
             }
 
             auditor.audit(null, AM_LOGIN_MODULE_COMPLETED.toString(), AuditRequestContext.getTransactionIdValue(),
-                    authentication, realmName, time, contextsMap, entries);
+                    authentication, realmName, time, trackingIds, entries);
         }
-
-        //-----------------------------------
 
         // get login state for this authentication session
         if (loginState == null) {

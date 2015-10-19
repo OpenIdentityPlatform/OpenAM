@@ -87,6 +87,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -97,11 +98,9 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static org.forgerock.openam.audit.AuditConstants.Context.SESSION;
 import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGIN_CHAIN_COMPLETED;
 import static org.forgerock.openam.audit.AuditConstants.Event.AM_LOGOUT;
 import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
-import static org.forgerock.openam.audit.AuditConstants.Context.AUTH;
 
 /**
  * This class is used to initialize the Authentication service and retrieve 
@@ -711,8 +710,6 @@ public class AuthD implements ConfigurationListener {
 
             String[] data = dataList.toArray(new String[dataList.size()]);
 
-            //----------------------------------
-
             if (auditor == null) {
                 auditor = InjectorHolder.getInstance(LegacyAuthenticationEventAuditor.class);
             }
@@ -738,10 +735,10 @@ public class AuthD implements ConfigurationListener {
 
                 long time = Calendar.getInstance().getTimeInMillis();
 
-                Map<String, String> contexts = null;
+                Set<String> trackingIds = null;
                 if (StringUtils.isNotEmpty(contextId)) {
-                    contexts = new HashMap<>();
-                    contexts.put(AuditConstants.Context.SESSION.toString(), contextId);
+                    trackingIds = new HashSet<>();
+                    trackingIds.add(contextId);
                 }
 
                 AMIdentity identity = cw.getIdentity(userDN, realmName);
@@ -762,10 +759,8 @@ public class AuthD implements ConfigurationListener {
                 entries = Collections.singletonList(entry);
 
                 auditor.audit(messageName, AM_LOGOUT.toString(), AuditRequestContext.getTransactionIdValue(),
-                        authentication, realmName, time, contexts, entries);
+                        authentication, realmName, time, trackingIds, entries);
             }
-
-            //----------------------------------
 
             this.logIt(data, LOG_ACCESS, messageId.toString(), props);
         } catch (SSOException ssoExp) {
@@ -802,8 +797,6 @@ public class AuthD implements ConfigurationListener {
                         (LogMessageProviderBase) MessageProviderFactory.getProvider(
                                 "Authentication");
 
-                //----------------------------------
-
                 if (auditor == null) {
                     auditor = InjectorHolder.getInstance(LegacyAuthenticationEventAuditor.class);
                 }
@@ -822,17 +815,20 @@ public class AuthD implements ConfigurationListener {
 
                         long time = Calendar.getInstance().getTimeInMillis();
 
-                        Map<String, String> contexts = null;
+                        Set<String> trackingIds = null;
                         if (StringUtils.isNotEmpty(contextID)) {
-                            contexts = new HashMap<>();
-                            contexts.put(AUTH.toString(), contextID);
+                            trackingIds = new HashSet<>();
+                            trackingIds.add(contextID);
                         }
                         if (StringUtils.isNotEmpty(LoginIDSid)) {
                             InternalSession session = AuthD.getSession(new SessionID(LoginIDSid));
-                            String sessionContext = null;
+                            String sessionContext;
                             if (session != null) {
+                                if (trackingIds == null) {
+                                    trackingIds = new HashSet<>();
+                                }
                                 sessionContext = session.getProperty(Constants.AM_CTX_ID);
-                                contexts.put(SESSION.toString(), sessionContext);
+                                trackingIds.add(sessionContext);
                             }
                         }
 
@@ -864,11 +860,9 @@ public class AuthD implements ConfigurationListener {
                         }
 
                         auditor.audit(messageName, description, AuditRequestContext.getTransactionIdValue(),
-                                authentication, realmName, time, contexts, entries);
+                                authentication, realmName, time, trackingIds, entries);
                     }
                 }
-
-                //----------------------------------
 
                 com.sun.identity.log.LogRecord lr = null;
                 

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Delegate auditor responsible for creating and publishing authentication and activity audit events specifically for
@@ -77,12 +78,12 @@ public class LegacyAuthenticationEventAuditor {
      * @param authentication The authentication details for the audit event. Cannot be null.
      * @param realmName The realm name for the audit event. May be null.
      * @param time The time the audit event occurred. May be null.
-     * @param contexts Any contexts for the audit event. May be null.
+     * @param trackingIds Any tracking ids for the audit event. May be null.
      * @param entries Any extra information for the audit event. May be null.
      * @return true if the event was handled, false if there was some sort of problem.
      */
     public boolean audit(String eventName, String eventDescription, String transactionId, String authentication,
-                         String realmName, long time, Map<String, String> contexts, List<Entry> entries) {
+                         String realmName, long time, Set<String> trackingIds, List<Entry> entries) {
         Reject.ifNull(transactionId, "The transactionId field cannot be null");
         Reject.ifNull(authentication, "The authentication field cannot be null");
         Reject.ifNull(eventDescription, "The eventDescription field cannot be null");
@@ -100,19 +101,19 @@ public class LegacyAuthenticationEventAuditor {
         //(any remaining events are purely authentication events)
 
         if (isAuthenticationEvent) {
-            return auditAuthenticationEvent(eventDescription, transactionId, authentication, realmName, time, contexts,
-                    entries);
+            return auditAuthenticationEvent(eventDescription, transactionId, authentication, realmName, time,
+                    trackingIds, entries);
         }
 
         if (isActivityEvent) {
-            return auditActivityEvent(eventDescription, transactionId, authentication, realmName, time, contexts);
+            return auditActivityEvent(eventDescription, transactionId, authentication, realmName, time, trackingIds);
         }
 
         return false;
     }
 
     private boolean auditAuthenticationEvent(String description, String transactionId, String authentication,
-                                             String realmName, long time, Map<String, String> contexts,
+                                             String realmName, long time, Set<String> trackingIds,
                                              List<Entry> entries) {
         boolean couldHandleEvent = true;
 
@@ -129,8 +130,8 @@ public class LegacyAuthenticationEventAuditor {
         if (StringUtils.isNotEmpty(realmName)) {
             builder.realm(realmName);
         }
-        if (contexts != null && !contexts.isEmpty()) {
-            builder.contexts(contexts);
+        if (trackingIds != null && !trackingIds.isEmpty()) {
+            builder.trackingIds(trackingIds);
         }
         if (entries != null && !entries.isEmpty()) {
             List<Map<String, Object>> list = new ArrayList<>();
@@ -154,7 +155,7 @@ public class LegacyAuthenticationEventAuditor {
     }
 
     private boolean auditActivityEvent(String description, String transactionId, String authentication,
-                                       String realmName, long time, Map<String, String> contexts) {
+                                       String realmName, long time, Set<String> trackingIds) {
         boolean couldHandleEvent = true;
 
         AMActivityAuditEventBuilder builder = activityAuditor.activityEvent();
@@ -170,8 +171,8 @@ public class LegacyAuthenticationEventAuditor {
         if (StringUtils.isNotEmpty(realmName)) {
             builder.realm(realmName);
         }
-        if (contexts != null && !contexts.isEmpty()) {
-            builder.contexts(contexts);
+        if (trackingIds != null && !trackingIds.isEmpty()) {
+            builder.trackingIds(trackingIds);
         }
 
         try {
