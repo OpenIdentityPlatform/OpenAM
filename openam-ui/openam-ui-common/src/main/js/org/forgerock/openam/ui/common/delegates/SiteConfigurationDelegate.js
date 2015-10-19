@@ -22,17 +22,17 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global $, define, _, location */
-
+/*global define */
 define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
+    "jquery",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function(constants, AbstractDelegate, configuration, eventManager, RealmHelper, URIUtils) {
-    var obj = new AbstractDelegate(constants.host + "/" + constants.context ),
+], function ($, constants, AbstractDelegate, configuration, eventManager, RealmHelper, URIUtils) {
+    var obj = new AbstractDelegate(constants.host + "/" + constants.context),
         lastKnownSubRealm,
         lastKnownOverrideRealm;
 
@@ -41,8 +41,8 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
      * @param {Function} successCallback Success callback function
      * @param {Function} errorCallback   Error callback function
      */
-    obj.getConfiguration = function(successCallback, errorCallback) {
-        if(!configuration.globalData.auth.subRealm) {
+    obj.getConfiguration = function (successCallback, errorCallback) {
+        if (!configuration.globalData.auth.subRealm) {
             try {
                 console.debug("No current SUB REALM was detected. Applying from current URI values...");
                 var subRealm = RealmHelper.getSubRealm();
@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
 
                 lastKnownSubRealm = RealmHelper.getSubRealm();
                 lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
-            } catch(error) {
+            } catch (error) {
                 console.debug("Unable to applying sub realm from URI values");
             }
         }
@@ -61,7 +61,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
             url: RealmHelper.decorateURIWithRealm("/json/__subrealm__/serverinfo/*"),
             suppressEvents: true,
-            success: function(response) {
+            success: function (response) {
                 var hostname = location.hostname,
                     fqdn = response.FQDN;
 
@@ -79,12 +79,13 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     /**
      * Checks for a change of realm
      */
-    obj.checkForDifferences = function(route, params) {
-        if(lastKnownSubRealm !== RealmHelper.getSubRealm() || lastKnownOverrideRealm !== RealmHelper.getOverrideRealm()) {
-            var currentSubRealm = RealmHelper.getSubRealm(),
-                currentOverrideRealm = RealmHelper.getOverrideRealm();
-
-            if(currentSubRealm !== lastKnownSubRealm) {
+    obj.checkForDifferences = function (route, params) {
+        var currentSubRealm = RealmHelper.getSubRealm(),
+            currentOverrideRealm = RealmHelper.getOverrideRealm(),
+            subRealmChanged = lastKnownSubRealm !== currentSubRealm,
+            overrideRealmChanged = lastKnownOverrideRealm !== currentOverrideRealm;
+        if (subRealmChanged || overrideRealmChanged) {
+            if (currentSubRealm !== lastKnownSubRealm) {
                 console.debug("Changing SUB REALM from '" + lastKnownSubRealm + "' to '" + currentSubRealm + "'");
                 configuration.globalData.auth.subRealm = currentSubRealm;
                 lastKnownSubRealm = currentSubRealm;
@@ -94,10 +95,10 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
 
             return obj.serviceCall({
                 type: "GET",
-                headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
                 url: RealmHelper.decorateURIWithRealm("/json/__subrealm__/serverinfo/*"),
                 errorsHandlers: {
-                    "unauthorized": { status: "401"},
+                    "unauthorized": { status: "401" },
                     "Bad Request": {
                         status: "400",
                         event: constants.EVENT_INVALID_REALM

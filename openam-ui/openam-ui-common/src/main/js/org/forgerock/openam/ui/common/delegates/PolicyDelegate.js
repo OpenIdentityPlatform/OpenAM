@@ -22,107 +22,138 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global $, define, _ */
+/*global define */
 /*jslint sub:true */
-
 define("org/forgerock/openam/ui/common/delegates/PolicyDelegate", [
+    "jquery",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
-], function (constants, AbstractDelegate) {
+], function ($, constants, AbstractDelegate) {
     var obj = new AbstractDelegate("/policy");
 
     obj.readEntity = function (baseEntity, callback) {
-        // this is a mock server call, responding with what would be expected of a server-side policy validation service.
+        // this is a mock server call, responding with what would be expected of a server-side policy validation service
         // (for example, as implemented in OpenIDM)
         var promise = $.Deferred(),
             functions = {
-                "required": "\nfunction (fullObject, value, params, propName) {\n    if (value === undefined) {\n        return [{\"policyRequirement\":\"REQUIRED\"}];\n    }\n    return [];\n}\n",
-                "not-empty": "\nfunction (fullObject, value, params, property) {\n    if (value !== undefined && (value === null || !value.length)) {\n        return [{\"policyRequirement\":\"REQUIRED\"}];\n    } else {\n        return [];\n    }\n}\n",
-                "valid-phone-format": "\nfunction (fullObject, value, params, property) {\n    var phonePattern = /^\\+?([0-9\\- \\(\\)])*$/;\n    \n        if (typeof(value) === \"string\" && value.length && !phonePattern.test(value)) {\n            return [ {\"policyRequirement\": \"VALID_PHONE_FORMAT\"}];\n        } else {\n            return [];\n        }\n    }",
-                "valid-email-address-format": "\nfunction (fullObject, value, params, property) {\n    var emailPattern = /^([A-Za-z0-9_\\-\\.])+\\@([A-Za-z0-9_\\-\\.])+\\.([A-Za-z]{2,4})$/; \n        \n        if (typeof(value) === \"string\" && value.length && !emailPattern.test(value)) {\n            return [ {\"policyRequirement\": \"VALID_EMAIL_ADDRESS_FORMAT\"}];\n        } else {\n            return [];\n        }\n    }"
+                "required": "\n" +
+                    "function (fullObject, value, params, propName) {\n" +
+                    "    if (value === undefined) {\n" +
+                    "        return [{\"policyRequirement\":\"REQUIRED\"}];\n" +
+                    "    }\n" +
+                    "    return [];\n" +
+                    "}\n",
+                "not-empty": "\n" +
+                    "function (fullObject, value, params, property) {\n" +
+                    "    if (value !== undefined && (value === null || !value.length)) {\n" +
+                    "        return [{\"policyRequirement\":\"REQUIRED\"}];\n" +
+                    "    } else {\n" +
+                    "        return [];\n" +
+                    "    }\n" +
+                    "}\n",
+                "valid-phone-format": "\n" +
+                    "function (fullObject, value, params, property) {\n" +
+                    "    var phonePattern = /^\\+?([0-9\\- \\(\\)])*$/;\n" +
+                    "    \n" +
+                    "        if (typeof(value) === \"string\" && value.length && !phonePattern.test(value)) {\n" +
+                    "            return [ {\"policyRequirement\": \"VALID_PHONE_FORMAT\"}];\n" +
+                    "        } else {\n" +
+                    "            return [];\n" +
+                    "        }\n" +
+                    "    }",
+                "valid-email-address-format": "\n" +
+                    "function (fullObject, value, params, property) {\n" +
+                    "    var emailPattern = /^([A-Za-z0-9_\\-\\.])+\\@([A-Za-z0-9_\\-\\.])+\\.([A-Za-z]{2,4})$/; \n" +
+                    "        \n" +
+                    "        if (typeof(value) === \"string\" && value.length && !emailPattern.test(value)) {\n" +
+                    "            return [ {\"policyRequirement\": \"VALID_EMAIL_ADDRESS_FORMAT\"}];\n" +
+                    "        } else {\n" +
+                    "            return [];\n" +
+                    "        }\n" +
+                    "    }"
             },
             response = {};
 
         if (baseEntity.match(new RegExp("users\/[^\/]+$"))) {
             response = {
-                        "resource": baseEntity,
-                        "properties": [
+                "resource": baseEntity,
+                "properties": [
+                    {
+                        "policyRequirements": [
+                            "REQUIRED"
+                        ],
+                        "policies": [
                             {
                                 "policyRequirements": [
                                     "REQUIRED"
                                 ],
-                                "policies": [
-                                    {
-                                        "policyRequirements": [
-                                            "REQUIRED"
-                                        ],
-                                        "policyId": "required",
-                                        "policyFunction": functions["required"]
-                                    },
-                                    {
-                                        "policyRequirements": [
-                                            "REQUIRED"
-                                        ],
-                                        "policyId": "not-empty",
-                                        "policyFunction": functions["not-empty"]
-                                    }
-                                ],
-                                "name": "uid"
+                                "policyId": "required",
+                                "policyFunction": functions["required"]
                             },
+                            {
+                                "policyRequirements": [
+                                    "REQUIRED"
+                                ],
+                                "policyId": "not-empty",
+                                "policyFunction": functions["not-empty"]
+                            }
+                        ],
+                        "name": "uid"
+                    },
+                    {
+                        "policyRequirements": [
+                            "VALID_EMAIL_ADDRESS_FORMAT"
+                        ],
+                        "policies": [
                             {
                                 "policyRequirements": [
                                     "VALID_EMAIL_ADDRESS_FORMAT"
                                 ],
-                                "policies": [
-                                    {
-                                        "policyRequirements": [
-                                            "VALID_EMAIL_ADDRESS_FORMAT"
-                                        ],
-                                        "policyId": "valid-email-address-format",
-                                        "policyFunction": functions["valid-email-address-format"]
-                                    }
+                                "policyId": "valid-email-address-format",
+                                "policyFunction": functions["valid-email-address-format"]
+                            }
+                        ],
+                        "name": "mail"
+                    },
+                    {
+                        "policyRequirements": [
+                            "REQUIRED"
+                        ],
+                        "policies": [
+                            {
+                                "policyRequirements": [
+                                    "REQUIRED"
                                 ],
-                                "name": "mail"
+                                "policyId": "required",
+                                "policyFunction": functions["required"]
                             },
                             {
                                 "policyRequirements": [
                                     "REQUIRED"
                                 ],
-                                "policies": [
-                                    {
-                                        "policyRequirements": [
-                                            "REQUIRED"
-                                        ],
-                                        "policyId": "required",
-                                        "policyFunction": functions["required"]
-                                    },
-                                    {
-                                        "policyRequirements": [
-                                            "REQUIRED"
-                                        ],
-                                        "policyId": "not-empty",
-                                        "policyFunction": functions["not-empty"]
-                                    }
-                                ],
-                                "name": "sn"
-                            },
+                                "policyId": "not-empty",
+                                "policyFunction": functions["not-empty"]
+                            }
+                        ],
+                        "name": "sn"
+                    },
+                    {
+                        "policyRequirements": [
+                            "VALID_PHONE_FORMAT"
+                        ],
+                        "policies": [
                             {
                                 "policyRequirements": [
                                     "VALID_PHONE_FORMAT"
                                 ],
-                                "policies": [
-                                    {
-                                        "policyRequirements": [
-                                            "VALID_PHONE_FORMAT"
-                                        ],
-                                        "policyId": "valid-phone-format",
-                                        "policyFunction": functions["valid-phone-format"]
-                                    }
-                                ],
-                                "name": "telephoneNumber"
+                                "policyId": "valid-phone-format",
+                                "policyFunction": functions["valid-phone-format"]
                             }
-                        ]
-                    };
+                        ],
+                        "name": "telephoneNumber"
+                    }
+                ]
+            };
         }
 
         promise.resolve(response);
@@ -137,6 +168,3 @@ define("org/forgerock/openam/ui/common/delegates/PolicyDelegate", [
 
     return obj;
 });
-
-
-

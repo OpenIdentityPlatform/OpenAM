@@ -14,8 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
-
+/*global define */
 define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     "jquery",
     "underscore",
@@ -196,7 +195,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
             var rawValue = this.model.get(this.column.get("name")),
                 formattedValue = this.formatter.fromRaw(rawValue, this.model),
                 href = _.isFunction(this.column.get("href")) ?
-                    this.column.get("href")(rawValue, formattedValue, this.model) : this.column.get('href');
+                    this.column.get("href")(rawValue, formattedValue, this.model) : this.column.get("href");
 
             this.$el.append($("<a>", {
                 href: href || rawValue,
@@ -215,7 +214,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         gotoUrl: function (e) {
             e.preventDefault();
             var href = $(e.currentTarget).data("href");
-            Router.navigate(href, {trigger: true});
+            Router.navigate(href, { trigger: true });
         }
 
     });
@@ -242,7 +241,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     });
 
     obj.queryFilter = function (data) {
-        if(data === undefined) { data = {}; }
+        if (data === undefined) { data = {}; }
 
         var params = [],
             additionalFilters = data._queryFilter || [],
@@ -258,7 +257,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
             }());
 
         _.each(this.state.filters, function (filter) {
-            if (filter.query() !== '') {
+            if (filter.query() !== "") {
                 params.push(getFilter(filter.name, filter.query()));
             }
         });

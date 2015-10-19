@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
+/*global define */
 define("org/forgerock/openam/ui/common/util/URLHelper", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper",
@@ -23,9 +23,10 @@ define("org/forgerock/openam/ui/common/util/URLHelper", [
     return {
         substitute: function (url) {
             return function () {
-                var realm = AdministeredRealmsHelper.getCurrentRealm();
+                var realm = AdministeredRealmsHelper.getCurrentRealm(),
+                    apiUrlBase = Constants.host + "/" + Constants.context + "/json" + (realm !== "/" ? realm : "");
 
-                return url.replace("__api__", Constants.host + "/" + Constants.context + "/json" + (realm !== "/" ? realm : ""))
+                return url.replace("__api__", apiUrlBase)
                     .replace("__host__", Constants.host)
                     .replace("__context__", Constants.context)
                     .replace("__username__", Configuration.loggedUser.get("username"));

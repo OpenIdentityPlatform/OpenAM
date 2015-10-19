@@ -24,10 +24,10 @@ define("org/forgerock/openam/ui/common/delegates/ServerDelegate", [
      */
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/serverinfo");
 
-    obj.version = function() {
+    obj.version = function () {
         return obj.serviceCall({
             url: "/version"
-        }).then(function(data) {
+        }).then(function (data) {
             return data.version;
         });
     };

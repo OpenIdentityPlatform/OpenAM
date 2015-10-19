@@ -22,8 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
-
+/*global define */
 define([
     "./util/Constants",
     "./util/RealmHelper",

@@ -14,7 +14,7 @@
  * Portions copyright 2014-2015 ForgeRock AS.
  */
 
-/*global define*/
+/*global define */
 define("org/forgerock/openam/ui/common/util/RealmHelper", [
     "underscore",
     "org/forgerock/commons/ui/common/main/Configuration",
