@@ -43,7 +43,6 @@ require.config({
         "bootstrap"               : "libs/bootstrap-3.3.5-custom",
         "bootstrap-datetimepicker": "libs/bootstrap-datetimepicker-4.14.30-min",
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
-        "bootstrap-multiselect"   : "libs/bootstrap-multiselect.0.9.13",
         "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0",
 
         "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-min",
@@ -99,9 +98,6 @@ require.config({
         },
         "bootstrap-dialog": {
             deps: ["jquery", "underscore", "backbone", "bootstrap"]
-        },
-        "bootstrap-multiselect": {
-            deps: ["jquery", "bootstrap"]
         },
         "bootstrap-tabdrop": {
             deps: ["jquery", "bootstrap"]
