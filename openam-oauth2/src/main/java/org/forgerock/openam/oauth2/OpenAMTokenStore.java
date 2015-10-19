@@ -184,8 +184,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
 
         final long currentTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
-        final long exp = TimeUnit.MILLISECONDS.toSeconds(providerSettings.getOpenIdTokenLifetime()) +
-                currentTimeInSeconds;
+        final long exp = providerSettings.getOpenIdTokenLifetime() + currentTimeInSeconds;
                 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
