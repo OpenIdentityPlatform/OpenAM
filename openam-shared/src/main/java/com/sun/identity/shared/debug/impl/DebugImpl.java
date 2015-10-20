@@ -234,7 +234,12 @@ public class DebugImpl implements IDebug {
     private void record(String msg, Throwable th) {
 
         StringBuilder prefix = new StringBuilder();
-        prefix.append(debugName).append(":").append(this.dateFormat.format(new Date())).append(": ").append(Thread
+        String dateFormatted;
+        synchronized (dateFormat) {
+            dateFormatted = this.dateFormat.format(new Date());
+        }
+        
+        prefix.append(debugName).append(":").append(dateFormatted).append(": ").append(Thread
                 .currentThread().toString());
 
         writeIt(prefix.toString(), msg, th);
