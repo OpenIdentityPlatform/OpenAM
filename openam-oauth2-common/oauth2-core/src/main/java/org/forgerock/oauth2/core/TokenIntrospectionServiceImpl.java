@@ -26,7 +26,6 @@ import java.util.TreeSet;
 import javax.inject.Inject;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -61,7 +60,7 @@ public class TokenIntrospectionServiceImpl implements TokenIntrospectionService 
      */
     @Override
     public JsonValue introspect(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
-            NotFoundException, ClientAuthenticationFailedException, ServerException {
+            NotFoundException, ServerException {
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
                 providerSettings.getIntrospectionEndpoint());

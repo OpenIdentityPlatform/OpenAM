@@ -56,6 +56,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -95,10 +96,10 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     private final SSOTokenManager ssoTokenManager;
     private final CookieExtractor cookieExtractor;
     private final SecureRandom secureRandom;
+    private final ClientAuthenticationFailureFactory failureFactory;
 
     /**
      * Constructs a new OpenAMTokenStore.
-     *
      * @param tokenStore An instance of the OAuthTokenStore.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param clientRegistrationStore An instance of the OpenIdConnectClientRegistrationStore.
@@ -106,12 +107,13 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * @param ssoTokenManager An instance of the SSOTokenManager
      * @param cookieExtractor An instance of the CookieExtractor
      * @param auditLogger An instance of OAuth2AuditLogger
+     * @param failureFactory
      */
     @Inject
     public OpenAMTokenStore(OAuthTokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
-            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger, SecureRandom secureRandom) {
+            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger, SecureRandom secureRandom, ClientAuthenticationFailureFactory failureFactory) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.clientRegistrationStore = clientRegistrationStore;
@@ -121,6 +123,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         this.auditLogger = auditLogger;
         this.logger = logger;
         this.secureRandom = secureRandom;
+        this.failureFactory = failureFactory;
     }
 
     /**
@@ -289,7 +292,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             }
 
         } catch (UnauthorizedClientException e) {
-            throw new InvalidClientException(e.getMessage());
+            throw failureFactory.getException(request, e.getMessage());
         }
 
     }
@@ -322,7 +325,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
                     }
                 }
             } catch (UnauthorizedClientException e) {
-                throw new InvalidClientException(e.getMessage());
+                throw failureFactory.getException(request, e.getMessage());
             } catch (JSONException e) {
                 //if claims object not found, fall through
             }

@@ -23,7 +23,7 @@ import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenService;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.restlet.Request;
@@ -82,7 +82,7 @@ public class RefreshTokenResource extends ServerResource {
         } catch (IllegalArgumentException e) {
             throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
                     request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
-        } catch (ClientAuthenticationFailedException e) {
+        } catch (InvalidClientAuthZHeaderException e) {
             getResponse().setChallengeRequests(singletonList(
                     new ChallengeRequest(
                             ChallengeScheme.valueOf(SUPPORTED_RESTLET_CHALLENGE_SCHEMES.get(e.getChallengeScheme())),

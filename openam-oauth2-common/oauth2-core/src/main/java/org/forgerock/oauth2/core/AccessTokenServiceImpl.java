@@ -23,9 +23,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
 import javax.inject.Inject;
+
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
@@ -76,7 +77,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
      * {@inheritDoc}
      */
     public AccessToken requestAccessToken(OAuth2Request request) throws RedirectUriMismatchException,
-            InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException, InvalidCodeException,
+            InvalidClientException, InvalidRequestException, InvalidCodeException,
             InvalidGrantException, ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException {
         final String grantType = request.getParameter(GRANT_TYPE);
         final GrantTypeHandler grantTypeHandler = grantTypeHandlers.get(grantType);
@@ -89,9 +90,9 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     /**
      * {@inheritDoc}
      */
-    public AccessToken refreshToken(OAuth2Request request) throws ClientAuthenticationFailedException,
-            InvalidClientException, InvalidRequestException, BadRequestException, ServerException,
-            ExpiredTokenException, InvalidGrantException, InvalidScopeException, NotFoundException {
+    public AccessToken refreshToken(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
+            BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException,
+            InvalidScopeException, NotFoundException {
 
         Reject.ifTrue(isEmpty(request.<String>getParameter(REFRESH_TOKEN)), "Missing parameter, 'refresh_token'");
 

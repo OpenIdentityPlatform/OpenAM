@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.assertj.core.data.Offset.offset;
 import static java.util.Collections.singletonMap;
 
+import com.iplanet.services.cdm.Client;
 import com.iplanet.sso.SSOTokenManager;
 
 import java.security.SecureRandom;
@@ -33,13 +34,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.identity.shared.debug.Debug;
 
-import org.assertj.core.data.Offset;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.DeviceCode;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -66,6 +68,7 @@ public class OpenAMTokenStoreTest {
     private Request request;
     private OAuth2AuditLogger auditLogger;
     private Debug debug;
+    private ClientAuthenticationFailureFactory failureFactory;
 
     @BeforeMethod
     public void setUp() {
@@ -79,9 +82,17 @@ public class OpenAMTokenStoreTest {
         cookieExtractor = mock(CookieExtractor.class);
         auditLogger = mock(OAuth2AuditLogger.class);
         debug = mock(Debug.class);
+        failureFactory = mock(ClientAuthenticationFailureFactory.class);
+
+        ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
+        InvalidClientException expectedResult = mock(InvalidClientException.class);
+        when(expectedResult.getError()).thenReturn(new String("invalid_client"));
+        when(failureFactory.getException()).thenReturn(expectedResult);
+        when(failureFactory.getException(anyString())).thenReturn(expectedResult);
+        when(failureFactory.getException(any(OAuth2Request.class), anyString())).thenReturn(expectedResult);
 
         openAMtokenStore = new OpenAMTokenStore(tokenStore, providerSettingsFactory, clientRegistrationStore,
-                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug, new SecureRandom());
+                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory);
     }
 
     @Test
@@ -173,7 +184,7 @@ public class OpenAMTokenStoreTest {
         //Given
         OpenAMTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticTokenStore(tokenStore,
                 providerSettingsFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor,
-                auditLogger, debug, new SecureRandom());
+                auditLogger, debug, new SecureRandom(), failureFactory);
         JsonValue token = json(object(
                 field("tokenName", Collections.singleton("access_token")),
                 field("realm", Collections.singleton("/otherrealm"))));

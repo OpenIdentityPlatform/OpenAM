@@ -35,6 +35,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -67,10 +68,17 @@ public class DeviceTokenResourceTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
+        InvalidClientException expectedResult = mock(InvalidClientException.class);
+        when(expectedResult.getError()).thenReturn(new String("invalid_client"));
+        when(failureFactory.getException()).thenReturn(expectedResult);
+        when(failureFactory.getException(anyString())).thenReturn(expectedResult);
+        when(failureFactory.getException(any(OAuth2Request.class), anyString())).thenReturn(expectedResult);
+
         when(request.getMethod()).thenReturn(Method.POST);
 
         resource = spy(new DeviceTokenResource(tokenStore, mockOAuth2RequestFactory(), clientRegistrationStore,
-                mockProviderSettingsFactory(), null));
+                mockProviderSettingsFactory(), null, failureFactory));
 
         when(providerSettings.getDeviceCodePollInterval()).thenReturn(5);
 
@@ -95,9 +103,12 @@ public class DeviceTokenResourceTest {
     @Test
     public void shouldCatchInvalidClients() throws Exception {
         // Given
+        InvalidClientException expectedResult = mock(InvalidClientException.class);
+        when(expectedResult.getError()).thenReturn(new String("invalid_client"));
+
         mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
         given(clientRegistrationStore.get(anyString(), any(OAuth2Request.class)))
-                .willThrow(new InvalidClientException());
+                .willThrow(expectedResult);
 
         // When
         try {

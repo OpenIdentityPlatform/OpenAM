@@ -33,7 +33,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
@@ -64,9 +66,10 @@ public class AuthorizationServiceImplTest {
         resourceOwnerConsentVerifier = mock(ResourceOwnerConsentVerifier.class);
         clientRegistrationStore = mock(ClientRegistrationStore.class);
         tokenIssuer = mock(AuthorizationTokenIssuer.class);
+        ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
 
         authorizationService = new AuthorizationServiceImpl(requestValidators, resourceOwnerSessionValidator,
-                providerSettingsFactory, resourceOwnerConsentVerifier, clientRegistrationStore, tokenIssuer);
+                providerSettingsFactory, resourceOwnerConsentVerifier, clientRegistrationStore, tokenIssuer, failureFactory);
 
         providerSettings = mock(OAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);

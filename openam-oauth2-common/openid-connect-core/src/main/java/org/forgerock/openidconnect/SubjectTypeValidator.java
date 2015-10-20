@@ -22,6 +22,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -35,12 +36,14 @@ public class SubjectTypeValidator implements AuthorizeRequestValidator {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
+    private final ClientAuthenticationFailureFactory failureFactory;
 
     @Inject
     public SubjectTypeValidator(OAuth2ProviderSettingsFactory providerSettingsFactory,
-                                OpenIdConnectClientRegistrationStore clientRegistrationStore) {
+            OpenIdConnectClientRegistrationStore clientRegistrationStore, ClientAuthenticationFailureFactory failureFactory) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.clientRegistrationStore = clientRegistrationStore;
+        this.failureFactory = failureFactory;
     }
 
     @Override
@@ -59,7 +62,7 @@ public class SubjectTypeValidator implements AuthorizeRequestValidator {
             }
         }
 
-        throw new InvalidClientException("Server does not support this client's subject type.");
+        throw failureFactory.getException(request, "Server does not support this client's subject type.");
 
     }
 }

@@ -19,22 +19,22 @@ package org.forgerock.oauth2.core.exceptions;
 /**
  * Thrown when client authentication fails.
  *
- * @since 12.0.0
+ * @since 13.0.0
  */
-public class ClientAuthenticationFailedException extends OAuth2Exception {
+public class InvalidClientAuthZHeaderException extends InvalidClientException {
 
     private final String challengeScheme;
     private final String challengeRealm;
 
     /**
-     * Constructs a new ClientAuthenticationFailedException with the specified message, header name and value.
+     * Constructs a new InvalidClientAuthZHeaderException with the specified message, header name and value.
      *
      * @param message The reason for the exception.
      * @param challengeScheme The name of the challenge type for the WWW-Authenticate header.
      * @param challengeRealm The name of the challenge realm for the WWW-Authenticate header.
      */
-    public ClientAuthenticationFailedException(final String message, final String challengeScheme,
-            final String challengeRealm) {
+    InvalidClientAuthZHeaderException(final String message, final String challengeScheme,
+                                             final String challengeRealm) {
         super(401, "invalid_client", message);
         this.challengeScheme = challengeScheme;
         this.challengeRealm = challengeRealm;

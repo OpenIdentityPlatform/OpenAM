@@ -30,6 +30,7 @@ import java.util.Set;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.PEMDecoder;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -49,7 +50,8 @@ public class OpenAMClientRegistrationTest {
     @BeforeMethod
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder(), resolver, providerSettings);
+        ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
+        clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder(), resolver, providerSettings, failureFactory);
     }
 
     @Test

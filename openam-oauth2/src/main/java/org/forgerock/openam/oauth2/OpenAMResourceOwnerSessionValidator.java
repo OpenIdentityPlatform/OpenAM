@@ -70,7 +70,7 @@ import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -261,7 +261,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     private long getMaxAge(OAuth2Request request)
             throws URISyntaxException, AccessDeniedException, ServerException,
             NotFoundException, EncodingException, UnauthorizedClientException, ResourceOwnerAuthenticationRequired,
-            SSOException, ParseException, ClientAuthenticationFailedException, InvalidClientException, InvalidRequestException {
+            SSOException, ParseException, InvalidClientAuthZHeaderException, InvalidClientException, InvalidRequestException {
 
         final ClientCredentials clientCredentials = clientCredentialsReader.extractCredentials(request, null);
 

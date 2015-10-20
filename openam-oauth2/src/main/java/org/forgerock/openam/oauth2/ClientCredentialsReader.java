@@ -26,6 +26,7 @@ import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -44,10 +45,12 @@ public class ClientCredentialsReader {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
+    private final ClientAuthenticationFailureFactory failureFactory;
 
     @Inject
-    public ClientCredentialsReader(OpenIdConnectClientRegistrationStore clientRegistrationStore) {
+    public ClientCredentialsReader(OpenIdConnectClientRegistrationStore clientRegistrationStore, ClientAuthenticationFailureFactory failureFactory) {
         this.clientRegistrationStore = clientRegistrationStore;
+        this.failureFactory = failureFactory;
     }
 
     /**
@@ -98,7 +101,7 @@ public class ClientCredentialsReader {
 
             if (clientId == null || clientId.isEmpty()) {
                 logger.error("Client Id is not set");
-                throw new InvalidClientException("Client authentication failed");
+                throw failureFactory.getException(request, "Client authentication failed");
             }
 
             client = new ClientCredentials(clientId, clientSecret == null ? null : clientSecret.toCharArray(), false,
@@ -112,7 +115,7 @@ public class ClientCredentialsReader {
         if (scopes.contains(OAuth2Constants.Params.OPENID)
                 && req.getResourceRef().getLastSegment().equals(OAuth2Constants.Params.ACCESS_TOKEN)
                 && !cr.getTokenEndpointAuthMethod().equals(method.getType())) {
-                    throw new InvalidClientException("Invalid authentication method for accessing this endpoint.");
+                    throw failureFactory.getException(request, "Invalid authentication method for accessing this endpoint.");
         }
 
         return client;
@@ -126,20 +129,20 @@ public class ClientCredentialsReader {
         final ClientRegistration clientRegistration = clientRegistrationStore.get(jwt.getSubject(), request);
         
         if (jwt.isExpired()) {
-            throw new InvalidClientException("JWT has expired");
+            throw failureFactory.getException(request, "JWT has expired");
         }
 
         if (!clientRegistration.verifyJwtIdentity(jwt)) {
-            throw new InvalidClientException("JWT is not valid");
+            throw failureFactory.getException(request, "JWT is not valid");
         }
 
         if (basicAuth && jwt.getSubject() != null) {
             logger.error("Client (" + jwt.getSubject() + ") using multiple authentication methods");
-            throw new InvalidRequestException("Client authentication failed");
+            throw failureFactory.getException(request, "Client authentication failed");
         }
 
         if (endpoint != null && !jwt.isIntendedForAudience(endpoint)) {
-            throw new InvalidClientException("Audience validation failed");
+            throw failureFactory.getException(request, "Audience validation failed");
         }
 
         return new ClientCredentials(jwt.getSubject(), null, true, false);

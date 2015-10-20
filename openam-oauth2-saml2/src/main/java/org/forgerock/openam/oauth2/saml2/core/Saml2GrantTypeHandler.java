@@ -16,10 +16,6 @@
 
 package org.forgerock.openam.oauth2.saml2.core;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.SCOPE;
-import static org.forgerock.oauth2.core.Utils.*;
-
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -30,10 +26,6 @@ import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.assertion.SubjectConfirmation;
 import com.sun.identity.saml2.assertion.SubjectConfirmationData;
 import com.sun.identity.saml2.common.SAML2Exception;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import javax.inject.Inject;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
@@ -43,7 +35,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -58,6 +49,15 @@ import org.forgerock.util.encode.Base64;
 import org.restlet.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.SCOPE;
+import static org.forgerock.oauth2.core.Utils.*;
 
 /**
  * @since 12.0.0
@@ -79,7 +79,7 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
     }
 
     public AccessToken handle(OAuth2Request request) throws InvalidGrantException, InvalidClientException,
-            ClientAuthenticationFailedException, InvalidRequestException, ServerException, InvalidScopeException, NotFoundException {
+            InvalidRequestException, ServerException, InvalidScopeException, NotFoundException {
 
         String clientId = request.getParameter(OAuth2Constants.Params.CLIENT_ID);
         Reject.ifTrue(isEmpty(clientId), "Missing parameter, 'client_id'");

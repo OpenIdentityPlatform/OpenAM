@@ -24,6 +24,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -38,9 +39,16 @@ public class SubjectTypeValidatorTest {
 
     @BeforeTest
     public void setUp() {
+
+        ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
+
+        when(failureFactory.getException()).thenReturn(mock(InvalidClientException.class));
+        when(failureFactory.getException(anyString())).thenReturn(mock(InvalidClientException.class));
+        when(failureFactory.getException(any(OAuth2Request.class), anyString())).thenReturn(mock(InvalidClientException.class));
+
         this.mockProviderSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         this.mockClientRegistrationStore = mock(OpenIdConnectClientRegistrationStore.class);
-        this.subjectTypeValidator = new SubjectTypeValidator(mockProviderSettingsFactory, mockClientRegistrationStore);
+        this.subjectTypeValidator = new SubjectTypeValidator(mockProviderSettingsFactory, mockClientRegistrationStore, failureFactory);
     }
 
     @Test

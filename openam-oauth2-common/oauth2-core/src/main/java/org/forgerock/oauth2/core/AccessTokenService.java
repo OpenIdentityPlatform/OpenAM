@@ -17,7 +17,7 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
@@ -50,7 +50,6 @@ public interface AccessTokenService {
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
      * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
-     * @throws ClientAuthenticationFailedException If client authentication fails.
      * @throws InvalidCodeException If the authorization code on the request has expired.
      * @throws ServerException If any internal server error occurs.
      * @throws UnauthorizedClientException If the client's authorization fails.
@@ -58,8 +57,8 @@ public interface AccessTokenService {
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     AccessToken requestAccessToken(OAuth2Request request) throws InvalidGrantException, RedirectUriMismatchException,
-            InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException, InvalidCodeException,
-            ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException;
+            InvalidClientException, InvalidRequestException, InvalidCodeException, ServerException,
+            UnauthorizedClientException, InvalidScopeException, NotFoundException;
 
     /**
      * Handles a request to refresh an already issued access token for a OAuth2 client, validates that the request is
@@ -68,7 +67,6 @@ public interface AccessTokenService {
      *
      * @param request The OAuth2Request for the client requesting an refresh token. Must not be {@code null}.
      * @return An Access Token.
-     * @throws ClientAuthenticationFailedException If client authentication fails.
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
      * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
@@ -79,6 +77,7 @@ public interface AccessTokenService {
      * @throws InvalidGrantException If the given token is not a refresh token.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    AccessToken refreshToken(OAuth2Request request) throws ClientAuthenticationFailedException, InvalidClientException,
-            InvalidRequestException, BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException, InvalidScopeException, NotFoundException;
+    AccessToken refreshToken(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
+            BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException,
+            InvalidScopeException, NotFoundException;
 }
