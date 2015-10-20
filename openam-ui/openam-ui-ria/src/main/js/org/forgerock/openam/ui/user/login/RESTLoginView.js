@@ -19,6 +19,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/CookieHelper",
@@ -27,16 +28,15 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "handlebars",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/util/ModuleLoader",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, AbstractView, AuthNDelegate, Configuration, Constants, CookieHelper, EventManager, Form2js,
-             Handlebars, i18nManager, Messages, ModuleLoader, RESTLoginHelper, RealmHelper, Router, SessionManager,
-             UIUtils, URIUtils) {
+], function ($, _, AbstractView, AuthNDelegate, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager,
+            Form2js, Handlebars, i18nManager, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils,
+            URIUtils) {
 
     function populateTemplate (view, populatedTemplate) {
         // A rendered template will be a string; an error will be an object
@@ -62,26 +62,26 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
         if (Configuration.backgroundLogin) {
             view.reloadData();
-            var args = {
+
+            BootstrapDialog.show({
                 title: $.t("common.form.sessionExpired"),
-                cssClass: "loginDialog",
+                cssClass: "login-dialog",
                 closable: false,
-                message: $(populatedTemplate),
-                onshow: function (dialog) {
-                    view.element = dialog.$modal;
-                    dialog.$modalBody.find("form").removeClass("col-sm-6 col-sm-offset-3");
-                    view.rebind();
+                message: $("<div></div>"),
+                onshow: function () {
+                    var dialog = this;
+                    view.noBaseTemplate = true;
+                    view.element = dialog.message;
+                },
+                onshown: function () {
+                    delete view.noBaseTemplate;
+                    view.element = "#content";
                 }
-            };
-            ModuleLoader.load("org/forgerock/commons/ui/common/components/BootstrapDialog")
-                .then(function (BootstrapDialog) {
-                    BootstrapDialog.show(args);
-                });
+            });
         }
     }
 
     var LoginView = AbstractView.extend({
-
         template: "templates/openam/RESTLoginTemplate.html",
         genericTemplate: "templates/openam/RESTLoginTemplate.html",
         unavailableTemplate: "templates/openam/RESTLoginUnavailableTemplate.html",
@@ -241,7 +241,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 } else { // We aren't logged in yet, so render a form...
                     this.renderForm(reqs, urlParams);
                     promise.resolve();
-
                 }
             }, this))
             .fail(_.bind(function (error) {

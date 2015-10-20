@@ -14,7 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-
 define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
     "jquery",
     "underscore",
