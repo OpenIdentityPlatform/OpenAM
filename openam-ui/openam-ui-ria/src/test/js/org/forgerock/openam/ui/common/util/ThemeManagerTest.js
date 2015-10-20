@@ -352,7 +352,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManagerTest", [
                 QUnit.stop();
                 expect(0);
                 Configuration.loggedUser = {
-                    roles: "ui-admin"
+                    uiroles: "ui-admin"
                 };
                 ThemeManager.getTheme().then(function () {
                     sinon.assert.calledWith(mock$, "<link/>", {
