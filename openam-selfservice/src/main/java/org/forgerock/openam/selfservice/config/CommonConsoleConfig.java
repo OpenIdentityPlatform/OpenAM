@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.selfservice.config;
 
+import java.util.Map;
+
 /**
  * Represents common console configuration used by all self services.
  *
@@ -43,5 +45,20 @@ public interface CommonConsoleConfig extends ConsoleConfig {
      * @return the token expiry time
      */
     long getTokenExpiry();
+
+    /**
+     * Whether the KBA stage is enabled.
+     *
+     * @return whether the KBA stage is enabled
+     */
+    boolean isKbaEnabled();
+
+    /**
+     * Gets the security questions in the expected format:
+     * <pre>Map&lt;id,Map&lt;locale,question&gt;&gt;</pre>
+     *
+     * @return security questions
+     */
+    Map<String, Map<String, String>> getSecurityQuestions();
 
 }

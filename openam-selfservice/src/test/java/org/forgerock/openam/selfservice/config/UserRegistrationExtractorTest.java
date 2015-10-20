@@ -41,6 +41,9 @@ public final class UserRegistrationExtractorTest {
         consoleAttributes.put("forgerockRESTSecuritySelfRegConfirmationUrl", Collections.singleton("someurl"));
         consoleAttributes.put("forgerockRESTSecuritySelfRegTokenTTL", Collections.singleton("1234"));
         consoleAttributes.put("forgerockRESTSecuritySelfRegServiceConfigClass", Collections.singleton("someclass"));
+        consoleAttributes.put("forgerockRESTSecurityKbaEnabled", Collections.singleton("true"));
+        consoleAttributes.put("forgerockRESTSecurityKBAQuestions", Collections.singleton("123|en|abc"));
+        consoleAttributes.put("forgerockRESTSecurityAnswersUserMustProvide", Collections.singleton("3"));
 
         // When
         ConsoleConfigExtractor<UserRegistrationConsoleConfig> extractor = new UserRegistrationExtractor();
@@ -51,6 +54,9 @@ public final class UserRegistrationExtractorTest {
         assertThat(config.getEmailUrl()).isEqualTo("someurl");
         assertThat(config.getTokenExpiry()).isEqualTo(1234L);
         assertThat(config.getConfigProviderClass()).isEqualTo("someclass");
+        assertThat(config.isKbaEnabled()).isTrue();
+        assertThat(config.getSecurityQuestions()).containsEntry("123", Collections.singletonMap("en", "abc"));
+        assertThat(config.getMinAnswersToProvide()).isEqualTo(3);
     }
 
 }

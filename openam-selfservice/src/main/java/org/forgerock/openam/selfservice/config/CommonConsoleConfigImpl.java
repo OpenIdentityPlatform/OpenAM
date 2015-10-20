@@ -17,6 +17,9 @@ package org.forgerock.openam.selfservice.config;
 
 import org.forgerock.util.Reject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Represents common console configuration used by all self services.
  *
@@ -28,12 +31,16 @@ final class CommonConsoleConfigImpl implements CommonConsoleConfig {
     private final boolean enabled;
     private final String emailUrl;
     private final long tokenExpiry;
+    private final boolean kbaEnabled;
+    private final Map<String, Map<String, String>> securityQuestions;
 
     private CommonConsoleConfigImpl(Builder builder) {
         configProviderClass = builder.configProviderClass;
         enabled = builder.enabled;
         emailUrl = builder.emailUrl;
         tokenExpiry = builder.tokenExpiry;
+        kbaEnabled = builder.kbaEnabled;
+        securityQuestions = builder.securityQuestions;
     }
 
     @Override
@@ -56,12 +63,28 @@ final class CommonConsoleConfigImpl implements CommonConsoleConfig {
         return tokenExpiry;
     }
 
+    @Override
+    public boolean isKbaEnabled() {
+        return kbaEnabled;
+    }
+
+    @Override
+    public Map<String, Map<String, String>> getSecurityQuestions() {
+        return securityQuestions;
+    }
+
     final static class Builder {
 
         private String configProviderClass;
         private boolean enabled;
         private String emailUrl;
         private long tokenExpiry;
+        private boolean kbaEnabled;
+        private final Map<String, Map<String, String>> securityQuestions;
+
+        Builder() {
+            securityQuestions = new HashMap<>();
+        }
 
         Builder setConfigProviderClass(String configProviderClass) {
             this.configProviderClass = configProviderClass;
@@ -80,6 +103,16 @@ final class CommonConsoleConfigImpl implements CommonConsoleConfig {
 
         Builder setTokenExpiry(long tokenExpiry) {
             this.tokenExpiry = tokenExpiry;
+            return this;
+        }
+
+        Builder setKbaEnabled(boolean kbaEnabled) {
+            this.kbaEnabled = kbaEnabled;
+            return this;
+        }
+
+        Builder setSecurityQuestions(Map<String, Map<String, String>> securityQuestions) {
+            this.securityQuestions.putAll(securityQuestions);
             return this;
         }
 

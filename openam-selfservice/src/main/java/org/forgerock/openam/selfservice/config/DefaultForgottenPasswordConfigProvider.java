@@ -27,6 +27,8 @@ import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.config.StageConfig;
 import org.forgerock.selfservice.stages.email.EmailAccountConfig;
 import org.forgerock.selfservice.stages.email.VerifyUserIdConfig;
+import org.forgerock.selfservice.stages.kba.KbaConfig;
+import org.forgerock.selfservice.stages.kba.SecurityAnswerVerificationConfig;
 import org.forgerock.selfservice.stages.reset.ResetStageConfig;
 import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandlerConfig;
 import org.forgerock.services.context.Context;
@@ -51,9 +53,11 @@ public final class DefaultForgottenPasswordConfigProvider implements ServiceConf
     @Override
     public ProcessInstanceConfig<CustomSupportConfigVisitor> getServiceConfig(
             ForgottenPasswordConsoleConfig config, Context context, String realm) {
-        String serverUrl = config.getEmailUrl() + "&realm=" + realm;
 
-        VerifyUserIdConfig verifyUserIdConfig = new VerifyUserIdConfig(new EmailAccountConfig())
+        List<StageConfig<? super CustomSupportConfigVisitor>> stages = new ArrayList<>();
+
+        String serverUrl = config.getEmailUrl() + "&realm=" + realm;
+        stages.add(new VerifyUserIdConfig(new EmailAccountConfig())
                 .setQueryFields(new HashSet<>(Arrays.asList("uid", "mail")))
                 .setIdentityIdField("/uid/0")
                 .setIdentityEmailField("/mail/0")
@@ -64,11 +68,19 @@ public final class DefaultForgottenPasswordConfigProvider implements ServiceConf
                         + "<h4><a href=\"%link%\">Email verification link</a></h4>")
                 .setEmailMimeType("text/html")
                 .setEmailVerificationLinkToken("%link%")
-                .setEmailVerificationLink(serverUrl);
+                .setEmailVerificationLink(serverUrl));
 
-        ResetStageConfig resetConfig = new ResetStageConfig()
+        if (config.isKbaEnabled()) {
+            stages.add(new SecurityAnswerVerificationConfig(new KbaConfig())
+                    .setQuestions(config.getSecurityQuestions())
+                    .setKbaPropertyName("kbaInformation")
+                    .setNumberOfQuestionsUserMustAnswer(config.getMinQuestionsToAnswer())
+                    .setIdentityServiceUrl("/users"));
+        }
+
+        stages.add(new ResetStageConfig()
                 .setIdentityServiceUrl("/users")
-                .setIdentityPasswordField("userPassword");
+                .setIdentityPasswordField("userPassword"));
 
         String secret = SystemProperties.get(Constants.ENC_PWD_PROPERTY);
         JwtTokenHandlerConfig jwtTokenConfig = new JwtTokenHandlerConfig()
@@ -79,10 +91,6 @@ public final class DefaultForgottenPasswordConfigProvider implements ServiceConf
                 .setEncryptionMethod(EncryptionMethod.A128CBC_HS256)
                 .setJwsAlgorithm(JwsAlgorithm.HS256)
                 .setTokenLifeTimeInSeconds(config.getTokenExpiry());
-
-        List<StageConfig<? super CustomSupportConfigVisitor>> stages = new ArrayList<>();
-        stages.add(verifyUserIdConfig);
-        stages.add(resetConfig);
 
         return new ProcessInstanceConfig<CustomSupportConfigVisitor>()
                 .setStageConfigs(stages)

@@ -16,6 +16,10 @@
 
 package org.forgerock.openam.selfservice.config;
 
+import org.forgerock.util.Reject;
+
+import java.util.Map;
+
 /**
  * Represents forgotten password console configuration.
  *
@@ -24,9 +28,11 @@ package org.forgerock.openam.selfservice.config;
 public final class UserRegistrationConsoleConfig implements CommonConsoleConfig {
 
     private final CommonConsoleConfig commonConfig;
+    private final int minAnswersToProvide;
 
-    UserRegistrationConsoleConfig(CommonConsoleConfig commonConfig) {
-        this.commonConfig = commonConfig;
+    UserRegistrationConsoleConfig(Builder builder) {
+        commonConfig = builder.commonConfig;
+        minAnswersToProvide = builder.minAnswersToProvide;
     }
 
     @Override
@@ -47,6 +53,50 @@ public final class UserRegistrationConsoleConfig implements CommonConsoleConfig 
     @Override
     public long getTokenExpiry() {
         return commonConfig.getTokenExpiry();
+    }
+
+    @Override
+    public boolean isKbaEnabled() {
+        return commonConfig.isKbaEnabled();
+    }
+
+    @Override
+    public Map<String, Map<String, String>> getSecurityQuestions() {
+        return commonConfig.getSecurityQuestions();
+    }
+
+    /**
+     * Get the minimum count of answers to provide.
+     *
+     * @return minimum count
+     */
+    public int getMinAnswersToProvide() {
+        return minAnswersToProvide;
+    }
+
+    static final class Builder {
+
+        private final CommonConsoleConfig commonConfig;
+        private int minAnswersToProvide;
+
+        Builder(CommonConsoleConfig commonConfig) {
+            this.commonConfig = commonConfig;
+        }
+
+        Builder setMinAnswersToProvide(int minAnswersToProvide) {
+            this.minAnswersToProvide = minAnswersToProvide;
+            return this;
+        }
+
+        UserRegistrationConsoleConfig build() {
+            Reject.ifFalse(minAnswersToProvide > 0);
+            return new UserRegistrationConsoleConfig(this);
+        }
+
+    }
+
+    static Builder newBuilder(CommonConsoleConfig commonConfig) {
+        return new Builder(commonConfig);
     }
 
 }

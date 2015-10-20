@@ -17,9 +17,14 @@
 package org.forgerock.openam.selfservice.config;
 
 import static com.sun.identity.shared.datastruct.CollectionHelper.getBooleanMapAttrThrows;
+import static com.sun.identity.shared.datastruct.CollectionHelper.getIntMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getLongMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttrThrows;
+import static com.sun.identity.shared.datastruct.CollectionHelper.getMapSetThrows;
 import static org.forgerock.openam.selfservice.config.CommonConsoleConfigImpl.newBuilder;
+import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.KBA_ENABLED_KEY;
+import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.SECURITY_QUESTIONS_KEY;
+import static org.forgerock.openam.selfservice.config.SecurityQuestionsHelper.parseQuestions;
 
 import com.sun.identity.shared.datastruct.ValueNotFoundException;
 
@@ -37,6 +42,7 @@ public final class ForgottenPasswordExtractor implements ConsoleConfigExtractor<
     private final static String EMAIL_URL_KEY = "forgerockRESTSecurityForgotPassConfirmationUrl";
     private final static String TOKEN_EXPIRY_KEY = "forgerockRESTSecurityForgotPassTokenTTL";
     private final static String SERVICE_CONFIG_CLASS_KEY = "forgerockRESTSecurityForgotPassServiceConfigClass";
+    private final static String MIN_QUESTIONS_TO_ANSWERED_KEY = "forgerockRESTSecurityQuestionsUserMustAnswer";
 
     @Override
     public ForgottenPasswordConsoleConfig extract(Map<String, Set<String>> consoleAttributes) {
@@ -46,9 +52,15 @@ public final class ForgottenPasswordExtractor implements ConsoleConfigExtractor<
                     .setEmailUrl(getMapAttrThrows(consoleAttributes, EMAIL_URL_KEY))
                     .setTokenExpiry(getLongMapAttrThrows(consoleAttributes, TOKEN_EXPIRY_KEY))
                     .setConfigProviderClass(getMapAttrThrows(consoleAttributes, SERVICE_CONFIG_CLASS_KEY))
+                    .setKbaEnabled(getBooleanMapAttrThrows(consoleAttributes, KBA_ENABLED_KEY))
+                    .setSecurityQuestions(parseQuestions(getMapSetThrows(consoleAttributes, SECURITY_QUESTIONS_KEY)))
                     .build();
 
-            return new ForgottenPasswordConsoleConfig(commonConfig);
+            return ForgottenPasswordConsoleConfig
+                    .newBuilder(commonConfig)
+                    .setMinQuestionsToAnswer(getIntMapAttrThrows(consoleAttributes, MIN_QUESTIONS_TO_ANSWERED_KEY))
+                    .build();
+
         } catch (ValueNotFoundException e) {
             throw new IllegalArgumentException("Invalid console values", e);
         }

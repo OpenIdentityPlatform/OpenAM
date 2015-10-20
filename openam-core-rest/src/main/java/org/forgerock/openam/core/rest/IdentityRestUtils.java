@@ -120,7 +120,7 @@ public final class IdentityRestUtils {
                         JsonValue kbaValue = JsonValueBuilder.toJsonValue(kbaString);
                         kbaChildren.add(kbaValue.getObject());
                     }
-                    result.put(USER_KBA_ATTRIBUTE, kbaChildren.toArray(new Object[0]));
+                    result.put(USER_KBA_ATTRIBUTE, kbaChildren);
                 } else {
                     result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
                 }

@@ -41,6 +41,9 @@ public final class ForgottenPasswordExtractorTest {
         consoleAttributes.put("forgerockRESTSecurityForgotPassConfirmationUrl", Collections.singleton("someurl"));
         consoleAttributes.put("forgerockRESTSecurityForgotPassTokenTTL", Collections.singleton("1234"));
         consoleAttributes.put("forgerockRESTSecurityForgotPassServiceConfigClass", Collections.singleton("someclass"));
+        consoleAttributes.put("forgerockRESTSecurityKbaEnabled", Collections.singleton("true"));
+        consoleAttributes.put("forgerockRESTSecurityKBAQuestions", Collections.singleton("123|en|abc"));
+        consoleAttributes.put("forgerockRESTSecurityQuestionsUserMustAnswer", Collections.singleton("3"));
 
         // When
         ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> extractor = new ForgottenPasswordExtractor();
@@ -51,6 +54,9 @@ public final class ForgottenPasswordExtractorTest {
         assertThat(config.getEmailUrl()).isEqualTo("someurl");
         assertThat(config.getTokenExpiry()).isEqualTo(1234L);
         assertThat(config.getConfigProviderClass()).isEqualTo("someclass");
+        assertThat(config.isKbaEnabled()).isTrue();
+        assertThat(config.getSecurityQuestions()).containsEntry("123", Collections.singletonMap("en", "abc"));
+        assertThat(config.getMinQuestionsToAnswer()).isEqualTo(3);
     }
 
 }

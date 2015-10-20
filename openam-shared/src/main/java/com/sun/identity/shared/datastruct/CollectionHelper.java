@@ -91,6 +91,27 @@ public class CollectionHelper {
     }
 
     /**
+     * Gets the set based on the passed key.
+     *
+     * @param map
+     *         the map
+     * @param key
+     *         key to lookup
+     *
+     * @return associated set
+     *
+     * @throws ValueNotFoundException
+     *         should the key not exist
+     */
+    public static Set<String> getMapSetThrows(Map<String, Set<String>> map, String key) throws ValueNotFoundException {
+        if (!map.containsKey(key)) {
+            throw new ValueNotFoundException("No value found for key " + key);
+        }
+
+        return map.get(key);
+    }
+
+    /**
      * Gets a boolean attribute from a {@code Map<String, Set<String>>}, defaulting to the given default value if
      * the attribute is not present.
      *
