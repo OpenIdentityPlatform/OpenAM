@@ -344,16 +344,19 @@
          */
         "block-spacing": [1, "always"],
         /**
-         * Enforce "stroustrup" style braces.
+         * Enforce the "one true brace style".
          *
          * if (a) # bad
          * {
          * }
+         * else {
+         * }
          *
          * if (a) { # good
+         * } else {
          * }
          */
-        "brace-style": [1, "stroustrup"],
+        "brace-style": [1, "1tbs", { "allowSingleLine": true }],
         /**
          * Require a space after a comma and disallow a space before a comma.
          *
