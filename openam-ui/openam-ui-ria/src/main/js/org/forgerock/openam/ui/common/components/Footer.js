@@ -14,7 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define */
 define("org/forgerock/openam/ui/common/components/Footer", [
     "underscore",
     "org/forgerock/commons/ui/common/main/Configuration",

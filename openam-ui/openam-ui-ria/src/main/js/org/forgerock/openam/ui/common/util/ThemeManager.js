@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, require */
 define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "jquery",
     "underscore",

@@ -22,8 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
-/*jslint sub:true */
 define("org/forgerock/openam/ui/common/delegates/PolicyDelegate", [
     "jquery",
     "org/forgerock/commons/ui/common/util/Constants",
