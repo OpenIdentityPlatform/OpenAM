@@ -194,6 +194,16 @@ public class OAuth2Constants {
          * Parameter usage location: OpenId Connect End Session request
          */
         public static final String END_SESSION_ID_TOKEN_HINT = "id_token_hint";
+
+        /**
+         * Parameter usage location: OpenId Connect End Session request
+         */
+        public static final String POST_LOGOUT_REDIRECT_URI = "post_logout_redirect_uri";
+
+        /**
+         * Parameter usage location: Specify the authentication chain to use
+         */
+        public static final String AUTH_CHAIN = "auth_chain";
     }
 
     public class CoreTokenParams{
