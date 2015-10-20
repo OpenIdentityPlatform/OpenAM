@@ -88,7 +88,8 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
             final char[] password = request.getParameter(PASSWORD) == null ? null :
                     request.<String>getParameter(PASSWORD).toCharArray();
             final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
-            return authenticate(username, password, realm);
+            final String authChain = request.getParameter(AUTH_CHAIN);
+            return authenticate(username, password, realm, authChain);
         } else {
             try {
                 final AMIdentity id = IdUtils.getIdentity(
@@ -109,13 +110,19 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         return null;
     }
 
-    private ResourceOwner authenticate(String username, char[] password, String realm) {
+    private ResourceOwner authenticate(String username, char[] password, String realm, String service) {
 
         ResourceOwner ret = null;
         AuthContext lc = null;
         try {
             lc = new AuthContext(realm);
-            lc.login(ServletUtils.getRequest(Request.getCurrent()), ServletUtils.getResponse(Response.getCurrent()));
+            if (service != null) {
+                lc.login(AuthContext.IndexType.SERVICE, service, null, ServletUtils.getRequest(Request.getCurrent()),
+                        ServletUtils.getResponse(Response.getCurrent()));
+            } else {
+                lc.login(ServletUtils.getRequest(Request.getCurrent()), ServletUtils.getResponse(Response.getCurrent()));
+            }
+
             while (lc.hasMoreRequirements()) {
                 Callback[] callbacks = lc.getRequirements();
                 ArrayList missing = new ArrayList();
