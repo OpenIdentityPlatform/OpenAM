@@ -38,13 +38,11 @@ module.exports = function (grunt) {
         compiledDirectory = "target/compiled",
         forgeRockCommonsDirectory = process.env.FORGEROCK_UI_SRC + "/forgerock-ui-commons",
         forgeRockUiDirectory = process.env.FORGEROCK_UI_SRC + "/forgerock-ui-user",
-        amCommonsDirectory = "../openam-ui-common",
         targetVersion = grunt.option("target-version") || "dev",
         buildCompositionDirs = _.flatten([
             "target/dependencies",
             // When building, dependencies are downloaded and expanded by Maven
             "target/dependencies-expanded/forgerock-ui-user",
-            "target/dependencies-expanded/openam-ui-common",
             // This must come last so that it overwrites any conflicting files!
             mavenProjectSource(".")
         ]),
@@ -52,18 +50,15 @@ module.exports = function (grunt) {
             // When watching, we want to get the dependencies directly from the source
             mavenProjectSource(forgeRockCommonsDirectory),
             mavenProjectSource(forgeRockUiDirectory),
-            mavenProjectSource(amCommonsDirectory),
             // This must come last so that it overwrites any conflicting files!
             mavenProjectSource(".")
         ]),
         testWatchDirs = _.flatten([
-            mavenProjectTestSource("."),
-            mavenProjectTestSource(amCommonsDirectory)
+            mavenProjectTestSource(".")
         ]),
         testInputDirs = _.flatten([
             compiledDirectory,
             mavenProjectTestSource("."),
-            mavenProjectTestSource(amCommonsDirectory),
             "target/test-classes/libs"
         ]),
         nonCompiledFiles = [
@@ -120,7 +115,10 @@ module.exports = function (grunt) {
              * Check the JavaScript source code for common mistakes and style issues.
              */
             lint: {
-                src: "." + mavenSrcPath + "/**/*.js",
+                src: [
+                    "." + mavenSrcPath + "/**/*.js",
+                    "!." + mavenSrcPath + "/libs/**/*.js"
+                ],
                 options: {
                     format: require.resolve("eslint-formatter-warning-summary")
                 }

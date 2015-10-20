@@ -26,7 +26,6 @@
     <name>OpenAM UI Parent</name>
     <packaging>pom</packaging>
     <modules>
-        <module>openam-ui-common</module>
         <module>openam-ui-ria</module>
     </modules>
 </project>
