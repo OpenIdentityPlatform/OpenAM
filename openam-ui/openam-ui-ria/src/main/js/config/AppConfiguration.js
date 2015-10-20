@@ -168,8 +168,7 @@ define("config/AppConfiguration", [
                             "dashboard": {
                                 "url": "#dashboard/",
                                 "name": "config.AppConfiguration.Navigation.links.dashboard",
-                                "icon": "fa fa-dashboard",
-                                "inactive": false
+                                "icon": "fa fa-dashboard"
                             },
                             "uma": {
                                 "icon": "fa fa-user",

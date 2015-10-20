@@ -56,6 +56,23 @@ define("config/ThemeConfiguration", {
                     phone: ""
                 }
             }
+        },
+        "fr-dark-theme": {
+            // An ordered list of URLs to stylesheets that will be applied to every page.
+            stylesheets: [
+                "themes/dark/css/bootstrap-3.3.5-custom.css",
+                "css/structure.css",
+                "themes/dark/css/theme-dark.css"
+            ],
+            settings: {
+                loginLogo: {
+                    src: "themes/dark/images/login-logo-white.png",
+                    title: "ForgeRock",
+                    alt: "ForgeRock",
+                    height: "228px",
+                    width: "220px"
+                }
+            }
         }
     },
     // Each mapping will be tested in order. The theme from the first matching mapping will be used. If no mapping

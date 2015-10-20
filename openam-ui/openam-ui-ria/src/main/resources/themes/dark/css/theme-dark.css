@@ -1,0 +1,20 @@
+.page-header, .page-header-min h3 {
+    border-bottom: 1px solid #2b2f31;
+}
+
+.navbar-brand {
+    padding: 8px 15px 0;
+}
+
+.card {
+    background-color: #1F2223;
+    border: 1px solid #444;
+}
+
+.dropdown-header {
+    font-size: inherit;
+}
+
+.btn-toolbar.page-toolbar {
+    border-color: #444;
+}
