@@ -235,8 +235,12 @@ public class DebugImpl implements IDebug {
     private void record(String msg, Throwable th) {
 
         StringBuilder prefix = new StringBuilder();
+        String dateFormatted;
+        synchronized (dateFormat) {
+            dateFormatted = this.dateFormat.format(new Date());
+        }
         prefix.append(debugName)
-                .append(":").append(this.dateFormat.format(new Date()))
+                .append(":").append(dateFormatted)
                 .append(": ").append(Thread.currentThread().toString())
                 .append(": TransactionId[").append(AuditRequestContext.getTransactionIdValue()).append("]");
 
