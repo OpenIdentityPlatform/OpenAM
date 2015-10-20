@@ -31,12 +31,15 @@ package com.sun.identity.log.service;
 
 import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 
 import com.iplanet.dpro.parser.ParseOutput;
 import com.iplanet.services.comm.share.Response;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
@@ -69,6 +72,8 @@ import java.util.logging.Level;
  * log record. This class is registered with the SAX parser.
  */
 public class LogRecWrite implements LogOperation, ParseOutput {
+
+    private static final String EVALUATION_REALM = "org.forgerock.openam.agents.config.policy.evaluation.realm";
     
     String _logname;
     String _loggedBySid;
@@ -171,16 +176,19 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         rec.setParameters(parameters);
         
         SSOToken loggedByToken = null;
+        String realm = NO_REALM;
         try {
             SSOTokenManager ssom = SSOTokenManager.getInstance();
             loggedByToken = ssom.createSSOToken(_loggedBySid);
-        } catch (SSOException ssoe) {
+            Map<String, Set<String>> appAttributes = IdUtils.getIdentity(loggedByToken).getAttributes();
+            realm = getFirstItem(appAttributes.get(EVALUATION_REALM), NO_REALM);
+        } catch (IdRepoException | SSOException ssoe) {
             Debug.error("LogRecWrite: exec:SSOException: ", ssoe);
         }
         if (MonitoringUtil.isRunning()) {
             slei.incHandlerRequestCount(1);
         }
-        auditAccessMessage(auditEventPublisher, auditEventFactory, rec);
+        auditAccessMessage(auditEventPublisher, auditEventFactory, rec, realm);
         logger.log(rec, loggedByToken);
         // Log file record write okay and return OK
         if (MonitoringUtil.isRunning()) {
@@ -189,8 +197,10 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         return res;
     }
 
-    private void auditAccessMessage(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory, LogRecord record) {
-        if (!auditEventPublisher.isAuditing(NO_REALM, AuditConstants.ACCESS_TOPIC)) {
+    private void auditAccessMessage(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
+            LogRecord record, String realm) {
+
+        if (!auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
             return;
         }
 
@@ -218,7 +228,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         String queryString = queryStringIndex > -1 ? resourceUrl.substring(queryStringIndex) : "";
         String path = resourceUrl.replace(queryString, "");
 
-        AuditEvent auditEvent = auditEventFactory.accessEvent(NO_REALM)
+        AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.POLICY_AGENT)

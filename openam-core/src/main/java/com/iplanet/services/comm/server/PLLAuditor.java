@@ -23,15 +23,16 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.utils.StringUtils.*;
 
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -54,6 +55,7 @@ public class PLLAuditor {
     private String method;
     private String trackingId;
     private String authenticationId;
+    private String realm;
     private Component component;
     private boolean accessAttemptAudited;
 
@@ -79,9 +81,9 @@ public class PLLAuditor {
      * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     public void auditAccessAttempt() {
-        if (auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
-            AuditEvent auditEvent = auditEventFactory.accessEvent(NO_REALM)
+            AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -106,11 +108,11 @@ public class PLLAuditor {
         if (!accessAttemptAudited) {
             auditAccessAttempt();
         }
-        if (auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AuditEvent auditEvent = auditEventFactory.accessEvent(NO_REALM)
+            AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -152,12 +154,12 @@ public class PLLAuditor {
         if (!accessAttemptAudited) {
             auditAccessAttempt();
         }
-        if (auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             final JsonValue detail = json(object(field(ACCESS_RESPONSE_DETAIL_REASON, message)));
-            AuditEvent auditEvent = auditEventFactory.accessEvent(NO_REALM)
+            AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -184,6 +186,7 @@ public class PLLAuditor {
         authenticationId = "";
         trackingId = "";
         component = Component.PLL;
+        realm = NO_REALM;
     }
 
     /**
@@ -228,5 +231,12 @@ public class PLLAuditor {
      */
     public void setAuthenticationId(String authenticationId) {
         this.authenticationId = authenticationId;
+    }
+
+    /**
+     * @param realm The realm for which the event is being logged.
+     */
+    public void setRealm(String realm) {
+        this.realm = isEmpty(realm) ? NO_REALM : DNMapper.orgNameToRealmName(realm);
     }
 }

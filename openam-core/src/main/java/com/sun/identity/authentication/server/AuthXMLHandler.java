@@ -278,6 +278,7 @@ public class AuthXMLHandler implements RequestHandler {
         auditor.setMethod(getMethodName(requestType));
         auditor.setAuthenticationId(getAuthenticationId(loginState));
         auditor.setTrackingId(getContextId(loginState));
+        auditor.setRealm(orgName);
         auditor.auditAccessAttempt();
 
         String params = authXMLRequest.getParams();

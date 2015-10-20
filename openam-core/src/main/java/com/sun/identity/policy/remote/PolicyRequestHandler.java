@@ -33,6 +33,8 @@
 package com.sun.identity.policy.remote;
 
 import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
+import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
+import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 
 import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
@@ -62,7 +64,6 @@ import com.sun.identity.session.util.RestrictedTokenHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.session.util.AppTokenHandler;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -278,10 +279,12 @@ public class PolicyRequestHandler implements RequestHandler {
 
         String appSSOTokenIDStr = req.getAppSSOToken();
         SSOToken appToken = null;
+        Map<String, Set<String>> appAttributes;
 
         try {
             appToken = getSSOToken(appSSOTokenIDStr, null);
-        } catch (PolicyException pe) {
+            appAttributes = IdUtils.getIdentity(appToken).getAttributes();
+        } catch (IdRepoException | SSOException | PolicyException pe) {
             if (debug.warningEnabled()) {
                 debug.warning("PolicyRequestHandler: Invalid app sso token, " +
                     appSSOTokenIDStr);
@@ -295,12 +298,13 @@ public class PolicyRequestHandler implements RequestHandler {
 
         auditor.setMethod(req.getMethodName());
         auditor.setSsoToken(appToken);
+        auditor.setRealm(getFirstItem(appAttributes.get(EVALUATION_REALM), NO_REALM));
         auditor.auditAccessAttempt();
 
         if (req.getMethodID() == 
                 PolicyRequest.POLICY_REQUEST_ADD_POLICY_LISTENER) {
             PolicyListenerRequest plReq = req.getPolicyListenerRequest();
-            boolean addListener = addPolicyListener(appToken, plReq);
+            boolean addListener = addPolicyListener(appToken, plReq, appAttributes);
             if (addListener) {
                 policyRes.setMethodID(
                         PolicyResponse.POLICY_ADD_LISTENER_RESPONSE);
@@ -319,7 +323,7 @@ public class PolicyRequestHandler implements RequestHandler {
         if (req.getMethodID() ==
                 PolicyRequest.POLICY_REQUEST_REMOVE_POLICY_LISTENER) {
             RemoveListenerRequest rmReq = req.getRemoveListenerRequest();
-            boolean removeListener = removePolicyListener(appToken, rmReq);
+            boolean removeListener = removePolicyListener(appToken, rmReq, appAttributes);
             if (removeListener) {
                 policyRes.setMethodID(
                     PolicyResponse.POLICY_REMOVE_LISTENER_RESPONSE);
@@ -440,7 +444,7 @@ public class PolicyRequestHandler implements RequestHandler {
         
                 try {
                     // Get an instance of the policy evaluator
-                    policyEvaluator = getPolicyEvaluator(appToken, serviceName);
+                    policyEvaluator = getPolicyEvaluator(appToken, serviceName, appAttributes);
         
                     // Get the resource result from the policy evaluator
                     resourceRst = new ResourceResults(
@@ -505,7 +509,9 @@ public class PolicyRequestHandler implements RequestHandler {
     /*
      *  Register a policy change listener to the policy framework.
      */
-    private boolean addPolicyListener(SSOToken appToken, PolicyListenerRequest policyListenerReq) {
+    private boolean addPolicyListener(SSOToken appToken, PolicyListenerRequest policyListenerReq,
+            Map<String, Set<String>> appAttributes) {
+
         if (policyListenerReq == null) {
             debug.error("PolicyRequestHandler.addPolicyListener: " +
                 "invalid policy listener request received");
@@ -529,7 +535,7 @@ public class PolicyRequestHandler implements RequestHandler {
 
         try {
             // Get an instance of the policy evaluator
-            policyEvaluator = getPolicyEvaluator(appToken, serviceTypeName);
+            policyEvaluator = getPolicyEvaluator(appToken, serviceTypeName, appAttributes);
      
             if (policyEvaluator != null) {
                 // add the policy listener to the policy framework
@@ -567,8 +573,9 @@ public class PolicyRequestHandler implements RequestHandler {
     /*
      *  Remove a policy change listener from the policy framework.
      */
-    private boolean removePolicyListener(SSOToken appToken,
-        RemoveListenerRequest removeListenerReq) { 
+    private boolean removePolicyListener(SSOToken appToken, RemoveListenerRequest removeListenerReq,
+            Map<String, Set<String>> appAttributes) {
+
         if (removeListenerReq == null) {
             debug.error("PolicyRequestHandler.removePolicyListener: " +
                 "invalid remove policy listener request received");
@@ -599,7 +606,7 @@ public class PolicyRequestHandler implements RequestHandler {
         PolicyEvaluator policyEvaluator = null;
         try {
             // Get an instance of the policy evaluator
-            policyEvaluator = getPolicyEvaluator(appToken, serviceTypeName);
+            policyEvaluator = getPolicyEvaluator(appToken, serviceTypeName, appAttributes);
      
             if (policyEvaluator != null) {
                 // remove the policy listener from the policy framework
@@ -709,21 +716,18 @@ public class PolicyRequestHandler implements RequestHandler {
      *         the SSO token of the requester
      * @param serviceTypeName
      *         the service type name
+     * @param appAttributes
+     *         the app attributes
      *
      * @return an policy evaluator
      *
      * @throws PolicyException
      *         should an error occur during the retrieval of an appropriate policy evaluator
      */
-    private PolicyEvaluator getPolicyEvaluator(
-            final SSOToken appToken, final String serviceTypeName) throws PolicyException {
+    private PolicyEvaluator getPolicyEvaluator(final SSOToken appToken, final String serviceTypeName,
+            final Map<String, Set<String>> appAttributes) throws PolicyException {
 
         try {
-            final AMIdentity appIdentity = IdUtils.getIdentity(appToken);
-
-            @SuppressWarnings("unchecked")
-            final Map<String, Set<String>> appAttributes = appIdentity.getAttributes();
-
             final String realm = CollectionUtils.getFirstItem(
                     appAttributes.get(EVALUATION_REALM), "/");
 
@@ -754,12 +758,8 @@ public class PolicyRequestHandler implements RequestHandler {
 
             return policyEvaluators.get(key);
 
-        } catch (IdRepoException idrE) {
-            throw new PolicyException(ResBundleUtils.rbName, "unable_to_get_an_evaluator", null, idrE);
-        } catch (SSOException ssoE) {
-            throw new PolicyException(ResBundleUtils.rbName, "unable_to_get_an_evaluator", null, ssoE);
-        } catch (EntitlementException eE) {
-            throw new PolicyException(ResBundleUtils.rbName, "unable_to_get_an_evaluator", null, eE);
+        } catch (SSOException | EntitlementException e) {
+            throw new PolicyException(ResBundleUtils.rbName, "unable_to_get_an_evaluator", null, e);
         }
     }
 
