@@ -199,7 +199,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                 Constants.host + "/" + Constants.context + "/xacml" + realm + "/policies");
         },
 
-        addNewPolicySet: function (e) {
+        addNewPolicySet: function () {
             Router.routeTo(Router.configuration.routes.realmsPolicySetNew, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true

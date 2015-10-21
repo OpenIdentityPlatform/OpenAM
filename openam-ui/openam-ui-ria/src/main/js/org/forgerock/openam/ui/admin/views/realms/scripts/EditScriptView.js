@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
              Constants, UIUtils, Script, ScriptsDelegate, SMSGlobalDelegate, FormHelper) {
 
     return AbstractView.extend({
-        initialize: function (options) {
+        initialize: function () {
             AbstractView.prototype.initialize.call(this);
             this.model = null;
         },
@@ -61,7 +61,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             "change [data-field]": "checkChanges"
         },
 
-        onModelSync: function (model, response) {
+        onModelSync: function () {
             this.renderAfterSyncModel();
         },
 
@@ -196,7 +196,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
 
-            _.each(dataFields, function (field, key, list) {
+            _.each(dataFields, function (field) {
                 dataField = field.getAttribute("data-field");
 
                 if (field.type === "radio") {
@@ -224,7 +224,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             savePromise = this.model.save();
 
             if (savePromise) {
-                savePromise.done(function (e) {
+                savePromise.done(function () {
                     if (self.newEntity) {
                         Router.routeTo(Router.currentRoute, {
                             args: [encodeURIComponent(self.realmPath), self.model.id],
@@ -259,7 +259,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             return syncRequired;
         },
 
-        validateScript: function (e) {
+        validateScript: function () {
             var scriptText = this.scriptEditor.getValue(),
                 language = this.$el.find("input[name=language]:checked"),
                 script,
@@ -279,7 +279,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             });
         },
 
-        uploadScript: function (e) {
+        uploadScript: function () {
             this.$el.find("[name=upload]").trigger("click");
         },
 
@@ -288,7 +288,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 file = e.target.files[0],
                 reader = new FileReader();
 
-            reader.onload = (function (file) {
+            reader.onload = (function () {
                 return function (e) {
                     self.scriptEditor.setValue(e.target.result);
                 };
@@ -319,9 +319,9 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 footerButtons = [],
                 options = {
                     type: self.data.newScript ? BootstrapDialog.TYPE_PRIMARY : BootstrapDialog.TYPE_DANGER,
-                    title: self.data.newScript ?
-                        $.t("console.scripts.edit.dialog.title.select") :
-                        $.t("console.scripts.edit.dialog.title.change"),
+                    title: self.data.newScript
+                        ? $.t("console.scripts.edit.dialog.title.select")
+                        : $.t("console.scripts.edit.dialog.title.change"),
                     cssClass: "script-change-context",
                     closable: !self.data.newScript,
                     message: $("<div></div>"),
@@ -383,7 +383,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 promise.resolve();
             } else {
                 defaultScript = new Script({ _id: selectedContext.defaultScript });
-                this.listenTo(defaultScript, "sync", function (model, response) {
+                this.listenTo(defaultScript, "sync", function (model) {
                     self.data.entity.script = model.attributes.script;
                     self.data.entity.language = model.attributes.language;
                     promise.resolve();
@@ -452,8 +452,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 i,
                 length = languages.length,
                 index;
-            if (this.langSchema && this.langSchema.properties && this.langSchema.properties.languages
-                && this.langSchema.properties.languages.items) {
+            if (this.langSchema && this.langSchema.properties && this.langSchema.properties.languages &&
+                this.langSchema.properties.languages.items) {
                 result = [];
                 for (i = 0; i < length; i++) {
                     index = _.indexOf(this.langSchema.properties.languages.items["enum"], languages[i]);
@@ -475,14 +475,14 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
         deleteScript: function () {
             var self = this,
-                onSuccess = function (model, response, options) {
+                onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsScripts, {
                         args: [encodeURIComponent(self.realmPath)],
                         trigger: true
                     });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
-                onError = function (model, response, options) {
+                onError = function (model, response) {
                     Messages.messages.addMessage({
                         response: response,
                         type: Messages.TYPE_DANGER

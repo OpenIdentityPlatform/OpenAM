@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     }
                 },
 
-                setGridColumnSize: function (el, size) {
+                setGridColumnSize: function () {
                     // JSONEditor grid system not used, so overridden here.
                 },
 

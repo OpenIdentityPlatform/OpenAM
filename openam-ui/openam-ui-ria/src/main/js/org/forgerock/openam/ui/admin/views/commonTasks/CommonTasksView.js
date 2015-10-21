@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/commonTasks/CommonTasksView", [
     "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
 ], function (AbstractView, RedirectToLegacyConsole) {
     var CommonTasksView = AbstractView.extend({
-        render: function (args, callback) {
+        render: function () {
             RedirectToLegacyConsole.global.commonTasks();
         }
     });

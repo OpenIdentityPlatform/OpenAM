@@ -32,8 +32,8 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
             var self = this;
 
             this.data.realmPath = args[0];
-            this.data.realmName = this.data.realmPath === "/" ? $.t("console.common.topLevelRealm") :
-                this.data.realmPath;
+            this.data.realmName = this.data.realmPath === "/" ? $.t("console.common.topLevelRealm")
+                : this.data.realmPath;
 
             this.realmExists(this.data.realmPath).done(function () {
                 TreeNavigation.prototype.render.call(self, args, callback);

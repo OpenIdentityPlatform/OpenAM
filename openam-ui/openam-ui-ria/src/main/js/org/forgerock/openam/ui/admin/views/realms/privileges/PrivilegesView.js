@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/admin/views/realms/privileges/PrivilegesView", [
 ], function (AbstractView, RedirectToLegacyConsole) {
     var PrivilegesView = AbstractView.extend({
         template: "templates/admin/views/realms/privileges/PrivilegesTemplate.html",
-        render: function (args, callback) {
+        render: function (args) {
             RedirectToLegacyConsole.realm.privileges(args[0]);
         }
     });

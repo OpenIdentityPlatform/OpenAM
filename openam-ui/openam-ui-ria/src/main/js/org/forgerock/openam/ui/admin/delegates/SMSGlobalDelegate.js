@@ -71,8 +71,6 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
             }
         };
 
-
-
     obj.realms = {
         /**
          * Gets all realms.

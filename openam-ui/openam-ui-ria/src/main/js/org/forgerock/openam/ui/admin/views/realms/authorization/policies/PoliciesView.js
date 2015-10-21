@@ -111,7 +111,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                             "click .edit-row-item": "editItem",
                             "click .delete-row-item": "deleteItem"
                         },
-                        editItem: function (e) {
+                        editItem: function () {
                             Router.routeTo(Router.configuration.routes.realmsPolicyEdit, {
                                 args: _.map([self.data.realmPath, self.data.policySetModel.id, this.model.id],
                                     encodeURIComponent),

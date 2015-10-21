@@ -140,7 +140,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 this.$el.find(".backgrid-container").append(grid.render().el);
                 this.$el.find(".panel-body").append(paginator.render().el);
 
-                this.data.items.fetch({ reset: true }).done(function (xhr) {
+                this.data.items.fetch({ reset: true }).done(function () {
                     if (callback) {
                         callback();
                     }
@@ -153,7 +153,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             });
         },
 
-        addNewResourceType: function (e) {
+        addNewResourceType: function () {
             Router.routeTo(Router.configuration.routes.realmsResourceTypeNew, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true

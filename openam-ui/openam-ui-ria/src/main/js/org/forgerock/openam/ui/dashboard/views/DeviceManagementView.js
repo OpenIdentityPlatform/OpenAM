@@ -40,7 +40,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                 card = $(target).closest("div[data-device-uuid]"),
                 uuid = card.attr("data-device-uuid");
 
-            DeviceManagementDelegate.deleteDevice(uuid).done(function (data) {
+            DeviceManagementDelegate.deleteDevice(uuid).done(function () {
                 card.parent().remove();
             });
         },
@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                             label: $.t("common.form.save"),
                             action: function (dialog) {
                                 statusDevice = dialog.$modalBody.find("[name=\"deviceSkip\"]").is(":checked");
-                                DeviceManagementDelegate.setDeviceSkippable(statusDevice).done(function (data) {
+                                DeviceManagementDelegate.setDeviceSkippable(statusDevice).done(function () {
                                     self.render();
                                     dialog.close();
                                 });
@@ -103,7 +103,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                         callback();
                     }
                 });
-            }).fail(function (error) {
+            }).fail(function () {
                 // TODO: add failure condition
             });
         }

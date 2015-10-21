@@ -78,7 +78,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                             text: input
                         };
                     },
-                    onChange: function (value) {
+                    onChange: function () {
                         title = this.$input.parent().find("label").data().title;
                         itemData = view.data.itemData;
                     },

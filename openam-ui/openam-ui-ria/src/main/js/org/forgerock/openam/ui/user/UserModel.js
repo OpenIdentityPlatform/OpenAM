@@ -14,8 +14,6 @@
  * Portions copyright 2015 ForgeRock AS.
  */
 
-
-
 define("org/forgerock/openam/ui/user/UserModel", [
     "jquery",
     "underscore",
@@ -57,7 +55,8 @@ define("org/forgerock/openam/ui/user/UserModel", [
                             {
                                 "type": "PUT",
                                 "data": JSON.stringify(
-                                    _.pick(this.toJSON(), ["givenName","sn","mail","postalAddress","telephoneNumber"])
+                                    _.pick(this.toJSON(),
+                                        ["givenName", "sn", "mail", "postalAddress", "telephoneNumber"])
                                 ),
                                 "url": RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
                                 "headers": {
@@ -86,7 +85,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     });
                 }
             },
-            parse: function (response, options) {
+            parse: function (response) {
                 var user = {};
 
                 delete response.userPassword;
@@ -115,7 +114,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
 
                 return user;
             },
-            getProfile: function (headers) {
+            getProfile: function () {
                 return ServiceInvoker.restCall({
                     url: RealmHelper.decorateURIWithRealm(baseUrl + "?_action=idFromSession"),
                     type: "POST",
@@ -128,7 +127,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
 
                         // keep track of the current realm as a future default value, following logout:
                         Router.configuration.routes.login.defaults[0] = data.realm;
-                        this.set("id",data.id);
+                        this.set("id", data.id);
                         return this.fetch().then(_.bind(function () {
                             return this;
                         }, this));

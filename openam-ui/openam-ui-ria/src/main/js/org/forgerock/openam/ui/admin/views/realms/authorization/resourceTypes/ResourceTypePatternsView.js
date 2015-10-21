@@ -18,7 +18,7 @@
 define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypePatternsView", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/common/main/AbstractView" ,
+    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListEditingView"
 ], function ($, _, AbstractView, StripedListEditingView) {
 
@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             el, callback);
     };
 
-    ResourceTypePatternsView.prototype.getPendingItem = function (e) {
+    ResourceTypePatternsView.prototype.getPendingItem = function () {
         var editing = this.$el.find(".editing");
         return editing.find(".form-control").val().toString();
     };

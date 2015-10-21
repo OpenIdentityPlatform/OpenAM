@@ -45,11 +45,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             this.remove();
         },
 
-        editItem: function (e) {
+        editItem: function () {
             this.parent.editItem(this);
         },
 
-        showPopover: function (e) {
+        showPopover: function () {
             var self = this,
                 popover = this.$el.find(".auth-criteria-info").data("bs.popover"),
                 selected = this.$el.find("#selectCriteria option:selected"),
@@ -68,13 +68,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
 
         },
 
-        hidePopover: function (e) {
+        hidePopover: function () {
             this.$el.find(".auth-criteria-info").popover("hide");
         },
 
         renderArrows: function () {
-            var config = this.parent.data.form.chainData.authChainConfiguration,
-                html = Handlebars.compile(
+            var html = Handlebars.compile(
                     "{{> templates/admin/views/realms/authentication/chains/_CriteriaFooter type='" +
                     this.data.linkConfig.criteria + "'}}"
                 );

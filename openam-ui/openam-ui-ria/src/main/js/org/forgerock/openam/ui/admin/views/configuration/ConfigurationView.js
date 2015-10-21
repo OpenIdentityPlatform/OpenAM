@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/configuration/ConfigurationView", [
     "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
 ], function (AbstractView, RedirectToLegacyConsole) {
     var ConfigurationView = AbstractView.extend({
-        render: function (args, callback) {
+        render: function () {
             RedirectToLegacyConsole.global.configuration();
         }
     });

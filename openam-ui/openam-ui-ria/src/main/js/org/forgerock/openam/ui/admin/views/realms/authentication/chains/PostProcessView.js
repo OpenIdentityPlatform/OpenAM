@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
             "partials/alerts/_Alert.html"
         ],
 
-        add: function (e) {
+        add: function () {
             var newProcessClass = this.$el.find("#newProcessClass").val().trim(),
                 invalidName = _.find(this.data.chainData.loginPostProcessClass, function (className) {
                     return className === newProcessClass;

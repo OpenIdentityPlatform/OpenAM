@@ -85,7 +85,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                         return "<span class='time-zone-selected'>" + item.text + "</span>";
                                     }
                                 },
-                                load: function (query, callback) {
+                                load: function () {
                                     var selectize = this;
                                     $.ajax({
                                         url: "timezones.json",

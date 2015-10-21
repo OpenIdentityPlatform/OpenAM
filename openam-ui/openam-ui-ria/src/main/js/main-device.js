@@ -53,10 +53,9 @@ require([
     "text!templates/common/LoginBaseTemplate.html",
     "text!templates/common/FooterTemplate.html",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "ThemeManager",
-    "org/forgerock/commons/ui/common/util/URIUtils"
+    "ThemeManager"
 ], function ($, HandleBars, Configuration, Constants, DeviceTemplate, DeviceDoneTemplate,
-            LoginBaseTemplate, FooterTemplate, i18nManager, ThemeManager, URIUtils) {
+            LoginBaseTemplate, FooterTemplate, i18nManager, ThemeManager) {
     var data = window.pageData,
         template = data.done ? DeviceDoneTemplate : DeviceTemplate;
 

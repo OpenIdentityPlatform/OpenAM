@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
 ], function (_, $, Router, TreeNavigation, UMADelegate) {
     var LabelTreeNavigationView = TreeNavigation.extend({
         template: "templates/uma/views/resource/LabelTreeNavigationTemplate.html",
-        partials: [ "templates/uma/views/resource/_NestedList.html" ],
+        partials: ["templates/uma/views/resource/_NestedList.html"],
         findActiveNavItem: function (fragment) {
             var myLabelsRoute = Router.configuration.routes.umaResourcesMyLabelsResource,
                 isCurrentRouteForResource = Router.currentRoute === myLabelsRoute,

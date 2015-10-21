@@ -230,7 +230,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
 
-            _.each(dataFields, function (field, key, list) {
+            _.each(dataFields, function (field) {
                 dataField = field.getAttribute("data-field");
 
                 if (field.type === "checkbox") {
@@ -247,7 +247,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             var savePromise,
                 self = this,
                 activeTabIndex,
-                activeTab ,
+                activeTab,
                 activeTabProperties;
 
             this.updateFields();
@@ -272,7 +272,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
             if (savePromise) {
                 savePromise
-                    .done(function (response) {
+                    .done(function () {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
                         if (self.newEntity) {
@@ -297,14 +297,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
         deletePolicy: function () {
             var self = this,
-                onSuccess = function (model, response, options) {
+                onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {
                         args: _.map([self.data.realmPath, self.data.policySetName], encodeURIComponent),
                         trigger: true
                     });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
-                onError = function (model, response, options) {
+                onError = function (model, response) {
                     Messages.addMessage({
                         message: response.responseJSON.message,
                         type: Messages.TYPE_DANGER

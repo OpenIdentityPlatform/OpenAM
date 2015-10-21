@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
         },
 
-        render: function (args, callback, element) {
+        render: function (args, callback) {
             this.idPrefix = "Env_";
             this.property = "condition";
             this.properties = "conditions";

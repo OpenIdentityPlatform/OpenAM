@@ -96,7 +96,7 @@ require([
         $("#wrapper").html(baseTemplate(data));
         $("#footer").html(footerTemplate(data));
         $("#content").html(formTemplate(data)).find(".panel-heading")
-        .click(function (e) {
+        .click(function () {
             $(this).toggleClass("expanded").next(".panel-collapse").slideToggle();
         });
 

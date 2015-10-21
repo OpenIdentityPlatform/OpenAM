@@ -281,7 +281,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             this.id = id;
         },
         renderWithModel: function (callback) {
-            var collection, grid, options, RevokeCell, SelectizeCell, self = this;
+            var collection, grid, RevokeCell, self = this;
 
             /**
              * FIXME: Ideally the data needs to the be whole model, but I'm told it's also global so we're

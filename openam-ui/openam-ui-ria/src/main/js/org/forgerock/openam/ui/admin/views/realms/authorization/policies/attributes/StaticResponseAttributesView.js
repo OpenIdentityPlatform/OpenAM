@@ -42,7 +42,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
             el, callback);
     };
 
-    StaticResponseAttributesView.prototype.getPendingItem = function (e) {
+    StaticResponseAttributesView.prototype.getPendingItem = function () {
         var editing = this.$el.find(".editing"),
             key = editing.find("[data-attr-key]"),
             val = editing.find("[data-attr-val]"),
@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
         return attr;
     };
 
-    StaticResponseAttributesView.prototype.isValid = function (e) {
+    StaticResponseAttributesView.prototype.isValid = function () {
         var editing = this.$el.find(".editing"),
             key = editing.find("[data-attr-key]"),
             val = editing.find("[data-attr-val]");

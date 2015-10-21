@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/admin/views/realms/sts/STSView", [
 ], function (AbstractView, RedirectToLegacyConsole) {
     var STSView = AbstractView.extend({
         template: "templates/admin/views/realms/sts/STSTemplate.html",
-        render: function (args, callback) {
+        render: function (args) {
             RedirectToLegacyConsole.realm.sts(args[0]);
         }
     });

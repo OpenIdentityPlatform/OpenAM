@@ -103,7 +103,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                         chainData[0].orgConfig = true;
                     }
 
-                    _.each(chainData[0].authChainConfiguration, function (chainLink, index) {
+                    _.each(chainData[0].authChainConfiguration, function (chainLink) {
                         moduleName = _.find(modulesData[0].result, { _id: chainLink.module });
                         // The server allows for deletion of modules that are in use within a chain. The chain itself
                         // will still have a reference to the deleted module.

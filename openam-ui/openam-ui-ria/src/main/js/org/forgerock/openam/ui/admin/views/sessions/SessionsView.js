@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/sessions/SessionsView", [
     "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
 ], function (AbstractView, RedirectToLegacyConsole) {
     var SessionsView = AbstractView.extend({
-        render: function (args, callback) {
+        render: function () {
             RedirectToLegacyConsole.global.sessions();
         }
     });

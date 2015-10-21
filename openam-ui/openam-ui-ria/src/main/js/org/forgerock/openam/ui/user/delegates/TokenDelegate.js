@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,17 +22,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * "Portions Copyrighted 2011-2013 ForgeRock Inc"
- */
-
-
 define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager"
-], function (constants, AbstractDelegate, configuration, eventManager) {
+    "org/forgerock/commons/ui/common/main/AbstractDelegate"
+], function (constants, AbstractDelegate) {
     var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/frrest/oauth2/token");
 
     /**
@@ -57,7 +50,7 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
      * @param id TokenID
      */
     obj.deleteToken = function (successCallback, errorCallback, id) {
-        obj.serviceCall({ type: "DELETE", url: "/" + id, success: function (data) {
+        obj.serviceCall({ type: "DELETE", url: "/" + id, success: function () {
             if (successCallback) {
                 successCallback(id);
             }

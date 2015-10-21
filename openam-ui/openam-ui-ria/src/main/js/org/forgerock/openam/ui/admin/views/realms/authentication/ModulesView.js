@@ -156,7 +156,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                         action: function (dialog) {
                             dialog.close();
                         }
-                    },{
+                    }, {
                         label: $.t("common.form.yes"),
                         cssClass: "btn-primary",
                         action: function (dialog) {

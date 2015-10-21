@@ -14,22 +14,63 @@
          * --------------------------------------------------------------------------------
          */
 
-         /**
-          * Camel cased variable names.
-          *
-          * var apples_and_pears # bad
-          * var fruit {
-          *     apple_and_pears: true
-          * }
-          *
-          * var applesAndPears # good
-          * var fruit {
-          *     appleAndPears: true
-          * }
-          */
-         "camelcase": [2, {
-             "properties": "always"
-         }],
+        /**
+         * Disallow spacing at the start or end of an array literal.
+         *
+         * var a = [ 1, 2 ]; # bad
+         *
+         * var a = [1, 2]; # good
+         */
+        "array-bracket-spacing": [2, "never"],
+        /**
+         * Require spacing inside of single line blocks.
+         *
+         * function () {return 1;} # bad
+         *
+         * function () { return 1; } # good
+         */
+        "block-spacing": [2, "always"],
+        /**
+         * Enforce the "one true brace style".
+         *
+         * if (a) # bad
+         * {
+         * }
+         * else {
+         * }
+         *
+         * if (a) { # good
+         * } else {
+         * }
+         */
+        "brace-style": [2, "1tbs", { "allowSingleLine": true }],
+        /**
+         * Camel cased variable names.
+         *
+         * var apples_and_pears # bad
+         * var fruit {
+         *     apple_and_pears: true
+         * }
+         *
+         * var applesAndPears # good
+         * var fruit {
+         *     appleAndPears: true
+         * }
+         */
+        "camelcase": [2, {
+            "properties": "always"
+        }],
+        /**
+         * Require a space after a comma and disallow a space before a comma.
+         *
+         * var a = [1,2 ,3]; # bad
+         *
+         * var a = [1, 2, 3]; # good
+         */
+        "comma-spacing": [2, {
+            "before": false,
+            "after": true
+        }],
         /**
          * Require commas to appear at the end of lines instead of the start.
          *
@@ -63,6 +104,10 @@
          *   }
          * }
          */
+        /**
+         * Require a line break at the end of a file.
+         */
+        "eol-last": 1,
         "guard-for-in": 2,
         /**
          * 4 space indent.
@@ -95,6 +140,10 @@
              */
             "VariableDeclarator": 1
         }],
+        /**
+         * Require consistent use of line break characters within a file.
+         */
+        "linebreak-style": 2,
         /**
          * Maximum line length of 120 characters.
          */
@@ -190,6 +239,20 @@
          */
         "no-labels": 2,
         /**
+         * Disallow if as the only statement in a else block.
+         *
+         * if (a) { # bad
+         * } else {
+         *   if (b) {
+         *   }
+         * }
+         *
+         * if (a) { # good
+         * } else if (b) {
+         * }
+         */
+        "no-lonely-if": 2,
+        /**
          * Disallow mixed spaces and tabs for indentation.
          *
          * \t....var a = 3; # bad
@@ -197,6 +260,10 @@
          * ........var a = 3; # good
          */
         "no-mixed-spaces-and-tabs": 2,
+        /**
+         * Disallow 3 or more consecutive empty lines.
+         */
+        "no-multiple-empty-lines": 2,
         /**
          * Multiple spaces not allowed.
          *
@@ -222,6 +289,16 @@
          */
         "no-native-reassign": 2,
         /**
+         * Disallow trailing whitespace at the end of lines.
+         *
+         * var a = 3;···· # bad
+         */
+        "no-trailing-spaces": 2,
+        /**
+         * Disallow declaration of variables that are not used in the code.
+         */
+        "no-unused-vars": 2,
+        /**
          * Disallow use of the void operator.
          *
          * return void 0; # bad
@@ -235,6 +312,16 @@
          * { apples: true } # good
          */
         "object-curly-spacing": [2, "always"],
+        /**
+         * Require operators to appear at the end of lines if split across multple lines.
+         *
+         * var a = b # bad
+         *     + c;
+         *
+         * var a = b + # good
+         *     c;
+         */
+        "operator-linebreak": 2,
         /**
          * Double quotes for string literals. Single quotes allowed to avoid escaping
          *
@@ -284,6 +371,18 @@
          */
         "space-before-function-paren": [2, "always"],
         /**
+         * Require a space before certain keywords.
+         *
+         * if (a) { # bad
+         * }else {
+         * }
+         *
+         * if (a) { # good
+         * } else {
+         * }
+         */
+        "space-before-keywords": 2,
+        /**
          * Spaces not allowed in parentheses.
          *
          * fruit( "apple" ) # bad
@@ -327,105 +426,6 @@
          * error rules.
          * --------------------------------------------------------------------------------
          */
-        /**
-         * Disallow spacing at the start or end of an array literal.
-         *
-         * var a = [ 1, 2 ]; # bad
-         *
-         * var a = [1, 2]; # good
-         */
-        "array-bracket-spacing": [1, "never"],
-        /**
-         * Require spacing inside of single line blocks.
-         *
-         * function () {return 1;} # bad
-         *
-         * function () { return 1; } # good
-         */
-        "block-spacing": [1, "always"],
-        /**
-         * Enforce the "one true brace style".
-         *
-         * if (a) # bad
-         * {
-         * }
-         * else {
-         * }
-         *
-         * if (a) { # good
-         * } else {
-         * }
-         */
-        "brace-style": [1, "1tbs", { "allowSingleLine": true }],
-        /**
-         * Require a space after a comma and disallow a space before a comma.
-         *
-         * var a = [1,2 ,3]; # bad
-         *
-         * var a = [1, 2, 3]; # good
-         */
-        "comma-spacing": [1, {
-            "before": false,
-            "after": true
-        }],
-        /**
-         * Require a line break at the end of a file.
-         */
-        "eol-last": 1,
-        /**
-         * Require consistent use of line break characters within a file.
-         */
-        "linebreak-style": 1,
-        /**
-         * Disallow if as the only statement in a else block.
-         *
-         * if (a) { # bad
-         * } else {
-         *   if (b) {
-         *   }
-         * }
-         *
-         * if (a) { # good
-         * } else if (b) {
-         * }
-         */
-        "no-lonely-if": 1,
-        /**
-         * Disallow 3 or more consecutive empty lines.
-         */
-        "no-multiple-empty-lines": 1,
-        /**
-         * Disallow trailing whitespace at the end of lines.
-         *
-         * var a = 3;···· # bad
-         */
-        "no-trailing-spaces": 1,
-        /**
-         * Disallow declaration of variables that are not used in the code.
-         */
-        "no-unused-vars": 1,
-        /**
-         * Require operators to appear at the end of lines if split across multple lines.
-         *
-         * var a = b # bad
-         *     + c;
-         *
-         * var a = b + # good
-         *     c;
-         */
-        "operator-linebreak": 1,
-        /**
-         * Require a space before certain keywords.
-         *
-         * if (a) { # bad
-         * }else {
-         * }
-         *
-         * if (a) { # good
-         * } else {
-         * }
-         */
-        "space-before-keywords": 1,
         /**
          * Validates that JSDoc is syntactically correct.
          */

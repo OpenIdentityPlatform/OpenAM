@@ -76,7 +76,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     });
                 },
 
-                onDragStart: function (item, container, _super) {
+                onDragStart: function (item, container) {
                     var offset = item.offset(),
                         pointer = container.rootGroup.pointer;
 
@@ -90,7 +90,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     $("body").addClass("dragging");
                 },
 
-                onDrop: function (item, container, _super, event) {
+                onDrop: function (item, container, _super) {
                     self.sortChainData(self.originalIndex, item.index());
                     self.validateChain();
                     _super(item, container);
@@ -148,7 +148,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     args: [encodeURIComponent(self.data.realmPath)],
                     trigger: true
                 });
-            },function (e) {
+            }, function (e) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
                     response: e
@@ -157,7 +157,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         },
 
 
-        render: function (args, callback) {
+        render: function (args) {
             var self = this;
 
             SMSRealmDelegate.authentication.chains.get(args[0], args[1]).then(function (data) {
@@ -180,14 +180,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                         if (self.data.form.chainData.adminAuthModule && self.data.form.chainData.orgConfig) {
                             popoverOpt.content =
                                 $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminOrgAuthChain");
+                        } else if (self.data.form.chainData.adminAuthModule) {
+                            popoverOpt.content =
+                                $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminAuthChain");
                         } else {
-                            if (self.data.form.chainData.adminAuthModule) {
-                                popoverOpt.content =
-                                    $.t("console.authentication.editChains.deleteBtnTooltip.defaultAdminAuthChain");
-                            } else {
-                                popoverOpt.content =
-                                    $.t("console.authentication.editChains.deleteBtnTooltip.defaultOrgAuthChain");
-                            }
+                            popoverOpt.content =
+                                $.t("console.authentication.editChains.deleteBtnTooltip.defaultOrgAuthChain");
                         }
                         // popover doesn't work in case button has disabled attribute
                         self.$el.find("#delete").addClass("disabled").popover(popoverOpt);
@@ -286,9 +284,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                 firstRequiredIndex = _.findIndex(config, { criteria: "REQUIRED" });
                 sufficentIndex = _.findIndex(_.drop(config, firstRequiredIndex), { criteria: "SUFFICIENT" });
 
-                if (firstRequiredIndex > -1 && sufficentIndex > -1
-                    && firstRequiredIndex < sufficentIndex
-                    && config.length - 1 > sufficentIndex) {
+                if (firstRequiredIndex > -1 && sufficentIndex > -1 &&
+                    firstRequiredIndex < sufficentIndex &&
+                    config.length - 1 > sufficentIndex) {
                     alert = Handlebars.compile("{{> alerts/_Alert type='warning' " +
                         "text='console.authentication.editChains.alerts.reqdFailSuffPass'}}");
                 }

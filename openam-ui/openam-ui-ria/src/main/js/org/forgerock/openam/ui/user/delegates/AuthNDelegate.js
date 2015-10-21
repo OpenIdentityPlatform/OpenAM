@@ -149,7 +149,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 "Internal Server Error ": { status: "500" }
             }
         }).then(processSucceeded, function (jqXHR) {
-            var oldReqs,errorBody,msg,
+            var oldReqs, errorBody,
                 currentStage = requirementList.length,
                 message,
                 failReason = null,
@@ -243,13 +243,13 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
 
     function hasRealmChanged () {
         var auth = Configuration.globalData.auth;
-        return auth.subRealm !== knownAuth.subRealm
-            || _.get(auth, "urlParams.realm") !== _.get(knownAuth, "urlParams.realm");
+        return auth.subRealm !== knownAuth.subRealm ||
+            _.get(auth, "urlParams.realm") !== _.get(knownAuth, "urlParams.realm");
     }
     function hasAuthIndexChanged () {
         var auth = Configuration.globalData.auth;
-        return _.get(auth, "urlParams.authIndexType") !== _.get(knownAuth, "urlParams.authIndexType")
-            || _.get(auth, "urlParams.authIndexValue") !== _.get(knownAuth, "urlParams.authIndexValue");
+        return _.get(auth, "urlParams.authIndexType") !== _.get(knownAuth, "urlParams.authIndexType") ||
+            _.get(auth, "urlParams.authIndexValue") !== _.get(knownAuth, "urlParams.authIndexValue");
     }
 
     obj.getRequirements = function (args) {

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,7 +21,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-
 
 define("org/forgerock/openam/ui/user/oauth2/TokensView", [
     "jquery",
@@ -63,7 +62,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
             $("#tokensTable").dataTable({
                 "bProcessing": true,
                 "sAjaxSource": "",
-                "fnServerData": function (sUrl, aoData, fnCallback, oSettings) {
+                "fnServerData": function (sUrl, aoData, fnCallback) {
                     tokensDelegate.getAllTokens(function (tokens) {
                         var data = { aaData: tokens }, i, cleanScope, cleanDate;
 
@@ -117,11 +116,11 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                 },
                 "sDom": 'l<"deleteSelected">f<"clear">rt<"clear">ip<"clear">',
                 "sPaginationType": "full_numbers",
-                "fnInitComplete": function (oSettings, json) {
+                "fnInitComplete": function () {
                     $(".deleteSelected").html('<input type="submit" class="button orange floatRight" value="' +
                         $.t("common.form.deleteSelected") + '" >');
                 },
-                "fnRowCallback": function (row, data, displayindex) {
+                "fnRowCallback": function (row, data) {
                     $(row).children().not(":first").click(function () {
                         var id = data.id[0], htmlCode, table, temp = row, td;
                         tokensDelegate.getTokenByID(function (tokenInfo) {
@@ -172,8 +171,6 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
         },
 
         formSubmit: function (event) {
-            var data = {};
-
             event.preventDefault();
             event.stopPropagation();
 
@@ -182,10 +179,10 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                 td = $(this);
                 id = td.attr("id");
                 tokensDelegate.deleteToken(
-                    function (id) {
+                    function () {
                         location.reload(true);
                     },
-                    function (id) {
+                    function () {
 
                     },
                     id);

@@ -78,7 +78,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     /**
      * Checks for a change of realm
      */
-    obj.checkForDifferences = function (route, params) {
+    obj.checkForDifferences = function () {
         var currentSubRealm = RealmHelper.getSubRealm(),
             currentOverrideRealm = RealmHelper.getOverrideRealm(),
             subRealmChanged = lastKnownSubRealm !== currentSubRealm,

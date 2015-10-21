@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     obj.DatetimeAgoCell = Backgrid.Cell.extend({
         className: "date-time-ago-cell",
         formatter: {
-            fromRaw: function (rawData, model) {
+            fromRaw: function (rawData) {
                 return moment(rawData).fromNow();
             }
         },
@@ -117,7 +117,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
     obj.UniversalIdToUsername = Backgrid.Cell.extend({
         formatter: {
-            fromRaw: function (rawData, model) {
+            fromRaw: function (rawData) {
                 return rawData.substring(3, rawData.indexOf(",ou=user"));
             }
         },
@@ -193,8 +193,8 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
             this.$el.empty();
             var rawValue = this.model.get(this.column.get("name")),
                 formattedValue = this.formatter.fromRaw(rawValue, this.model),
-                href = _.isFunction(this.column.get("href")) ?
-                    this.column.get("href")(rawValue, formattedValue, this.model) : this.column.get("href");
+                href = _.isFunction(this.column.get("href"))
+                    ? this.column.get("href")(rawValue, formattedValue, this.model) : this.column.get("href");
 
             this.$el.append($("<a>", {
                 href: href || rawValue,
@@ -245,12 +245,12 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         var params = [],
             additionalFilters = data._queryFilter || [],
             getFilter = (function () {
-                return data && data.filterName && data.filterName === "eq" ?
-                    function (filterName, filterQuery) {
+                return data && data.filterName && data.filterName === "eq"
+                    ? function (filterName, filterQuery) {
                         // Policies endpoints do not support 'co', so we emulate it using 'eq' and wildcards
                         return filterName + "+eq+" + encodeURIComponent('"*' + filterQuery + '*"');
-                    } :
-                    function (filterName, filterQuery) {
+                    }
+                    : function (filterName, filterQuery) {
                         return filterName + "+co+" + encodeURIComponent('"' + filterQuery + '"');
                     };
             }());
@@ -265,7 +265,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         return params.length === 0 ? true : params.join("+AND+");
     };
 
-    obj.parseState = function (resp, queryParams, state, options) {
+    obj.parseState = function (resp) {
         if (!this.state.totalRecords) {
             this.state.totalRecords = resp.remainingPagedResults + resp.resultCount;
         }
@@ -320,7 +320,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         return Backbone.sync(method, model, options);
     };
 
-    obj.parseRecords = function (data, options) {
+    obj.parseRecords = function (data) {
         return data.result;
     };
 

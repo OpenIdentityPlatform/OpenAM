@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -30,9 +30,8 @@ define("org/forgerock/openam/ui/user/logout/RESTLogoutView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
-    "org/forgerock/commons/ui/common/components/Navigation"
-], function (AbstractView, Router, Configuration, Constants, EventManager, UiUtils, LoginHelper, Navigation) {
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
+], function (AbstractView, Router, Configuration, Constants, EventManager, UiUtils, LoginHelper) {
 
     var LogoutView = AbstractView.extend({
         template: "templates/openam/RESTLogoutTemplate.html",

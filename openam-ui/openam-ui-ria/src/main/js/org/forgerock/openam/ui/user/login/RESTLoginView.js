@@ -101,9 +101,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 realmPath;
 
             if (overrideRealmParameter) {
-                realmPath = overrideRealmParameter.substring(0, 1) === "/" ?
-                    overrideRealmParameter.slice(1) :
-                    overrideRealmParameter;
+                realmPath = overrideRealmParameter.substring(0, 1) === "/"
+                    ? overrideRealmParameter.slice(1)
+                    : overrideRealmParameter;
             } else {
                 realmPath = RealmHelper.getSubRealm();
             }
@@ -116,9 +116,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 submitContent = {},
                 auth = Configuration.globalData.auth;
 
-            _.each(_.keys(auth.urlParams),function (key) {
+            _.each(_.keys(auth.urlParams), function (key) {
                 if (key.indexOf("IDToken") > -1) {
-                    index = parseInt(key.substring(7),10) - 1;
+                    index = parseInt(key.substring(7), 10) - 1;
                     submitContent["callback_" + index] = auth.urlParams["IDToken" + key.substring(7)];
                 }
             });
@@ -165,7 +165,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, submitContent);
         },
 
-        render: function (args, callback) {
+        render: function (args) {
             var urlParams = {}, // Deserialized querystring params
                 promise = $.Deferred(),
                 auth = Configuration.globalData.auth;
@@ -203,9 +203,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     // If we have a token, let's see who we are logged in as....
                     SessionManager.getLoggedUser(function (user) {
 
-                        if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase()
-                            && urlParams.ForceAuth !== "true")
-                        {
+                        if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase() &&
+                            urlParams.ForceAuth !== "true") {
                             Configuration.setProperty("loggedUser", user);
                             delete auth.passedInRealm;
 
@@ -221,9 +220,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                 });
 
                                 // Copied from EVENT_LOGIN_REQUEST handler
-                                if (Configuration.gotoURL
-                                    && _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1)
-                                {
+                                if (Configuration.gotoURL &&
+                                    _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1) {
                                     console.log("Auto redirect to " + Configuration.gotoURL);
                                     Router.navigate(Configuration.gotoURL, { trigger: true });
                                     delete Configuration.gotoURL;
@@ -302,7 +300,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     },
                     output: [{
                         name: "options",
-                        value: [ $.t("common.user.login") ]
+                        value: [$.t("common.user.login")]
                     }],
                     type: "ConfirmationCallback",
                     isSubmit: true
@@ -339,11 +337,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             if (this.$el.find("[name=loginRemember]").length !== 0 && login) {
                 this.$el.find("input[type=text]:first").val(login);
-                this.$el.find("[name=loginRemember]").attr("checked","true");
+                this.$el.find("[name=loginRemember]").attr("checked", "true");
                 this.$el.find("[type=password]").focus();
             } else {
-                this.$el.find(":input:not([type='radio']):not([type='checkbox'])"
-                    + ":not([type='submit']):not([type='button']):first").focus();
+                this.$el.find(":input:not([type='radio']):not([type='checkbox'])" +
+                    ":not([type='submit']):not([type='button']):first").focus();
             }
         },
 
@@ -352,20 +350,20 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             // Rest does not accept the params listed in the array below as is
             // they must be transformed into the "authIndexType" and "authIndexValue" params
-            _.each(["authlevel","module","service","user"],function (p) {
+            _.each(["authlevel", "module", "service", "user"], function (p) {
                 if (urlParams[p]) {
                     urlParams.authIndexType = ((p === "authlevel") ? "level" : p);
                     urlParams.authIndexValue = urlParams[p];
                     //***note special case for authLevel
-                    Configuration.globalData.auth.additional += "&authIndexType=" + ((p === "authlevel") ? "level" : p)
-                        + "&authIndexValue=" + urlParams[p];
+                    Configuration.globalData.auth.additional += "&authIndexType=" +
+                        ((p === "authlevel") ? "level" : p) + "&authIndexValue=" + urlParams[p];
                 }
             });
 
             // Special case for SSORedirect
             if (urlParams.goto && urlParams.goto.indexOf("/SSORedirect") === 0) {
                 urlParams.goto = "/" + Constants.context + urlParams.goto;
-                Configuration.globalData.auth.additional.replace("&goto=","&goto=" + "/" + Constants.context);
+                Configuration.globalData.auth.additional.replace("&goto=", "&goto=" + "/" + Constants.context);
             }
 
             Configuration.globalData.auth.urlParams = urlParams;
@@ -420,8 +418,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
                 if (options && options.value !== undefined) {
                     // if there is only one option then mark it as default.
-                    defaultOption = options.value.length > 1 ?
-                        _.find(this.output, { name: "defaultOption" }) : { "value": 0 };
+                    defaultOption = options.value.length > 1
+                        ? _.find(this.output, { name: "defaultOption" }) : { "value": 0 };
 
                     _.each(options.value, function (option, key) {
                         btnClass = (defaultOption && defaultOption.value === key) ? "btn-primary" : "btn-default";

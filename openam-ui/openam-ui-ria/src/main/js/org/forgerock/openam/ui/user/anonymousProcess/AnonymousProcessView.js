@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
             });
         },
 
-        render: function (args, callback) {
+        render: function () {
             var params = Router.convertCurrentUrlToJSON().params,
                 overrideRealm = RealmHelper.getOverrideRealm(),
                 subRealm = RealmHelper.getSubRealm(),

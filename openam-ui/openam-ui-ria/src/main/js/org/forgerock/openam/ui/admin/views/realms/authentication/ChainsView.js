@@ -41,8 +41,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             e.preventDefault();
             var self = this,
                 chainName,
-                invalidName = false,
-                href = $(e.currentTarget).attr("href");
+                invalidName = false;
 
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authentication/chains/AddChainTemplate.html",

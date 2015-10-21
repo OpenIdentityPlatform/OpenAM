@@ -51,7 +51,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        attrSpecificChangeInput: function (e) {
+        attrSpecificChangeInput: function () {
             if (this.data.title === "authenticateToRealm") {
                 var itemData = this.data.itemData;
                 if (itemData.authenticateToRealm.indexOf("/") !== 0) {

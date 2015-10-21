@@ -40,6 +40,3 @@ define("org/forgerock/openam/ui/dashboard/delegates/OAuthTokensDelegate", [
 
     return obj;
 });
-
-
-

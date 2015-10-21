@@ -131,7 +131,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     };
 
     obj.filterUrlParams = function (params) {
-        var paramsToSave = ["arg","authIndexType","authIndexValue","goto","gotoOnFail","ForceAuth","locale"],
+        var paramsToSave = ["arg", "authIndexType", "authIndexValue", "goto", "gotoOnFail", "ForceAuth", "locale"],
             filteredParams = {};
 
         _.each(paramsToSave, function (p) {
@@ -179,7 +179,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     obj.removeSessionCookie = function () {
         var auth = Configuration.globalData.auth;
         if (auth.cookieDomains && auth.cookieDomains.length !== 0) {
-            _.each(auth.cookieDomains,function (cookieDomain) {
+            _.each(auth.cookieDomains, function (cookieDomain) {
                 CookieHelper.deleteCookie(auth.cookieName, "/", cookieDomain);
             });
         } else {

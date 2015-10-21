@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/policies/conditions/LegacyListItem.html",
                 this.data,
-                function (tpl) {
+                function () {
                     self.setElement("#legacy_" + itemID);
                     self.delegateEvents();
 
