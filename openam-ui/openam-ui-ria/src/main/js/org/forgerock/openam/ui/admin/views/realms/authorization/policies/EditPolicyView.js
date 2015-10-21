@@ -34,6 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageSubjectsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageEnvironmentsView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "bootstrap-tabdrop",
     "selectize"
 ], function ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, PolicyModel, PolicySetModel,
              PoliciesDelegate, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
@@ -155,6 +156,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                                     return (promises[promises.length] = $.Deferred()).resolve;
                                 };
 
+                            self.$el.find(".tab-menu .nav-tabs").tabdrop();
                             self.buildResourceTypeSelection();
 
                             ManageSubjectsView.render(self.data, resolve());

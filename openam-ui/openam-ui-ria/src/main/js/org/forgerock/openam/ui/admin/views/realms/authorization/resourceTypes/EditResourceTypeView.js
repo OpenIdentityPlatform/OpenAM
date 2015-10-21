@@ -26,7 +26,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
     "org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypePatternsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypeActionsView",
-    "org/forgerock/openam/ui/admin/utils/FormHelper"
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "bootstrap-tabdrop"
 ], function ($, _, Messages, AbstractView, EventManager, Router, Constants, UIUtils, ResourceTypeModel,
              ResourceTypePatternsView, ResourceTypeActionsView, FormHelper) {
 
@@ -94,6 +95,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 var promises = [], resolve = function () { return (promises[promises.length] = $.Deferred()).resolve;},
                     data = self.data;
 
+                self.$el.find(".tab-menu .nav-tabs").tabdrop();
                 self.renderSettings();
 
                 self.patternsView = new ResourceTypePatternsView();

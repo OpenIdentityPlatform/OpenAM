@@ -29,6 +29,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
+    "bootstrap-tabdrop",
     "selectize"
 ], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesDelegate, FormHelper, Messages, AbstractView,
              EventManager, Router, Constants, UIUtils) {
@@ -99,6 +100,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                             realmPath: self.realmPath,
                             policySetModel: self.model
                         }, function (policiesNumber) {
+                            self.$el.find(".tab-menu .nav-tabs").tabdrop();
+
                             if (policiesNumber > 0) {
                                 self.data.disableSettingsEdit = true;
                                 self.$el.find("#saveChanges, #delete").attr("disabled", true);
