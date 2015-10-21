@@ -16,12 +16,17 @@
 
 
 define("org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView", [
-    "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView"
-], function (AnonymousProcessView) {
-    var PasswordResetView = AnonymousProcessView.extend({
-        endpoint: "forgottenPassword",
-        i18nBase: "common.user.passwordReset"
-    });
+    "lodash",
+    "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView",
+    "org/forgerock/commons/ui/user/anonymousProcess/PasswordResetView"
+], function (_, AnonymousProcessView, PasswordResetView) {
 
-    return new PasswordResetView();
+    function AMPasswordResetView () { }
+
+    AMPasswordResetView.prototype = PasswordResetView;
+    AMPasswordResetView.prototype.endpoint = "forgottenPassword";
+
+    _.extend(AMPasswordResetView.prototype, AnonymousProcessView.prototype);
+
+    return new AMPasswordResetView();
 });

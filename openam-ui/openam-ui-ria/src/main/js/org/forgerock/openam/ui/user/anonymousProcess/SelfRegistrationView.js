@@ -16,12 +16,17 @@
 
 
 define("org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView", [
-    "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView"
-], function (AnonymousProcessView) {
-    var SelfRegistrationView = AnonymousProcessView.extend({
-        endpoint: "userRegistration",
-        i18nBase: "common.user.selfRegistration"
-    });
+    "lodash",
+    "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView",
+    "org/forgerock/commons/ui/user/anonymousProcess/SelfRegistrationView"
+], function (_, AnonymousProcessView, SelfRegistrationView) {
 
-    return new SelfRegistrationView();
+    function AMSelfRegistrationView () { }
+
+    AMSelfRegistrationView.prototype = SelfRegistrationView;
+    AMSelfRegistrationView.prototype.endpoint = "userRegistration";
+
+    _.extend(AMSelfRegistrationView.prototype, AnonymousProcessView.prototype);
+
+    return new AMSelfRegistrationView();
 });
