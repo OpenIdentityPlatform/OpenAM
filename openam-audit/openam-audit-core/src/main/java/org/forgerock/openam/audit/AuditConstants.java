@@ -15,7 +15,8 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.audit.events.AuditEventBuilder.*;
+import static org.forgerock.audit.events.AuditEventBuilder.AUTHENTICATION;
+import static org.forgerock.audit.events.AuditEventBuilder.ID;
 
 /**
  * Collection of constants related to auditing.
@@ -45,7 +46,13 @@ public final class AuditConstants {
         /** Session destroyed audit event name. */
         AM_SESSION_DESTROYED("AM-SESSION-DESTROYED"),
         /** Session property changed audit event name. */
-        AM_SESSION_PROPERTY_CHANGED("AM-SESSION-PROPERTY_CHANGED");
+        AM_SESSION_PROPERTY_CHANGED("AM-SESSION-PROPERTY_CHANGED"),
+        /** Event for auth process module completion. */
+        AM_LOGIN_MODULE_COMPLETED("AM-LOGIN-MODULE-COMPLETED"),
+        /** Event for auth process module chain completion. */
+        AM_LOGIN_CHAIN_COMPLETED("AM-LOGIN-CHAIN-COMPLETED"),
+        /** Event for logout. */
+        AM_LOGOUT("AM-LOGOUT");
 
         private final String name;
 
@@ -135,27 +142,21 @@ public final class AuditConstants {
     }
 
     /**
-     * Types of available event handlers.
+     * Predefined keys for the entries in the authentication audit "entries/info" field.
      */
-    public enum EventHandlerType {
-        /** CSV event handler type. */
-        CSV
-    }
-
-    /**
-     * Types of audit event.
-     */
-    public enum Event {
-        /** Event for auth process module completion. */
-        AM_LOGIN_MODULE_COMPLETED("AM_LOGIN_MODULE_COMPLETED"),
-        /** Event for auth process module chain completion. */
-        AM_LOGIN_CHAIN_COMPLETED("AM_LOGIN_CHAIN_COMPLETED"),
-        /** Event for logout. */
-        AM_LOGOUT("AM_LOGOUT");
+    public enum EntriesInfoFieldKey {
+        /** Key for the IP address. */
+        IP_ADDRESS("ipAddress"),
+        /** Key for the auth level. */
+        AUTH_LEVEL("authLevel"),
+        /** Key for the module name. */
+        MODULE_NAME("moduleName"),
+        /** Key for the module class. */
+        MODULE_CLASS("moduleClass");
 
         private final String name;
 
-        Event(String name) {
+        EntriesInfoFieldKey(String name) {
             this.name = name;
         }
 
@@ -163,6 +164,14 @@ public final class AuditConstants {
         public String toString() {
             return name;
         }
+    }
+
+    /**
+     * Types of available event handlers.
+     */
+    public enum EventHandlerType {
+        /** CSV event handler type. */
+        CSV
     }
 
     /**

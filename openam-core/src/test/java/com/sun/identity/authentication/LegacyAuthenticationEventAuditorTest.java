@@ -39,12 +39,13 @@ public class LegacyAuthenticationEventAuditorTest {
     AMAuthenticationAuditEventBuilder authenticationBuilder = mock(AMAuthenticationAuditEventBuilder.class);
     AMActivityAuditEventBuilder activityBuilder = mock(AMActivityAuditEventBuilder.class);
 
-    private static final String LOGOUT_EVENT_1 = "LOGOUT";
-    private static final String LOGOUT_EVENT_2 = "LOGOUT_USER";
-    private static final String LOGOUT_EVENT_3 = "LOGOUT_ROLE";
-    private static final String LOGOUT_EVENT_4 = "LOGOUT_SERVICE";
-    private static final String LOGOUT_EVENT_5 = "LOGOUT_LEVEL";
-    private static final String LOGOUT_EVENT_6 = "LOGOUT_MODULE_INSTANCE";
+    private static final String LOGOUT = "LOGOUT";
+    private static final String LOGOUT_USER = "LOGOUT_USER";
+    private static final String LOGOUT_ROLE = "LOGOUT_ROLE";
+    private static final String LOGOUT_SERVICE = "LOGOUT_SERVICE";
+    private static final String LOGOUT_LEVEL = "LOGOUT_LEVEL";
+    private static final String LOGOUT_MODULE_INSTANCE = "LOGOUT_MODULE_INSTANCE";
+    private static final String ACTIVITY_ONLY_EVENT = "CHANGE_USER_PASSWORD_SUCCEEDED";
 
     private static final String TEST_REALM = "TEST_REALM";
 
@@ -56,8 +57,8 @@ public class LegacyAuthenticationEventAuditorTest {
     }
 
     @Test
-    public void shouldReturnTrueForLegacyLogoutEvent1() throws Exception {
-        boolean result = auditor.isLogoutEvent(LOGOUT_EVENT_1);
+    public void shouldReturnTrueForLegacyLogoutEvent() throws Exception {
+        boolean result = auditor.isLogoutEvent(LOGOUT);
 
         assertEquals(true, result);
         verifyNoMoreInteractions(authenticationAuditor);
@@ -67,8 +68,8 @@ public class LegacyAuthenticationEventAuditorTest {
     }
 
     @Test
-    public void shouldReturnTrueForLegacyLogoutEvent2() throws Exception {
-        boolean result = auditor.isLogoutEvent(LOGOUT_EVENT_2);
+    public void shouldReturnTrueForLegacyLogoutUserEvent() throws Exception {
+        boolean result = auditor.isLogoutEvent(LOGOUT_USER);
 
         assertEquals(true, result);
         verifyNoMoreInteractions(authenticationAuditor);
@@ -78,8 +79,8 @@ public class LegacyAuthenticationEventAuditorTest {
     }
 
     @Test
-    public void shouldReturnTrueForLegacyLogoutEvent3() throws Exception {
-        boolean result = auditor.isLogoutEvent(LOGOUT_EVENT_3);
+    public void shouldReturnTrueForLegacyLogoutRoleEvent() throws Exception {
+        boolean result = auditor.isLogoutEvent(LOGOUT_ROLE);
 
         assertEquals(true, result);
         verifyNoMoreInteractions(authenticationAuditor);
@@ -89,8 +90,8 @@ public class LegacyAuthenticationEventAuditorTest {
     }
 
     @Test
-    public void shouldReturnTrueForLegacyLogoutEvent4() throws Exception {
-        boolean result = auditor.isLogoutEvent(LOGOUT_EVENT_4);
+    public void shouldReturnTrueForLegacyLogoutServiceEvent() throws Exception {
+        boolean result = auditor.isLogoutEvent(LOGOUT_SERVICE);
 
         assertEquals(true, result);
         verifyNoMoreInteractions(authenticationAuditor);
@@ -100,8 +101,8 @@ public class LegacyAuthenticationEventAuditorTest {
     }
 
     @Test
-    public void shouldReturnTrueForLegacyLogoutEvent5() throws Exception {
-        boolean result = auditor.isLogoutEvent(LOGOUT_EVENT_5);
+    public void shouldReturnTrueForLegacyLogoutLevelEvent() throws Exception {
+        boolean result = auditor.isLogoutEvent(LOGOUT_LEVEL);
 
         assertEquals(true, result);
         verifyNoMoreInteractions(authenticationAuditor);
@@ -111,8 +112,8 @@ public class LegacyAuthenticationEventAuditorTest {
     }
 
     @Test
-    public void shouldReturnTrueForLegacyLogoutEvent6() throws Exception {
-        boolean result = auditor.isLogoutEvent(LOGOUT_EVENT_6);
+    public void shouldReturnTrueForLegacyLogoutModuleInstanceEvent() throws Exception {
+        boolean result = auditor.isLogoutEvent(LOGOUT_MODULE_INSTANCE);
 
         assertEquals(true, result);
         verifyNoMoreInteractions(authenticationAuditor);
@@ -124,6 +125,50 @@ public class LegacyAuthenticationEventAuditorTest {
     @Test
     public void shouldReturnFalseForNonLegacyLogoutEvent() throws Exception {
         boolean result = auditor.isLogoutEvent("Doesn't exist");
+
+        assertEquals(false, result);
+        verifyNoMoreInteractions(authenticationAuditor);
+        verifyNoMoreInteractions(activityAuditor);
+        verifyNoMoreInteractions(authenticationBuilder);
+        verifyNoMoreInteractions(activityBuilder);
+    }
+
+    @Test
+    public void shouldReturnFalseForActivityOnlyEvent() throws Exception {
+        boolean result = LegacyAuthenticationEventAuditor.isAuthenticationOnlyEvent(ACTIVITY_ONLY_EVENT);
+
+        assertEquals(false, result);
+        verifyNoMoreInteractions(authenticationAuditor);
+        verifyNoMoreInteractions(activityAuditor);
+        verifyNoMoreInteractions(authenticationBuilder);
+        verifyNoMoreInteractions(activityBuilder);
+    }
+
+    @Test
+    public void shouldReturnTrueForNonActivityOnlyEvent() throws Exception {
+        boolean result = LegacyAuthenticationEventAuditor.isAuthenticationOnlyEvent("Some other event");
+
+        assertEquals(true, result);
+        verifyNoMoreInteractions(authenticationAuditor);
+        verifyNoMoreInteractions(activityAuditor);
+        verifyNoMoreInteractions(authenticationBuilder);
+        verifyNoMoreInteractions(activityBuilder);
+    }
+
+    @Test
+    public void shouldReturnTrueForActivityOnlyEvent() throws Exception {
+        boolean result = LegacyAuthenticationEventAuditor.isActivityOnlyEvent(ACTIVITY_ONLY_EVENT);
+
+        assertEquals(true, result);
+        verifyNoMoreInteractions(authenticationAuditor);
+        verifyNoMoreInteractions(activityAuditor);
+        verifyNoMoreInteractions(authenticationBuilder);
+        verifyNoMoreInteractions(activityBuilder);
+    }
+
+    @Test
+    public void shouldReturnFalseForNonActivityOnlyEvent() throws Exception {
+        boolean result = LegacyAuthenticationEventAuditor.isActivityOnlyEvent("Some other event");
 
         assertEquals(false, result);
         verifyNoMoreInteractions(authenticationAuditor);

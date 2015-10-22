@@ -152,8 +152,6 @@ public class AMLoginContext {
      */
     private ResourceBundle bundle;
 
-    private AuthenticationAuditor authenticationAuditor;
-
     static {
         // set the auth configuration programmatically.
         // this getConfiguration() call throws null exception

@@ -15,6 +15,8 @@
 */
 package org.forgerock.openam.audit.model;
 
+import org.forgerock.openam.audit.AuditConstants.EventOutcome;
+
 import java.util.Map;
 
 /**
@@ -27,7 +29,7 @@ import java.util.Map;
 public class AuthenticationAuditEntry {
 
     private String moduleId;
-    private String result;
+    private EventOutcome result;
     private Map<String, String> info;
 
     /**
@@ -44,7 +46,7 @@ public class AuthenticationAuditEntry {
      *
      * @return The result.
      */
-    public String getResult() {
+    public EventOutcome getResult() {
         return result;
     }
 
@@ -71,7 +73,7 @@ public class AuthenticationAuditEntry {
      *
      * @param result The result.
      */
-    public void setResult(String result) {
+    public void setResult(EventOutcome result) {
         this.result = result;
     }
 

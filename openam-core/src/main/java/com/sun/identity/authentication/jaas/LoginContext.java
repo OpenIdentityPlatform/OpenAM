@@ -347,11 +347,11 @@ public class LoginContext {
 
     /**
      * LoginModule information -
-     *      incapsulates Configuration info and actual module instances.
+     *      encapsulates Configuration info and actual module instances.
      */
-    public static class ModuleInfo {
-        AppConfigurationEntry entry;
-        Object module;
+    static class ModuleInfo {
+        private AppConfigurationEntry entry;
+        private Object module;
 
         ModuleInfo(AppConfigurationEntry newEntry, Object newModule) {
             this.entry = newEntry;
