@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 package com.sun.identity.idm.common;
 
@@ -42,6 +42,8 @@ import javax.servlet.ServletContext;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.util.SSLSocketFactoryManager;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
@@ -64,6 +66,9 @@ import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.utils.CollectionUtils;
+
 import java.util.HashMap;
 
 
@@ -85,6 +90,7 @@ public class IdRepoUtils {
     private static final String TIVOLI_LDIF = "tivoliUserSchema";
 
     private static final String SCHEMA_PROPERTY_FILENAME = "schemaNames";
+    private static final String LDAPv3_LDAP_SERVER = "sun-idrepo-ldapv3-config-ldap-server";
     private static final Set<String> defaultPwdAttrs = new HashSet<String>(2);
     private static Debug DEBUG = Debug.getInstance("IdRepoUtils");
 
@@ -149,7 +155,7 @@ public class IdRepoUtils {
 
     /**
      * Return true if specified IdRepo type has schemas.
-     * 
+     *
      * @param idRepoType IdRepo type
      * @return true if specified IdRepo type has schemas
      */
@@ -160,12 +166,12 @@ public class IdRepoUtils {
 
         String schemaFiles = getSchemaFiles(idRepoType);
         return ((schemaFiles != null) && (schemaFiles.trim().length() > 0));
-            
+
     }
 
     /**
      * Loads schema to specified IdRepo.
-     * 
+     *
      * @param ssoToken single sign on token of authenticated user identity
      * @param idRepoName IdRepo name
      * @param realm the realm
@@ -261,7 +267,7 @@ public class IdRepoUtils {
             String suffix = CollectionHelper.getMapAttr(attrValues,
                 "sun-idrepo-ldapv3-config-organization_name");
             if (suffix != null) {
-                schemaStr = StringUtils.strReplaceAll(schemaStr, 
+                schemaStr = StringUtils.strReplaceAll(schemaStr,
                     "@userStoreRootSuffix@", suffix);
                 String dbName =LDAPUtils.getDBName(suffix, ld);
                 schemaStr = StringUtils.strReplaceAll(schemaStr, "@DB_NAME@",
@@ -271,7 +277,7 @@ public class IdRepoUtils {
             if (idRepoType.equals(LDAPv3ForADAM)) {
                 String adamInstanceGUID = getADAMInstanceGUID(attrValues);
                 if (adamInstanceGUID != null) {
-                    schemaStr = StringUtils.strReplaceAll(schemaStr, 
+                    schemaStr = StringUtils.strReplaceAll(schemaStr,
                         "@INSTANCE_GUID@", adamInstanceGUID);
                 }
             }
@@ -335,35 +341,47 @@ public class IdRepoUtils {
         return null;
     }
 
-    private static LDAPConnection getLDAPConnection(Map attrValues) 
-        throws Exception {
-        String s = CollectionHelper.getMapAttr(attrValues,
-            "sun-idrepo-ldapv3-config-ssl-enabled");
+    private static LDAPConnection getLDAPConnection(Map attrValues)
+            throws Exception {
+        String s = CollectionHelper.getMapAttr(attrValues, "sun-idrepo-ldapv3-config-ssl-enabled");
         boolean ssl = ((s != null) && s.equals("true"));
-        LDAPConnection ld = (ssl) ? new LDAPConnection(
-            SSLSocketFactoryManager.getSSLSocketFactory()) :
-            new LDAPConnection();
+        LDAPConnection ld = (ssl) ?
+                new LDAPConnection(SSLSocketFactoryManager.getSSLSocketFactory()) :
+                new LDAPConnection();
         ld.setConnectTimeout(300);
 
-        String hostPort = CollectionHelper.getMapAttr(attrValues,
-            "sun-idrepo-ldapv3-config-ldap-server");
-        if ((hostPort == null) || (hostPort.trim().length() == 0)) {
+        Set<LDAPURL> ldapUrls = getLDAPUrls(attrValues);
+        if (CollectionUtils.isEmpty(ldapUrls)) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAPURLs found");
+            }
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
         }
 
-        String bindDn = CollectionHelper.getMapAttr(attrValues,
-            "sun-idrepo-ldapv3-config-authid");
-        if ((bindDn == null) || (bindDn.trim().length() == 0)) {
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
-        }
-        String bindPwd = CollectionHelper.getMapAttr(attrValues,
-            "sun-idrepo-ldapv3-config-authpw");
-        if ((bindPwd == null) || (bindPwd.trim().length() == 0)) {
+        LDAPURL ldapUrl = ldapUrls.iterator().next();
+        if (org.forgerock.openam.utils.StringUtils.isEmpty(ldapUrl.getHost())) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAP host found");
+            }
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
         }
 
-        // hostPort contains port so 389 will be ignored
-        ld.connect(3, hostPort, 389, bindDn, bindPwd);
+        String bindDn = CollectionHelper.getMapAttr(attrValues, "sun-idrepo-ldapv3-config-authid");
+        if (org.forgerock.openam.utils.StringUtils.isBlank(bindDn)) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAP bindDN found");
+            }
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+        }
+        String bindPwd = CollectionHelper.getMapAttr(attrValues, "sun-idrepo-ldapv3-config-authpw");
+        if (org.forgerock.openam.utils.StringUtils.isBlank(bindPwd)) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAP bindPW found");
+            }
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+        }
+
+        ld.connect(3, ldapUrl.getHost(), ldapUrl.getPort(), bindDn, bindPwd);
         return ld;
     }
 
@@ -466,5 +484,26 @@ public class IdRepoUtils {
             }
         }
         return map;
+    }
+
+    private static Set<LDAPURL> getLDAPUrls( Map<String, Set<String>> attrValues) {
+        // Get the prioritised set of ldap servers
+        Set<String> ldapServers = attrValues.get(LDAPv3_LDAP_SERVER);
+        Set<LDAPURL> ldapUrls = null;
+        if (null != ldapServers) {
+            String hostServerId = null;
+            String hostSiteId = "";
+            try {
+                hostServerId = WebtopNaming.getAMServerID();
+                hostSiteId = WebtopNaming.getSiteID(hostServerId);
+            } catch (ServerEntryNotFoundException senfe) {
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning("ServerEntryNotFoundException, hostServerId=" + hostServerId + ", hostSiteId="
+                            + hostSiteId);
+                }
+            }
+            ldapUrls = org.forgerock.openam.ldap.LDAPUtils.prioritizeServers(ldapServers, hostServerId, hostSiteId);
+        }
+        return ldapUrls;
     }
 }
