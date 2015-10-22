@@ -587,6 +587,7 @@
                 "subtitle": "Users allowed to access this resource and their permissions",
                 "grid": ["User", "Last accessed", "Permissions"],
                 "share": "Share",
+                "editLabels" : "Edit Labels",
                 "revoke": "Unshare Resource",
                 "revokeAllMessage": "Are you sure you want to revoke all access?",
                 "resource" : "Resource",

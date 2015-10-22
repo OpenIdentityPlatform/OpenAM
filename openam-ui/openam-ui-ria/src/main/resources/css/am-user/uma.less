@@ -238,10 +238,14 @@ span.item-button-panel {
         box-shadow: none;
         opacity: 1;
         > div {
-            //.selectize-div;
+            box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.4);
         }
 
+        &:not(.has-options){
+            display:none;
+        }
     }
+
     .selectize-control.single .selectize-input.disabled {
         background: none;
         border: none;
@@ -253,7 +257,10 @@ span.item-button-panel {
     }
 
     #editLabels{
-        margin-left: -10px;
+        margin: 6px 0 0 -10px;
+        &:hover{
+            text-decoration:none;
+        }
     }
 
 }
