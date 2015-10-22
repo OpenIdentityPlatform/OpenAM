@@ -13,17 +13,24 @@
 *
 * Copyright 2015 ForgeRock AS.
 */
-package org.forgerock.openam.audit;
+package com.sun.identity.authentication;
 
 import org.forgerock.audit.AuditException;
-import org.forgerock.openam.audit.model.Entry;
+import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
+import org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder;
+import org.forgerock.openam.audit.ActivityAuditor;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuthenticationAuditor;
+import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +42,7 @@ import java.util.Set;
  *
  * This class abstracts away some of the logic that is needed to publish authentication and activity audit events
  * within the locations where legacy authentication events were historically logged. It is an intermediary between the
- * legacy publishing locations and the auditor classes ({@link AuthenticationAuditor} and {@link ActivityAuditor}).
+ * legacy publishing locations and the auditor classes ({@link org.forgerock.openam.audit.AuthenticationAuditor} and {@link org.forgerock.openam.audit.ActivityAuditor}).
  *
  * @since 13.0.0
  */
@@ -44,6 +51,12 @@ public class LegacyAuthenticationEventAuditor {
 
     private AuthenticationAuditor authenticationAuditor;
     private ActivityAuditor activityAuditor;
+
+    private static final Set<String> LOGOUT_EVENTS = new HashSet<>(Arrays.asList("LOGOUT", "LOGOUT_USER" +
+            "LOGOUT_ROLE", "LOGOUT_SERVICE", "LOGOUT_LEVEL", "LOGOUT_MODULE_INSTANCE"));
+
+    private static final Set<String> ACTIVITY_ONLY_EVENTS =
+            new HashSet<>(Arrays.asList("CHANGE_USER_PASSWORD_SUCCEEDED"));
 
     /**
      * Guice injected constructor for creating a {@link LegacyAuthenticationEventAuditor} instance.
@@ -83,7 +96,7 @@ public class LegacyAuthenticationEventAuditor {
      * @return true if the event was handled, false if there was some sort of problem.
      */
     public boolean audit(String eventName, String eventDescription, String transactionId, String authentication,
-                         String realmName, long time, Set<String> trackingIds, List<Entry> entries) {
+                         String realmName, long time, Set<String> trackingIds, List<AuthenticationAuditEntry> entries) {
         Reject.ifNull(transactionId, "The transactionId field cannot be null");
         Reject.ifNull(authentication, "The authentication field cannot be null");
         Reject.ifNull(eventDescription, "The eventDescription field cannot be null");
@@ -93,7 +106,7 @@ public class LegacyAuthenticationEventAuditor {
 
         //Determine if event is an activity event ONLY. Event names drawn from AuthenticationLogMessageIDs.xml.
         if (StringUtils.isNotEmpty(eventName)) {
-            if ("CHANGE_USER_PASSWORD_SUCCEEDED".equals(eventName)) {
+            if (isActivityOnlyEvent(eventName)) {
                 isActivityEvent = true;
                 isAuthenticationEvent = false;
             }
@@ -114,7 +127,7 @@ public class LegacyAuthenticationEventAuditor {
 
     private boolean auditAuthenticationEvent(String description, String transactionId, String authentication,
                                              String realmName, long time, Set<String> trackingIds,
-                                             List<Entry> entries) {
+                                             List<AuthenticationAuditEntry> entries) {
         boolean couldHandleEvent = true;
 
         AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
@@ -135,11 +148,11 @@ public class LegacyAuthenticationEventAuditor {
         }
         if (entries != null && !entries.isEmpty()) {
             List<Map<String, Object>> list = new ArrayList<>();
-            for (Entry entry : entries) {
+            for (AuthenticationAuditEntry authenticationAuditEntry : entries) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("moduleId", entry.getModuleId());
-                map.put("result", entry.getResult());
-                map.put("info", entry.getInfo());
+                map.put("moduleId", authenticationAuditEntry.getModuleId());
+                map.put("result", authenticationAuditEntry.getResult());
+                map.put("info", authenticationAuditEntry.getInfo());
                 list.add(map);
             }
             builder.entries(list);
@@ -191,21 +204,54 @@ public class LegacyAuthenticationEventAuditor {
      * @param message The legacy authn event message.
      * @return true if this is a logout event, false in all other cases.
      */
-    public boolean isLogoutEvent(String message) {
+    public static boolean isLogoutEvent(String message) {
         boolean isLogoutEvent = false;
 
         if (StringUtils.isNotEmpty(message)) {
-            if ("LOGOUT".equals(message)
-                    || "LOGOUT_USER".equals(message)
-                    || "LOGOUT_ROLE".equals(message)
-                    || "LOGOUT_SERVICE".equals(message)
-                    || "LOGOUT_LEVEL".equals(message)
-                    || "LOGOUT_MODULE_INSTANCE".equals(message)) {
+            if (LOGOUT_EVENTS.contains(message)) {
                 isLogoutEvent = true;
             }
         }
 
         return isLogoutEvent;
+    }
+
+    /**
+     * Reports whether or not the legacy authn event is to be logged to the authentication audit log only. The list
+     * of messages which indicate an authentication event are drawn from {@code AuthenticationLogMessageIDs.xml}.
+     *
+     * @param message The legacy authn event message.
+     * @return true if this is an authentication event, false in all other cases.
+     */
+    public static boolean isAuthenticationOnlyEvent(String message) {
+        boolean isAuthenticationOnlyEvent = false;
+
+        if (StringUtils.isNotEmpty(message)) {
+            if (!ACTIVITY_ONLY_EVENTS.contains(message)) {
+                isAuthenticationOnlyEvent = true;
+            }
+        }
+
+        return isAuthenticationOnlyEvent;
+    }
+
+    /**
+     * Reports whether or not the legacy activity event is to be logged to the authentication audit log only. The list
+     * of messages which indicate an activity event are drawn from {@code AuthenticationLogMessageIDs.xml}.
+     *
+     * @param message The legacy authn event message.
+     * @return true if this is an activity event, false in all other cases.
+     */
+    public static boolean isActivityOnlyEvent(String message) {
+        boolean isActivityOnlyEvent = false;
+
+        if (StringUtils.isNotEmpty(message)) {
+            if (ACTIVITY_ONLY_EVENTS.contains(message)) {
+                isActivityOnlyEvent = true;
+            }
+        }
+
+        return isActivityOnlyEvent;
     }
 
     /**
@@ -227,20 +273,5 @@ public class LegacyAuthenticationEventAuditor {
         }
 
         return false;
-    }
-
-    /**
-     * Reports whether or not this auditor is logging audit events for the specified realm.
-     *
-     * As this is a legacy auditor it is not logging just one specific audit topic, as there is not a direct
-     * one to one correlation between the set of all legacy authn events and one of the new audit topics. This function
-     * will report whether or not at least one audit topic is being audited by this auditor.
-     *
-     * @param realm The realm
-     * @return true if this auditor is performing some form of auditing for this realm, false otherwise.
-     */
-    public boolean isAuditing(String realm) {
-        return (authenticationAuditor.isAuditing(realm, AuditConstants.AUTHENTICATION_TOPIC)
-                || activityAuditor.isAuditing(realm, AuditConstants.ACTIVITY_TOPIC));
     }
 }

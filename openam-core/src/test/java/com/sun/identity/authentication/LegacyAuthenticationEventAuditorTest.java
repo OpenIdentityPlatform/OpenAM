@@ -13,8 +13,13 @@
 *
 * Copyright 2015 ForgeRock AS.
 */
-package org.forgerock.openam.audit;
+package com.sun.identity.authentication;
 
+import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
+import org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder;
+import org.forgerock.openam.audit.ActivityAuditor;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuthenticationAuditor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -173,45 +178,5 @@ public class LegacyAuthenticationEventAuditorTest {
         verify(activityAuditor, times(1)).isAuditing(TEST_REALM, AuditConstants.ACTIVITY_TOPIC);
         verifyNoMoreInteractions(authenticationAuditor);
         verifyNoMoreInteractions(activityAuditor);
-    }
-
-    @Test
-    public void shouldReturnTrueForRealmAuditingWhenAuthenticationTopicIsBeingAudited() throws Exception {
-        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
-        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
-
-        boolean result = auditor.isAuditing(TEST_REALM);
-
-        assertEquals(true, result);
-    }
-
-    @Test
-    public void shouldReturnTrueForRealmAuditingWhenActivityTopicIsBeingAudited() throws Exception {
-        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
-        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
-
-        boolean result = auditor.isAuditing(TEST_REALM);
-
-        assertEquals(true, result);
-    }
-
-    @Test
-    public void shouldReturnTrueForRealmAuditingWhenBothTopicsAreBeingAudited() throws Exception {
-        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
-        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(true);
-
-        boolean result = auditor.isAuditing(TEST_REALM);
-
-        assertEquals(true, result);
-    }
-
-    @Test
-    public void shouldReturnFalseForRealmAuditing() throws Exception {
-        when(authenticationAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
-        when(activityAuditor.isAuditing(any(String.class), any(String.class))).thenReturn(false);
-
-        boolean result = auditor.isAuditing(TEST_REALM);
-
-        assertEquals(false, result);
     }
 }

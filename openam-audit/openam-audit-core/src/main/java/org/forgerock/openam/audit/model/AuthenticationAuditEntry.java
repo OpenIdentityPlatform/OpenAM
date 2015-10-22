@@ -24,7 +24,7 @@ import java.util.Map;
  *
  * @since 13.0.0
  */
-public class Entry {
+public class AuthenticationAuditEntry {
 
     private String moduleId;
     private String result;
