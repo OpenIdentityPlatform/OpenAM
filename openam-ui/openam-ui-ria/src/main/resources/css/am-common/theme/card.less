@@ -1,0 +1,32 @@
+.am-panel-card {
+
+    .card-menu {
+        button.btn-link{
+            color:#999;
+            &:hover{
+                color: darken(@base-theme-color, 5%);
+            }
+        }
+    }
+
+    .card-body {
+        .card-subtext {
+            color:#999;
+        }
+    }
+
+    .card-footer {
+        border-top: 1px solid #ddd;
+        color: #999;
+        .text-success {
+            color: darken(@base-theme-color, 5%);
+        }
+    }
+
+    &:hover {
+        border: 1px solid @base-theme-color;
+        .card-icon-circle {
+            background-color: darken(@base-theme-color, 5%);
+        }
+    }
+}

@@ -6,9 +6,12 @@
     padding: 8px 15px 0;
 }
 
-.card {
-    background-color: #1F2223;
-    border: 1px solid #444;
+.am-panel-card:hover {
+    border-color: #486B64;
+}
+
+.am-panel-card:hover .card-icon-circle {
+    background-color: #7CCABA;
 }
 
 .dropdown-header {

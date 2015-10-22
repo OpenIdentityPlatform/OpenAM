@@ -1,10 +1,5 @@
-/* Candidate for Commons */
-.card {
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+.am-panel-card{
     margin-bottom: 30px;
-    color:#999;
 
     a:hover, a:focus{
         text-decoration:none;
@@ -12,12 +7,6 @@
 
     .card-menu {
         float:right;
-        button.btn-link{
-            color:#999;
-            &:hover{
-                color: darken(@base-theme-color, 5%);
-            }
-        }
     }
 
     .card-body {
@@ -41,7 +30,6 @@
         }
 
         .card-subtext {
-            color:#999;
             .ellipsis;
 
             div, p{
@@ -56,13 +44,8 @@
     }
 
     .card-footer {
-        border-top: 1px solid #ddd;
-        color: #999;
         padding: 10px 15px;
         text-align: center;
-        .text-success {
-            color: darken(@base-theme-color, 5%);
-        }
     }
 
     .card-icon-circle {
@@ -76,11 +59,9 @@
     }
 
     &:hover {
-        border: 1px solid @base-theme-color;
         transition: all 0.3s ease-in-out;
         .card-icon-circle {
             transition: all 0.3s ease-in-out;
-            background-color: darken(@base-theme-color, 5%);
         }
     }
 }

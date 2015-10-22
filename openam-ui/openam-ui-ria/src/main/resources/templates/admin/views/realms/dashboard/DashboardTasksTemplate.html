@@ -14,7 +14,7 @@
     <div class="grid-list">
     {{#each taskGroup.tasks}}
         <div class="col-sm-6 col-md-3">
-            <div class="card" >
+            <div class="panel-default panel am-panel-card">
                 <a href="#{{#if link}}{{link}}{{else}}{{_id}}{{/if}}" data-task-{{#if link}}link="{{link}}"{{else}}group="{{_id}}"{{/if}}>
                     <div class="card-body">
                         <div class="card-icon-circle card-icon-circle-sm bg-primary">

@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView"
         data: {},
         element: "#commonTasks",
         events:{
-            "click .card a" : "cardClick",
+            "click .am-panel-card a" : "cardClick",
             "click span#commonTasksBtn" : "commonTasksBtnClick"
         },
         render: function (args, callback) {
