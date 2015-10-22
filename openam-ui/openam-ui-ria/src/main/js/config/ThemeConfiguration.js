@@ -60,7 +60,7 @@ define("config/ThemeConfiguration", {
         "fr-dark-theme": {
             // An ordered list of URLs to stylesheets that will be applied to every page.
             stylesheets: [
-                "themes/dark/css/bootstrap-3.3.5-custom.css",
+                "themes/dark/css/bootstrap.min.css",
                 "css/structure.css",
                 "themes/dark/css/theme-dark.css"
             ],
