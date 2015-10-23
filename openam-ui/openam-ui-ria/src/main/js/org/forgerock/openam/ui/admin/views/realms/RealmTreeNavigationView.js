@@ -38,14 +38,10 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
             this.realmExists(this.data.realmPath).done(function () {
                 TreeNavigation.prototype.render.call(self, args, callback);
             }).fail(function (xhr) {
-                if (_.isObject(xhr) && _.isObject(xhr.responseJSON) && xhr.responseJSON.code === 401) {
-                    // session timeout, redirect to login page
-                    Router.routeTo(Router.configuration.routes.login, {
-                        args: [],
-                        trigger: true
-                    });
-                } else {
-                    // invalid realm specificied, return to realm list page
+                /**
+                 * If a non-existant realm was specified, return to realms list
+                 */
+                if (xhr.status === 404) {
                     Router.routeTo(Router.configuration.routes.realms, {
                         args: [],
                         trigger: true
