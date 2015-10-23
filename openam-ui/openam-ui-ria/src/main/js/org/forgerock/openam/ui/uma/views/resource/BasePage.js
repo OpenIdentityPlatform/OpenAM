@@ -25,7 +25,8 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
     "org/forgerock/openam/ui/uma/views/share/CommonShare",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator"
 ], function ($, AbstractView, Backbone, BackbonePaginator, Backgrid, BackgridFilter,
             BackgridUtils, CommonShare, Configuration, Constants, RealmHelper) {
     var BasePage = AbstractView.extend({

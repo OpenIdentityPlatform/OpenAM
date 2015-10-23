@@ -34,7 +34,8 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator"
 ], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, AbstractView, BackgridUtils, Configuration,
              Constants, RealmHelper) {
     var HistoryView = AbstractView.extend({
