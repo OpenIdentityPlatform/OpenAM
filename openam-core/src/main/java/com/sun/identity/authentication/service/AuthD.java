@@ -730,8 +730,10 @@ public class AuthD implements ConfigurationListener {
 
                 AMIdentity identity = IdUtils.getIdentity(userDN, realmName);
                 String authentication = null;
+                String principal = null;
                 if (identity != null) {
                     authentication = identity.getUniversalId();
+                    principal = identity.getName();
                 }
 
                 List<AuthenticationAuditEntry> entries;
@@ -748,7 +750,7 @@ public class AuthD implements ConfigurationListener {
 
                 //TODO? AM_LOGOUT.toString()
                 auditor.audit(messageName, AuditRequestContext.getTransactionIdValue(),
-                        authentication, realmName, trackingIds, entries, result);
+                        authentication, principal, realmName, trackingIds, entries, result);
             }
 
             this.logIt(data, LOG_ACCESS, messageId.toString(), props);
@@ -866,8 +868,10 @@ public class AuthD implements ConfigurationListener {
 
                 AMIdentity identity = IdUtils.getIdentity(userName, realmName);
                 String authentication = null;
+                String principal = null;
                 if (identity != null) {
                     authentication = identity.getUniversalId();
+                    principal = identity.getName();
                 }
 
                 String moduleName = (String) ssoProperties.get("ModuleName");
@@ -878,15 +882,12 @@ public class AuthD implements ConfigurationListener {
                 List<AuthenticationAuditEntry> entries = null;
                 if (StringUtils.isNotEmpty(moduleName)) {
                     Map<String, String> info = null;
-                    String ip = (String) ssoProperties.get("IPAddr");
+                    String ip = (String) ssoProperties.get(LogConstants.IP_ADDR);
                     if (StringUtils.isNotEmpty(ip)) {
                         info = Collections.singletonMap(IP_ADDRESS.toString(), ip);
                     }
                     AuthenticationAuditEntry authenticationAuditEntry = new AuthenticationAuditEntry();
                     authenticationAuditEntry.setModuleId(moduleName);
-//                    if (StringUtils.isNotEmpty(description)) {
-//                        authenticationAuditEntry.setResult(description);
-//                    }
                     messageName = AM_LOGIN_CHAIN_COMPLETED.toString();
                     if (info != null) {
                         authenticationAuditEntry.setInfo(info);
@@ -899,7 +900,7 @@ public class AuthD implements ConfigurationListener {
                 }
 
                 auditor.audit(messageName, AuditRequestContext.getTransactionIdValue(),
-                        authentication, realmName, trackingIds, entries, result);
+                        authentication, principal, realmName, trackingIds, entries, result);
             }
         }
     }

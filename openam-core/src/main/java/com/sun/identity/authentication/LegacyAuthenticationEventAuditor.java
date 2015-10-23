@@ -15,6 +15,8 @@
 */
 package com.sun.identity.authentication;
 
+import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status;
+
 import org.forgerock.audit.AuditException;
 import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
 import org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder;
@@ -28,11 +30,10 @@ import org.forgerock.util.Reject;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status;
 
 /**
  * Delegate auditor responsible for creating and publishing authentication and activity audit events specifically for
@@ -88,18 +89,18 @@ public class LegacyAuthenticationEventAuditor {
      * @param eventName The description of the event which occurred (see {@code AuthenticationLogMessageIDs.xml}
      *                         'name' attribute of each logmessage element. Cannot be null.
      * @param transactionId The transaction id for the audit event. Cannot be null.
-     * @param authentication The authentication details for the audit event. Cannot be null.
+     * @param authentication The authentication details for the audit event.
+     * @param principal The principal details for the audit event.
      * @param realmName The realm name for the audit event. May be null.
      * @param trackingIds Any tracking ids for the audit event. May be null.
      * @param entries Any extra information for the audit event. May be null.
      * @param result The result of any authentication process. May be null.
      * @return true if the event was handled, false if there was some sort of problem.
      */
-    public boolean audit(String eventName, String transactionId, String authentication,
+    public boolean audit(String eventName, String transactionId, String authentication, String principal,
                          String realmName, Set<String> trackingIds, List<AuthenticationAuditEntry> entries,
                          Status result) {
         Reject.ifNull(transactionId, "The transactionId field cannot be null");
-        Reject.ifNull(authentication, "The authentication field cannot be null");
         Reject.ifNull(eventName, "The eventName field cannot be null");
 
         if (NOT_AUDITED_EVENTS.contains(eventName)) {
@@ -119,7 +120,7 @@ public class LegacyAuthenticationEventAuditor {
         //(any remaining events are purely authentication events)
 
         if (isAuthenticationEvent) {
-            return auditAuthenticationEvent(eventName, transactionId, authentication, realmName,
+            return auditAuthenticationEvent(eventName, transactionId, authentication, principal, realmName,
                     trackingIds, entries, result);
         }
 
@@ -131,16 +132,23 @@ public class LegacyAuthenticationEventAuditor {
     }
 
     private boolean auditAuthenticationEvent(String description, String transactionId, String authentication,
-                                             String realmName, Set<String> trackingIds,
+                                             String principal, String realmName, Set<String> trackingIds,
                                              List<AuthenticationAuditEntry> entries, Status result) {
         boolean couldHandleEvent = true;
 
         AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
 
         builder.transactionId(transactionId)
-                .authentication(authentication)
                 .component(AuditConstants.Component.AUTHENTICATION);
 
+        if(StringUtils.isEmpty(authentication)) {
+            builder.authentication("");
+        } else {
+            builder.authentication(authentication);
+        }
+        if (StringUtils.isNotEmpty(principal)) {
+            builder.principal(Collections.singletonList(principal));
+        }
         if (result != null) {
             builder.result(result);
         }

@@ -2142,12 +2142,10 @@ public abstract class AMLoginModule implements LoginModule {
             String authentication = null;
             if (principalName != null && orgDN != null) {
                 authentication = IdUtils.getIdentity(principalName, realmName).getUniversalId();
-            } else if (principalName != null) {
-                authentication = principalName;
             }
 
             auditor.audit(AM_LOGIN_MODULE_COMPLETED.toString(), AuditRequestContext.getTransactionIdValue(),
-                    authentication, realmName, trackingIds, entries, result);
+                    authentication, principalName, realmName, trackingIds, entries, result);
         }
 
         // get login state for this authentication session
@@ -2383,23 +2381,29 @@ public abstract class AMLoginModule implements LoginModule {
                 }
             }
 
-            String authentication;
+            String authentication = null;
             String name = null;
             if (sharedState.containsKey(ISAuthConstants.SHARED_STATE_USERNAME)) {
                 name = (String) sharedState.get(ISAuthConstants.SHARED_STATE_USERNAME);
             }
+            AMIdentity identity = null;
             if (principalName != null && orgDN != null) {
-                authentication = cw.getIdentity(principalName, realmName).getUniversalId();
-            } else if (principalName != null) {
-                authentication = principalName;
+                identity = cw.getIdentity(principalName, realmName);
+                if (identity != null) {
+                    authentication = identity.getUniversalId();
+                }
+            }
+
+            if (authentication != null && identity != null) {
+                principalName = identity.getName();
             } else if (StringUtils.isNotEmpty(name)) {
-                authentication = name;
+                principalName = name;
             } else {
-                authentication = "Unknown user";
+                principalName = "";
             }
 
             auditor.audit(AM_LOGIN_MODULE_COMPLETED.toString(), AuditRequestContext.getTransactionIdValue(),
-                    authentication, realmName, trackingIds, entries, result);
+                    authentication, principalName, realmName, trackingIds, entries, result);
         }
 
         // get login state for this authentication session
