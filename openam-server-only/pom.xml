@@ -502,13 +502,6 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-ui-policy</artifactId>
-            <type>zip</type>
-            <classifier>www</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>

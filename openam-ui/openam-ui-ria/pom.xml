@@ -35,13 +35,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-ui-common</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-            <classifier>www</classifier>
-        </dependency>
-        <dependency>
             <groupId>org.forgerock.commons.ui</groupId>
             <artifactId>forgerock-ui-user</artifactId>
             <type>zip</type>
@@ -229,25 +222,6 @@
                                     <groupId>org.forgerock.commons.ui</groupId>
                                     <artifactId>forgerock-ui-user</artifactId>
                                     <version>${forgerock.ui.version}</version>
-                                    <type>zip</type>
-                                    <classifier>www</classifier>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>unpack-openam-ui-common</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/dependencies-expanded/openam-ui-common</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.forgerock.openam</groupId>
-                                    <artifactId>openam-ui-common</artifactId>
-                                    <version>${project.version}</version>
                                     <type>zip</type>
                                     <classifier>www</classifier>
                                 </artifactItem>
