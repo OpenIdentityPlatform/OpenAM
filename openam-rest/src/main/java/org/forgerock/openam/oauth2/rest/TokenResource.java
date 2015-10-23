@@ -39,6 +39,7 @@ import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -62,6 +63,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.forgerockrest.RestUtils;
@@ -302,21 +304,32 @@ public class TokenResource implements CollectionResourceProvider {
                 queryString = id;
             }
 
-            String[] constraints = queryString.split("\\,");
+            String[] constraints = queryString.split(",");
+            boolean userNamePresent = false;
             for (String constraint : constraints) {
                 String[] params = constraint.split("=");
                 if (params.length == 2) {
+                    if (OAuthTokenField.USER_NAME.getOAuthField().equals(params[0])) {
+                        userNamePresent = true;
+                    }
                     query.put(params[0], params[1]);
                 }
             }
 
             //get uid of submitter
-            AMIdentity uid;
+            AMIdentity uid = null;
             try {
                 uid = getUid(context);
                 if (!uid.equals(adminUserId)) {
+                    if (userNamePresent) {
+                        handler.handleError(new BadRequestException("userName field MUST NOT be set in _queryId"));
+                        return;
+                    }
                     query.put(USERNAME, uid.getName());
                     query.put(REALM, DNMapper.orgNameToRealmName(uid.getRealm()));
+                } else if (!userNamePresent) {
+                    handler.handleError(new BadRequestException("userName field MUST be set in _queryId"));
+                    return;
                 }
             } catch (Exception e) {
                 if (debug.errorEnabled()) {
