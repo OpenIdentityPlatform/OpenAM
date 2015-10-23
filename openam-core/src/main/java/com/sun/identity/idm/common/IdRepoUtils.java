@@ -39,12 +39,16 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletContext;
 
 import com.iplanet.am.sdk.AMHashMap;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 
+import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.LdifUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
@@ -92,6 +96,7 @@ public class IdRepoUtils {
     private static final String TIVOLI_LDIF = "tivoliUserSchema";
 
     private static final String SCHEMA_PROPERTY_FILENAME = "schemaNames";
+    private static final String LDAPv3_LDAP_SERVER = "sun-idrepo-ldapv3-config-ldap-server";
     private static final Set<String> defaultPwdAttrs = new HashSet<String>(2);
     private static Debug DEBUG = Debug.getInstance("IdRepoUtils");
 
@@ -322,26 +327,39 @@ public class IdRepoUtils {
             options.setSSLContext(new SSLContextBuilder().getSSLContext());
         }
 
-        String hostName = CollectionHelper.getMapAttr(attrValues,
-                "sun-idrepo-ldapv3-config-ldap-server");
-        if ((hostName == null) || (hostName.trim().length() == 0)) {
+        Set<LDAPURL> ldapUrls = getLDAPUrls(attrValues);
+        if (CollectionUtils.isEmpty(ldapUrls)) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAPURLs found");
+            }
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
         }
 
-        ConnectionFactory factory = new LDAPConnectionFactory(hostName, 389, options);
-
-        String bindDn = CollectionHelper.getMapAttr(attrValues,
-            "sun-idrepo-ldapv3-config-authid");
-        if ((bindDn == null) || (bindDn.trim().length() == 0)) {
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
-        }
-        String bindPwd = CollectionHelper.getMapAttr(attrValues,
-            "sun-idrepo-ldapv3-config-authpw");
-        if ((bindPwd == null) || (bindPwd.trim().length() == 0)) {
+        LDAPURL ldapUrl = ldapUrls.iterator().next();
+        if (org.forgerock.openam.utils.StringUtils.isEmpty(ldapUrl.getHost())) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAP host found");
+            }
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
         }
 
-        // hostName contains port so 389 will be ignored
+        ConnectionFactory factory = new LDAPConnectionFactory(ldapUrl.getHost(), ldapUrl.getPort(), options);
+
+        String bindDn = CollectionHelper.getMapAttr(attrValues, "sun-idrepo-ldapv3-config-authid");
+        if (org.forgerock.openam.utils.StringUtils.isBlank(bindDn)) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAP bindDN found");
+            }
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+        }
+        String bindPwd = CollectionHelper.getMapAttr(attrValues, "sun-idrepo-ldapv3-config-authpw");
+        if (org.forgerock.openam.utils.StringUtils.isBlank(bindPwd)) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAP bindPW found");
+            }
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+        }
+
         BindRequest bindRequest = Requests.newSimpleBindRequest(bindDn, bindPwd.getBytes());
         return Connections.newAuthenticatedConnectionFactory(factory, bindRequest);
     }
@@ -445,5 +463,26 @@ public class IdRepoUtils {
             }
         }
         return map;
+    }
+
+    private static Set<LDAPURL> getLDAPUrls( Map<String, Set<String>> attrValues) {
+        // Get the prioritised set of ldap servers
+        Set<String> ldapServers = attrValues.get(LDAPv3_LDAP_SERVER);
+        Set<LDAPURL> ldapUrls = null;
+        if (null != ldapServers) {
+            String hostServerId = null;
+            String hostSiteId = "";
+            try {
+                hostServerId = WebtopNaming.getAMServerID();
+                hostSiteId = WebtopNaming.getSiteID(hostServerId);
+            } catch (ServerEntryNotFoundException senfe) {
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning("ServerEntryNotFoundException, hostServerId=" + hostServerId + ", hostSiteId="
+                            + hostSiteId);
+                }
+            }
+            ldapUrls = org.forgerock.openam.ldap.LDAPUtils.prioritizeServers(ldapServers, hostServerId, hostSiteId);
+        }
+        return ldapUrls;
     }
 }
