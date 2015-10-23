@@ -137,6 +137,17 @@ define("config/process/AMConfig", [
             Router.routeTo(Router.configuration.routes.profile, { trigger: true });
         }
     }, {
+        startEvent: Constants.EVENT_THEME_CHANGED,
+        description: "",
+        dependencies: [
+            "Footer",
+            "org/forgerock/commons/ui/common/components/LoginHeader"
+        ],
+        processDescription: function (event, Footer, LoginHeader) {
+            Footer.render();
+            LoginHeader.render();
+        }
+    }, {
         startEvent: Constants.EVENT_AUTHENTICATED,
         description: "",
         dependencies: [

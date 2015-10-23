@@ -60,6 +60,7 @@ define("org/forgerock/openam/ui/common/util/Constants", [
 
     // Theme
     Constants.DEFAULT_STYLESHEETS = ["css/bootstrap-3.3.5-custom.css", "css/styles-admin.css"];
+    Constants.EVENT_THEME_CHANGED = "main.EVENT_THEME_CHANGED";
 
     return Constants;
 });

@@ -27,9 +27,10 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "underscore",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "config/ThemeConfiguration",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, Constants, Configuration, ThemeConfiguration, URIUtils) {
+], function ($, _, Constants, Configuration, EventManager, ThemeConfiguration, URIUtils) {
     /**
      * @exports org/forgerock/openam/ui/common/util/ThemeManager
      */
@@ -193,6 +194,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
             applyThemeToPage(theme.path, theme.icon, stylesheets);
             Configuration.globalData.theme = theme;
             Configuration.globalData.themeName = themeName;
+            EventManager.sendEvent(Constants.EVENT_THEME_CHANGED);
             return $.Deferred().resolve(theme);
         }
     };

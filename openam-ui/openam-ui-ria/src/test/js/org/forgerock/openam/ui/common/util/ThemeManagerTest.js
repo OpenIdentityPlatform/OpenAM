@@ -22,7 +22,8 @@ define([
     "org/forgerock/openam/ui/common/util/Constants"
 ], function ($, _, Squire, sinon, Constants) {
     var baseUrl = "toUrl:",
-        ThemeManager, Configuration, URIUtils, mock$, themeConfig, urlParams, sandbox;
+        ThemeManager, Configuration, EventManager, URIUtils,
+        mock$, themeConfig, urlParams, sandbox;
     describe("org/forgerock/openam/ui/common/util/ThemeManager", function () {
         beforeEach(function (done) {
             var injector = new Squire();
@@ -65,6 +66,10 @@ define([
                 }
             };
 
+            EventManager = {
+                sendEvent: sinon.stub()
+            };
+
             URIUtils = {
                 getCurrentCompositeQueryString: sinon.stub().returns(""),
                 parseQueryString: sinon.stub().returns(urlParams)
@@ -75,6 +80,7 @@ define([
                 .mock("config/ThemeConfiguration", themeConfig)
                 .mock("org/forgerock/commons/ui/common/util/URIUtils", URIUtils)
                 .mock("org/forgerock/commons/ui/common/main/Configuration", Configuration)
+                .mock("org/forgerock/commons/ui/common/main/EventManager", EventManager)
                 .require(["org/forgerock/openam/ui/common/util/ThemeManager"], function (d) {
                     ThemeManager = d;
                     done();
@@ -86,6 +92,11 @@ define([
         });
 
         describe("getTheme", function () {
+            it("sends EVENT_THEME_CHANGED event", function () {
+                return ThemeManager.getTheme().then(function () {
+                    expect(EventManager.sendEvent).to.be.calledOnce.calledWith(Constants.EVENT_THEME_CHANGED);
+                });
+            });
             it("throws if theme configuration does not contain a theme object", function () {
                 delete themeConfig.themes;
                 expect(function () {
