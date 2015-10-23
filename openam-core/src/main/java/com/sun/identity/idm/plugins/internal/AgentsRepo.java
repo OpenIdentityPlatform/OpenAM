@@ -1347,7 +1347,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             pSet.add(oauth2Attribute);
             Map ansMap = new HashMap();
             String userPwd = null;
-            ansMap = getAttributes(adminToken, IdType.AGENTONLY, 
+            ansMap = getAttributes(adminToken, IdType.AGENT, 
                 userid, pSet);
             Set userPwdSet = (Set) ansMap.get("userpassword"); 
             if ((userPwdSet != null) && (!userPwdSet.isEmpty())) {
