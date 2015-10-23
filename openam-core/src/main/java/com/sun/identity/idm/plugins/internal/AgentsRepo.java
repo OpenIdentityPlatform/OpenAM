@@ -73,10 +73,12 @@ import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceAlreadyExistsException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchemaManager;
+
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 
@@ -293,6 +295,9 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                     throw IdRepoDuplicateObjectException.identityOfTypeAlreadyExists(agentName, type.getName());
                 }
             }
+        } catch (ServiceAlreadyExistsException saee) {
+            debug.error("AgentsRepo.create():Unable to create agents ", saee);
+            throw IdRepoDuplicateObjectException.identityOfTypeAlreadyExists(agentName, type.getName());
         } catch (SMSException smse) {
             debug.error("AgentsRepo.create():Unable to create agents ", smse);
             Object args[] = { NAME };
