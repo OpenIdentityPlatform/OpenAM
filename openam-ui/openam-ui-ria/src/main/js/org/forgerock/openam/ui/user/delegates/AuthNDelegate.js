@@ -96,6 +96,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     obj.handleRequirements = function (requirements) {
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
+            Configuration.globalData.auth.currentStage = requirementList.length;
 
             if (!CookieHelper.getCookie("authId") && _.findWhere(requirements.callbacks,
                 { type: "RedirectCallback" })) {
@@ -240,11 +241,14 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
 
     function hasRealmChanged () {
         var auth = Configuration.globalData.auth;
+
         return auth.subRealm !== knownAuth.subRealm ||
             _.get(auth, "urlParams.realm") !== _.get(knownAuth, "urlParams.realm");
     }
+
     function hasAuthIndexChanged () {
         var auth = Configuration.globalData.auth;
+
         return _.get(auth, "urlParams.authIndexType") !== _.get(knownAuth, "urlParams.authIndexType") ||
             _.get(auth, "urlParams.authIndexValue") !== _.get(knownAuth, "urlParams.authIndexValue");
     }
@@ -259,6 +263,8 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                         : location.hostname);
                 });
         } else if (requirementList.length === 0 || hasRealmChanged() || hasAuthIndexChanged()) {
+            obj.resetProcess();
+
             return obj.begin(args).then(function (requirements) {
                 obj.handleRequirements(requirements);
                 return requirements;

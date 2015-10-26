@@ -38,30 +38,16 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             Form2js, Handlebars, i18nManager, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils,
             URIUtils) {
 
-    function populateTemplate (view, populatedTemplate) {
-        // A rendered template will be a string; an error will be an object
-        if (typeof populatedTemplate === "string") {
-            view.template = "templates/openam/authn/" + view.reqs.stage + ".html";
-        } else {
-            view.template = view.genericTemplate;
-        }
+    function populateTemplate () {
+        var self = this,
+            firstAuthStage = Configuration.globalData.auth.currentStage === 1;
 
-        view.data.showForgotPassword = false;
-        view.data.showRegister = false;
-        view.data.showSpacer = false;
-
-        if (Configuration.globalData.forgotPassword === "true") {
-            view.data.showForgotPassword = true;
-        }
-        if (Configuration.globalData.selfRegistration === "true") {
-            if (view.data.showForgotPassword) {
-                view.data.showSpacer = true;
-            }
-            view.data.showRegister = true;
-        }
+        // self-service links should be shown only on the first stage
+        this.data.showForgotPassword = firstAuthStage && Configuration.globalData.forgotPassword === "true";
+        this.data.showRegister = firstAuthStage && Configuration.globalData.selfRegistration === "true";
 
         if (Configuration.backgroundLogin) {
-            view.reloadData();
+            this.prefillLoginData();
 
             BootstrapDialog.show({
                 title: $.t("common.form.sessionExpired"),
@@ -70,12 +56,14 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 message: $("<div></div>"),
                 onshow: function () {
                     var dialog = this;
-                    view.noBaseTemplate = true;
-                    view.element = dialog.message;
+                    // change the target element of the view
+                    self.noBaseTemplate = true;
+                    self.element = dialog.message;
                 },
                 onshown: function () {
-                    delete view.noBaseTemplate;
-                    view.element = "#content";
+                    // return back to the default state
+                    delete self.noBaseTemplate;
+                    self.element = "#content";
                 }
             });
         }
@@ -150,7 +138,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             // START CUSTOM STAGE-SPECIFIC LOGIC HERE
 
-            // Known to be used by DataStore1.html
+            // Known to be used by username/password based authn stages
             if (this.$el.find("[name=loginRemember]:checked").length !== 0) {
                 expire = new Date();
                 expire.setDate(expire.getDate() + 20);
@@ -185,7 +173,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             }
 
             AuthNDelegate.getRequirements().then(_.bind(function (reqs) {
-
                 var auth = Configuration.globalData.auth;
 
                 // Clear out existing session if instructed
@@ -263,7 +250,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         renderForm: function (reqs, urlParams) {
             var cleaned = _.clone(reqs),
                 implicitConfirmation = true,
-                promise = $.Deferred();
+                promise = $.Deferred(),
+                usernamePasswordStages = ["DataStore1", "AD1", "JDBC1", "LDAP1", "Membership1", "RADIUS1"],
+                template,
+                self = this;
 
             cleaned.callbacks = [];
             _.each(reqs.callbacks, function (element) {
@@ -332,23 +322,27 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 Configuration.globalData.auth.autoLoginAttempts++;
             } else {
                 // Attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                UIUtils.compileTemplate(
-                    "templates/openam/authn/" + reqs.stage + ".html",
-                    _.extend(Configuration.globalData, this.data))
-                    .always(_.partial(function (view, template) {
-                        populateTemplate(view, template);
-                        view.parentRender(_.bind(function () {
-                            view.reloadData();
+                template = usernamePasswordStages.indexOf(reqs.stage) !== -1
+                    ? "templates/openam/authn/UsernamePasswordStage.html"
+                    : "templates/openam/authn/" + reqs.stage + ".html";
+
+                UIUtils.compileTemplate(template, _.extend(Configuration.globalData, this.data))
+                    .always(function (compiledTemplate) {
+                        // A rendered template will be a string; an error will be an object
+                        self.template = typeof compiledTemplate === "string"
+                            ? template : self.genericTemplate;
+
+                        populateTemplate.call(self);
+                        self.parentRender(function () {
+                            self.prefillLoginData();
                             // Resolve a promise when all templates will be loaded
                             promise.resolve();
-                        }, view));
-                    }, this));
+                        });
+                    });
             }
             return promise;
         },
-        reloadData: function () {
-            // This function is useful for adding logic that is used by stage-specific custom templates.
-
+        prefillLoginData: function () {
             var login = CookieHelper.getCookie("login");
 
             if (this.$el.find("[name=loginRemember]").length !== 0 && login) {
