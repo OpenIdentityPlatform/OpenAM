@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.ldap;
 
+import java.util.Iterator;
 import javax.naming.InvalidNameException;
 import javax.naming.NamingException;
 import com.sun.identity.shared.Constants;

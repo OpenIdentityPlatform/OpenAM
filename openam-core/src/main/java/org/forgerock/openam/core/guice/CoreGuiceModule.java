@@ -66,10 +66,14 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+import com.sun.identity.sm.ldap.ConfigAuditorFactory;
+
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.auditors.SMSAuditFilter;
+import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CTSPersistentStoreImpl;
 import org.forgerock.openam.cts.CoreTokenConfig;
@@ -181,6 +185,8 @@ public class CoreGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
         bind(Debug.class).annotatedWith(Names.named(DataLayerConstants.DATA_LAYER_DEBUG))
                 .toInstance(Debug.getInstance(DataLayerConstants.DATA_LAYER_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named("amSMS"))
+                .toInstance(Debug.getInstance("amSMS"));
 
         bind(Debug.class).annotatedWith(Names.named(PolicyMonitor.POLICY_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(PolicyMonitor.POLICY_MONITOR_DEBUG));
@@ -254,6 +260,12 @@ public class CoreGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(AMIdentityRepository.class, AMIdentityRepository.class)
                 .build(AMIdentityRepositoryFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(SMSAuditor.class, SMSAuditor.class)
+                .build(ConfigAuditorFactory.class));
+
+        Multibinder.newSetBinder(binder(), SMSAuditFilter.class);
 
         Multibinder.newSetBinder(binder(), IdRepoCreationListener.class);
 

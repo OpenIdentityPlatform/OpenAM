@@ -52,7 +52,9 @@ public final class AuditConstants {
         /** Event for auth process module chain completion. */
         AM_LOGIN_CHAIN_COMPLETED("AM-LOGIN-CHAIN-COMPLETED"),
         /** Event for logout. */
-        AM_LOGOUT("AM-LOGOUT");
+        AM_LOGOUT("AM-LOGOUT"),
+        /** Event for a change in configuration. */
+        AM_CONFIG_CHANGE("AM-CONFIG-CHANGE");
 
         private final String name;
 
@@ -127,6 +129,29 @@ public final class AuditConstants {
     }
 
     /**
+     * Predefined operations for configuration events.
+     */
+    public enum ConfigOperations {
+        /** Creation operation.*/
+        CREATE("CREATE"),
+        /** Modification operation. */
+        MODIFY("MODIFY"),
+        /** Deletion operation. */
+        DELETE("DELETE");
+
+        private final String name;
+
+        ConfigOperations(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    /**
      * Predefined tracking ID types.
      */
     public enum TrackingIdKey {
@@ -180,6 +205,11 @@ public final class AuditConstants {
      * The topic to which events built using {@link AMActivityAuditEventBuilder} should be routed.
      */
     public static final String ACTIVITY_TOPIC = "activity";
+
+    /**
+     * The topic to which events built using {@link AMConfigAuditEventBuilder} should be routed.
+     */
+    public static final String CONFIG_TOPIC = "config";
 
     /**
      * The topic to which events built using {@link AMAuthenticationAuditEventBuilder} should be routed.

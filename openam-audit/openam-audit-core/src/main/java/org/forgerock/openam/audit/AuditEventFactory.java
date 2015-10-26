@@ -77,6 +77,15 @@ public class AuditEventFactory {
     }
 
     /**
+     * Creates a new AMConfigAuditEventBuilder.
+     *
+     * @return An AMConfigAuditEventBuilder.
+     */
+    public AMConfigAuditEventBuilder configEvent() {
+        return new AMConfigAuditEventBuilder();
+    }
+
+    /**
      * Creates a new AMAuthenticationAuditEventBuilder.
      *
      * @return An AMAuthenticationAuditEventBuilder.
