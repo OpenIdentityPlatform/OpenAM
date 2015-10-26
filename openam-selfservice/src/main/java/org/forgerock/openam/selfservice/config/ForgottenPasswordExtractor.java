@@ -19,10 +19,12 @@ package org.forgerock.openam.selfservice.config;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getBooleanMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getIntMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getLongMapAttrThrows;
+import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapSetThrows;
-import static org.forgerock.openam.selfservice.config.CommonConsoleConfigImpl.newBuilder;
-import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.KBA_ENABLED_KEY;
+import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.CAPTCHA_SECRET_KEY;
+import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.CAPTCHA_SITE_KEY;
+import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.CAPTCHA_VERIFICATION_URL;
 import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.SECURITY_QUESTIONS_KEY;
 import static org.forgerock.openam.selfservice.config.SecurityQuestionsHelper.parseQuestions;
 
@@ -39,26 +41,31 @@ import java.util.Set;
 public final class ForgottenPasswordExtractor implements ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> {
 
     private final static String ENABLED_KEY = "forgerockRESTSecurityForgotPasswordEnabled";
+    private final static String EMAIL_VERIFICATION_ENABLED = "forgerockRESTSecurityForgotPassEmailVerificationEnabled";
     private final static String EMAIL_URL_KEY = "forgerockRESTSecurityForgotPassConfirmationUrl";
     private final static String TOKEN_EXPIRY_KEY = "forgerockRESTSecurityForgotPassTokenTTL";
     private final static String SERVICE_CONFIG_CLASS_KEY = "forgerockRESTSecurityForgotPassServiceConfigClass";
+    private final static String KBA_ENABLED_KEY = "forgerockRESTSecurityForgotPassKbaEnabled";
     private final static String MIN_QUESTIONS_TO_ANSWERED_KEY = "forgerockRESTSecurityQuestionsUserMustAnswer";
+    private final static String CAPTCHA_ENABLED_KEY = "forgerockRESTSecurityForgotPassCaptchaEnabled";
 
     @Override
     public ForgottenPasswordConsoleConfig extract(Map<String, Set<String>> consoleAttributes) {
         try {
-            CommonConsoleConfig commonConfig = newBuilder()
+            return ForgottenPasswordConsoleConfig
+                    .newBuilder()
                     .setEnabled(getBooleanMapAttrThrows(consoleAttributes, ENABLED_KEY))
+                    .setEmailVerificationEnabled(getBooleanMapAttrThrows(consoleAttributes, EMAIL_VERIFICATION_ENABLED))
                     .setEmailUrl(getMapAttrThrows(consoleAttributes, EMAIL_URL_KEY))
-                    .setTokenExpiry(getLongMapAttrThrows(consoleAttributes, TOKEN_EXPIRY_KEY))
-                    .setConfigProviderClass(getMapAttrThrows(consoleAttributes, SERVICE_CONFIG_CLASS_KEY))
+                    .setCaptchaEnabled(getBooleanMapAttrThrows(consoleAttributes, CAPTCHA_ENABLED_KEY))
+                    .setSiteKey(getMapAttr(consoleAttributes, CAPTCHA_SITE_KEY))
+                    .setSecretKey(getMapAttr(consoleAttributes, CAPTCHA_SECRET_KEY))
+                    .setVerificationUrl(getMapAttr(consoleAttributes, CAPTCHA_VERIFICATION_URL))
                     .setKbaEnabled(getBooleanMapAttrThrows(consoleAttributes, KBA_ENABLED_KEY))
                     .setSecurityQuestions(parseQuestions(getMapSetThrows(consoleAttributes, SECURITY_QUESTIONS_KEY)))
-                    .build();
-
-            return ForgottenPasswordConsoleConfig
-                    .newBuilder(commonConfig)
                     .setMinQuestionsToAnswer(getIntMapAttrThrows(consoleAttributes, MIN_QUESTIONS_TO_ANSWERED_KEY))
+                    .setTokenExpiry(getLongMapAttrThrows(consoleAttributes, TOKEN_EXPIRY_KEY))
+                    .setConfigProviderClass(getMapAttrThrows(consoleAttributes, SERVICE_CONFIG_CLASS_KEY))
                     .build();
 
         } catch (ValueNotFoundException e) {

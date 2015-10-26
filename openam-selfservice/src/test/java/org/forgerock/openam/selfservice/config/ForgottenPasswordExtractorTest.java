@@ -38,12 +38,17 @@ public final class ForgottenPasswordExtractorTest {
         Map<String, Set<String>> consoleAttributes = new HashMap<>();
 
         consoleAttributes.put("forgerockRESTSecurityForgotPasswordEnabled", Collections.singleton("true"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailVerificationEnabled", Collections.singleton("true"));
         consoleAttributes.put("forgerockRESTSecurityForgotPassConfirmationUrl", Collections.singleton("someurl"));
         consoleAttributes.put("forgerockRESTSecurityForgotPassTokenTTL", Collections.singleton("1234"));
         consoleAttributes.put("forgerockRESTSecurityForgotPassServiceConfigClass", Collections.singleton("someclass"));
-        consoleAttributes.put("forgerockRESTSecurityKbaEnabled", Collections.singleton("true"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassKbaEnabled", Collections.singleton("true"));
         consoleAttributes.put("forgerockRESTSecurityKBAQuestions", Collections.singleton("123|en|abc"));
         consoleAttributes.put("forgerockRESTSecurityQuestionsUserMustAnswer", Collections.singleton("3"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassCaptchaEnabled", Collections.singleton("true"));
+        consoleAttributes.put("forgerockRESTSecurityCaptchaSiteKey", Collections.singleton("someKey"));
+        consoleAttributes.put("forgerockRESTSecurityCaptchaSecretKey", Collections.singleton("someSecret"));
+        consoleAttributes.put("forgerockRESTSecurityCaptchaVerificationUrl", Collections.singleton("someUrl"));
 
         // When
         ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> extractor = new ForgottenPasswordExtractor();
@@ -51,12 +56,17 @@ public final class ForgottenPasswordExtractorTest {
 
         // Then
         assertThat(config.isEnabled()).isTrue();
+        assertThat(config.isEmailVerificationEnabled()).isTrue();
         assertThat(config.getEmailUrl()).isEqualTo("someurl");
         assertThat(config.getTokenExpiry()).isEqualTo(1234L);
         assertThat(config.getConfigProviderClass()).isEqualTo("someclass");
         assertThat(config.isKbaEnabled()).isTrue();
         assertThat(config.getSecurityQuestions()).containsEntry("123", Collections.singletonMap("en", "abc"));
         assertThat(config.getMinQuestionsToAnswer()).isEqualTo(3);
+        assertThat(config.isCaptchaEnabled()).isTrue();
+        assertThat(config.getCaptchaSiteKey()).isEqualTo("someKey");
+        assertThat(config.getCaptchaSecretKey()).isEqualTo("someSecret");
+        assertThat(config.getCaptchaVerificationUrl()).isEqualTo("someUrl");
     }
 
 }

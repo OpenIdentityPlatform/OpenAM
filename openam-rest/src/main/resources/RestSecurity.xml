@@ -126,11 +126,99 @@
                                  i18nKey="a108">
                 </AttributeSchema>
 
-                <AttributeSchema name="forgerockRESTSecurityKbaEnabled"
+                <AttributeSchema name="forgerockRESTSecuritySelfRegEmailVerificationEnabled"
                                  type="single"
                                  syntax="boolean"
-                                 resourceName="kbaEnabled"
+                                 resourceName="selfRegEmailVerificationEnabled"
                                  i18nKey="a120">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassEmailVerificationEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgetPassEmailVerificationEnabled"
+                                 i18nKey="a121">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecuritySelfRegCaptchaEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="selfRegCaptchaEnabled"
+                                 i18nKey="a150">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassCaptchaEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotPassCaptchaEnabled"
+                                 i18nKey="a151">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityCaptchaSiteKey"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="captchaSiteKey"
+                                 i18nKey="a152">
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityCaptchaSecretKey"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="captchaSecretKey"
+                                 i18nKey="a153">
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityCaptchaVerificationUrl"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="captchaVerificationUrl"
+                                 i18nKey="a154">
+                    <DefaultValues>
+                        <Value>https://www.google.com/recaptcha/api/siteverify</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecuritySelfRegKbaEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="selfRegKbaEnabled"
+                                 i18nKey="a200">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassKbaEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotPassKbaEnabled"
+                                 i18nKey="a201">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -143,7 +231,7 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="kbaQuestions"
-                                 i18nKey="a121">
+                                 i18nKey="a202">
                     <DefaultValues>
                         <Value>1|en|What is the name of your favourite restaurant?</Value>
                         <Value>2|en|What was the model of your first car?</Value>
@@ -156,7 +244,7 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="50"
                                  validator="RequiredValueValidator"
                                  resourceName="kbaQuestionsUserMustAnswer"
-                                 i18nKey="a122">
+                                 i18nKey="a203">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -166,7 +254,7 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="30"
                                  validator="RequiredValueValidator"
                                  resourceName="kbaAnswersUserMustProvide"
-                                 i18nKey="a123">
+                                 i18nKey="a204">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -176,7 +264,7 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="selfRegistrationServiceConfigClass"
-                                 i18nKey="a160">
+                                 i18nKey="a300">
                     <DefaultValues>
                         <Value>org.forgerock.openam.selfservice.config.DefaultUserRegistrationConfigProvider</Value>
                     </DefaultValues>
@@ -185,7 +273,7 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="forgotPasswordServiceConfigClass"
-                                 i18nKey="a161">
+                                 i18nKey="a301">
                     <DefaultValues>
                         <Value>org.forgerock.openam.selfservice.config.DefaultForgottenPasswordConfigProvider</Value>
                     </DefaultValues>

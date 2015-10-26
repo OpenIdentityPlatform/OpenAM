@@ -23,8 +23,6 @@ import org.forgerock.selfservice.stages.captcha.CaptchaStage;
 import org.forgerock.selfservice.stages.captcha.CaptchaStageConfig;
 import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
 import org.forgerock.selfservice.stages.email.VerifyEmailAccountStage;
-import org.forgerock.selfservice.stages.email.VerifyUserIdConfig;
-import org.forgerock.selfservice.stages.email.VerifyUserIdStage;
 import org.forgerock.selfservice.stages.kba.SecurityAnswerDefinitionConfig;
 import org.forgerock.selfservice.stages.kba.SecurityAnswerDefinitionStage;
 import org.forgerock.selfservice.stages.kba.SecurityAnswerVerificationConfig;
@@ -35,6 +33,8 @@ import org.forgerock.selfservice.stages.reset.ResetStage;
 import org.forgerock.selfservice.stages.reset.ResetStageConfig;
 import org.forgerock.selfservice.stages.user.UserDetailsConfig;
 import org.forgerock.selfservice.stages.user.UserDetailsStage;
+import org.forgerock.selfservice.stages.user.UserQueryConfig;
+import org.forgerock.selfservice.stages.user.UserQueryStage;
 
 import javax.inject.Inject;
 
@@ -50,7 +50,7 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
     private final SecurityAnswerDefinitionStage securityAnswerDefinitionStage;
     private final UserRegistrationStage userRegistrationStage;
     private final UserDetailsStage userDetailsStage;
-    private final VerifyUserIdStage verifyUserIdStage;
+    private final UserQueryStage userQueryStage;
     private final SecurityAnswerVerificationStage securityAnswerVerificationStage;
     private final ResetStage resetStage;
     private final CaptchaStage captchaStage;
@@ -64,8 +64,8 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
      *         security answer definition stage
      * @param userRegistrationStage
      *         user registration stage
-     * @param verifyUserIdStage
-     *         verify user Id stage
+     * @param userQueryStage
+     *         user query stage
      * @param securityAnswerVerificationStage
      *         security answer verification stage
      * @param resetStage
@@ -76,13 +76,13 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
     @Inject
     public BasicStageConfigVisitor(VerifyEmailAccountStage verifyEmailAccountStage,
             SecurityAnswerDefinitionStage securityAnswerDefinitionStage, UserRegistrationStage userRegistrationStage,
-            UserDetailsStage userDetailsStage, VerifyUserIdStage verifyUserIdStage,
-            SecurityAnswerVerificationStage securityAnswerVerificationStage, ResetStage resetStage, CaptchaStage captchaStage) {
+            UserDetailsStage userDetailsStage, UserQueryStage userQueryStage, ResetStage resetStage,
+            CaptchaStage captchaStage, SecurityAnswerVerificationStage securityAnswerVerificationStage) {
         this.verifyEmailAccountStage = verifyEmailAccountStage;
         this.securityAnswerDefinitionStage = securityAnswerDefinitionStage;
         this.userRegistrationStage = userRegistrationStage;
         this.userDetailsStage = userDetailsStage;
-        this.verifyUserIdStage = verifyUserIdStage;
+        this.userQueryStage = userQueryStage;
         this.securityAnswerVerificationStage = securityAnswerVerificationStage;
         this.resetStage = resetStage;
         this.captchaStage = captchaStage;
@@ -109,11 +109,6 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
     }
 
     @Override
-    public ProgressStageBinder<?> build(VerifyUserIdConfig verifyUserIdConfig) {
-        return ProgressStageBinder.bind(verifyUserIdStage, verifyUserIdConfig);
-    }
-
-    @Override
     public ProgressStageBinder<?> build(SecurityAnswerVerificationConfig securityAnswerVerificationConfig) {
         return ProgressStageBinder.bind(securityAnswerVerificationStage, securityAnswerVerificationConfig);
     }
@@ -126,6 +121,11 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
     @Override
     public ProgressStageBinder<?> build(CaptchaStageConfig captchaStageConfig) {
         return ProgressStageBinder.bind(captchaStage, captchaStageConfig);
+    }
+
+    @Override
+    public ProgressStageBinder<?> build(UserQueryConfig userQueryConfig) {
+        return ProgressStageBinder.bind(userQueryStage, userQueryConfig);
     }
 
     @Override

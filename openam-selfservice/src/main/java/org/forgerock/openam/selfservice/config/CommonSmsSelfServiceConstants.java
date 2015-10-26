@@ -23,8 +23,10 @@ package org.forgerock.openam.selfservice.config;
  */
 final class CommonSmsSelfServiceConstants {
 
-    final static String KBA_ENABLED_KEY = "forgerockRESTSecurityKbaEnabled";
     final static String SECURITY_QUESTIONS_KEY = "forgerockRESTSecurityKBAQuestions";
+    final static String CAPTCHA_SITE_KEY = "forgerockRESTSecurityCaptchaSiteKey";
+    final static String CAPTCHA_SECRET_KEY = "forgerockRESTSecurityCaptchaSecretKey";
+    final static String CAPTCHA_VERIFICATION_URL = "forgerockRESTSecurityCaptchaVerificationUrl";
 
     private CommonSmsSelfServiceConstants() {
         throw new UnsupportedOperationException();

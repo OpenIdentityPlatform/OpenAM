@@ -21,46 +21,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.testng.annotations.Test;
 
 /**
- * Unit test for {@link CommonConsoleConfigImpl}.
+ * Unit test for {@link CommonConsoleConfig}.
  *
  * @since 13.0.0
  */
-public final class CommonConsoleConfigImplTest {
+public final class CommonConsoleConfigTest {
 
     @Test
     public void successfullyCreatesInstance() {
         // When
-        CommonConsoleConfig config = CommonConsoleConfigImpl
-                .newBuilder()
+        MockConfig config = new MockConfigBuilder()
                 .setEnabled(true)
                 .setConfigProviderClass("abc")
-                .setEmailUrl("someurl")
                 .setTokenExpiry(123L)
                 .build();
 
         // Then
         assertThat(config.isEnabled()).isTrue();
         assertThat(config.getConfigProviderClass()).isEqualTo("abc");
-        assertThat(config.getEmailUrl()).isEqualTo("someurl");
         assertThat(config.getTokenExpiry()).isEqualTo(123L);
-    }
-
-    @Test(expectedExceptions = NullPointerException.class)
-    public void failsWithNullEmailUrl() {
-        // When
-        CommonConsoleConfigImpl
-                .newBuilder()
-                .setEnabled(true)
-                .setConfigProviderClass("abc")
-                .setTokenExpiry(123L)
-                .build();
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void failsWithNullConfigProviderClass() {
         // When
-        CommonConsoleConfigImpl
-                .newBuilder()
+        new MockConfigBuilder()
                 .setEnabled(true)
                 .setEmailUrl("someurl")
                 .setTokenExpiry(123L)
@@ -70,12 +55,67 @@ public final class CommonConsoleConfigImplTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void failsWithNegativeTokenExpiry() {
         // When
-        CommonConsoleConfigImpl
-                .newBuilder()
+        new MockConfigBuilder()
                 .setEnabled(true)
                 .setConfigProviderClass("abc")
                 .setEmailUrl("someurl")
                 .build();
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
+    public void failsWithNullEmailUrl() {
+        // When
+        new MockConfigBuilder()
+                .setEnabled(true)
+                .setConfigProviderClass("abc")
+                .setTokenExpiry(123L)
+                .setEmailVerificationEnabled(true)
+                .build();
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
+    public void failsWithMissingCaptchaConfig() {
+        // When
+        new MockConfigBuilder()
+                .setEnabled(true)
+                .setConfigProviderClass("abc")
+                .setTokenExpiry(123L)
+                .setCaptchaEnabled(true)
+                .build();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void failsWithMissingKbaConfig() {
+        // When
+        new MockConfigBuilder()
+                .setEnabled(true)
+                .setConfigProviderClass("abc")
+                .setTokenExpiry(123L)
+                .setKbaEnabled(true)
+                .build();
+    }
+
+    private static final class MockConfig extends CommonConsoleConfig {
+
+        protected MockConfig(MockConfigBuilder builder) {
+            super(builder);
+        }
+
+    }
+
+    private static final class MockConfigBuilder
+            extends CommonConsoleConfig.Builder<MockConfig, MockConfigBuilder> {
+
+        @Override
+        MockConfigBuilder getThis() {
+            return this;
+        }
+
+        @Override
+        MockConfig internalBuild() {
+            return new MockConfig(this);
+        }
+
     }
 
 }

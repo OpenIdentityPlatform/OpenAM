@@ -25,7 +25,7 @@ import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor
 import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.config.StageConfig;
-import org.forgerock.selfservice.stages.email.EmailAccountConfig;
+import org.forgerock.selfservice.stages.captcha.CaptchaStageConfig;
 import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
 import org.forgerock.selfservice.stages.kba.KbaConfig;
 import org.forgerock.selfservice.stages.kba.SecurityAnswerDefinitionConfig;
@@ -55,15 +55,24 @@ public final class DefaultUserRegistrationConfigProvider implements ServiceConfi
 
         List<StageConfig<? super CustomSupportConfigVisitor>> stages = new ArrayList<>();
 
-        String serverUrl = config.getEmailUrl() + "&realm=" + realm;
-        stages.add(new VerifyEmailAccountConfig(new EmailAccountConfig())
-                .setEmailServiceUrl("/email")
-                .setEmailSubject("Register new account")
-                .setEmailMessage("<h3>This is your registration email.</h3>"
-                        + "<h4><a href=\"%link%\">Email verification link</a></h4>")
-                .setEmailMimeType("text/html")
-                .setEmailVerificationLinkToken("%link%")
-                .setEmailVerificationLink(serverUrl));
+        if (config.isCaptchaEnabled()) {
+            stages.add(new CaptchaStageConfig()
+                    .setRecaptchaSiteKey(config.getCaptchaSiteKey())
+                    .setRecaptchaSecretKey(config.getCaptchaSecretKey())
+                    .setRecaptchaUri(config.getCaptchaVerificationUrl()));
+        }
+
+        if (config.isEmailVerificationEnabled()) {
+            String serverUrl = config.getEmailUrl() + "&realm=" + realm;
+            stages.add(new VerifyEmailAccountConfig()
+                    .setEmailServiceUrl("/email")
+                    .setSubject("Register new account")
+                    .setMessage("<h3>This is your registration email.</h3>"
+                            + "<h4><a href=\"%link%\">Email verification link</a></h4>")
+                    .setMimeType("text/html")
+                    .setVerificationLinkToken("%link%")
+                    .setVerificationLink(serverUrl));
+        }
 
         stages.add(new UserDetailsConfig()
                 .setIdentityEmailField("/mail"));

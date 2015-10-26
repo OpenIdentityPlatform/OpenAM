@@ -18,51 +18,18 @@ package org.forgerock.openam.selfservice.config;
 
 import org.forgerock.util.Reject;
 
-import java.util.Map;
-
 /**
  * Represents forgotten password console configuration.
  *
  * @since 13.0.0
  */
-public final class ForgottenPasswordConsoleConfig implements CommonConsoleConfig {
+public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
 
-    private final CommonConsoleConfig commonConfig;
     private final int minQuestionsToAnswer;
 
-    ForgottenPasswordConsoleConfig(Builder builder) {
-        commonConfig = builder.commonConfig;
+    private ForgottenPasswordConsoleConfig(ForgottenPasswordBuilder builder) {
+        super(builder);
         minQuestionsToAnswer = builder.minQuestionsToAnswer;
-    }
-
-    @Override
-    public String getConfigProviderClass() {
-        return commonConfig.getConfigProviderClass();
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return commonConfig.isEnabled();
-    }
-
-    @Override
-    public String getEmailUrl() {
-        return commonConfig.getEmailUrl();
-    }
-
-    @Override
-    public long getTokenExpiry() {
-        return commonConfig.getTokenExpiry();
-    }
-
-    @Override
-    public boolean isKbaEnabled() {
-        return commonConfig.isKbaEnabled();
-    }
-
-    @Override
-    public Map<String, Map<String, String>> getSecurityQuestions() {
-        return commonConfig.getSecurityQuestions();
     }
 
     /**
@@ -74,29 +41,34 @@ public final class ForgottenPasswordConsoleConfig implements CommonConsoleConfig
         return minQuestionsToAnswer;
     }
 
-    static final class Builder {
+    static final class ForgottenPasswordBuilder
+            extends Builder<ForgottenPasswordConsoleConfig, ForgottenPasswordBuilder> {
 
-        private final CommonConsoleConfig commonConfig;
         private int minQuestionsToAnswer;
 
-        Builder(CommonConsoleConfig commonConfig) {
-            this.commonConfig = commonConfig;
+        private ForgottenPasswordBuilder() {
         }
 
-        Builder setMinQuestionsToAnswer(int minQuestionsToAnswer) {
+        ForgottenPasswordBuilder setMinQuestionsToAnswer(int minQuestionsToAnswer) {
             this.minQuestionsToAnswer = minQuestionsToAnswer;
             return this;
         }
 
-        ForgottenPasswordConsoleConfig build() {
+        @Override
+        ForgottenPasswordBuilder getThis() {
+            return this;
+        }
+
+        @Override
+        ForgottenPasswordConsoleConfig internalBuild() {
             Reject.ifFalse(minQuestionsToAnswer > 0);
             return new ForgottenPasswordConsoleConfig(this);
         }
 
     }
 
-    static Builder newBuilder(CommonConsoleConfig commonConfig) {
-        return new Builder(commonConfig);
+    static ForgottenPasswordBuilder newBuilder() {
+        return new ForgottenPasswordBuilder();
     }
 
 }

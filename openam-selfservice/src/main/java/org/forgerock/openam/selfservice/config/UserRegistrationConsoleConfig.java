@@ -18,51 +18,18 @@ package org.forgerock.openam.selfservice.config;
 
 import org.forgerock.util.Reject;
 
-import java.util.Map;
-
 /**
  * Represents forgotten password console configuration.
  *
  * @since 13.0.0
  */
-public final class UserRegistrationConsoleConfig implements CommonConsoleConfig {
+public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
 
-    private final CommonConsoleConfig commonConfig;
     private final int minAnswersToProvide;
 
-    UserRegistrationConsoleConfig(Builder builder) {
-        commonConfig = builder.commonConfig;
+    private UserRegistrationConsoleConfig(UserRegistrationBuilder builder) {
+        super(builder);
         minAnswersToProvide = builder.minAnswersToProvide;
-    }
-
-    @Override
-    public String getConfigProviderClass() {
-        return commonConfig.getConfigProviderClass();
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return commonConfig.isEnabled();
-    }
-
-    @Override
-    public String getEmailUrl() {
-        return commonConfig.getEmailUrl();
-    }
-
-    @Override
-    public long getTokenExpiry() {
-        return commonConfig.getTokenExpiry();
-    }
-
-    @Override
-    public boolean isKbaEnabled() {
-        return commonConfig.isKbaEnabled();
-    }
-
-    @Override
-    public Map<String, Map<String, String>> getSecurityQuestions() {
-        return commonConfig.getSecurityQuestions();
     }
 
     /**
@@ -74,29 +41,34 @@ public final class UserRegistrationConsoleConfig implements CommonConsoleConfig 
         return minAnswersToProvide;
     }
 
-    static final class Builder {
+    static final class UserRegistrationBuilder
+            extends Builder<UserRegistrationConsoleConfig, UserRegistrationBuilder> {
 
-        private final CommonConsoleConfig commonConfig;
         private int minAnswersToProvide;
 
-        Builder(CommonConsoleConfig commonConfig) {
-            this.commonConfig = commonConfig;
+        private UserRegistrationBuilder() {
         }
 
-        Builder setMinAnswersToProvide(int minAnswersToProvide) {
+        UserRegistrationBuilder setMinAnswersToProvide(int minAnswersToProvide) {
             this.minAnswersToProvide = minAnswersToProvide;
             return this;
         }
 
-        UserRegistrationConsoleConfig build() {
+        @Override
+        UserRegistrationBuilder getThis() {
+            return this;
+        }
+
+        @Override
+        UserRegistrationConsoleConfig internalBuild() {
             Reject.ifFalse(minAnswersToProvide > 0);
             return new UserRegistrationConsoleConfig(this);
         }
 
     }
 
-    static Builder newBuilder(CommonConsoleConfig commonConfig) {
-        return new Builder(commonConfig);
+    static UserRegistrationBuilder newBuilder() {
+        return new UserRegistrationBuilder();
     }
 
 }

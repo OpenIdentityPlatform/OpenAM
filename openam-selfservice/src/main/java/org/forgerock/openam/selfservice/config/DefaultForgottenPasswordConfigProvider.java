@@ -25,12 +25,13 @@ import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor
 import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.config.StageConfig;
-import org.forgerock.selfservice.stages.email.EmailAccountConfig;
-import org.forgerock.selfservice.stages.email.VerifyUserIdConfig;
+import org.forgerock.selfservice.stages.captcha.CaptchaStageConfig;
+import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
 import org.forgerock.selfservice.stages.kba.KbaConfig;
 import org.forgerock.selfservice.stages.kba.SecurityAnswerVerificationConfig;
 import org.forgerock.selfservice.stages.reset.ResetStageConfig;
 import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandlerConfig;
+import org.forgerock.selfservice.stages.user.UserQueryConfig;
 import org.forgerock.services.context.Context;
 
 import java.util.ArrayList;
@@ -56,19 +57,30 @@ public final class DefaultForgottenPasswordConfigProvider implements ServiceConf
 
         List<StageConfig<? super CustomSupportConfigVisitor>> stages = new ArrayList<>();
 
-        String serverUrl = config.getEmailUrl() + "&realm=" + realm;
-        stages.add(new VerifyUserIdConfig(new EmailAccountConfig())
-                .setQueryFields(new HashSet<>(Arrays.asList("uid", "mail")))
+        if (config.isCaptchaEnabled()) {
+            stages.add(new CaptchaStageConfig()
+                    .setRecaptchaSiteKey(config.getCaptchaSiteKey())
+                    .setRecaptchaSecretKey(config.getCaptchaSecretKey())
+                    .setRecaptchaUri(config.getCaptchaVerificationUrl()));
+        }
+
+        stages.add(new UserQueryConfig()
+                .setValidQueryFields(new HashSet<>(Arrays.asList("uid", "mail", "sn", "givenName")))
                 .setIdentityIdField("/uid/0")
                 .setIdentityEmailField("/mail/0")
-                .setIdentityServiceUrl("/users")
-                .setEmailServiceUrl("/email")
-                .setEmailSubject("Reset password email")
-                .setEmailMessage("<h3>This is your reset email.</h3>"
-                        + "<h4><a href=\"%link%\">Email verification link</a></h4>")
-                .setEmailMimeType("text/html")
-                .setEmailVerificationLinkToken("%link%")
-                .setEmailVerificationLink(serverUrl));
+                .setIdentityServiceUrl("/users"));
+
+        if (config.isEmailVerificationEnabled()) {
+            String serverUrl = config.getEmailUrl() + "&realm=" + realm;
+            stages.add(new VerifyEmailAccountConfig()
+                    .setEmailServiceUrl("/email")
+                    .setSubject("Reset password email")
+                    .setMessage("<h3>This is your reset email.</h3>"
+                            + "<h4><a href=\"%link%\">Email verification link</a></h4>")
+                    .setMimeType("text/html")
+                    .setVerificationLinkToken("%link%")
+                    .setVerificationLink(serverUrl));
+        }
 
         if (config.isKbaEnabled()) {
             stages.add(new SecurityAnswerVerificationConfig(new KbaConfig())
