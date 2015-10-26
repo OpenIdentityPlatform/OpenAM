@@ -16,15 +16,26 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/components/BootstrapDialog",
-    "handlebars",
+    "org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, AbstractView, BootstrapDialog, Handlebars, Messages, Router, SMSRealmDelegate, UIUtils) {
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
+], function ($, _, AbstractView, AddChainDialog, Messages, SMSRealmDelegate) {
+    function getChainNameFromElement (element) {
+        return $(element).data().chainName;
+    }
+    function performDeleteChains (realmPath, names) {
+        return $.when([].concat(names).map(function (name) {
+            return SMSRealmDelegate.authentication.chains.remove(realmPath, name);
+        }));
+    }
+    function chainNameExists (chains, name) {
+        return _.every(chains, function (chain) {
+            return chain._id !== name;
+        });
+    }
+
     var ChainsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ChainsTemplate.html",
         events: {
@@ -35,65 +46,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             "click  #addChain"              : "addChain"
         },
         partials: [
-            "partials/alerts/_Alert.html"
+            "partials/alerts/_Alert.html" // AddChainDialog
         ],
-        addChain: function (e) {
-            e.preventDefault();
-            var self = this,
-                chainName,
-                invalidName = false;
+        addChain: function (event) {
+            event.preventDefault();
 
-            UIUtils.fillTemplateWithData(
-                "templates/admin/views/realms/authentication/chains/AddChainTemplate.html",
-                self.data,
-                function (html) {
-                    BootstrapDialog.show({
-                        title: $.t("console.authentication.chains.createNewChain"),
-                        message: $(html),
-                        buttons: [{
-                            label: $.t("common.form.create"),
-                            cssClass: "btn-primary",
-                            action: function (dialog) {
-                                chainName = dialog.getModalBody().find("#newName").val().trim();
-
-                                // TODO : More client side validation here
-                                invalidName = _.find(self.data.sortedChains, function (chain) {
-                                    return chain._id === chainName;
-                                });
-
-                                if (invalidName) {
-                                    var alert = Handlebars.compile("{{> alerts/_Alert type='warning'" +
-                                                "text='console.authentication.chains.duplicateChain'}}");
-                                    dialog.getModalBody().find("#alertContainer").html(alert);
-                                } else {
-                                    SMSRealmDelegate.authentication.chains.create(
-                                        self.data.realmPath,
-                                        { _id: chainName }
-                                    ).done(function () {
-                                        dialog.close();
-                                        Router.routeTo(Router.configuration.routes.realmsAuthenticationChainEdit, {
-                                            args: [
-                                                encodeURIComponent(self.data.realmPath),
-                                                encodeURIComponent(chainName)
-                                            ],
-                                            trigger: true
-                                        });
-                                    }).fail(function (e) {
-                                        Messages.addMessage({
-                                            type: Messages.TYPE_DANGER,
-                                            response: e
-                                        });
-                                    });
-                                }
-                            }
-                        }, {
-                            label: $.t("common.form.cancel"),
-                            action: function (dialog) {
-                                dialog.close();
-                            }
-                        }]
-                    });
-                });
+            AddChainDialog(this.data.realmPath, _.partial(chainNameExists, this.data.sortedChains));
         },
         chainSelected: function (event) {
             var hasChainsSelected = this.$el.find("input[type=checkbox][data-chain-name]").is(":checked"),
@@ -120,25 +78,20 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             }
             this.$el.find("#deleteChains").prop("disabled", !checked);
         },
-        deleteChain: function (e) {
+        deleteChain: function (event) {
             var self = this,
-                chainName = $(e.currentTarget).data().chainName;
+                name = getChainNameFromElement(event.currentTarget);
 
-            SMSRealmDelegate.authentication.chains.remove(this.data.realmPath, chainName).done(function () {
+            performDeleteChains(this.data.realmPath, name).then(function () {
                 self.render([self.data.realmPath]);
             });
         },
         deleteChains: function () {
             var self = this,
-                chainNames = self.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked")
-                    .toArray().map(function (element) {
-                        return $(element).data().chainName;
-                    }),
-                promises = chainNames.map(function (name) {
-                    return SMSRealmDelegate.authentication.chains.remove(self.data.realmPath, name);
-                });
+                elements = this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked"),
+                names = _(elements).toArray().map(getChainNameFromElement).value();
 
-            $.when(promises).done(function () {
+            performDeleteChains(this.data.realmPath, names).then(function () {
                 self.render([self.data.realmPath]);
             });
         },
@@ -148,7 +101,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
 
             this.data.realmPath = args[0];
 
-            SMSRealmDelegate.authentication.chains.all(this.data.realmPath).done(function (data) {
+            SMSRealmDelegate.authentication.chains.all(this.data.realmPath).then(function (data) {
                 _.each(data.values.result, function (obj) {
                     // Add default chains to top of list.
                     if (obj.active) {
@@ -163,10 +116,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                         callback();
                     }
                 });
-            }).fail(function (e) {
+            }, function (event) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: e
+                    response: event
                 });
             });
         }
