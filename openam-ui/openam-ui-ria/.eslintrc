@@ -141,10 +141,6 @@
             "VariableDeclarator": 1
         }],
         /**
-         * Require consistent use of line break characters within a file.
-         */
-        "linebreak-style": 2,
-        /**
          * Maximum line length of 120 characters.
          */
         "max-len": [2, 120, 4],
