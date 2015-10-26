@@ -23,14 +23,18 @@
   "http": {
     "method": "GET",
     "path": "/some/path",
-    "queryString": "p1=v1&p2=v2",
-    "headers": {  }
+    "queryParameters": { "p1": [ "v1" ], "p2": [ "v2" ] },
+    "headers": { "h1": [ "v1" ], "h2": [ "v2" ] },
+    "cookies": {
+      "JSESSIONID": "[name=JSESSIONID value=92F2583684E45A3612AAC1743FE70362 port=[] ]",
+      "amlbcookie": "[name=amlbcookie value=01 port=[] ]"
+    }
   },
   "response": {
     "status": "SUCCESS",
     "statusCode": "200",
     "elapsedTime": 42,
-    "elapsedTimeUnits": "ms"
+    "elapsedTimeUnits": "MILLISECONDS"
   },
   "trackingIds": ["12345"]
 }

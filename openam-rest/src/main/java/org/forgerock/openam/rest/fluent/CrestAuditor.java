@@ -15,8 +15,8 @@
  */
 package org.forgerock.openam.rest.fluent;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -29,7 +29,6 @@ import org.forgerock.audit.AuditException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Request;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;

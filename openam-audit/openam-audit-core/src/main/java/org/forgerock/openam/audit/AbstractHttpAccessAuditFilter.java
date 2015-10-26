@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.audit;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;

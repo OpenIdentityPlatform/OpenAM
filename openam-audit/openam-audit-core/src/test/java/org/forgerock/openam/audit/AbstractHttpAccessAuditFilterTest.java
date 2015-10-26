@@ -248,7 +248,7 @@ public class AbstractHttpAccessAuditFilterTest {
         assertThat(auditEvent).integerAt("client/port").isEqualTo(9000);
         assertThat(auditEvent).stringAt("http/method").isEqualTo("GET");
         assertThat(auditEvent).stringAt("http/path").isEqualTo("http://example.com:8080");
-        assertThat(auditEvent).stringAt("http/queryString").isEqualTo("query=value");
+        assertThat(auditEvent).hasArray("http/queryParameters/query").contains("value");
         assertThat(auditEvent).hasArray("http/headers/" + ContentTypeHeader.NAME).contains("CONTENT_TYPE");
     }
 

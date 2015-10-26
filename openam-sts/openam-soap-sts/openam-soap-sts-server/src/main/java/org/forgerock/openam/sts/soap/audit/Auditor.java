@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.sts.soap.audit;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -27,7 +27,6 @@ import static org.forgerock.openam.audit.AuditConstants.Component.STS;
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 
 import com.google.inject.assistedinject.Assisted;
-import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;

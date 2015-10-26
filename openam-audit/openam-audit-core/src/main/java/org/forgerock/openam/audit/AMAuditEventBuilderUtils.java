@@ -25,7 +25,11 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.utils.StringUtils;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -112,6 +116,34 @@ public final class AMAuditEventBuilderUtils {
         }
 
         return trackingIdValues;
+    }
+
+    /**
+     * Generate a map of query parameters from the ampersand-separated list of key-value pairs.
+     *
+     * @param queryString HTTP query string.
+     * @return Map of parameter keys to their values.
+     */
+    public static Map<String, List<String>> getQueryParametersAsMap(String queryString) {
+        Map<String, List<String>> queryParameters = new LinkedHashMap<>();
+
+        if (queryString != null) {
+            for (String param : queryString.split("&")) {
+                String[] nv = param.split("=", 2);
+                if (nv.length == 2) {
+                    String name = nv[0];
+                    String value = nv[1];
+                    List<String> list = queryParameters.get(name);
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        queryParameters.put(name, list);
+                    }
+                    list.add(value);
+                }
+            }
+        }
+
+        return queryParameters;
     }
 
 }

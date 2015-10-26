@@ -29,7 +29,7 @@
  */
 package com.sun.identity.log.service;
 
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 
@@ -51,6 +51,7 @@ import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
@@ -227,13 +228,14 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         int queryStringIndex = resourceUrl.indexOf('?');
         String queryString = queryStringIndex > -1 ? resourceUrl.substring(queryStringIndex) : "";
         String path = resourceUrl.replace(queryString, "");
+        Map<String, List<String>> queryParameters = AMAuditEventBuilderUtils.getQueryParametersAsMap(queryString);
 
         AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.POLICY_AGENT)
                 .authentication(clientId)
-                .http("UNKNOWN", path, queryString, Collections.<String, List<String>>emptyMap())
+                .http("UNKNOWN", path, queryParameters, Collections.<String, List<String>>emptyMap())
                 .request("HTTP", "UNKNOWN")
                 .client(clientIp)
                 .trackingId(contextId)

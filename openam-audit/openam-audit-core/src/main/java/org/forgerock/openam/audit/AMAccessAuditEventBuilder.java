@@ -15,12 +15,14 @@
  */
 package org.forgerock.openam.audit;
 
+import static java.util.Collections.list;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.utils.ClientUtils.getClientIPAddress;
 import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.AccessAuditEventBuilder;
+import org.forgerock.http.protocol.Form;
 import org.forgerock.http.protocol.Header;
 import org.forgerock.services.context.Context;
 import org.forgerock.http.MutableUri;
@@ -32,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,7 +86,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         http(
                 request.getMethod(),
                 request.getRequestURL().toString(),
-                request.getQueryString() == null ? "" : request.getQueryString(),
+                getQueryParametersAsMap(request),
                 getHeadersAsMap(request));
         return this;
     }
@@ -105,7 +108,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         http(
                 request.getMethod(),
                 uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + uri.getPath(),
-                uri.getQuery() == null ? "" : uri.getQuery(),
+                getQueryParametersAsMap(request.getForm()),
                 getHeadersAsMap(request.getHeaders()));
         return this;
     }
@@ -133,17 +136,12 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, List<String>> getHeadersAsMap(HttpServletRequest request) {
         Map<String, List<String>> headers = new HashMap<>();
-        Enumeration headerNamesEnumeration = request.getHeaderNames();
-        while (headerNamesEnumeration.hasMoreElements()) {
-            String headerName = (String) headerNamesEnumeration.nextElement();
-            List<String> headerValues = new ArrayList<>();
-            Enumeration headersEnumeration = request.getHeaders(headerName);
-            while (headersEnumeration.hasMoreElements()) {
-                headerValues.add((String) headersEnumeration.nextElement());
-            }
-            headers.put(headerName, headerValues);
+        for (Enumeration<String> e = request.getHeaderNames(); e.hasMoreElements();) {
+            String name = e.nextElement();
+            headers.put(name, list(request.getHeaders(name)));
         }
         return headers;
     }
@@ -154,5 +152,15 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
             headers.put(header.getKey(), new ArrayList<>(header.getValue().getValues()));
         }
         return headers;
+    }
+
+    private Map<String, List<String>> getQueryParametersAsMap(HttpServletRequest request) {
+        return AMAuditEventBuilderUtils.getQueryParametersAsMap(request.getQueryString());
+    }
+
+    private Map<String, List<String>> getQueryParametersAsMap(Form form) {
+        Map<String, List<String>> queryParameters = new LinkedHashMap<>();
+        queryParameters.putAll(form);
+        return queryParameters;
     }
 }

@@ -15,9 +15,10 @@
  */
 package org.forgerock.openam.audit;
 
+import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.audit.AuditConstants.EventName;
@@ -42,7 +43,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -175,7 +179,7 @@ public class AuditEventPublisherTest {
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
                 .request("CREST", "READ")
-                .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
+                .http("GET", "/some/path", getQueryParameters(), Collections.<String, List<String>>emptyMap())
                 .response(SUCCESS, "200", 42, MILLISECONDS)
                 .realm(realm)
                 .toEvent();
@@ -211,5 +215,12 @@ public class AuditEventPublisherTest {
         AMAuditService auditService = new DefaultAuditServiceProxy(builder.build(), serviceConfig);
         auditService.startup();
         when(auditServiceProvider.getDefaultAuditService()).thenReturn(auditService);
+    }
+
+    private Map<String, List<String>> getQueryParameters() {
+        HashMap<String, List<String>> queryParameters = new LinkedHashMap<>();
+        queryParameters.put("p1", asList("v1"));
+        queryParameters.put("p2", asList("v2"));
+        return queryParameters;
     }
 }
