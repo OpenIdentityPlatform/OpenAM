@@ -19,6 +19,7 @@ import org.forgerock.audit.events.AuthenticationAuditEventBuilder;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 import org.forgerock.openam.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +55,11 @@ public class AMAuthenticationAuditEventBuilder extends
      * @return this builder for method chaining.
      */
     public AMAuthenticationAuditEventBuilder entryList(List<AuthenticationAuditEntry> entries) {
-        super.entries(entries);
+        List<Map<String, Object>> convertedEntries = new ArrayList<>();
+        for (AuthenticationAuditEntry entry : entries) {
+            convertedEntries.add(entry.toMap());
+        }
+        super.entries(convertedEntries);
         return this;
     }
 

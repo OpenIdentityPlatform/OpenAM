@@ -2124,7 +2124,7 @@ public abstract class AMLoginModule implements LoginModule {
             authenticationAuditEntry.setInfo(info);
             entries = Collections.singletonList(authenticationAuditEntry);
 
-            AuthenticationAuditEventBuilder.Status result = FAILED;
+            AuthenticationAuditEventBuilder.Status result = SUCCESSFUL;
 
             String sessionId = getSessionId();
             Set<String> trackingIds = null;
@@ -2366,7 +2366,7 @@ public abstract class AMLoginModule implements LoginModule {
             authenticationAuditEntry.setInfo(info);
             entries = Collections.singletonList(authenticationAuditEntry);
 
-            AuthenticationAuditEventBuilder.Status result = SUCCESSFUL;
+            AuthenticationAuditEventBuilder.Status result = FAILED;
 
             String sessionId = getSessionId();
             Set<String> trackingIds = null;
@@ -2383,12 +2383,18 @@ public abstract class AMLoginModule implements LoginModule {
 
             String authentication = null;
             String name = null;
-            if (sharedState.containsKey(ISAuthConstants.SHARED_STATE_USERNAME)) {
-                name = (String) sharedState.get(ISAuthConstants.SHARED_STATE_USERNAME);
-            }
             AMIdentity identity = null;
             if (principalName != null && orgDN != null) {
                 identity = cw.getIdentity(principalName, realmName);
+                if (identity != null) {
+                    authentication = identity.getUniversalId();
+                }
+            }
+            if (sharedState.containsKey(ISAuthConstants.SHARED_STATE_USERNAME)) {
+                name = (String) sharedState.get(ISAuthConstants.SHARED_STATE_USERNAME);
+            }
+            if (name != null && orgDN != null) {
+                identity = cw.getIdentity(name, realmName);
                 if (identity != null) {
                     authentication = identity.getUniversalId();
                 }

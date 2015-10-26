@@ -17,6 +17,7 @@ package org.forgerock.openam.audit.model;
 
 import org.forgerock.openam.audit.AuditConstants.EventOutcome;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -28,9 +29,11 @@ import java.util.Map;
  */
 public class AuthenticationAuditEntry {
 
-    private String moduleId;
-    private EventOutcome result;
-    private Map<String, String> info;
+    private static final String MODULE_ID_KEY = "moduleId";
+    private static final String RESULT_KEY = "result";
+    private static final String INFO_KEY = "info";
+
+    private Map<String, Object> entry = new HashMap<>();
 
     /**
      * Get the module id.
@@ -38,7 +41,7 @@ public class AuthenticationAuditEntry {
      * @return The module id.
      */
     public String getModuleId() {
-        return moduleId;
+        return (String) this.entry.get(MODULE_ID_KEY);
     }
 
     /**
@@ -47,7 +50,7 @@ public class AuthenticationAuditEntry {
      * @return The result.
      */
     public EventOutcome getResult() {
-        return result;
+        return (EventOutcome) this.entry.get(RESULT_KEY);
     }
 
     /**
@@ -56,7 +59,7 @@ public class AuthenticationAuditEntry {
      * @return The {@code Map} of all info values.
      */
     public Map<String, String> getInfo() {
-        return info;
+        return (Map<String, String>) this.entry.get(INFO_KEY);
     }
 
     /**
@@ -65,7 +68,7 @@ public class AuthenticationAuditEntry {
      * @param moduleId The module id.
      */
     public void setModuleId(String moduleId) {
-        this.moduleId = moduleId;
+        this.entry.put(MODULE_ID_KEY, moduleId);
     }
 
     /**
@@ -74,7 +77,7 @@ public class AuthenticationAuditEntry {
      * @param result The result.
      */
     public void setResult(EventOutcome result) {
-        this.result = result;
+        this.entry.put(RESULT_KEY, result);
     }
 
     /**
@@ -83,6 +86,15 @@ public class AuthenticationAuditEntry {
      * @param info The {@code Map} for the info values.
      */
     public void setInfo(Map<String, String> info) {
-        this.info = info;
+        this.entry.put(INFO_KEY, info);
+    }
+
+    /**
+     * Get this {@link AuthenticationAuditEntry} as a {@code Map}.
+     *
+     * @return The {@code Map} representation.
+     */
+    public Map<String, Object> toMap() {
+        return this.entry;
     }
 }

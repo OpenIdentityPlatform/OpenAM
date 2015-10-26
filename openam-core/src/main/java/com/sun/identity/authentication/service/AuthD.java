@@ -28,8 +28,15 @@
  */
 package com.sun.identity.authentication.service;
 
-import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status.SUCCESSFUL;
+import static com.sun.identity.authentication.LegacyAuthenticationEventAuditor.isActivityOnlyEvent;
+import static com.sun.identity.authentication.LegacyAuthenticationEventAuditor.isAuthenticationOnlyEvent;
 import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status.FAILED;
+import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status.SUCCESSFUL;
+import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.EVENT_DATA;
+import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.IP_ADDRESS;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_LOGIN_CHAIN_COMPLETED;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_LOGOUT;
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
 
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.util.Misc;
@@ -43,6 +50,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.LegacyAuthenticationEventAuditor;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.RequestUtils;
@@ -73,7 +81,6 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.audit.events.AuthenticationAuditEventBuilder;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AuditConstants;
-import com.sun.identity.authentication.LegacyAuthenticationEventAuditor;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 import org.forgerock.openam.ldap.LDAPUtils;
@@ -88,7 +95,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,12 +107,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_LOGIN_CHAIN_COMPLETED;
-import static com.sun.identity.authentication.LegacyAuthenticationEventAuditor.isActivityOnlyEvent;
-import static com.sun.identity.authentication.LegacyAuthenticationEventAuditor.isAuthenticationOnlyEvent;
-import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
-import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.*;
 
 /**
  * This class is used to initialize the Authentication service and retrieve 
@@ -721,8 +721,6 @@ public class AuthD implements ConfigurationListener {
             String realmName = DNMapper.orgNameToRealmName(orgDN);
 
             if (auditor.isAuditing(realmName, AuditConstants.AUTHENTICATION_TOPIC)) {
-                String messageName = messageId.toString();
-
                 Set<String> trackingIds = null;
                 if (StringUtils.isNotEmpty(contextId)) {
                     trackingIds = Collections.singleton(contextId);
@@ -733,7 +731,7 @@ public class AuthD implements ConfigurationListener {
                 String principal = null;
                 if (identity != null) {
                     authentication = identity.getUniversalId();
-                    principal = identity.getName();
+                    principal = getPrincipalFromUniversalId(identity.getName());
                 }
 
                 List<AuthenticationAuditEntry> entries;
@@ -748,8 +746,7 @@ public class AuthD implements ConfigurationListener {
 
                 AuthenticationAuditEventBuilder.Status result = SUCCESSFUL;
 
-                //TODO? AM_LOGOUT.toString()
-                auditor.audit(messageName, AuditRequestContext.getTransactionIdValue(),
+                auditor.audit(AM_LOGOUT.toString(), AuditRequestContext.getTransactionIdValue(),
                         authentication, principal, realmName, trackingIds, entries, result);
             }
 
@@ -845,6 +842,11 @@ public class AuthD implements ConfigurationListener {
             // Logout audit logging is already handled by the logLogout method, but that calls here for legacy
             // purposes, so we must ensure to not log a second time if we are dealing with a logout message.
             if (!auditor.isLogoutEvent(messageName)) {
+                String description = null;
+                if (provider != null) {
+                    description = provider.getAllHashMessageIDs().get(messageName).getDescription();
+                }
+
                 String userName = (String) ssoProperties.get("LoginID");
                 String contextID = (String) ssoProperties.get(LogConstants.CONTEXT_ID);
                 String LoginIDSid = (String) ssoProperties.get(LogConstants.LOGIN_ID_SID);
@@ -868,10 +870,20 @@ public class AuthD implements ConfigurationListener {
 
                 AMIdentity identity = IdUtils.getIdentity(userName, realmName);
                 String authentication = null;
-                String principal = null;
+                String principal;
                 if (identity != null) {
+                    //Reached when the userName indicates a valid AM identity, whether or not the userName was
+                    //logged in.
                     authentication = identity.getUniversalId();
-                    principal = identity.getName();
+                    if (contextID != null) {
+                        principal = getPrincipalFromUniversalId(identity.getName());
+                    } else {
+                        //An absence of contextId indicates that the userName was not successfully logged in.
+                        principal = identity.getName();
+                    }
+                } else {
+                    //Reached when the userName is not a valid AM identity.
+                    principal = userName;
                 }
 
                 String moduleName = (String) ssoProperties.get("ModuleName");
@@ -884,7 +896,14 @@ public class AuthD implements ConfigurationListener {
                     Map<String, String> info = null;
                     String ip = (String) ssoProperties.get(LogConstants.IP_ADDR);
                     if (StringUtils.isNotEmpty(ip)) {
-                        info = Collections.singletonMap(IP_ADDRESS.toString(), ip);
+                        info = new HashMap<>();
+                        info.put(IP_ADDRESS.toString(), ip);
+                    }
+                    if (StringUtils.isNotEmpty(description)) {
+                        if (info == null) {
+                            info = new HashMap<>();
+                        }
+                        info.put(EVENT_DATA.toString(), description);
                     }
                     AuthenticationAuditEntry authenticationAuditEntry = new AuthenticationAuditEntry();
                     authenticationAuditEntry.setModuleId(moduleName);
@@ -894,15 +913,25 @@ public class AuthD implements ConfigurationListener {
                     }
                     entries = Collections.singletonList(authenticationAuditEntry);
 
-                    //TODO Check success or fail:
-                    //result = SUCCESSFUL;
-                    result = FAILED;
+                    if (contextID == null) {
+                        //An absence of contextId indicates that the userName was not successfully logged in.
+                        result = FAILED;
+                    } else {
+                        result = SUCCESSFUL;
+                    }
                 }
 
                 auditor.audit(messageName, AuditRequestContext.getTransactionIdValue(),
                         authentication, principal, realmName, trackingIds, entries, result);
             }
         }
+    }
+
+    private String getPrincipalFromUniversalId(String name) {
+        int startOfPrincipalName = name.indexOf("=") + 1;
+        String principalNameWithTrailingData = name.substring(startOfPrincipalName);
+        int startOfTrailingData = principalNameWithTrailingData.indexOf(",");
+        return principalNameWithTrailingData.substring(0, startOfTrailingData);
     }
 
     private void initializeAuditor() {

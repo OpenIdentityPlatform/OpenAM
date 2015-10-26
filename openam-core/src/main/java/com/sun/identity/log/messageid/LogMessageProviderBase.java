@@ -80,6 +80,15 @@ public class LogMessageProviderBase
     }
 
     /**
+     * Returns all hash message IDs. That is, the message IDs and their corresponding values.
+     *
+     * @return all hash message IDs.
+     */
+    public Map<String, LogMessageID> getAllHashMessageIDs() {
+        return hashMessageIDs;
+    }
+
+    /**
      * Returns Log Record. <code>null</code> is returned if there are no
      * corresponding entries in the XML definition file match with the
      * <code>messageIDName</code>.

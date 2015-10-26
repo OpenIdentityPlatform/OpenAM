@@ -152,7 +152,9 @@ public final class AuditConstants {
         /** Key for the module name. */
         MODULE_NAME("moduleName"),
         /** Key for the module class. */
-        MODULE_CLASS("moduleClass");
+        MODULE_CLASS("moduleClass"),
+        /** Key for the extra textual information about event. */
+        EVENT_DATA("eventData");
 
         private final String name;
 
