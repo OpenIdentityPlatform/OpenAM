@@ -20,19 +20,20 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "handlebars",
     "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils",
 
     // jquery dependencies
     "selectize"
-], function ($, _, AbstractView, BootstrapDialog, Configuration, EventManager, Router, Constants, SMSRealmDelegate,
-             Form, FormHelper, MessageManager, UIUtils) {
+], function ($, _, AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormHelper, Handlebars,
+             MessageManager, Router, SMSRealmDelegate, UIUtils) {
     var ModulesView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ModulesTemplate.html",
         events: {
@@ -42,6 +43,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             "click #deleteModules": "deleteModules",
             "click .check-before-edit": "editModule"
         },
+        partials: [
+            "partials/alerts/_Alert.html"
+        ],
         data: {},
         addModule: function (e) {
             e.preventDefault();
@@ -112,9 +116,21 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             });
         },
         addModuleDialogValidation: function (dialog) {
-            var nameValid = dialog.$modalBody.find("#newModuleName").val().length > 0,
-                typeValid = dialog.$modalBody.find("#newModuleType")[0].selectize.getValue().length > 0;
-            return (nameValid && typeValid);
+            var valid = true,
+                alert = "",
+                nameValid,
+                typeValid;
+
+            if (dialog.$modalBody.find("#newModuleName").val().indexOf(" ") !== -1) {
+                valid = false;
+                alert = Handlebars.compile("{{> alerts/_Alert type='warning' " +
+                    "text='console.authentication.modules.moduleNameValidationError'}}");
+            }
+
+            dialog.$modalBody.find("#alertContainer").html(alert);
+            nameValid = dialog.$modalBody.find("#newModuleName").val().length > 0;
+            typeValid = dialog.$modalBody.find("#newModuleType")[0].selectize.getValue().length > 0;
+            return (nameValid && typeValid && valid);
         },
         enableOrDisableNextButton: function (dialog) {
             var self = this;

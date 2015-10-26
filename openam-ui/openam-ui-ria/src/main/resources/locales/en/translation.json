@@ -678,7 +678,8 @@
                 "inUse": {
                     "title": "Edit module",
                     "message": "The <code>__moduleName__</code> module is being used by the following Authentication Chain(s) <code>__usedChains__</code>. Editing this module may change their behaviour. <br><br>Are you sure you want to continue?"
-                }
+                },
+                "moduleNameValidationError" : "Spaces are not allowed in a module's name"
             },
             "chains": {
                 "title" : "Authentication Chains",
