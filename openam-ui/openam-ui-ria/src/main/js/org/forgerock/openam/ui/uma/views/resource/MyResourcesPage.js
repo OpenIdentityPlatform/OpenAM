@@ -66,6 +66,11 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
         },
         unshareAllResources: function () {
             var buttons = [{
+                label: $.t("common.form.cancel"),
+                action: function (dialog) {
+                    dialog.close();
+                }
+            }, {
                 id: "ok",
                 label: $.t("common.form.ok"),
                 cssClass: "btn-primary btn-danger",
@@ -83,11 +88,6 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
                         dialog.enableButtons(true);
                         dialog.getButton("ok").text($.t("common.form.ok"));
                     });
-                }
-            }, {
-                label: $.t("common.form.cancel"),
-                action: function (dialog) {
-                    dialog.close();
                 }
             }];
 

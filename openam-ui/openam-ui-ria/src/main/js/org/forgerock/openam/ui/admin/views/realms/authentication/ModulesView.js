@@ -61,6 +61,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                             title: $.t("console.authentication.modules.addModuleDialogTitle"),
                             message: $(html),
                             buttons: [{
+                                label: $.t("common.form.cancel"),
+                                action: function (dialog) {
+                                    dialog.close();
+                                }
+                            }, {
                                 id: "nextButton",
                                 label: $.t("common.form.create"),
                                 cssClass: "btn-primary",
@@ -99,11 +104,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                                                 }
                                             });
                                     }
-                                }
-                            }, {
-                                label: $.t("common.form.cancel"),
-                                action: function (dialog) {
-                                    dialog.close();
                                 }
                             }],
                             onshow: function (dialog) {
@@ -165,22 +165,20 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                     {
                         usedChains: data.moduleChains, moduleName: data.moduleName
                     }),
-                buttons: [
-                    {
-                        label: $.t("common.form.cancel"),
-                        cssClass: "btn-default",
-                        action: function (dialog) {
-                            dialog.close();
-                        }
-                    }, {
-                        label: $.t("common.form.yes"),
-                        cssClass: "btn-primary",
-                        action: function (dialog) {
-                            Router.setUrl(event.currentTarget.href);
-                            dialog.close();
-                        }
+                buttons: [{
+                    label: $.t("common.form.cancel"),
+                    cssClass: "btn-default",
+                    action: function (dialog) {
+                        dialog.close();
                     }
-                ]
+                }, {
+                    label: $.t("common.form.yes"),
+                    cssClass: "btn-primary",
+                    action: function (dialog) {
+                        Router.setUrl(event.currentTarget.href);
+                        dialog.close();
+                    }
+                }]
             });
         },
 

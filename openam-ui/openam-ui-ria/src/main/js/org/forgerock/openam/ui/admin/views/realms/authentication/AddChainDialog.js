@@ -24,6 +24,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, BootstrapDialog, Handlebars, Messages, Router, SMSRealmDelegate, UIUtils) {
     var buttons = [{
+        label: $.t("common.form.cancel"),
+        action: function (dialog) {
+            dialog.close();
+        }
+    }, {
         label: $.t("common.form.create"),
         cssClass: "btn-primary",
         action: function (dialog) {
@@ -53,11 +58,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
                     "{{> alerts/_Alert type='warning' text='console.authentication.chains.duplicateChain'}}"
                 ));
             }
-        }
-    }, {
-        label: $.t("common.form.cancel"),
-        action: function (dialog) {
-            dialog.close();
         }
     }];
 

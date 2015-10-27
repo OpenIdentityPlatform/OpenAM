@@ -104,6 +104,11 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 message: $.t("uma.resources.show.revokeAllMessage"),
                 closable: false,
                 buttons: [{
+                    label: $.t("common.form.cancel"),
+                    action: function (dialog) {
+                        dialog.close();
+                    }
+                }, {
                     id: "btnOk",
                     label: $.t("common.form.ok"),
                     cssClass: "btn-primary btn-danger",
@@ -121,11 +126,6 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                         }).always(function () {
                             dialog.close();
                         });
-                    }
-                }, {
-                    label: $.t("common.form.cancel"),
-                    action: function (dialog) {
-                        dialog.close();
                     }
                 }]
             });

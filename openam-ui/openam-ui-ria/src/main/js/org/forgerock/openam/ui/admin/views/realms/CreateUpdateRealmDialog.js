@@ -89,6 +89,11 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                         return element;
                     },
                     buttons: [{
+                        label: $.t("common.form.cancel"),
+                        action: function (dialog) {
+                            dialog.close();
+                        }
+                    }, {
                         label: $.t("common.form." + i18nButtonKey),
                         cssClass: "btn-primary",
                         action: function (dialog) {
@@ -112,11 +117,6 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                                     options.callback();
                                 }
                             });
-                        }
-                    }, {
-                        label: $.t("common.form.cancel"),
-                        action: function (dialog) {
-                            dialog.close();
                         }
                     }],
                     onshow: function (dialog) {

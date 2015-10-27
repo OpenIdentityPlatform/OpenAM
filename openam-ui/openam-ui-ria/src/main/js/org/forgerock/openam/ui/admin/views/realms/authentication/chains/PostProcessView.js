@@ -75,26 +75,23 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
                     message: $.t("console.authentication.editChains.processingClass.addClassNameDialog.message",
                         { newClassName: newProcessClass }),
                     closable: false,
-                    buttons: [
-                        {
-                            id: "btnOk",
-                            label: $.t("common.form.ok"),
-                            cssClass: "btn-primary",
-                            action: function (dialog) {
-                                self.add();
-                                dialog.close();
-                                promise.resolve();
-                            }
-                        },
-                        {
-                            label: $.t("common.form.cancel"),
-                            action: function (dialog) {
-                                self.$el.find("#newProcessClass").val("");
-                                dialog.close();
-                                promise.resolve();
-                            }
+                    buttons: [{
+                        label: $.t("common.form.cancel"),
+                        action: function (dialog) {
+                            self.$el.find("#newProcessClass").val("");
+                            dialog.close();
+                            promise.resolve();
                         }
-                    ]
+                    }, {
+                        id: "btnOk",
+                        label: $.t("common.form.ok"),
+                        cssClass: "btn-primary",
+                        action: function (dialog) {
+                            self.add();
+                            dialog.close();
+                            promise.resolve();
+                        }
+                    }]
                 });
             }
             return promise;

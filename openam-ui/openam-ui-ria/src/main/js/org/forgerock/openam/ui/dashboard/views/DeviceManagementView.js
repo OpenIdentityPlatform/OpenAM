@@ -61,19 +61,19 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                         cssClass: "device-details",
                         closable: false,
                         buttons: [{
+                            label: $.t("common.form.cancel"),
+                            action: function (dialog) {
+                                dialog.close();
+                            }
+                        }, {
                             label: $.t("common.form.save"),
+                            cssClass: "btn-primary",
                             action: function (dialog) {
                                 statusDevice = dialog.$modalBody.find("[name=\"deviceSkip\"]").is(":checked");
                                 DeviceManagementDelegate.setDeviceSkippable(statusDevice).done(function () {
                                     self.render();
                                     dialog.close();
                                 });
-                            }
-                        }, {
-                            label: $.t("common.form.close"),
-                            cssClass: "btn-primary",
-                            action: function (dialog) {
-                                dialog.close();
                             }
                         }],
                         onshown: function (dialog) {
