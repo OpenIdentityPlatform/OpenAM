@@ -299,6 +299,10 @@
             "allow": "Allow",
             "deny": "Deny",
             "notApplicable": "n/a",
+            "enable": "Enable",
+            "disable": "Disable",
+            "enabled": "Enabled",
+            "disabled": "Disabled",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
@@ -767,22 +771,11 @@
             "title": "Realms",
             "description" : "Use realms to organize subjects and configuration data. Within each realm you can configure data stores, administration privileges, authentication chains, authorization policies, and other realm-specific settings.",
             "newRealm": "New Realm",
-            "actions": {
-                "edit": "Edit",
-                "disable": "Disable",
-                "activate": "Activate",
-                "delete": "Delete"
-            },
-            "active": "Active",
-            "inactive": "Inactive",
-            "realmName": "Realm name",
-            "realmPath": "Path",
-            "realmAliases": "Realm/DNS Aliases",
+            "header": ["Realm name", "Status", "Path", "Realm/DNS Aliases"],
             "warningDialog": {
                 "title": "Delete \"__realmName__\"?",
-                "activeMessage": "This is an active realm. All configuration data will be lost if deleted. You can set the realm as inactive to prevent login but retain configuration data. <br>Do you want to delete the realm?",
-                "inactiveMessage": "This is an inactive realm. No one can currently login. All configuration data will be lost if deleted. <br>Are you sure you want to delete the realm?",
-                "deactivate" : "Deactivate"
+                "enableMessage": "This is an enabled realm. All configuration data will be lost if deleted. You can set the realm as disabled to prevent login but retain configuration data. <br>Do you want to delete this realm?",
+                "disableMessage": "This is a disabled realm. No one can currently login. All configuration data will be lost if deleted. <br>Are you sure you want to delete this realm?"
             },
             "createUpdateRealmDialog": {
                 "createTitle": "New Realm",

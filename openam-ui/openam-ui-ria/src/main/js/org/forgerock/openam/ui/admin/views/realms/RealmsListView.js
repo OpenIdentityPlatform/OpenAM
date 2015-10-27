@@ -102,7 +102,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
 
             if (realm.active) {
                 buttons.splice(1, 0, {
-                    label: $.t("console.realms.warningDialog.deactivate"),
+                    label: $.t("common.form.disable"),
                     action: function (dialog) {
                         realm.active = false;
                         SMSGlobalDelegate.realms.update(realm).done(function () {
@@ -120,8 +120,8 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             BootstrapDialog.show({
                 title: $.t("console.realms.warningDialog.title", { realmName: realm.name }),
                 type: BootstrapDialog.TYPE_DANGER,
-                message: realm.active ? $.t("console.realms.warningDialog.activeMessage")
-                    : $.t("console.realms.warningDialog.inactiveMessage"),
+                message: realm.active ? $.t("console.realms.warningDialog.enableMessage")
+                    : $.t("console.realms.warningDialog.disableMessage"),
                 buttons: buttons
             });
 

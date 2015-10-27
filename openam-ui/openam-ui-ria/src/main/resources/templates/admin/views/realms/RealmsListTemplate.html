@@ -20,14 +20,14 @@
                                 <i class="fa fa-ellipsis-v fa-lg"></i>
                             </button>
                             <ul class="dropdown-menu pull-left" role="menu">
-                                <li><a href="#" class="edit-realm"><i class="fa fa-pencil"></i> {{t "console.realms.actions.edit"}}</a></li>
+                                <li><a href="#" class="edit-realm"><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
                                 {{#if active}}
-                                <li><a href="#" class="toggle-realm-active"><i class="fa fa-ban"></i> {{t "console.realms.actions.disable"}}</a></li>
+                                    <li><a href="#" class="toggle-realm-active"><i class="fa fa-ban"></i> {{t "common.form.disable"}}</a></li>
                                 {{else}}
-                                <li><a href="#" class="toggle-realm-active"><i class="fa fa-check"></i> {{t "console.realms.actions.activate"}}</a></li>
+                                    <li><a href="#" class="toggle-realm-active"><i class="fa fa-check"></i> {{t "common.form.enable"}}</a></li>
                                 {{/if}}
                                 <li class="divider"></li>
-                                <li {{#equals path "/" }} class="disabled" {{/equals}}><a href="#" class="delete-realm"><i class="fa fa-times"></i> {{t "console.realms.actions.delete"}}</a></li>
+                                <li {{#equals path "/" }} class="disabled" {{/equals}}><a href="#" class="delete-realm"><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
                             </ul>
                         </div>
                         <a href="{{routeTo 'realmDefault' path}}">
@@ -52,9 +52,9 @@
                             </div>
                             <div class="card-footer">
                                 {{#if active}}
-                                <span class="text-success"><i class="fa fa-check"></i> {{t 'console.realms.active'}}</span>
+                                    <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.enabled"}}</span>
                                 {{else}}
-                                <span class="text-warning"><i class="fa fa-exclamation-triangle"></i></i> {{t 'console.realms.inactive'}}</span>
+                                    <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.disabled"}}</span>
                                 {{/if}}
                             </div>
                         </a>
@@ -68,17 +68,25 @@
                 <div class="panel-body">
                     <table class="table">
                         <thead>
-                        <tr>
-                            <th>{{t 'console.realms.realmName'}}</th>
-                            <th>{{t 'console.realms.realmPath'}}</th>
-                            <th>{{t 'console.realms.realmAliases'}}</th>
-                            <th class="fr-col-btn-2"></th>
-                        </tr>
+                            <tr>
+                                <th>{{t 'console.realms.header.0'}}</th>
+                                <th>{{t 'console.realms.header.1'}}</th>
+                                <th>{{t 'console.realms.header.2'}}</th>
+                                <th>{{t 'console.realms.header.3'}}</th>
+                                <th class="fr-col-btn-2"></th>
+                            </tr>
                         </thead>
                         <tbody>
                         {{#each realms}}
                         <tr>
                             <td class="wordwrap"><a href="{{routeTo 'realmDefault' path}}">{{name}}</a></td>
+                            <td class="wordwrap">
+                                {{#if active}}
+                                    <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.enabled"}}</span>
+                                {{else}}
+                                    <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.disabled"}}</span>
+                                {{/if}}
+                            </td>
                             <td class="wordwrap">{{path}}</td>
                             <td>
                                 {{#each aliases}}
