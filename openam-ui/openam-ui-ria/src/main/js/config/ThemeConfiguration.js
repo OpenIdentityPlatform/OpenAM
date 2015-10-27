@@ -33,7 +33,9 @@ define("config/ThemeConfiguration", {
                     // The title attribute used on <img> tags.
                     title: "ForgeRock",
                     // The alt attribute used on <img> tags.
-                    alt: "ForgeRock"
+                    alt: "ForgeRock",
+                    // The width of the logo as a CSS length.
+                    width: "202px"
                 },
                 // This logo is displayed on login pages.
                 loginLogo: {
