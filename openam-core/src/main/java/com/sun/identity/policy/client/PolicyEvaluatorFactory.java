@@ -131,7 +131,7 @@ public class PolicyEvaluatorFactory {
                         + ":appSSOTokenProvider=" +appSSOTokenProvider
                         + ":creating new PolicyEvaluator");
             }
-            pe = new PolicyEvaluator(serviceName, appSSOTokenProvider);
+            pe = PolicyEvaluator.getInstance(serviceName, appSSOTokenProvider);
             appTokenEvaluatorsMap.put(appSSOTokenProvider, pe);
         } else {
             if (debug.messageEnabled()) {
