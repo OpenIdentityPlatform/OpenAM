@@ -308,7 +308,7 @@
             "enableCookies" : "Cookies must be enabled to login",
             "deleteSelected" : "Delete Selected",
             "startTypingToSearch": "Start typing to search",
-            "unchanged": "unchanged",
+            "passwordPlaceholder": "••••••••••••",
             "validation" : {
                 "VALID_PHONE_FORMAT": "Contains invalid characters",
                 "VALID_NAME_FORMAT": "Contains invalid characters",
