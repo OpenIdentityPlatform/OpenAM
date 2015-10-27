@@ -17,8 +17,6 @@
             <div class="media" id="shareCounter">&nbsp;</div>
         </div>
 
-        <div id="advancedView" class="form-group"></div>
-
         {{#if notFound}}
         <div class="col-sm-12">
             <div class="striped-list " id="resourceList">
@@ -48,12 +46,7 @@
             </div>
         </div>
 
-        <!--<div id="selectAuthentication" class="float-left">
-            <label>Authentication method</label>
-        </div>-->
-
     <div class="clearfix pull-right">
-        <a href="#" id="toggleAdvanced" role="button" class="btn btn-default"><i class="fa fa-cog"></i> {{t 'uma.share.advanced'}}</a>
         <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="btn btn-primary" disabled/>
     </div>
     {{/if}}

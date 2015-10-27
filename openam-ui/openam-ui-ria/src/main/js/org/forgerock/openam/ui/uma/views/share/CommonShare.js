@@ -61,8 +61,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         },
         template: "templates/uma/views/share/CommonShare.html",
         events: {
-            "click input#shareButton": "save",
-            "click #toggleAdvanced": "onToggleAdvanced"
+            "click input#shareButton": "save"
         },
         enableOrDisableShareButton: function () {
             var subjectValid = this.$el.find("#selectUser select")[0].selectize.getValue().length > 0,
@@ -83,7 +82,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.render();
         },
 
-        /**
+        /*
          * @returns Boolean whether the parent model required sync'ing
          */
         syncParentModel: function (id) {
@@ -301,12 +300,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             var policy = this.parentModel.get("policy"),
                 permissionCount = policy ? policy.get("permissions").length : 0;
             ShareCounter.render(permissionCount, callback);
-        },
-
-        onToggleAdvanced: function (event) {
-            event.preventDefault();
-            this.$el.find("#uma").toggleClass("advanced-mode");
-            this.$el.find("#toggleAdvanced").blur();
         }
     });
 
