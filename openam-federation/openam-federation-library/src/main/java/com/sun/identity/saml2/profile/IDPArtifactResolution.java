@@ -24,7 +24,7 @@
  *
  * $Id: IDPArtifactResolution.java,v 1.13 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2012-2014 ForgeRock AS.
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -39,6 +39,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
@@ -52,6 +53,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import org.w3c.dom.Element;
 
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
@@ -270,8 +272,8 @@ public class IDPArtifactResolution {
             SAML2Utils.debug.message(classMethod + "Entering onMessage().");
         }
     
-        Element reqElem = SAML2Utils.getSamlpElement(message, 
-            "ArtifactResolve");
+        Element reqElem = SOAPCommunicator.getInstance().getSamlpElement(message,
+                "ArtifactResolve");
         ArtifactResolve artResolve = 
             ProtocolFactory.getInstance().createArtifactResolve(reqElem);
 
@@ -280,8 +282,8 @@ public class IDPArtifactResolution {
                 SAML2Utils.debug.message(classMethod +
                     "no valid ArtifactResolve node found in SOAP body.");
             }
-            return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT, 
-                "noArtifactResolve", null);
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                    "noArtifactResolve", null);
         }
 
         String spEntityID = artResolve.getIssuer().getValue();
@@ -293,8 +295,8 @@ public class IDPArtifactResolution {
             String[] data = { idpEntityID, realm, artResolve.getID() };
             LogUtil.error(
                 Level.INFO, LogUtil.INVALID_ISSUER_REQUEST, data, null);
-            return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT, 
-                "invalidIssuerInRequest", null);
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                    "invalidIssuerInRequest", null);
         }
         SPSSODescriptorElement spSSODescriptor = null;
         try {
@@ -307,8 +309,8 @@ public class IDPArtifactResolution {
         if (spSSODescriptor == null) {
             SAML2Utils.debug.error(classMethod +
                 "Unable to get SP SSO Descriptor from meta.");
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT, 
-                "metaDataError", null);
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "metaDataError", null);
         }
         OrderedSet acsSet = SPSSOFederate.getACSUrl(spSSODescriptor,
             SAML2Constants.HTTP_ARTIFACT);
@@ -325,16 +327,16 @@ public class IDPArtifactResolution {
                 SAML2Utils.debug.error(classMethod +
                     "The artifact resolve is not signed " +
                     "when it is expected to be signed.");
-                return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT,
-                    "ArtifactResolveNotSigned", null);
+                return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                        "ArtifactResolveNotSigned", null);
             }
-            X509Certificate spCert = KeyUtil.getVerificationCert(
-                spSSODescriptor, spEntityID, SAML2Constants.SP_ROLE);
-            if (!artResolve.isSignatureValid(spCert)) {
+            Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(spSSODescriptor, spEntityID,
+                    SAML2Constants.SP_ROLE);
+            if (!artResolve.isSignatureValid(verificationCerts)) {
                 SAML2Utils.debug.error(classMethod +
                     "artifact resolve verification failed.");
-                return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT, 
-                    "invalidArtifact", null);
+                return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                        "invalidArtifact", null);
             }
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(classMethod +
@@ -346,8 +348,8 @@ public class IDPArtifactResolution {
         if (art == null) {
             SAML2Utils.debug.error(classMethod +
                 "Unable to get an artifact from ArtifactResolve.");
-            return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT, 
-                "invalidArtifactSignature", null);
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                    "invalidArtifactSignature", null);
         }
 
         String artStr = art.getArtifactValue();
@@ -368,7 +370,7 @@ public class IDPArtifactResolution {
                     SAML2Utils.debug.message(classMethod
                             + "target serverID is null");
                 }
-                return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
                         "InvalidArtifactId", null);
             }
 
@@ -382,7 +384,7 @@ public class IDPArtifactResolution {
                                 + "target serverID is not valid: "
                                 + targetServerID);
                     }
-                    return SAML2Utils.createSOAPFault(
+                    return SOAPCommunicator.getInstance().createSOAPFault(
                             SAML2Constants.CLIENT_FAULT, "InvalidArtifactId",
                             null);
                 }
@@ -392,7 +394,7 @@ public class IDPArtifactResolution {
                     remoteArtURL = remoteServiceURL
                             + SAML2Utils.removeDeployUri(request
                                     .getRequestURI());
-                    SOAPConnection con = SAML2Utils.scf.createConnection();
+                    SOAPConnection con = SOAPCommunicator.getInstance().openSOAPConnection();
                     SOAPMessage resMsg = con.call(message, remoteArtURL);
                     return resMsg;
                 } catch (Exception ex) {
@@ -405,7 +407,7 @@ public class IDPArtifactResolution {
                                                 + remoteArtURL, ex);
                     }
                     if (!saml2FailoverEnabled) {
-                        return SAML2Utils.createSOAPFault(
+                        return SOAPCommunicator.getInstance().createSOAPFault(
                                 SAML2Constants.SERVER_FAULT,
                                 "RemoteArtifactResolutionFailed", null);
                     }
@@ -428,13 +430,13 @@ public class IDPArtifactResolution {
                     res = ProtocolFactory.getInstance().createResponse(tmp);
                 } catch (SAML2Exception e) {
                     SAML2Utils.debug.error(classMethod + " SAML2 ERROR!!!", e);
-                    return SAML2Utils.createSOAPFault(
+                    return SOAPCommunicator.getInstance().createSOAPFault(
                             SAML2Constants.CLIENT_FAULT,
                             "UnableToFindResponseInRepo", null);
                 } catch (SAML2TokenRepositoryException se) {
                     SAML2Utils.debug.error(classMethod + " There was a problem reading the response "
                             + "from the SAML2 Token Repository using artStr:" + artStr, se);
-                    return SAML2Utils.createSOAPFault(
+                    return SOAPCommunicator.getInstance().createSOAPFault(
                             SAML2Constants.CLIENT_FAULT,
                             "UnableToFindResponseInRepo", null);
                 }
@@ -442,7 +444,7 @@ public class IDPArtifactResolution {
         }
 
         if (res == null) {
-            return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT,
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
                     saml2FailoverEnabled ? "UnableToFindResponseInRepo"
                             : "UnableToFindResponse", null);
         }
@@ -503,12 +505,12 @@ public class IDPArtifactResolution {
             KeyProvider kp = KeyUtil.getKeyProviderInstance();
             if (kp == null) {
                 SAML2Utils.debug.error(classMethod + "Unable to get a key provider instance.");
-                return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT, "nullKeyProvider", null);
+                return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT, "nullKeyProvider", null);
             }
             String idpSignCertAlias = SAML2Utils.getSigningCertAlias(realm, idpEntityID, SAML2Constants.IDP_ROLE);
             if (idpSignCertAlias == null) {
                 SAML2Utils.debug.error(classMethod + "Unable to get the hosted IDP signing certificate alias.");
-                return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT, "missingSigningCertAlias", null);
+                return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT, "missingSigningCertAlias", null);
             }
             String encryptedKeyPass =
                     SAML2Utils.getSigningCertEncryptedKeyPass(realm, idpEntityID, SAML2Constants.IDP_ROLE);
@@ -537,10 +539,10 @@ public class IDPArtifactResolution {
 
         SOAPMessage msg = null;
         try {
-            msg = SAML2Utils.createSOAPMessage(str, false);
+            msg = SOAPCommunicator.getInstance().createSOAPMessage(str, false);
         } catch (SOAPException se) {
             SAML2Utils.debug.error(classMethod + "Unable to create a SOAPMessage and add a document ", se);
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT, "unableToCreateSOAPMessage", null);
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT, "unableToCreateSOAPMessage", null);
         }
 
         return msg;

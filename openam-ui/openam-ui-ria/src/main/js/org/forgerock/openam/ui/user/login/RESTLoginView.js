@@ -184,7 +184,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 }
             }
 
-            AuthNDelegate.getRequirements().done(_.bind(function (reqs) {
+            AuthNDelegate.getRequirements().then(_.bind(function (reqs) {
 
                 var auth = Configuration.globalData.auth;
 
@@ -242,8 +242,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     this.renderForm(reqs, urlParams);
                     promise.resolve();
                 }
-            }, this))
-            .fail(_.bind(function (error) {
+            }, this), _.bind(function (error) {
                 // If we can't render a login form, then the user must not be able to login
                 this.template = this.unavailableTemplate;
                 this.parentRender(function () {
@@ -251,7 +250,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         Messages.messages.addMessage(error);
                     }
                 });
-
             }, this));
 
             promise.done(function () {
@@ -270,8 +268,27 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             cleaned.callbacks = [];
             _.each(reqs.callbacks, function (element) {
 
+                var redirectForm,
+                    redirectCallback;
+
                 if (element.type === "RedirectCallback") {
-                    window.location.replace(element.output[0].value);
+
+                    redirectCallback = _.object(_.map(element.output, function (o) {
+                        return [o.name, o.value];
+                    }));
+
+                    redirectForm = $("<form action='" + redirectCallback.redirectUrl + "' method='POST'></form>");
+
+                    if (redirectCallback.redirectMethod === "POST") {
+
+                        _.each(redirectCallback.redirectData, function (v, k) {
+                            redirectForm.append("<input type='hidden' name='" + k + "' value='" + v + "' />");
+                        });
+
+                        redirectForm.appendTo("body").submit();
+                    } else {
+                        window.location.replace(redirectCallback.redirectUrl);
+                    }
                 }
 
                 if (element.type === "ConfirmationCallback") {

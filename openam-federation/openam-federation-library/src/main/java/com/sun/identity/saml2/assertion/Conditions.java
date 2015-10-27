@@ -29,15 +29,18 @@
 
 package com.sun.identity.saml2.assertion;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.sun.identity.saml2.assertion.impl.ConditionsImpl;
+import com.sun.identity.saml2.common.SAML2Exception;
 import java.util.Date;
 import java.util.List;
-import com.sun.identity.saml2.common.SAML2Exception;
 
 /**
  * The <code>Conditions</code> defines the SAML constructs that place
  * constraints on the acceptable use if SAML <code>Assertion</code>s.
  * @supported.all.api
  */
+@JsonDeserialize(as=ConditionsImpl.class)
 public interface Conditions {
 
     /**

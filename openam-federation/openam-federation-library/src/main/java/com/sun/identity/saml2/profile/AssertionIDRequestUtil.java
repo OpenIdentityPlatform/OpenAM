@@ -24,13 +24,8 @@
  *
  * $Id: AssertionIDRequestUtil.java,v 1.8 2009/06/12 22:21:40 mallas Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
-
-/*
- * Portions Copyrighted 2013-2014 ForgeRock AS
- */
-
 package com.sun.identity.saml2.profile;
 
 import java.io.BufferedInputStream;
@@ -47,12 +42,14 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import com.sun.identity.common.HttpURLConnectionManager;
 import org.w3c.dom.Element;
@@ -603,11 +600,11 @@ public class AssertionIDRequestUtil {
                 "assertionIDRequestIssuerNotFound"));
         }
 
-        X509Certificate signingCert = KeyUtil.getVerificationCert(spSSODesc,
-            requestedEntityID, SAML2Constants.SP_ROLE);
+        Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(spSSODesc, requestedEntityID,
+                SAML2Constants.SP_ROLE);
 
-        if (signingCert != null) {
-            boolean valid = assertionIDRequest.isSignatureValid(signingCert);
+        if (!verificationCerts.isEmpty()) {
+            boolean valid = assertionIDRequest.isSignatureValid(verificationCerts);
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(
                     "AssertionIDRequestUtil.verifyAssertionIDRequest: " +
@@ -691,7 +688,7 @@ public class AssertionIDRequestUtil {
 
         SOAPMessage resMsg = null;
         try {
-            resMsg = SAML2Utils.sendSOAPMessage(aIDReqStr, location, true);
+            resMsg = SOAPCommunicator.getInstance().sendSOAPMessage(aIDReqStr, location, true);
         } catch (SOAPException se) {
             SAML2Utils.debug.error(
                 "AssertionIDRequestUtil.sendAssertionIDRequestBySOAP:", se);
@@ -699,7 +696,7 @@ public class AssertionIDRequestUtil {
                 SAML2Utils.bundle.getString("errorSendingAssertionIDRequest"));
         }
         
-        Element respElem = SAML2Utils.getSamlpElement(resMsg, "Response");
+        Element respElem = SOAPCommunicator.getInstance().getSamlpElement(resMsg, "Response");
         Response response =
             ProtocolFactory.getInstance().createResponse(respElem);
         
@@ -738,11 +735,10 @@ public class AssertionIDRequestUtil {
         }
 
 
-        X509Certificate signingCert = KeyUtil.getVerificationCert(roled,
-            samlAuthorityEntityID, role);
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(roled, samlAuthorityEntityID, role);
 
-        if (signingCert != null) {
-            boolean valid = response.isSignatureValid(signingCert);
+        if (!signingCerts.isEmpty()) {
+            boolean valid = response.isSignatureValid(signingCerts);
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(
                     "AssertionIDRequestUtil .verifyResponse: " +
@@ -753,8 +749,7 @@ public class AssertionIDRequestUtil {
                     "invalidSignatureOnResponse"));
             }
         } else {
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("missingSigningCertAlias"));
+            throw new SAML2Exception(SAML2Utils.bundle.getString("missingSigningCertAlias"));
         }
 
     }

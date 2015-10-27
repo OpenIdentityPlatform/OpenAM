@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
 
     obj.login = function (params, successCallback, errorCallback) {
         var self = this;
-        AuthNDelegate.getRequirements().done(function (requirements) {
+        AuthNDelegate.getRequirements().then(function (requirements) {
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
 
@@ -147,10 +147,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
         SessionDelegate.isSessionValid(tokenCookie).then(function (result) {
             if (result.valid) {
-                SessionDelegate.logout(tokenCookie).then(function () {
+                SessionDelegate.logout(tokenCookie).then(function (response) {
                     obj.removeSessionCookie();
 
-                    successCallback();
+                    successCallback(response);
                     return true;
 
                 }, obj.removeSessionCookie);

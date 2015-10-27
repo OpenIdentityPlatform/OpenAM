@@ -544,6 +544,10 @@
         <jsp-file>/saml2/jsp/spAssertionConsumer.jsp</jsp-file>
     </servlet>
     <servlet>
+        <servlet-name>AuthConsumer</servlet-name>
+        <jsp-file>/saml2/jsp/saml2AuthAssertionConsumer.jsp</jsp-file>
+    </servlet>
+    <servlet>
         <servlet-name>SPSloInit</servlet-name>
         <jsp-file>/saml2/jsp/spSingleLogoutInit.jsp</jsp-file>
     </servlet>
@@ -776,6 +780,10 @@
     <servlet-mapping>
         <servlet-name>Consumer</servlet-name>
         <url-pattern>/Consumer/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuthConsumer</servlet-name>
+        <url-pattern>/AuthConsumer/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SSOPOST</servlet-name>

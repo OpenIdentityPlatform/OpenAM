@@ -1332,7 +1332,7 @@ public class AuthClientUtils {
                 utilDebug.message("getCookieDomains - SMSException ");
             }
             if (cookieDomains == null) {
-                cookieDomains = Collections.EMPTY_SET;
+                cookieDomains = Collections.singleton(null);
             }
         } catch (SSOException ex) {
             // unable to get SSOToken

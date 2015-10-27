@@ -32,8 +32,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     obj.begin = function () {
         var url,
             args = {},
-            tokenCookie,
-            promise = $.Deferred();
+            tokenCookie;
 
         knownAuth = _.clone(Configuration.globalData.auth);
 
@@ -59,7 +58,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
 
         url = url + "?" + $.param(args);
 
-        obj.serviceCall({
+        return obj.serviceCall({
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
             data: "",
@@ -68,65 +67,66 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 "unauthorized": { status: "401" },
                 "bad request": { status: "400" }
             }
-        }).done(function (requirements) {
-            promise.resolve(requirements);
-        }).fail(function (jqXHR) {
+        }).then(function (requirements) {
+            return requirements;
+        }, function (jqXHR) {
             // some auth processes might throw an error fail immediately
-            var errorBody = $.parseJSON(jqXHR.responseText),
-                msg;
+            var errorBody = $.parseJSON(jqXHR.responseText);
 
             // if the error body contains an authId, then we might be able to
             // continue on after this error to the next module in the chain
             if (errorBody.hasOwnProperty("authId")) {
-                obj.submitRequirements(errorBody).done(function (requirements) {
+                return obj.submitRequirements(errorBody).then(function (requirements) {
                     obj.resetProcess();
-                    promise.resolve(requirements);
-                }).fail(function () {
-                    promise.reject();
+                    return requirements;
+                }, function () {
+                    return errorBody;
                 });
             } else if (errorBody.code && errorBody.code === 400) {
-                msg = {
+                return {
                     message: errorBody.message,
                     type: "error"
                 };
-                // in this case, the user has no way to login
-                promise.reject(msg);
-            } else {
-                // in this case, the user has no way to login
-                promise.reject();
             }
-        });
 
-        return promise;
+            return errorBody;
+        });
     };
 
     obj.handleRequirements = function (requirements) {
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
-        } else if (requirements.hasOwnProperty("tokenId")) {
-            if (Configuration.globalData.auth.cookieDomains &&
-                Configuration.globalData.auth.cookieDomains.length !== 0) {
-                _.each(Configuration.globalData.auth.cookieDomains, function (cookieDomain) {
-                    CookieHelper.setCookie(Configuration.globalData.auth.cookieName, requirements.tokenId, "", "/",
-                                           cookieDomain, Configuration.globalData.secureCookie);
-                });
-            } else {
-                CookieHelper.setCookie(Configuration.globalData.auth.cookieName, requirements.tokenId, "", "/",
-                                       location.hostname, Configuration.globalData.secureCookie);
+
+            if (!CookieHelper.getCookie("authId") && _.findWhere(requirements.callbacks,
+                { type: "RedirectCallback" })) {
+                CookieHelper.setCookie(
+                    "authId",
+                    requirements.authId, "", "/",
+                    Configuration.globalData.auth.cookieDomains
+                        ? Configuration.globalData.auth.cookieDomains
+                        : location.hostname,
+                    Configuration.globalData.secureCookie);
             }
+        } else if (requirements.hasOwnProperty("tokenId")) {
+            CookieHelper.setCookie(
+                Configuration.globalData.auth.cookieName,
+                requirements.tokenId, "", "/",
+                Configuration.globalData.auth.cookieDomains
+                    ? Configuration.globalData.auth.cookieDomains
+                    : location.hostname,
+                Configuration.globalData.secureCookie);
         }
     };
 
     obj.submitRequirements = function (requirements) {
-        var promise = $.Deferred(),
-            processSucceeded = function (requirements) {
+        var processSucceeded = function (requirements) {
                 obj.handleRequirements(requirements);
-                promise.resolve(requirements);
+                return requirements;
             },
             processFailed = function (reason) {
                 var failedStage = requirementList.length;
                 obj.resetProcess();
-                promise.reject(failedStage, reason);
+                return [failedStage, reason];
             },
             goToFailureUrl = function (errorBody) {
                 if (errorBody.detail && errorBody.detail.failureUrl) {
@@ -134,11 +134,9 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                     window.location.href = errorBody.detail.failureUrl;
                 }
             },
-            url;
+            url = RealmHelper.decorateURIWithRealm("__subrealm__/authenticate");
 
-        url = RealmHelper.decorateURIWithRealm("__subrealm__/authenticate");
-
-        obj.serviceCall({
+        return obj.serviceCall({
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
             data: JSON.stringify(requirements),
@@ -149,7 +147,8 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 "Internal Server Error ": { status: "500" }
             }
         }).then(processSucceeded, function (jqXHR) {
-            var oldReqs, errorBody,
+            var oldReqs,
+                errorBody,
                 currentStage = requirementList.length,
                 message,
                 failReason = null,
@@ -159,7 +158,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 // we timed out, so let's try again with a fresh session
                 oldReqs = requirementList[0];
                 obj.resetProcess();
-                obj.begin().done(function (requirements) {
+                return obj.begin().then(function (requirements) {
                     obj.handleRequirements(requirements);
 
                     if (requirements.hasOwnProperty("authId")) {
@@ -169,22 +168,20 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                              * try to do it again immediately.
                              */
                             oldReqs.authId = requirements.authId;
-                            obj.submitRequirements(oldReqs)
-                                .done(processSucceeded)
-                                .fail(processFailed);
+                            return obj.submitRequirements(oldReqs).then(processSucceeded, processFailed);
                         } else {
                             // restart the process at the beginning
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loginTimeout");
-                            promise.resolve(requirements);
+                            return requirements;
                         }
                     } else {
-                        promise.resolve(requirements);
+                        return requirements;
                     }
                 /**
                  * this is very unlikely, since it would require a call to .begin() to fail
                  * after having succeeded once before
                  */
-                }).fail(processFailed);
+                }, processFailed);
             } else if (jqXHR.status === 500) {
                 if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
                     message = jqXHR.responseJSON.message;
@@ -196,13 +193,15 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                     message: message,
                     type: Messages.TYPE_DANGER
                 });
+
+                return;
             } else { // we have a 401 unauthorized response
                 errorBody = $.parseJSON(jqXHR.responseText);
 
                 // if the error body has an authId property, then we may be
                 // able to advance beyond this error
                 if (errorBody.hasOwnProperty("authId")) {
-                    obj.submitRequirements(errorBody).done(processSucceeded).fail(processFailed);
+                    return obj.submitRequirements(errorBody).then(processSucceeded, processFailed);
                 } else {
                     // TODO to refactor this switch soon. Something like a map from error.message to failReason
                     // http://sources.forgerock.org/cru/CR-6216#CFR-114597
@@ -233,8 +232,6 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 }
             }
         });
-
-        return promise;
     };
 
     obj.resetProcess = function () {
@@ -253,29 +250,31 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     }
 
     obj.getRequirements = function (args) {
-        var ret = $.Deferred();
-
-        if (requirementList.length === 0 || hasRealmChanged() || hasAuthIndexChanged()) {
-
-            obj.begin(args).done(function (requirements) {
+        if (CookieHelper.getCookie("authId")) {
+            return obj.submitRequirements(_.extend({ "authId": CookieHelper.getCookie("authId") },
+                Configuration.globalData.auth.urlParams)).done(function () {
+                    knownAuth = _.clone(Configuration.globalData.auth);
+                    CookieHelper.deleteCookie("authId", "/", Configuration.globalData.auth.cookieDomains
+                        ? Configuration.globalData.auth.cookieDomains
+                        : location.hostname);
+                });
+        } else if (requirementList.length === 0 || hasRealmChanged() || hasAuthIndexChanged()) {
+            return obj.begin(args).then(function (requirements) {
                 obj.handleRequirements(requirements);
-                ret.resolve(requirements);
-            }).fail(function (error) {
-                ret.reject(error);
+                return requirements;
+            }, function (error) {
+                return error;
             });
         } else {
-            ret.resolve(requirementList[requirementList.length - 1]);
+            return $.Deferred().resolve(requirementList[requirementList.length - 1]);
         }
-        return ret;
     };
 
     obj.setGoToUrl = function (tokenId, urlGoTo) {
-        var args = {};
-        args.goto = urlGoTo;
         return obj.serviceCall({
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
-            data: JSON.stringify(args),
+            data: JSON.stringify({ "goto": urlGoTo }),
             url: "",
             serviceUrl: Constants.host + "/" + Constants.context + "/json/users?_action=validateGoto",
             errorsHandlers: { "Bad Request": { status: "400" } }

@@ -24,10 +24,7 @@
  *
  * $Id: SAML2MetaUtils.java,v 1.9 2009/09/21 17:28:12 exu Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2010-2014 ForgeRock Inc
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.meta;
 
@@ -237,11 +234,10 @@ public final class SAML2MetaUtils {
      * @param config the <code>BaseConfigType</code> object
      * @return a attrbute value <code>Map</code>
      */
-    public static Map getAttributes(BaseConfigType config) {
-        Map attrMap = new HashMap();
-        List list = config.getAttribute();
-        for(Iterator iter = list.iterator(); iter.hasNext();) {
-            AttributeType avp = (AttributeType)iter.next();
+    public static Map<String, List<String>> getAttributes(BaseConfigType config) {
+        Map<String, List<String>> attrMap = new HashMap<>();
+        List<AttributeType> list = config.getAttribute();
+        for (AttributeType avp : list) {
             attrMap.put(avp.getName(), avp.getValue());
         }
 

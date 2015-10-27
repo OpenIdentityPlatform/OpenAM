@@ -65,6 +65,7 @@
         <module>openam-auth-oidc</module>
         <module>openam-auth-scripted</module>
         <module>openam-auth-device-id</module>
+        <module>openam-auth-saml2</module>
     </modules>
 
     <profiles>

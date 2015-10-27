@@ -31,6 +31,10 @@
 package com.sun.identity.saml2.assertion;
 
 import java.util.List;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.sun.identity.saml2.assertion.impl.AttributeStatementImpl;
+import com.sun.identity.saml2.assertion.impl.SubjectImpl;
 import com.sun.identity.saml2.common.SAML2Exception;
 
 /**
@@ -54,6 +58,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * </pre>
  * @supported.all.api
  */
+@JsonDeserialize(as=AttributeStatementImpl.class)
 public interface AttributeStatement extends Statement {
 
     /**
@@ -62,7 +67,7 @@ public interface AttributeStatement extends Statement {
      * @return List of <code>Attribute</code>(s) in the statement.
      * @see #setAttribute(List)
      */
-    public List getAttribute();
+    List<Attribute> getAttribute();
 
     /**
      * Sets <code>Attribute</code>(s) of the statement.
@@ -71,8 +76,7 @@ public interface AttributeStatement extends Statement {
      * @throws SAML2Exception if the object is immutable.
      * @see #getAttribute()
      */
-    public void setAttribute(List value)
-        throws SAML2Exception;
+    void setAttribute(List<Attribute> value) throws SAML2Exception;
 
     /**
      * Returns <code>EncryptedAttribute</code>(s) of the statement. 
@@ -80,7 +84,7 @@ public interface AttributeStatement extends Statement {
      * @return List of <code>EncryptedAttribute</code>(s) in the statement.
      * @see #setEncryptedAttribute(List)
      */
-    public List getEncryptedAttribute();
+    List<EncryptedAttribute> getEncryptedAttribute();
 
     /**
      * Sets <code>EncryptedAttribute</code>(s) of the statement.
@@ -89,8 +93,7 @@ public interface AttributeStatement extends Statement {
      * @throws SAML2Exception if the object is immutable.
      * @see #getEncryptedAttribute()
      */
-    public void setEncryptedAttribute(List value)
-        throws SAML2Exception;
+    void setEncryptedAttribute(List<EncryptedAttribute> value) throws SAML2Exception;
 
 }
 

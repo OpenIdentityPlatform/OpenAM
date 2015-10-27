@@ -16,16 +16,15 @@
 
 package org.forgerock.openam.core.rest.session;
 
-import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
+import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.*;
 import static org.forgerock.openam.core.rest.session.SessionResource.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Mockito.*;
-
-import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -33,20 +32,24 @@ import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import java.security.Principal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.AdviceContext;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.services.context.ClientContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

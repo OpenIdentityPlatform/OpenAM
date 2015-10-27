@@ -29,53 +29,55 @@
 
 package com.sun.identity.saml2.profile;
 
-import javax.xml.soap.SOAPMessage;
 import com.sun.identity.federation.common.FSUtils;
-import com.sun.identity.saml2.common.SAML2Constants;
-import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.common.NameIDInfoKey;
-import com.sun.identity.saml2.common.AccountUtils;
-import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
-import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
-import com.sun.identity.saml2.meta.SAML2MetaException;
-import com.sun.identity.saml2.meta.SAML2MetaManager;
-import com.sun.identity.saml2.meta.SAML2MetaUtils;
-import com.sun.identity.saml2.logging.LogUtil;
-import com.sun.identity.saml2.assertion.AssertionFactory;
-import com.sun.identity.saml2.assertion.Issuer;
-import com.sun.identity.saml2.assertion.NameID;
-import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
-import com.sun.identity.saml2.plugins.FedletAdapter;
-import com.sun.identity.saml2.protocol.ProtocolFactory;
-import com.sun.identity.saml2.protocol.LogoutResponse;
-import com.sun.identity.saml2.protocol.LogoutRequest;
-import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.plugin.monitoring.FedMonAgent;
 import com.sun.identity.plugin.monitoring.FedMonSAML2Svc;
 import com.sun.identity.plugin.monitoring.MonitorManager;
+import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
-import com.sun.identity.plugin.session.SessionException;
+import com.sun.identity.saml2.assertion.AssertionFactory;
+import com.sun.identity.saml2.assertion.Issuer;
+import com.sun.identity.saml2.assertion.NameID;
+import com.sun.identity.saml2.common.AccountUtils;
+import com.sun.identity.saml2.common.NameIDInfoKey;
+import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.logging.LogUtil;
+import com.sun.identity.saml2.meta.SAML2MetaException;
+import com.sun.identity.saml2.meta.SAML2MetaManager;
+import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.saml2.plugins.FedletAdapter;
+import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
+import com.sun.identity.saml2.protocol.LogoutRequest;
+import com.sun.identity.saml2.protocol.LogoutResponse;
+import com.sun.identity.saml2.protocol.ProtocolFactory;
+import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
-
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.HashMap; 
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.soap.SOAPMessage;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.saml2.SAML2Store;
 
 /**
  * This class reads the required data from HttpServletRequest and
@@ -574,8 +576,17 @@ public class SPSingleLogout {
         String idpEntityID = logoutRes.getIssuer().getValue();
         Issuer resIssuer = logoutRes.getIssuer();
         String inResponseTo = logoutRes.getInResponseTo();
-        LogoutRequest logoutReq =  (LogoutRequest)
-            SPCache.logoutRequestIDHash.remove(inResponseTo);
+        LogoutRequest logoutReq =  (LogoutRequest) SPCache.logoutRequestIDHash.remove(inResponseTo);
+
+        if (logoutReq == null && SAML2FailoverUtils.isSAML2FailoverEnabled()) { //check the samlFailover cache instead
+            try {
+                logoutReq = (LogoutRequest) SAML2FailoverUtils.retrieveSAML2Token(inResponseTo);
+            } catch (SAML2TokenRepositoryException e) {
+                throw new SAML2Exception(SAML2Utils.bundle.getString("LogoutRequestIDandInResponseToDoNotMatch"));
+            }
+        } else {
+            logoutReq = (LogoutRequest) SAML2Store.getTokenFromStore(inResponseTo);
+        }
 
         // invoke SPAdapter preSingleLogoutProcess
         String userId = null;
@@ -743,8 +754,8 @@ public class SPSingleLogout {
             }
         }
         if (spAdapter != null) {
-            spAdapter.postSingleLogoutSuccess(hostedEntityID, realm, request, 
-                response, userID, logoutRequest, logoutResponse, binding);
+            spAdapter.postSingleLogoutSuccess(hostedEntityID, realm, request,
+                    response, userID, logoutRequest, logoutResponse, binding);
         }
     }
 

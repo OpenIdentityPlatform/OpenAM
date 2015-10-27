@@ -244,6 +244,16 @@ public class CollectionUtils {
         return newSet;
     }
 
+    /**
+     * Retrieves the first item from a collection.
+     *
+     * @param collection The collection.
+     * @param <T> The type of the collection.
+     * @return The first instance of the collection else null if not present.
+     */
+    public static <T> T getFirstItem(final Collection<T> collection) {
+        return getFirstItem(collection, null);
+    }
 
     /**
      * Retrieves the first item from a collections.

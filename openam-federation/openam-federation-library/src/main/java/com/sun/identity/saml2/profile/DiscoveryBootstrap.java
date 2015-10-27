@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,8 @@
  *
  * $Id: DiscoveryBootstrap.java,v 1.4 2008/12/05 00:18:31 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 package com.sun.identity.saml2.profile;
 
 import java.util.ArrayList;
@@ -198,8 +198,6 @@ public class DiscoveryBootstrap {
             discoEntryList.add(discoEntry);
             SessionSubject sessionSubject = null;
             if (DiscoServiceManager.encryptNIinSessionContext()) {
-                String encAlias = SAML2Utils.getEncryptionCertAlias(realm,
-                    providerID, SAML2Constants.IDP_ROLE);
                 IDPSSODescriptorElement idpSSODesc = SAML2Utils
                     .getSAML2MetaManager().getIDPSSODescriptor(realm,
                     providerID);

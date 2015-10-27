@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,8 @@
  *
  * $Id: AuthnQueryUtil.java,v 1.8 2008/12/03 00:32:31 hengming Exp $
  *
- *
- *  Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
-
 package com.sun.identity.saml2.profile;
 
 import java.util.ArrayList;
@@ -36,12 +34,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.w3c.dom.Element;
 
@@ -73,8 +73,6 @@ import com.sun.identity.saml2.protocol.RequestedAuthnContext;
 import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.saml2.protocol.StatusCode;
-
-
 
 /**
  * This class provides methods to send or process <code>AuthnQuery</code>.
@@ -394,11 +392,10 @@ public class AuthnQueryUtil {
             throw new SAML2Exception(SAML2Utils.bundle.getString(
                 "authnQueryIssuerNotFound"));
         }
-        X509Certificate signingCert = KeyUtil.getVerificationCert(spSSODesc,
-            spEntityID, SAML2Constants.SP_ROLE);
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(spSSODesc, spEntityID, SAML2Constants.SP_ROLE);
 
-        if (signingCert != null) {
-            boolean valid = authnQuery.isSignatureValid(signingCert);
+        if (!signingCerts.isEmpty()) {
+            boolean valid = authnQuery.isSignatureValid(signingCerts);
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(
                     "AuthnQueryUtil.verifyAuthnQuery: " +
@@ -456,8 +453,8 @@ public class AuthnQueryUtil {
         
         SOAPMessage resMsg = null;
         try {
-            resMsg = SAML2Utils.sendSOAPMessage(authnQueryXMLString,
-                authnServiceURL, true);
+            resMsg = SOAPCommunicator.getInstance().sendSOAPMessage(authnQueryXMLString,
+                    authnServiceURL, true);
         } catch (SOAPException se) {
             SAML2Utils.debug.error(
                 "AuthnQueryUtil.sendAuthnQuerySOAP: ", se);
@@ -465,7 +462,7 @@ public class AuthnQueryUtil {
                 SAML2Utils.bundle.getString("errorSendingAuthnQuery"));
         }
         
-        Element respElem = SAML2Utils.getSamlpElement(resMsg, "Response");
+        Element respElem = SOAPCommunicator.getInstance().getSamlpElement(resMsg, "Response");
         Response response =
             ProtocolFactory.getInstance().createResponse(respElem);
         
@@ -507,14 +504,13 @@ public class AuthnQueryUtil {
                 "responseNotSigned"));
         }
 
-        X509Certificate signingCert = KeyUtil.getVerificationCert(aad,
-            authnAuthorityEntityID, SAML2Constants.AUTHN_AUTH_ROLE);
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(aad, authnAuthorityEntityID,
+                SAML2Constants.AUTHN_AUTH_ROLE);
 
-        if (signingCert == null) {
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("missingSigningCertAlias"));
+        if (signingCerts.isEmpty()) {
+            throw new SAML2Exception(SAML2Utils.bundle.getString("missingSigningCertAlias"));
         }
-        boolean valid = response.isSignatureValid(signingCert);
+        boolean valid = response.isSignatureValid(signingCerts);
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message("AuthnQueryUtil.verifyResponse: " +
                 "Signature validity is : " + valid);
@@ -526,42 +522,36 @@ public class AuthnQueryUtil {
 
         String spEntityID = authnQuery.getIssuer().getValue();
 
-        List assertions = response.getAssertion();
-	if (assertions == null) {
-	    List encAssertions = response.getEncryptedAssertion();
-	    if ((encAssertions != null) && (!encAssertions.isEmpty())) {
-                String alias = SAML2Utils.getEncryptionCertAlias(realm,
-                    spEntityID, SAML2Constants.SP_ROLE); 
-                PrivateKey privateKey = keyProvider.getPrivateKey(alias);
-                for(Iterator iter = encAssertions.iterator();iter.hasNext();) {
-                    EncryptedAssertion eAssertion =
-                        (EncryptedAssertion)iter.next();
-                    Assertion assertion = eAssertion.decrypt(privateKey);
+        List<Assertion> assertions = response.getAssertion();
+        if (assertions == null) {
+            List<EncryptedAssertion> encAssertions = response.getEncryptedAssertion();
+            if (encAssertions != null && !encAssertions.isEmpty()) {
+                Set<PrivateKey> privateKeys = KeyUtil.getDecryptionKeys(realm, spEntityID, SAML2Constants.SP_ROLE);
+                for (EncryptedAssertion eAssertion : encAssertions) {
+                    Assertion assertion = eAssertion.decrypt(privateKeys);
                     if (assertions == null) {
-                        assertions = new ArrayList();
+                        assertions = new ArrayList<>();
                     }
                     assertions.add(assertion);
                 }
-	    }
-	}
+            }
+        }
 
         if ((assertions == null) || (assertions.isEmpty())) {
             return;
         }
 
-        signingCert = KeyUtil.getVerificationCert(aad,
-            authnAuthorityEntityID, SAML2Constants.IDP_ROLE);
+        signingCerts = KeyUtil.getVerificationCerts(aad, authnAuthorityEntityID, SAML2Constants.IDP_ROLE);
 
         for(Iterator iter = assertions.iterator(); iter.hasNext(); ) {
             Assertion assertion = (Assertion)iter.next();
             if (assertion.isSigned()) {
 
-                if (signingCert == null) {
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("missingSigningCertAlias"));
+                if (signingCerts.isEmpty()) {
+                    throw new SAML2Exception(SAML2Utils.bundle.getString("missingSigningCertAlias"));
                 }
 
-                valid = assertion.isSignatureValid(signingCert);
+                valid = assertion.isSignatureValid(signingCerts);
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message(
                         "AuthnQueryUtil.verifyResponse: " +
@@ -575,26 +565,20 @@ public class AuthnQueryUtil {
         }
     }
 
-    private static NameID getNameID(Subject subject, String realm,
-        String authnAuthorityEntityID){
-
+    private static NameID getNameID(Subject subject, String realm, String authnAuthorityEntityID) {
         NameID nameID = subject.getNameID();
-	if (nameID == null) {
-            String alias = SAML2Utils.getEncryptionCertAlias(realm,
-                authnAuthorityEntityID, SAML2Constants.AUTHN_AUTH_ROLE);
-
-            PrivateKey privateKey = keyProvider.getPrivateKey(alias);
-
-	    EncryptedID encryptedID = subject.getEncryptedID();
+        if (nameID == null) {
+            EncryptedID encryptedID = subject.getEncryptedID();
             try {
-                nameID = encryptedID.decrypt(privateKey);
+                nameID = encryptedID.decrypt(KeyUtil.getDecryptionKeys(realm, authnAuthorityEntityID,
+                        SAML2Constants.AUTHN_AUTH_ROLE));
             } catch (SAML2Exception ex) {
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("AuthnQueryUtil.getNameID:", ex);
                 }
-                return null; 
+                return null;
             }
-	}
+        }
 
         if (!SAML2Utils.isPersistentNameID(nameID)) {
             return null;

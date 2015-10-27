@@ -42,7 +42,7 @@ import javax.security.auth.callback.Callback;
 public class RedirectCallback implements Callback, java.io.Serializable {
     
     private String redirectUrl = null;
-    private Map redirectData = new HashMap();
+    private Map<String, String> redirectData = new HashMap<>();
     private String method = "get";
     private String status = null;
     private String statusParameter = "AM_AUTH_SUCCESS_PARAM";
@@ -133,7 +133,7 @@ public class RedirectCallback implements Callback, java.io.Serializable {
      * Returns the data to be redirected to redirect URL.
      * @return the Map of data to be redirected to redirect URL.
      */
-    public Map getRedirectData() {
+    public Map<String, String> getRedirectData() {
         return redirectData;
     }
     

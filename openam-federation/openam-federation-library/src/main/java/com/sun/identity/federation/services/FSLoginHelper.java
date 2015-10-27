@@ -28,10 +28,9 @@
 
 package com.sun.identity.federation.services;
 
-import com.sun.identity.cot.COTConstants;
-import com.sun.identity.cot.CircleOfTrustManager;
-import com.sun.identity.cot.CircleOfTrustDescriptor;
 import com.sun.identity.cot.COTException;
+import com.sun.identity.cot.CircleOfTrustDescriptor;
+import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
@@ -44,15 +43,11 @@ import com.sun.identity.federation.message.common.RequestAuthnContext;
 import com.sun.identity.federation.meta.IDFFMetaException;
 import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaUtils;
-import com.sun.identity.federation.services.FSSPAuthenticationContextInfo;
 import com.sun.identity.federation.services.util.FSServiceUtils;
 import com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType;
 import com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType;
-import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.liberty.LibertyManager;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;

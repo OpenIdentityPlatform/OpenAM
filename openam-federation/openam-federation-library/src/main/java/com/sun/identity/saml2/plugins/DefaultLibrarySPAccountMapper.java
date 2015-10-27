@@ -28,6 +28,7 @@
  */
 package com.sun.identity.saml2.plugins;
 
+import java.security.Key;
 import java.security.PrivateKey;
 import java.util.Map;
 import java.util.HashMap;
@@ -58,8 +59,6 @@ import org.forgerock.openam.utils.StringUtils;
  * Custom implementations may extend from this class to override some of these implementations if they choose to do so.
  */
 public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implements SPAccountMapper {
-
-    private PrivateKey decryptionKey = null;
 
      /**
       * Default constructor
@@ -100,10 +99,10 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
         NameID nameID;
         EncryptedID encryptedID = assertion.getSubject().getEncryptedID();
 
+        Set<PrivateKey> decryptionKeys = null;
         if (encryptedID != null) {
-            decryptionKey = KeyUtil.getDecryptionKey(
-                    SAML2Utils.getSAML2MetaManager().getSPSSOConfig(realm, hostEntityID));
-            nameID = encryptedID.decrypt(decryptionKey);
+            decryptionKeys = KeyUtil.getDecryptionKeys(getSSOConfig(realm, hostEntityID));
+            nameID = encryptedID.decrypt(decryptionKeys);
         } else {
             nameID = assertion.getSubject().getNameID();
         }
@@ -120,7 +119,7 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
         }
 
         // Check if this is an auto federation case.
-        userID = getAutoFedUser(realm, hostEntityID, assertion, nameID.getValue());
+        userID = getAutoFedUser(realm, hostEntityID, assertion, nameID.getValue(), decryptionKeys);
         if (StringUtils.isNotEmpty(userID)) {
             return userID;
         } else {
@@ -173,8 +172,8 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
      * statement does not have the auto federation attribute then the NameID value will be used if use NameID as SP user
      * ID is enabled, otherwise null.
      */ 
-    protected String getAutoFedUser(String realm, String entityID, Assertion assertion, String decryptedNameID)
-            throws SAML2Exception {
+    protected String getAutoFedUser(String realm, String entityID, Assertion assertion, String decryptedNameID,
+            Set<PrivateKey> decryptionKeys) throws SAML2Exception {
         if (!isAutoFedEnabled(realm, entityID)) {
             if (debug.messageEnabled()) {
                 debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Auto federation is disabled.");
@@ -203,7 +202,7 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
             }
         } else {
             for (AttributeStatement statement : attributeStatements) {
-                autoFedAttributeValue = getAttribute(statement, autoFedAttribute, realm, entityID);
+                autoFedAttributeValue = getAttribute(statement, autoFedAttribute, decryptionKeys);
                 if (autoFedAttributeValue != null && !autoFedAttributeValue.isEmpty()) {
                     if (debug.messageEnabled()) {
                         debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
@@ -297,8 +296,8 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
         return true;
     }
 
-    private Set<String> getAttribute(AttributeStatement statement, String attributeName, String realm,
-            String hostEntityID) {
+    private Set<String> getAttribute(AttributeStatement statement, String attributeName,
+            Set<PrivateKey> decryptionKeys) {
         if (debug.messageEnabled()) {
             debug.message("DefaultLibrarySPAccountMapper.getAttribute: attribute Name =" + attributeName);
         }
@@ -315,11 +314,7 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
             list = allList;
             for (EncryptedAttribute encryptedAttribute : encList) {
                 try {
-                    if (decryptionKey == null) {
-                        decryptionKey = KeyUtil.getDecryptionKey(
-                                SAML2Utils.getSAML2MetaManager().getSPSSOConfig(realm, hostEntityID));
-                    }
-                    list.add(encryptedAttribute.decrypt(decryptionKey));
+                    list.add(encryptedAttribute.decrypt(decryptionKeys));
                 } catch (SAML2Exception se) {
                     debug.error("Decryption error:", se);
                     return null;

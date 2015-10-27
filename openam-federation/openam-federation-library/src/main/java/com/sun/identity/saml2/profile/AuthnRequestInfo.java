@@ -59,8 +59,8 @@ public class AuthnRequestInfo extends CacheObject {
      * @param relayState the Redirection URL on completion of Request.
      * @param paramsMap Map of other parameters sent by the requester.
      */
-    
-    protected AuthnRequestInfo(HttpServletRequest request ,
+
+    public AuthnRequestInfo(HttpServletRequest request,
                             HttpServletResponse response,
                             String realm,
                             String spEntityID,

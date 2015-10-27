@@ -24,9 +24,8 @@
  *
  * $Id: RequestAbstract.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.protocol;
 
 import com.sun.identity.saml.xmlsig.XMLSignatureException;
@@ -38,6 +37,8 @@ import java.security.cert.X509Certificate;
 import java.security.Signature;
 import com.sun.identity.saml2.xmlsig.SigManager;
 import java.util.Date;
+import java.util.Set;
+
 import org.w3c.dom.Element;
 
 /** 
@@ -201,15 +202,13 @@ public interface RequestAbstract {
     /**
      * Return whether the signature is valid or not.
      *
-     * @param senderCert Certificate containing the public key
-     *             which may be used for  signature verification;
-     *             This certificate may also may be used to check
-     *             against the certificate included in the signature
+     * @param verificationCerts Certificates containing the public keys which may be used for signature verification;
+     *                          This certificate may also may be used to check against the certificate included in the
+     *                          signature.
      * @return true if the signature is valid; false otherwise.
      * @throws SAML2Exception if the signature could not be verified
      */
-    public boolean isSignatureValid(X509Certificate senderCert)
-        throws SAML2Exception;
+    public boolean isSignatureValid(Set<X509Certificate> verificationCerts) throws SAML2Exception;
     
     /** 
      * Returns a String representation of this Object.

@@ -24,6 +24,7 @@
  *
  * $Id: AssertionImpl.java,v 1.8 2009/05/09 15:43:59 mallas Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
@@ -41,6 +42,8 @@ import java.text.ParseException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Set;
+
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.saml2.common.SAML2Constants;
@@ -58,7 +61,6 @@ import com.sun.identity.saml2.assertion.Conditions;
 import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.xmlenc.EncManager;
 import com.sun.identity.saml2.xmlsig.SigManager;
-import com.sun.identity.saml2.common.SAML2Utils;
 
 /**
  * The <code>Assertion</code> element is a package of information
@@ -75,10 +77,10 @@ public class AssertionImpl implements Assertion {
     private String signature;
     private Conditions conditions;
     private String id;
-    private List statements = new ArrayList();
-    private List authnStatements = new ArrayList();
-    private List authzDecisionStatements = new ArrayList();
-    private List attributeStatements = new ArrayList();
+    private List<Object> statements = new ArrayList();
+    private List<AuthnStatement> authnStatements = new ArrayList();
+    private List<AuthzDecisionStatement> authzDecisionStatements = new ArrayList();
+    private List<AttributeStatement> attributeStatements = new ArrayList();
     private Issuer issuer;
     private boolean isMutable = true;
     private String signedXMLString = null;
@@ -363,6 +365,7 @@ public class AssertionImpl implements Assertion {
      *
      * @return The version number of the assertion.
      */
+    @Override
     public String getVersion() {
         return version;
     }
@@ -373,6 +376,7 @@ public class AssertionImpl implements Assertion {
      * @param version the version number.
      * @exception SAML2Exception if the object is immutable
      */
+    @Override
     public void setVersion(String version) throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
@@ -386,6 +390,7 @@ public class AssertionImpl implements Assertion {
      *
      * @return the time of the assertion issued
      */
+    @Override
     public Date getIssueInstant() {
         return issueInstant;
     }
@@ -396,6 +401,7 @@ public class AssertionImpl implements Assertion {
      * @param issueInstant the issue time of the assertion
      * @exception SAML2Exception if the object is immutable
     */
+    @Override
     public void setIssueInstant(Date issueInstant) throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
@@ -409,6 +415,7 @@ public class AssertionImpl implements Assertion {
      *
      * @return the subject of the assertion
      */
+    @Override
     public Subject getSubject() {
         return subject;
     }
@@ -432,6 +439,7 @@ public class AssertionImpl implements Assertion {
      *
      * @return the advice of the assertion
      */
+    @Override
     public Advice getAdvice() {
         return advice;
     }
@@ -442,6 +450,7 @@ public class AssertionImpl implements Assertion {
      * @param advice the advice of the assertion
      * @exception SAML2Exception if the object is immutable
      */
+    @Override
     public void setAdvice(Advice advice) throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
@@ -455,6 +464,7 @@ public class AssertionImpl implements Assertion {
      *
      * @return the signature of the assertion
      */
+    @Override
     public String getSignature() {
         return signature;
     }
@@ -464,6 +474,7 @@ public class AssertionImpl implements Assertion {
      *
      * @return the conditions of the assertion
      */
+    @Override
     public Conditions getConditions() {
         return conditions;
     }
@@ -474,6 +485,7 @@ public class AssertionImpl implements Assertion {
      * @param conditions the conditions of the assertion
      * @exception SAML2Exception if the object is immutable
      */
+    @Override
     public void setConditions(Conditions conditions) throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
@@ -487,6 +499,7 @@ public class AssertionImpl implements Assertion {
      *
      * @return the id of the assertion
      */
+    @Override
     public String getID() {
         return id;
     }
@@ -497,6 +510,7 @@ public class AssertionImpl implements Assertion {
      * @param id the id of the assertion
      * @exception SAML2Exception if the object is immutable
      */
+    @Override
     public void setID(String id) throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
@@ -510,7 +524,8 @@ public class AssertionImpl implements Assertion {
      *
      * @return the statements of the assertion
      */
-    public List getStatements() {
+    @Override
+    public List<Object> getStatements() {
         return statements;
     }
 
@@ -519,7 +534,8 @@ public class AssertionImpl implements Assertion {
      *
      * @return the Authn statements of the assertion
      */
-    public List getAuthnStatements() {
+    @Override
+    public List<AuthnStatement> getAuthnStatements() {
         return authnStatements;
     }
 
@@ -528,7 +544,8 @@ public class AssertionImpl implements Assertion {
      *
      * @return the <code>AuthzDecisionStatements</code> of the assertion
      */
-    public List getAuthzDecisionStatements() {
+    @Override
+    public List<AuthzDecisionStatement> getAuthzDecisionStatements() {
         return authzDecisionStatements;
     }
 
@@ -537,7 +554,8 @@ public class AssertionImpl implements Assertion {
      *
      * @return the attribute statements of the assertion
      */
-    public List getAttributeStatements() {
+    @Override
+    public List<AttributeStatement> getAttributeStatements() {
         return attributeStatements;
     }
 
@@ -547,7 +565,8 @@ public class AssertionImpl implements Assertion {
      * @param statements the statements of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setStatements(List statements) throws SAML2Exception {
+    @Override
+    public void setStatements(List<Object> statements) throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
                 "objectImmutable"));
@@ -561,7 +580,8 @@ public class AssertionImpl implements Assertion {
      * @param statements the <code>AuthnStatements</code> of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setAuthnStatements(List statements) throws SAML2Exception {
+    @Override
+    public void setAuthnStatements(List<AuthnStatement> statements) throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
                 "objectImmutable"));
@@ -576,7 +596,8 @@ public class AssertionImpl implements Assertion {
      * the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setAuthzDecisionStatements(List statements)
+    @Override
+    public void setAuthzDecisionStatements(List<AuthzDecisionStatement> statements)
         throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
@@ -591,7 +612,8 @@ public class AssertionImpl implements Assertion {
      * @param statements the attribute statements of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setAttributeStatements(List statements) throws SAML2Exception {
+    @Override
+    public void setAttributeStatements(List<AttributeStatement> statements) throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
                 "objectImmutable"));
@@ -604,6 +626,7 @@ public class AssertionImpl implements Assertion {
      *
      * @return the issuer of the assertion
      */
+    @Override
     public Issuer getIssuer() {
         return issuer;
     }
@@ -614,6 +637,7 @@ public class AssertionImpl implements Assertion {
      * @param issuer the issuer of the assertion
      * @exception SAML2Exception if the object is immutable
      */
+    @Override
     public void setIssuer(Issuer issuer) throws SAML2Exception {
         if (!isMutable) {
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
@@ -627,31 +651,20 @@ public class AssertionImpl implements Assertion {
      *
      * @return true if the assertion is signed; false otherwise.
      */
+    @Override
     public boolean isSigned() {
         return (signature != null);
     }
 
-    /**
-     * Return whether the signature is valid or not.
-     *
-     * @param senderCert Certificate containing the public key
-     *             which may be used for  signature verification;
-     *             This certificate may also may be used to check
-     *             against the certificate included in the signature
-     * @return true if the signature is valid; false otherwise.
-     * @throws SAML2Exception if the signature could not be verified
-     */
-    public boolean isSignatureValid(X509Certificate senderCert)
+    @Override
+    public boolean isSignatureValid(Set<X509Certificate> verificationCerts)
     throws SAML2Exception {
 
         if (isSignatureValid == null) {            
             if (signedXMLString == null) {
                 signedXMLString = toXMLString(true, true);
             }
-            isSignatureValid = Boolean.valueOf(
-                SigManager.getSigInstance().verify(
-                    signedXMLString, getID(), senderCert)
-            );
+            isSignatureValid = SigManager.getSigInstance().verify(signedXMLString, getID(), verificationCerts);
         }
         return isSignatureValid.booleanValue();
     }
@@ -666,6 +679,7 @@ public class AssertionImpl implements Assertion {
      *             will not include any certificate
      * @exception SAML2Exception if it could not sign the assertion.
      */
+    @Override
     public void sign(
         PrivateKey privateKey,
         X509Certificate cert
@@ -703,6 +717,7 @@ public class AssertionImpl implements Assertion {
      * @return <code>EncryptedAssertion</code> object
      * @throws SAML2Exception if error occurs during the encryption process.
      */
+    @Override
     public EncryptedAssertion encrypt(
         Key recipientPublicKey,
         String dataEncAlgorithm,
@@ -731,6 +746,7 @@ public class AssertionImpl implements Assertion {
      *         <code>NotOnOrAfter</code> (current time exclusive) values 
      *         and true otherwise or if no conditions specified.
      */
+    @Override
     public boolean isTimeValid() {
         if (conditions == null)  {
             return true;
@@ -749,6 +765,7 @@ public class AssertionImpl implements Assertion {
     * @return A String representation
     * @exception SAML2Exception if something is wrong during conversion
     */
+   @Override
     public String toXMLString(boolean includeNSPrefix, boolean declareNS)
         throws SAML2Exception {
 
@@ -853,6 +870,7 @@ public class AssertionImpl implements Assertion {
     * @return A String representation
     * @exception SAML2Exception if something is wrong during conversion
     */
+   @Override
     public String toXMLString() throws SAML2Exception {
         return this.toXMLString(true, false);
     }
@@ -860,6 +878,7 @@ public class AssertionImpl implements Assertion {
    /**
     * Makes the object immutable
     */
+   @Override
     public void makeImmutable() {
         if (isMutable) {
             if (authnStatements != null) {
@@ -916,6 +935,7 @@ public class AssertionImpl implements Assertion {
     *
     * @return true if the object is mutable
     */
+   @Override
     public boolean isMutable() {
         return isMutable;
     }

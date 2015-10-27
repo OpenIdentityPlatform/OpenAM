@@ -18,18 +18,7 @@ package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -37,13 +26,23 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
-import org.forgerock.services.context.Context;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import org.forgerock.http.header.CookieHeader;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -65,10 +64,11 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
-import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -516,9 +516,15 @@ public class SessionResource implements CollectionResourceProvider {
             } else {
                 httpServletResponse = new HeaderCollectingHttpServletResponse(new UnsupportedResponse(), adviceContext);
             }
+
+            String sessionId;
+            Map<String, Object> map = new HashMap<>();
+
             if (ssoToken != null) {
+                sessionId = ssoToken.getTokenID().toString();
+
                 try {
-                    authUtilsWrapper.logout(ssoToken.getTokenID().toString(), null, httpServletResponse);
+                    authUtilsWrapper.logout(sessionId, null, httpServletResponse);
                 } catch (SSOException e) {
                     if (LOGGER.errorEnabled()) {
                         LOGGER.error("SessionResource.logout() :: Token ID, " + tokenId +
@@ -526,13 +532,21 @@ public class SessionResource implements CollectionResourceProvider {
                     }
                     throw new InternalServerErrorException("Error logging out", e);
                 }
+
+                try { //equiv to LogoutViewBean's POST_PROCESS_LOGOUT_URL usage
+                    String papRedirect = ssoToken.getProperty(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL);
+                    if (!StringUtils.isBlank(papRedirect)) {
+                        map.put("goto", papRedirect);
+                    }
+                } catch (SSOException e) {
+                    LOGGER.warning("SessionResource.logout() :: Unable to perform PAP redirect.");
+                }
             }
 
-            Map<String, Object> map = new HashMap<String, Object>();
             map.put("result", "Successfully logged out");
-            if (LOGGER.messageEnabled()) {
-                LOGGER.message("SessionResource.logout() :: Successfully logged out token, " + tokenId);
-            }
+
+            LOGGER.message("SessionResource.logout() :: Successfully logged out token, {}", tokenId);
+
             return new JsonValue(map);
         }
     }

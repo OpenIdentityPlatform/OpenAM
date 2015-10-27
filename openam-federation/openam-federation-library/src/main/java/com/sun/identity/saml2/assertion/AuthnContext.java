@@ -26,9 +26,14 @@
  *
  * Portions Copyrighted 2015 ForgeRock AS.
  */
+
+
+
 package com.sun.identity.saml2.assertion;
 
 import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.sun.identity.saml2.assertion.impl.AuthnContextImpl;
 import com.sun.identity.saml2.common.SAML2Exception;
 
 /**
@@ -69,6 +74,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * </pre>
  * @supported.all.api
  */
+@JsonDeserialize(as=AuthnContextImpl.class)
 public interface AuthnContext {
 
     /**

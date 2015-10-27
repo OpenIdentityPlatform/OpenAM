@@ -24,15 +24,20 @@
  *
  * $Id: Issuer.java,v 1.2 2008/06/25 05:47:41 qcheng Exp $
  *
+ * Ports Copyrighted 2015 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.assertion;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.sun.identity.saml2.assertion.impl.IssuerImpl;
 
 /**
  *  The <code>Issuer</code> provides information about the issuer of  
  *  a SAML assertion or protocol message.
  *  @supported.all.api 
  */
+@JsonDeserialize(as=IssuerImpl.class)
 public interface Issuer extends NameIDType {
 }

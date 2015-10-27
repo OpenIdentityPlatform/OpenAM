@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,15 +24,12 @@
  *
  * $Id: EncryptedAttributeImpl.java,v 1.2 2008/06/25 05:47:43 qcheng Exp $
  *
- * Portions copyright 2014 ForgeRock AS.
- *
+ * Portions copyright 2014-2015 ForgeRock AS.
  */
-
-
-
 package com.sun.identity.saml2.assertion.impl;
 
-import java.security.Key;
+import java.security.PrivateKey;
+import java.util.Set;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
@@ -114,24 +111,13 @@ public class EncryptedAttributeImpl implements EncryptedAttribute {
         this.xmlString = xmlString;
     }
 
-    /**
-     * Returns an instance of <code>Attribute</code> object.
-     *
-     * @param recipientPrivateKey Private key of the recipient used to
-     *                            decrypt the secret key
-     * @return <code>Attribute</code> object.
-     * @throws SAML2Exception if error occurs.
-     */
-    public Attribute decrypt(Key recipientPrivateKey)
-        throws SAML2Exception
-    {
-        Element el = EncManager.getEncInstance().
-            decrypt(xmlString, recipientPrivateKey);
+    @Override
+    public Attribute decrypt(Set<PrivateKey> privateKeys) throws SAML2Exception {
+        Element el = EncManager.getEncInstance().decrypt(xmlString, privateKeys);
 
         SAML2SDKUtils.decodeXMLToDebugLog("EncryptedAttributeImpl.decrypt: ", el);
 
-        return AssertionFactory.getInstance().
-            createAttribute(el);
+        return AssertionFactory.getInstance().createAttribute(el);
     }
 
     /**

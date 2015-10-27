@@ -24,13 +24,13 @@
  *
  * $Id: StatusResponseImpl.java,v 1.4 2008/06/25 05:48:01 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.protocol.impl;
 
 import java.security.PublicKey;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 
 import com.sun.identity.shared.DateUtils;
@@ -44,6 +44,8 @@ import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.saml2.protocol.StatusResponse;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Set;
+
 import com.sun.identity.saml2.xmlsig.SigManager;
 import org.w3c.dom.Element;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -353,25 +355,12 @@ public abstract class StatusResponseImpl implements StatusResponse {
     public boolean isSigned() {
         return isSigned;
     }
-    
-    /**
-     * Returns whether the signature on the <code>StatusResponse</code>
-     * is valid or not.
-     *
-     * @param senderCert Certificate containing the public key
-     *             which may be used for  signature verification;
-     *             This certificate may also may be used to check
-     *             against the certificate included in the signature
-     * @return true if the signature is valid; false otherwise.
-     * @throws SAML2Exception if the signature could not be verified
-     */
-    public boolean isSignatureValid(X509Certificate senderCert)
+
+    @Override
+    public boolean isSignatureValid(Set<X509Certificate> verificationCerts)
         throws SAML2Exception { 	
         if (isSignatureValid == null) {
-             isSignatureValid = Boolean.valueOf(
-                 SigManager.getSigInstance().verify(
-                 signedXMLString, getID(), senderCert)
-             );
+             isSignatureValid = SigManager.getSigInstance().verify(signedXMLString, getID(), verificationCerts);
          }
          return isSignatureValid.booleanValue();
     }   

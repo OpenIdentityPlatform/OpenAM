@@ -79,6 +79,7 @@ import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.console.federation.SAMLv2AuthContexts;
 import javax.xml.bind.JAXBException;
 
+import org.apache.xml.security.encryption.XMLCipher;
 import org.forgerock.openam.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -663,13 +664,13 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
      * @throws AMConsoleException if unable to retrieve the Identity Provider
      *     attrubutes based on the realm and entityName passed.
      */
-    public Map getExtendedIdentityProviderAttributes(
+    public Map<String, List<String>> getExtendedIdentityProviderAttributes(
             String realm,
             String entityName
             ) throws AMConsoleException {
         String[] params = {realm, entityName, "SAMLv2", "IDP-Extended"};
         logEvent("ATTEMPT_GET_ENTITY_DESCRIPTOR_ATTR_VALUES", params);
-        Map map = null;
+        Map<String, List<String>> map = null;
         IDPSSOConfigElement idpssoConfig = null;
         try {
             SAML2MetaManager samlManager = getSAML2MetaManager();
@@ -1633,31 +1634,29 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     public void updateKeyinfo(
         String realm,
         String entityName,
-        Map extValues,
-        Map stdValues,
+        Map<String, Set<String>> extValues,
+        Map<String, Set<String>> stdValues,
         boolean isIDP
     ) throws AMConsoleException {
         
         String keysize = getResult(stdValues, TF_KEY_NAME);
         String algorithm = getResult(stdValues, TF_ALGORITHM);
-        String e_certAlias = null;
-        String s_certAlias = null;
+        Set<String> signingCertAliases;
+        Set<String> encryptionCertAliases;
         if (isIDP) {
-            e_certAlias = getResult(extValues, IDP_ENCRYPT_CERT_ALIAS);
-            s_certAlias = getResult(extValues, IDP_SIGN_CERT_ALIAS);
+            encryptionCertAliases = extValues.get(IDP_ENCRYPT_CERT_ALIAS);
+            signingCertAliases = extValues.get(IDP_SIGN_CERT_ALIAS);
         } else {
-            e_certAlias = getResult(extValues, SP_ENCRYPT_CERT_ALIAS);
-            s_certAlias = getResult(extValues, SP_SIGN_CERT_ALIAS);
+            encryptionCertAliases = extValues.get(SP_ENCRYPT_CERT_ALIAS);
+            signingCertAliases = extValues.get(SP_SIGN_CERT_ALIAS);
         }
-        int keysi = (keysize != null && keysize.length() > 0) ?
-                Integer.parseInt(keysize) : 128;
-        String alg = (algorithm == null || algorithm.length() == 0) ?
-                "http://www.w3.org/2001/04/xmlenc#aes128-cbc" : algorithm;
+        int keysi = !StringUtils.isEmpty(keysize) ? Integer.parseInt(keysize) : 128;
+        String alg = StringUtils.isEmpty(algorithm) ? XMLCipher.AES_128 : algorithm;
         try {
-            SAML2MetaSecurityUtils.updateProviderKeyInfo(realm,
-                    entityName, s_certAlias, true, isIDP, alg, keysi);
-            SAML2MetaSecurityUtils.updateProviderKeyInfo(realm,
-                    entityName, e_certAlias, false, isIDP, alg, keysi);
+            SAML2MetaSecurityUtils.updateProviderKeyInfo(realm, entityName, signingCertAliases, true, isIDP, alg,
+                    keysi);
+            SAML2MetaSecurityUtils.updateProviderKeyInfo(realm, entityName, encryptionCertAliases, false, isIDP, alg,
+                    keysi);
         } catch (SAML2MetaException e) {
             debug.warning ("SAMLv2ModelImpl.updateKeyinfo:", e);            
             throw new AMConsoleException(getErrorString(e));

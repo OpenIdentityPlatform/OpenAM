@@ -103,7 +103,7 @@ public class RealmContext extends AbstractContext {
      *
      * @param realm The resolved realm.
      */
-    void setOverrideRealm(String realm) {
+    public void setOverrideRealm(String realm) {
         this.overrideRealm = realm;
     }
 

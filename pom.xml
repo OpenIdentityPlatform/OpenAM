@@ -50,7 +50,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>forgerock-parent</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.4-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -641,6 +641,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-auth-fr-oath</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-saml2</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

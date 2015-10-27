@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -125,10 +124,8 @@ public abstract class SAMLv2Base extends EntityPropertiesBase {
      * @param list the list to be converted.
      * @return the corresponding Set.
      */
-    protected Set convertListToSet(List list) {
-        Set s = new HashSet();
-        s.addAll(list);
-        return s;
+    protected Set<String> convertListToSet(List<String> list) {
+        return new LinkedHashSet<>(list);
     }
     
     /**

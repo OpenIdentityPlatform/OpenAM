@@ -24,7 +24,7 @@
  *
  * $Id: SAML2MetaSecurityUtils.java,v 1.6 2009/06/08 23:43:18 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.meta;
@@ -32,6 +32,7 @@ package com.sun.identity.saml2.meta;
 import java.security.KeyStore;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,6 +40,9 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
+import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType;
+import com.sun.identity.saml2.jaxb.metadata.SSODescriptorType;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -445,8 +449,8 @@ public final class SAML2MetaSecurityUtils {
      * certificates in standard metadata. 
      * @param realm Realm the entity resides.
      * @param entityID ID of the entity to be updated.  
-     * @param certAlias Alias of the certificate to be set to the entity. If
-     *        null, will remove existing key information from the SP or IDP.
+     * @param certAliases The set of certificate aliases to be set for the entity. If null or empty, existing key
+     *                    information will be removed from the SP or IDP.
      * @param isSigning true if this is signing certificate alias, false if 
      *        this is encryption certification alias.
      * @param isIDP true if this is for IDP signing/encryption alias, false
@@ -459,7 +463,7 @@ public final class SAML2MetaSecurityUtils {
      *        for the entity.
      */
     public static void updateProviderKeyInfo(String realm,
-        String entityID, String certAlias, boolean isSigning, boolean isIDP,
+        String entityID, Set<String> certAliases, boolean isSigning, boolean isIDP,
         String encAlgo, int keySize) throws SAML2MetaException { 
         SAML2MetaManager metaManager = new SAML2MetaManager();
         EntityConfigElement config = 
@@ -468,98 +472,65 @@ public final class SAML2MetaSecurityUtils {
             String[] args = {entityID, realm};
             throw new SAML2MetaException("entityNotHosted", args);
         }
-        EntityDescriptorElement desp = metaManager.getEntityDescriptor(
-            realm, entityID);
+        EntityDescriptorElement desp = metaManager.getEntityDescriptor(realm, entityID);
+        BaseConfigType baseConfig;
+        RoleDescriptorType descriptor;
         if (isIDP) {
-            IDPSSOConfigElement idpConfig = 
-                SAML2MetaUtils.getIDPSSOConfig(config);
-            IDPSSODescriptorElement idpDesp = 
-                SAML2MetaUtils.getIDPSSODescriptor(desp);
-            if ((idpConfig == null) || (idpDesp == null)) {
+            baseConfig = SAML2MetaUtils.getIDPSSOConfig(config);
+            descriptor = SAML2MetaUtils.getIDPSSODescriptor(desp);
+            if (baseConfig == null || descriptor == null) {
                 String[] args = {entityID, realm};
                 throw new SAML2MetaException("entityNotIDP", args);
             }
-            // update standard metadata
-            if ((certAlias == null) || (certAlias.length() == 0)) {
-                // remove key info
-                removeKeyDescriptor(idpDesp, isSigning); 
-                if (isSigning) {
-                    setExtendedAttributeValue(idpConfig,
-                        SAML2Constants.SIGNING_CERT_ALIAS, null);
-                } else {
-                    setExtendedAttributeValue(idpConfig,
-                        SAML2Constants.ENCRYPTION_CERT_ALIAS, null);
-                }
-            } else {
-                KeyDescriptorElement kde = 
-                    getKeyDescriptor(certAlias, isSigning, encAlgo, keySize);
-                updateKeyDescriptor(idpDesp, kde);
-                // update extended metadata
-                Set value = new HashSet();
-                value.add(certAlias);
-                if (isSigning) {
-                    setExtendedAttributeValue(idpConfig,
-                        SAML2Constants.SIGNING_CERT_ALIAS, value);
-                } else {
-                    setExtendedAttributeValue(idpConfig,
-                        SAML2Constants.ENCRYPTION_CERT_ALIAS, value);
-                }
-            }
-            metaManager.setEntityDescriptor(realm, desp);
-            metaManager.setEntityConfig(realm, config); 
         } else {
-            SPSSOConfigElement spConfig = SAML2MetaUtils.getSPSSOConfig(config);
-            SPSSODescriptorElement spDesp = 
-                SAML2MetaUtils.getSPSSODescriptor(desp);
-            if ((spConfig == null) || (spDesp == null)) {
+            baseConfig = SAML2MetaUtils.getSPSSOConfig(config);
+            descriptor = SAML2MetaUtils.getSPSSODescriptor(desp);
+            if (baseConfig == null || descriptor == null) {
                 String[] args = {entityID, realm};
                 throw new SAML2MetaException("entityNotSP", args);
             }
-            // update standard metadata
-            if ((certAlias == null) || (certAlias.length() == 0)) {
-                // remove key info
-                removeKeyDescriptor(spDesp, isSigning); 
-                if (isSigning) {
-                    setExtendedAttributeValue(spConfig, 
-                        SAML2Constants.SIGNING_CERT_ALIAS, null); 
-                } else {
-                    setExtendedAttributeValue(spConfig, 
-                        SAML2Constants.ENCRYPTION_CERT_ALIAS, null); 
-                }
-            } else {
-                KeyDescriptorElement kde = 
-                    getKeyDescriptor(certAlias, isSigning, encAlgo, keySize);
-                updateKeyDescriptor(spDesp, kde);
-                // update extended metadata
-                Set value = new HashSet();
-                value.add(certAlias);
-                if (isSigning) {
-                    setExtendedAttributeValue(spConfig,
-                        SAML2Constants.SIGNING_CERT_ALIAS, value);
-                } else {
-                    setExtendedAttributeValue(spConfig,
-                        SAML2Constants.ENCRYPTION_CERT_ALIAS, value);
-                }
-            }
-            metaManager.setEntityDescriptor(realm, desp);
-            metaManager.setEntityConfig(realm, config); 
         }
+
+        // update standard metadata
+        if (CollectionUtils.isEmpty(certAliases)) {
+            // remove key info
+            removeKeyDescriptor(descriptor, isSigning);
+            if (isSigning) {
+                setExtendedAttributeValue(baseConfig, SAML2Constants.SIGNING_CERT_ALIAS, null);
+            } else {
+                setExtendedAttributeValue(baseConfig, SAML2Constants.ENCRYPTION_CERT_ALIAS, null);
+            }
+        } else {
+            Set<KeyDescriptorType> keyDescriptors = new LinkedHashSet<>(certAliases.size());
+            for (String certAlias : certAliases) {
+                keyDescriptors.add(getKeyDescriptor(certAlias, isSigning, encAlgo, keySize));
+            }
+            updateKeyDescriptor(descriptor, keyDescriptors);
+
+            // update extended metadata
+            if (isSigning) {
+                setExtendedAttributeValue(baseConfig, SAML2Constants.SIGNING_CERT_ALIAS, certAliases);
+            } else {
+                setExtendedAttributeValue(baseConfig, SAML2Constants.ENCRYPTION_CERT_ALIAS, certAliases);
+            }
+        }
+        metaManager.setEntityDescriptor(realm, desp);
+        metaManager.setEntityConfig(realm, config);
     }
 
-    private static void updateKeyDescriptor(RoleDescriptorType desp, 
-        KeyDescriptorElement newKey) {
-        // NOTE : we only support one signing and one encryption key right now
-        // the code need to be change if we need to support multiple signing
-        // and/or encryption keys in one entity
-        List keys = desp.getKeyDescriptor();
-        for (Iterator iter = keys.iterator(); iter.hasNext();) {
-            KeyDescriptorElement key = (KeyDescriptorElement) iter.next();
-            if ((key.getUse() != null) && 
-                key.getUse().equalsIgnoreCase(newKey.getUse())) {
-                iter.remove();
+    private static void updateKeyDescriptor(RoleDescriptorType desp, Set<KeyDescriptorType> keyDescriptors) {
+        String use = keyDescriptors.iterator().next().getUse();
+        List<KeyDescriptorType> keys = desp.getKeyDescriptor();
+
+        Iterator<KeyDescriptorType> iterator = keys.iterator();
+        while (iterator.hasNext()) {
+            final KeyDescriptorType keyDescriptor = iterator.next();
+            if (keyDescriptor.getUse().equalsIgnoreCase(use)) {
+                iterator.remove();
             }
         }
-        desp.getKeyDescriptor().add(newKey);
+
+        desp.getKeyDescriptor().addAll(keyDescriptors);
     }
 
     private static void removeKeyDescriptor(RoleDescriptorType desp,

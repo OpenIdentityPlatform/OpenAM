@@ -24,6 +24,7 @@
  *
  * $Id: FSSSOAndFedHandler.java,v 1.12 2009/11/04 00:06:11 exu Exp $ 
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -82,6 +83,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
@@ -1413,14 +1415,14 @@ public abstract class FSSSOAndFedHandler {
                     return SigManager.getSigInstance().verify(
                         authnRequest.getSignedXMLString(),
                         IFSConstants.ID,
-                        cert);
+                        Collections.singleton(cert));
                 } else if (minorVersion ==
                     IFSConstants.FF_12_PROTOCOL_MINOR_VERSION)
                 {
                     return SigManager.getSigInstance().verify(
                         authnRequest.getSignedXMLString(),
                         IFSConstants.REQUEST_ID,
-                        cert);
+                        Collections.singleton(cert));
                 } else { 
                     FSUtils.debug.message("invalid minor version.");
                     return false;          

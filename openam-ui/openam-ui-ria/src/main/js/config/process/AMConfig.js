@@ -39,10 +39,16 @@ define("config/process/AMConfig", [
                 urlParams = URIUtils.parseQueryString(argsURLFragment),
                 gotoURL = urlParams.goto;
 
-            sessionManager.logout(function () {
+            sessionManager.logout(function (response) {
                 conf.setProperty("loggedUser", null);
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
                 delete conf.gotoURL;
+
+                // change response.goto to response.<attribute name>
+                // response.goto = "http://www.bbc.co.uk";
+
+                gotoURL = urlParams.goto || response.goto;
+
                 if (gotoURL) {
                     Router.setUrl(decodeURIComponent(gotoURL));
                 } else {

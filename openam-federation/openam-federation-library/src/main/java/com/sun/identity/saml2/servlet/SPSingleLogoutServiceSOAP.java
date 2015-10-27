@@ -32,6 +32,7 @@ package com.sun.identity.saml2.servlet;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.profile.LogoutUtil;
 import com.sun.identity.saml2.profile.SPCache;
@@ -99,15 +100,9 @@ public class SPSingleLogoutServiceSOAP extends HttpServlet {
                     req.getRequestURI() +", spMetaAlias=" + spMetaAlias
                     + ", spEntityID=" + spEntityID);
             }
-            
-            // Get all the headers from the HTTP request
-            MimeHeaders headers = SAML2Utils.getHeaders(req);
-            // Get the body of the HTTP request
-            InputStream is = req.getInputStream();
-            // Now internalize the contents of a HTTP request
-            // and create a SOAPMessage
-            SOAPMessage msg =
-                SAML2Utils.mf.createMessage(headers, is);
+
+            SOAPMessage msg = SOAPCommunicator.getInstance().getSOAPMessage(req);
+
             SOAPMessage reply = null;
             reply = onMessage(msg, req, resp, realm, spEntityID);
             if (reply != null) {
@@ -165,22 +160,22 @@ public class SPSingleLogoutServiceSOAP extends HttpServlet {
         String tmpStr = request.getParameter("isLBReq");
         boolean isLBReq = (tmpStr == null || !tmpStr.equals("false"));
         try {
-            Element reqElem = SAML2Utils.getSamlpElement(message, 
-                "LogoutRequest");
+            Element reqElem = SOAPCommunicator.getInstance().getSamlpElement(message,
+                    "LogoutRequest");
             logoutReq = 
                 ProtocolFactory.getInstance().createLogoutRequest(reqElem);
             // delay the signature validation until it finds the session
         } catch (SAML2Exception se) {
             SAML2Utils.debug.error("SPSingleLogoutServiceSOAP.onMessage: " +
                 "unable to get LogoutRequest from message", se);
-            return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT,
-                "errorLogoutRequest", se.getMessage());
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                    "errorLogoutRequest", se.getMessage());
         }
 
         if (logoutReq == null) {
             SAML2Utils.debug.error("SPSLOServiceSOAP.onMessage: null request");
-            return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT,
-                "nullLogoutRequest", null);
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                    "nullLogoutRequest", null);
         }
 
         // process LogoutRequestElement
@@ -190,26 +185,26 @@ public class SPSingleLogoutServiceSOAP extends HttpServlet {
 
         if (loRes == null) {
             SAML2Utils.debug.error("SPSLOSOAP.onMessage: null LogoutResponse");
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT,
-                "errorLogoutResponse", null);
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "errorLogoutResponse", null);
         }
     
         SOAPMessage msg = null;
         try {
             LogoutUtil.signSLOResponse(loRes, realm, spEntityID, 
                 SAML2Constants.SP_ROLE, logoutReq.getIssuer().getValue());
-            msg = SAML2Utils.createSOAPMessage(loRes.toXMLString(true, true),
-                false);
+            msg = SOAPCommunicator.getInstance().createSOAPMessage(loRes.toXMLString(true, true),
+                    false);
         } catch (SAML2Exception se) {
             SAML2Utils.debug.error("SPSingleLogoutServiceSOAP.onMessage: " +
                 "Unable to create SOAP message:", se);
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT,
-                "errorLogoutResponseSOAP", se.getMessage());
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "errorLogoutResponseSOAP", se.getMessage());
         } catch (SOAPException ex) {
             SAML2Utils.debug.error("SPSingleLogoutServiceSOAP.onMessage: " +
                 "Unable to create SOAP message:", ex);
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT,
-                "errorLogoutResponseSOAP", ex.getMessage());
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "errorLogoutResponseSOAP", ex.getMessage());
         }
 
         return msg;

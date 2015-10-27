@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.xmlsig;
@@ -27,6 +27,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import java.util.Collections;
 
 public class SigProviderTest {
 
@@ -80,8 +82,8 @@ public class SigProviderTest {
         // Verify that the signed document has a valid signature
         boolean verified = false;
         try {
-            verified = sigProvider.verify(signedDocumentXML,
-                    ID_ATTRIBUTE_VALUE, keyProvider.getX509Certificate(DEFAULT_PRIVATE_KEY_ALIAS));
+            verified = sigProvider.verify(signedDocumentXML, ID_ATTRIBUTE_VALUE,
+                    Collections.singleton(keyProvider.getX509Certificate(DEFAULT_PRIVATE_KEY_ALIAS)));
         } catch (SAML2Exception e) {
             Assert.fail(e.getMessage());
         }

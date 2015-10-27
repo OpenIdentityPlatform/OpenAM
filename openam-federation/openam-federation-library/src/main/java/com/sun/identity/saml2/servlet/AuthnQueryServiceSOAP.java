@@ -38,6 +38,8 @@ import javax.servlet.ServletException;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import org.w3c.dom.Element;
 
 
@@ -45,7 +47,6 @@ import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.profile.AuthnQueryUtil;
 import com.sun.identity.saml2.protocol.AuthnQuery;
@@ -78,13 +79,11 @@ public class AuthnQueryServiceSOAP extends HttpServlet {
         SAMLUtils.checkHTTPContentLength(req);
 
         AuthnQuery authnQuery = null;
-        MimeHeaders headers = SAML2Utils.getHeaders(req);
 
         try {
-            InputStream is = req.getInputStream();
-            SOAPMessage msg = SAML2Utils.mf.createMessage(headers, is);
-            Element elem = SAML2Utils.getSamlpElement(msg,
-                SAML2Constants.AUTHN_QUERY);
+            SOAPMessage msg = SOAPCommunicator.getInstance().getSOAPMessage(req);
+            Element elem = SOAPCommunicator.getInstance().getSamlpElement(msg,
+                    SAML2Constants.AUTHN_QUERY);
             authnQuery =
                 ProtocolFactory.getInstance().createAuthnQuery(elem);
         } catch (Exception ex) {
@@ -121,13 +120,13 @@ public class AuthnQueryServiceSOAP extends HttpServlet {
         try {
             Response samlResp = AuthnQueryUtil.processAuthnQuery(
                 authnQuery, req, resp, authnAuthorityEntityID, realm);
-            replymsg = SAML2Utils.createSOAPMessage(
-                samlResp.toXMLString(true, true), false);
+            replymsg = SOAPCommunicator.getInstance().createSOAPMessage(
+                    samlResp.toXMLString(true, true), false);
         } catch (Throwable t) {
             SAML2Utils.debug.error("AuthnQueryServiceSOAP.doGetPost: " +
                 "Unable to create SOAP message:", t);
-            replymsg = SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT,
-                "unableToCreateSOAPMessage", null);
+            replymsg = SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "unableToCreateSOAPMessage", null);
         }
 
         try {

@@ -124,10 +124,10 @@ public class FederationManager {
         macro="authentication",
         optionalOptions={
             "realm|e|s|Realm where entity resides.",
-            "spscertalias|a|s|Service provider signing certificate alias",
-            "idpscertalias|b|s|Identity provider signing certificate alias",
-            "specertalias|r|s|Service provider encryption certificate alias",
-            "idpecertalias|g|s|Identity provider encryption certificate alias.",
+            "spscertalias|a|m|Service provider signing certificate aliases",
+            "idpscertalias|b|m|Identity provider signing certificate aliases",
+            "specertalias|r|m|Service provider encryption certificate aliases",
+            "idpecertalias|g|m|Identity provider encryption certificate aliases.",
             "spec|c|s|Specify metadata specification, either wsfed, idff or saml2, defaults to saml2"},
         resourceStrings={
             "update-keyinfo-succeeded=Update entity keyinfo succeeded : {0}",

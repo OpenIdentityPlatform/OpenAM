@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,12 @@
  *
  * $Id: EncryptedAssertion.java,v 1.2 2008/06/25 05:47:41 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.assertion;
 
-import java.security.Key;
+import java.security.PrivateKey;
+import java.util.Set;
 
 import com.sun.identity.saml2.common.SAML2Exception;
 
@@ -46,12 +46,10 @@ public interface EncryptedAssertion extends EncryptedElement {
     /**
      * Decrypt the encrypted assertion.
      *
-     * @param recipientPrivateKey Private key of the recipient used to
-     *                            decrypt the secret key
+     * @param privateKeys Private keys of the recipient used to decrypt the secret key.
      * @return an assertion that is decrypted from this object
      * @exception SAML2Exception if it could not decrypt the assertion properly.
      */
-    public Assertion decrypt(Key recipientPrivateKey)
-        throws SAML2Exception;
+    public Assertion decrypt(Set<PrivateKey> privateKeys) throws SAML2Exception;
 
 }

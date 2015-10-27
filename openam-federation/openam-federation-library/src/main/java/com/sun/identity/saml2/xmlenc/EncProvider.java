@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,14 @@
  *
  * $Id: EncProvider.java,v 1.3 2008/06/25 05:48:03 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.xmlenc;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.security.Key;
+import java.security.PrivateKey;
+import java.util.Set;
 import javax.crypto.SecretKey;
 
 import com.sun.identity.saml2.common.SAML2Exception;
@@ -116,21 +116,18 @@ public interface EncProvider {
      * with recipient's public key in the XML document.
      * @param xmlString String representing an XML document with encrypted
      *     secret key.
-     * @param recipientPrivateKey Private key used to decrypt the secret key
+     * @param privateKeys Private keys used to decrypt the secret key.
      * @return the secret key.
      * @exception SAML2Exception if there is an error during the decryption
      *     process
      */
-    public SecretKey getSecretKey(
-        String xmlString,
-        Key recipientPrivateKey)
-    throws SAML2Exception;
+    public SecretKey getSecretKey(String xmlString, Set<PrivateKey> privateKeys) throws SAML2Exception;
 
     /**
      * Decrypts an XML document that contains encrypted data.
      * @param xmlString String representing an XML document with encrypted
      *                  data.
-     * @param recipientPrivateKey Private key used to decrypt the secret key
+     * @param privateKeys Private keys used to decrypt the secret key.
      * @return org.w3c.dom.Element Decrypted XML document. For example, if
      *                             the input document's root element is
      *                             EncryptedID, then the return element will
@@ -138,8 +135,5 @@ public interface EncProvider {
      * @exception SAML2Exception if there is an error during the decryption
      *                           process
      */
-    public Element decrypt(
-        String xmlString,
-        Key recipientPrivateKey)
-     throws SAML2Exception;
+    public Element decrypt(String xmlString, Set<PrivateKey> privateKeys) throws SAML2Exception;
 } 

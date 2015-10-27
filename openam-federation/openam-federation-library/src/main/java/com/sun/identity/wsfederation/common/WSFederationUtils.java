@@ -24,8 +24,8 @@
  *
  * $Id: WSFederationUtils.java,v 1.6 2009/10/28 23:58:58 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 package com.sun.identity.wsfederation.common;
 
 import com.sun.identity.multiprotocol.SingleLogoutManager;
@@ -38,6 +38,7 @@ import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.logging.Level;
 
 import com.sun.identity.shared.debug.Debug;
@@ -264,7 +265,7 @@ public class WSFederationUtils {
                 true);
             XMLSignatureManager manager = XMLSignatureManager.getInstance();
             valid = SigManager.getSigInstance().verify(
-                signedXMLString, id, cert);
+                signedXMLString, id, Collections.singleton(cert));
         } catch (WSFederationMetaException ex) {
             valid = false;
         } catch (SAML2Exception ex) {

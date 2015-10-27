@@ -24,15 +24,16 @@
  *
  * $Id: SigProvider.java,v 1.2 2008/06/25 05:48:04 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.xmlsig;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Set;
+
 import com.sun.identity.saml2.common.SAML2Exception;
 
 /**
@@ -62,22 +63,21 @@ public interface SigProvider {
 	PrivateKey privateKey,
 	X509Certificate cert
     ) throws SAML2Exception;
-    
-    /** 
-     * Verify the signature of the xml document  
-     * @param xmlString String representing an signed XML document
-     * @param idValue id attribute value of the node whose signature
-     *                is to be verified
-     * @param senderCert Certificate containing the public key
-     *             which may be used for  signature verification;
-     *             This certificate may also may be used to check
-     *             against the certificate included in the signature
-     * @return true if the xml signature is verified, false otherwise 
-     * @throws SAML2Exception if problem occurs during verification
-     */
+
+	/**
+	 * Verify the signature of the xml document.
+	 *
+	 * @param xmlString String representing an signed XML document.
+	 * @param idValue id attribute value of the node whose signature is to be verified.
+	 * @param verificationCerts Certificates containing the public keys which may be used for signature verification;
+	 *                          This certificate may also may be used to check against the certificate included in the
+	 *                          signature.
+	 * @return true if the xml signature is verified, false otherwise.
+	 * @throws SAML2Exception if problem occurs during verification.
+	 */
     public boolean verify(
 	String xmlString,
 	String idValue,
-	X509Certificate senderCert
+	Set<X509Certificate> verificationCerts
     ) throws SAML2Exception;
 }

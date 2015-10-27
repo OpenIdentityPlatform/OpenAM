@@ -357,7 +357,7 @@ public interface SAMLv2Model
      * @throws AMConsoleException if unable to retrieve the Identity Provider
      *     attrubutes based on the realm and entityName passed.
      */
-    public Map getExtendedIdentityProviderAttributes(
+    public Map<String, List<String>> getExtendedIdentityProviderAttributes(
         String realm,
         String entityName
         ) throws AMConsoleException;
@@ -1010,8 +1010,8 @@ public interface SAMLv2Model
     public void updateKeyinfo(
         String realm,
         String entityName,
-        Map extValues,
-        Map stdValues,
+        Map<String, Set<String>> extValues,
+        Map<String, Set<String>> stdValues,
         boolean isIDP
         ) throws AMConsoleException;
 
