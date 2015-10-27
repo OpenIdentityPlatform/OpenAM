@@ -868,7 +868,10 @@ public class AuthD implements ConfigurationListener {
                     }
                 }
 
-                AMIdentity identity = IdUtils.getIdentity(userName, realmName);
+                AMIdentity identity = null;
+                if (StringUtils.isNotEmpty(userName) && StringUtils.isNotEmpty(realmName)) {
+                    identity = IdUtils.getIdentity(userName, realmName);
+                }
                 String authentication = null;
                 String principal;
                 if (identity != null) {

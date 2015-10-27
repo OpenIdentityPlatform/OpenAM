@@ -15,7 +15,7 @@
 */
 package org.forgerock.openam.audit.model;
 
-import org.forgerock.openam.audit.AuditConstants.EventOutcome;
+import org.forgerock.audit.events.AuthenticationAuditEventBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,8 +49,8 @@ public class AuthenticationAuditEntry {
      *
      * @return The result.
      */
-    public EventOutcome getResult() {
-        return (EventOutcome) this.entry.get(RESULT_KEY);
+    public AuthenticationAuditEventBuilder.Status getResult() {
+        return (AuthenticationAuditEventBuilder.Status) this.entry.get(RESULT_KEY);
     }
 
     /**
@@ -76,7 +76,7 @@ public class AuthenticationAuditEntry {
      *
      * @param result The result.
      */
-    public void setResult(EventOutcome result) {
+    public void setResult(AuthenticationAuditEventBuilder.Status result) {
         this.entry.put(RESULT_KEY, result);
     }
 
