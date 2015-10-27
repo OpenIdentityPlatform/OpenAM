@@ -24,7 +24,7 @@
  *
  * $Id: PolicyEvaluator.java,v 1.7 2009/10/21 23:50:46 dillidorai Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.policy.client;
 
@@ -106,33 +106,13 @@ public class PolicyEvaluator {
      * Creates an instance of client policy evaluator 
      *
      * @param serviceName name of the service for which to create 
-     * policy evaluator
-     *
-     * @throws PolicyException if required properties cannot be retrieved.
-     * @throws SSOException if application single sign on token is invalid.
-     *
-     * @supported.api
-     */
-    public PolicyEvaluator(String serviceName)
-			throws PolicyException, SSOException {
-        if (debug.messageEnabled()) {
-            debug.message("PolicyEvaluator():Creating PolicyEvaluator:" 
-                    + "serviceName=" + serviceName );
-        }
-	init(serviceName, null); //null appSSOTokenProvider
-    }
-
-    /**
-     * Creates an instance of client policy evaluator 
-     *
-     * @param serviceName name of the service for which to create 
      *        policy evaluator.
      * @param appSSOTokenProvider an object where application single sign on
      *        token can be obtained.
      * @throws PolicyException if required properties cannot be retrieved.
      * @throws SSOException if application single sign on token is invalid.
      */
-    PolicyEvaluator(String serviceName, 
+    private PolicyEvaluator(String serviceName, 
             AppSSOTokenProvider appSSOTokenProvider)
 	    throws PolicyException, SSOException {
         if (debug.messageEnabled()) {
@@ -149,6 +129,22 @@ public class PolicyEvaluator {
         } //else do the following
 
 	init(serviceName, appSSOTokenProvider);
+    }
+    
+    /**
+     * Returns an instance of client policy evaluator 
+     *
+     * @param serviceName name of the service for which to create 
+     *        policy evaluator.
+     * @param appSSOTokenProvider an object where application single sign on
+     *        token can be obtained.
+     * @throws PolicyException if required properties cannot be retrieved.
+     * @throws SSOException if application single sign on token is invalid.
+     */
+    static PolicyEvaluator getInstance(String serviceName, 
+            AppSSOTokenProvider appSSOTokenProvider)
+        throws PolicyException, SSOException {
+        return new PolicyEvaluator(serviceName,appSSOTokenProvider);
     }
 
     /**
@@ -450,7 +446,7 @@ public class PolicyEvaluator {
      *
      * @return a valid application single sign on token.
      */
-    private SSOToken getNewAppSSOToken() throws PolicyException {
+    private synchronized SSOToken getNewAppSSOToken() throws PolicyException {
         SSOToken token = null;
         if (debug.messageEnabled()) {
             debug.message("PolicyEvaluator.getNewAppSSOToken():"
