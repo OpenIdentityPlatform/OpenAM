@@ -11,36 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS
+ * Copyright 2013-2015 ForgeRock AS
  */
 package org.forgerock.openam.entitlement.indextree;
 
 import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
 import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
-import org.forgerock.openam.entitlement.indextree.events.ModificationEventType;
 import org.forgerock.openam.entitlement.indextree.events.ErrorEventType;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
+import org.forgerock.openam.entitlement.indextree.events.ModificationEventType;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.AttributeDescription;
 import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.CancelledResultException;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
-import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.opendj.ldap.controls.EntryChangeNotificationResponseControl;
-import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.responses.SearchResultReference;
-
-import javax.inject.Inject;
 
 /**
  * Implementation of the {@link SearchResultHandler} and is responsible for handling changes to path index attributes
  * under service entitlements. All changes and potential errors result in an event which is passed to an observable to
  * notify all its observers.
- *
- * @author andrew.forrest@forgerock.com
  */
 public class IndexChangeHandler implements SearchResultHandler {
 
@@ -111,27 +105,9 @@ public class IndexChangeHandler implements SearchResultHandler {
     }
 
     @Override
-    public void handleErrorResult(ErrorResultException erE) {
-        if ( erE instanceof CancelledResultException ) {
-        	//server should be in process of shutting down.
-        	DEBUG.message("Index change persistence search has been cancelled.");
-        	return;
-        } else {
-    	    DEBUG.error("Index change persistence search has failed.", erE);
-        }
-        // Notify all observers of the error.
-        observable.notifyObservers(ErrorEventType.SEARCH_FAILURE.createEvent());
-    }
-
-    @Override
     public boolean handleReference(SearchResultReference searchResultReference) {
         // Not interested in this scenario.
         return true;
-    }
-
-    @Override
-    public void handleResult(Result result) {
-        // Not interested in this scenario.
     }
 
 }

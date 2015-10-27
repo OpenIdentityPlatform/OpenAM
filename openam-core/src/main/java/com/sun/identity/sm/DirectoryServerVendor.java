@@ -28,13 +28,10 @@
  */
 package com.sun.identity.sm;
 
-import java.util.Enumeration;
-
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
@@ -76,12 +73,10 @@ public class DirectoryServerVendor {
      * Returns the vendor of Directory Server.
      * @param conn LDAP connection to the server.
      * @return the vendor of Directory Server.
-     * @throws ErrorResultException if unable to get the vendor information.
-     * @throws ErrorResultIOException if unable to get the vendor information
+     * @throws LdapException if unable to get the vendor information.
      * @throws SearchResultReferenceIOException if unable to get the vendor information
      */
-    public Vendor query(Connection conn) throws ErrorResultException, ErrorResultIOException,
-            SearchResultReferenceIOException {
+    public Vendor query(Connection conn) throws LdapException, SearchResultReferenceIOException {
         String result = null;
         ConnectionEntryReader res = conn.search("", SearchScope.BASE_OBJECT, "(objectclass=*)", attrs);
 

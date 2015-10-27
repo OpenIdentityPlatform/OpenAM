@@ -15,29 +15,28 @@
  */
 package org.forgerock.openam.cts.impl;
 
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.tokens.CoreTokenField;
+import java.util.ArrayList;
+import java.util.Collection;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaperInit;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.opendj.ldap.LdapException;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.*;
 
 public class CoreTokenAdapterTest {
     protected CoreTokenAdapter adapter;
@@ -61,7 +60,7 @@ public class CoreTokenAdapterTest {
     }
 
     @Test
-    public void shouldCreateToken() throws ErrorResultException, CoreTokenException {
+    public void shouldCreateToken() throws LdapException, CoreTokenException {
         // Given
         Token token = new Token("badger", TokenType.SESSION);
 

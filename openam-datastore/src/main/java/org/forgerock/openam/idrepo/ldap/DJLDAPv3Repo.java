@@ -15,6 +15,67 @@
  */
 package org.forgerock.openam.idrepo.ldap;
 
+import static org.forgerock.openam.ldap.LDAPConstants.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+
+import org.forgerock.openam.idrepo.ldap.helpers.ADAMHelper;
+import org.forgerock.openam.idrepo.ldap.helpers.ADHelper;
+import org.forgerock.openam.idrepo.ldap.helpers.DirectoryHelper;
+import org.forgerock.openam.idrepo.ldap.psearch.DJLDAPv3PersistentSearch;
+import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdapFromJsonQueryFilterVisitor;
+import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Entry;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LDAPUrl;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.LinkedAttribute;
+import org.forgerock.opendj.ldap.LinkedHashMapEntry;
+import org.forgerock.opendj.ldap.Modification;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.BindRequest;
+import org.forgerock.opendj.ldap.requests.ModifyRequest;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.BindResult;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldap.schema.AttributeType;
+import org.forgerock.opendj.ldap.schema.ObjectClass;
+import org.forgerock.opendj.ldap.schema.ObjectClassType;
+import org.forgerock.opendj.ldap.schema.Schema;
+import org.forgerock.opendj.ldap.schema.UnknownSchemaElementException;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Function;
+import org.forgerock.util.Options;
+import org.forgerock.util.time.Duration;
+
 import com.iplanet.am.util.Cache;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
@@ -38,62 +99,6 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
 import com.sun.identity.sm.SchemaType;
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.openam.ldap.LDAPConstants.*;
-import org.forgerock.openam.idrepo.ldap.helpers.ADAMHelper;
-import org.forgerock.openam.idrepo.ldap.helpers.ADHelper;
-import org.forgerock.openam.idrepo.ldap.helpers.DirectoryHelper;
-import org.forgerock.openam.idrepo.ldap.psearch.DJLDAPv3PersistentSearch;
-import org.forgerock.openam.ldap.LDAPURL;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.ldap.LdapFromJsonQueryFilterVisitor;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.openam.utils.CrestQuery;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
-import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.Function;
-import org.forgerock.opendj.ldap.LDAPOptions;
-import org.forgerock.opendj.ldap.LDAPUrl;
-import org.forgerock.opendj.ldap.LinkedAttribute;
-import org.forgerock.opendj.ldap.LinkedHashMapEntry;
-import org.forgerock.opendj.ldap.Modification;
-import org.forgerock.opendj.ldap.ModificationType;
-import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SSLContextBuilder;
-import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.BindRequest;
-import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.requests.SearchRequest;
-import org.forgerock.opendj.ldap.responses.BindResult;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.opendj.ldap.schema.AttributeType;
-import org.forgerock.opendj.ldap.schema.ObjectClass;
-import org.forgerock.opendj.ldap.schema.ObjectClassType;
-import org.forgerock.opendj.ldap.schema.Schema;
-import org.forgerock.opendj.ldap.schema.UnknownSchemaElementException;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This is an IdRepo implementation that utilizes the LDAP protocol via OpenDJ LDAP SDK to access directory servers.
@@ -302,15 +307,15 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
     }
 
     protected ConnectionFactory createConnectionFactory(String username, char[] password, int maxPoolSize) {
-        LDAPOptions ldapOptions = new LDAPOptions();
-        ldapOptions.setTimeout(defaultTimeLimit, TimeUnit.SECONDS);
+        Options ldapOptions = Options.defaultOptions()
+                .set(REQUEST_TIMEOUT, new Duration((long) defaultTimeLimit, TimeUnit.SECONDS));
 
         if (isSecure) {
             try {
-                ldapOptions.setSSLContext(new SSLContextBuilder().getSSLContext());
+                ldapOptions = ldapOptions.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
 
                 if (useStartTLS) {
-                    ldapOptions.setUseStartTLS(true);
+                    ldapOptions = ldapOptions.set(SSL_USE_STARTTLS, true);
                 }
             } catch (GeneralSecurityException gse) {
                 DEBUG.error("An error occurred while setting the SSLContext", gse);
@@ -372,7 +377,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             conn = bindConnectionFactory.getConnection();
             BindResult bindResult = conn.bind(bindRequest);
             return bindResult.isSuccess();
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             ResultCode resultCode = ere.getResult().getResultCode();
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("An error occurred while trying to authenticate a user: " + ere.toString());
@@ -429,7 +434,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             conn = bindConnectionFactory.getConnection();
             conn.bind(bindRequest);
             conn.modify(modifyRequest);
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while trying to change password for identity: " + name, ere);
             handleErrorResult(ere);
         } finally {
@@ -661,7 +666,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     conn.modify(modifyRequest);
                 }
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("Unable to add a new entry: " + name + " attrMap: "
                     + IdRepoUtils.getAttrMapWithoutPasswordAttrs(attrMap, null), ere);
             if (ResultCode.ENTRY_ALREADY_EXISTS.equals(ere.getResult().getResultCode())) {
@@ -753,7 +758,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
      * @throws IdRepoException If there is an error while retrieving the identity attributes.
      */
     private <T> Map<String, T> getAttributes(IdType type, String name, Set<String> attrNames,
-            Function<Attribute, T, Void> function) throws IdRepoException {
+            Function<Attribute, T, IdRepoException> function) throws IdRepoException {
         Set<String> attrs = attrNames == null
                 ? new CaseInsensitiveHashSet(0) : new CaseInsensitiveHashSet(attrNames);
 
@@ -795,21 +800,21 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 if (!definedAttributes.isEmpty() && !definedAttributes.contains(attrName)) {
                     continue;
                 }
-                result.put(attribute.getAttributeDescriptionAsString(), function.apply(attribute, null));
+                result.put(attribute.getAttributeDescriptionAsString(), function.apply(attribute));
                 if (attrName.equalsIgnoreCase(userStatusAttr) && attrs.contains(DEFAULT_USER_STATUS_ATTR)) {
                     String converted = helper.convertToInetUserStatus(attribute.firstValueAsString(), inactiveValue);
                     result.put(DEFAULT_USER_STATUS_ATTR,
-                            function.apply(new LinkedAttribute(DEFAULT_USER_STATUS_ATTR, converted), null));
+                            function.apply(new LinkedAttribute(DEFAULT_USER_STATUS_ATTR, converted)));
                 }
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while getting user attributes", ere);
             handleErrorResult(ere);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
         if (attrs.contains(DN_ATTR)) {
-            result.put(DN_ATTR, function.apply(new LinkedAttribute(DN_ATTR, dn), null));
+            result.put(DN_ATTR, function.apply(new LinkedAttribute(DN_ATTR, dn)));
         }
 
         if (DEBUG.messageEnabled()) {
@@ -946,17 +951,17 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             Attribute attr = new LinkedAttribute(attrName);
             if (AD_UNICODE_PWD_ATTR.equalsIgnoreCase(attrName)) {
                 if (values instanceof byte[][]) {
-                    attr.add(ByteString.valueOf(helper.encodePassword(IdType.USER, (byte[][]) values)));
+                    attr.add(ByteString.valueOfBytes(helper.encodePassword(IdType.USER, (byte[][]) values)));
                 } else {
-                    attr.add(ByteString.valueOf(helper.encodePassword(IdType.USER, (Set) values)));
+                    attr.add(ByteString.valueOfBytes(helper.encodePassword(IdType.USER, (Set) values)));
                 }
             } else if (values instanceof byte[][]) {
                 for (byte[] bytes : (byte[][]) values) {
-                    attr.add(ByteString.valueOf(bytes));
+                    attr.add(ByteString.valueOfBytes(bytes));
                 }
             } else if (values instanceof Set) {
                 for (String value : (Set<String>) values) {
-                    attr.add(ByteString.valueOf(value));
+                    attr.add(value);
                 }
             }
             if (attr.isEmpty()) {
@@ -1029,7 +1034,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         try {
             conn = connectionFactory.getConnection();
             conn.modify(modifyRequest);
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occured while setting attributes for identity: " + name, ere);
             handleErrorResult(ere);
         } finally {
@@ -1066,7 +1071,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         try {
             conn = connectionFactory.getConnection();
             conn.modify(modifyRequest);
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while removing attributes from identity: " + name
                     + " attributes: " + attrNames, ere);
             handleErrorResult(ere);
@@ -1181,29 +1186,19 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     reader.readReference();
                 }
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             ResultCode resultCode = ere.getResult().getResultCode();
             if (resultCode.equals(ResultCode.NO_SUCH_OBJECT)) {
                 return new RepoSearchResults(new HashSet<String>(0), RepoSearchResults.SUCCESS,
                         Collections.EMPTY_MAP, type);
-            } else {
-                DEBUG.error("Unexpected error occurred during search", ere);
-                errorCode = resultCode.intValue();
-            }
-        } catch (ErrorResultIOException erioe) {
-            ErrorResultException ere = erioe.getCause();
-            if (ere != null) {
-                ResultCode resultCode = ere.getResult().getResultCode();
-                if (resultCode.equals(ResultCode.TIME_LIMIT_EXCEEDED)
+            } else if (resultCode.equals(ResultCode.TIME_LIMIT_EXCEEDED)
                         || resultCode.equals(ResultCode.CLIENT_SIDE_TIMEOUT)) {
                     errorCode = RepoSearchResults.TIME_LIMIT_EXCEEDED;
                 } else if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
                     errorCode = RepoSearchResults.SIZE_LIMIT_EXCEEDED;
-                } else {
-                    DEBUG.error("Unexpected error occurred during search", ere);
-                }
             } else {
-                DEBUG.error("Unexpected error occurred during search", erioe);
+                DEBUG.error("Unexpected error occurred during search", ere);
+                errorCode = resultCode.intValue();
             }
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
@@ -1233,7 +1228,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         try {
             conn = connectionFactory.getConnection();
             conn.delete(dn);
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("Unable to delete entry: " + dn, ere);
             handleErrorResult(ere);
         } finally {
@@ -1329,11 +1324,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     }
                 }
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while retrieving group members for " + dn, ere);
             handleErrorResult(ere);
-        } catch (ErrorResultIOException erioe) {
-            handleIOError(erioe, "#getGroupMembers");
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
             DEBUG.error("Got reference instead of entry", srrioe);
@@ -1371,11 +1364,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     reader.readReference();
                 }
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while trying to retrieve filtered role members for " + dn, ere);
             handleErrorResult(ere);
-        } catch (ErrorResultIOException erioe) {
-            handleIOError(erioe, "#getRoleMembers");
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
             DEBUG.error("Got reference instead of entry", srrioe);
@@ -1421,11 +1412,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     }
                 }
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while trying to retrieve filtered role members for " + dn, ere);
             handleErrorResult(ere);
-        } catch (ErrorResultIOException erioe) {
-            handleIOError(erioe, "#getFilteredRoleMembers");
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
             DEBUG.error("Got reference instead of entry", srrioe);
@@ -1496,12 +1485,10 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                         reader.readReference();
                     }
                 }
-            } catch (ErrorResultException ere) {
+            } catch (LdapException ere) {
                 DEBUG.error("An error occurred while trying to retrieve group memberships for " + dn
                         + " using " + uniqueMemberAttr, ere);
                 handleErrorResult(ere);
-            } catch (ErrorResultIOException erioe) {
-                handleIOError(erioe, "#getGroupMemberships@uniqueMember");
             } catch (SearchResultReferenceIOException srrioe) {
                 //should never ever happen...
                 DEBUG.error("Got reference instead of entry", srrioe);
@@ -1518,7 +1505,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 if (attr != null) {
                     results.addAll(LDAPUtils.getAttributeValuesAsStringSet(attr));
                 }
-            } catch (ErrorResultException ere) {
+            } catch (LdapException ere) {
                 DEBUG.error("An error occurred while trying to retrieve group memberships for " + dn
                         + " using " + memberOfAttr + " attribute", ere);
                 handleErrorResult(ere);
@@ -1547,7 +1534,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             if (attr != null) {
                 results.addAll(LDAPUtils.getAttributeValuesAsStringSet(attr));
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while trying to retrieve role memberships for " + dn
                     + " using " + roleDNAttr + " attribute", ere);
             handleErrorResult(ere);
@@ -1577,7 +1564,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             if (attr != null) {
                 results.addAll(LDAPUtils.getAttributeValuesAsStringSet(attr));
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while trying to retrieve filtered role memberships for " + dn
                     + " using " + roleAttr + " attribute", ere);
             handleErrorResult(ere);
@@ -1669,7 +1656,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     conn.modify(userMod);
                 }
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while trying to modify group membership. Name: " + groupDN
                     + " memberDNs: " + memberDNs + " Operation: " + modType, ere);
             handleErrorResult(ere);
@@ -1705,7 +1692,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 modifyRequest.addModification(mod);
                 conn.modify(modifyRequest);
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while trying to modify role membership. Name: " + roleDN
                     + " memberDNs: " + memberDNs, ere);
             handleErrorResult(ere);
@@ -1870,8 +1857,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
      * identity type was invalid.
      */
     private <T> Map<String, T> getServiceAttributes(IdType type, String name, String serviceName,
-            Set<String> attrNames, Function<Attribute, T, Void> extractor,
-            Function<Map<String, Set<String>>, Map<String, T>, Void> converter) throws IdRepoException {
+            Set<String> attrNames, Function<Attribute, T, IdRepoException> extractor,
+            Function<Map<String, Set<String>>, Map<String, T>, IdRepoException> converter) throws IdRepoException {
         if (type.equals(IdType.USER)) {
             Map<String, T> attrsFromUser = getAttributes(type, name, attrNames, extractor);
             if (serviceName == null || serviceName.isEmpty()) {
@@ -1891,7 +1878,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 }
             }
 
-            Map<String, T> filteredAttrsFromRealm2 = converter.apply(filteredAttrsFromRealm, null);
+            Map<String, T> filteredAttrsFromRealm2 = converter.apply(filteredAttrsFromRealm);
             Set<String> attrNameSet = new CaseInsensitiveHashSet(attrsFromUser.keySet());
             for (Map.Entry<String, T> entry : filteredAttrsFromRealm2.entrySet()) {
                 String attrName = entry.getKey();
@@ -1901,7 +1888,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             }
             return attrsFromUser;
         } else if (type.equals(IdType.REALM)) {
-            Map<String, T> attrs = converter.apply(serviceMap.get(serviceName), null);
+            Map<String, T> attrs = converter.apply(serviceMap.get(serviceName));
             Map<String, T> results = new HashMap<String, T>();
             if (attrs == null || attrs.isEmpty()) {
                 return results;
@@ -2342,11 +2329,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                         type.getName());
             }
             dn = entry.getName().toString();
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while querying entry DN", ere);
             handleErrorResult(ere);
-        } catch (ErrorResultIOException erioe) {
-            handleIOError(erioe, "#getDN");
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
             DEBUG.error("Got reference instead of entry", srrioe);
@@ -2459,7 +2444,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     try {
                         conn = connectionFactory.getConnection();
                         schema = Schema.readSchemaForEntry(conn, DN.valueOf(rootSuffix)).asStrictSchema();
-                    } catch (ErrorResultException ere) {
+                    } catch (LdapException ere) {
                         DEBUG.error("Unable to read the directory schema", ere);
                         throw new IdRepoException("Unable to read the directory schema");
                     } finally {
@@ -2471,33 +2456,19 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         return schema;
     }
 
-    private void handleErrorResult(ErrorResultException ere) throws IdRepoException {
+    private void handleErrorResult(LdapException ere) throws IdRepoException {
         ResultCode resultCode = ere.getResult().getResultCode();
         if (ResultCode.CONSTRAINT_VIOLATION.equals(resultCode)) {
             throw new IdRepoFatalException(IdRepoBundle.BUNDLE_NAME, "313",
                     new Object[]{CLASS_NAME, resultCode.intValue(), ere.getResult().getDiagnosticMessage()});
         } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
             throw new IdentityNotFoundException(resultCode, "220", CLASS_NAME, ere.getResult().getDiagnosticMessage());
+        } else if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
+            DEBUG.warning("Size limit exceeded.", ere);
+        } else if (resultCode.equals(ResultCode.TIME_LIMIT_EXCEEDED)) {
+            DEBUG.warning("Time limit exceeded.", ere);
         } else {
             throw newIdRepoException(resultCode, "306", CLASS_NAME, resultCode.intValue());
-        }
-    }
-
-    private void handleIOError(ErrorResultIOException erioe, String method) throws IdRepoException {
-        ErrorResultException cause = erioe.getCause();
-        if (cause != null) {
-            ResultCode resultCode = cause.getResult().getResultCode();
-            if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
-                DEBUG.warning("Size limit exceeded in " + method);
-            } else if (resultCode.equals(ResultCode.TIME_LIMIT_EXCEEDED)) {
-                DEBUG.warning("Time limit exceeded in " + method);
-            } else {
-                DEBUG.error("Unexpected IO error occurred in " + method, erioe);
-                throw newIdRepoException(resultCode, "311", erioe.getMessage());
-            }
-        } else {
-            DEBUG.error("An IO problem occurred in" + method, erioe);
-            throw newIdRepoException("311", erioe.getMessage());
         }
     }
 
@@ -2509,19 +2480,20 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         return new IdRepoException(IdRepoBundle.BUNDLE_NAME, key, String.valueOf(resultCode.intValue()), args);
     }
 
-    private static class StringAttributeExtractor implements Function<Attribute, Set<String>, Void> {
+    private static class StringAttributeExtractor implements Function<Attribute, Set<String>, IdRepoException> {
 
-            public Set<String> apply(Attribute value, Void p) {
-                return LDAPUtils.getAttributeValuesAsStringSet(value);
-            }
+        @Override
+        public Set<String> apply(Attribute byteStrings) {
+            return LDAPUtils.getAttributeValuesAsStringSet(byteStrings);
+        }
     }
 
-    private static class BinaryAttributeExtractor implements Function<Attribute, byte[][], Void> {
-
-        public byte[][] apply(Attribute attr, Void arg) {
-            byte[][] values = new byte[attr.size()][];
+    private static class BinaryAttributeExtractor implements Function<Attribute, byte[][], IdRepoException> {
+        @Override
+        public byte[][] apply(Attribute byteStrings) {
+            byte[][] values = new byte[byteStrings.size()][];
             int counter = 0;
-            for (ByteString byteString : attr) {
+            for (ByteString byteString : byteStrings) {
                 byte[] bytes = byteString.toByteArray();
                 values[counter++] = bytes;
             }
@@ -2529,18 +2501,20 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
     }
 
-    private static class StringToStringConverter implements Function<Map<String, Set<String>>, Map<String, Set<String>>, Void> {
+    private static class StringToStringConverter implements Function<Map<String, Set<String>>, Map<String, Set<String>>, IdRepoException> {
 
-        public Map<String, Set<String>> apply(Map<String, Set<String>> value, Void p) {
-            return value;
+        @Override
+        public Map<String, Set<String>> apply(Map<String, Set<String>> stringSetMap) {
+            return stringSetMap;
         }
     }
 
-    private static class StringToBinaryConverter implements Function<Map<String, Set<String>>, Map<String, byte[][]>, Void> {
+    private static class StringToBinaryConverter implements Function<Map<String, Set<String>>, Map<String, byte[][]>, IdRepoException> {
 
-        public Map<String, byte[][]> apply(Map<String, Set<String>> value, Void p) {
-            Map<String, byte[][]> result = new HashMap<String, byte[][]>(value.size());
-            for (Map.Entry<String, Set<String>> entry : value.entrySet()) {
+        @Override
+        public Map<String, byte[][]> apply(Map<String, Set<String>> stringSetMap) {
+            Map<String, byte[][]> result = new HashMap<>(stringSetMap.size());
+            for (Map.Entry<String, Set<String>> entry : stringSetMap.entrySet()) {
                 Set<String> values = entry.getValue();
                 byte[][] binary = new byte[values.size()][];
                 int counter = 0;

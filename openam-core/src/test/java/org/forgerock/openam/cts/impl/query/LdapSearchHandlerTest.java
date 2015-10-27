@@ -18,20 +18,19 @@ package org.forgerock.openam.cts.impl.query;
 import static org.mockito.BDDMockito.*;
 
 import com.sun.identity.shared.debug.Debug;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapSearchHandler;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class LdapSearchHandlerTest {
 
@@ -50,7 +49,7 @@ public class LdapSearchHandlerTest {
     }
 
     @Test
-    public void shouldUseConnectionForSearch() throws QueryFailedException, ErrorResultException {
+    public void shouldUseConnectionForSearch() throws QueryFailedException, LdapException {
         handler.performSearch(mockConnection, mockRequest, Collections.<Entry>emptyList());
         verify(mockConnection).search(eq(mockRequest), anyCollection());
     }
@@ -60,15 +59,15 @@ public class LdapSearchHandlerTest {
         // Given
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(null);
-        given(mockConnection.search(mockRequest, entries)).willThrow(ErrorResultException.class);
+        given(mockConnection.search(mockRequest, entries)).willThrow(LdapException.class);
 
         // When / Then
         handler.performSearch(mockConnection, mockRequest, entries);
     }
 
     @Test (expectedExceptions = QueryFailedException.class)
-    public void shouldThrowExceptionOnFailure() throws QueryFailedException, ErrorResultException {
-        ErrorResultException error = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT);
+    public void shouldThrowExceptionOnFailure() throws QueryFailedException, LdapException {
+        LdapException error = LdapException.newLdapException(ResultCode.NO_SUCH_OBJECT);
         given(mockConnection.search(any(SearchRequest.class), anyCollection())).willThrow(error);
         handler.performSearch(mockConnection, mockRequest, Collections.<Entry>emptyList());
     }

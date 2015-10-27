@@ -150,8 +150,7 @@ class PCMappingTable implements java.io.Serializable {
      *                Failure
      */
     public void addRule(Guid guid, String filter) throws UMSException {
-        DataLayer.getInstance().addAttributeValue(_principal, _mappingGuid,
-                DN.valueOf(guid.getDn()).toNormalizedString(), filter);
+        DataLayer.getInstance().addAttributeValue(_principal, _mappingGuid, guid.getDn(), filter);
     }
 
     /**
@@ -166,8 +165,7 @@ class PCMappingTable implements java.io.Serializable {
      *                Failure
      */
     public void removeRule(Guid guid, String filter) throws UMSException {
-        DataLayer.getInstance().removeAttributeValue(_principal, _mappingGuid,
-                DN.valueOf(guid.getDn()).toNormalizedString(), filter);
+        DataLayer.getInstance().removeAttributeValue(_principal, _mappingGuid, guid.getDn(), filter);
     }
 
     /**

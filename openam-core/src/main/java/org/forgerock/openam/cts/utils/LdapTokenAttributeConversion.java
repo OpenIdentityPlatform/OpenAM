@@ -29,7 +29,6 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.AttributeDescription;
-import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.LinkedHashMapEntry;
@@ -92,16 +91,16 @@ public class LdapTokenAttributeConversion {
                 entry.addAttribute(key, dateString);
             } else if (CoreTokenFieldTypes.isByteArray(field)) {
                 byte[] array = token.getValue(field);
-                entry.addAttribute(key, ByteString.valueOf(array));
+                entry.addAttribute(key, array);
             } else if (CoreTokenFieldTypes.isInteger(field)) {
                 Integer value = token.getValue(field);
-                entry.addAttribute(key, ByteString.valueOf(value));
+                entry.addAttribute(key, value);
             } else if (CoreTokenFieldTypes.isString(field)) {
                 String value = token.getValue(field);
                 if (value.isEmpty()) {
                     value = EMPTY;
                 }
-                entry.addAttribute(key, ByteString.valueOf(value));
+                entry.addAttribute(key, value);
             } else {
                 throw new IllegalStateException();
             }
@@ -123,7 +122,7 @@ public class LdapTokenAttributeConversion {
     public Map<CoreTokenField, Object> mapFromEntry(Entry entry) {
         stripObjectClass(entry);
 
-        Map<CoreTokenField, Object> r = new LinkedHashMap<CoreTokenField, Object>();
+        Map<CoreTokenField, Object> r = new LinkedHashMap<>();
 
         for (Attribute a : entry.getAllAttributes()) {
             AttributeDescription description = a.getAttributeDescription();

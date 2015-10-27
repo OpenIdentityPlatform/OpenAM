@@ -35,7 +35,7 @@ import com.sun.identity.shared.locale.L10NMessage;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 
 /**
  * The <code>AMException</code> is thrown whenever an error is is encountered
@@ -54,7 +54,7 @@ public class AMException extends Exception implements L10NMessage {
 
     private Object args[] = null;
 
-    private ErrorResultException rootCause = null;
+    private LdapException rootCause = null;
 
     private String ldapErrorMsg = null;
 
@@ -96,18 +96,7 @@ public class AMException extends Exception implements L10NMessage {
      *            if the root cause is a <code>UMSException</code>.
      */
     public AMException(String msg, String errorCode, UMSException ue) {
-        try {
-            rootCause = (ErrorResultException) ue.getRootCause();
-            ldapErrCode = Integer.toString(rootCause.getResult().getResultCode().intValue());
-            ldapErrorMsg = AMSDKBundle.getString(ldapErrCode);
-        } catch (Exception e) {
-        }
-        if (ldapErrorMsg != null) {
-            localizedMsg = msg + "::" + ldapErrorMsg;
-        } else {
-            localizedMsg = msg;
-        }
-        this.errorCode = errorCode;
+        this(msg, errorCode, null, ue);
     }
 
     /**
@@ -124,7 +113,7 @@ public class AMException extends Exception implements L10NMessage {
      */
     public AMException(SSOToken token, String errorCode, UMSException ue) {
         try {
-            rootCause = (ErrorResultException) ue.getRootCause();
+            rootCause = (LdapException) ue.getRootCause();
             ldapErrCode = Integer.toString(rootCause.getResult().getResultCode().intValue());
             ldapErrorMsg = AMSDKBundle.getString(ldapErrCode);
         } catch (Exception e) {
@@ -174,7 +163,7 @@ public class AMException extends Exception implements L10NMessage {
     public AMException(String msg, String errorCode, Object args[],
             UMSException ue) {
         try {
-            rootCause = (ErrorResultException) ue.getRootCause();
+            rootCause = (LdapException) ue.getRootCause();
             ldapErrCode = Integer.toString(rootCause.getResult().getResultCode().intValue());
             ldapErrorMsg = AMSDKBundle.getString(ldapErrCode);
         } catch (Exception e) {
@@ -234,11 +223,11 @@ public class AMException extends Exception implements L10NMessage {
      * Returns the root <code>LDAPException</code> of this
      * <code>AMException</code>, if any.
      * 
-     * @return The <code>LDAPException</code> that caused this
+     * @return The {@link LdapException} that caused this
      *         <code>AMException</code>. If null, it means no root
      *         <code>LDAPException</code> has been set.
      */
-    public ErrorResultException getLDAPException() {
+    public LdapException getLDAPException() {
         return rootCause;
     }
 

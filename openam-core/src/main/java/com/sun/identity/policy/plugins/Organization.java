@@ -55,7 +55,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.Requests;
@@ -314,7 +314,7 @@ public class Organization implements Subject {
                     }
                 }
             }
-        } catch (ErrorResultException le) {
+        } catch (LdapException le) {
             ResultCode resultCode = le.getResult().getResultCode();
             if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
                 debug.warning("Organization.getValidValues(): exceeded the size limit");
@@ -652,7 +652,7 @@ public class Organization implements Subject {
                         }
                     }
                 }
-            } catch (ErrorResultException le) {
+            } catch (LdapException le) {
                 String[] objs = {orgName};
                 ResultCode resultCode = le.getResult().getResultCode();
                 if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {

@@ -29,11 +29,6 @@
 
 package com.sun.identity.authentication.internal.server;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Map;
-import java.util.Set;
-
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.ldap.LDAPUser;
@@ -49,31 +44,28 @@ import com.sun.identity.authentication.internal.LoginModule;
 import com.sun.identity.authentication.internal.util.AuthI18n;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
-
-import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Map;
+import java.util.Set;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
-
-import com.sun.identity.sm.DNMapper;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
 
 public class LocalLdapAuthModule implements LoginModule {
 
@@ -181,7 +173,7 @@ public class LocalLdapAuthModule implements LoginModule {
 
         String host;
         int port;
-        LDAPOptions ldapOptions = new LDAPOptions();
+        Options ldapOptions = Options.defaultOptions();
 
         // Check if organization is present in options
         String orgUrl = (String) options.get(LoginContext.ORGNAME);
@@ -202,7 +194,7 @@ public class LocalLdapAuthModule implements LoginModule {
                 String hostName = dscm.getHostName(DSConfigMgr.DEFAULT);
                 if (si.getConnectionType() == Server.Type.CONN_SSL) {
                     try {
-                        ldapOptions.setSSLContext(new SSLContextBuilder().getSSLContext());
+                        ldapOptions.set(LDAPConnectionFactory.SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
                     } catch (GeneralSecurityException e) {
                         debug.error("getConnection.JSSESocketFactory", e);
                         throw new LDAPServiceException(AuthI18n.authI18n
@@ -258,7 +250,7 @@ public class LocalLdapAuthModule implements LoginModule {
                 }
                 if (useSSL) {
                     try {
-                        ldapOptions.setSSLContext(new SSLContextBuilder().getSSLContext());
+                        ldapOptions.set(LDAPConnectionFactory.SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
                     } catch (GeneralSecurityException e) {
                         debug.error("authentication().JSSESocketFactory()", e);
                         throw (new LoginException(e.getMessage()));
@@ -280,7 +272,7 @@ public class LocalLdapAuthModule implements LoginModule {
         try (ConnectionFactory factory = LDAPUtils.createFailoverConnectionFactory(host, port, dn, passwd, ldapOptions);
              Connection conn = factory.getConnection()) {
             return true;
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             throw new LoginException(e.getMessage());
         }
     }
@@ -341,7 +333,7 @@ public class LocalLdapAuthModule implements LoginModule {
             }
             return retVal;
 
-        } catch (ErrorResultIOException | SearchResultReferenceIOException ex) {
+        } catch (LdapException | SearchResultReferenceIOException ex) {
             throw new LoginException(ex.getMessage());
         } finally {
             IOUtils.closeIfNotNull(conn);
@@ -359,7 +351,7 @@ public class LocalLdapAuthModule implements LoginModule {
             ServerInstance si = cfgMgr.getServerInstance(DSConfigMgr.DEFAULT, LDAPUser.Type.AUTH_BASIC);
             baseDN = si.getBaseDN();
             readServerConfiguration = true;
-        } catch (LDAPServiceException | ErrorResultException ex) {
+        } catch (LDAPServiceException | LdapException ex) {
             throw new LoginException(ex.getMessage());
         }
     }

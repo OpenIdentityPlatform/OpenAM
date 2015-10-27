@@ -34,10 +34,7 @@ import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.LinkedHashMapEntry;
 import org.testng.annotations.Test;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
-public class TokenAttributeConversionTest {
+public class LdapTokenAttributeConversionTest {
     @Test
     public void shouldProduceDNWithTokenId() {
         // Given

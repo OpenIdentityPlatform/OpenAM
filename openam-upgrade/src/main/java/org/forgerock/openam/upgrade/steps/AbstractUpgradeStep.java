@@ -31,7 +31,6 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultException;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
@@ -105,7 +104,7 @@ public abstract class AbstractUpgradeStep implements UpgradeStep {
      * Acquires an LDAP connection against the configuration store.
      *
      * @return An LDAP connection object set up based on the configuration store settings.
-     * @throws ErrorResultException If there was a problem establishing a connection to a valid server.
+     * @throws DataLayerException If there was a problem establishing a connection to a valid server.
      */
     protected final Connection getConnection() throws DataLayerException {
         return connectionFactory.create();

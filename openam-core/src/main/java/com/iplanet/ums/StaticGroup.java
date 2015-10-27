@@ -142,12 +142,11 @@ public class StaticGroup extends PersistentObject implements
      */
     public void addMember(Guid guid) throws UMSException {
 
-        String id = DN.valueOf(guid.getDn()).toNormalizedString();
+        String id = guid.getDn();
 
         PersistentObject entry = null;
 
         try {
-            // entry = getUMSSession().getObject(guid);
             entry = UMSObject.getObject(getPrincipal(), guid);
         } catch (UMSException ignore) {
         }
@@ -380,8 +379,7 @@ public class StaticGroup extends PersistentObject implements
      */
     public void removeMember(Guid guid) throws UMSException {
         String dn = guid.getDn();
-        super.modify(new Attr(MEMBER_ATTR_NAME, DN.valueOf(dn).toNormalizedString()),
-                ModificationType.DELETE);
+        super.modify(new Attr(MEMBER_ATTR_NAME, dn), ModificationType.DELETE);
         save();
     }
 

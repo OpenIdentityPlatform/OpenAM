@@ -18,6 +18,8 @@ package org.forgerock.openam.idrepo.ldap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.assistedinject.Assisted;
+import static org.mockito.Mockito.*;
+
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoBundle;
@@ -40,21 +42,19 @@ import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.FutureResult;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.MemoryBackend;
 import org.forgerock.opendj.ldap.RequestContext;
 import org.forgerock.opendj.ldap.RequestHandler;
-import org.forgerock.opendj.ldap.ResultHandler;
 import org.forgerock.opendj.ldap.schema.Schema;
 import org.forgerock.opendj.ldif.LDIFEntryReader;
-import static org.mockito.Mockito.*;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.util.promise.Promise;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
@@ -147,13 +147,16 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
             cf.close();
         }
 
-        public FutureResult<Connection> getConnectionAsync(ResultHandler<? super Connection> handler) {
-            return cf.getConnectionAsync(handler);
+        @Override
+        public Promise<Connection, LdapException> getConnectionAsync() {
+            return cf.getConnectionAsync();
         }
 
-        public Connection getConnection() throws ErrorResultException {
+        @Override
+        public Connection getConnection() throws LdapException {
             return cf.getConnection();
         }
+
     }
 
     protected Callback[] getCredentials(String username, String password) {

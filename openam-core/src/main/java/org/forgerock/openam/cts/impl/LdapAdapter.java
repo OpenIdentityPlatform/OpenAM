@@ -16,13 +16,13 @@
 package org.forgerock.openam.cts.impl;
 
 import java.util.Collection;
-
+import javax.inject.Inject;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
-import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFactory;
@@ -31,13 +31,11 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entries;
 import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-
-import javax.inject.Inject;
 
 /**
  * Responsible adapting the LDAP SDK Connection and its associated domain
@@ -69,14 +67,14 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
      *
      * @param connection The non null connection to perform this call against.
      * @param token Non null Token to create.
-     * @throws ErrorResultException Unexpected LDAP Exception.
+     * @throws LdapException Unexpected LDAP Exception.
      * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException If the operation failed for a known reason.
      */
     public void create(Connection connection, Token token) throws LdapOperationFailedException {
         Entry entry = conversion.getEntry(token);
         try {
             processResult(connection.add(entry));
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             throw new LdapOperationFailedException(e.getResult());
         }
     }
@@ -93,7 +91,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
         try {
             SearchResultEntry resultEntry = connection.readEntry(dn);
             return conversion.tokenFromEntry(resultEntry);
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             Result result = e.getResult();
             // Check for NO_SUCH_OBJECT
             if (result != null && ResultCode.NO_SUCH_OBJECT.equals(result.getResultCode())) {
@@ -128,7 +126,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
 
         try {
             processResult(connection.modify(request));
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             throw new LdapOperationFailedException(e.getResult());
         }
         return true;
@@ -139,14 +137,14 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
      *
      * @param connection Non null connection to call.
      * @param tokenId The non null Token ID to delete.
-     * @throws ErrorResultException If there was an unexpected LDAP error during the process.
+     * @throws LdapException If there was an unexpected LDAP error during the process.
      * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException If the operation failed, this exception will capture the reason.
      */
     public void delete(Connection connection, String tokenId) throws LdapOperationFailedException {
         String dn = String.valueOf(conversion.generateTokenDN(tokenId));
         try {
             processResult(connection.delete(dn));
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             Result result = e.getResult();
             // Check for NO_SUCH_OBJECT
             if (e.getResult() != null && ResultCode.NO_SUCH_OBJECT.equals(result.getResultCode())) {

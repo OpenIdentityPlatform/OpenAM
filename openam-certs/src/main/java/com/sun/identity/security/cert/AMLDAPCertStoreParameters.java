@@ -29,8 +29,6 @@
 
 package com.sun.identity.security.cert;
 
-import org.forgerock.opendj.ldap.LDAPOptions;
-
 /**
  * Parameters used to access ldap cert store
  */
@@ -43,7 +41,6 @@ public class AMLDAPCertStoreParameters {
     private String startSearchLoc = null;  
     private boolean secureLdap = false;
     private String uriParams = null;
-    private LDAPOptions sslOptions = null;
     private boolean doCRLCaching = true;
     private boolean doCRLupdate = true;
 

@@ -28,6 +28,8 @@
  */
 package com.sun.identity.setup;
 
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -39,19 +41,19 @@ import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.LdifUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
+import org.forgerock.util.time.Duration;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSSchema;
@@ -199,7 +201,7 @@ public class AMSetupDSConfig {
         try (Connection conn = getLDAPConnection(ssl)) {
             ConnectionEntryReader results = conn.search(suffix, SearchScope.BASE_OBJECT, Filter.objectClassPresent().toString());
             return results.hasNext();
-        } catch (ErrorResultIOException e) {
+        } catch (LdapException e) {
             disconnectDServer();
             return false;
         }
@@ -218,11 +220,11 @@ public class AMSetupDSConfig {
         try (Connection conn = getLDAPConnection(ssl)){
             ConnectionEntryReader results = conn.search(baseDN, SearchScope.WHOLE_SUBTREE, filter, "dn");
             return Boolean.toString(results.hasNext());
-        } catch (ErrorResultIOException e) {
+        } catch (LdapException e) {
              if (Debug.getInstance(SetupConstants.DEBUG_NAME).messageEnabled()) {
                  Debug.getInstance(SetupConstants.DEBUG_NAME).message(
                      "AMSetupDSConfig.isDITLoaded: LDAP Operation return code: " +
-                             e.getCause().getResult().getResultCode());
+                             e.getResult().getResultCode());
             }
             return "false";
         }
@@ -254,11 +256,6 @@ public class AMSetupDSConfig {
                  "AMSetupDSConfig.loadSchemaFiles:failed", e);
             throw new ConfiguratorException("configurator.ldiferror",
                 null, locale);
-        } catch (ErrorResultException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("AMSetupDSConfig.loadSchemaFiles:failed", e);
-            SetupProgress.reportEnd("emb.failed", null);
-            InstallLog.getInstance().write("AMSetupDSConfig.loadSchemaFiles:failed", e);
-            throw new ConfiguratorException(e.getMessage());
         }
     }
   
@@ -284,14 +281,17 @@ public class AMSetupDSConfig {
             if (ld == null) {
                 ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
 
-                LDAPOptions options = new LDAPOptions().setTimeout(300, TimeUnit.MILLISECONDS);
-                if (ssl) {
-                    options.setSSLContext(new SSLContextBuilder().getSSLContext());
-                }
-                LDAPConnectionFactory connectionFactory = new LDAPConnectionFactory(dsHostName, getPort(), options);
+                // All connections will use authentication
+                SimpleBindRequest request = Requests.newSimpleBindRequest(dsManager, dsAdminPwd.getBytes());
+                Options options = Options.defaultOptions()
+                        .set(REQUEST_TIMEOUT, new Duration((long)3, TimeUnit.SECONDS))
+                        .set(AUTHN_BIND_REQUEST, request);
 
-                ld = Connections.newAuthenticatedConnectionFactory(connectionFactory,
-                        Requests.newSimpleBindRequest(dsManager, dsAdminPwd.getBytes()));
+                if (ssl) {
+                    options = options.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
+                }
+
+                ld = new LDAPConnectionFactory(dsHostName, getPort(), options);
 
                 shutdownMan.addShutdownListener(new
                     ShutdownListener() {
@@ -304,7 +304,7 @@ public class AMSetupDSConfig {
             }
 
             return ld.getConnection();
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             disconnectDServer();
             dsConfigInstance = null;
             ld = null;

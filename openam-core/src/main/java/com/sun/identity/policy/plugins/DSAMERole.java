@@ -29,17 +29,38 @@
 
 package com.sun.identity.policy.plugins;
 
-import com.iplanet.am.sdk.*;
+import com.iplanet.am.sdk.AMConstants;
+import com.iplanet.am.sdk.AMException;
+import com.iplanet.am.sdk.AMOrganization;
+import com.iplanet.am.sdk.AMSearchControl;
+import com.iplanet.am.sdk.AMSearchResults;
+import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.policy.*;
+import com.sun.identity.policy.InvalidNameException;
+import com.sun.identity.policy.NameNotFoundException;
+import com.sun.identity.policy.PolicyConfig;
+import com.sun.identity.policy.PolicyEvaluator;
+import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.PolicyManager;
+import com.sun.identity.policy.PolicyUtils;
+import com.sun.identity.policy.ResBundleUtils;
+import com.sun.identity.policy.SubjectEvaluationCache;
+import com.sun.identity.policy.Syntax;
+import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ResultCode;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * DSAME Role plugin lets policy admins specify the DSAME roles as a subject.
@@ -201,7 +222,7 @@ public class DSAMERole implements Subject {
             }
             return new ValidValues(status, results.getSearchResults());
         } catch (AMException e) {
-            ErrorResultException lde = e.getLDAPException();
+            LdapException lde = e.getLDAPException();
             if (lde != null) {
                 ResultCode ldapErrorCode = lde.getResult().getResultCode();
                 if (ResultCode.INVALID_CREDENTIALS.equals(ldapErrorCode)) {

@@ -30,14 +30,10 @@
 
 package org.forgerock.openam.ldap;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
+import static org.forgerock.openam.ldap.LDAPUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.GeneralSecurityException;
@@ -54,10 +50,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
 import javax.net.ssl.SSLContext;
-import static org.forgerock.openam.ldap.LDAPUtils.convertToLDAPURLs;
-import static org.forgerock.openam.ldap.LDAPUtils.newFailoverConnectionPool;
-import static org.forgerock.openam.utils.CollectionUtils.asList;
+
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
@@ -65,11 +60,8 @@ import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
-import org.forgerock.opendj.ldap.FailoverLoadBalancingAlgorithm;
 import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
@@ -91,7 +83,18 @@ import org.forgerock.opendj.ldap.responses.BindResult;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
 import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.time.Duration;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 public class LDAPAuthUtils {
     private boolean returnUserDN;
@@ -261,8 +264,8 @@ public class LDAPAuthUtils {
     }
 
     private ConnectionFactory createConnectionPool(Map<String, ConnectionFactory> connectionPools,
-            String bindingUser, char[] bindingPwd) throws ErrorResultException, LDAPUtilException {
-        ConnectionFactory connPool = null;
+            String bindingUser, char[] bindingPwd) throws LdapException, LDAPUtilException {
+        ConnectionFactory connPool;
 
         try {
             String configName = servers.toString() + ":" + bindingUser;
@@ -270,9 +273,8 @@ public class LDAPAuthUtils {
             if (connPool == null) {
                 synchronized(connectionPools) {
                     connPool = connectionPools.get(configName);
-                    LDAPOptions options = new LDAPOptions();
-
-                    options.setTimeout(operationsTimeout, TimeUnit.SECONDS);
+                    Options options = Options.defaultOptions()
+                            .set(REQUEST_TIMEOUT, new Duration((long) operationsTimeout, TimeUnit.MILLISECONDS));
 
                     if (connPool == null) {
                         if (debug.messageEnabled()) {
@@ -337,9 +339,9 @@ public class LDAPAuthUtils {
                             }
 
                             SSLContext sslContext = builder.getSSLContext();
-                            options.setSSLContext(sslContext);
+                            options.set(SSL_CONTEXT, sslContext);
                             if (useStartTLS) {
-                                options.setUseStartTLS(true);
+                                options.set(SSL_USE_STARTTLS, true);
                             }
                         }
 
@@ -351,8 +353,7 @@ public class LDAPAuthUtils {
                         } else {
                             ConnectionFactory secondaryCf = newFailoverConnectionPool(secondaryUrls, bindingUser,
                                     bindingPwd, max, heartBeatInterval, heartBeatTimeUnit, options);
-                            connFactory = Connections.newLoadBalancer(
-                                    new FailoverLoadBalancingAlgorithm(asList(primaryCf, secondaryCf)));
+                            connFactory = Connections.newFailoverLoadBalancer(asList(primaryCf, secondaryCf), options);
                         }
 
                         ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
@@ -439,7 +440,7 @@ public class LDAPAuthUtils {
      *
      * @return connection that is available to use
      */
-    private Connection getConnection() throws ErrorResultException, LDAPUtilException {
+    private Connection getConnection() throws LdapException, LDAPUtilException {
         if (cPool == null) {
             cPool = createConnectionPool(connectionPools, null, null);
         }
@@ -451,7 +452,7 @@ public class LDAPAuthUtils {
      * Get connection from pool.  Re-authenticate if necessary
      * @return connection that is available to use
      */
-    private Connection getAdminConnection() throws ErrorResultException, LDAPUtilException {
+    private Connection getAdminConnection() throws LdapException, LDAPUtilException {
         if (acPool == null) {
             acPool = createConnectionPool(adminConnectionPools, authDN, authPassword);
         }
@@ -521,7 +522,7 @@ public class LDAPAuthUtils {
             } else {
                 processPasswordPolicyControls(result);
             }
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             if (ere.getResult().getResultCode().equals(ResultCode.CONSTRAINT_VIOLATION)) {
                 PasswordPolicyResult result = checkControls(processControls(ere.getResult()));
                 if (result != null) {
@@ -779,28 +780,7 @@ public class LDAPAuthUtils {
                 throw new LDAPUtilException("multipleUserMatchFound",
                         (Object[])null);
             }
-        } catch (ErrorResultIOException erio) {
-            if (debug.warningEnabled()) {
-                debug.warning("Search for User error: ", erio);
-                debug.warning("resultCode: " + erio.getCause().getResult().getResultCode());
-            }
-
-            if (erio.getCause().getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
-                    erio.getCause().getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
-                    erio.getCause().getResult().getResultCode().equals(ResultCode.UNAVAILABLE) ||
-                    erio.getCause().getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_TIMEOUT)) {
-                if (debug.warningEnabled()) {
-                    debug.warning("Cannot connect to " + servers, erio);
-                }
-                setState(ModuleState.SERVER_DOWN);
-                return;
-            }
-
-            throw new LDAPUtilException(erio);
-        } catch (SearchResultReferenceIOException srrio) {
-            debug.error("Unable to complete search for user: " + userId, srrio);
-            throw new LDAPUtilException(srrio);
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             if (debug.warningEnabled()) {
                 debug.warning("Search for User error: ", ere);
                 debug.warning("resultCode: " + ere.getResult().getResultCode());
@@ -839,6 +819,9 @@ public class LDAPAuthUtils {
 
                 setState(ModuleState.USER_NOT_FOUND);
             }
+        } catch (SearchResultReferenceIOException srrio) {
+            debug.error("Unable to complete search for user: " + userId, srrio);
+            throw new LDAPUtilException(srrio);
         }
     }
 
@@ -882,7 +865,7 @@ public class LDAPAuthUtils {
             } else {
                 processPasswordPolicyControls(result);
             }
-        } catch(ErrorResultException ere) {
+        } catch(LdapException ere) {
             if (ere.getResult().getResultCode().equals(ResultCode.INVALID_CREDENTIALS)) {
                 if (!isAd) {
                     controls = processControls(ere.getResult());

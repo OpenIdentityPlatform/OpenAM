@@ -113,8 +113,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Version Properties -->
-        <opendj.server.version>2.6.2</opendj.server.version>
-        <opendj.sdk.version>2.6.10</opendj.sdk.version>
+        <opendj.server.version>3.0.0-M6</opendj.server.version>
+        <opendj.sdk.version>3.0.0-M6</opendj.sdk.version>
+        <opendj.server.legacy>3.0.0-M6</opendj.server.legacy>
 
         <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
         <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
@@ -127,6 +128,7 @@
         <forgerock.audit.version>2.0.0</forgerock.audit.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
 
+        <ant.contrib.version>1.0b3</ant.contrib.version>
         <guice.version>3.0</guice.version>
         <restlet.version>2.3.4</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -1487,14 +1489,26 @@
             <!-- OpenDJ API -->
             <dependency>
                 <groupId>org.forgerock.opendj</groupId>
-                <artifactId>opendj-ldap-sdk</artifactId>
+                <artifactId>opendj-core</artifactId>
                 <version>${opendj.sdk.version}</version>
             </dependency>
-            <!-- OpenDJ Server - 2.6 -->
+            <!-- OpenDJ Grizzly -->
+            <dependency>
+                <groupId>org.forgerock.opendj</groupId>
+                <artifactId>opendj-grizzly</artifactId>
+                <version>${opendj.sdk.version}</version>
+            </dependency>
+            <!-- OpenDJ Server -->
             <dependency>
                 <groupId>org.forgerock.opendj</groupId>
                 <artifactId>opendj-server</artifactId>
                 <version>${opendj.server.version}</version>
+            </dependency>
+            <!-- OpenDJ Server -->
+            <dependency>
+                <groupId>org.forgerock.opendj</groupId>
+                <artifactId>opendj-server-legacy</artifactId>
+                <version>${opendj.server.legacy}</version>
             </dependency>
 
             <!-- Legacy External Libraries for OpenAM -->

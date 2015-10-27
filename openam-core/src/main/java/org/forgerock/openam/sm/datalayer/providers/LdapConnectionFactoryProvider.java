@@ -15,14 +15,16 @@
  */
 package org.forgerock.openam.sm.datalayer.providers;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
+import java.text.MessageFormat;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.text.MessageFormat;
 
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.sm.ConnectionConfig;
@@ -36,12 +38,13 @@ import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.sm.datalayer.utils.TimeoutConfig;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.LDAPOptions;
-import org.forgerock.opendj.ldap.ResultHandler;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.util.Function;
+import org.forgerock.util.Options;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.PromiseImpl;
+import org.forgerock.util.time.Duration;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Responsible for generating ConnectionFactory instances. The instances generated are tailored to
@@ -93,8 +96,8 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
         ConnectionConfig config = configFactory.getConfig(connectionType);
         int timeout = timeoutConfig.getTimeout(connectionType);
 
-        LDAPOptions options = new LDAPOptions();
-        options.setTimeout(timeout, SECONDS);
+        Options options = Options.defaultOptions()
+                .set(REQUEST_TIMEOUT, new Duration((long) timeout, TimeUnit.SECONDS));
 
         debug("Creating Embedded Factory:\nURL: {0}\nMax Connections: {1}\nHeartbeat: {2}\nOperation Timeout: {3}",
                 config.getLDAPURLs(),
@@ -129,10 +132,10 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
                         return value;
                     }
                 };
-        private static final Function<ErrorResultException, Connection, DataLayerException> EXCEPTION_FUNCTION =
-                new Function<ErrorResultException, Connection, DataLayerException>() {
+        private static final Function<LdapException, Connection, DataLayerException> EXCEPTION_FUNCTION =
+                new Function<LdapException, Connection, DataLayerException>() {
                     @Override
-                    public Connection apply(ErrorResultException value) throws DataLayerException {
+                    public Connection apply(LdapException value) throws DataLayerException {
                         throw new LdapOperationFailedException(value.getResult());
                     }
                 };
@@ -143,8 +146,7 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
 
         @Override
         public Promise<Connection, DataLayerException> createAsync() {
-            final PromiseImpl<Connection, ErrorResultException> promise = PromiseImpl.create();
-            ldapConnectionFactory.getConnectionAsync(new ConnectionResultHandler(promise));
+            final Promise<Connection, LdapException> promise = ldapConnectionFactory.getConnectionAsync();
             return promise.then(IDENTITY_FUNCTION, EXCEPTION_FUNCTION);
         }
 
@@ -152,7 +154,7 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
         public Connection create() throws DataLayerException {
             try {
                 return ldapConnectionFactory.getConnection();
-            } catch (ErrorResultException e) {
+            } catch (LdapException e) {
                 throw new LdapOperationFailedException(e.getResult());
             }
         }
@@ -167,22 +169,5 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
             return connection != null && !connection.isClosed() && connection.isValid();
         }
 
-        private static class ConnectionResultHandler implements ResultHandler<Connection> {
-            private final PromiseImpl<Connection, ErrorResultException> promise;
-
-            public ConnectionResultHandler(PromiseImpl<Connection, ErrorResultException> promise) {
-                this.promise = promise;
-            }
-
-            @Override
-            public void handleErrorResult(ErrorResultException error) {
-                promise.tryHandleException(error);
-            }
-
-            @Override
-            public void handleResult(Connection result) {
-                promise.tryHandleResult(result);
-            }
-        }
     }
 }

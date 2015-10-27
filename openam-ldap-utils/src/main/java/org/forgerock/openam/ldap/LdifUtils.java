@@ -31,6 +31,8 @@
 
 package org.forgerock.openam.ldap;
 
+import com.sun.identity.shared.debug.Debug;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,7 +40,7 @@ import java.io.InputStream;
 
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.Modification;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.ResultCode;
@@ -50,8 +52,6 @@ import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldif.ChangeRecord;
 import org.forgerock.opendj.ldif.ChangeRecordVisitor;
 import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Utility class for LDIF operations.
@@ -103,14 +103,14 @@ public final class LdifUtils {
                 public Void visitChangeRecord(Void aVoid, AddRequest change) {
                     try {
                         ld.add(change);
-                    } catch (ErrorResultException e) {
+                    } catch (LdapException e) {
                         if (ResultCode.ENTRY_ALREADY_EXISTS.equals(e.getResult().getResultCode())) {
                             for (Attribute attr : change.getAllAttributes()) {
                                 ModifyRequest modifyRequest = Requests.newModifyRequest(change.getName());
                                 modifyRequest.addModification(new Modification(ModificationType.ADD, attr));
                                 try {
                                     ld.modify(modifyRequest);
-                                } catch (ErrorResultException ex) {
+                                } catch (LdapException ex) {
                                     DEBUG.warning("LDAPUtils.createSchemaFromLDIF - Could not modify schema: {}",
                                             modifyRequest, ex);
                                 }
@@ -126,7 +126,7 @@ public final class LdifUtils {
                 public Void visitChangeRecord(Void aVoid, ModifyRequest change) {
                     try {
                         ld.modify(change);
-                    } catch (ErrorResultException e) {
+                    } catch (LdapException e) {
                         DEBUG.warning("LDAPUtils.createSchemaFromLDIF - Could not modify schema: {}", change, e);
                     }
                     return null;

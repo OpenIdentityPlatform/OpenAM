@@ -263,7 +263,7 @@ public interface ISAuthConstants {
      * Session Service Max Session Time Attribute
      */
 
-    public static final String MAX_SESSION_TIME = 
+    public static final String MAX_SESSION_TIME =
         "iplanet-am-session-max-session-time";
 
     /**

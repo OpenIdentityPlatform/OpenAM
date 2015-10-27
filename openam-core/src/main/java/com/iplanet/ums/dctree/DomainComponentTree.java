@@ -494,7 +494,7 @@ public class DomainComponentTree {
     }
 
     /**
-     * Given a domain componet in a dctree, maps it to a
+     * Given a domain component in a dctree, maps it to a
      * virtual domain name
      * 
      * @param dc
@@ -504,22 +504,14 @@ public class DomainComponentTree {
      */
     public String mapDCToDomainName(DomainComponent dc) {
 
-        if (m_dcRoot == null)
+        if (m_dcRoot == null) {
             return null;
+        }
 
-        String rootDN = DN.valueOf(m_dcRoot.getDN()).toNormalizedString();
-        String dcDN = DN.valueOf(dc.getDN()).toNormalizedString();
+        DN rootDN = DN.valueOf(m_dcRoot.getDN());
+        DN dcDN = DN.valueOf(dc.getDN());
+        Iterator<AVA> iterator = dcDN.rename(rootDN, DN.rootDN()).rdn().iterator();
 
-        // Skip the dcRoot part of the DN for the given domain component.
-        // Find the position of the rootDN in dcDN
-        //
-        int end = dcDN.indexOf("," + rootDN);
-
-        // TODO: Kind of kludgy, need to revisit
-        //
-        dcDN = dcDN.substring(0, end);
-
-        Iterator<AVA> iterator = DN.valueOf(dcDN).rdn().iterator();
         String domainName = iterator.next().getAttributeValue().toString();
         // Compose the fully qualified domain name with the "." character
         while (iterator.hasNext()) {

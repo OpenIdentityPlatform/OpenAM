@@ -40,9 +40,9 @@ import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
-import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.FutureResult;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.LdapPromise;
 import org.forgerock.opendj.ldap.RootDSE;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -75,7 +75,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
     private final List<String> attributeNames;
     private volatile boolean shutdown = false;
     private volatile Connection conn;
-    private FutureResult<Result> futureResult;
+    private LdapPromise<Result> futureResult;
     private PersistentSearchMode mode;
     private RetryTask retryTask;
 
@@ -93,7 +93,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         this.attributeNames = Arrays.asList(attributeNames);
     }
 
-    private void detectPersistentSearchMode(Connection conn) throws ErrorResultException {
+    private void detectPersistentSearchMode(Connection conn) throws LdapException {
         RootDSE dse = RootDSE.readRootDSE(conn);
         Collection<String> supportedControls = dse.getSupportedControls();
         if (supportedControls.contains(PersistentSearchRequestControl.OID)) {
@@ -148,14 +148,14 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         try {
             conn = factory.getConnection();
             startSearch(conn);
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("An error occurred while trying to initiate persistent search connection", ere);
             DEBUG.message("Restarting persistent search");
             restartSearch();
         }
     }
 
-    private void startSearch(Connection conn) throws ErrorResultException {
+    private void startSearch(Connection conn) throws LdapException {
         if (mode == null) {
             detectPersistentSearchMode(conn);
         }
@@ -319,7 +319,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
             return true;
         }
 
-        public void handleErrorResult(ErrorResultException error) {
+        public void handleErrorResult(LdapException error) {
             if (!shutdown) {
                 DEBUG.error("An error occurred while executing persistent search", error);
                 DEBUG.message("Restarting persistent search. Some changes may have been missed in the interim.");

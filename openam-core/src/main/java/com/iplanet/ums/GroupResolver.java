@@ -83,13 +83,13 @@ public class GroupResolver extends DefaultClassResolver {
                 }
                 if (attrName.equalsIgnoreCase("memberof")) {
                     String attrVal = filter.substring(ind + 1).trim();
-                    String dn = DN.valueOf(guidToDN(attrVal)).toNormalizedString();
+                    DN dn = DN.valueOf(guidToDN(attrVal));
                     if (debug.messageEnabled()) {
                         debug.message("AssignableDynamicGroup.GroupResolver."
                                 + "isAssignable: comparing <" + dn + "> to <"
                                 + id + ">");
                     }
-                    return dn.equalsIgnoreCase(DN.valueOf(guidToDN(id)).toNormalizedString());
+                    return dn.equals(DN.valueOf(guidToDN(id)));
                 }
             }
         } catch (LocalizedIllegalArgumentException ex) {

@@ -19,7 +19,6 @@ import com.google.inject.Key;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
 import com.sun.identity.shared.debug.Debug;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
@@ -45,7 +43,7 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.EntryNotFoundException;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.schema.Schema;
 import org.forgerock.opendj.ldif.ChangeRecordReader;
@@ -121,7 +119,7 @@ public class DirectoryContentUpgrader {
             Schema schema = null;
             try {
                 schema = Schema.readSchemaForEntry(conn, DN.valueOf(baseDN)).asStrictSchema();
-            } catch (ErrorResultException ere) {
+            } catch (LdapException ere) {
                 DEBUG.error("Unable to read directory schema, the schema won't be upgraded", ere);
             }
             Iterator<Upgrader> it = upgraders.iterator();
@@ -151,7 +149,7 @@ public class DirectoryContentUpgrader {
             conn.readEntry(dn, "dn");
         } catch (EntryNotFoundException enfe) {
             return false;
-        } catch (ErrorResultException ere) {
+        } catch (LdapException ere) {
             DEBUG.error("Unable to read entry with dn: " + dn, ere);
             throw new UpgradeException(ere);
         }
@@ -349,7 +347,7 @@ public class DirectoryContentUpgrader {
                 SearchResultEntry result = conn.readEntry(indexDN, INDEX_TYPE_ATTR);
                 String indexType = result.getAttribute(INDEX_TYPE_ATTR).firstValueAsString();
                 return !"ordering".equalsIgnoreCase(indexType);
-            } catch (ErrorResultException e) {
+            } catch (LdapException e) {
                 throw new UpgradeException(e);
             } catch (NoSuchElementException e) {
                 return true;

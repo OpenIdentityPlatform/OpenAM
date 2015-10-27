@@ -30,24 +30,21 @@ package com.sun.identity.sm;
 
 import static org.forgerock.opendj.ldap.ResultCode.*;
 
+import com.iplanet.am.sdk.AMException;
+import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.services.util.XMLException;
+import com.iplanet.sso.SSOException;
+import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.Locale;
-import com.iplanet.am.sdk.AMException;
-import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.services.ldap.event.EventException;
-import com.iplanet.services.util.XMLException;
-import com.iplanet.sso.SSOException;
-import com.iplanet.ums.IUMSConstants;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
-
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 
 /**
@@ -355,15 +352,10 @@ public class SMSException extends Exception implements L10NMessage {
         if (rootCause == null) {
             return;
         }
-        if (rootCause instanceof ErrorResultException) {
-            message = mapLDAPException(((ErrorResultException) rootCause).getResult().getResultCode());
-        } else if (rootCause instanceof ErrorResultIOException) {
-                message = mapLDAPException(((ErrorResultIOException) rootCause).getCause().getResult().getResultCode());
+        if (rootCause instanceof LdapException) {
+            message = mapLDAPException(((LdapException) rootCause).getResult().getResultCode());
         } else if (rootCause instanceof LDAPServiceException) {
             // do nothing
-        } else if (rootCause instanceof EventException) {
-            exceptionStatus = STATUS_ABORT;
-            message = getString(IUMSConstants.SMS_EVENT_NOTIFICATION_FAILED);
         } else if (rootCause instanceof XMLException) {
             exceptionStatus = STATUS_ABORT;
             message = getString(IUMSConstants.SMS_XML_PARSER_EXCEPTION);

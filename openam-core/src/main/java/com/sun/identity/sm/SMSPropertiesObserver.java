@@ -35,7 +35,7 @@ import com.iplanet.services.ldap.event.EventService;
 import com.sun.identity.common.configuration.ConfigurationListener;
 import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 
 /**
  * Listenes to changes to <class>SystemProperties</class> and reinitialized
@@ -79,7 +79,7 @@ public class SMSPropertiesObserver implements ConfigurationListener {
         SMSThreadPool.initialize(true);
         try {
             EventService.getEventService().restartPSearches();
-        } catch (EventException | ErrorResultException e) {
+        } catch (EventException | LdapException e) {
             if (debug.errorEnabled()) {
                 debug.error("SMSPropertiesObserver :: Unable to restart PSearches after SystemProperties change.", e);
             }

@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.ldap;
 
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
@@ -30,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
-
 import javax.naming.InvalidNameException;
 
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
@@ -40,12 +41,9 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
-import org.forgerock.opendj.ldap.FailoverLoadBalancingAlgorithm;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.LoadBalancerEventListener;
 import org.forgerock.opendj.ldap.RDN;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
@@ -53,7 +51,9 @@ import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
 import org.forgerock.util.Reject;
+import org.forgerock.util.time.Duration;
 
 /**
  * Utility methods to help interaction with the OpenDJ LDAP SDK.
@@ -115,7 +115,7 @@ public final class LDAPUtils {
             int maxSize,
             int heartBeatInterval,
             String heartBeatTimeUnit,
-            LDAPOptions ldapOptions) {
+            Options ldapOptions) {
         return newFailoverConnectionPool(prioritizeServers(servers, hostServerId, hostSiteId),
                 username, password, maxSize, heartBeatInterval, heartBeatTimeUnit, ldapOptions);
     }
@@ -138,7 +138,7 @@ public final class LDAPUtils {
             int maxSize,
             int heartBeatInterval,
             String heartBeatTimeUnit,
-            LDAPOptions ldapOptions) {
+            Options ldapOptions) {
         List<ConnectionFactory> factories = new ArrayList<ConnectionFactory>(servers.size());
         for (LDAPURL ldapurl : servers) {
             ConnectionFactory cf = Connections.newFixedConnectionPool(
@@ -173,7 +173,7 @@ public final class LDAPUtils {
             char[] password,
             int heartBeatInterval,
             String heartBeatTimeUnit,
-            LDAPOptions options) {
+            Options options) {
         return newFailoverConnectionFactory(prioritizeServers(servers, hostServerId, hostSiteId),
                 username, password, heartBeatInterval, heartBeatTimeUnit, options);
     }
@@ -195,7 +195,7 @@ public final class LDAPUtils {
             char[] password,
             int heartBeatInterval,
             String heartBeatTimeUnit,
-            LDAPOptions ldapOptions) {
+            Options ldapOptions) {
         List<ConnectionFactory> factories = new ArrayList<ConnectionFactory>(servers.size());
         for (LDAPURL ldapurl : servers) {
             factories.add(newConnectionFactory(ldapurl, username, password, heartBeatInterval, heartBeatTimeUnit,
@@ -220,7 +220,7 @@ public final class LDAPUtils {
             char[] password,
             int heartBeatInterval,
             String heartBeatTimeUnit,
-            LDAPOptions ldapOptions) {
+            Options ldapOptions) {
         Boolean ssl = ldapurl.isSSL();
         int heartBeatTimeout =
                 SystemPropertiesManager.getAsInt(Constants.LDAP_HEARTBEAT_TIMEOUT, DEFAULT_HEARTBEAT_TIMEOUT);
@@ -229,29 +229,32 @@ public final class LDAPUtils {
             try {
                 //Creating a defensive copy of ldapOptions to handle the case when a mixture of SSL/non-SSL connections
                 //needs to be established.
-                ldapOptions = new LDAPOptions(ldapOptions).setSSLContext(new SSLContextBuilder().getSSLContext());
+                ldapOptions = Options.copyOf(ldapOptions).set(LDAPConnectionFactory.SSL_CONTEXT,
+                        new SSLContextBuilder().getSSLContext());
             } catch (GeneralSecurityException gse) {
                 DEBUG.error("An error occurred while creating SSLContext", gse);
             }
         }
-        ConnectionFactory cf = new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
+
+        // Enable heartbeat
         if (heartBeatInterval > 0) {
             TimeUnit unit = TimeUnit.valueOf(heartBeatTimeUnit.toUpperCase());
+            ldapOptions = ldapOptions
+                    .set(HEARTBEAT_ENABLED, true)
+                    .set(HEARTBEAT_INTERVAL, new Duration(unit.toSeconds(heartBeatInterval), TimeUnit.SECONDS))
+                    .set(HEARTBEAT_TIMEOUT, new Duration(unit.toSeconds(heartBeatTimeout), TimeUnit.SECONDS));
+        }
 
-            cf = Connections.newHeartBeatConnectionFactory(cf,
-                     unit.toSeconds(heartBeatInterval), //interval
-                     unit.toSeconds(heartBeatTimeout), //timeout
-                     TimeUnit.SECONDS);
-        }
+        // Enable Authenticated connection
         if (username != null) {
-            cf = Connections.newAuthenticatedConnectionFactory(cf, Requests.newSimpleBindRequest(username, password));
+            ldapOptions = ldapOptions.set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(username, password));
         }
-        return cf;
+
+        return new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
     }
 
     private static ConnectionFactory loadBalanceFactories(List<ConnectionFactory> factories) {
-        return Connections.newLoadBalancer(new FailoverLoadBalancingAlgorithm(factories,
-                new LoggingLBEventListener()));
+        return Connections.newFailoverLoadBalancer(factories, Options.defaultOptions());
     }
 
     /**
@@ -517,7 +520,7 @@ public final class LDAPUtils {
                     return dbName.firstValueAsString();
                 }
             }
-        } catch (ErrorResultIOException e) {
+        } catch (LdapException e) {
             // If not S1DS, then cn=mapping tree wouldn't exist.
             // Hence return userRoot as DBNAME.
         } catch (SearchResultReferenceIOException e) {
@@ -612,7 +615,7 @@ public final class LDAPUtils {
 
     private static class LoggingLBEventListener implements LoadBalancerEventListener {
 
-        public void handleConnectionFactoryOffline(ConnectionFactory factory, ErrorResultException error) {
+        public void handleConnectionFactoryOffline(ConnectionFactory factory, LdapException error) {
             DEBUG.error("Connection factory became offline: " + factory, error);
         }
 
@@ -643,7 +646,7 @@ public final class LDAPUtils {
      * @return A connection factory.
      */
     public static ConnectionFactory createFailoverConnectionFactory(String host, int defaultPort,
-            String authDN, String authPasswd, LDAPOptions options) {
+            String authDN, String authPasswd, Options options) {
         StringTokenizer st = new StringTokenizer(host);
         String[] hostList = new String[st.countTokens()];
         int[] portList = new int[st.countTokens()];
@@ -666,16 +669,15 @@ public final class LDAPUtils {
             for (int i = 0; i < hostCount; i++) {
                 factories.add(createSingleHostConnectionFactory(hostList[i], portList[i], authDN, authPasswd, options));
             }
-            return Connections.newLoadBalancer(new FailoverLoadBalancingAlgorithm(factories));
+            return Connections.newFailoverLoadBalancer(factories, options);
         } else {
             return createSingleHostConnectionFactory(hostList[0], portList[0], authDN, authPasswd, options);
         }
     }
 
     private static ConnectionFactory createSingleHostConnectionFactory(String host, int port,
-            String authDN, String authPasswd, LDAPOptions options) {
-        ConnectionFactory ldc = new LDAPConnectionFactory(host, port, options);
-        return Connections.newAuthenticatedConnectionFactory(ldc,
-                Requests.newSimpleBindRequest(authDN, authPasswd.getBytes()));
+            String authDN, String authPasswd, Options options) {
+        options = options.set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(authDN, authPasswd.getBytes()));
+        return new LDAPConnectionFactory(host, port, options);
     }
 }

@@ -60,8 +60,8 @@ import com.sun.identity.sm.ldap.LDAPEventManager;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
@@ -147,7 +147,7 @@ public class EventService {
      *
      * @supported.api
      */
-    public synchronized static EventService getEventService() throws EventException, ErrorResultException {
+    public synchronized static EventService getEventService() throws EventException, LdapException {
         if (isShutdownCalled) {
             return null;
         }

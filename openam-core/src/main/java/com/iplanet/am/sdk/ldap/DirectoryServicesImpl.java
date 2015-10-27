@@ -29,22 +29,6 @@
 
 package com.iplanet.am.sdk.ldap;
 
-import java.security.AccessController;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import com.iplanet.am.sdk.AMConstants;
 import com.iplanet.am.sdk.AMEntryExistsException;
 import com.iplanet.am.sdk.AMEventManagerException;
@@ -114,9 +98,26 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import java.security.AccessController;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.RDN;
 import org.forgerock.opendj.ldap.ResultCode;
@@ -290,7 +291,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
      * Method which does some generic processing of the UMSException and throws
      * an appropriate AMException
      * 
-     * @param SSOToken
+     * @param token
      *            the SSOToken of the user performing the operation
      * @param ue
      *            the UMSException thrown
@@ -301,39 +302,34 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
      *             a suitable AMException with specific message indicating the
      *             error.
      */
-    private void processInternalException(SSOToken token, UMSException ue,
-            String defaultErrorCode) throws AMException {
+    private void processInternalException(SSOToken token, UMSException ue, String defaultErrorCode) throws AMException {
         try {
-            ErrorResultException lex = (ErrorResultException) ue.getRootCause();
+            LdapException lex = (LdapException) ue.getRootCause();
             if (lex != null) {
-                ResultCode errorCode = lex.getResult().getResultCode();
                 // Check for specific error conditions
-                if (ResultCode.CONSTRAINT_VIOLATION.equals(errorCode)) {
-                    throw new AMException(ue.getMessage(), "19", ue);
-                } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(errorCode)) {
-                    throw new AMException(token, "3", ue);
-                } else if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(errorCode)) {
-                    throw new AMException(token, "4", ue);
-                } else if (ResultCode.NOT_ALLOWED_ON_RDN.equals(errorCode)) {
-                    throw new AMException(token, "967", ue);
-                } else if (ResultCode.ADMIN_LIMIT_EXCEEDED.equals(errorCode)) {
-                    throw new AMException(token, "968", ue);
-                } else {
-                    throw new AMException(token, defaultErrorCode, ue);
+                switch (lex.getResult().getResultCode().asEnum()) {
+                    case CONSTRAINT_VIOLATION:
+                        throw new AMException(ue.getMessage(), "19", ue);
+                    case TIME_LIMIT_EXCEEDED:
+                        throw new AMException(token, "3", ue);
+                    case SIZE_LIMIT_EXCEEDED:
+                        throw new AMException(token, "4", ue);
+                    case NOT_ALLOWED_ON_RDN:
+                        throw new AMException(token, "967", ue);
+                    case ADMIN_LIMIT_EXCEEDED:
+                        throw new AMException(token, "968", ue);
+                    default:
+                        throw new AMException(token, defaultErrorCode, ue);
                 }
             } else {
                 throw new AMException(token, defaultErrorCode, ue);
             }
-        } catch (Throwable ex) { // Cannot obtain the specific error
-            if (ex instanceof AMException) {
-                throw ((AMException) ex);
-            } else {
-                if (debug.messageEnabled()) {
-                    debug.message("Unknown exception in process "
-                            + "internal exception", ex);
-                }
-                throw new AMException(token, defaultErrorCode);
+        } catch (RuntimeException ex) { // Cannot obtain the specific error
+            if (debug.messageEnabled()) {
+                debug.message("Unknown exception in process "
+                        + "internal exception", ex);
             }
+            throw new AMException(token, defaultErrorCode);
         }
     }
 
@@ -1977,7 +1973,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             SearchResults results = po.search(searchFilter, control);
             resultSet = searchResultsToSet(results);
         } catch (UMSException ue) {
-            ErrorResultException lex = (ErrorResultException) ue.getRootCause();
+            LdapException lex = (LdapException) ue.getRootCause();
             ResultCode errorCode = lex.getResult().getResultCode();
             if (retryErrorCodes.contains("" + errorCode)) {
                 throw new AMException(token, Integer.toString(errorCode.intValue()), ue);
@@ -2252,7 +2248,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             debug.error("DirectoryServicesImpl.getMembers() entryDN " + entryDN
                     + " objectType: " + objectType
                     + " Unable to get members: ", e);
-            ErrorResultException le = (ErrorResultException) e.getRootCause();
+            LdapException le = (LdapException) e.getRootCause();
             if (le != null){
                 ResultCode resultCode = le.getResult().getResultCode();
                 if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)
@@ -3785,7 +3781,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                 debug.warning("DirectoryServicesImpl.verifyAndGetOrgDN(): "
                         + "Unable to Obtain Parent Organization", ue);
             }
-            ErrorResultException lex = (ErrorResultException) ue.getRootCause();
+            LdapException lex = (LdapException) ue.getRootCause();
             ResultCode errorCode = lex.getResult().getResultCode();
             if (retryErrorCodes.contains("" + errorCode)) {
                 throw new AMException(token, Integer.toString(errorCode.intValue()), ue);

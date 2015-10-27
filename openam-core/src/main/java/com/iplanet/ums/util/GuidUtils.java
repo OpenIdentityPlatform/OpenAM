@@ -31,7 +31,6 @@ package com.iplanet.ums.util;
 
 import com.iplanet.ums.Guid;
 import com.sun.identity.sm.ServiceManager;
-import org.forgerock.opendj.ldap.DN;
 
 /**
  * Utilitiy Class for Guid.
@@ -60,7 +59,7 @@ public class GuidUtils {
     static String baseDN = ServiceManager.getBaseDN();
 
     public static Guid getOrgGuid(Guid guid) {
-        String dn = DN.valueOf(guid.getDn()).toNormalizedString();
+        String dn = guid.getDn();
         int index = dn.indexOf("o=");
         if (index > -1) {
             return (new Guid(dn.substring(index, dn.length())));

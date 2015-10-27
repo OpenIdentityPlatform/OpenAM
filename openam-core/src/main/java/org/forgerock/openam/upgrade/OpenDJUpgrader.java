@@ -26,10 +26,6 @@
 
 package org.forgerock.openam.upgrade;
 
-import com.sun.identity.setup.AMSetupUtils;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.debug.Debug;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,11 +37,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
@@ -69,6 +60,10 @@ import org.forgerock.opendj.ldif.LDIFEntryWriter;
 import org.opends.server.core.LockFileManager;
 import org.opends.server.tools.RebuildIndex;
 import org.opends.server.util.TimeThread;
+
+import com.sun.identity.setup.AMSetupUtils;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Upgrade tool for upgrading the embedded instance of OpenDS to OpenDJ.
@@ -217,9 +212,6 @@ public final class OpenDJUpgrader {
                 // Work around for OPENDJ-1078
                 final String lockFile = LockFileManager.getServerLockFileName();
                 LockFileManager.releaseLock(lockFile, new StringBuilder());
-
-                // Work around for OPENDJ-1079
-                fixDJConfig();
             } else {
                 throw new UpgradeException("OpenDJ upgrade failed with code:  "+ret);
             }
@@ -263,55 +255,6 @@ public final class OpenDJUpgrader {
         System.setProperty("INSTALL_ROOT", installRoot);
         System.setProperty("org.opends.server.ServerRoot", installRoot);
         return org.opends.server.tools.upgrade.UpgradeCli.main(args, true, System.out, System.err);
-    }
-
-
-    // Work around for OPENDJ-1079 is to remove the HTTP Connection Handler from the
-    // config.  This entry breaks Tomcat6/OpenAM and must be removed
-
-    private void fixDJConfig() {
-        File readConfig = new File(installRoot+"/config/config.ldif");
-        File writeConfig = new File(installRoot+"/config/config.ldif.UPDATED");
-
-        String currentLine;
-        String targetLine = new String("dn: cn=HTTP Connection Handler");
-
-        BufferedReader read = null;
-        BufferedWriter write = null;
-
-        try {
-            read = new BufferedReader(
-                    new FileReader(readConfig));
-
-            write = new BufferedWriter(
-                    new FileWriter(writeConfig));
-
-            while ((currentLine = read.readLine()) != null) {
-                if (currentLine.contains(targetLine)) {
-                    while(((currentLine = read.readLine()) != null) &&
-                            (currentLine.length() != 0)) {
-                        // skip lines in the target dn
-                        continue;
-                    }
-                } else {
-                    // write out the lines we're not interested in
-                    write.write(currentLine+"\n");
-                }
-            }
-
-            // delete old config and rename new config
-            readConfig.delete();
-            writeConfig.renameTo(new File(installRoot+"/config/config.ldif"));
-
-        } catch(FileNotFoundException fnfe) {
-            error("Could not find file:  "+fnfe.getMessage());
-        } catch (IOException ioe) {
-            error("Could not read/write file:  "+ioe.getMessage());
-        } finally {
-            closeIfNotNull(write);
-            closeIfNotNull(read);
-
-        }
     }
 
     private void backupFile(final String fileName)
@@ -382,7 +325,7 @@ public final class OpenDJUpgrader {
         final List<DN> baseDNs = new LinkedList<DN>();
         final SearchRequest request = Requests.newSearchRequest(
                 "cn=backends,cn=config", SearchScope.WHOLE_SUBTREE,
-                "(objectclass=ds-cfg-local-db-backend)", "ds-cfg-base-dn");
+                "(objectclass=ds-cfg-backend)", "ds-cfg-base-dn");
         FileInputStream is = null;
         LDIFEntryReader reader = null;
 

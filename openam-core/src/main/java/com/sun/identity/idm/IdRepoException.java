@@ -37,6 +37,7 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.forgerock.openam.ldap.LDAPConstants;
+import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * The exception class whose instance is thrown if there is any error during the
@@ -107,13 +108,45 @@ public class IdRepoException extends Exception implements L10NMessage {
      *            ldap error code
      * @param args
      *            arguments to message. If it is not present pass the as null.
+     *  @deprecated
+     *            Passing in an ldapErrorCode as a String is not recommended, use the
+     *            OO ctor instead.
      */
-    public IdRepoException(String rbName, String errorCode,
-        String ldapErrCode,Object[] args)
+    @Deprecated
+    public IdRepoException(String rbName, String errorCode, String ldapErrCode, Object[] args)
     {
         this.bundleName = rbName;
         this.errorCode = errorCode;
         this.ldapErrCode = ldapErrCode;
+        this.args = args;
+        this.message = getL10NMessage(java.util.Locale.ENGLISH);
+    }
+
+    /**
+     * This constructor is used to pass the localized error message At this
+     * level, the locale of the caller is not known and it is not possible to
+     * throw localized error message at this level. Instead this constructor
+     * provides Resource Bundle name ,error code and LDAP Result Code ( in case
+     * of LDAP related exception for correctly locating the
+     * error message. The default <code>getMessage()</code> will always return
+     * English messages only. This is in consistent with current JRE.
+     *
+     * @param rbName
+     *            Resource bundle Name to be used for getting localized error
+     *            message.
+     * @param errorCode
+     *            Key to resource bundle. You can use <code>ResourceBundle rb =
+     *        ResourceBunde.getBundle(rbName,locale);
+     *        String localizedStr = rb.getString(errorCode)</code>.
+     * @param ldapResultCode
+     *            ldap result code
+     * @param args
+     *            arguments to message. If it is not present pass the as null.
+     */
+    public IdRepoException(String rbName, String errorCode, ResultCode ldapResultCode, Object[] args) {
+        this.bundleName = rbName;
+        this.errorCode = errorCode;
+        this.ldapErrCode = String.valueOf(ldapResultCode.intValue());
         this.args = args;
         this.message = getL10NMessage(java.util.Locale.ENGLISH);
     }
@@ -176,6 +209,23 @@ public class IdRepoException extends Exception implements L10NMessage {
      */
     public String getResourceBundleName() {
         return bundleName;
+    }
+
+    /**
+     * Returns an int representation of <code>ldapErrCode</code>.
+     * This is to be used with ResultCode.valueOf() which will return a valid
+     * ResultCode object regardless of the return of this method.
+     *
+     * A null or invalid <code>ldapErrorCode</code> will return <code>-1</code>.
+     *
+     * @return an int representation of this exception's LDAP error code.
+     */
+    public int getLdapErrorIntCode() {
+        try {
+            return Integer.valueOf(ldapErrCode);
+        } catch (NumberFormatException nfe) {
+            return -1;
+        }
     }
 
     /**

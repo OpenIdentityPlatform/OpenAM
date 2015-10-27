@@ -28,8 +28,6 @@
  */
 package com.sun.identity.sm.ldap;
 
-import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
-
 import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -72,8 +70,7 @@ import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.DereferenceAliasesPolicy;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.EntryNotFoundException;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.LinkedAttribute;
 import org.forgerock.opendj.ldap.LinkedHashMapEntry;
 import org.forgerock.opendj.ldap.Modification;
@@ -252,8 +249,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         if (dn == null || dn.length() == 0) {
             // This must not be possible return an exception.
             debug.error("SMSLdapObject: read():Null or Empty DN=" + dn);
-            throw (new SMSException(ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT,
-                    getBundleString(IUMSConstants.SMS_INVALID_DN, dn)), "sms-NO_SUCH_OBJECT"));
+            throw new SMSException(LdapException.newLdapException(ResultCode.NO_SUCH_OBJECT,
+                    getBundleString(IUMSConstants.SMS_INVALID_DN, dn)), "sms-NO_SUCH_OBJECT");
         }
 
 
@@ -278,7 +275,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             try (Connection conn = getConnection(token.getPrincipal())) {
                 ldapEntry = conn.readEntry(DN.valueOf(dn), getAttributeNames());
                 break;
-            } catch (ErrorResultException e) {
+            } catch (LdapException e) {
                 errorCode = e.getResult().getResultCode();
                 if (!retryErrorCodes.contains(errorCode) || retry == connNumRetry) {
                     if (errorCode.equals(ResultCode.NO_SUCH_OBJECT)) {
@@ -335,7 +332,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                 conn.add(entry);
                 debug.message("SMSLdapObject.create Successfully created entry: {}", dn);
                 break;
-            } catch (ErrorResultException e) {
+            } catch (LdapException e) {
                 ResultCode errorCode = e.getResult().getResultCode();
                 if (errorCode.equals(ResultCode.ENTRY_ALREADY_EXISTS) && retry > 0) {
                     // During install time and other times,
@@ -374,7 +371,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                 conn.modify(request);
                 debug.message("SMSLdapObject.modify(): Successfully modified entry: {}", dn);
                 break;
-            } catch (ErrorResultException e) {
+            } catch (LdapException e) {
                 ResultCode errorCode = e.getResult().getResultCode();
                 if (!retryErrorCodes.contains(errorCode) || retry == connNumRetry) {
                     debug.error("SMSLdapObject.modify(): Error modifying: {} By Principal {}", dn,
@@ -429,7 +426,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                 try (Connection conn = getConnection(p)) {
                     conn.delete(dn);
                     break;
-                } catch (ErrorResultException e) {
+                } catch (LdapException e) {
                     ResultCode errorCode = e.getResult().getResultCode();
                     if (!retryErrorCodes.contains(errorCode) || retry == connNumRetry) {
                         throw e;
@@ -442,7 +439,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                     }
                 }
             }
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             debug.warning("SMSLdapObject:delete() Unable to delete entry: {}", dn, e);
             throw new SMSException(e, "sms-entry-cannot-delete");
         }
@@ -512,13 +509,13 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                             debug.error("SMSLdapObject.subEntries: Reference should be handled already for dn {}", dn, e);
                         }
                     }
-                } catch (ErrorResultIOException e) {
+                } catch (LdapException e) {
                     debug.warning("SMSLdapObject.subEntries: Error in obtaining sub-entries: {}", dn, e);
                     throw new SMSException(e, "sms-entry-cannot-obtain");
                 }
                 break;
-            } catch (ErrorResultIOException e) {
-                ResultCode errorCode = e.getCause().getResult().getResultCode();
+            } catch (LdapException e) {
+                ResultCode errorCode = e.getResult().getResultCode();
                 if (errorCode.equals(ResultCode.NO_SUCH_OBJECT)) {
                     debug.message("SMSLdapObject.subEntries(): entry not present: {}", dn);
                     break;
@@ -570,7 +567,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         if (enableProxy) {
             try {
                 conn = dlayer.getConnection(p);
-            } catch (ErrorResultException e) {
+            } catch (LdapException e) {
                 debug.error("SMSLdapObject:getConnection() - Failed to get Connection", e);
             }
         } else {
@@ -615,8 +612,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                 iterResults.hasNext();
                 results = iterResults;
                 break;
-            } catch (ErrorResultIOException e) {
-                ResultCode errorCode = e.getCause().getResult().getResultCode();
+            } catch (LdapException e) {
+                ResultCode errorCode = e.getResult().getResultCode();
                 if (errorCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
                     debug.warning("SMSLdapObject.search: size limit {} exceeded", numOfEntries);
                     break;
@@ -665,8 +662,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                     debug.error("SMSLdapObject.search: reference should already be handled", e);
                 }
             }
-        } catch (ErrorResultIOException e) {
-            ResultCode errorCode = e.getCause().getResult().getResultCode();
+        } catch (LdapException e) {
+            ResultCode errorCode = e.getResult().getResultCode();
             if (errorCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
                 debug.warning("SMSLdapObject.search: size limit {} exceeded", numOfEntries);
             } else {
@@ -704,8 +701,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                 results = conn.search(request);
                 results.hasNext();
                 return results;
-            } catch (ErrorResultIOException e) {
-                ResultCode errorCode = e.getCause().getResult().getResultCode();
+            } catch (LdapException e) {
+                ResultCode errorCode = e.getResult().getResultCode();
                 if (!retryErrorCodes.contains(errorCode) || retry >= connNumRetry) {
                     debug.warning("SMSLdapObject.search(): LDAP exception in search for filter match: {}", filter, e);
                     throw new SMSException(e, "sms-error-in-searching");
@@ -784,7 +781,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             entryExists = true;
         } catch (EntryNotFoundException e) {
             debug.warning("SMSLdapObject:entryExists: {} does not exist", dn);
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             throw new SMSException("Unable to find entry with DN: " + dn, e, IUMSConstants.SMS_LDAP_OPERATION_FAILED);
         }
         return entryExists;
@@ -915,8 +912,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                 ConnectionEntryReader iterResults = conn.search(request);
                 iterResults.hasNext();
                 return toDNStrings(iterResults, dn, SUBORG_CANNOT_OBTAIN);
-            } catch (ErrorResultIOException e) {
-                ResultCode errorCode = e.getCause().getResult().getResultCode();
+            } catch (LdapException e) {
+                ResultCode errorCode = e.getResult().getResultCode();
                 if (!retryErrorCodes.contains(errorCode) || retry >= connNumRetry) {
                     if (errorCode.equals(ResultCode.NO_SUCH_OBJECT)) {
                         debug.message("SMSLdapObject.searchSubOrganizationNames(): suborg not present: {}", dn);
@@ -1055,8 +1052,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                 results = conn.search(request);
                 results.hasNext();
                 return toDNStrings(results, dn, ORG_CANNOT_OBTAIN);
-            } catch (ErrorResultIOException e) {
-                ResultCode errorCode = e.getCause().getResult().getResultCode();
+            } catch (LdapException e) {
+                ResultCode errorCode = e.getResult().getResultCode();
                 if (!retryErrorCodes.contains(errorCode) || retry == connNumRetry) {
                     if (errorCode.equals(ResultCode.NO_SUCH_OBJECT)) {
                         debug.message("SMSLdapObject.getOrgNames(): org not present: {}", dn);
@@ -1101,7 +1098,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                     debug.error("SMSLdapObject.toDNStrings: Reference should be handled already for {}", dn, e);
                 }
             }
-        } catch (ErrorResultIOException e) {
+        } catch (LdapException e) {
             debug.warning("SMSLdapObject.toDNStrings: Error in obtaining suborg names: {}", dn, e);
             throw new SMSException(e, errorCode);
         }

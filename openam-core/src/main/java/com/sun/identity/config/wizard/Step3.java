@@ -29,10 +29,6 @@
 
 package com.sun.identity.config.wizard;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Map;
-
 import com.iplanet.services.util.Crypt;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.config.SessionAttributeNames;
@@ -41,11 +37,14 @@ import com.sun.identity.setup.BootstrapData;
 import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Map;
 import org.apache.click.Context;
 import org.apache.click.control.ActionLink;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchScope;
 
 /**
@@ -626,7 +625,7 @@ public class Step3 extends LDAPStoreWizardPage {
             String[] attrs = {""};
             conn.search(rootSuffix, SearchScope.BASE_OBJECT, filter, attrs);
             writeToResponse("ok");
-        } catch (ErrorResultException lex) {
+        } catch (LdapException lex) {
             if (!writeErrorToResponse(lex.getResult().getResultCode())) {
                 writeToResponse(getLocalizedString("cannot.connect.to.SM.datastore"));
             }

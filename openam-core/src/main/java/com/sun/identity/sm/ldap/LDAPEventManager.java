@@ -33,19 +33,17 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPUser;
 import com.iplanet.services.ldap.ServerInstance;
-import com.iplanet.services.ldap.event.EventException;
-import java.util.Map;
-
-import org.forgerock.openam.ldap.PersistentSearchChangeType;
-import org.forgerock.opendj.ldap.SearchScope;
-import com.iplanet.services.ldap.event.EventService;
-
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.services.ldap.event.DSEvent;
+import com.iplanet.services.ldap.event.EventException;
+import com.iplanet.services.ldap.event.EventService;
 import com.iplanet.services.ldap.event.IDSEventListener;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSObjectListener;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import java.util.Map;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * This class registers itself as a listener to <class>
@@ -93,7 +91,7 @@ public class LDAPEventManager implements IDSEventListener {
         } catch (EventException ex) {
             debug.error("LDAPEventManager.addObjectChangeListener " +
                 "Unable to set persistent search", ex);
-        } catch (ErrorResultException ex) {
+        } catch (LdapException ex) {
             debug.error("LDAPEventManager.addObjectChangeListener " +
                 "Unable to set persistent search", ex);
         }
@@ -107,7 +105,7 @@ public class LDAPEventManager implements IDSEventListener {
         } catch (EventException ex) {
             debug.error("LDAPEventManager.removeObjectChangeListener " +
                 "Unable to remove persistent search", ex);
-        } catch (ErrorResultException ex) {
+        } catch (LdapException ex) {
             debug.error("LDAPEventManager.removeObjectChangeListener " +
                 "Unable to remove persistent search", ex);
         }

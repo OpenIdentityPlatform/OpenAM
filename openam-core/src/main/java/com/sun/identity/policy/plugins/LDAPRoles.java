@@ -30,6 +30,8 @@
 
 package com.sun.identity.policy.plugins;
 
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +40,22 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
+import org.forgerock.util.time.Duration;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -54,20 +72,6 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.LDAPOptions;
-import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.requests.SearchRequest;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This class represents a group of LDAP roles
@@ -236,7 +240,9 @@ public class LDAPRoles implements Subject {
         }
 
         // initialize the connection pool for the ldap server
-        LDAPOptions options = new LDAPOptions().setTimeout(timeLimit, TimeUnit.SECONDS);
+        Options options = Options.defaultOptions()
+                .set(REQUEST_TIMEOUT, new Duration((long)timeLimit, TimeUnit.MILLISECONDS));
+
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);
         connPool = LDAPConnectionPools.getConnectionPool(ldapServer);
@@ -328,7 +334,7 @@ public class LDAPRoles implements Subject {
                     }
                 }
             }
-        } catch (ErrorResultException le) {
+        } catch (LdapException le) {
             ResultCode resultCode = le.getResult().getResultCode();
             if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
                 debug.warning("LDAPRoles.getValidValues(): exceeded the size limit");
@@ -723,7 +729,7 @@ public class LDAPRoles implements Subject {
                     qualifiedUsers.add(reader.readEntry());
                 }
             }
-        } catch (ErrorResultException le) {
+        } catch (LdapException le) {
             ResultCode resultCode = le.getResult().getResultCode();
             if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
                 String objs[] = { orgName };

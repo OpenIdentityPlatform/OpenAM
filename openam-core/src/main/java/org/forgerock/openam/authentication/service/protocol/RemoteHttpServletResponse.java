@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright 2010-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,33 +25,32 @@
 
 package org.forgerock.openam.authentication.service.protocol;
 
-import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Encapsulates a HttpServletResponse and makes that state that is serializable
  * transferable. 
- * 
- * @author Steve Ferris steve.ferris@forgerock.com
  */
-public class RemoteHttpServletResponse extends RemoteServletResponse 
-implements HttpServletResponse, Serializable {
+public class RemoteHttpServletResponse extends RemoteServletResponse implements HttpServletResponse, Serializable {
     public static final long serialVersionUID = 42L;
 
     // transferrable state
-    private Set internalCookies = new HashSet();
-    private Map internalHeaders = new HashMap();
-    private Map internalDateHeaders = new HashMap();
-    
-    private transient Debug debug = null;
-    
+    private Set<RemoteCookie> internalCookies = new HashSet<>();
+    private Map<String, List<String>> internalHeaders = new HashMap<>();
+    private Map<String, Set<Long>> internalDateHeaders = new HashMap<>();
+
     /**
      * Creates a new RemoteHttpServletResponse encapsulating a normal response
      * 
@@ -59,8 +58,6 @@ implements HttpServletResponse, Serializable {
      */
     public RemoteHttpServletResponse(HttpServletResponse response) {
         super(response);
-        
-        debug = Debug.getInstance("remoteHttpServletResponse");
     }
     
     /**
@@ -68,8 +65,6 @@ implements HttpServletResponse, Serializable {
      */
     public RemoteHttpServletResponse() {
         super();
-        
-        debug = Debug.getInstance("remoteHttpServletResponse");
     }
         
     /**
@@ -102,7 +97,7 @@ implements HttpServletResponse, Serializable {
      * 
      * @return A Set containing the cookies.
      */
-    public Set getCookies() {
+    public Set<RemoteCookie> getCookies() {
         return internalCookies;
     }
 
@@ -113,8 +108,8 @@ implements HttpServletResponse, Serializable {
      * @return true if the header is set, false otherwise.
      */
     public boolean containsHeader(String name) {
-	return (this._getHttpServletResponse() != null) ? 
-            this._getHttpServletResponse().containsHeader(name) : internalHeaders.containsKey(name);
+	    return this._getHttpServletResponse() != null ?
+                this._getHttpServletResponse().containsHeader(name) : internalHeaders.containsKey(name);
     }
     
     /**
@@ -124,8 +119,7 @@ implements HttpServletResponse, Serializable {
      * @return The encoded URL, null if not available.
      */
     public String encodeURL(String url) {
-	return (this._getHttpServletResponse() != null) ? 
-            this._getHttpServletResponse().encodeURL(url) : null;
+	    return this._getHttpServletResponse() != null ? this._getHttpServletResponse().encodeURL(url) : null;
     }
 
     /**
@@ -135,8 +129,7 @@ implements HttpServletResponse, Serializable {
      * @return Encoded redirect URL, null if not available.
      */
     public String encodeRedirectURL(String url) {
-	return (this._getHttpServletResponse() != null) ?
-            this._getHttpServletResponse().encodeRedirectURL(url) : null;
+	    return this._getHttpServletResponse() != null ? this._getHttpServletResponse().encodeRedirectURL(url) : null;
     }
 
     /**
@@ -146,8 +139,7 @@ implements HttpServletResponse, Serializable {
      * @return The encoded URL, null if unavailable.
      */
     public String encodeUrl(String url) {
-	return (this._getHttpServletResponse() != null) ?
-            this._getHttpServletResponse().encodeUrl(url) : null;
+	    return this._getHttpServletResponse() != null ? this._getHttpServletResponse().encodeUrl(url) : null;
     }
     
     /**
@@ -157,8 +149,7 @@ implements HttpServletResponse, Serializable {
      * @return The encoded redirect URL, null if not available.
      */
     public String encodeRedirectUrl(String url) {
-	return (this._getHttpServletResponse() != null) ?
-            this._getHttpServletResponse().encodeRedirectUrl(url) : null;
+	    return this._getHttpServletResponse() != null ? this._getHttpServletResponse().encodeRedirectUrl(url) : null;
     }
     
     /**
@@ -170,9 +161,10 @@ implements HttpServletResponse, Serializable {
      * @throws IOException If the error code cannot be set.
      */
     public void sendError(int sc, String msg) throws IOException {
-	    if (this._getHttpServletResponse() != null)
+	    if (this._getHttpServletResponse() != null) {
             this._getHttpServletResponse().sendError(sc, msg);
         }
+    }
 
     /**
      * The default behavior of this method is to call sendError(int sc)
@@ -182,8 +174,9 @@ implements HttpServletResponse, Serializable {
      * @throws IOException If the error code cannot be set.
      */
     public void sendError(int sc) throws IOException {
-        if (this._getHttpServletResponse() != null)
+        if (this._getHttpServletResponse() != null) {
             this._getHttpServletResponse().sendError(sc);
+        }
     }
 
     /**
@@ -194,8 +187,9 @@ implements HttpServletResponse, Serializable {
      * @throws IOException If the redirect cannot be set.
      */
     public void sendRedirect(String location) throws IOException {
-        if (this._getHttpServletResponse() != null)
+        if (this._getHttpServletResponse() != null) {
             this._getHttpServletResponse().sendRedirect(location);
+        }
     }
     
     /**
@@ -210,8 +204,8 @@ implements HttpServletResponse, Serializable {
             this._getHttpServletResponse().setDateHeader(name, date);
         } 
         
-        Set dSet = new HashSet();
-        dSet.add(new Long(date));
+        Set<Long> dSet = new HashSet<>();
+        dSet.add(date);
         internalDateHeaders.put(name, dSet);
     }
     
@@ -228,12 +222,12 @@ implements HttpServletResponse, Serializable {
         }
         
         if (internalDateHeaders.containsKey(name)) {
-            Set existingSet = (Set) internalDateHeaders.get(name);
-            existingSet.add(new Long(date));
+            Set<Long> existingSet = internalDateHeaders.get(name);
+            existingSet.add(date);
             internalDateHeaders.put(name, existingSet);
         } else {
-            Set dSet = new HashSet();
-            dSet.add(new Long(date));
+            Set<Long> dSet = new HashSet<>();
+            dSet.add(date);
             internalDateHeaders.put(name, dSet);
         }
     }
@@ -243,7 +237,7 @@ implements HttpServletResponse, Serializable {
      * 
      * @return The Map of date headers.
      */
-    public Map getDateHeaders() {
+    public Map<String, Set<Long>> getDateHeaders() {
         return internalDateHeaders;
     }
     
@@ -259,7 +253,7 @@ implements HttpServletResponse, Serializable {
             this._getHttpServletResponse().setHeader(name, value);
         } 
        
-        Set vSet = new HashSet();        
+        List<String> vSet = new ArrayList<>();
         vSet.add(value);
         internalHeaders.put(name, vSet);
     }
@@ -277,11 +271,11 @@ implements HttpServletResponse, Serializable {
         }
         
         if (internalHeaders.containsKey(name)) {
-            Set existingSet = (Set) internalHeaders.get(name);
+            List<String> existingSet = internalHeaders.get(name);
             existingSet.add(value);
             internalHeaders.put(name, existingSet);
         } else {
-            Set vSet = new HashSet();
+            List<String> vSet = new ArrayList<>();
             vSet.add(value);
             internalHeaders.put(name, vSet);
         }
@@ -292,7 +286,7 @@ implements HttpServletResponse, Serializable {
      * 
      * @return Map of set headers.
      */
-    public Map getHeaders() {
+    public Map<String, List<String>> getHeaders() {
         return internalHeaders;
     }
     
@@ -308,8 +302,8 @@ implements HttpServletResponse, Serializable {
             this._getHttpServletResponse().setIntHeader(name, value);
         }
         
-        Set iSet = new HashSet();
-        iSet.add(new Integer(value));
+        List<String> iSet = new ArrayList<>();
+        iSet.add(String.valueOf(value));
         internalHeaders.put(name, iSet);
     }
     
@@ -326,12 +320,12 @@ implements HttpServletResponse, Serializable {
         }
         
         if (internalHeaders.containsKey(name)) {
-            Set existingSet = (Set) internalHeaders.get(name);
-            existingSet.add(new Integer(value));
+            List<String> existingSet = internalHeaders.get(name);
+            existingSet.add(Integer.toString(value));
             internalHeaders.put(name, existingSet);
         } else {
-            Set iSet = new HashSet();
-            iSet.add(new Integer(value));
+            List<String> iSet = new ArrayList<>();
+            iSet.add(String.valueOf(value));
             internalHeaders.put(name, iSet);
         }
     }
@@ -343,8 +337,9 @@ implements HttpServletResponse, Serializable {
      * @param sc The status code of the response
      */
     public void setStatus(int sc) {
-        if (this._getHttpServletResponse() != null) 
+        if (this._getHttpServletResponse() != null) {
             this._getHttpServletResponse().setStatus(sc);
+        }
     }
     
     /**
@@ -354,7 +349,40 @@ implements HttpServletResponse, Serializable {
      * @param sc The status code of the response
      */
      public void setStatus(int sc, String sm) {
-         if (this._getHttpServletResponse() != null) 
-            this._getHttpServletResponse().setStatus(sc, sm);
-     } 
+         if (this._getHttpServletResponse() != null) {
+             this._getHttpServletResponse().setStatus(sc, sm);
+         }
+     }
+
+    @Override
+    public int getStatus() {
+        if (this._getHttpServletResponse() != null) {
+            this._getHttpServletResponse().getStatus();
+        }
+
+        return 0;
+    }
+
+    @Override
+    public String getHeader(String s) {
+        if (CollectionUtils.isNotEmpty(internalHeaders)) {
+            return internalHeaders.get(s).get(0); //return first
+        }
+
+        return null;
+    }
+
+    @Override
+    public Collection<String> getHeaders(String s) {
+        if (internalHeaders.keySet().contains(s)) {
+            return internalHeaders.get(s);
+        } else {
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
+    public Collection<String> getHeaderNames() {
+        return internalHeaders.keySet();
+    }
 }

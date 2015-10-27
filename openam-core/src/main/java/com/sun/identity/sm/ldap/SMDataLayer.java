@@ -28,17 +28,7 @@
  */
 package com.sun.identity.sm.ldap;
 
-import static com.sun.identity.shared.Constants.LDAP_CONN_IDLE_TIME_IN_SECS;
-
-import java.util.concurrent.TimeUnit;
-
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
+import static com.sun.identity.shared.Constants.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
@@ -47,6 +37,14 @@ import com.iplanet.services.ldap.LDAPUser;
 import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
 import com.sun.identity.shared.debug.Debug;
+import java.util.concurrent.TimeUnit;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * SMDataLayer (A PACKAGE SCOPE CLASS) to access LDAP or other database
@@ -108,7 +106,7 @@ class SMDataLayer {
         try {
             conn = _ldapPool.getConnection();
             debug.message("SMDataLayer:getConnection() - Got Connection : {}", conn);
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             debug.error("SMDataLayer:getConnection() - Failed to get Connection", e);
         }
 

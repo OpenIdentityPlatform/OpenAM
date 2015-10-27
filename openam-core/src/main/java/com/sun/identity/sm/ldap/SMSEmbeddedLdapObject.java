@@ -28,6 +28,20 @@
 */
 package com.sun.identity.sm.ldap;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.ums.IUMSConstants;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
+import com.sun.identity.sm.SMSDataEntry;
+import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSNotificationManager;
+import com.sun.identity.sm.SMSObjectDB;
+import com.sun.identity.sm.SMSObjectListener;
+
 import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -41,45 +55,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.setup.AMSetupServlet;
-import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.shared.debug.Debug;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.ums.IUMSConstants;
-import com.sun.identity.sm.SMSDataEntry;
-import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSNotificationManager;
-import com.sun.identity.sm.SMSObjectDB;
-import com.sun.identity.sm.SMSObjectListener;
-
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
 import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
 import org.opends.server.core.ModifyOperation;
 import org.opends.server.protocols.internal.InternalClientConnection;
 import org.opends.server.protocols.internal.InternalSearchOperation;
+import org.opends.server.protocols.internal.Requests;
+import org.opends.server.protocols.internal.SearchRequest;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.protocols.ldap.LDAPModification;
-import org.opends.server.types.DereferencePolicy;
 import org.opends.server.types.DirectoryException;
-import org.opends.server.types.ModificationType;
-import org.opends.server.types.ResultCode;
-import org.opends.server.types.SearchScope;
 import org.opends.server.types.SearchResultEntry;
-
 /**
  * This object represents an LDAP entry in the directory server. The UMS have an
  * equivalent class called PersistentObject. The SMS could not integrate with
@@ -113,10 +112,10 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
 
     static boolean initialized = false;
     static Debug debug;
-    static LinkedHashSet OU_ATTR;
-    static LinkedHashSet O_ATTR;
+    static LinkedHashSet<String> orgUnitAttr;
+    static LinkedHashSet<String> orgAttr;
     static InternalClientConnection icConn;
-    static LinkedHashSet smsAttributes;
+    static LinkedHashSet<String> smsAttributes;
     static final String SMS_EMBEDDED_LDAP_OBJECT_SEARCH_LIMIT = 
         "com.sun.identity.sm.sms_embedded_ldap_object_search_limit";
     private ConfigAuditorFactory auditorFactory;
@@ -142,10 +141,10 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         AMResourceBundleCache amCache = AMResourceBundleCache.getInstance();
         bundle = amCache.getResBundle(IUMSConstants.UMS_BUNDLE_NAME,
             java.util.Locale.ENGLISH);
-        OU_ATTR = new LinkedHashSet(1);
-        OU_ATTR.add(getNamingAttribute());
-        O_ATTR = new LinkedHashSet(1);
-        O_ATTR.add(getOrgNamingAttribute());
+        orgUnitAttr = new LinkedHashSet<>(1);
+        orgUnitAttr.add(getNamingAttribute());
+        orgAttr = new LinkedHashSet<>(1);
+        orgAttr.add(getOrgNamingAttribute());
 
         icConn = InternalClientConnection.getRootConnection();
         try {
@@ -218,10 +217,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         }
 
         try {
-            InternalSearchOperation iso = icConn.processSearch(dn,
-                SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
-                0, 0, false, "(objectclass=*)",
-                smsAttributes);
+            SearchRequest request = Requests.newSearchRequest(dn, SearchScope.BASE_OBJECT, "(objectclass=*)",
+                    smsAttributes.toArray(new String[smsAttributes.size()]));
+            InternalSearchOperation iso = icConn.processSearch(request);
             ResultCode resultCode = iso.getResultCode();
 
             if (resultCode == ResultCode.SUCCESS) {
@@ -411,9 +409,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         // sorting is not implemented
         // Get the sub entries
         try {
-            InternalSearchOperation iso = icConn.processSearch(dn,
-                SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
-                numOfEntries, 0, false, filter, OU_ATTR, null, null);
+            SearchRequest request = Requests.newSearchRequest(dn, SearchScope.SINGLE_LEVEL, "(objectclass=*)",
+                    orgUnitAttr.toArray(new String[orgUnitAttr.size()]));
+            InternalSearchOperation iso = icConn.processSearch(request);
 
             ResultCode resultCode = iso.getResultCode();
             if (resultCode == ResultCode.NO_SUCH_OBJECT) {
@@ -440,11 +438,11 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
             LinkedList searchResult = iso.getSearchEntries();
             for(Iterator iter = searchResult.iterator(); iter.hasNext(); ) {
                 SearchResultEntry entry = (SearchResultEntry)iter.next();
-                String edn = entry.getDN().toString();
+                String edn = entry.getName().toString();
                 if (!edn.toLowerCase().startsWith("ou=")) {
                     continue;
                 }
-                String rdn = entry.getDN().getRDN().getAttributeValue(0)
+                String rdn = entry.getName().getRDN(0).getAttributeValue(0)
                     .toString();
                 answer.add(rdn);
             }
@@ -550,7 +548,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
 
         Set<String> answer = new LinkedHashSet<>();
         for (SearchResultEntry entry : iso.getSearchEntries()) {
-            String dn = entry.getDN().toString();
+            String dn = entry.getName().toString();
             answer.add(dn);
         }
 
@@ -570,9 +568,10 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         // sorting is not implemented
         try {
             // Get the sub entries
-            InternalSearchOperation iso = icConn.processSearch(startDN, scope,
-                    DereferencePolicy.NEVER_DEREF_ALIASES, numOfEntries, 0, false,
-                    filter, null, null, null);
+
+            SearchRequest request = Requests.newSearchRequest(startDN, scope, filter);
+            request.setSizeLimit(numOfEntries);
+            InternalSearchOperation iso = icConn.processSearch(request);
 
             return iso;
         } catch (DirectoryException dex) {
@@ -641,8 +640,8 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
      */
     private static boolean entryExists(String dn) throws SMSException {
         try {
-            InternalSearchOperation iso = icConn.processSearch(dn, SearchScope.BASE_OBJECT,
-                    DereferencePolicy.NEVER_DEREF_ALIASES, 0, 0, false, "(objectclass=*)", null);
+            SearchRequest request = Requests.newSearchRequest(dn, SearchScope.BASE_OBJECT, "(objectclass=*)");
+            InternalSearchOperation iso = icConn.processSearch(request);
 
             ResultCode resultCode = iso.getResultCode();
             if (resultCode == ResultCode.SUCCESS) {
@@ -821,7 +820,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
 
         Set<String> answer = new LinkedHashSet<>();
         for (SearchResultEntry entry : iso.getSearchEntries()) {
-            String edn = entry.getDN().toString();
+            String edn = entry.getName().toString();
             answer.add(edn);
         }
 

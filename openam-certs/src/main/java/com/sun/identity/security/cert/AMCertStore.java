@@ -29,6 +29,8 @@
 
 package com.sun.identity.security.cert;
 
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -41,10 +43,8 @@ import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.Requests;
@@ -52,6 +52,7 @@ import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.responses.SearchResultReference;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
 
 import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.security.SecurityDebug;
@@ -73,7 +74,6 @@ public class AMCertStore {
     protected X509Certificate certificate = null;
     protected static CertificateFactory cf = null;
 
-    static final String amSecurity = "amSecurity";
     static com.sun.identity.shared.debug.Debug debug = SecurityDebug.debug;
 
     static {
@@ -105,27 +105,31 @@ public class AMCertStore {
             String serverName = storeParam.getServerName();
             int port = storeParam.getPort();
             LDAPConnectionFactory factory;
+
+            // Regardless of SSL on connection, we will use authentication
+            SimpleBindRequest authenticatedRequest = Requests.newSimpleBindRequest(
+                    storeParam.getUser(), storeParam.getPassword().toCharArray());
+            Options options = Options.defaultOptions()
+                    .set(AUTHN_BIND_REQUEST, authenticatedRequest);
+
             if (storeParam.isSecure()) {
                 debug.message("AMCertStore.getConnection: initial connection factory using ssl.");
                 try {
-                    factory = new LDAPConnectionFactory(serverName, port, new LDAPOptions().setSSLContext(new SSLContextBuilder().getSSLContext()));
+                    options = options.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
+                    ldapconn = new LDAPConnectionFactory(serverName, port, options);
                     debug.message("AMCertStore.getConnection: SSLSocketFactory called");
                 } catch (GeneralSecurityException e) {
                     debug.error("AMCertStore.getConnection: Error getting SSL Context", e);
                     return null;
                 }
             } else { // non-ssl
-                factory = new LDAPConnectionFactory(serverName, port);
+                ldapconn = new LDAPConnectionFactory(serverName, port, options);
             }
-
-            SimpleBindRequest bindRequest = Requests.newSimpleBindRequest(storeParam.getUser(), storeParam.getPassword().toCharArray());
-            ldapconn = Connections.newAuthenticatedConnectionFactory(Connections.newHeartBeatConnectionFactory(factory),
-                    bindRequest);
         }
 
         try {
             return ldapconn.getConnection();
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             debug.error("AMCertStore.getConnection: Exception in connection to LDAP server", e);
             return null;
         }

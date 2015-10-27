@@ -15,13 +15,14 @@
  */
 package org.forgerock.openam.entitlement.indextree;
 
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.ServiceManagementDAO;
 import javax.inject.Inject;
-
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.FutureResult;
+import org.forgerock.opendj.ldap.LdapPromise;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
@@ -29,9 +30,6 @@ import org.forgerock.opendj.ldap.controls.PersistentSearchRequestControl;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
-
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceManagementDAO;
 
 /**
  * This monitor implementation acquires a connection against the data source and uses a persistent search to listen for
@@ -48,7 +46,7 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
     private final SearchRequest request;
 
     private Connection connection;
-    private FutureResult<Result> searchStatus;
+    private LdapPromise<Result> searchStatus;
 
     @Inject
     public IndexChangeMonitorImpl(SearchResultHandler handler,

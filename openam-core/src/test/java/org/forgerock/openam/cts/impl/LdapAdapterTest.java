@@ -16,8 +16,20 @@
  */
 package org.forgerock.openam.cts.impl;
 
+import static org.fest.assertions.Assertions.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.mockito.BDDMockito.*;
+import static org.testng.AssertJUnit.*;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.utils.LDAPDataConversion;
+import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
+import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
@@ -25,15 +37,11 @@ import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFactory;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFilterVisitor;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
-import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.responses.Result;
@@ -44,17 +52,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.mockito.BDDMockito.*;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.fail;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LdapAdapterTest {
 
@@ -114,7 +111,7 @@ public class LdapAdapterTest {
         String tokenId = "badger";
         DN testDN = DN.rootDN();
 
-        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT);
+        LdapException exception = LdapException.newLdapException(ResultCode.NO_SUCH_OBJECT);
         given(mockConnection.readEntry(eq(testDN))).willThrow(exception);
 
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
@@ -152,7 +149,7 @@ public class LdapAdapterTest {
         String tokenId = "badger";
         DN testDN = DN.rootDN();
 
-        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT);
+        LdapException exception = LdapException.newLdapException(ResultCode.NO_SUCH_OBJECT);
         given(mockConnection.delete(anyString())).willThrow(exception);
 
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
@@ -167,7 +164,7 @@ public class LdapAdapterTest {
         String tokenId = "badger";
         DN testDN = DN.rootDN();
 
-        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.OTHER);
+        LdapException exception = LdapException.newLdapException(ResultCode.OTHER);
         given(mockConnection.delete(anyString())).willThrow(exception);
 
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);

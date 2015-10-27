@@ -28,19 +28,17 @@
  */
 package com.sun.identity.sm.ldap;
 
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSDataEntry;
+import com.sun.identity.sm.SMSUtils;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
-
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSDataEntry;
-import com.sun.identity.sm.SMSUtils;
 
 /**
  * This class iterates through the <code>LDAPSearchResults</code> and converts the
@@ -85,8 +83,8 @@ public class SearchResultIterator implements Iterator<SMSDataEntry> {
                 }
                 return true;
             }
-        } catch (ErrorResultIOException e) {
-            ResultCode errorCode = e.getCause().getResult().getResultCode();
+        } catch (LdapException e) {
+            ResultCode errorCode = e.getResult().getResultCode();
             if (errorCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
                 debug.message("SearchResultIterator: size limit exceeded");
             } else {

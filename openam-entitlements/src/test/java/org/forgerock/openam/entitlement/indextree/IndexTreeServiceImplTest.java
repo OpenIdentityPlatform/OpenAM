@@ -11,28 +11,27 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock Inc.
+ * Copyright 2013-2015 ForgeRock Inc.
  */
 package org.forgerock.openam.entitlement.indextree;
+
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
-import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.util.thread.listener.ShutdownManager;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.util.thread.listener.ShutdownManager;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Unit test for IndexTresServiceImpl.
@@ -64,7 +63,7 @@ public class IndexTreeServiceImplTest {
     private Set<String> excludes;
 
     @BeforeMethod
-    public void setUp() throws ErrorResultException {
+    public void setUp() throws LdapException {
         // Create mock objects.
         manager = mock(IndexChangeManager.class);
         privilegedAction = mock(MockPrivilegedAction.class);

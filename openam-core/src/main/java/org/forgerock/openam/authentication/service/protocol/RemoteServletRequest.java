@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2013 ForgeRock, Inc. All Rights Reserved
+ * Copyright 2010-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -36,14 +36,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 /**
  * This class encapsulates a ServletRequest allowing its state to be serialized.
- * 
- * @author Steve Ferris steve.ferris@forgerock.com
  */
 public class RemoteServletRequest implements ServletRequest, Serializable {
     public static final long serialVersionUID = 42L;
@@ -54,15 +56,16 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
     
     /* The fields to hold the state of the request
      */
-    private Set attributeNames = new HashSet();
-    private Map internalAttributes = new HashMap();
+    private Set<String> attributeNames = new HashSet<>();
+    private Map<String, Object> internalAttributes = new HashMap<>();
     private String characterEncoding = null;
     private int contentLength = -1;
+    private long contentLengthLong = -1;
     private String contentType = null;
-    private Map internalParameters = new HashMap();
-    private Map internalParamererMap = new HashMap();
-    private Set internalParameterNames = new HashSet();
-    private Map internalParameterValues = new HashMap();
+    private Map<String, String> internalParameters = new HashMap<>();
+    private Map<String, String[]> internalParamererMap = new HashMap<>();
+    private Set<String> internalParameterNames = new HashSet<>();
+    private Map<String, String[]> internalParameterValues = new HashMap<>();
     private String protocol = null;
     private String scheme = null;
     private String serverName = null;
@@ -70,13 +73,14 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
     private String remoteAddr = null;
     private String remoteHost = null;
     private Locale locale = null;
-    private Set locales = new HashSet();
+    private Set<Locale> locales = new HashSet<>();
     private boolean isSecure = false;
     private String localName = null;
     private String localAddr = null;
     private int localPort = -1;
     private int remotePort = -1;
-    
+    private DispatcherType dispatcherType = null;
+
     protected transient Debug debug = null;
     private static final String CLASS = "RemoteServletRequest";
     public static final String SERIALIZABLE_INT = "java.io.Serializable";
@@ -95,11 +99,11 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
             debug.message(CLASS + " <init>");
         }
         
-	if (request == null) {
-	    throw new IllegalArgumentException("Request cannot be null");   
-	}
+	    if (request == null) {
+	        throw new IllegalArgumentException("Request cannot be null");
+	    }
         
-	this.request = request;
+	    this.request = request;
         
         // process the requests parameters
         processRequest();
@@ -121,7 +125,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
         characterEncoding = getCharacterEncoding();
         contentLength = getContentLength();
         contentType = getContentType();
-        
+
         // iterate over the parameters storing those that can be serialized
         Enumeration pNames = getParameterNames();
         
@@ -148,11 +152,13 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
         localName = getLocalName();
         localPort = getLocalPort();
         remotePort = getRemotePort();
+        contentLengthLong = getContentLengthLong();
+        dispatcherType = getDispatcherType();
         
-        Enumeration lNames = getLocales();
+        Enumeration<Locale> lNames = getLocales();
         
         while (lNames.hasMoreElements()) {
-            locales.add((Locale) lNames.nextElement());
+            locales.add(lNames.nextElement());
         }
         
         isSecure = isSecure();
@@ -202,8 +208,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The value of the attribute or null. 
      */
     public Object getAttribute(String name) {
-	return (request != null) ? this.request.getAttribute(name) : 
-            internalAttributes.get(name);
+	    return request != null ? this.request.getAttribute(name) : internalAttributes.get(name);
     }
     
     /**
@@ -212,9 +217,8 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * 
      * @return Enumeration of attribute names
      */
-    public Enumeration getAttributeNames() {
-	return (request != null) ? this.request.getAttributeNames() : 
-            new Vector(attributeNames).elements();
+    public Enumeration<String> getAttributeNames() {
+	    return request != null ? this.request.getAttributeNames() :  new Vector<>(attributeNames).elements();
     }    
     
     /**
@@ -224,7 +228,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The character encoding of this request
      */
     public String getCharacterEncoding() {
-	return (request != null) ? this.request.getCharacterEncoding() : characterEncoding;
+	    return request != null ? this.request.getCharacterEncoding() : characterEncoding;
     }
 	
     /**
@@ -235,7 +239,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @param enc The new character encoding for the request
      */
     public void setCharacterEncoding(String enc) throws java.io.UnsupportedEncodingException {
-	if (request != null) {
+	    if (request != null) {
             this.request.setCharacterEncoding(enc);
         } else {
             characterEncoding = enc;
@@ -249,17 +253,17 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The content length of the request
      */
     public int getContentLength() {
-	return (request != null) ? this.request.getContentLength() : contentLength;
+	    return request != null ? this.request.getContentLength() : contentLength;
     }
-    
-   /**
+
+    /**
     * The default behavior of this method is to return getContentType()
     * on the wrapped request object. Serialized.
     *
     * @return The content type of the request 
     */
     public String getContentType() {
-	return (request != null) ? this.request.getContentType() : contentType;
+	    return request != null ? this.request.getContentType() : contentType;
     }
     
     /**
@@ -269,7 +273,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The InputStream if available.
      */
     public ServletInputStream getInputStream() throws IOException {
-	return (request != null) ? this.request.getInputStream() : null;
+	    return request != null ? this.request.getInputStream() : null;
     }
 
     /**
@@ -279,7 +283,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @since 2.4
      */
     public String getLocalAddr() {
-        return (request != null) ? this.request.getLocalAddr() : localAddr;
+        return request != null ? this.request.getLocalAddr() : localAddr;
     }
 
     /**
@@ -289,7 +293,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @since 2.4
      */
     public String getLocalName() {
-        return (request != null) ? this.request.getLocalName() : localName;
+        return request != null ? this.request.getLocalName() : localName;
     }
 
     /**
@@ -299,7 +303,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @since 2.4
      */
     public int getRemotePort() {
-        return (request != null) ? this.request.getRemotePort() : remotePort;
+        return request != null ? this.request.getRemotePort() : remotePort;
     }
 
     /**
@@ -309,7 +313,48 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @since 2.4
      */
     public int getLocalPort() {
-        return (request != null) ? this.request.getLocalPort() : localPort;
+        return request != null ? this.request.getLocalPort() : localPort;
+    }
+
+    @Override
+    public long getContentLengthLong() {
+        return request != null ? this.request.getContentLengthLong() : contentLengthLong;
+    }
+
+    @Override
+    public ServletContext getServletContext() {
+        return request != null ? request.getServletContext() : null;
+    }
+
+    @Override
+    public AsyncContext startAsync() throws IllegalStateException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
+            throws IllegalStateException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isAsyncStarted() {
+        return false;
+    }
+
+    @Override
+    public boolean isAsyncSupported() {
+        return false;
+    }
+
+    @Override
+    public AsyncContext getAsyncContext() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DispatcherType getDispatcherType() {
+        return request != null ? request.getDispatcherType() : dispatcherType;
     }
 
     /**
@@ -320,8 +365,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The value of the specified parameter or null.
      */
     public String getParameter(String name) {
-	return (request != null) ? this.request.getParameter(name) : 
-            (String) internalParameters.get(name);
+	    return request != null ? this.request.getParameter(name) : internalParameters.get(name);
     }
     
     /**
@@ -331,9 +375,8 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * 
      * @return A map of the parameters.
      */
-    public Map getParameterMap() {
-	return (request != null) ? this.request.getParameterMap() : 
-            internalParamererMap;
+    public Map<String, String[]>  getParameterMap() {
+	    return request != null ? this.request.getParameterMap() : internalParamererMap;
     }
     
     /**
@@ -342,9 +385,8 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * 
      * @return Enumeration of paramters names.
      */     
-    public Enumeration getParameterNames() {
-	return (request != null) ? this.request.getParameterNames() : 
-            new Vector(internalParameterNames).elements();
+    public Enumeration<String> getParameterNames() {
+	    return request != null ? this.request.getParameterNames() : new Vector<>(internalParameterNames).elements();
     }
 
     /**
@@ -355,8 +397,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return Array of Strings of the specified parameter values.
      */
     public String[] getParameterValues(String name) {
-	return (request != null) ? this.request.getParameterValues(name) : 
-            (String[]) internalParameterValues.get(name);
+	    return request != null ? this.request.getParameterValues(name) : internalParameterValues.get(name);
     }
     
     /**
@@ -366,7 +407,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The protocol associated with the request.
      */
     public String getProtocol() {
-	return (request != null) ? this.request.getProtocol() : protocol;
+	    return request != null ? this.request.getProtocol() : protocol;
     }
     
     /**
@@ -376,7 +417,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The scheme associated with the request.
      */
     public String getScheme() {
-	return (request != null) ? this.request.getScheme() : scheme;
+	    return request != null ? this.request.getScheme() : scheme;
     }
     
     /**
@@ -386,7 +427,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The name of the server. 
      */
     public String getServerName() {
-	return (request != null) ? this.request.getServerName() : serverName;
+	    return request != null ? this.request.getServerName() : serverName;
     }
     
     /**
@@ -396,7 +437,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The port of the server.
      */
     public int getServerPort() {
-	return (request != null) ? this.request.getServerPort() : serverPort;
+	    return request != null ? this.request.getServerPort() : serverPort;
     }
     
     /**
@@ -404,7 +445,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * on the wrapped request object. <b>Not serialized, null post serialization.</b>
      */
     public BufferedReader getReader() throws IOException {
-	return (request != null) ? this.request.getReader() : null;
+	    return request != null ? this.request.getReader() : null;
     }
     
     /**
@@ -414,7 +455,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The remote address of the client associated with the request.
      */
     public String getRemoteAddr() {
-	return (request != null) ? this.request.getRemoteAddr() : remoteAddr;
+	    return request != null ? this.request.getRemoteAddr() : remoteAddr;
     }
     
     /**
@@ -424,7 +465,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The remote host of the client associated with the request.
      */
     public String getRemoteHost() {
-	return (request != null) ? this.request.getRemoteHost() : remoteHost;
+	    return request != null ? this.request.getRemoteHost() : remoteHost;
     }
     
     /**
@@ -466,7 +507,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The locale of the request.
      */
     public Locale getLocale() {
-	return (request != null) ? this.request.getLocale() : locale;
+	    return request != null ? this.request.getLocale() : locale;
     }
     
     /**
@@ -475,9 +516,8 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * 
      * @return Enumeration of the locales of the request.
      */
-    public Enumeration getLocales() {
-	return (request != null) ? this.request.getLocales() : 
-            new Vector(locales).elements();
+    public Enumeration<Locale> getLocales() {
+	    return request != null ? this.request.getLocales() : new Vector<>(locales).elements();
     }
     
     /**
@@ -487,7 +527,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return true if the cookie is secure, false otherwise.
      */
     public boolean isSecure() {
-	return (request != null) ? this.request.isSecure() : isSecure;
+	    return request != null ? this.request.isSecure() : isSecure;
     }
     
     /**
@@ -497,7 +537,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return RequestDispatcher or null if not available.
      */
     public RequestDispatcher getRequestDispatcher(String path) {
-	return (request != null) ? this.request.getRequestDispatcher(path) : null;
+	    return request != null ? this.request.getRequestDispatcher(path) : null;
     }
     
     /**
@@ -507,7 +547,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * @return The real path of the request.
      */
     public String getRealPath(String path) {
-	return (request != null) ? this.request.getRealPath(path) : null;
+	    return request != null ? this.request.getRealPath(path) : null;
     }    
     
     /**
@@ -521,23 +561,14 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
             return false;
         
         Class[] interfaces = obj.getClass().getInterfaces();
-        
-        for (int i = 0; i < interfaces.length; i++) {
-            if (interfaces[i].getName().equals(SERIALIZABLE_INT)) {
+
+        for (Class anInterface : interfaces) {
+            if (anInterface.getName().equals(SERIALIZABLE_INT)) {
                 return true;
             }
         }
         
         return false;
-    }
-    
-    protected String printNames(Class[] interfaces) {
-        StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < interfaces.length; i++) {
-            buffer.append("i=").append(interfaces[i].getName());
-        }
-        
-        return buffer.toString();
     }
 
     @Override

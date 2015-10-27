@@ -29,24 +29,6 @@
 
 package com.sun.identity.sm;
 
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.ModificationItem;
-import javax.naming.ldap.Rdn;
-import java.security.AccessController;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -65,9 +47,25 @@ import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.jaxrpc.SMSJAXRPCObject;
+import java.security.AccessController;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 
 /**
@@ -520,7 +518,7 @@ public class SMSEntry implements Cloneable {
                 if (debug.messageEnabled()) {
                     debug.message("SMSEntry: Duplicate value for addition");
                 }
-                throw (new SMSException(ErrorResultException.newErrorResult(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS,
+                throw (new SMSException(LdapException.newLdapException(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS,
                         getBundleString(IUMSConstants.SMS_ATTR_OR_VAL_EXISTS)),
                         "sms-ATTR_OR_VAL_EXISTS"));
             }
@@ -617,7 +615,7 @@ public class SMSEntry implements Cloneable {
         Set attr = null;
         if ((attrSet == null) || ((attr = (Set) attrSet.get(attrName)) == null)
                 || (!attr.contains(value))) {
-            throw (new SMSException(ErrorResultException.newErrorResult(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS,
+            throw (new SMSException(LdapException.newLdapException(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS,
                     getBundleString(IUMSConstants.SMS_ATTR_OR_VAL_EXISTS)),
                     "sms-ATTR_OR_VAL_EXISTS"));
         }
@@ -639,7 +637,7 @@ public class SMSEntry implements Cloneable {
     public void removeAttribute(String attrName) throws SMSException {
         Set attribute = (Set) attrSet.get(attrName);
         if (attribute == null) {
-            throw (new SMSException(ErrorResultException.newErrorResult(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS,
+            throw (new SMSException(LdapException.newLdapException(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS,
                     getBundleString(IUMSConstants.SMS_ATTR_OR_VAL_EXISTS)),
                     "sms-ATTR_OR_VAL_EXISTS"));
         }

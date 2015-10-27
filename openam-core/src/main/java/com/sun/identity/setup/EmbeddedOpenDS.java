@@ -29,46 +29,8 @@
 
 package com.sun.identity.setup;
 
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSEntry;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
-import org.forgerock.guava.common.io.ByteStreams;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.Attributes;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
-import org.forgerock.opendj.ldap.Modification;
-import org.forgerock.opendj.ldap.ModificationType;
-import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownPriority;
-import org.opends.messages.Message;
-import org.opends.server.core.DirectoryServer;
-import org.opends.server.extensions.ConfigFileHandler;
-import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
-import org.opends.server.tools.InstallDS;
-import org.opends.server.tools.RebuildIndex;
-import org.opends.server.tools.dsconfig.DSConfig;
-import org.opends.server.tools.dsreplication.ReplicationCliMain;
-import org.opends.server.types.DirectoryEnvironmentConfig;
-import org.opends.server.util.EmbeddedUtils;
-import org.opends.server.util.ServerConstants;
-import org.opends.server.util.TimeThread;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletContext;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -98,6 +60,47 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.ServletContext;
+
+import org.forgerock.guava.common.io.ByteStreams;
+import org.forgerock.i18n.LocalizableMessage;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.config.dsconfig.DSConfig;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Attributes;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.Modification;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.requests.ModifyRequest;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.util.Options;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownPriority;
+import org.forgerock.util.time.Duration;
+import org.opends.server.core.DirectoryServer;
+import org.opends.server.extensions.ConfigFileHandler;
+import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
+import org.opends.server.tools.InstallDS;
+import org.opends.server.tools.RebuildIndex;
+import org.opends.server.tools.dsreplication.ReplicationCliMain;
+import org.opends.server.types.DirectoryEnvironmentConfig;
+import org.opends.server.util.EmbeddedUtils;
+import org.opends.server.util.ServerConstants;
+import org.opends.server.util.TimeThread;
+
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSEntry;
 
 // OpenDS, now OpenDJ, does not have APIs to install and setup replication yet
 
@@ -505,7 +508,7 @@ public class EmbeddedOpenDS {
             debug.message("EmbeddedOpenDS.shutdown server...");
             DirectoryServer.shutDown(
                     "com.sun.identity.setup.EmbeddedOpenDS",
-                    Message.EMPTY);
+                    LocalizableMessage.EMPTY);
             int sleepcount = 0;
             while (DirectoryServer.isRunning() && (sleepcount < 60)) {
                 sleepcount++;
@@ -614,8 +617,7 @@ public class EmbeddedOpenDS {
         int ret = ReplicationCliMain.mainCLI(
                 enableCmd, false,
                 SetupProgress.getOutputStream(),
-                SetupProgress.getOutputStream(),
-                null);
+                SetupProgress.getOutputStream());
 
         if (ret == 0) {
             SetupProgress.reportEnd("emb.success", null);
@@ -672,8 +674,7 @@ public class EmbeddedOpenDS {
 
         initializeCmd[7] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
         int ret = ReplicationCliMain.mainCLI(initializeCmd, false,
-                SetupProgress.getOutputStream(), SetupProgress.getOutputStream(),
-                null);
+                SetupProgress.getOutputStream(), SetupProgress.getOutputStream());
 
         if (ret == 0) {
             SetupProgress.reportEnd("emb.success", null);
@@ -714,7 +715,7 @@ public class EmbeddedOpenDS {
             debug.message("EmbeddedOpenDS:getReplicationStatus:exec dsreplication :"
                     + dbgcmd);
         }
-        int ret = ReplicationCliMain.mainCLI(statusCmd, false, oo, err, null);
+        int ret = ReplicationCliMain.mainCLI(statusCmd, false, oo, err);
         if (debug.messageEnabled()) {
             debug.message("EmbeddedOpenDS:getReplicationStatus:dsreplication ret:"
                     + ret);
@@ -918,7 +919,8 @@ public class EmbeddedOpenDS {
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ByteArrayOutputStream boe = new ByteArrayOutputStream();
-        DSConfig.main(args, false, bos, boe);
+
+        DSConfig.main(args, bos, boe);
         String str = bos.toString();
         String stre = boe.toString();
         if (stre.length() > 0 &&
@@ -996,7 +998,7 @@ public class EmbeddedOpenDS {
                 }
                 bos = new ByteArrayOutputStream();
                 boe = new ByteArrayOutputStream();
-                DSConfig.main(args1, false, bos, boe);
+                DSConfig.main(args1, bos, boe);
                 str = bos.toString();
                 stre = boe.toString();
                 if (debug.messageEnabled()) {
@@ -1041,7 +1043,7 @@ public class EmbeddedOpenDS {
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ByteArrayOutputStream boe = new ByteArrayOutputStream();
-        DSConfig.main(args, false, bos, boe);
+        DSConfig.main(args, bos, boe);
         String str = bos.toString();
         String stre = boe.toString();
         if (stre.length() != 0) {
@@ -1113,7 +1115,7 @@ public class EmbeddedOpenDS {
                         }
                         bos = new ByteArrayOutputStream();
                         boe = new ByteArrayOutputStream();
-                        DSConfig.main(args1, false, bos, boe);
+                        DSConfig.main(args1, bos, boe);
                         str = bos.toString();
                         stre = boe.toString();
                         if (stre.length() != 0) {
@@ -1168,7 +1170,7 @@ public class EmbeddedOpenDS {
             String dsAdminPwd) {
         try {
             return getLDAPConnectionFactory(dsHostName, dsPort, dsManager, dsAdminPwd).getConnection();
-        } catch (ErrorResultException ex) {
+        } catch (LdapException ex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME)
                     .error("EmbeddedOpenDS.setup(). Error getting LDAPConnection:", ex);
         }
@@ -1178,10 +1180,13 @@ public class EmbeddedOpenDS {
     private static synchronized ConnectionFactory getLDAPConnectionFactory(String dsHostName, String dsPort,
             String dsManager, String dsAdminPwd) {
         if (factory == null) {
-            factory = Connections.newAuthenticatedConnectionFactory(
-                    new LDAPConnectionFactory(dsHostName, Integer.parseInt(dsPort),
-                            new LDAPOptions().setConnectTimeout(300, TimeUnit.SECONDS)),
-                    Requests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()));
+
+            // All connections will use authentication
+            Options options = Options.defaultOptions()
+                    .set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()))
+                    .set(CONNECT_TIMEOUT, new Duration((long)3, TimeUnit.SECONDS));
+
+            factory = new LDAPConnectionFactory(dsHostName, Integer.parseInt(dsPort), options);
             ShutdownManager.getInstance().addShutdownListener(new ShutdownListener() {
                 @Override
                 public void shutdown() {

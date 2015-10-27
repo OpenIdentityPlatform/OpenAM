@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright 2010-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,8 +25,6 @@
 
 package org.forgerock.openam.authentication.service.protocol;
 
-import com.sun.identity.shared.debug.Debug;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -37,13 +35,9 @@ import javax.servlet.ServletResponse;
 
 /**
  * Encapsulates the transferable state of a ServletResponse object.
- * 
- * @author Steve Ferris steve.ferris@forgerock.com
  */
 public class RemoteServletResponse implements ServletResponse, Serializable {
     public static final long serialVersionUID = 42L;
-
-    public static final String SERIALIZABLE_INT = "java.io.Serializable";
 
     /* The response being wrapped.
      */
@@ -56,8 +50,6 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
     private String contentType = null;
     private Locale locale = null;
 
-    private transient Debug debug = null;
-
     /**
      * Creates a ServletResponse adaptor wrapping the given response object.
      *
@@ -65,8 +57,7 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
      * @throws java.lang.IllegalArgumentException if the response is null.
      */
     public RemoteServletResponse(ServletResponse response) {
-        debug = Debug.getInstance("remoteResponse");
-        
+
         if (response == null) {
             throw new IllegalArgumentException("Response cannot be null");
         }
@@ -84,7 +75,7 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
      * Used by deserialization.
      */
     public RemoteServletResponse() {
-        debug = Debug.getInstance("remoteResponse");
+
     }
 
     /**
@@ -117,7 +108,7 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
      * @return The character encoding of the response.
      */
     public String getCharacterEncoding() {
-        return (response != null) ? this.response.getCharacterEncoding() : characterEncoding;
+        return response != null ? this.response.getCharacterEncoding() : characterEncoding;
     }
 
     /**
@@ -127,70 +118,80 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
      * @since 2.4
      */
     public String getContentType() {
-        return (response != null) ? this.response.getContentType() : contentType;
+        return response != null ? this.response.getContentType() : contentType;
     }
 
     /**
      * The default behavior of this method is to return getOutputStream()
      * on the wrapped response object. Not serialized.
-     * 
+     *
      * @return The output stream associated with the response, null if unavailable.
      */
     public ServletOutputStream getOutputStream() throws IOException {
-        return (response != null) ? this.response.getOutputStream() : null;
-    }  
+        return response != null ? this.response.getOutputStream() : null;
+    }
 
     /**
      * The default behavior of this method is to return getWriter()
      * on the wrapped response object. Not serialized.
-     * 
+     *
      * @return The writer associated with the response, null if unavailable.
      */
     public PrintWriter getWriter() throws IOException {
-        return (response != null) ? this.response.getWriter() : null;
+        return response != null ? this.response.getWriter() : null;
     }
 
     /**
      * The default behavior of this method is to call setContentLength(int len)
      * on the wrapped response object. Not serialized.
-     * 
+     *
      * @param len The new content length of the response.
      */
     public void setContentLength(int len) {
-        if (response != null)
+        if (response != null) {
             this.response.setContentLength(len);
+        }
+    }
+
+    @Override
+    public void setContentLengthLong(long contentLength) {
+        if (response != null) {
+            this.response.setContentLengthLong(contentLength);
+        }
     }
 
     /**
      * The default behavior of this method is to call setContentType(String type)
      * on the wrapped response object. Not Serialized.
-     * 
+     *
      * @param type The new content type of the response.
      */
     public void setContentType(String type) {
-        if (response != null) 
+        if (response != null) {
             this.response.setContentType(type);
+        }
     }
 
     /**
      * The default behavior of this method is to call setBufferSize(int size)
      * on the wrapped response object. Not serailzed.
-     * 
+     *
      * @param size The new buffer size of the request.
      */
     public void setBufferSize(int size) {
-        if (response != null) 
+        if (response != null) {
             this.response.setBufferSize(size);
+        }
     }
 
     /**
      * The default behavior of this method is to return getBufferSize()
      * on the wrapped response object. Not serialized.
-     * 
+     *
      * @return The buffer size of the response, -1 if unavailable.
      */
     public int getBufferSize() {
-        return (response != null) ? this.response.getBufferSize(): -1;
+        return response != null ? this.response.getBufferSize(): -1;
     }
 
     /**
@@ -198,18 +199,19 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
      * on the wrapped response object. Not serialized.
      */
     public void flushBuffer() throws IOException {
-        if (response != null)
+        if (response != null) {
             this.response.flushBuffer();
+        }
     }
 
     /**
      * The default behavior of this method is to return isCommitted()
      * on the wrapped response object. Not serialized.
-     * 
+     *
      * @return True if the response has been committed, false otherwise.
      */
     public boolean isCommitted() {
-        return (response != null) ? this.response.isCommitted() : false;
+        return response != null && this.response.isCommitted();
     }
 
     /**
@@ -217,8 +219,9 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
      * on the wrapped response object. Not serialized.
      */
     public void reset() {
-        if (response != null)
+        if (response != null) {
             this.response.reset();
+        }
     }
 
     /**
@@ -226,14 +229,15 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
      * on the wrapped response object. Not serialized.
      */
     public void resetBuffer() {
-        if (response != null)
+        if (response != null) {
             this.response.resetBuffer();
+        }
     }
 
     /**
      * The default behavior of this method is to call setLocale(Locale loc)
      * on the wrapped response object. Serialized.
-     * 
+     *
      * @param loc Sets the new locale of the response.
      */
     public void setLocale(Locale loc) {
@@ -247,7 +251,7 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
     /**
      * Sets the character encoding of the response
      *
-     * @param charSet
+     * @param charSet Sets the new charSet of the response.
      * @since 2.4
      */
     public void setCharacterEncoding(String charSet) {
@@ -257,32 +261,14 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
             this.charSet = charSet;
         }
     }
-    
+
     /**
      * The default behavior of this method is to return getLocale()
      * on the wrapped response object. Serialized.
-     * 
+     *
      * @return The locale of the response
      */
     public Locale getLocale() {
-	return (response != null) ? this.response.getLocale() : locale;
-    }
-    
-    /**
-     * Checks if the obj implements java.io.Serializable.
-     * 
-     * @param obj The object to test for serialization.
-     * @return true if serializable, false otherwise.
-     */
-    protected boolean isSerializable(Object obj) {
-        Class[] interfaces = obj.getClass().getInterfaces();
-        
-        for (int i = 0; i < interfaces.length; i++) {
-            if (interfaces[i].getName().equals(SERIALIZABLE_INT)) {
-                return true;
-            }
-        }
-        
-        return false;
+	    return response != null ? this.response.getLocale() : locale;
     }
 }

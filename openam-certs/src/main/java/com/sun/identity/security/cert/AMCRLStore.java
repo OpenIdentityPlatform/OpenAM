@@ -28,6 +28,16 @@
  */
 package com.sun.identity.security.cert;
 
+import com.iplanet.security.x509.CertUtils;
+import com.iplanet.security.x509.IssuingDistributionPointExtension;
+import com.sun.identity.common.HttpURLConnectionManager;
+import com.sun.identity.shared.encode.URLEncDec;
+import sun.security.x509.CRLDistributionPointsExtension;
+import sun.security.x509.DistributionPoint;
+import sun.security.x509.GeneralNames;
+import sun.security.x509.PKIXExtensions;
+import sun.security.x509.X509CertImpl;
+
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,38 +51,24 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.LDAPUrl;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
-
-import com.iplanet.security.x509.CertUtils;
-import com.iplanet.security.x509.IssuingDistributionPointExtension;
-import com.sun.identity.common.HttpURLConnectionManager;
-import com.sun.identity.shared.encode.URLEncDec;
-
-import sun.security.x509.CRLDistributionPointsExtension;
-import sun.security.x509.DistributionPoint;
-import sun.security.x509.GeneralNames;
-import sun.security.x509.PKIXExtensions;
-import sun.security.x509.X509CertImpl;
+import org.forgerock.util.Options;
 
 /**
  * The class is used to manage crl store in LDAP server
@@ -477,17 +473,14 @@ public class AMCRLStore extends AMCertStore {
      * @param dn
      * @param crls
      */
-    private boolean updateCRL(Connection ldc, String dn, byte[] crls) {
+    private void updateCRL(Connection ldc, String dn, byte[] crls) {
         try {
             ModifyRequest modifyRequest = Requests.newModifyRequest(dn)
-                    .addModification(ModificationType.REPLACE, mCrlAttrName, ByteString.valueOf(crls));
+                    .addModification(ModificationType.REPLACE, mCrlAttrName, crls);
             ldc.modify(modifyRequest);
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             debug.error("Error updating CRL Cache : ", e);
-            return false;
         }
-
-        return true;
     }
 
     /**
@@ -548,8 +541,9 @@ public class AMCRLStore extends AMCertStore {
         // Check ldap over SSL
         if (url.isSecure()) {
             try {
-                LDAPOptions options = new LDAPOptions().setSSLContext(new SSLContextBuilder().getSSLContext());
-                factory = new LDAPConnectionFactory(url.getHost(), url.getPort(), options);
+                factory = new LDAPConnectionFactory(url.getHost(), url.getPort(),
+                        Options.defaultOptions().set(LDAPConnectionFactory.SSL_CONTEXT,
+                        new SSLContextBuilder().getSSLContext()));
             } catch (GeneralSecurityException e) {
                 debug.error("AMCRLStore.getCRLByLdapURI: Error getting SSL Context", e);
                 return null;

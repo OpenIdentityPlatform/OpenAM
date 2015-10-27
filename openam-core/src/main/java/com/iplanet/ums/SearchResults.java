@@ -28,21 +28,20 @@
  */
 package com.iplanet.ums;
 
+import com.iplanet.services.ldap.Attr;
+import com.iplanet.services.ldap.AttrSet;
+import com.iplanet.services.util.I18n;
+import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import com.iplanet.services.ldap.Attr;
-import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.util.I18n;
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.controls.Control;
 import org.forgerock.opendj.ldap.controls.VirtualListViewResponseControl;
@@ -183,12 +182,12 @@ public class SearchResults implements java.io.Serializable {
                             + "  releasing connection : " + m_conn);
                 }
             }
-        } catch (ErrorResultIOException | SearchResultReferenceIOException ignored) {
+        } catch (LdapException | SearchResultReferenceIOException ignored) {
         }
         return hasGotMoreElements;
     }
 
-    private void readEntry() throws SearchResultReferenceIOException, ErrorResultIOException {
+    private void readEntry() throws SearchResultReferenceIOException, LdapException {
         if (m_ldapSearchResults != null) {
             if (m_ldapSearchResults.isReference()) {
                 //Ignoring references

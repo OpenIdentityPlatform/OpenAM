@@ -71,7 +71,11 @@
     <dependencies>
         <dependency>
             <groupId>org.forgerock.opendj</groupId>
-            <artifactId>opendj-ldap-sdk</artifactId>
+            <artifactId>opendj-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.opendj</groupId>
+            <artifactId>opendj-grizzly</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>

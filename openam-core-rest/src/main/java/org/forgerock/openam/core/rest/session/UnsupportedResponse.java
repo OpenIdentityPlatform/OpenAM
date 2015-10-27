@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.core.rest.session;
 
+import java.util.Collection;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -117,6 +118,26 @@ final class UnsupportedResponse implements HttpServletResponse {
     }
 
     @Override
+    public int getStatus() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getHeader(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Collection<String> getHeaders(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Collection<String> getHeaderNames() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String getCharacterEncoding() {
         throw new UnsupportedOperationException();
     }
@@ -143,6 +164,11 @@ final class UnsupportedResponse implements HttpServletResponse {
 
     @Override
     public void setContentLength(int len) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setContentLengthLong(long len) {
         throw new UnsupportedOperationException();
     }
 

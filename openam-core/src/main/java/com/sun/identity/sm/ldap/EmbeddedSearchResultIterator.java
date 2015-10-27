@@ -30,12 +30,17 @@ package com.sun.identity.sm.ldap;
 
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.sm.SMSDataEntry;
-
-import java.util.*;
-
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.ldap.ByteString;
 import org.opends.server.types.Attribute;
-import org.opends.server.types.AttributeValue;
 import org.opends.server.types.SearchResultEntry;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -67,12 +72,12 @@ public class EmbeddedSearchResultIterator implements Iterator<SMSDataEntry> {
         }
 
         SearchResultEntry entry = (SearchResultEntry)resultIter.next();
-        String dn = entry.getDN().toString();
+        String dn = entry.getName().toString();
         if (hasExcludeDNs) {
             while (excludeDNs.contains(dn)) {
                 if (resultIter.hasNext()) {
                     entry = (SearchResultEntry)resultIter.next();
-                    dn = entry.getDN().toString();
+                    dn = entry.getName().toString();
                 } else {
                     entry = null;
                     break;
@@ -96,18 +101,17 @@ public class EmbeddedSearchResultIterator implements Iterator<SMSDataEntry> {
         //not supported.
     }
 
-    static Map convertLDAPAttributeSetToMap(List attributes) {
-        Map answer = null;
-        if ((attributes != null) && (!attributes.isEmpty())) {
-            for (Iterator iter = attributes.iterator(); iter.hasNext();) {
-                Attribute attr = (Attribute) iter.next();
+    static Map<String, Set<String>> convertLDAPAttributeSetToMap(List<Attribute> attributes) {
+        Map<String, Set<String>> answer = null;
+        if (CollectionUtils.isNotEmpty(attributes)) {
+            for (Attribute attr : attributes) {
                 if (attr != null) {
-                    Set strValues = new HashSet();
-                    for(AttributeValue value : attr) {
-                        strValues.add(value.toString());
+                    Set<String> strValues = new HashSet<>();
+                    for (ByteString anAttr : attr) {
+                        strValues.add(anAttr.toString());
                     }
                     if (answer == null) {
-                        answer = new CaseInsensitiveHashMap(10);
+                        answer = new CaseInsensitiveHashMap<>(10);
                     }
                     answer.put(attr.getName(), strValues);
                 }

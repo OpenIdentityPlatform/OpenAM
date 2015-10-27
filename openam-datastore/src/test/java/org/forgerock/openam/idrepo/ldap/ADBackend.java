@@ -11,16 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
-import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.IntermediateResponseHandler;
+import org.forgerock.opendj.ldap.LdapResultHandler;
 import org.forgerock.opendj.ldap.MemoryBackend;
 import org.forgerock.opendj.ldap.RequestContext;
 import org.forgerock.opendj.ldap.RequestHandler;
-import org.forgerock.opendj.ldap.ResultHandler;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.opendj.ldap.requests.AddRequest;
 import org.forgerock.opendj.ldap.requests.BindRequest;
@@ -33,7 +32,6 @@ import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.BindResult;
 import org.forgerock.opendj.ldap.responses.CompareResult;
 import org.forgerock.opendj.ldap.responses.ExtendedResult;
-import org.forgerock.opendj.ldap.responses.Responses;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.responses.SearchResultReference;
@@ -51,67 +49,55 @@ public class ADBackend implements RequestHandler<RequestContext> {
     }
 
     public void handleAdd(RequestContext requestContext, AddRequest request,
-            IntermediateResponseHandler intermediateResponseHandler, ResultHandler<Result> resultHandler) {
+            IntermediateResponseHandler intermediateResponseHandler, LdapResultHandler<Result> resultHandler) {
         backend.handleAdd(requestContext, request, intermediateResponseHandler, resultHandler);
     }
 
     public void handleBind(RequestContext requestContext, int version, BindRequest request,
-            IntermediateResponseHandler intermediateResponseHandler, ResultHandler<BindResult> resultHandler) {
+            IntermediateResponseHandler intermediateResponseHandler, LdapResultHandler<BindResult> resultHandler) {
         backend.handleBind(requestContext, version, request, intermediateResponseHandler, resultHandler);
     }
 
     public void handleCompare(RequestContext requestContext, CompareRequest request,
-            IntermediateResponseHandler intermediateResponseHandler, ResultHandler<CompareResult> resultHandler) {
+            IntermediateResponseHandler intermediateResponseHandler, LdapResultHandler<CompareResult> resultHandler) {
         backend.handleCompare(requestContext, request, intermediateResponseHandler, resultHandler);
     }
 
     public void handleDelete(RequestContext requestContext, DeleteRequest request,
-            IntermediateResponseHandler intermediateResponseHandler, ResultHandler<Result> resultHandler) {
+            IntermediateResponseHandler intermediateResponseHandler, LdapResultHandler<Result> resultHandler) {
         backend.handleDelete(requestContext, request, intermediateResponseHandler, resultHandler);
     }
 
     public <R extends ExtendedResult> void handleExtendedRequest(RequestContext requestContext,
             ExtendedRequest<R> request, IntermediateResponseHandler intermediateResponseHandler,
-            ResultHandler<R> resultHandler) {
+                                                                 LdapResultHandler<R> resultHandler) {
         backend.handleExtendedRequest(requestContext, request, intermediateResponseHandler, resultHandler);
     }
 
     public void handleModify(RequestContext requestContext, ModifyRequest request,
-            IntermediateResponseHandler intermediateResponseHandler, ResultHandler<Result> resultHandler) {
+            IntermediateResponseHandler intermediateResponseHandler, LdapResultHandler<Result> resultHandler) {
         backend.handleModify(requestContext, request, intermediateResponseHandler, resultHandler);
     }
 
     public void handleModifyDN(RequestContext requestContext, ModifyDNRequest request,
-            IntermediateResponseHandler intermediateResponseHandler, ResultHandler<Result> resultHandler) {
+            IntermediateResponseHandler intermediateResponseHandler, LdapResultHandler<Result> resultHandler) {
         backend.handleModifyDN(requestContext, request, intermediateResponseHandler, resultHandler);
     }
 
     public void handleSearch(RequestContext requestContext, SearchRequest request,
-            IntermediateResponseHandler intermediateResponseHandler, final SearchResultHandler resultHandler) {
+            IntermediateResponseHandler intermediateResponseHandler, final SearchResultHandler searchHandler,
+                             final LdapResultHandler<Result> resultHandler) {
         SearchResultHandler fakeHandler = new SearchResultHandler() {
 
             public boolean handleEntry(SearchResultEntry entry) {
-                return resultHandler.handleEntry(entry);
+                return searchHandler.handleEntry(entry);
             }
 
             public boolean handleReference(SearchResultReference reference) {
-                return resultHandler.handleReference(reference);
+                return searchHandler.handleReference(reference);
             }
 
-            public void handleErrorResult(ErrorResultException error) {
-                resultHandler.handleErrorResult(error);
-            }
-
-            public void handleResult(Result result) {
-                handleReference(Responses.newSearchResultReference("ldap://ForestDnsZones.openam.forgerock.com/"
-                        + "DC=ForestDnsZones,DC=openam,DC=forgerock,DC=com"));
-                handleReference(Responses.newSearchResultReference("ldap://DomainDnsZones.openam.forgerock.com/"
-                        + "DC=ForestDnsZones,DC=openam,DC=forgerock,DC=com"));
-                handleReference(Responses.newSearchResultReference("ldap://openam.forgerock.com/"
-                        + "DC=ForestDnsZones,DC=openam,DC=forgerock,DC=com"));
-                resultHandler.handleResult(result);
-            }
         };
-        backend.handleSearch(requestContext, request, intermediateResponseHandler, fakeHandler);
+        backend.handleSearch(requestContext, request, intermediateResponseHandler, fakeHandler, resultHandler);
     }
 }

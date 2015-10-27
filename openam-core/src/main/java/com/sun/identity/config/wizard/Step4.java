@@ -31,31 +31,22 @@ package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.ProtectedPage;
-import org.apache.click.control.ActionLink;
 import com.sun.identity.setup.SetupConstants;
-import org.apache.click.Context;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
-import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SSLContextBuilder;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
-
 import java.io.IOException;
 import java.net.Socket;
-import java.security.GeneralSecurityException;
 import java.util.Hashtable;
-import java.util.concurrent.TimeUnit;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
+import org.apache.click.Context;
+import org.apache.click.control.ActionLink;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Step 4 is the input of the remote user data store properties.
@@ -385,7 +376,7 @@ public class Step4 extends ProtectedPage {
             String[] attrs = {""};
             conn.search(rootSuffix, SearchScope.BASE_OBJECT, ObjectClassFilter, attrs);
             writeToResponse("ok");
-        } catch (ErrorResultException lex) {
+        } catch (LdapException lex) {
             ResultCode resultCode = lex.getResult().getResultCode();
             if (!writeErrorToResponse(resultCode)) {
                 writeToResponse(getLocalizedString("cannot.connect.to.SM.datastore"));
@@ -438,7 +429,7 @@ public class Step4 extends ProtectedPage {
             String[] attrs = {""};
             conn.search(rootSuffix, SearchScope.BASE_OBJECT, ObjectClassFilter, attrs);
             writeToResponse("ok");
-        } catch (ErrorResultException lex) {
+        } catch (LdapException lex) {
             ResultCode resultCode = lex.getResult().getResultCode();
             if (!writeErrorToResponse(resultCode)) {
                 writeToResponse(getLocalizedString("cannot.connect.to.UM.datastore"));

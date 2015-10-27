@@ -50,7 +50,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.util.Options;
 
 /**
  * This object is the manager of all connection information. The server
@@ -323,7 +323,7 @@ public class DSConfigMgr implements IDSConfigMgr {
         }
         return LDAPUtils.newFailoverConnectionFactory(
                 getLdapUrls(serverGroupID, Server.Type.CONN_SSL.equals(sCfg.getConnectionType())),
-                authID, passwd != null ? passwd.toCharArray() : null, 0, null, new LDAPOptions());
+                authID, passwd != null ? passwd.toCharArray() : null, 0, null, Options.defaultOptions());
     }
 
     private Set<LDAPURL> getLdapUrls(String serverGroupID, boolean isSSL) {

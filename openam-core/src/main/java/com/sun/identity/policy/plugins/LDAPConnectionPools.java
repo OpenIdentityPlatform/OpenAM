@@ -28,26 +28,23 @@
  */
 package com.sun.identity.policy.plugins;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
-import org.forgerock.opendj.ldap.SSLContextBuilder;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
-
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.util.Options;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * Provides a pool of <code>LDAPConnection</code>
@@ -85,7 +82,7 @@ public class LDAPConnectionPools {
             int minPoolSize,
             int maxPoolSize)
             throws PolicyException {
-        initConnectionPool(host, authDN, authPasswd, ssl, minPoolSize, maxPoolSize, new LDAPOptions());
+        initConnectionPool(host, authDN, authPasswd, ssl, minPoolSize, maxPoolSize, Options.defaultOptions());
     }
 
     /**
@@ -104,7 +101,7 @@ public class LDAPConnectionPools {
                                    boolean ssl, 
                                    int minPoolSize, 
                                    int maxPoolSize,
-                                   LDAPOptions options)
+                                   Options options)
             throws PolicyException {
 
         if (host.length() < 1) {
@@ -120,7 +117,7 @@ public class LDAPConnectionPools {
                         debug.message("Create LDAPConnectionPool: " + host);
                     }
                     if (ssl) {
-                        options.setSSLContext(new SSLContextBuilder().getSSLContext());
+                        options.set(LDAPConnectionFactory.SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
                     }
 
                     ConnectionFactory ldc =

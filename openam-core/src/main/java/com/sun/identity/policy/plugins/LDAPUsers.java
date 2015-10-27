@@ -43,8 +43,7 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.DereferenceAliasesPolicy;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -268,7 +267,7 @@ public class LDAPUsers implements Subject {
 
         try (Connection ld = connPool.getConnection()){
             ConnectionEntryReader res = search(searchFilter, ld, userRDNAttrName);
-            while (hasNext(res)) {
+            while (res.hasNext()) {
                 try {
                     if (res.isEntry()) {
                         SearchResultEntry entry = res.readEntry();
@@ -279,8 +278,8 @@ public class LDAPUsers implements Subject {
                         // ignore referrals
                         debug.message("LDAPUsers.getValidValues(): Ignoring reference: {}", res.readReference());
                     }
-                } catch (ErrorResultIOException e) {
-                    ResultCode resultCode = e.getCause().getResult().getResultCode();
+                } catch (LdapException e) {
+                    ResultCode resultCode = e.getResult().getResultCode();
                     if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
                         debug.warning("LDAPUsers.getValidValues(): exceeded the size limit");
                         status = ValidValues.SIZE_LIMIT_EXCEEDED;
@@ -294,18 +293,10 @@ public class LDAPUsers implements Subject {
                     // ignore referrals
                 }
             }
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             throw handleResultException(e);
         }
         return new ValidValues(status, validUserDNs);
-    }
-
-    protected boolean hasNext(ConnectionEntryReader res) throws ErrorResultException {
-        try {
-            return res.hasNext();
-        } catch (ErrorResultIOException e) {
-            throw e.getCause();
-        }
     }
 
     /**
@@ -341,7 +332,7 @@ public class LDAPUsers implements Subject {
             Map<String, Map<String, String[]>> map = new HashMap<>();
             results.add(map);
 
-            while (hasNext(res)) {
+            while (res.hasNext()) {
                 try {
                     SearchResultEntry entry = res.readEntry();
         
@@ -352,8 +343,8 @@ public class LDAPUsers implements Subject {
                 } catch (SearchResultReferenceIOException lre) {
                     // ignore referrals
                     continue;
-                } catch (ErrorResultIOException e) {
-                    ResultCode resultCode = e.getCause().getResult().getResultCode();
+                } catch (LdapException e) {
+                    ResultCode resultCode = e.getResult().getResultCode();
                     if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
                         debug.warning("LDAPUsers.getValidEntries(): exceeded the size limit");
                         status = ValidValues.SIZE_LIMIT_EXCEEDED;
@@ -366,7 +357,7 @@ public class LDAPUsers implements Subject {
                     }
                 }
             }
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             throw handleResultException(e);
         } catch (Exception e) {
             throw new PolicyException(e);
@@ -695,16 +686,16 @@ public class LDAPUsers implements Subject {
             // search the remote ldap and find out the user DN
             try (Connection ld = connPool.getConnection()){
                 ConnectionEntryReader res = search(searchFilter, ld, attrs);
-                while (hasNext(res)) {
+                while (res.hasNext()) {
                     try {
                         SearchResultEntry entry = res.readEntry();
                         qualifiedUserDNs.add(entry.getName().toString());
                     } catch (SearchResultReferenceIOException e) {
                         // ignore referrals
                         continue;
-                    } catch (ErrorResultIOException e) {
+                    } catch (LdapException e) {
                         String objs[] = { orgName };
-                        ResultCode resultCode = e.getCause().getResult().getResultCode();
+                        ResultCode resultCode = e.getResult().getResultCode();
                         if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
                             debug.warning("LDAPUsers.getUserDN(): exceeded the size limit");
                             throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_size_limit", objs,
@@ -718,7 +709,7 @@ public class LDAPUsers implements Subject {
                         }
                     }
                 }
-            } catch (ErrorResultException e) {
+            } catch (LdapException e) {
                 throw handleResultException(e);
             } catch (Exception e) {
                 throw new PolicyException(e);
@@ -735,7 +726,7 @@ public class LDAPUsers implements Subject {
         return userDN;
     }
 
-    private PolicyException handleResultException(ErrorResultException e) {
+    private PolicyException handleResultException(LdapException e) {
         ResultCode ldapErrorCode = e.getResult().getResultCode();
         if (ldapErrorCode.equals(ResultCode.INVALID_CREDENTIALS)) {
             return new PolicyException(ResBundleUtils.rbName, "ldap_invalid_password", null, null);

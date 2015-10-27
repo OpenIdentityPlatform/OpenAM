@@ -32,8 +32,7 @@ package com.iplanet.ums;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ResourceBundle;
-
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 
 /**
  * <PRE>
@@ -214,8 +213,8 @@ public class UMSException extends java.lang.Exception {
 
         // get the root cause message
         String nestedMsg;
-        if (rootCause instanceof ErrorResultException) {
-            nestedMsg = ((ErrorResultException) rootCause).getResult().getDiagnosticMessage();
+        if (rootCause instanceof LdapException) {
+            nestedMsg = ((LdapException) rootCause).getResult().getDiagnosticMessage();
         } else {
             nestedMsg = rootCause.getMessage();
         }

@@ -28,22 +28,20 @@
  */
 package com.sun.identity.idm.common;
 
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.ServletContext;
+import java.util.concurrent.TimeUnit;
 
-import com.iplanet.am.sdk.AMHashMap;
-import com.iplanet.services.naming.ServerEntryNotFoundException;
-import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.CaseInsensitiveHashMap;
+import javax.servlet.ServletContext;
 
 import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.ldap.LDAPUtils;
@@ -52,30 +50,33 @@ import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.BindRequest;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
+import org.forgerock.util.time.Duration;
 
+import com.iplanet.am.sdk.AMHashMap;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
+import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -322,9 +323,11 @@ public class IdRepoUtils {
 
     private static ConnectionFactory getLDAPConnection(Map attrValues)
         throws Exception {
-        LDAPOptions options = new LDAPOptions().setConnectTimeout(300, TimeUnit.SECONDS);
+        Options options = Options.defaultOptions()
+                .set(CONNECT_TIMEOUT, new Duration((long) 300, TimeUnit.MILLISECONDS));
+
         if (CollectionHelper.getBooleanMapAttr(attrValues, "sun-idrepo-ldapv3-config-ssl-enabled", false)) {
-            options.setSSLContext(new SSLContextBuilder().getSSLContext());
+            options = options.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
         }
 
         Set<LDAPURL> ldapUrls = getLDAPUrls(attrValues);
@@ -343,8 +346,7 @@ public class IdRepoUtils {
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
         }
 
-        ConnectionFactory factory = new LDAPConnectionFactory(ldapUrl.getHost(), ldapUrl.getPort(), options);
-
+        // All connections will use authentication
         String bindDn = CollectionHelper.getMapAttr(attrValues, "sun-idrepo-ldapv3-config-authid");
         if (org.forgerock.openam.utils.StringUtils.isBlank(bindDn)) {
             if (DEBUG.warningEnabled()) {
@@ -359,9 +361,9 @@ public class IdRepoUtils {
             }
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
         }
+        options = options.set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(bindDn, bindPwd.getBytes()));
 
-        BindRequest bindRequest = Requests.newSimpleBindRequest(bindDn, bindPwd.getBytes());
-        return Connections.newAuthenticatedConnectionFactory(factory, bindRequest);
+        return new LDAPConnectionFactory(ldapUrl.getHost(), ldapUrl.getPort(), options);
     }
 
     /**

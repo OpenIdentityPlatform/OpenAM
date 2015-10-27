@@ -1218,6 +1218,18 @@ Copyright:
 Version: cc_zh_TW-2008-08-08.jar
 Copyright:
 
+Version: grizzly-framework-2.3.23.jar
+Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
+
+Version: grizzly-http-2.3.23.jar
+Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
+
+Version: grizzly-http-server-2.3.23.jar
+Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
+
+Version: grizzly-http-servlet-2.3.23.jar
+Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
+
 Version: jaxb-impl-1.0.6.jar
 Copyright:
 
@@ -1232,6 +1244,9 @@ Copyright: Copyright (c) 2001-2011 Oracle and/or its affiliates. All rights rese
 
 Version: javax.security.auth.message-3.1.jar
 Copyright: Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+
+Version: javax.servlet-api-3.1-b02.jar
+Copyright: Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
 
 Version: jaxb-libs-1.0.6.jar
 Copyright: Copyright (c) 2001-2011 Oracle and/or its affiliates. All rights reserved.

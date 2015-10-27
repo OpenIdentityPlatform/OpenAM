@@ -29,6 +29,8 @@
 
 package com.sun.identity.diagnostic.plugin.services.common;
 
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,7 +42,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.security.AccessController;
-import java.security.GeneralSecurityException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,7 +51,19 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+
 import javax.net.ssl.HttpsURLConnection;
+
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
+import org.forgerock.util.time.Duration;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Crypt;
@@ -63,17 +76,6 @@ import com.sun.identity.setup.Bootstrap;
 import com.sun.identity.setup.BootstrapData;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManager;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
-import org.forgerock.opendj.ldap.SSLContextBuilder;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This is the base class for Server related functionality.
@@ -434,13 +436,15 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
     protected static Connection getLDAPConnection(String dsHostName, int dsPort, String dsProtocol, String dsManager,
             String dsAdminPwd) {
         try {
-            LDAPOptions options = new LDAPOptions().setConnectTimeout(3, TimeUnit.SECONDS);
+            // All connections will use authentication
+            Options options = Options.defaultOptions()
+                    .set(CONNECT_TIMEOUT, new Duration((long)3, TimeUnit.SECONDS))
+                    .set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()));
+
             if (dsProtocol.equalsIgnoreCase("ldaps")) {
-                options.setSSLContext(new SSLContextBuilder().getSSLContext());
+                options = options.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
             }
-            ConnectionFactory factory = Connections.newAuthenticatedConnectionFactory(
-                    new LDAPConnectionFactory(dsHostName, dsPort, options),
-                    Requests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()));
+            ConnectionFactory factory = new LDAPConnectionFactory(dsHostName, dsPort, options);
             return factory.getConnection();
         } catch (Exception ignored) {
             return null;
@@ -473,7 +477,7 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
         String[] attrs = { "" };
         try (ConnectionEntryReader reader = ld.search(suffix, SearchScope.BASE_OBJECT, filter, attrs)) {
             return reader.hasNext();
-        } catch (ErrorResultIOException e) {
+        } catch (LdapException e) {
             return false;
         }
     }

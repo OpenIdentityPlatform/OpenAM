@@ -41,7 +41,6 @@ import com.iplanet.services.util.JCEEncryption;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
-import org.forgerock.openam.ldap.LdifUtils;
 import com.sun.identity.cli.AuthenticatedCommand;
 import com.sun.identity.cli.CLIException;
 import com.sun.identity.cli.CLIUtil;
@@ -61,21 +60,18 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSSchema;
 import com.sun.identity.sm.ServiceManager;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldif.LDIF;
-import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
-import org.forgerock.opendj.ldif.LDIFEntryReader;
-
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Set;
 import javax.security.auth.login.LoginException;
-import java.io.FileReader;
+import org.forgerock.openam.ldap.LdifUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
 
 /**
  * Import service configuration data.
@@ -153,7 +149,7 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
         } catch (SMSException e) {
             throw new CLIException(e.getMessage(),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             throw new CLIException(e.getMessage(),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SSOException e) {
@@ -323,7 +319,7 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
                 outputWriter.printlnMessage(getResourceString("import-service-configuration-connected-to-ds"));
             }
             return conn;
-        } catch (LDAPServiceException | ErrorResultException e) {
+        } catch (LDAPServiceException | LdapException e) {
             throw new CLIException(getResourceString("import-service-configuration-not-connect-to-ds"),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED, null);
         }

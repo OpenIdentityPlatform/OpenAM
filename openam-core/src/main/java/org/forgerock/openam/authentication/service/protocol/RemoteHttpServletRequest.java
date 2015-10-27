@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2013 ForgeRock, Inc. All Rights Reserved
+ * Copyright (c) 2010-2015 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,27 +27,30 @@ package org.forgerock.openam.authentication.service.protocol;
 
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
+import java.io.IOException;
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
+import javax.servlet.http.ProtocolHandler;
 
 /**
- * This class encapsulates a HttpServletRequest extending from RemoteServletRequst.
+ * This class encapsulates a HttpServletRequest extending from RemoteServletRequest.
  * The information or state that can be serialized is with non serialized 
  * content handled sensibly.
- * 
- * @author Steve Ferris steve.ferris@forgerock.com
  */
-public class RemoteHttpServletRequest extends RemoteServletRequest 
-        implements HttpServletRequest, Serializable {
+public class RemoteHttpServletRequest extends RemoteServletRequest implements HttpServletRequest, Serializable {
     public static final long serialVersionUID = 42L;
     
     /**
@@ -55,11 +58,10 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      */
     private String authType = null;
     // normal cookies are not serialized.
-    private transient Cookie[] cookies = null;
     private RemoteCookie[] internalCookies = null;
-    private Set headerNames = new CaseInsensitiveHashSet();
-    private Map internalHeader = new CaseInsensitiveHashMap();
-    private Map internalHeaders = new CaseInsensitiveHashMap();
+    private Set<String> headerNames = new CaseInsensitiveHashSet<>();
+    private Map<String, String> internalHeader = new CaseInsensitiveHashMap<>();
+    private Map<String, Set<String>> internalHeaders = new CaseInsensitiveHashMap<>();
     private String method = null;
     private String pathInfo = null;
     private String pathTranslated = null;
@@ -124,8 +126,8 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
         remoteSession = new RemoteSession(getSession());
     }
     
-    private Set createSet(Enumeration headers) {
-        Set headersSet = new HashSet();
+    private Set<String> createSet(Enumeration<String> headers) {
+        Set<String> headersSet = new HashSet<>();
         
         while (headers.hasMoreElements()) {
             headersSet.add(headers.nextElement());
@@ -140,7 +142,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The internal request.
      */
     private HttpServletRequest _getHttpServletRequest() {
-	return (HttpServletRequest) super.getRequest();
+	    return (HttpServletRequest) super.getRequest();
     }
 
     /**
@@ -150,8 +152,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The auth type of the request.
      */
     public String getAuthType() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getAuthType() : authType;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getAuthType() : authType;
     }
    
     /**
@@ -186,8 +187,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The named date header in seconds or -1 if not available.
      */
     public long getDateHeader(String name) {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getDateHeader(name) : -1;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getDateHeader(name) : -1;
     }
         	
     /**
@@ -197,8 +197,8 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The value of the named header.
      */
     public String getHeader(String name) {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getHeader(name) : (String) internalHeader.get(name);
+	    return this._getHttpServletRequest() != null ?
+            this._getHttpServletRequest().getHeader(name) : internalHeader.get(name);
     }
        
     /**
@@ -207,9 +207,9 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * 
      * @return Enumeration of the value of the named header.
      */
-    public Enumeration getHeaders(String name) {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getHeaders(name) : new Vector((HashSet) internalHeaders.get(name)).elements();
+    public Enumeration<String> getHeaders(String name) {
+	    return this._getHttpServletRequest() != null ?
+            this._getHttpServletRequest().getHeaders(name) : new Vector<>(internalHeaders.get(name)).elements();
     }  
 
     /**
@@ -218,9 +218,9 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * 
      * @return Enumeration of header names
      */
-    public Enumeration getHeaderNames() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getHeaderNames() : new Vector(headerNames).elements();
+    public Enumeration<String> getHeaderNames() {
+	    return this._getHttpServletRequest() != null ?
+            this._getHttpServletRequest().getHeaderNames() : new Vector<>(headerNames).elements();
     }
     
     /**
@@ -232,7 +232,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      */
     public int getIntHeader(String name) {
 	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getIntHeader(name) : Integer.parseInt((String) internalHeader.get(name));
+            this._getHttpServletRequest().getIntHeader(name) : Integer.parseInt(internalHeader.get(name));
     }
     
     /**
@@ -264,9 +264,8 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The translated path of the request.
      */
     public String getPathTranslated() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getPathTranslated() :
-            pathTranslated;
+	    return this._getHttpServletRequest() != null ?
+                this._getHttpServletRequest().getPathTranslated() : pathTranslated;
     }
 
     /**
@@ -276,9 +275,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The context path of the request.
      */
     public String getContextPath() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getContextPath() :
-            contextPath;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getContextPath() : contextPath;
     }
     
     /**
@@ -288,9 +285,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The query string of the request.
      */
     public String getQueryString() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getQueryString() :
-            queryString;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getQueryString() : queryString;
     }
     
     /**
@@ -300,8 +295,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The remote user of the request, if set null otherwise.
      */
     public String getRemoteUser() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getRemoteUser() : remoteUser;
+	return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getRemoteUser() : remoteUser;
     }
  
     /**
@@ -311,8 +305,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return True if user is in named role, false otherwise.
      */
     public boolean isUserInRole(String role) {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().isUserInRole(role) : false;
+	    return this._getHttpServletRequest() != null && this._getHttpServletRequest().isUserInRole(role);
     }
     
     /**
@@ -322,8 +315,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The principal of the authenticated user, if available otherwise null.
      */
     public java.security.Principal getUserPrincipal() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getUserPrincipal() : userPrincipal;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getUserPrincipal() : userPrincipal;
     }
     
     /**
@@ -333,8 +325,8 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The session id of the request, if available.
      */
     public String getRequestedSessionId() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getRequestedSessionId() : requestedSessionId;
+	    return this._getHttpServletRequest() != null ?
+                this._getHttpServletRequest().getRequestedSessionId() : requestedSessionId;
     }
     
     /**
@@ -344,8 +336,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The request URI
      */
     public String getRequestURI() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getRequestURI() : requestURI;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getRequestURI() : requestURI;
     }
     
     /**
@@ -355,8 +346,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The requests URL
      */
     public StringBuffer getRequestURL() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getRequestURL() : requestURL;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getRequestURL() : requestURL;
     }
 	
     /**
@@ -366,8 +356,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The servlets path.
      */
     public String getServletPath() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getServletPath() : servletPath;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getServletPath() : servletPath;
     }
         
     /**
@@ -377,8 +366,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The HttpSession associated with the request or null if unavailable.
      */
     public HttpSession getSession(boolean create) {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getSession(create) : remoteSession;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getSession(create) : remoteSession;
     }
     
     /**
@@ -388,10 +376,9 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return The HttpSession associated with the request or null if unavailable.
      */
     public HttpSession getSession() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().getSession() : remoteSession;
+	    return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getSession() : remoteSession;
     }
-    
+
     /**
      * The default behavior of this method is to return isRequestedSessionIdValid()
      * on the wrapped request object. Not Serialized.
@@ -399,8 +386,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return true if the session id is valid, false otherwise.
      */ 
     public boolean isRequestedSessionIdValid() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().isRequestedSessionIdValid() : false;
+	    return this._getHttpServletRequest() != null && this._getHttpServletRequest().isRequestedSessionIdValid();
     }
      
     /**
@@ -410,8 +396,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return true if the session id is from a cookie, false otherwise.
      */
     public boolean isRequestedSessionIdFromCookie() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().isRequestedSessionIdFromCookie() : false;
+	    return this._getHttpServletRequest() != null && this._getHttpServletRequest().isRequestedSessionIdFromCookie();
     }
     
     /**
@@ -421,8 +406,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return true if the session id is from a URL, false otherwise.
      */ 
     public boolean isRequestedSessionIdFromURL() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().isRequestedSessionIdFromURL() : false;
+	    return this._getHttpServletRequest() != null && this._getHttpServletRequest().isRequestedSessionIdFromURL();
     }
     
     /**
@@ -432,7 +416,53 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
      * @return true if the session id is from a URL, false otherwise.
      */
     public boolean isRequestedSessionIdFromUrl() {
-	return (this._getHttpServletRequest() != null) ? 
-            this._getHttpServletRequest().isRequestedSessionIdFromUrl() : false;
-    }    
+	    return this._getHttpServletRequest() != null && this._getHttpServletRequest().isRequestedSessionIdFromUrl();
+    }
+
+    @Override
+    public String changeSessionId() {
+        if (this._getHttpServletRequest() != null) {
+            return this._getHttpServletRequest().changeSessionId();
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    @Override
+    public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+        return this._getHttpServletRequest() != null && this._getHttpServletRequest().authenticate(response);
+    }
+
+    @Override
+    public void login(String username, String password) throws ServletException {
+        if (this._getHttpServletRequest() != null) {
+            this._getHttpServletRequest().login(username, password);
+        }
+    }
+
+    @Override
+    public void logout() throws ServletException {
+        if (this._getHttpServletRequest() != null) {
+            this._getHttpServletRequest().logout();
+        }
+    }
+
+    @Override
+    public Collection<Part> getParts() throws IOException, ServletException {
+        return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getParts() :
+                Collections.<Part>emptySet();
+    }
+
+    @Override
+    public Part getPart(String name) throws IOException, ServletException {
+         return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getPart(name) : null;
+    }
+
+    @Override
+    public void upgrade(ProtocolHandler handler) throws IOException {
+        if (this._getHttpServletRequest() != null) {
+            this._getHttpServletRequest().upgrade(handler);
+        }
+    }
+
 }

@@ -29,7 +29,8 @@
 
 package com.sun.identity.policy.plugins;
 
-import com.iplanet.services.ldap.LDAPUser;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ShutdownManager;
@@ -45,23 +46,6 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.ldap.LDAPUtilException;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.ConnectionPool;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
-import org.forgerock.opendj.ldap.LDAPOptions;
-import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.requests.SearchRequest;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
-import org.forgerock.util.thread.listener.ShutdownListener;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -73,6 +57,21 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.time.Duration;
 
 /**
  * The class <code>LDAPFilterCondition</code> is a plugin 
@@ -440,7 +439,7 @@ public class LDAPFilterCondition implements Condition {
                     }
                 }
             }
-        } catch (ErrorResultException le) {
+        } catch (LdapException le) {
             ResultCode resultCode = le.getResult().getResultCode();
             if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
                 debug.warning("LDAPFilterCondition.searchFilterSatified(): exceeded the size limit");
@@ -464,8 +463,6 @@ public class LDAPFilterCondition implements Condition {
                     + ": Partial results have been received, status code 9."
                     + " The message provided by the LDAP server is: \n"
                     + e.getMessage());
-        } catch (ErrorResultIOException e) {
-            throw new PolicyException(e.getMessage());
         }
         debug.message("LDAPFilterCondition.searchFilterSatified():returning, filterSatisfied={}", filterSatisfied);
         return filterSatisfied;
@@ -572,8 +569,9 @@ public class LDAPFilterCondition implements Condition {
         }
 
         // initialize the connection pool for the ldap server
-        LDAPOptions options = new LDAPOptions();
-        options.setConnectTimeout(timeLimit, TimeUnit.SECONDS);
+        Options options = Options.defaultOptions()
+                .set(CONNECT_TIMEOUT, new Duration((long) timeLimit, TimeUnit.MILLISECONDS));
+
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);
         connPool = LDAPConnectionPools.getConnectionPool(ldapServer);

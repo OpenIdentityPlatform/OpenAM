@@ -15,18 +15,16 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
+import com.sun.identity.shared.debug.Debug;
 import java.util.Collection;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 
@@ -61,7 +59,7 @@ public class LdapSearchHandler {
     public Result performSearch(Connection connection, SearchRequest request, Collection<Entry> entries) throws QueryFailedException {
         try {
             return connection.search(request, entries);
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             if (!entries.isEmpty()) {
                 if (debug.warningEnabled()) {
                     debug.warning("Partial search result has been received due to the following error:", e);

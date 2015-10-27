@@ -29,15 +29,6 @@
 
 package com.iplanet.ums.cos;
 
-import java.security.Principal;
-import java.util.AbstractCollection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.StringTokenizer;
-
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
 import com.iplanet.services.util.I18n;
@@ -51,8 +42,16 @@ import com.iplanet.ums.SchemaManager;
 import com.iplanet.ums.SearchResults;
 import com.iplanet.ums.UMSException;
 import com.iplanet.ums.UMSObject;
+import java.security.Principal;
+import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.StringTokenizer;
 import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.Modification;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.ResultCode;
@@ -447,11 +446,9 @@ public class COSManager {
                 pObject.save();
             }
         } catch (UMSException e) {
-            ErrorResultException le = (ErrorResultException) e.getRootCause();
-            if (ResultCode.OBJECTCLASS_VIOLATION.equals(le.getResult().getResultCode())) {
-                // Ignore... It's not a COS generated attribute's
-                // object class.
-            } else {
+            LdapException le = (LdapException) e.getRootCause();
+            // Ignore anything that is not a COS generated attribute's object class
+            if (!ResultCode.OBJECTCLASS_VIOLATION.equals(le.getResult().getResultCode())) {
                 throw e;
             }
         }
@@ -572,7 +569,7 @@ public class COSManager {
     /**
      * Utility method to check if an object class exists in a persistent object.
      * 
-     * @param objectclass
+     * @param objectClass
      *            The object class.
      * @param pObject
      *            The persistent object.

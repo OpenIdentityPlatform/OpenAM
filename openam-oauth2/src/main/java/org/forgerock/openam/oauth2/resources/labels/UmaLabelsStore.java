@@ -16,6 +16,11 @@
 
 package org.forgerock.openam.oauth2.resources.labels;
 
+import static org.forgerock.openam.oauth2.resources.labels.LabelsConstants.*;
+import static org.forgerock.opendj.ldap.Filter.*;
+import static org.forgerock.opendj.ldap.ModificationType.*;
+import static org.forgerock.opendj.ldap.requests.Requests.*;
+
 import com.google.inject.Inject;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Collections;
@@ -37,9 +42,8 @@ import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
 import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -48,13 +52,6 @@ import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
-
-import static org.forgerock.opendj.ldap.Filter.and;
-import static org.forgerock.opendj.ldap.Filter.equality;
-import static org.forgerock.opendj.ldap.Filter.present;
-import static org.forgerock.opendj.ldap.ModificationType.REPLACE;
-import static org.forgerock.opendj.ldap.requests.Requests.newAddRequest;
-import static org.forgerock.openam.oauth2.resources.labels.LabelsConstants.*;
 
 /**
  * This class stores and gives access to UMA Resource Set labels. The underlying data
@@ -94,7 +91,7 @@ public class UmaLabelsStore {
         String id = tokenIdGenerator.generateTokenId(label.getId());
         try (Connection connection = getConnection()) {
             return createLabel(realm, username, label, id, connection);
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             if (e.getResult().getResultCode().equals(ResultCode.NO_SUCH_OBJECT)) {
                 DN userDn = getUserDn(realm, username);
                 DN realmDn = userDn.parent();
@@ -103,7 +100,7 @@ public class UmaLabelsStore {
                         connection.add(newAddRequest(realmDn)
                                 .addAttribute("ou", LDAPUtils.rdnValueFromDn(realmDn))
                                 .addAttribute("objectClass", "top", ORG_UNIT_OBJECT_CLASS));
-                    } catch (ErrorResultException ex) {
+                    } catch (LdapException ex) {
                         if (!ex.getResult().getResultCode().equals(ResultCode.ENTRY_ALREADY_EXISTS)) {
                             throw new InternalServerErrorException("Could not create realm entry " + realmDn, ex);
                         }
@@ -112,11 +109,11 @@ public class UmaLabelsStore {
                         connection.add(newAddRequest(userDn)
                                 .addAttribute("ou", LDAPUtils.rdnValueFromDn(userDn))
                                 .addAttribute("objectClass", "top", ORG_UNIT_OBJECT_CLASS));
-                    } catch (ErrorResultException ex) {
+                    } catch (LdapException ex) {
                         throw new InternalServerErrorException("Could not create user entry " + userDn, ex);
                     }
                     return createLabel(realm, username, label, id, connection);
-                } catch (ErrorResultException e1) {
+                } catch (LdapException e1) {
                     e = e1;
                 }
             }
@@ -127,7 +124,8 @@ public class UmaLabelsStore {
         }
     }
 
-    private ResourceSetLabel createLabel(String realm, String username, ResourceSetLabel label, String id, Connection connection) throws ErrorResultException, InternalServerErrorException {
+    private ResourceSetLabel createLabel(String realm, String username, ResourceSetLabel label, String id,
+                                         Connection connection) throws LdapException, InternalServerErrorException {
         final AddRequest addRequest = newAddRequest(getLabelDn(realm, username, id))
                 .addAttribute("objectClass", "top", OBJECT_CLASS)
                 .addAttribute(ID_ATTR, id)
@@ -162,7 +160,7 @@ public class UmaLabelsStore {
                 }
             }
             return getResourceSetLabel(entry, resourceSets);
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             final ResultCode resultCode = e.getResult().getResultCode();
             if (resultCode.equals(ResultCode.NO_SUCH_OBJECT)) {
                 throw new NotFoundException();
@@ -187,7 +185,7 @@ public class UmaLabelsStore {
             if (!result.isSuccess()) {
                 throw new InternalServerErrorException("Unknown unsuccessful request");
             }
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             final ResultCode resultCode = e.getResult().getResultCode();
             if (resultCode.equals(ResultCode.NO_SUCH_OBJECT)) {
                 throw new NotFoundException();
@@ -209,7 +207,7 @@ public class UmaLabelsStore {
             if (!result.isSuccess()) {
                 throw new InternalServerErrorException("Unknown unsuccessful request");
             }
-        } catch (ErrorResultException e) {
+        } catch (LdapException e) {
             throw new InternalServerErrorException(e); // TODO
         }
     }
@@ -275,8 +273,8 @@ public class UmaLabelsStore {
                 }
             }
             return result;
-        } catch (ErrorResultIOException e) {
-            if (e.getCause().getResult().getResultCode().equals(ResultCode.NO_SUCH_OBJECT)) {
+        } catch (LdapException e) {
+            if (e.getResult().getResultCode().equals(ResultCode.NO_SUCH_OBJECT)) {
                 return Collections.emptySet();
             }
             throw new InternalServerErrorException("Could not complete search", e);
@@ -285,7 +283,7 @@ public class UmaLabelsStore {
         }
     }
 
-    private Set<String> getResourceSetIds(SearchResultEntry searchResult) throws SearchResultReferenceIOException, ErrorResultIOException {
+    private Set<String> getResourceSetIds(SearchResultEntry searchResult) throws SearchResultReferenceIOException, LdapException {
         final Attribute attribute = searchResult.getAttribute(RESOURCE_SET_ATTR);
         if (attribute != null) {
             final Iterator<ByteString> resourceSets = attribute.iterator();
