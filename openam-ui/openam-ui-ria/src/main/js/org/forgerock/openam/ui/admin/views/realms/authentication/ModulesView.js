@@ -87,8 +87,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                                                             {
                                                                 args: [
                                                                     encodeURIComponent(self.data.realmPath),
-                                                                    encodeURIComponent(moduleName),
-                                                                    encodeURIComponent(moduleType)],
+                                                                    encodeURIComponent(moduleType),
+                                                                    encodeURIComponent(moduleName)],
                                                                 trigger: true
                                                             });
                                                     }).fail(function (e) {

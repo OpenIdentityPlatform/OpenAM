@@ -183,6 +183,12 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     return obj.serviceCall({
                         url: scopedByRealm(realm, "authentication/modules/types?_queryFilter=true")
                     }).done(SMSDelegateUtils.sortResultBy("name"));
+                },
+                get: function (realm, type) {
+                    // TODO: change this to a proper server-side call when OPENAM-7242 is implemented
+                    return obj.authentication.modules.types.all(realm).then(function (data) {
+                        return _.findWhere(data.result, { "_id": type });
+                    });
                 }
             }
         }

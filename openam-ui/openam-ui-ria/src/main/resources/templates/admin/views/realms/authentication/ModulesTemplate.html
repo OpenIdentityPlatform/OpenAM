@@ -24,7 +24,7 @@
                     <tr data-module-name="{{_id}}" data-module-type="{{type}}" data-module-chains={{chains}}>
                         <td class="select-row-cell"><input class="select-module" type="checkbox" {{#if chains}}disabled{{/if}}/></td>
                         <td class="wordwrap">
-                            <a href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmPath _id type}}" title="{{t 'common.form.edit'}}" {{#if chains}}class="check-before-edit"{{/if}}>{{_id}}</a>
+                            <a href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmPath type _id}}" title="{{t 'common.form.edit'}}" {{#if chains}}class="check-before-edit"{{/if}}>{{_id}}</a>
                         </td>
                         <td>{{typeDescription}}</td>
 
@@ -35,7 +35,7 @@
                         </td>
                         <td class="fr-col-btn-2">
                             <div class="btn-group">
-                                <a class="btn btn-link{{#if chains}} check-before-edit{{/if}}" href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmPath _id type}}"  title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
+                                <a class="btn btn-link{{#if chains}} check-before-edit{{/if}}" href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmPath type _id}}"  title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
                                 <button type="button" class="btn btn-link delete-module-button" {{#if chains}}disabled{{/if}}><i class="fa fa-close" {{#unless chains}}title="{{t 'common.form.delete'}}"{{/unless}} ></i></button>
                             </div>
                         </td>
