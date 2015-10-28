@@ -37,12 +37,6 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             "click .edit-realm"          : "editRealm",
             "click .toggle-realm-active" : "toggleRealmActive"
         },
-        getRealmFromEvent: function (event) {
-            var path = $(event.currentTarget).closest("div[data-realm-path]").data("realm-path"),
-                realm = _.find(this.data.realms, { path: path });
-
-            return realm;
-        },
         addRealm: function (event) {
             event.preventDefault();
             var self = this;
@@ -52,32 +46,6 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                 callback : function () {
                     self.render();
                 }
-            });
-        },
-        editRealm: function (event) {
-            event.preventDefault();
-            var realm = this.getRealmFromEvent(event),
-                self = this;
-
-            CreateUpdateRealmDialog.show({
-                allRealmPaths :  this.data.allRealmPaths,
-                realmPath : realm.path,
-                callback : function () {
-                    self.render();
-                }
-            });
-        },
-        toggleRealmActive: function (event) {
-            event.preventDefault();
-            var self = this,
-                realm = this.getRealmFromEvent(event);
-
-            realm.active = !realm.active;
-            SMSGlobalDelegate.realms.update(realm).done(function () {
-                self.render();
-            }).fail(function (e) {
-                console.error(e);
-                self.render();
             });
         },
         deleteRealm: function (event) {
@@ -126,6 +94,37 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             });
 
         },
+        editRealm: function (event) {
+            event.preventDefault();
+            var realm = this.getRealmFromEvent(event),
+                self = this;
+
+            CreateUpdateRealmDialog.show({
+                allRealmPaths :  this.data.allRealmPaths,
+                realmPath : realm.path,
+                callback : function () {
+                    self.render();
+                }
+            });
+        },
+        getActiveTabIndex: function () {
+            var tabIndex = 0;
+            _.find(this.$el.find(".tab-pane"), function (tabpane, index) {
+                if ($(tabpane).hasClass("active")) {
+                    tabIndex = index;
+                }
+            });
+            return tabIndex;
+        },
+        getRealmFromEvent: function (event) {
+            var path = $(event.currentTarget).closest("div[data-realm-path]").data("realm-path"),
+                realm = _.find(this.data.realms, { path: path });
+
+            return realm;
+        },
+        getRealmFromList: function (path) {
+            return _.find(this.data.realms, { path: path });
+        },
         performDeleteRealm: function (path) {
             var self = this;
 
@@ -133,14 +132,13 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                 self.render();
             });
         },
-        getRealmFromList: function (path) {
-            return _.find(this.data.realms, { path: path });
-        },
         render: function (args, callback) {
             var self = this;
 
             SMSGlobalDelegate.realms.all().done(function (data) {
-                var result = _.find(data.result, { name: "/" });
+                var result = _.find(data.result, { name: "/" }),
+                    activeTabIndex = self.getActiveTabIndex();
+
                 if (result) {
                     result.name = $.t("console.common.topLevelRealm");
                 }
@@ -152,6 +150,9 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                 });
 
                 self.parentRender(function () {
+                    this.$el.find(".tab-pane").eq(activeTabIndex).addClass("active");
+                    this.$el.find(".tab-toggles").eq(activeTabIndex).addClass("active");
+
                     if (callback) {
                         callback();
                     }
@@ -159,6 +160,19 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             }).fail(function (e) {
                 console.error(e);
                 // TODO: Add failure condition
+            });
+        },
+        toggleRealmActive: function (event) {
+            event.preventDefault();
+            var self = this,
+                realm = this.getRealmFromEvent(event);
+
+            realm.active = !realm.active;
+            SMSGlobalDelegate.realms.update(realm).done(function () {
+                self.render();
+            }).fail(function (e) {
+                console.error(e);
+                self.render();
             });
         }
     });

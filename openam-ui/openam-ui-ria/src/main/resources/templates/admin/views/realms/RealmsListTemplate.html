@@ -4,13 +4,13 @@
     <div class="btn-toolbar page-toolbar"  role="toolbar" aria-label="toolbar">
         <a class="btn btn-primary" id="addRealm" href="#realms/"><i class="fa fa-plus"></i> {{t "console.realms.newRealm"}}</a>
         <ul class="btn-group pull-right" role="group">
-            <li class="btn-group active"><a class="btn fr-btn-secondary" data-toggle="tab" href="#grid"><i class="fa fa-th"></i></a></li>
-            <li class="btn-group"><a class="btn fr-btn-secondary" data-toggle="tab" href="#list"><i class="fa fa-list"></i></a></li>
+            <li class="btn-group tab-toggles"><a class="btn fr-btn-secondary" data-toggle="tab" href="#grid"><i class="fa fa-th"></i></a></li>
+            <li class="btn-group tab-toggles"><a class="btn fr-btn-secondary" data-toggle="tab" href="#list"><i class="fa fa-list"></i></a></li>
         </ul>
     </div>
 
     <div class="tab-content clearfix">
-        <div role="tabpanel" class="tab-pane active" id="grid">
+        <div role="tabpanel" class="tab-pane" id="grid">
             <div class="row">
                 {{#each realms}}
                 <div class="col-sm-6 col-md-3">
