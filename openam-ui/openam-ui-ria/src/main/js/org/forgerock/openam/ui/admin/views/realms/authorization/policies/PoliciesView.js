@@ -154,7 +154,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
 
                     if (self.data.items.length) {
                         self.renderToolbar();
-                        self.$el.find(".backgrid-container").append(grid.render().el);
+                        self.$el.find(".table-container").append(grid.render().el);
                         self.$el.find("#paginationContainer").append(paginator.render().el);
                     }
 

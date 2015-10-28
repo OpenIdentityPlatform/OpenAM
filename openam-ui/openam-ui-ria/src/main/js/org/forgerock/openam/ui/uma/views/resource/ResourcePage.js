@@ -365,7 +365,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                         self.$el.find("li#unshare").removeClass("disabled");
                     }
 
-                    self.$el.find("#backgridContainer").append(grid.render().el);
+                    self.$el.find(".table-container").append(grid.render().el);
                     // FIXME: Re-enable filtering and pagination
                     // self.$el.find("#paginationContainer").append(paginator.render().el);
 

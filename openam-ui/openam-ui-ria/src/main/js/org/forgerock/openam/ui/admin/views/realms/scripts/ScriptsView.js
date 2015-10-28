@@ -156,7 +156,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             this.parentRender(function () {
                 this.renderToolbar();
 
-                this.$el.find(".backgrid-container").append(grid.render().el);
+                this.$el.find(".table-container").append(grid.render().el);
                 this.$el.find(".panel-body").append(paginator.render().el);
 
                 $.when(this.contextSchemaPromise, this.languageSchemaPromise).done(function (contSchema, langSchema) {

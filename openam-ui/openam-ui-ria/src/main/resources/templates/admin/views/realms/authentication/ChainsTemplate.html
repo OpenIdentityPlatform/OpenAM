@@ -7,38 +7,40 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
-        <table class="table">
-            <thead>
-            <tr>
-                <th class="select-all-header-cell"><input id="selectAll" type="checkbox" /></th>
-                <th>{{t 'console.authentication.chains.chainName'}}</th>
-                <th class="fr-col-btn-2"></th>
-            </tr>
-            </thead>
-            <tbody>
-            {{#each sortedChains}}
-            <tr class="sorted-chains {{#if defaultConfig}}default-config-row{{/if}}">
-                <td class="select-row-cell"><input data-chain-name="{{_id}}" type="checkbox" {{#if defaultConfig}}disabled{{/if}}/></td>
-                <td>
-                    <a class="edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmPath _id}}">{{_id}}</a>
-                    {{#if defaultConfig}}
-                    <div>
-                        <small class="text-muted">
-                            {{#if defaultConfig.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if defaultConfig.orgConfig}}/ {{/if}}{{/if}}
-                            {{#if defaultConfig.orgConfig}}{{t 'console.authentication.chains.defaultOrgAuthConfiguration'}} {{/if}}
-                        </small>
-                    </div>
-                    {{/if}}
-                </td>
-                <td class="fr-col-btn-2">
-                    <div class="btn-group">
-                        <a class="btn btn-link edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmPath}}{{_id}}"><i class="fa fa-pencil"></i></a>
-                        <button data-chain-name="{{_id}}" type="button" class="btn btn-link delete-chain-btn" {{#if defaultConfig}}disabled{{/if}}><i class="fa fa-close"></i></button>
-                    </div>
-                </td>
-            </tr>
-            {{/each}}
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="select-all-header-cell"><input id="selectAll" type="checkbox" /></th>
+                    <th>{{t 'console.authentication.chains.chainName'}}</th>
+                    <th class="fr-col-btn-2"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#each sortedChains}}
+                <tr class="sorted-chains {{#if defaultConfig}}default-config-row{{/if}}">
+                    <td class="select-row-cell"><input data-chain-name="{{_id}}" type="checkbox" {{#if defaultConfig}}disabled{{/if}}/></td>
+                    <td>
+                        <a class="edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmPath _id}}">{{_id}}</a>
+                        {{#if defaultConfig}}
+                        <div>
+                            <small class="text-muted">
+                                {{#if defaultConfig.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if defaultConfig.orgConfig}}/ {{/if}}{{/if}}
+                                {{#if defaultConfig.orgConfig}}{{t 'console.authentication.chains.defaultOrgAuthConfiguration'}} {{/if}}
+                            </small>
+                        </div>
+                        {{/if}}
+                    </td>
+                    <td class="fr-col-btn-2">
+                        <div class="btn-group">
+                            <a class="btn btn-link edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmPath}}{{_id}}"><i class="fa fa-pencil"></i></a>
+                            <button data-chain-name="{{_id}}" type="button" class="btn btn-link delete-chain-btn" {{#if defaultConfig}}disabled{{/if}}><i class="fa fa-close"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

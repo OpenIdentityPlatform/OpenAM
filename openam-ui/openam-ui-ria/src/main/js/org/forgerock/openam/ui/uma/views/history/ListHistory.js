@@ -119,7 +119,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
             });
 
             self.parentRender(function () {
-                self.$el.find("#backgridContainer").append(grid.render().el);
+                self.$el.find(".table-container").append(grid.render().el);
                 self.$el.find(".panel-body").append(paginator.render().el);
                 collection.fetch({ processData: false, reset: true });
             });

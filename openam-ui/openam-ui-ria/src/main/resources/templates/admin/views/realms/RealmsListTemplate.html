@@ -66,43 +66,45 @@
         <div role="tabpanel" class="tab-pane" id="list">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <table class="table">
-                        <thead>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>{{t 'console.realms.header.0'}}</th>
+                                    <th>{{t 'console.realms.header.1'}}</th>
+                                    <th>{{t 'console.realms.header.2'}}</th>
+                                    <th>{{t 'console.realms.header.3'}}</th>
+                                    <th class="fr-col-btn-2"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {{#each realms}}
                             <tr>
-                                <th>{{t 'console.realms.header.0'}}</th>
-                                <th>{{t 'console.realms.header.1'}}</th>
-                                <th>{{t 'console.realms.header.2'}}</th>
-                                <th>{{t 'console.realms.header.3'}}</th>
-                                <th class="fr-col-btn-2"></th>
+                                <td class="wordwrap"><a href="{{routeTo 'realmDefault' path}}">{{name}}</a></td>
+                                <td class="wordwrap">
+                                    {{#if active}}
+                                        <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.enabled"}}</span>
+                                    {{else}}
+                                        <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.disabled"}}</span>
+                                    {{/if}}
+                                </td>
+                                <td class="wordwrap">{{path}}</td>
+                                <td>
+                                    {{#each aliases}}
+                                        {{this}}{{#unless @last}}, {{/unless}}
+                                    {{/each}}
+                                </td>
+                                <td class="fr-col-btn-2">
+                                    <div class="btn-group realm-name" data-realm-path="{{path}}">
+                                        <button type="button" class="btn btn-link edit-realm" data-realm-name="{{name}}"><i class="fa fa-pencil"></i></button>
+                                        <button type="button" class="btn btn-link delete-realm"><i class="fa fa-close"></i></button>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                        {{#each realms}}
-                        <tr>
-                            <td class="wordwrap"><a href="{{routeTo 'realmDefault' path}}">{{name}}</a></td>
-                            <td class="wordwrap">
-                                {{#if active}}
-                                    <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.enabled"}}</span>
-                                {{else}}
-                                    <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.disabled"}}</span>
-                                {{/if}}
-                            </td>
-                            <td class="wordwrap">{{path}}</td>
-                            <td>
-                                {{#each aliases}}
-                                    {{this}}{{#unless @last}}, {{/unless}}
-                                {{/each}}
-                            </td>
-                            <td class="fr-col-btn-2">
-                                <div class="btn-group realm-name" data-realm-path="{{path}}">
-                                    <button type="button" class="btn btn-link edit-realm" data-realm-name="{{name}}"><i class="fa fa-pencil"></i></button>
-                                    <button type="button" class="btn btn-link delete-realm"><i class="fa fa-close"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        {{/each}}
-                        </tbody>
-                    </table>
+                            {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

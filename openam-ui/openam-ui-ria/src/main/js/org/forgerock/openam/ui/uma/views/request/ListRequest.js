@@ -133,7 +133,7 @@ define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
             });
 
             self.parentRender(function () {
-                self.$el.find(".backgrid-container").append(grid.render().el);
+                self.$el.find(".table-container").append(grid.render().el);
                 self.$el.find(".panel-body").append(paginator.render().el);
 
                 self.data.requests.fetch({ reset: true, processData: false }).done(function () {

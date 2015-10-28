@@ -108,7 +108,7 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
             });
 
             this.parentRender(function () {
-                self.$el.find("#backgridContainer").append(grid.render().el);
+                self.$el.find(".table-container").append(grid.render().el);
                 self.data.requests.fetch({ reset: true, processData: false }).done(function () {
                     self.model = self.data.requests.findWhere({ _id: id });
                     if (callback) { callback(); }

@@ -141,7 +141,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
             this.parentRender(function () {
                 this.renderToolbar();
 
-                this.$el.find(".backgrid-container").append(grid.render().el);
+                this.$el.find(".table-container").append(grid.render().el);
                 this.$el.find(".panel-body").append(paginator.render().el);
 
                 this.data.items.fetch({ reset: true }).done(function () {

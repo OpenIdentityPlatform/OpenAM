@@ -7,27 +7,29 @@
     </div>
     <div id="trustedDeviceCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="trustedDeviceCollapse" aria-expanded="true">
         <div class="panel-body">
-            <table id="trustedDevicesTable" class="table">
-                <thead>
-                    <th id="trustedDevicesDeviceName" class="col-md-7" scope="col">{{t "openam.trusted.devices.deviceName"}}</th>
-                    <th id="trustedDevicesLastUsed" class="col-md-3" scope="col">{{t "openam.trusted.devices.lastUsed"}}</th>
-                    <th id="trustedDevicesDeleteBtn" class="col-md-2" scope="col"></th>
-                </thead>
+            <div class="table-container">
+                <table id="trustedDevicesTable" class="table">
+                    <thead>
+                        <th id="trustedDevicesDeviceName" class="col-md-7" scope="col">{{t "openam.trusted.devices.deviceName"}}</th>
+                        <th id="trustedDevicesLastUsed" class="col-md-3" scope="col">{{t "openam.trusted.devices.lastUsed"}}</th>
+                        <th id="trustedDevicesDeleteBtn" class="col-md-2" scope="col"></th>
+                    </thead>
 
-                <tbody>
-                {{#each devices}}
-                <tr id="trustedDevice_{{@index}}">
-                    <td>{{this.name}}</td>
-                    <td>{{this.lastSelectedDate}}</td>
-                    <td>
-                        <div class="pull-right">
-                            <a class="deleteDevice" href="#" id="{{this.uuid}}" data-toggle="tooltip" title="{{t 'openam.trusted.devices.deleteDevice'}}"><i class="fa fa-times"></i></a>
-                        </div>
-                    </td>
-                </tr>
-                {{/each}}
-                </tbody>
-            </table>
+                    <tbody>
+                    {{#each devices}}
+                    <tr id="trustedDevice_{{@index}}">
+                        <td>{{this.name}}</td>
+                        <td>{{this.lastSelectedDate}}</td>
+                        <td>
+                            <div class="pull-right">
+                                <a class="deleteDevice" href="#" id="{{this.uuid}}" data-toggle="tooltip" title="{{t 'openam.trusted.devices.deleteDevice'}}"><i class="fa fa-times"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
