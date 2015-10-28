@@ -62,7 +62,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             { name: "subjects", attr: ["subject"] },
             { name: "environments", attr: ["condition"] },
             { name: "responseAttributes", action: "getAllResponseAttributes" },
-            { name: "settings", attr: ["name", "description"] }
+            { name: "settings", attr: ["name", "description", "active"] }
         ],
 
         render: function (args, callback) {
@@ -234,9 +234,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 dataField = field.getAttribute("data-field");
 
                 if (field.type === "checkbox") {
-                    if (field.checked) {
-                        app[dataField].push(field.value);
-                    }
+                    app[dataField] = field.checked;
                 } else {
                     app[dataField] = field.value;
                 }

@@ -103,6 +103,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                     editable: false
                 },
                 {
+                    name: "active",
+                    label: $.t("console.authorization.policies.list.grid.1"),
+                    cell: BackgridUtils.TemplateCell.extend({
+                        template: "templates/admin/backgrid/cell/StatusCell.html"
+                    }),
+                    sortable: false,
+                    editable: false
+                },
+                {
                     name: "",
                     cell: BackgridUtils.TemplateCell.extend({
                         className: "fr-col-btn-2",

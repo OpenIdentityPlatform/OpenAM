@@ -1097,7 +1097,7 @@
                     }
                 },
                 "list": {
-                    "grid": ["Name"],
+                    "grid": ["Name", "Status"],
                     "addNew": "Add a New Policy",
                     "description": "Create, edit or delete authorization policies that apply to this policy set.",
                     "noPolicies": "You haven't added any policies to this set yet."
