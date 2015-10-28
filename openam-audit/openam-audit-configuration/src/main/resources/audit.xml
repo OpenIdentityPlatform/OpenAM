@@ -79,6 +79,11 @@
                             <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="z900">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
             </Global>
 
@@ -134,6 +139,11 @@
                     <AttributeSchema name="location" type="single" i18nKey="csv003">
                         <DefaultValues>
                             <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="z900">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

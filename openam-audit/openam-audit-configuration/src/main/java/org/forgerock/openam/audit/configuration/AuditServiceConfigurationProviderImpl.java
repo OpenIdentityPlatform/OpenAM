@@ -15,15 +15,11 @@
  */
 package org.forgerock.openam.audit.configuration;
 
-import static com.iplanet.am.util.SystemProperties.CONFIG_PATH;
-import static com.sun.identity.shared.Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR;
 import static com.sun.identity.shared.datastruct.CollectionHelper.*;
 import static com.sun.identity.sm.SMSUtils.serviceExists;
 import static java.util.Collections.*;
-import static org.forgerock.openam.audit.AuditConstants.EventHandlerType.CSV;
 import static org.forgerock.openam.audit.AuditConstants.SERVICE_NAME;
 
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
@@ -33,10 +29,16 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
-import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandlerConfiguration;
+import org.forgerock.audit.events.EventTopicsMetaData;
+import org.forgerock.audit.events.EventTopicsMetaDataBuilder;
+import org.forgerock.openam.audit.AMAuditService;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.RealmUtils;
 
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.AccessController;
 import java.util.HashSet;
 import java.util.List;
@@ -54,8 +56,16 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
 
     private final Debug debug = Debug.getInstance("amAudit");
     private final List<AuditServiceConfigurationListener> listeners = new CopyOnWriteArrayList<>();
+    private final EventTopicsMetaData eventTopicsMetaData;
 
     private volatile boolean initialised = false;
+
+    /**
+     * Construct an instance of AuditServiceConfigurationProviderImpl.
+     */
+    public AuditServiceConfigurationProviderImpl() {
+        this.eventTopicsMetaData = getEventTopicsMetaData();
+    }
 
     @Override
     public void setupComplete() {
@@ -111,13 +121,29 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
     }
 
     @Override
-    public Set<AuditEventHandlerConfigurationWrapper> getDefaultEventHandlerConfigurations() {
+    public Set<AuditEventHandlerConfiguration> getDefaultEventHandlerConfigurations() {
         return getEventHandlerConfigurations(getAuditGlobalConfiguration());
     }
 
     @Override
-    public Set<AuditEventHandlerConfigurationWrapper> getRealmEventHandlerConfigurations(String realm) {
+    public Set<AuditEventHandlerConfiguration> getRealmEventHandlerConfigurations(String realm) {
         return getEventHandlerConfigurations(getAuditRealmConfiguration(realm));
+    }
+
+    @Override
+    public EventTopicsMetaData getEventTopicsMetaData() {
+        EventTopicsMetaDataBuilder builder = EventTopicsMetaDataBuilder.coreTopicSchemas();
+
+        String path = "/org/forgerock/openam/audit/events-config.json";
+        try {
+            InputStream is = AMAuditService.class.getResourceAsStream(path);
+            String contents = IOUtils.readStream(is);
+            builder.withCoreTopicSchemaExtensions(JsonValueBuilder.toJsonValue(contents.replaceAll("\\s", "")));
+        } catch (IOException e) {
+            debug.error("Unable to read Audit event configuration file {}", path, e);
+        }
+
+        return builder.build();
     }
 
     private void notifyDefaultConfigurationListeners() {
@@ -169,49 +195,28 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
                 getBooleanMapAttr(attributes, "resolveHostNameEnabled", false));
     }
 
-    private Set<AuditEventHandlerConfigurationWrapper> getEventHandlerConfigurations(ServiceConfig serviceConfig) {
+    private Set<AuditEventHandlerConfiguration> getEventHandlerConfigurations(ServiceConfig serviceConfig) {
         if (!serviceExists(serviceConfig)) {
             return emptySet();
         }
 
-        Set<AuditEventHandlerConfigurationWrapper> eventHandlerConfigurations = new HashSet<>();
+        Set<AuditEventHandlerConfiguration> eventHandlerConfigurations = new HashSet<>();
         try {
             Set<String> handlerNames = serviceConfig.getSubConfigNames();
             for (String handlerName : handlerNames) {
-                AuditEventHandlerConfigurationWrapper eventHandlerConfiguration =
-                        getEventHandlerConfiguration(serviceConfig.getSubConfig(handlerName));
-                if (eventHandlerConfiguration != null) {
-                    eventHandlerConfigurations.add(eventHandlerConfiguration);
-                }
+                @SuppressWarnings("unchecked")
+                Map<String, Set<String>> attributes = serviceConfig.getSubConfig(handlerName).getAttributes();
+                AuditEventHandlerConfiguration config = AuditEventHandlerConfiguration.builder()
+                        .withName(handlerName)
+                        .withAttributes(attributes)
+                        .withEventTopicsMetaData(eventTopicsMetaData).build();
+                eventHandlerConfigurations.add(config);
             }
         } catch (SSOException | SMSException e) {
             debug.error("Error accessing service {}. No audit event handlers will be registered.", SERVICE_NAME, e);
         }
 
         return eventHandlerConfigurations;
-    }
-
-    private AuditEventHandlerConfigurationWrapper getEventHandlerConfiguration(ServiceConfig eventHandlerConfig) {
-        @SuppressWarnings("unchecked")
-        Map<String, Set<String>> attributes = eventHandlerConfig.getAttributes();
-        boolean handlerEnabled = getBooleanMapAttr(attributes, "enabled", false);
-
-        if (handlerEnabled && CSV.name().equalsIgnoreCase(eventHandlerConfig.getSchemaID())) {
-            return getCsvEventHandlerConfiguration(eventHandlerConfig.getName(), attributes);
-        }
-
-        return null;
-    }
-
-    private AuditEventHandlerConfigurationWrapper getCsvEventHandlerConfiguration(
-            String name, Map<String, Set<String>> attributes) {
-
-        CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
-        String location = getMapAttr(attributes, "location");
-        csvHandlerConfiguration.setLogDirectory(location.replaceAll("%BASE_DIR%", SystemProperties.get(CONFIG_PATH))
-                .replaceAll("%SERVER_URI%", SystemProperties.get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
-
-        return new AuditEventHandlerConfigurationWrapper(csvHandlerConfiguration, CSV, name, attributes.get("topics"));
     }
 
     private ServiceConfig getAuditGlobalConfiguration() {

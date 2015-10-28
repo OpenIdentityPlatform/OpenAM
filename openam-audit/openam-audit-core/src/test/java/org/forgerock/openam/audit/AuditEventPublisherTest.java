@@ -67,6 +67,7 @@ public class AuditEventPublisherTest {
     @BeforeMethod
     protected void setUp() throws Exception {
         mockHandler = mock(AuditEventHandler.class);
+        when(mockHandler.getHandledTopics()).thenReturn(asSet("access"));
         auditServiceProvider = mock(AuditServiceProvider.class);
         auditEventPublisher = new AuditEventPublisher(auditServiceProvider);
         auditEventCaptor = ArgumentCaptor.forClass(JsonValue.class);
@@ -157,7 +158,7 @@ public class AuditEventPublisherTest {
         AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, true, false);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
-                .withAuditEventHandler(mock(AuditEventHandler.class), "handler", asSet("access"));
+                .withAuditEventHandler(mock(AuditEventHandler.class));
         AMAuditService auditService = new RealmAuditServiceProxy(builder.build(), mock(AMAuditService.class),
                 serviceConfig);
         auditService.startup();
@@ -189,7 +190,7 @@ public class AuditEventPublisherTest {
         AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, true, false);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
-                .withAuditEventHandler(mockHandler, "handler", asSet("access"));
+                .withAuditEventHandler(mockHandler);
         AMAuditService auditService = new RealmAuditServiceProxy(builder.build(), mock(AMAuditService.class),
                 serviceConfig);
         auditService.startup();
@@ -200,7 +201,7 @@ public class AuditEventPublisherTest {
         AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false, false);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
-                .withAuditEventHandler(mockHandler, "handler", asSet("access"));
+                .withAuditEventHandler(mockHandler);
         AMAuditService auditService = new RealmAuditServiceProxy(builder.build(), mock(AMAuditService.class),
                 serviceConfig);
         auditService.startup();
@@ -211,7 +212,7 @@ public class AuditEventPublisherTest {
         AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false, false);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
-                .withAuditEventHandler(mockHandler, "handler", asSet("access"));
+                .withAuditEventHandler(mockHandler);
         AMAuditService auditService = new DefaultAuditServiceProxy(builder.build(), serviceConfig);
         auditService.startup();
         when(auditServiceProvider.getDefaultAuditService()).thenReturn(auditService);

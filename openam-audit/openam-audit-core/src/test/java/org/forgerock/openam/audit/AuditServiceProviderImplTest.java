@@ -15,14 +15,18 @@
  */
 package org.forgerock.openam.audit;
 
-import static java.util.Collections.*;
+import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+import com.google.inject.Binder;
+import org.forgerock.audit.AuditException;
+import org.forgerock.audit.events.EventTopicsMetaData;
+import org.forgerock.audit.events.EventTopicsMetaDataBuilder;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
-import org.forgerock.audit.events.handlers.EventHandlerConfiguration;
+import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
-import org.forgerock.openam.audit.configuration.AuditEventHandlerConfigurationWrapper;
+import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurationListener;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurationProvider;
 import org.forgerock.util.thread.listener.ShutdownManager;
@@ -31,24 +35,21 @@ import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * @since 13.0.0
  */
-public class AuditServiceProviderImplTest {
+public class AuditServiceProviderImplTest extends GuiceTestCase {
 
     private AuditServiceProvider provider;
-    private AuditServiceConfigurationProvider configurator;
     private AuditServiceConfigurationListener configListener;
-    private AuditEventHandlerConfigurationWrapper handlerConfig;
+    private Set<AuditEventHandlerConfiguration> handlerConfigs = new HashSet<>();
+    private AMAuditServiceConfiguration auditServiceConfig;
 
-    @Mock
-    private AMAuditServiceConfiguration mockServiceConfig;
-    @Mock
-    private AuditEventHandlerFactory mockHandlerFactory;
-    @Mock
-    private AuditEventHandler mockHandler;
     @Mock
     private ShutdownManager mockShutdownManager;
 
@@ -56,13 +57,33 @@ public class AuditServiceProviderImplTest {
     protected void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        handlerConfig = new AuditEventHandlerConfigurationWrapper(mock(EventHandlerConfiguration.class),
-                        AuditConstants.EventHandlerType.CSV, "handler", singleton("access"));
+        Map<String, Set<String>> configAttributes = new HashMap<>();
+        configAttributes.put("handlerFactory", singleton(MockAuditEventHandlerFactory.class.getName()));
+        configAttributes.put("topics", singleton("access"));
+        configAttributes.put("enabled", singleton("true"));
+        AuditEventHandlerConfiguration configuration = AuditEventHandlerConfiguration.builder()
+                .withName("Mock Handler")
+                .withAttributes(configAttributes)
+                .withEventTopicsMetaData(EventTopicsMetaDataBuilder.coreTopicSchemas().build()).build();
+        handlerConfigs.add(configuration);
 
-        configurator = new MockAuditServiceConfigurationProvider();
-        provider = new AuditServiceProviderImpl(configurator, mockHandlerFactory, mockShutdownManager);
+        configAttributes = new HashMap<>();
+        configAttributes.put("handlerFactory", singleton("no.such.class"));
+        configAttributes.put("topics", singleton("access"));
+        configAttributes.put("enabled", singleton("true"));
+        configuration = AuditEventHandlerConfiguration.builder()
+                .withName("No such handler")
+                .withAttributes(configAttributes)
+                .withEventTopicsMetaData(EventTopicsMetaDataBuilder.coreTopicSchemas().build()).build();
+        handlerConfigs.add(configuration);
 
-        when(mockHandlerFactory.create(any(AuditEventHandlerConfigurationWrapper.class))).thenReturn(mockHandler);
+        auditServiceConfig = new AMAuditServiceConfiguration(true, true, false);
+        provider = new AuditServiceProviderImpl(new MockAuditServiceConfigurationProvider(), mockShutdownManager);
+    }
+
+    @Override
+    public void configure(Binder binder) {
+        binder.bind(MockAuditEventHandlerFactory.class).toInstance(new MockAuditEventHandlerFactory());
     }
 
     @Test
@@ -100,6 +121,67 @@ public class AuditServiceProviderImplTest {
         assertThat(provider.getAuditService("anyRealm")).isEqualTo(provider.getDefaultAuditService());
     }
 
+    @Test
+    public void shouldInstantiateHandlerFactoryAndCreateMockHandler() throws Exception {
+        // Given
+
+        // When
+        configListener.globalConfigurationChanged();
+
+        // Then
+        assertThat(provider.getDefaultAuditService().getRegisteredHandler("Mock Handler")).isNotNull();
+    }
+
+    @Test
+    public void shouldSilentlyFailToInstantiateHandlerFactory() throws Exception {
+        // Given
+
+        // When
+        configListener.globalConfigurationChanged();
+
+        // Then
+        assertThat(provider.getDefaultAuditService().getRegisteredHandler("No such handler")).isNull();
+    }
+
+    @Test
+    public void shouldNotRegisterHandlersWhenDefaultAuditServiceDisabled() throws Exception {
+        // Given
+        auditServiceConfig = new AMAuditServiceConfiguration(false, true, false);
+
+        // When
+        configListener.globalConfigurationChanged();
+
+        // Then
+        assertThat(provider.getDefaultAuditService().getRegisteredHandler("Mock Handler")).isNull();
+    }
+
+    @Test
+    public void shouldNotRegisterHandlersWhenRealmAuditServiceDisabled() throws Exception {
+        // Given
+        auditServiceConfig = new AMAuditServiceConfiguration(false, true, false);
+
+        // When
+        configListener.realmConfigurationChanged("anyRealm");
+
+        // Then
+        assertThat(provider.getAuditService("anyRealm").getRegisteredHandler("Mock Handler")).isNull();
+    }
+
+    @Test
+    public void shouldNotRegisterHandlersWhenFactoryReturnsNull() throws Exception {
+        // Given
+        for (AuditEventHandlerConfiguration config : handlerConfigs) {
+            config.getAttributes().put("enabled", singleton("false"));
+        }
+
+        // When
+        configListener.globalConfigurationChanged();
+
+        // Then
+        assertThat(provider.getDefaultAuditService().getRegisteredHandler("Mock Handler")).isNull();
+        assertThat(provider.getDefaultAuditService().getRegisteredHandler("No such handler")).isNull();
+    }
+
     class MockAuditServiceConfigurationProvider implements AuditServiceConfigurationProvider {
 
         @Override
@@ -117,22 +199,40 @@ public class AuditServiceProviderImplTest {
 
         @Override
         public AMAuditServiceConfiguration getDefaultConfiguration() {
-            return mockServiceConfig;
+            return auditServiceConfig;
         }
 
         @Override
         public AMAuditServiceConfiguration getRealmConfiguration(String realm) {
-            return mockServiceConfig;
+            return auditServiceConfig;
         }
 
         @Override
-        public Set<AuditEventHandlerConfigurationWrapper> getDefaultEventHandlerConfigurations() {
-            return singleton(handlerConfig);
+        public Set<AuditEventHandlerConfiguration> getDefaultEventHandlerConfigurations() {
+            return handlerConfigs;
         }
 
         @Override
-        public Set<AuditEventHandlerConfigurationWrapper> getRealmEventHandlerConfigurations(String realm) {
-            return singleton(handlerConfig);
+        public Set<AuditEventHandlerConfiguration> getRealmEventHandlerConfigurations(String realm) {
+            return handlerConfigs;
+        }
+
+        @Override
+        public EventTopicsMetaData getEventTopicsMetaData() {
+            return EventTopicsMetaDataBuilder.coreTopicSchemas().build();
+        }
+    }
+
+    class MockAuditEventHandlerFactory implements AuditEventHandlerFactory {
+
+        @Override
+        public AuditEventHandler create(AuditEventHandlerConfiguration configuration) throws AuditException {
+            if ("false".equals(configuration.getAttributes().get("enabled").iterator().next())) {
+                return null;
+            }
+            AuditEventHandler mockHandler = mock(AuditEventHandler.class);
+            when(mockHandler.getName()).thenReturn(configuration.getHandlerName());
+            return mockHandler;
         }
     }
 }
