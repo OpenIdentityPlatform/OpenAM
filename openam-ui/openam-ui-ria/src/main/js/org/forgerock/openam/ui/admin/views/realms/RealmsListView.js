@@ -50,6 +50,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
         },
         deleteRealm: function (event) {
             event.preventDefault();
+            if ($(event.target).parent().hasClass("disabled")) { return false; }
 
             var self = this,
                 realm = this.getRealmFromEvent(event),
