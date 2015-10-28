@@ -45,6 +45,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         // self-service links should be shown only on the first stage
         this.data.showForgotPassword = firstAuthStage && Configuration.globalData.forgotPassword === "true";
         this.data.showRegister = firstAuthStage && Configuration.globalData.selfRegistration === "true";
+        this.data.showRememberLogin = firstAuthStage;
 
         if (Configuration.backgroundLogin) {
             this.prefillLoginData();
