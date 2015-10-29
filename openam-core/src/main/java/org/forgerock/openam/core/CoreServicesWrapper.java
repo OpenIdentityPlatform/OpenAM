@@ -74,6 +74,18 @@ public class CoreServicesWrapper {
     }
 
     /**
+     * Gets the resource URL to use for resource-based authentication.
+     *
+     * {@link AuthClientUtils#getResourceURL(HttpServletRequest)}
+     *
+     * @param request the servlet request.
+     * @return the resource URL to authenticate for.
+     */
+    public String getResourceURL(HttpServletRequest request) {
+        return AuthClientUtils.getResourceURL(request);
+    }
+
+    /**
      * Gets the admin SSO Token.
      *
      * {@link java.security.AccessController#doPrivileged(java.security.PrivilegedAction)}
