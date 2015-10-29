@@ -18,22 +18,29 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/components/BootstrapDialog",
+    "org/forgerock/openam/ui/admin/views/realms/authentication/AddModuleDialog",
+    "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/openam/ui/admin/views/realms/authentication/EditModuleDialog",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "handlebars",
-    "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
-    "org/forgerock/commons/ui/common/util/UIUtils",
 
     // jquery dependencies
     "selectize"
-], function ($, _, AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormHelper, Handlebars,
-             MessageManager, Router, SMSRealmDelegate, UIUtils) {
+], function ($, _, AbstractView, AddModuleDialog, arrayify, Configuration, EditModuleDialog, Form, FormHelper, Promise,
+             SMSRealmDelegate) {
+    function getModuleInfoFromElement (element) {
+        return $(element).closest("tr").data();
+    }
+    function performDeleteModules (realmPath, moduleInfos) {
+        return Promise.all(arrayify(moduleInfos).map(function (moduleInfo) {
+            return SMSRealmDelegate.authentication.modules.remove(realmPath, moduleInfo.moduleName,
+                                                                  moduleInfo.moduleType);
+        }));
+    }
+
     var ModulesView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ModulesTemplate.html",
         events: {
@@ -47,100 +54,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             "partials/alerts/_Alert.html"
         ],
         data: {},
-        addModule: function (e) {
-            e.preventDefault();
-
+        addModule: function (event) {
+            event.preventDefault();
             var self = this;
 
             SMSRealmDelegate.authentication.modules.types.all(this.data.realmPath).done(function (data) {
-                self.data.moduleTypes = data.result;
-                UIUtils.fillTemplateWithData(
-                    "templates/admin/views/realms/authentication/modules/AddModuleTemplate.html", self.data,
-                    function (html) {
-                        BootstrapDialog.show({
-                            title: $.t("console.authentication.modules.addModuleDialogTitle"),
-                            message: $(html),
-                            buttons: [{
-                                label: $.t("common.form.cancel"),
-                                action: function (dialog) {
-                                    dialog.close();
-                                }
-                            }, {
-                                id: "nextButton",
-                                label: $.t("common.form.create"),
-                                cssClass: "btn-primary",
-                                action: function (dialog) {
-                                    if (self.addModuleDialogValidation(dialog)) {
-                                        var moduleName = dialog.getModalBody().find("#newModuleName").val(),
-                                            moduleType = dialog.getModalBody().find("#newModuleType").val();
-
-                                        SMSRealmDelegate.authentication.modules.exists(self.data.realmPath, moduleName)
-                                            .done(function (result) {
-                                                var authenticationModules = SMSRealmDelegate.authentication.modules;
-                                                if (!result) {
-                                                    authenticationModules.create(self.data.realmPath, {
-                                                        _id: moduleName
-                                                    }, moduleType).done(function () {
-                                                        dialog.close();
-                                                        Router.routeTo(
-                                                            Router.configuration.routes.realmsAuthenticationModuleEdit,
-                                                            {
-                                                                args: [
-                                                                    encodeURIComponent(self.data.realmPath),
-                                                                    encodeURIComponent(moduleType),
-                                                                    encodeURIComponent(moduleName)],
-                                                                trigger: true
-                                                            });
-                                                    }).fail(function (e) {
-                                                        //TODO
-                                                        console.error(e);
-                                                    });
-                                                } else {
-                                                    MessageManager.messages.addMessage({
-                                                        message:
-                                                            $.t("console.authentication.modules.addModuleDialogError"),
-                                                        type: "error"
-                                                    });
-                                                }
-                                            });
-                                    }
-                                }
-                            }],
-                            onshow: function (dialog) {
-                                dialog.getButton("nextButton").disable();
-                                dialog.$modalBody.find("#newModuleType").selectize();
-                                self.enableOrDisableNextButton(dialog);
-                            }
-                        });
-                    });
-            });
-        },
-        addModuleDialogValidation: function (dialog) {
-            var valid = true,
-                alert = "",
-                nameValid,
-                typeValid;
-
-            if (dialog.$modalBody.find("#newModuleName").val().indexOf(" ") !== -1) {
-                valid = false;
-                alert = Handlebars.compile("{{> alerts/_Alert type='warning' " +
-                    "text='console.authentication.modules.moduleNameValidationError'}}");
-            }
-
-            dialog.$modalBody.find("#alertContainer").html(alert);
-            nameValid = dialog.$modalBody.find("#newModuleName").val().length > 0;
-            typeValid = dialog.$modalBody.find("#newModuleType")[0].selectize.getValue().length > 0;
-            return (nameValid && typeValid && valid);
-        },
-        enableOrDisableNextButton: function (dialog) {
-            var self = this;
-
-            dialog.$modalBody.on("change keyup", "#newModuleName, #newModuleType", function () {
-                if (self.addModuleDialogValidation(dialog)) {
-                    dialog.getButton("nextButton").enable();
-                } else {
-                    dialog.getButton("nextButton").disable();
-                }
+                AddModuleDialog(self.data.realmPath, data.result);
             });
         },
         moduleSelected: function (event) {
@@ -159,61 +78,33 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             event.preventDefault();
             var data = $(event.currentTarget).closest("tr").data();
 
-            BootstrapDialog.show({
-                title: $.t("console.authentication.modules.inUse.title"),
-                message: $.t("console.authentication.modules.inUse.message",
-                    {
-                        usedChains: data.moduleChains, moduleName: data.moduleName
-                    }),
-                buttons: [{
-                    label: $.t("common.form.cancel"),
-                    cssClass: "btn-default",
-                    action: function (dialog) {
-                        dialog.close();
-                    }
-                }, {
-                    label: $.t("common.form.yes"),
-                    cssClass: "btn-primary",
-                    action: function (dialog) {
-                        Router.setUrl(event.currentTarget.href);
-                        dialog.close();
-                    }
-                }]
-            });
+            EditModuleDialog(data.moduleName, data.moduleChains);
         },
-
         deleteModule: function (event) {
             var self = this,
-                data = $(event.currentTarget).closest("tr").data();
+                element = event.currentTarget,
+                moduleInfo = getModuleInfoFromElement(element);
 
-            SMSRealmDelegate.authentication.modules.remove(
-                self.data.realmPath,
-                data.moduleName,
-                data.moduleType
-            ).done(function () {
+            $(element).prop("disabled", true);
+
+            performDeleteModules(this.data.realmPath, moduleInfo).then(function () {
                 self.render(self.data.args);
-            }).fail(function (e) {
-                // TODO: Add failure condition
-                console.error(e);
+            }, function () {
+                $(element).prop("disabled", false);
             });
-
         },
-        deleteModules: function () {
+        deleteModules: function (event) {
             var self = this,
-                promises = self.$el.find("input[type=checkbox]:checked").closest("tr").toArray().map(
-                    function (element) {
-                        var dataset = $(element).data(),
-                            name = dataset.moduleName,
-                            type = dataset.moduleType;
+                element = event.currentTarget,
+                elements = this.$el.find("input[type=checkbox]:checked"),
+                moduleInfos = _(elements).toArray().map(getModuleInfoFromElement).value();
 
-                        return SMSRealmDelegate.authentication.modules.remove(self.data.realmPath, name, type);
-                    });
+            $(element).prop("disabled", true);
 
-            $.when(promises).then(function () {
-                self.render(self.data.args);
-            }).fail(function (e) {
-                // TODO: Add failure condition
-                console.error(e);
+            performDeleteModules(this.data.realmPath, moduleInfos).then(function () {
+                self.render([self.data.realmPath]);
+            }, function () {
+                $(element).prop("disabled", false);
             });
         },
         render: function (args, callback) {
@@ -227,10 +118,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             chainsPromise = SMSRealmDelegate.authentication.chains.all(this.data.realmPath);
             modulesPromise = SMSRealmDelegate.authentication.modules.all(this.data.realmPath);
 
-            $.when(chainsPromise, modulesPromise).then(function (chainData, modulesData) {
-
-                _.each(modulesData[0].result, function (module) {
-                    _.each(chainData.values.result, function (chain) {
+            Promise.all([chainsPromise, modulesPromise]).then(function (values) {
+                _.each(values[1][0].result, function (module) {
+                    _.each(values[0].values.result, function (chain) {
                         _.each(chain.authChainConfiguration, function (link) {
                             if (link.module === module._id) {
                                 module.chains = module.chains || [];
@@ -241,7 +131,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                     module.chains = _.uniq(module.chains);
                 });
 
-                self.data.formData = modulesData[0].result;
+                self.data.formData = values[1][0].result;
 
                 self.parentRender(function () {
                     if (callback) {

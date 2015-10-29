@@ -16,61 +16,70 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog", [
     "jquery",
+    "lodash",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "handlebars",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, BootstrapDialog, Handlebars, Messages, Router, SMSRealmDelegate, UIUtils) {
-    var buttons = [{
-        label: $.t("common.form.cancel"),
-        action: function (dialog) {
-            dialog.close();
-        }
-    }, {
-        label: $.t("common.form.create"),
-        cssClass: "btn-primary",
-        action: function (dialog) {
-            var chainName = dialog.getModalBody().find("#newName").val().trim();
+], function ($, _, BootstrapDialog, Handlebars, Messages, Router, SMSRealmDelegate, UIUtils) {
+    function closeDialog (dialog) {
+        dialog.close();
+    }
+    function nameValid (chains, name) {
+        return _.every(chains, function (chain) {
+            return chain._id !== name;
+        });
+    }
+    function validateAndCreate (dialog) {
+        var name = dialog.getModalBody().find("#name").val().trim();
 
-            if (dialog.options.isNameValid(chainName)) {
-                SMSRealmDelegate.authentication.chains.create(
-                    dialog.options.realmPath,
-                    { _id: chainName }
-                ).then(function () {
-                    dialog.close();
-                    Router.routeTo(Router.configuration.routes.realmsAuthenticationChainEdit, {
-                        args: [
-                            encodeURIComponent(dialog.options.realmPath),
-                            encodeURIComponent(chainName)
-                        ],
-                        trigger: true
-                    });
-                }, function (event) {
-                    Messages.addMessage({
-                        type: Messages.TYPE_DANGER,
-                        response: event
-                    });
+        if (nameValid(dialog.options.data.chains, name)) {
+            SMSRealmDelegate.authentication.chains.create(
+                dialog.options.data.realmPath,
+                { _id: name }
+            ).then(function () {
+                dialog.close();
+                Router.routeTo(Router.configuration.routes.realmsAuthenticationChainEdit, {
+                    args: [
+                        encodeURIComponent(dialog.options.data.realmPath),
+                        encodeURIComponent(name)
+                    ],
+                    trigger: true
                 });
-            } else {
-                dialog.getModalBody().find("#alertContainer").html(Handlebars.compile(
-                    "{{> alerts/_Alert type='warning' text='console.authentication.chains.duplicateChain'}}"
-                ));
-            }
+            }, function (event) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: event
+                });
+            });
+        } else {
+            dialog.getModalBody().find("#alertContainer").html(Handlebars.compile(
+                "{{> alerts/_Alert type='warning' text='console.authentication.chains.duplicateChain'}}"
+            ));
         }
-    }];
+    }
 
-    return function (realmPath, isNameValid) {
+    return function (realmPath, chains) {
         UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/chains/AddChainTemplate.html",
-        this.data,
+        {},
         function (html) {
             BootstrapDialog.show({
                 title: $.t("console.authentication.chains.createNewChain"),
                 message: $(html),
-                buttons: buttons,
-                isNameValid: isNameValid || function () { return true; },
-                realmPath: realmPath
+                buttons: [{
+                    label: $.t("common.form.cancel"),
+                    action: closeDialog
+                }, {
+                    label: $.t("common.form.create"),
+                    cssClass: "btn-primary",
+                    action: validateAndCreate
+                }],
+                data: {
+                    chains: chains,
+                    realmPath: realmPath
+                }
             });
         });
     };

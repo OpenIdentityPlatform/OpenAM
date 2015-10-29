@@ -19,21 +19,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog",
+    "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
-], function ($, _, AbstractView, AddChainDialog, Messages, SMSRealmDelegate) {
+], function ($, _, AbstractView, AddChainDialog, arrayify, Messages, Promise, SMSRealmDelegate) {
     function getChainNameFromElement (element) {
         return $(element).data().chainName;
     }
     function performDeleteChains (realmPath, names) {
-        return $.when([].concat(names).map(function (name) {
+        return Promise.all(arrayify(names).map(function (name) {
             return SMSRealmDelegate.authentication.chains.remove(realmPath, name);
         }));
-    }
-    function chainNameExists (chains, name) {
-        return _.every(chains, function (chain) {
-            return chain._id !== name;
-        });
     }
 
     var ChainsView = AbstractView.extend({
@@ -51,7 +48,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         addChain: function (event) {
             event.preventDefault();
 
-            AddChainDialog(this.data.realmPath, _.partial(chainNameExists, this.data.sortedChains));
+            AddChainDialog(this.data.realmPath, this.data.sortedChains);
         },
         chainSelected: function (event) {
             var hasChainsSelected = this.$el.find("input[type=checkbox][data-chain-name]").is(":checked"),
@@ -80,19 +77,29 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         },
         deleteChain: function (event) {
             var self = this,
+                element = event.currentTarget,
                 name = getChainNameFromElement(event.currentTarget);
+
+            $(element).prop("disabled", true);
 
             performDeleteChains(this.data.realmPath, name).then(function () {
                 self.render([self.data.realmPath]);
+            }, function () {
+                $(element).prop("disabled", false);
             });
         },
-        deleteChains: function () {
+        deleteChains: function (event) {
             var self = this,
+                element = event.currentTarget,
                 elements = this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked"),
                 names = _(elements).toArray().map(getChainNameFromElement).value();
 
+            $(element).prop("disabled", true);
+
             performDeleteChains(this.data.realmPath, names).then(function () {
                 self.render([self.data.realmPath]);
+            }, function () {
+                $(element).prop("disabled", false);
             });
         },
         render: function (args, callback) {
