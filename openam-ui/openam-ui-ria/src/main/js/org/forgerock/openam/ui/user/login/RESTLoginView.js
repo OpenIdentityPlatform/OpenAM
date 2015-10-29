@@ -361,13 +361,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             // Rest does not accept the params listed in the array below as is
             // they must be transformed into the "authIndexType" and "authIndexValue" params
-            _.each(["authlevel", "module", "service", "user"], function (p) {
-                if (urlParams[p]) {
-                    urlParams.authIndexType = ((p === "authlevel") ? "level" : p);
-                    urlParams.authIndexValue = urlParams[p];
-                    //***note special case for authLevel
+            _.each(["authlevel", "module", "service", "user", "resource", "resourceURL"], function (param) {
+                if (urlParams[param]) {
+                    urlParams.authIndexType = ((param === "authlevel") ? "level" : param);
+                    urlParams.authIndexValue = urlParams[param];
+                    //*** Note special case for authLevel
                     Configuration.globalData.auth.additional += "&authIndexType=" +
-                        ((p === "authlevel") ? "level" : p) + "&authIndexValue=" + urlParams[p];
+                        ((param === "authlevel") ? "level" : param) + "&authIndexValue=" + urlParams[param];
                 }
             });
 
