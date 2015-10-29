@@ -24,6 +24,7 @@
  *
  * $Id: FederationPlugin.java,v 1.8 2008/10/30 18:24:04 mallas Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
                                                                                 
 package com.sun.identity.setup.plugin;
@@ -127,9 +128,7 @@ public class FederationPlugin implements ConfiguratorPlugin {
                "com.sun.identity.authentication.modules.federation.Federation");
             modules.add(
                "com.sun.identity.authentication.modules.sae.SAE");
-            modules.add(
-               "com.sun.identity.authentication.modules.wss.WSSAuthModule");
-            
+
             ss.setAttributeDefaults(values);
         } catch (SSOException e) {
             e.printStackTrace();

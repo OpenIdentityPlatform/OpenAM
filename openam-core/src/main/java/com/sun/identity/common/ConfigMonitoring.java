@@ -610,11 +610,6 @@ public class ConfigMonitoring {
          *    AgentConfiguration.AGENT_TYPE_AGENT_AUTHENTICATOR =
          *      "SharedAgent"
          *
-         *  these are in the federation tree, so not accessible
-         *    com.sun.identity.wss.provider.ProviderConfig.WSC = "WSCAgent"
-         *    com.sun.identity.wss.provider.ProviderConfig.WSP = "WSPAgent"
-         *    com.sun.identity.wss.provider.TrustAuthorityConfig.\
-         *      DISCOVERY_TRUST_AUTHORITY = "DiscoveryAgent"
          */
         Set agents = null;
         try {
@@ -802,16 +797,10 @@ public class ConfigMonitoring {
          *    "2.2_Agent"
          *    "WSCAgent"
          *    "SharedAgent"
-         *    "STSAgent"
-         *    "DiscoveryAgent"
          *    "J2EEAgent"
          *   for "agentgroup":
-         *    "STSAgent"
-         *    "WSPAgent"
-         *    "WSCAgent"
          *    "WebAgent"
          *    "J2EEAgent"
-         *    "DiscoveryAgent"
          *  aid.getMemberships(IdType.AGENTGROUP) for agents
          *    gives the agent group name(s) it's a member of
          *  aid.getAttribute(com.sun.identity.agents.config.login.url) =>
@@ -922,21 +911,14 @@ public class ConfigMonitoring {
          *   for "agent":
          *    "SharedAgent" -> skip these (Agent Authenticator)
          *    "2.2_Agent" -> only have name
-         *    "WSCAgent" -> get wspendpoint and wspproxyendpoint
-         *    "STSAgent" -> get stsendpoint
-         *    "DiscoveryAgent" -> get discoveryendpoint, authnserviceendpoint
          *    "J2EEAgent" get com.sun.identity.client.notification.url (minus
          *                 "/notification) and
          *                com.sun.identity.agents.config.login.url (already)
          *   for "agentgroup":
-         *    "STSAgent" -> get stsendpoint
-         *    "WSPAgent" -> get wspendpoint and wspproxyendpoint (can be opt)
-         *    "WSCAgent" -> get wspendpoint and wspproxyendpoint (can be opt)
          *    "WebAgent" -> get com.sun.identity.agents.config.login.url (ok)
          *    "J2EEAgent" -> get com.sun.identity.agents.config.login.url (ok)
          *                   and com.sun.identity.client.notification.url
          *                     minus the "/notification"
-         *    "DiscoveryAgent" -> get discoveryendpoint and authnserviceendpoint
          *
          *  aid.getMemberships(IdType.AGENTGROUP) for agents
          *    gives the agent group name(s) it's a member of
@@ -997,17 +979,6 @@ public class ConfigMonitoring {
          */
         if (atype.equalsIgnoreCase("2.2_Agent")) { // agentonly
             // only agent's name
-        } else if (atype.equalsIgnoreCase("WSCAgent")) { // both
-            // wspendpoint and wspproxyendpoint for both
-            attrsToGet.add("wspendpoint");
-            attrsToGet.add("wspproxyendpoint");
-        } else if (atype.equalsIgnoreCase("STSAgent")) { // both
-            // stsendpoint for both
-            attrsToGet.add("stsendpoint");
-        } else if (atype.equalsIgnoreCase("DiscoveryAgent")) { // both
-            // discoveryendpoint and authnserviceendpoint for both
-            attrsToGet.add("discoveryendpoint");
-            attrsToGet.add("authnserviceendpoint");
         } else if (atype.equalsIgnoreCase("J2EEAgent")) {  // both
             /*
              * com.sun.identity.client.notification.url (minus "/notification")
@@ -1015,10 +986,6 @@ public class ConfigMonitoring {
              */
             attrsToGet.add("com.sun.identity.agents.config.login.url");
             attrsToGet.add("com.sun.identity.client.notification.url");
-        } else if (atype.equalsIgnoreCase("WSPAgent")) {  // both
-            // wspendpoint and wspproxyendpoint (both)
-            attrsToGet.add("wspendpoint");
-            attrsToGet.add("wspproxyendpoint");
         } else if (atype.equalsIgnoreCase("WebAgent")) {  // both
             attrsToGet.add("com.sun.identity.agents.config.agenturi.prefix");
             attrsToGet.add("com.sun.identity.agents.config.login.url");

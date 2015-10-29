@@ -73,18 +73,6 @@ public class IdRepoSampleSearchIds {
                 idtype, pattern, isc);
             Set adResSet = adRes.getSearchResults();
             processType(idtype, adResSet);
-        IdSearchControl control = new IdSearchControl();           
-        control.setAllReturnAttributes(true);
-        control.setTimeOut(0);          
-        Map kvPairMap = new HashMap();
-        Set set = new HashSet();
-        set.add("STSAgent");           
-        kvPairMap.put("AgentType", set);
-        control.setSearchModifiers(IdSearchOpModifier.OR, kvPairMap);
-        IdSearchResults results = idRepo.searchIdentities(IdType.AGENTONLY,
-            "*", control);
-        Set agents = results.getSearchResults();      
-        System.out.println("Listing agents for STSAgent "+agents);
         } catch (IdRepoException ire) {
             System.err.println("idRepoProcessing: IdRepoException" +
                 " Searching Identities for '" +

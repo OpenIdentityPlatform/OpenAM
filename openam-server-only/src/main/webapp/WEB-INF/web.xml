@@ -208,10 +208,6 @@
         <listener-class>com.sun.identity.authentication.service.AuthServletContextListener</listener-class>
     </listener>
 
-    <listener>
-        <listener-class>com.sun.identity.wss.sts.STSContextListener</listener-class>
-    </listener>
-
     <!-- listener declaration -->
 
     <servlet>
@@ -628,14 +624,6 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <servlet>
-        <description>JAX-WS endpoint - sts</description>
-        <display-name>sts</display-name>
-        <servlet-name>sts</servlet-name>
-        <servlet-class>com.sun.identity.wss.sts.SecurityTokenService</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
     <!-- end of servlet declarations -->
 
     <servlet-mapping>
@@ -1023,23 +1011,6 @@
     <servlet-mapping>
         <servlet-name>federationrest</servlet-name>
         <url-pattern>/federationws/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>sts</servlet-name>
-        <url-pattern>/sts</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>sts</servlet-name>
-        <url-pattern>/sts/mex</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>sts</servlet-name>
-        <url-pattern>/sts/soap11</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>sts</servlet-name>
-        <url-pattern>/sts/mexsoap11</url-pattern>
     </servlet-mapping>
 
     <!-- end of servlet mapping -->

@@ -428,6 +428,27 @@ public class UpgradeUtils {
 
     }
 
+    public static void removeSubSchema(
+            String serviceName,
+            String subSchemaName,
+            ServiceSchema serviceSchema)
+            throws UpgradeException {
+        String classMethod = "UpgradeUtils:removeSubSchema : ";
+
+        if (debug.messageEnabled()) {
+            debug.message(classMethod + "Removing subschema:" +
+                    subSchemaName + " for service: " + serviceName);
+        }
+
+        try {
+            serviceSchema.removeSubSchema(subSchemaName);
+        } catch (SSOException ssoe) {
+            throw new UpgradeException("invalid sso token");
+        } catch (SMSException ssoe) {
+            throw new UpgradeException("error removing subschema " + subSchemaName);
+        }
+    }
+
     protected static void addAttributesToSchema(String serviceName,
                                                 String schemaType,
                                                 ServiceSchemaModificationWrapper schemaMods,
@@ -2231,7 +2252,7 @@ public class UpgradeUtils {
      * @return the <code>ServiceSchema</code> object.
      * @throws UpgradeException if there is an error.
      */
-    static ServiceSchema getServiceSchema(String serviceName,
+    public static ServiceSchema getServiceSchema(String serviceName,
             String subSchemaName, String schemaType, SSOToken adminToken)
             throws UpgradeException {
         ServiceSchema ss = null;

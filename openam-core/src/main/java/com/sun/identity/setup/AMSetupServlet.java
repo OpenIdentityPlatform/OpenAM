@@ -1012,9 +1012,6 @@ public class AMSetupServlet extends HttpServlet {
                 if ((userRepo == null) || userRepo.isEmpty()) {
                     createDemoUser();
                 }
-                if (!existingConfiguration) {
-                    createIdentitiesForWSSecurity(serverURL, deployuri);
-                }
             }
 
             String aceDataDir = basedir + "/" + deployuri + "/auth/ace/data";
@@ -1742,83 +1739,6 @@ public class AMSetupServlet extends HttpServlet {
         }
         SetupProgress.reportEnd("emb.done", null);
     }
-
-    /**
-     * Creates Identities for WS Security
-     *
-     * @param serverURL URL at which OpenAM is configured.
-     */
-    private static void createIdentitiesForWSSecurity(String serverURL, String deployuri) throws IdRepoException,
-            SSOException {
-        SSOToken token = getAdminSSOToken();
-        
-        if (!isAgentServiceLoad(token)) {
-            return;
-        }
-        
-        SetupProgress.reportStart("configurator.progress.create.wss.agents", null);
-        AMIdentityRepository idrepo = new AMIdentityRepository(token, "/");
-        Map<String, String> config = new HashMap<String, String>();
-
-        // Add WSC configuration
-        config.put("sunIdentityServerDeviceStatus", "Active");
-        config.put("SecurityMech", "urn:sun:wss:security:null:UserNameToken");
-        config.put("UserCredential", "UserName:test|UserPassword:test");
-        config.put("useDefaultStore", "true");
-        config.put("privateKeyAlias", "test");
-        config.put("publicKeyAlias", "test");
-        config.put("isRequestSign", "true");
-        config.put("keepSecurityHeaders", "true");
-        config.put("WSPEndpoint", "default");
-        config.put("EncryptionAlgorithm", "AES");
-        config.put("EncryptionStrength", "128");
-        config.put("SigningRefType", "DirectReference");
-        config.put("DnsClaim", "wsc");
-        config.put("SignedElements", "Body,SecurityToken,Timestamp,To,From,ReplyTo,Action,MessageID");
-        config.put("AgentType", "WSCAgent");
-        createAgent(token, idrepo, "wsc", "wsc", "WSC", "", config);
-
-        // Add WSP configuration
-        config.remove("AgentType");
-        config.put("AgentType", "WSPAgent");
-        config.put("DetectMessageReplay", "true");
-        config.put("DetectUserTokenReplay", "true");
-        config.remove("SecurityMech");
-        config.put("SecurityMech", "urn:sun:wss:security:null:UserNameToken,"
-                + "urn:sun:wss:security:null:SAML2Token-HK," + "urn:sun:wss:security:null:SAML2Token-SV,"
-                + "urn:sun:wss:security:null:X509Token");
-        config.remove("DnsClaim");
-        config.put("DnsClaim", "wsp");
-        createAgent(token, idrepo, "wsp", "wsp", "WSP", "", config);
-        config.remove("keepSecurityHeaders");        
-
-        // Add STS Client configuration
-        config.remove("AgentType");
-        config.put("DnsClaim", "wsc");
-        config.put("AgentType", "STSAgent");
-        config.remove("SecurityMech");
-        config.remove("keepSecurityHeaders");
-        config.remove("DetectMessageReplay");
-        config.remove("DetectUserTokenReplay");
-        config.remove("WSPEndpoint");
-        config.put("SecurityMech", "urn:sun:wss:security:null:X509Token");
-        config.put("STSEndpoint", serverURL + deployuri + "/sts");
-        config.put("STSMexEndpoint", serverURL + deployuri + "/sts/mex");
-        config.put("WSTrustVersion", "1.3");
-        config.put("KeyType", "PublicKey");
-        createAgent(token, idrepo, "SecurityTokenService", "SecurityTokenService", "STS", "", config);
-        config.remove("KeyType");
-
-        // Add Agent Authenticator configuration
-        Map<String, String> configAgentAuth = new HashMap<String, String>();
-        configAgentAuth.put("AgentType", "SharedAgent");
-        configAgentAuth.put("sunIdentityServerDeviceStatus", "Active");
-        configAgentAuth.put("AgentsAllowedToRead", "wsc,wsp,SecurityTokenService");
-        createAgent(token, idrepo, "agentAuth", "changeit", "Agent_Authenticator", "", configAgentAuth);
-        
-        SetupProgress.reportEnd("emb.done", null);
-    }
-
 
     private static void createAgent(SSOToken adminToken, AMIdentityRepository idrepo, String name, String password,
             String type, String desc, Map<String, String> config) throws IdRepoException, SSOException {

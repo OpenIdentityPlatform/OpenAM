@@ -266,15 +266,6 @@
                             <targetPath>legal-notices</targetPath>
                         </webResource>
                         <webResource>
-                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/wsdl</directory>
-                            <includes>
-                                <include>*.wsdl</include>
-                                <include>*.xsd</include>
-                            </includes>
-                            <targetPath>WEB-INF/wsdl</targetPath>
-                            <filtering>false</filtering>
-                        </webResource>
-                        <webResource>
                             <directory>${project.basedir}/../openam-schema/openam-idsvcs-schema/src/main/resources/xml
                             </directory>
                             <includes>
@@ -291,15 +282,6 @@
                             </includes>
                             <targetPath>WEB-INF/wsdl</targetPath>
                             <filtering>true</filtering>
-                        </webResource>
-                        <webResource>
-                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss
-                            </directory>
-                            <includes>
-                                <include>sun-jaxws.xml</include>
-                            </includes>
-                            <targetPath>WEB-INF</targetPath>
-                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <!-- This pickup the remaining moved elements build from the
