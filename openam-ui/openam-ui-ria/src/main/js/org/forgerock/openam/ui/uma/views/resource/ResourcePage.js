@@ -370,7 +370,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     // self.$el.find("#paginationContainer").append(paginator.render().el);
 
                     self.$el.find("#umaShareImage img").error(function () {
-                        $(this).parent().addClass("no-image");
+                        $(this).parent().addClass("fa-file-image-o no-image");
                     });
 
                     var starredLabel = _.find(this.allLabels, { type: "STAR" }),

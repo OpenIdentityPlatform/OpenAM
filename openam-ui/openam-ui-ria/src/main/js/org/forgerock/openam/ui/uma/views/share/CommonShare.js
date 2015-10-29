@@ -196,7 +196,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 self.renderShareCounter(callback);
                 self.$el.find("#advancedView").append(grid.render().el);
                 self.$el.find("#umaShareImage img").error(function () {
-                    $(this).parent().addClass("no-image");
+                    $(this).parent().addClass("fa-file-image-o no-image");
                 });
             });
         },
