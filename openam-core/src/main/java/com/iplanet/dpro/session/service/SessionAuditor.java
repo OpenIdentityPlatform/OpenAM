@@ -18,9 +18,11 @@ package com.iplanet.dpro.session.service;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
 import static org.forgerock.openam.audit.AuditConstants.ACTIVITY_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.utils.StringUtils.isEmpty;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.DNMapper;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.openam.audit.AuditConstants.EventName;
 import org.forgerock.openam.audit.AuditEventFactory;
@@ -61,7 +63,10 @@ public final class SessionAuditor {
     }
 
     public void auditActivity(InternalSession session, EventName eventName) {
-        if (auditEventPublisher.isAuditing(NO_REALM, ACTIVITY_TOPIC)) {
+        String realm = session.getClientDomain();
+        realm = isEmpty(realm) ? NO_REALM : DNMapper.orgNameToRealmName(realm);
+
+        if (auditEventPublisher.isAuditing(realm, ACTIVITY_TOPIC)) {
 
             String contextId = session.getProperty(Constants.AM_CTX_ID);
 
@@ -74,6 +79,7 @@ public final class SessionAuditor {
                     .runAs(getUserId(getAdminToken()))
                     .objectId(contextId)
                     .operation(getCrudType(eventName))
+                    .realm(realm)
                     .toEvent();
             auditEventPublisher.tryPublish(ACTIVITY_TOPIC, auditEvent);
 
