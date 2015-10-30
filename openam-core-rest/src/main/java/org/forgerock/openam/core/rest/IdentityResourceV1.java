@@ -1319,10 +1319,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     private boolean authenticatedUserMatchesUserProfile(Context context, String resourceId) {
         try {
             SSOToken ssoToken = SSOTokenManager.getInstance().createSSOToken(getCookieFromServerContext(context));
-            String requestRealm = coreWrapper.convertRealmNameToOrgName(context.asContext(RealmContext.class)
-                    .getResolvedRealm());
+            String requestRealm =
+                    coreWrapper.convertRealmNameToOrgName(context.asContext(RealmContext.class).getResolvedRealm());
             return resourceId.equalsIgnoreCase(ssoToken.getProperty("UserId"))
-                    && requestRealm.equals(ssoToken.getProperty(Constants.ORGANIZATION));
+                    && requestRealm.equalsIgnoreCase(ssoToken.getProperty(Constants.ORGANIZATION));
         } catch (SSOException e) {
             debug.error("IdentityResource::Failed to determine if requesting user is accessing own profile. " +
                     "resourceId={}", resourceId, e);

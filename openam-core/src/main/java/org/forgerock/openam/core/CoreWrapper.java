@@ -220,7 +220,7 @@ public class CoreWrapper {
      * @return The realm in DN format.
      */
     public String convertRealmNameToOrgName(String realm) {
-        return DNMapper.realmNameToAMSDKName(realm);
+        return DNMapper.orgNameToDN(realm);
     }
 
     /**
