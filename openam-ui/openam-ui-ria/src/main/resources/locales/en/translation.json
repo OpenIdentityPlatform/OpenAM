@@ -351,6 +351,13 @@
             }
         },
         "user" : {
+            "userQuery" : {
+                "mainEnterPrompt": "Enter your ",
+                "optionalEnterPrompt": "or your ",
+                "orAllEnterPrompt" : "or all of the following information",
+                "title" : "Enter details to find your account",
+                "any" : "Any of these:"
+            },
             "passwordReset" : {
                 "title": "Reset Your Password",
                 "completed": "Your password has been successfully reset.",
