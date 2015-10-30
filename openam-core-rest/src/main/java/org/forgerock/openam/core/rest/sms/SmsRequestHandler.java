@@ -59,6 +59,7 @@ import org.forgerock.guava.common.collect.Maps;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.http.routing.RoutingMode;
@@ -176,6 +177,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceCollections =
             new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
     private final SitesResourceProvider sitesResourceProvider;
+    private final RealmNormaliser realmNormaliser;
     private Map<String, Map<SmsRouteTree, Set<RouteMatcher<Request>>>> serviceRoutes = new HashMap<>();
     private final SmsRouteTree routeTree;
     private final SessionCache sessionCache;
@@ -189,7 +191,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler,
             AuthenticationModuleTypeHandler authenticationModuleTypeHandler,
             SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter,
-            RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper)
+            RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
+            RealmNormaliser realmNormaliser)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
@@ -199,6 +202,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.debug = debug;
         this.sessionCache = sessionCache;
         this.coreWrapper = coreWrapper;
+        this.realmNormaliser = realmNormaliser;
         this.excludedServices = excludedServicesFactory.get(type);
         this.authenticationModuleCollectionHandler = authenticationModuleCollectionHandler;
         this.authenticationModuleTypeHandler = authenticationModuleTypeHandler;
@@ -262,7 +266,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
 
     private void addRealmHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
-            routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", new FilterChain(new SmsRealmProvider(sessionCache, coreWrapper), realmContextFilter));
+            routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", new FilterChain(new SmsRealmProvider(
+                    sessionCache, coreWrapper, realmNormaliser), realmContextFilter));
         }
     }
 

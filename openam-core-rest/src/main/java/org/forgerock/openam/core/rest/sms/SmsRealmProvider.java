@@ -48,6 +48,7 @@ import com.sun.identity.sm.SMSException;
 
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -86,17 +87,23 @@ public class SmsRealmProvider implements RequestHandler {
     private static final String INACTIVE_VALUE = "Inactive";
     private static final String ACTIVE_ATTRIBUTE_NAME = "active";
     private static final String ALIASES_ATTRIBUTE_NAME = "aliases";
-    private static final String REALM_NAME_ATTRIBUTE_NAME = "name";
-    private static final String PATH_ATTRIBUTE_NAME = "parentPath";
+    protected static final String REALM_NAME_ATTRIBUTE_NAME = "name";
+    protected static final String PATH_ATTRIBUTE_NAME = "parentPath";
     private static final String PARENT_I18N_KEY = "a109";
     private static final String ACTIVE_I18N_KEY = "a108";
-    public static final String ROOT_SERVICE = "";
+    private static final String ROOT_SERVICE = "";
+    private static final String BAD_REQUEST_REALM_NAME_ERROR_MESSAGE
+            = "Realm name specified in URL does not match realm name specified in JSON";
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
+    private RealmNormaliser realmNormaliser;
 
-    public SmsRealmProvider(SessionCache sessionCache, CoreWrapper coreWrapper) {
+    public SmsRealmProvider(SessionCache sessionCache,
+                            CoreWrapper coreWrapper,
+                            RealmNormaliser realmNormaliser) {
         this.sessionCache = sessionCache;
         this.coreWrapper = coreWrapper;
+        this.realmNormaliser = realmNormaliser;
     }
 
     /**
@@ -458,6 +465,16 @@ public class SmsRealmProvider implements RequestHandler {
             return new BadRequestException("Invalid attribute values").asPromise();
         }
 
+        // protect against attempts to change a realm that does not exist as this results in unexpected behaviour
+        try {
+            String requestPath = getExpectedPathFromRequestContext(request);
+            if (!realmPath.equals(requestPath)) {
+                return new BadRequestException(BAD_REQUEST_REALM_NAME_ERROR_MESSAGE).asPromise();
+            }
+        } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+            return new BadRequestException(BAD_REQUEST_REALM_NAME_ERROR_MESSAGE).asPromise();
+        }
+
         final JsonValue realmDetails = request.getContent();
 
         try {
@@ -482,6 +499,20 @@ public class SmsRealmProvider implements RequestHandler {
             debug.error("RealmResource.updateInstance() : Cannot UPDATE " + realmPath, e);
             return new PermanentException(401, "Access Denied", null).asPromise();
         }
+    }
+
+    protected String getExpectedPathFromRequestContext(UpdateRequest request)
+            throws org.forgerock.oauth2.core.exceptions.NotFoundException {
+        String contextPath = request.getContent().get(PATH_ATTRIBUTE_NAME).asString();
+        String realmName = request.getContent().get(REALM_NAME_ATTRIBUTE_NAME).asString();
+
+        if (contextPath.endsWith("/")) {
+            contextPath = contextPath.substring(0, contextPath.lastIndexOf('/'));
+        }
+        if (!realmName.startsWith("/")) {
+            realmName = "/" + realmName;
+        }
+        return realmNormaliser.normalise(contextPath + realmName);
     }
 
     private void checkValues(JsonValue content) throws BadRequestException {
