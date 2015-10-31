@@ -40,7 +40,7 @@ define([
                 });
         });
 
-        describe("decorateURLWithOverrideRealm", function () {
+        describe("#decorateURLWithOverrideRealm", function () {
             it("appends the current query string to the URL", sinon.test(function () {
                 this.stub(URIUtils, "getCurrentQueryString").returns("realm=realm1");
 
@@ -56,7 +56,7 @@ define([
             }));
         });
 
-        describe("decorateURIWithRealm", function () {
+        describe("#decorateURIWithRealm", function () {
             it("appends as a query parameter the realm from the current query string", sinon.test(function () {
                 Configuration.globalData.auth.subRealm = "realm1";
                 this.stub(URIUtils, "getCurrentQueryString").returns("realm=realm2");
@@ -66,7 +66,7 @@ define([
             }));
         });
 
-        describe("decorateURIWithSubRealm", function () {
+        describe("#decorateURIWithSubRealm", function () {
             it("replaces __subrealm__ with the sub realm from global configuration", sinon.test(function () {
                 Configuration.globalData.auth.subRealm = "realm1";
 
@@ -82,7 +82,7 @@ define([
             }));
         });
 
-        describe("getOverrideRealm", function () {
+        describe("#getOverrideRealm", function () {
             it("returns the realm from the current query string", sinon.test(function () {
                 this.stub(URIUtils, "getCurrentQueryString").returns("realm=realm1");
 
@@ -103,7 +103,7 @@ define([
             }));
         });
 
-        describe("getSubRealm", function () {
+        describe("#getSubRealm", function () {
             it("returns the realm from the fragment path", sinon.test(function () {
                 this.stub(URIUtils, "getCurrentFragment").returns("login/realm1");
 

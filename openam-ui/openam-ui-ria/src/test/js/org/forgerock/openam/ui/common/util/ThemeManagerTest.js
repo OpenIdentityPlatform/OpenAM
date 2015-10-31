@@ -91,7 +91,7 @@ define([
             sandbox.restore();
         });
 
-        describe("getTheme", function () {
+        describe("#getTheme", function () {
             it("sends EVENT_THEME_CHANGED event", function () {
                 return ThemeManager.getTheme().then(function () {
                     expect(EventManager.sendEvent).to.be.calledOnce.calledWith(Constants.EVENT_THEME_CHANGED);
