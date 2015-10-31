@@ -190,7 +190,7 @@
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
-        <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+        <siteDistributionURL>scp://community.internal.forgerock.com/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
 
         <!-- Default license (CDDL) to package into the artifacts -->
         <forgerock.license.groupId>org.forgerock</forgerock.license.groupId>
