@@ -300,7 +300,6 @@
                                  i18nKey="a400">
                     <DefaultValues>
                         <Value>en|Registration email</Value>
-                        <Value>fr|Inscription e-mail</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -310,8 +309,7 @@
                                  resourceName="registrationEmailText"
                                  i18nKey="a410">
                     <DefaultValues>
-                        <Value>en|Click on this <a href="%link%">link</a> to register</Value>
-                        <Value>fr|Cliquez sur ce <a href="%link%">lien</a> pour vous inscrire</Value>
+                        <Value>en|Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to register</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -322,7 +320,6 @@
                                  i18nKey="a420">
                     <DefaultValues>
                         <Value>en|Forgotten password email</Value>
-                        <Value>fr|Mot de passe oublié email</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -332,8 +329,7 @@
                                  resourceName="forgottenPasswordEmailText"
                                  i18nKey="a430">
                     <DefaultValues>
-                        <Value>en|Click on this <a href="%link%">link</a> to reset your password</Value>
-                        <Value>fr|Cliquez sur ce <a href="%link%">lien</a> pour réinitialiser votre mot de passe</Value>
+                        <Value>en|Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to reset your password</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
