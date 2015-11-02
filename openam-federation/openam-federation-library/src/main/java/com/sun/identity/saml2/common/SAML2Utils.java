@@ -28,6 +28,7 @@
 package com.sun.identity.saml2.common;
 
 import com.sun.identity.common.HttpURLConnectionManager;
+import com.sun.identity.common.SystemConfigurationException;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.cot.COTException;
 import com.sun.identity.cot.CircleOfTrustDescriptor;
@@ -101,6 +102,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.owasp.esapi.ESAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1598,15 +1600,20 @@ public class SAML2Utils extends SAML2SDKUtils {
     }
 
     /**
-     * Gets remote service URL according to server id embedded in specified id.
-     * @param id an id.
-     * @return remote service URL or null if it is local or an error occurred.
+     * Gets remote service URL according to server id embedded in the provided ID.
+     *
+     * @param id The server's ID or a user's sessionIndex.
+     * @return Remote service URL corresponding to the ID, or null if the ID is local, or an error occurred.
      */
     public static String getRemoteServiceURL(String id) {
         if (debug.messageEnabled()) {
             debug.message("SAML2Utils.getRemoteServiceURL: id = " + id);
         }
-        
+
+        if (StringUtils.isEmpty(id)) {
+            return null;
+        }
+
         String serverID = extractServerId(id);
         
         try {
@@ -1624,9 +1631,9 @@ public class SAML2Utils extends SAML2SDKUtils {
             }
 
             return SystemConfigurationUtil.getServerFromID(serverID);
-        } catch (Exception ex) {
+        } catch (SystemConfigurationException sce) {
             if (debug.messageEnabled()) {
-                debug.message("SAML2Utils.getRemoteServiceURL:", ex);
+                debug.message("SAML2Utils.getRemoteServiceURL:", sce);
             }
             return null;
         }
