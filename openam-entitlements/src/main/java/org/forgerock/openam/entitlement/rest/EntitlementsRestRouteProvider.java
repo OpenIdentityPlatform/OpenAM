@@ -22,9 +22,10 @@ import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.fluent.PoliciesAuditFilter;
 
 /**
- * A {@link RestRouteProvider} that add routes for all the entitlement (policy)
+ * A {@link RestRouteProvider} that adds routes for all the entitlement (policy)
  * endpoints.
  *
  * @since 13.0.0
@@ -34,7 +35,7 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
     @Override
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter.route("policies")
-                .auditAs(POLICY)
+                .auditAs(POLICY, PoliciesAuditFilter.class)
                 .authorizeWith(PrivilegeAuthzModule.class)
                 .forVersion(1)
                 .through(PolicyV1Filter.class)

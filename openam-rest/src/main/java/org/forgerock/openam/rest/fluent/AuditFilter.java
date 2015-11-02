@@ -15,15 +15,9 @@
  */
 package org.forgerock.openam.rest.fluent;
 
-import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
-import static org.forgerock.json.resource.ResourceException.getException;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
-import org.forgerock.services.context.Context;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
@@ -43,9 +37,13 @@ import org.forgerock.json.resource.Response;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.ResultHandler;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Filter which will audit any requests that pass through it.
@@ -255,7 +253,7 @@ public class AuditFilter implements Filter {
                 .thenOnResult(new ResultHandler<Response>() {
                     @Override
                     public void handleResult(Response response) {
-                        auditingHandler.auditAccessSuccess();
+                        auditingHandler.auditAccessSuccess(getDetail(response));
                     }
                 })
                 .thenOnException(new ExceptionHandler<ResourceException>() {
@@ -268,5 +266,18 @@ public class AuditFilter implements Filter {
 
     private CrestAuditor newAuditor(Context context, Request request) {
         return new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to the response
+     * to a successful access event. This information is logged in the access audit log. Subclasses can implement
+     * this method if they need to return details.
+     *
+     * @param response The {@link Response} instance from which details may be taken. Cannot be null.
+     * @return Defaults to null. Overriders of this method can return {@link JsonValue} free-form details, or null
+     * to indicate no details.
+     */
+    public JsonValue getDetail(Response response) {
+        return null;
     }
 }

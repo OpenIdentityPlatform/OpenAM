@@ -105,11 +105,15 @@ class CrestAuditor {
 
     /**
      * Publishes an event with details of the successfully completed CREST operation, if the 'access' topic is audited.
+     * Provides additional detail.
      * <p/>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
+     *
+     * @param responseDetail Additional details relating to the response (e.g. failure description or summary
+     *                       of the payload). Can be null if there are no additional details.
      */
-    void auditAccessSuccess() {
+    void auditAccessSuccess(JsonValue responseDetail) {
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
 
             final long endTime = System.currentTimeMillis();
@@ -119,8 +123,12 @@ class CrestAuditor {
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
-                    .component(component)
-                    .response(SUCCESS, "", elapsedTime, MILLISECONDS);
+                    .component(component);
+            if (responseDetail == null) {
+                builder.response(SUCCESS, "", elapsedTime, MILLISECONDS);
+            } else {
+                builder.responseWithDetail(SUCCESS, "", elapsedTime, MILLISECONDS, responseDetail);
+            }
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
