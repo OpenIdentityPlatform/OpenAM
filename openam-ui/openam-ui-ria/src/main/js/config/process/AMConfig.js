@@ -44,10 +44,9 @@ define("config/process/AMConfig", [
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
                 delete conf.gotoURL;
 
-                // change response.goto to response.<attribute name>
-                // response.goto = "http://www.bbc.co.uk";
-
-                gotoURL = urlParams.goto || response.goto;
+                if (!gotoURL && response) {
+                    gotoURL = response.goto;
+                }
 
                 if (gotoURL) {
                     Router.setUrl(decodeURIComponent(gotoURL));
