@@ -73,15 +73,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddModuleDialo
             });
         }
     }
-    function enableOrDisableCreateButton (dialog) {
-        dialog.$modalBody.on("change keyup", "#newModuleName, #newModuleType", function () {
-            if (addModuleDialogValidation(dialog)) {
-                dialog.getButton("createButton").enable();
-            } else {
-                dialog.getButton("createButton").disable();
-            }
-        });
-    }
 
     return function (realmPath, types) {
         UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/modules/AddModuleTemplate.html",
@@ -107,7 +98,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddModuleDialo
                 onshow: function (dialog) {
                     dialog.getButton("createButton").disable();
                     dialog.$modalBody.find("#newModuleType").selectize();
-                    enableOrDisableCreateButton(dialog);
+
+                    dialog.$modalBody.on("change keyup", "#newModuleName, #newModuleType", function () {
+                        if (addModuleDialogValidation(dialog)) {
+                            dialog.getButton("createButton").enable();
+                        } else {
+                            dialog.getButton("createButton").disable();
+                        }
+                    });
                 }
             });
         });

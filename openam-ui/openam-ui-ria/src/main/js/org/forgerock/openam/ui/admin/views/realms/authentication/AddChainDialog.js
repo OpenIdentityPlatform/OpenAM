@@ -27,15 +27,34 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
     function closeDialog (dialog) {
         dialog.close();
     }
-    function nameValid (chains, name) {
-        return _.every(chains, function (chain) {
-            return chain._id !== name;
+    function nameValid (dialog) {
+        var valid = true,
+            alert = "",
+            existName = false,
+            name = dialog.getModalBody().find("#name").val().trim(),
+            chains = dialog.options.data.chains;
+
+        if (name === "") { valid = false; }
+
+        _.each(chains, function (chain) {
+            if (chain._id === name) {
+                existName = true;
+            }
         });
+
+        if (existName) {
+            valid = false;
+            alert = Handlebars.compile("{{> alerts/_Alert type='warning' " +
+                "text='console.authentication.chains.duplicateChain'}}");
+        }
+
+        dialog.$modalBody.find("#alertContainer").html(alert);
+        return valid;
     }
     function validateAndCreate (dialog) {
         var name = dialog.getModalBody().find("#name").val().trim();
 
-        if (nameValid(dialog.options.data.chains, name)) {
+        if (nameValid(dialog)) {
             SMSRealmDelegate.authentication.chains.create(
                 dialog.options.data.realmPath,
                 { _id: name }
@@ -54,10 +73,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
                     response: event
                 });
             });
-        } else {
-            dialog.getModalBody().find("#alertContainer").html(Handlebars.compile(
-                "{{> alerts/_Alert type='warning' text='console.authentication.chains.duplicateChain'}}"
-            ));
         }
     }
 
@@ -72,6 +87,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
                     label: $.t("common.form.cancel"),
                     action: closeDialog
                 }, {
+                    id: "createButton",
                     label: $.t("common.form.create"),
                     cssClass: "btn-primary",
                     action: validateAndCreate
@@ -79,6 +95,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
                 data: {
                     chains: chains,
                     realmPath: realmPath
+                },
+                onshow: function (dialog) {
+                    dialog.getButton("createButton").disable();
+
+                    dialog.$modalBody.on("change keyup", "#name", function () {
+                        if (nameValid(dialog)) {
+                            dialog.getButton("createButton").enable();
+                        } else {
+                            dialog.getButton("createButton").disable();
+                        }
+                    });
                 }
             });
         });
