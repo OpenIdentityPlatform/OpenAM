@@ -21,12 +21,13 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
     "backgrid",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, _, AbstractView, Backgrid, BackgridUtils, BootstrapDialog, CreateUpdateRealmDialog,
+], function ($, _, AbstractView, Backgrid, BackgridUtils, BootstrapDialog, Messages, CreateUpdateRealmDialog,
             Form, FormHelper, Router, SMSGlobalDelegate) {
     var RealmsView = AbstractView.extend({
         template: "templates/admin/views/realms/RealmsListTemplate.html",
@@ -50,8 +51,6 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
         },
         deleteRealm: function (event) {
             event.preventDefault();
-            if ($(event.target).parent().hasClass("disabled")) { return false; }
-
             var self = this,
                 realm = this.getRealmFromEvent(event),
                 buttons = [{
@@ -63,11 +62,15 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                     label: $.t("common.form.delete"),
                     cssClass: "btn-danger",
                     action: function (dialog) {
-                        self.performDeleteRealm(realm.path).done(function () {
+                        self.performDeleteRealm(realm.path).always(function () {
                             dialog.close();
                         });
                     }
                 }];
+
+            if (!realm.canDelete) {
+                return false;
+            }
 
             if (realm.active) {
                 buttons.splice(1, 0, {
@@ -131,7 +134,17 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
 
             return SMSGlobalDelegate.realms.remove(path).done(function () {
                 self.render();
+            }).fail(function (response) {
+                if (response && response.status === 409) {
+                    Messages.addMessage({
+                        message: $.t("console.realms.parentRealmCannotDeleted"),
+                        type: Messages.TYPE_DANGER
+                    });
+                }
             });
+        },
+        canRealmBeDeleted: function (realm) {
+            return realm.path === "/" ? false : true;
         },
         render: function (args, callback) {
             var self = this;
@@ -147,6 +160,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                 self.data.allRealmPaths = [];
 
                 _.each(self.data.realms, function (realm) {
+                    realm.canDelete = self.canRealmBeDeleted(realm);
                     self.data.allRealmPaths.push(realm.path);
                 });
 

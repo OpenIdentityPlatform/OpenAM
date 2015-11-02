@@ -779,6 +779,7 @@
             "description" : "Use realms to organize subjects and configuration data. Within each realm you can configure data stores, administration privileges, authentication chains, authorization policies, and other realm-specific settings.",
             "newRealm": "New Realm",
             "header": ["Realm name", "Status", "Path", "Realm/DNS Aliases"],
+            "parentRealmCannotDeleted": "Parent-realms cannot be deleted. Please delete any sub-realms first.",
             "warningDialog": {
                 "title": "Delete \"__realmName__\"?",
                 "enableMessage": "This is an enabled realm. All configuration data will be lost if deleted. You can set the realm as disabled to prevent login but retain configuration data. <br>Do you want to delete this realm?",

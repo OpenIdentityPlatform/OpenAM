@@ -27,7 +27,7 @@
                                     <li><a href="#" class="toggle-realm-active"><i class="fa fa-check"></i> {{t "common.form.enable"}}</a></li>
                                 {{/if}}
                                 <li class="divider"></li>
-                                <li {{#equals path "/" }} class="disabled" {{/equals}}><a href="#" class="delete-realm"><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
+                                <li {{#unless canDelete}} class="disabled" {{/unless}}><a href="#" class="delete-realm"><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
                             </ul>
                         </div>
                         <a href="{{routeTo 'realmDefault' path}}">
@@ -97,7 +97,7 @@
                                 <td class="fr-col-btn-2">
                                     <div class="btn-group realm-name" data-realm-path="{{path}}">
                                         <button type="button" class="btn btn-link edit-realm" data-realm-name="{{name}}"><i class="fa fa-pencil"></i></button>
-                                        <button type="button" class="btn btn-link delete-realm"><i class="fa fa-close"></i></button>
+                                        <button type="button" class="btn btn-link delete-realm {{#unless canDelete}} disabled {{/unless}}"><i class="fa fa-close"></i></button>
                                     </div>
                                 </td>
                             </tr>
