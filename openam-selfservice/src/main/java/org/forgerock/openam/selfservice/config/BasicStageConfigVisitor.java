@@ -17,10 +17,11 @@
 package org.forgerock.openam.selfservice.config;
 
 import org.forgerock.selfservice.core.ProgressStageBinder;
-import org.forgerock.selfservice.core.config.StageConfig;
 import org.forgerock.selfservice.stages.CommonConfigVisitor;
 import org.forgerock.selfservice.stages.captcha.CaptchaStage;
 import org.forgerock.selfservice.stages.captcha.CaptchaStageConfig;
+import org.forgerock.selfservice.stages.dynamic.DynamicConfigVisitor;
+import org.forgerock.selfservice.stages.dynamic.DynamicStageConfig;
 import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
 import org.forgerock.selfservice.stages.email.VerifyEmailAccountStage;
 import org.forgerock.selfservice.stages.kba.SecurityAnswerDefinitionConfig;
@@ -39,8 +40,7 @@ import org.forgerock.selfservice.stages.user.UserQueryStage;
 import javax.inject.Inject;
 
 /**
- * This visitor is responsible for building progress stages related to
- * the user registration flow as defined by the visited configurations.
+ * This visitor is responsible for building progress stages.
  *
  * @since 13.0.0
  */
@@ -54,6 +54,8 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
     private final SecurityAnswerVerificationStage securityAnswerVerificationStage;
     private final ResetStage resetStage;
     private final CaptchaStage captchaStage;
+
+    private final DynamicConfigVisitor dynamicConfigVisitor;
 
     /**
      * Constructs a new user registration visitor.
@@ -72,12 +74,15 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
      *         reset password stage
      * @param captchaStage
      *         captcha stage
+     * @param dynamicConfigVisitor
+     *         dynamic config visitor
      */
     @Inject
     public BasicStageConfigVisitor(VerifyEmailAccountStage verifyEmailAccountStage,
             SecurityAnswerDefinitionStage securityAnswerDefinitionStage, UserRegistrationStage userRegistrationStage,
             UserDetailsStage userDetailsStage, UserQueryStage userQueryStage, ResetStage resetStage,
-            CaptchaStage captchaStage, SecurityAnswerVerificationStage securityAnswerVerificationStage) {
+            CaptchaStage captchaStage, SecurityAnswerVerificationStage securityAnswerVerificationStage,
+            DynamicConfigVisitor dynamicConfigVisitor) {
         this.verifyEmailAccountStage = verifyEmailAccountStage;
         this.securityAnswerDefinitionStage = securityAnswerDefinitionStage;
         this.userRegistrationStage = userRegistrationStage;
@@ -86,6 +91,8 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
         this.securityAnswerVerificationStage = securityAnswerVerificationStage;
         this.resetStage = resetStage;
         this.captchaStage = captchaStage;
+
+        this.dynamicConfigVisitor = dynamicConfigVisitor;
     }
 
     @Override
@@ -129,8 +136,8 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
     }
 
     @Override
-    public ProgressStageBinder<?> build(StageConfig stageConfig) {
-        throw new UnsupportedOperationException("Unknown stage config " + stageConfig.getName());
+    public ProgressStageBinder<?> build(DynamicStageConfig dynamicStageConfig) {
+        return dynamicConfigVisitor.build(dynamicStageConfig);
     }
 
 }

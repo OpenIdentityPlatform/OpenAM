@@ -21,8 +21,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import com.google.inject.Injector;
-import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
+import org.forgerock.selfservice.stages.CommonConfigVisitor;
 import org.forgerock.services.context.Context;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -90,7 +90,7 @@ public final class ServiceConfigProviderFactoryImplTest {
         }
 
         @Override
-        public ProcessInstanceConfig<CustomSupportConfigVisitor> getServiceConfig(
+        public ProcessInstanceConfig<CommonConfigVisitor> getServiceConfig(
                 MockConfig config, Context context, String realm) {
             return null;
         }

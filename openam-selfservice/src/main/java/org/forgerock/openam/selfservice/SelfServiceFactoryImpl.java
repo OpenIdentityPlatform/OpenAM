@@ -17,11 +17,12 @@
 package org.forgerock.openam.selfservice;
 
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
+import org.forgerock.openam.selfservice.config.BasicStageConfigVisitor;
 import org.forgerock.selfservice.core.AnonymousProcessService;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
+import org.forgerock.selfservice.stages.CommonConfigVisitor;
 
 import javax.inject.Inject;
 
@@ -34,7 +35,7 @@ class SelfServiceFactoryImpl implements SelfServiceFactory {
 
     private final SnapshotTokenHandlerFactory tokenHandlerFactory;
     private final ProcessStore processStore;
-    private final CustomSupportConfigVisitor stageConfigVisitor;
+    private final BasicStageConfigVisitor stageConfigVisitor;
 
     /**
      * Constructs the default forgotten password service provider.
@@ -48,14 +49,14 @@ class SelfServiceFactoryImpl implements SelfServiceFactory {
      */
     @Inject
     SelfServiceFactoryImpl(SnapshotTokenHandlerFactory tokenHandlerFactory,
-            ProcessStore processStore, CustomSupportConfigVisitor stageConfigVisitor) {
+            ProcessStore processStore, BasicStageConfigVisitor stageConfigVisitor) {
         this.tokenHandlerFactory = tokenHandlerFactory;
         this.processStore = processStore;
         this.stageConfigVisitor = stageConfigVisitor;
     }
 
     @Override
-    public RequestHandler getService(ProcessInstanceConfig<CustomSupportConfigVisitor> serviceConfig) {
+    public RequestHandler getService(ProcessInstanceConfig<CommonConfigVisitor> serviceConfig) {
         return new AnonymousProcessService<>(serviceConfig, stageConfigVisitor, tokenHandlerFactory, processStore);
     }
 

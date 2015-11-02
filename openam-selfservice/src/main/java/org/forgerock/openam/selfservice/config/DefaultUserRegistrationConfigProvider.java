@@ -21,10 +21,10 @@ import com.sun.identity.shared.Constants;
 import org.forgerock.json.jose.jwe.EncryptionMethod;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
 import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.config.StageConfig;
+import org.forgerock.selfservice.stages.CommonConfigVisitor;
 import org.forgerock.selfservice.stages.captcha.CaptchaStageConfig;
 import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
 import org.forgerock.selfservice.stages.kba.KbaConfig;
@@ -42,7 +42,8 @@ import java.util.List;
  *
  * @since 13.0.0
  */
-public final class DefaultUserRegistrationConfigProvider implements ServiceConfigProvider<UserRegistrationConsoleConfig> {
+public final class DefaultUserRegistrationConfigProvider
+        implements ServiceConfigProvider<UserRegistrationConsoleConfig> {
 
     @Override
     public boolean isServiceEnabled(UserRegistrationConsoleConfig config) {
@@ -50,10 +51,10 @@ public final class DefaultUserRegistrationConfigProvider implements ServiceConfi
     }
 
     @Override
-    public ProcessInstanceConfig<CustomSupportConfigVisitor> getServiceConfig(
+    public ProcessInstanceConfig<CommonConfigVisitor> getServiceConfig(
             UserRegistrationConsoleConfig config, Context context, String realm) {
 
-        List<StageConfig<? super CustomSupportConfigVisitor>> stages = new ArrayList<>();
+        List<StageConfig<? super CommonConfigVisitor>> stages = new ArrayList<>();
 
         if (config.isCaptchaEnabled()) {
             stages.add(new CaptchaStageConfig()
@@ -66,6 +67,7 @@ public final class DefaultUserRegistrationConfigProvider implements ServiceConfi
             String serverUrl = config.getEmailUrl() + "&realm=" + realm;
             stages.add(new VerifyEmailAccountConfig()
                     .setEmailServiceUrl("/email")
+                    .setIdentityEmailField("mail")
                     .setSubjectTranslations(config.getSubjectTranslations())
                     .setMessageTranslations(config.getMessageTranslations())
                     .setMimeType("text/html")
@@ -95,7 +97,7 @@ public final class DefaultUserRegistrationConfigProvider implements ServiceConfi
                 .setJwsAlgorithm(JwsAlgorithm.HS256)
                 .setTokenLifeTimeInSeconds(config.getTokenExpiry());
 
-        return new ProcessInstanceConfig<CustomSupportConfigVisitor>()
+        return new ProcessInstanceConfig<CommonConfigVisitor>()
                 .setStageConfigs(stages)
                 .setSnapshotTokenConfig(jwtTokenConfig)
                 .setStorageType(StorageType.STATELESS);

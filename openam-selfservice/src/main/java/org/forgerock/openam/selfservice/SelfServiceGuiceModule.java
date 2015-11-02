@@ -17,6 +17,7 @@ package org.forgerock.openam.selfservice;
 
 import static org.forgerock.json.resource.Resources.newInternalConnectionFactory;
 
+import com.google.inject.Injector;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
@@ -39,12 +40,15 @@ import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactoryImpl;
 import org.forgerock.openam.selfservice.config.UserRegistrationConsoleConfig;
 import org.forgerock.openam.selfservice.config.UserRegistrationExtractor;
-import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
-import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitorImpl;
 import org.forgerock.selfservice.core.ProcessStore;
+import org.forgerock.selfservice.core.ProgressStage;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
 import org.forgerock.selfservice.stages.CommonConfigVisitor;
 import org.forgerock.selfservice.stages.SelfService;
+import org.forgerock.selfservice.stages.dynamic.DynamicConfigVisitor;
+import org.forgerock.selfservice.stages.dynamic.DynamicConfigVisitorImpl;
+import org.forgerock.selfservice.stages.dynamic.DynamicProgressStageProvider;
+import org.forgerock.selfservice.stages.dynamic.DynamicStageConfig;
 
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
@@ -64,7 +68,6 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         bind(SnapshotTokenHandlerFactory.class).to(SnapshotTokenHandlerFactoryImpl.class);
         bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
         bind(CommonConfigVisitor.class).to(BasicStageConfigVisitor.class);
-        bind(CustomSupportConfigVisitor.class).to(CustomSupportConfigVisitorImpl.class);
         bind(SelfServiceFactory.class).to(SelfServiceFactoryImpl.class);
 
         bind(new TypeLiteral<ConsoleConfigExtractor<UserRegistrationConsoleConfig>>() {})
@@ -115,6 +118,20 @@ public final class SelfServiceGuiceModule extends PrivateModule {
             PrivilegedAction<SSOToken> ssoTokenPrivilegedAction) {
         ConnectionFactory internalConnectionFactory = newInternalConnectionFactory(router);
         return new ElevatedConnectionFactoryWrapper(internalConnectionFactory, ssoTokenPrivilegedAction);
+    }
+
+    @Provides
+    @Singleton
+    DynamicConfigVisitor getCustomConfigVisitor(final Injector injector) {
+        return new DynamicConfigVisitorImpl(new DynamicProgressStageProvider() {
+
+            @Override
+            public ProgressStage<DynamicStageConfig> get(
+                    Class<? extends ProgressStage<DynamicStageConfig>> progressStageClass) {
+                return injector.getInstance(progressStageClass);
+            }
+
+        });
     }
 
 }
