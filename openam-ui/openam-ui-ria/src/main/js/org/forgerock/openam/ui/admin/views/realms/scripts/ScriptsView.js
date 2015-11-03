@@ -190,7 +190,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 },
                 onError = function (model, response) {
                     onDestroy();
-                    Messages.messages.addMessage({ message: response.responseJSON.message, type: "error" });
+                    Messages.addMessage({ response: response, type: Messages.TYPE_DANGER });
                 };
 
             for (; i < this.data.selectedUUIDs.length; i++) {

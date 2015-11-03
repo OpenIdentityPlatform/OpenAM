@@ -115,12 +115,12 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     action: function (dialog) {
                         dialog.enableButtons(false);
                         dialog.getButton("btnOk").text($.t("common.form.working"));
-                        self.model.get("policy").destroy().done(function () {
+                        self.model.get("policy").destroy().then(function () {
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllPoliciesSuccess");
                             self.onModelChange(self.model);
-                        }).fail(function (error) {
+                        }, function (response) {
                             Messages.addMessage({
-                                response: error.responseText,
+                                response: response,
                                 type: Messages.TYPE_DANGER
                             });
                         }).always(function () {

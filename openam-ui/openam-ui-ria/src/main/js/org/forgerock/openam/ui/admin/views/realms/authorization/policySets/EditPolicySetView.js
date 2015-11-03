@@ -245,7 +245,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                 },
                 onError = function (model, response) {
                     Messages.addMessage({
-                        message: response.responseJSON.message,
+                        response: response,
                         type: Messages.TYPE_DANGER
                     });
                 };

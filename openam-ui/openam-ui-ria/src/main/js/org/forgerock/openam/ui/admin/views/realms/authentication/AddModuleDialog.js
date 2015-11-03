@@ -52,14 +52,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddModuleDialo
             modulesDelegate.exists(dialog.options.data.realmPath, moduleName).then(function (result) {
                 var authenticationModules = modulesDelegate;
                 if (result) {
-                    Messages.messages.addMessage({
-                        message: $.t("console.authentication.modules.addModuleDialogError"),
-                        type: "error"
+                    Messages.addMessage({
+                        type: Messages.TYPE_DANGER,
+                        message: $.t("console.authentication.modules.addModuleDialogError")
                     });
                 } else {
-                    authenticationModules.create(dialog.options.data.realmPath, {
-                        _id: moduleName
-                    }, moduleType).then(function () {
+                    authenticationModules.create(dialog.options.data.realmPath, { _id: moduleName }, moduleType)
+                    .then(function () {
                         dialog.close();
                         Router.routeTo(Router.configuration.routes.realmsAuthenticationModuleEdit, {
                             args: [
@@ -68,8 +67,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddModuleDialo
                                 encodeURIComponent(moduleName)],
                             trigger: true
                         });
+                    }, function (response) {
+                        Messages.addMessage({
+                            type: Messages.TYPE_DANGER,
+                            response: response
+                        });
                     });
                 }
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
             });
         }
     }

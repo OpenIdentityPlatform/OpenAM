@@ -311,9 +311,9 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         }
 
         options.error = function (response) {
-            Messages.messages.addMessage({
-                type: "error",
-                message: JSON.parse(response.responseText).message
+            Messages.addMessage({
+                type: Messages.TYPE_DANGER,
+                response: response
             });
         };
 

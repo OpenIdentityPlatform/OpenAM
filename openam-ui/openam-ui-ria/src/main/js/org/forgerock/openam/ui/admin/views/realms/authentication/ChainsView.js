@@ -84,7 +84,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
 
             performDeleteChains(this.data.realmPath, name).then(function () {
                 self.render([self.data.realmPath]);
-            }, function () {
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
                 $(element).prop("disabled", false);
             });
         },
@@ -98,7 +102,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
 
             performDeleteChains(this.data.realmPath, names).then(function () {
                 self.render([self.data.realmPath]);
-            }, function () {
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
                 $(element).prop("disabled", false);
             });
         },
@@ -123,10 +131,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                         callback();
                     }
                 });
-            }, function (event) {
+            }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: event
+                    response: response
                 });
             });
         }

@@ -275,6 +275,11 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                     function (tpl) {
                         self.$el.find("#validation").html(tpl);
                     });
+            }).fail(function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
             });
         },
 
@@ -482,7 +487,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
                 onError = function (model, response) {
-                    Messages.messages.addMessage({
+                    Messages.addMessage({
                         response: response,
                         type: Messages.TYPE_DANGER
                     });

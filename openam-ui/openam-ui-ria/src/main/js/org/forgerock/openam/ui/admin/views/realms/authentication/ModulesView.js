@@ -24,13 +24,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
     "org/forgerock/openam/ui/admin/views/realms/authentication/EditModuleDialog",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
 
     // jquery dependencies
     "selectize"
-], function ($, _, AbstractView, AddModuleDialog, arrayify, Configuration, EditModuleDialog, Form, FormHelper, Promise,
-             SMSRealmDelegate) {
+], function ($, _, AbstractView, AddModuleDialog, arrayify, Configuration, EditModuleDialog, Form, FormHelper, Messages,
+             Promise, SMSRealmDelegate) {
     function getModuleInfoFromElement (element) {
         return $(element).closest("tr").data();
     }
@@ -58,8 +59,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             event.preventDefault();
             var self = this;
 
-            SMSRealmDelegate.authentication.modules.types.all(this.data.realmPath).done(function (data) {
+            SMSRealmDelegate.authentication.modules.types.all(this.data.realmPath).then(function (data) {
                 AddModuleDialog(self.data.realmPath, data.result);
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
             });
         },
         moduleSelected: function (event) {
@@ -89,7 +95,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
 
             performDeleteModules(this.data.realmPath, moduleInfo).then(function () {
                 self.render(self.data.args);
-            }, function () {
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
                 $(element).prop("disabled", false);
             });
         },
@@ -103,7 +113,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
 
             performDeleteModules(this.data.realmPath, moduleInfos).then(function () {
                 self.render([self.data.realmPath]);
-            }, function () {
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
                 $(element).prop("disabled", false);
             });
         },
@@ -132,6 +146,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                 });
 
                 self.data.formData = values[1][0].result;
+
+                self.parentRender(function () {
+                    if (callback) {
+                        callback();
+                    }
+                });
+            }, function (errorChains, errorModules) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: errorChains ? errorChains : errorModules
+                });
 
                 self.parentRender(function () {
                     if (callback) {

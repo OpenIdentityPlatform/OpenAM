@@ -21,9 +21,11 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
     "org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
-], function ($, _, AbstractView, CreateUpdateRealmDialog, DashboardTasksView, SMSGlobalDelegate, SMSRealmDelegate) {
+], function ($, _, AbstractView, CreateUpdateRealmDialog, DashboardTasksView, Messages, SMSGlobalDelegate,
+             SMSRealmDelegate) {
     var DashboardView = AbstractView.extend({
         template: "templates/admin/views/realms/dashboard/DashboardTemplate.html",
         events: {
@@ -46,8 +48,7 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
 
             this.data.realmPath = args[0];
 
-            $.when(realmPromise, tasksPromise).done(function (realmData, tasksData) {
-
+            $.when(realmPromise, tasksPromise).then(function (realmData, tasksData) {
                 self.data.realm = {
                     status: realmData.values.active ? $.t("common.form.enabled") : $.t("common.form.disabled"),
                     aliases: realmData.values.aliases
@@ -59,10 +60,11 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
                     dashboardTasks.data.taskGroup = { tasks: tasksData[0].result };
                     dashboardTasks.render(args, callback);
                 }, callback);
-            })
-            .fail(function () {
-                // TODO: Add failure condition
-                self.parentRender(callback);
+            }, function (errorRealm, errorTasks) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: errorRealm ? errorRealm : errorTasks
+                });
             });
 
         }

@@ -17,8 +17,9 @@
 define("org/forgerock/openam/ui/admin/utils/FormHelper", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/common/components/BootstrapDialog"
-], function ($, _, BootstrapDialog) {
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
+    "org/forgerock/commons/ui/common/components/Messages"
+], function ($, _, BootstrapDialog, Messages) {
     /**
      * @exports org/forgerock/openam/ui/admin/utils/FormHelper
      */
@@ -53,7 +54,11 @@ define("org/forgerock/openam/ui/admin/utils/FormHelper", [
 
             promise.done(function () {
                 span.removeClass().addClass("fa fa-check fa-fw");
-            }).fail(function () {
+            }).fail(function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
                 span.removeClass().addClass("fa fa-times fa-fw");
                 element.removeClass().addClass("btn btn-danger");
             }).always(function () {

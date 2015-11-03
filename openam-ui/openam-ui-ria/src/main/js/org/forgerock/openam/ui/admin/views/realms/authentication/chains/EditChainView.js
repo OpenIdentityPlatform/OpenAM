@@ -148,10 +148,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     args: [encodeURIComponent(self.data.realmPath)],
                     trigger: true
                 });
-            }, function (e) {
+            }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: e
+                    response: response
                 });
             });
         },
@@ -207,10 +207,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     PostProcessView.render(self.data.form.chainData);
                 });
 
-            }, function (e) {
+            }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: e
+                    response: response
                 });
             });
         },
@@ -231,10 +231,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     promise = SMSRealmDelegate.authentication.chains.update(
                         self.data.realmPath, chainData._id, savedData);
 
-                promise.fail(function (error) {
+                promise.fail(function (response) {
                     Messages.addMessage({
                         type: Messages.TYPE_DANGER,
-                        response: error
+                        response: response
                     });
                 });
 
@@ -249,10 +249,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                 },
                 promise = SMSRealmDelegate.authentication.chains.update(this.data.realmPath, chainData._id, savedData);
 
-            promise.fail(function (error) {
+            promise.fail(function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: error
+                    response: response
                 });
             });
 

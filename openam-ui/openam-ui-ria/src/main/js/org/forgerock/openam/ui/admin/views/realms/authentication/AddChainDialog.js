@@ -67,10 +67,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
                     ],
                     trigger: true
                 });
-            }, function (event) {
+            }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: event
+                    response: response
                 });
             });
         }

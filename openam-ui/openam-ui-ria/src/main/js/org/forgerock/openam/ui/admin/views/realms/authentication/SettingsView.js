@@ -21,11 +21,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, AbstractView, Configuration, Constants, Form, FormHelper, SMSRealmDelegate) {
+], function ($, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSRealmDelegate) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
@@ -39,7 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
             this.data.realmLocation = args[0];
 
-            SMSRealmDelegate.authentication.get(this.data.realmLocation).done(function (data) {
+            SMSRealmDelegate.authentication.get(this.data.realmLocation).then(function (data) {
                 self.data.formData = data;
 
                 self.parentRender(function () {
@@ -51,6 +52,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
                     if (callback) {
                         callback();
                     }
+                });
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
                 });
             });
         },

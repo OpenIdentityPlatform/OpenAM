@@ -212,7 +212,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
                 onError = function (model, response) {
-                    Messages.messages.addMessage({ message: response.responseJSON.message, type: "error" });
+                    Messages.addMessage({ response: response, type: Messages.TYPE_DANGER });
                 };
 
             this.model.destroy({

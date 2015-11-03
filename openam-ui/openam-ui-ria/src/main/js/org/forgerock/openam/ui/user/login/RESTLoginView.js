@@ -235,7 +235,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 this.template = this.unavailableTemplate;
                 this.parentRender(function () {
                     if (error) {
-                        Messages.messages.addMessage(error);
+                        Messages.addMessage({
+                            type: Messages.TYPE_DANGER,
+                            response: error
+                        });
                     }
                 });
             }, this));

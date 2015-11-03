@@ -24,9 +24,9 @@ define("org/forgerock/openam/ui/admin/delegates/ScriptsDelegate", [
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json");
 
     function getLocalizedResponse (response) {
-        Messages.messages.addMessage({
-            type: "error",
-            message: JSON.parse(response.responseText).message
+        Messages.addMessage({
+            type: Messages.TYPE_DANGER,
+            response: response
         });
     }
 

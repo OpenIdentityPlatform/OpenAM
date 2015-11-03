@@ -46,8 +46,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
                 },
                 onError = function (model, response) {
                     self.data.items.fetch({ reset: true });
-                    Messages.messages.addMessage({
-                        message: response.responseJSON.message,
+                    Messages.addMessage({
+                        response: response,
                         type: Messages.TYPE_DANGER
                     });
                 };
