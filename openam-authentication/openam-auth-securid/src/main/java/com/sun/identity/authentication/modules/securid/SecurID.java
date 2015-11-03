@@ -122,7 +122,7 @@ public class SecurID extends AMLoginModule {
             String thisOrg = getRequestOrg();
             if (debug.messageEnabled()) {
                 debug.message("SecurID:init:subject = " + subject +
-                    "\n\tsharedState = " + sharedState +
+                    "\n\tusername from sharedState = " + sharedState.get(getUserKey()) +
                     "\n\toptions = " + options +
                     "\n\torg = " + thisOrg);
             }
