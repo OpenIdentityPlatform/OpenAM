@@ -292,7 +292,7 @@ public class AuditFilter implements Filter {
             case UPDATE:
                 return getUpdateSuccessDetail((UpdateRequest) request, (ResourceResponse) response);
             case DELETE:
-                return getDeleteSuccessDetail((UpdateRequest) request, (ResourceResponse) response);
+                return getDeleteSuccessDetail((DeleteRequest) request, (ResourceResponse) response);
             case PATCH:
                 return getPatchSuccessDetail((PatchRequest) request, (ResourceResponse) response);
             case ACTION:
@@ -314,7 +314,7 @@ public class AuditFilter implements Filter {
      * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
      * implementation is provided here as null.
      */
-    private JsonValue getCreateSuccessDetail(CreateRequest request, ResourceResponse response) {
+    public JsonValue getCreateSuccessDetail(CreateRequest request, ResourceResponse response) {
         return null;
     }
 
@@ -328,7 +328,7 @@ public class AuditFilter implements Filter {
      * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
      * implementation is provided here as null.
      */
-    private JsonValue getReadSuccessDetail(ReadRequest request, ResourceResponse response) {
+    public JsonValue getReadSuccessDetail(ReadRequest request, ResourceResponse response) {
         return null;
     }
 
@@ -342,7 +342,7 @@ public class AuditFilter implements Filter {
      * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
      * implementation is provided here as null.
      */
-    private JsonValue getUpdateSuccessDetail(UpdateRequest request, ResourceResponse response) {
+    public JsonValue getUpdateSuccessDetail(UpdateRequest request, ResourceResponse response) {
         return null;
     }
 
@@ -356,7 +356,7 @@ public class AuditFilter implements Filter {
      * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
      * implementation is provided here as null.
      */
-    private JsonValue getDeleteSuccessDetail(UpdateRequest request, ResourceResponse response) {
+    public JsonValue getDeleteSuccessDetail(DeleteRequest request, ResourceResponse response) {
         return null;
     }
 
@@ -370,7 +370,7 @@ public class AuditFilter implements Filter {
      * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
      * implementation is provided here as null.
      */
-    private JsonValue getPatchSuccessDetail(PatchRequest request, ResourceResponse response) {
+    public JsonValue getPatchSuccessDetail(PatchRequest request, ResourceResponse response) {
         return null;
     }
 
@@ -398,7 +398,7 @@ public class AuditFilter implements Filter {
      * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
      * implementation is provided here as null.
      */
-    private JsonValue getQuerySuccessDetail(QueryRequest request, QueryResponse response) {
+    public JsonValue getQuerySuccessDetail(QueryRequest request, QueryResponse response) {
         return null;
     }
 }

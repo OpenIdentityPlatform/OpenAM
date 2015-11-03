@@ -19,13 +19,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.routing.Version;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.RequestType;
+import org.forgerock.json.resource.RequestVisitor;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Responses;
+import org.forgerock.util.i18n.PreferredLocales;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @since 13.0.0
@@ -96,20 +107,12 @@ public class PoliciesAuditFilterTest extends AbstractAuditFilterTest {
     }
 
     @Test
-    public void shouldNotReturnJsonDetailGivenNoActionResponseContent() {
-        QueryResponse queryResponse = Responses.newQueryResponse();
-
-        JsonValue filterResponse = auditFilter.getDetail(queryResponse);
-
-        assertThat(filterResponse).isEqualTo(null);
-    }
-
-    @Test
-    public void shouldReturnJsonDetailGivenActionResponseContent() {
+    public void shouldReturnJsonDetailForActionSuccess() {
         JsonValue jsonValue = new JsonValue("Test string");
         ActionResponse actionResponse = Responses.newActionResponse(jsonValue);
+        ActionRequest actionRequest = mock(ActionRequest.class);
 
-        JsonValue filterResponse = auditFilter.getDetail(actionResponse);
+        JsonValue filterResponse = auditFilter.getActionSuccessDetail(actionRequest, actionResponse);
 
         assertThat(filterResponse).isEqualTo(jsonValue);
     }
