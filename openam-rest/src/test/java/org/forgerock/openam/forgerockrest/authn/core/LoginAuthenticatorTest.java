@@ -23,19 +23,22 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.IdRepoException;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -744,6 +747,46 @@ public class LoginAuthenticatorTest {
         assertEquals(exception.getStatusCode(), 400);
     }
 
+    @Test(dataProvider = "resourceBasedAuthenticationParams")
+    public void shouldUseAuthIndexValueOrGotoUrlForResourceBasedAuth(
+            String authIndexValue, String resourceUrlParam, String expectedResource) throws AuthLoginException {
+        // Given
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        LoginConfiguration config = new LoginConfiguration().indexType(AuthIndexType.RESOURCE)
+                                                            .indexValue(authIndexValue)
+                                                            .httpRequest(mockRequest);
+
+        Map<String, Set<String>> envMap = Collections.singletonMap("a", Collections.singleton("b"));
+        given(coreServicesWrapper.getEnvMap(mockRequest)).willReturn(envMap);
+        given(coreServicesWrapper.getResourceURL(mockRequest)).willReturn(resourceUrlParam);
+
+        LoginProcess mockProcess = mock(LoginProcess.class);
+        AuthenticationContext mockAuthContext = mock(AuthenticationContext.class);
+        given(mockProcess.getLoginConfiguration()).willReturn(config);
+        given(mockProcess.getAuthContext()).willReturn(mockAuthContext);
+
+        // When
+        loginAuthenticator.startLoginProcess(mockProcess);
+
+        // Then
+        verify(mockAuthContext).login(AuthContext.IndexType.RESOURCE, expectedResource, false, envMap, null);
+    }
+
+    @DataProvider
+    public Object[][] resourceBasedAuthenticationParams() {
+        final String authIndex = "http://authIndex.com";
+        final String resourceParam = "http://resourceURL.com";
+        // AuthIndexValue, ResourceURL/goto param, expected resource used
+        return new Object[][]{
+                {authIndex, resourceParam, authIndex},
+                {authIndex, null, authIndex},
+                {"true", resourceParam, resourceParam},
+                {"true", null, null},
+                {null, resourceParam, resourceParam},
+                {null, null, null},
+                {"", resourceParam, resourceParam}
+        };
+    }
     @Test
     public void shouldThrow400ExceptionWithOrgDNNotValidReturningNull() throws SSOException,
             AuthException, AuthLoginException, IOException {

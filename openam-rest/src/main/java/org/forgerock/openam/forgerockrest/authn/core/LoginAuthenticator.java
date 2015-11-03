@@ -19,12 +19,6 @@
  */
 package org.forgerock.openam.forgerockrest.authn.core;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
@@ -33,6 +27,13 @@ import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
+
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
@@ -137,6 +138,12 @@ public class LoginAuthenticator {
 
         if (indexType != null && indexType.equals(AuthIndexType.RESOURCE)) {
             Map<String, Set<String>> envMap = coreServicesWrapper.getEnvMap(request);
+
+            // If the resource value is the string "true" then get the value from the resourceURL or goto parameter
+            if (StringUtils.isBlank(indexValue) || Boolean.parseBoolean(indexValue)) {
+                indexValue = coreServicesWrapper.getResourceURL(request);
+            }
+
             authContext.login(indexType.getIndexType(), indexValue, false, envMap, null);
         } else if (indexType != null && indexType.getIndexType() != null) {
             authContext.login(indexType.getIndexType(), indexValue);
