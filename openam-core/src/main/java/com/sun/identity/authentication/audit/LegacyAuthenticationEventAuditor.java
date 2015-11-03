@@ -13,7 +13,7 @@
 *
 * Copyright 2015 ForgeRock AS.
 */
-package com.sun.identity.authentication;
+package com.sun.identity.authentication.audit;
 
 import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status;
 

@@ -88,7 +88,7 @@ public class Scripted extends AMLoginModule {
     final HttpClientRequestFactory httpClientRequestFactory = InjectorHolder.getInstance(HttpClientRequestFactory.class);
     private RestletHttpClient httpClient;
     private ScriptIdentityRepository identityRepository;
-    private Map<String, Object> sharedState;
+    protected Map<String, Object> sharedState;
 
     /**
      * {@inheritDoc}

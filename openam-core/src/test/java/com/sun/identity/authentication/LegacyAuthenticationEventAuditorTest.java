@@ -15,6 +15,7 @@
 */
 package com.sun.identity.authentication;
 
+import com.sun.identity.authentication.audit.LegacyAuthenticationEventAuditor;
 import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
 import org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder;
 import org.forgerock.openam.audit.ActivityAuditor;

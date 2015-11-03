@@ -172,35 +172,6 @@ public final class AuditConstants {
     }
 
     /**
-     * Types of available event handlers.
-     */
-    public enum EventHandlerType {
-        /** CSV event handler type. */
-        CSV
-    }
-
-    /**
-     * Outcomes of types of audit event.
-     */
-    public enum EventOutcome {
-        /** Successful outcome of an auth module. */
-        AM_LOGIN_MODULE_OUTCOME_SUCCESS("SUCCESS"),
-        /** Unsuccessful outcome of an auth module. */
-        AM_LOGIN_MODULE_OUTCOME_FAILURE("FAILURE");
-
-        private final String name;
-
-        EventOutcome(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
-
-    /**
      * The topic to which events built using {@link AMAccessAuditEventBuilder} should be routed.
      */
     public static final String ACCESS_TOPIC = "access";
@@ -229,11 +200,6 @@ public final class AuditConstants {
      * Names of fields on an audit events.
      */
     public static final String USER_ID = AUTHENTICATION + "." + ID;
-
-    /**
-     * The Context IDs.
-     */
-    public static final String USERNAME_AUDIT_CONTEXT_KEY = "username";
 
     /**
      * Names of the realm field on an audit event.

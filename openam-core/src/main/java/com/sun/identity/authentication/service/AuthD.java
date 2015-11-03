@@ -28,8 +28,8 @@
  */
 package com.sun.identity.authentication.service;
 
-import static com.sun.identity.authentication.LegacyAuthenticationEventAuditor.isActivityOnlyEvent;
-import static com.sun.identity.authentication.LegacyAuthenticationEventAuditor.isAuthenticationOnlyEvent;
+import static com.sun.identity.authentication.audit.LegacyAuthenticationEventAuditor.isActivityOnlyEvent;
+import static com.sun.identity.authentication.audit.LegacyAuthenticationEventAuditor.isAuthenticationOnlyEvent;
 import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status.FAILED;
 import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status.SUCCESSFUL;
 import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.EVENT_DATA;
@@ -50,7 +50,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.LegacyAuthenticationEventAuditor;
+import com.sun.identity.authentication.audit.LegacyAuthenticationEventAuditor;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.RequestUtils;

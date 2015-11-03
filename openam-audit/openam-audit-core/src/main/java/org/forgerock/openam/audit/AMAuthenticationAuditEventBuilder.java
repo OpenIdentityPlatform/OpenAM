@@ -15,19 +15,18 @@
 */
 package org.forgerock.openam.audit;
 
+import static java.util.Collections.singletonList;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
+
 import org.forgerock.audit.events.AuthenticationAuditEventBuilder;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 import org.forgerock.openam.utils.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putComponent;
-
-import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putRealm;
 
 /**
  * Builder for OpenAM audit authentication events.
@@ -82,7 +81,7 @@ public class AMAuthenticationAuditEventBuilder extends
         if (info != null && !info.isEmpty()) {
             map.put("info", info);
         }
-        entries(Collections.singletonList(map));
+        entries(singletonList(map));
         return this;
     }
 
@@ -94,6 +93,31 @@ public class AMAuthenticationAuditEventBuilder extends
      */
     public AMAuthenticationAuditEventBuilder component(AuditConstants.Component value) {
         putComponent(jsonValue, value.toString());
+        return this;
+    }
+
+    /**
+     * Sets the provided name for the event. This method is preferred over
+     * {@link org.forgerock.audit.events.AuditEventBuilder#eventName(String)} as it allows OpenAM to manage event
+     * names better and documentation to be automatically generated for new events.
+     *
+     * @param name one of the predefined names from {@link AuditConstants.EventName}
+     * @return this builder
+     */
+    public AMAuthenticationAuditEventBuilder eventName(AuditConstants.EventName name) {
+        return eventName(name.toString());
+    }
+
+    /**
+     * A principal of the authentication event.
+     *
+     * @param principal the principal
+     * @return an audit authentication event builder
+     */
+    public AMAuthenticationAuditEventBuilder principal(String principal) {
+        if (isNotEmpty(principal)) {
+            principal(singletonList(principal));
+        }
         return this;
     }
 }
