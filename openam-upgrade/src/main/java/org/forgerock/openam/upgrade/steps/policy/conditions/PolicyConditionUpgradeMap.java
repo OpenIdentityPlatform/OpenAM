@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.upgrade.steps.policy.conditions;
 
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.VALUE_CASE_INSENSITIVE;
+import static org.forgerock.openam.network.ipv4.IPv4Condition.IP_RANGE;
+
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
@@ -23,7 +26,6 @@ import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.entitlement.opensso.PolicySubject;
 import com.sun.identity.policy.interfaces.Condition;
-import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.conditions.environment.AMIdentityMembershipCondition;
 import org.forgerock.openam.entitlement.conditions.environment.AuthLevelCondition;
 import org.forgerock.openam.entitlement.conditions.environment.AuthSchemeCondition;
@@ -39,7 +41,6 @@ import org.forgerock.openam.entitlement.conditions.environment.SessionCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SessionPropertyCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
 import org.forgerock.openam.entitlement.conditions.subject.IdentitySubject;
-import static org.forgerock.openam.network.ipv4.IPv4Condition.IP_RANGE;
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 
 import java.util.ArrayList;
@@ -47,8 +48,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.VALUE_CASE_INSENSITIVE;
 
 /**
  * A map containing all the migration logic from an old policy condition to a new entitlement condition.
@@ -346,7 +345,12 @@ class PolicyConditionUpgradeMap {
                         LDAPFilterCondition eCondition = new LDAPFilterCondition();
                         Map<String, Set<String>> properties = condition.getProperties();
 
-                        eCondition.setState(new JsonValue(properties).toString());
+                        String ldapFilter = getValue(properties.get(ConditionConstants.LDAP_FILTER));
+                        try {
+                            eCondition.setLdapFilter(ldapFilter);
+                        } catch (EntitlementException e) {
+                            throw new RuntimeException(e);
+                        }
 
                         migrationReport.migratedEnvironmentCondition(
                                 com.sun.identity.policy.plugins.LDAPFilterCondition.class.getName(),
