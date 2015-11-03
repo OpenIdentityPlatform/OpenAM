@@ -15,6 +15,10 @@
  */
 package org.forgerock.openam.radius.server.audit;
 
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
@@ -29,13 +33,18 @@ import org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus;
 import org.forgerock.guava.common.base.Strings;
 import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.guava.common.eventbus.Subscribe;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.audit.AuditConstants.EventName;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.audit.context.TransactionId;
+import org.forgerock.openam.radius.common.Packet;
 import org.forgerock.openam.radius.common.PacketType;
+import org.forgerock.openam.radius.server.RadiusRequest;
 import org.forgerock.openam.radius.server.RadiusRequestContext;
 import org.forgerock.openam.radius.server.RadiusResponse;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
@@ -50,7 +59,7 @@ import com.sun.identity.shared.debug.Debug;
 /**
  * Makes audit logs on behalf of the Radius Server.
  */
-public class RadiusAuditLoggerEventBus implements RadiusAuditLogger {
+public class RadiusAuditLoggerEventBus implements RadiusAuditor {
 
     private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
@@ -68,7 +77,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditLogger {
     public RadiusAuditLoggerEventBus(@Named("RadiusEventBus") EventBus eventBus, AuditEventFactory eventFactory,
             AuditEventPublisher eventPublisher) {
         LOG.message("Entering RadiusAuditLogger.RadiusAuditLogger");
-        LOG.message("Registering RadiusAuditLogger with the eventBus, hashCode; " + eventBus.hashCode());
+        LOG.message("Registering RadiusAuditLogger with the eventBus, hashCode; {}", eventBus.hashCode());
         eventBus.register(this);
         this.auditEventFactory = eventFactory;
         this.auditEventPublisher = eventPublisher;
@@ -122,16 +131,21 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditLogger {
     public void makeLogEntry(EventName eventName, AcceptedRadiusEvent accessRequestEvent) {
         LOG.message("Entering RadiusAuditLoggerEventBus.makeLogEntry()");
         Set<String> trackingIds = new HashSet<String>();
-        trackingIds.add(accessRequestEvent.getUsername());
         trackingIds.add(accessRequestEvent.getRequest().getContextHolderKey());
+
+        // This sets the request context so that when the OpenAM auth chains etc call AuditRequestContext.get they
+        // will use the same transaction id. This means log entries across the audit logs can be tied up.
+        AuditRequestContext.set(new AuditRequestContext(new TransactionId(accessRequestEvent.getRequestId())));
 
         AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(accessRequestEvent.getRealm())
                 .timestamp(accessRequestEvent.getTimeOfEvent())
-                .transactionId("RADIUS_" + accessRequestEvent.getRequestId())
+                .transactionId(accessRequestEvent.getRequestId())
                 .eventName(eventName)
                 .component(Component.RADIUS)
                 .authentication(accessRequestEvent.getUsername())
                 .trackingIds(trackingIds);
+
+        setRequestDetails(builder, accessRequestEvent);
 
         try {
             setClientDetails(builder, accessRequestEvent.getRequestContext());
@@ -141,7 +155,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditLogger {
                 setResponseDetails(builder, response);
             }
         } catch (RadiusAuditLoggingException e) {
-            LOG.warning("Failed to set client details on access audit event. Reason; " + e.getMessage());
+            LOG.warning("Failed to set client details on access audit event. Reason; {}", e.getMessage());
         }
         
         try {
@@ -152,6 +166,27 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditLogger {
         LOG.message("Leaving RadiusAuditLoggerEventBus.makeLogEntry()");
     }
 
+
+    private void setRequestDetails(AMAccessAuditEventBuilder builder, AcceptedRadiusEvent accessRequestEvent) {
+        LOG.message("Entering RadiusAuditLoggerEventBus.setRequestDetails()");
+
+        RadiusRequest request = accessRequestEvent.getRequest();
+        if (request != null) {
+            Packet packet = request.getRequestPacket();
+            if (packet != null) {
+                PacketType packetType = packet.getType();
+                Short packetId = packet.getIdentifier();
+                if (packetType != null && packetId != null) {
+                    String operationName = packetType.toString();
+                    JsonValue requestId = json(object(
+                            field("radiusId", packetId)));
+                    builder.request("RADIUS", operationName, requestId);
+                }
+            }
+        }
+
+        LOG.message("Leaving RadiusAuditLoggerEventBus.setRequestDetails()");
+    }
 
     /**
      * Sets the client details via the access event builder.
@@ -166,7 +201,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditLogger {
         String clientIPAddress = null;
         InetSocketAddress source = radiusRequestContext.getSource();
         if (source == null) {
-            throw new RadiusAuditLoggingException("Could not obtain the source address form the request context.");
+            throw new RadiusAuditLoggingException("Could not obtain the source address from the request context.");
         } else {
             int port = source.getPort();
             InetAddress address = source.getAddress();

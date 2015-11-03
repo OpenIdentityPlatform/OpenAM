@@ -126,15 +126,11 @@ public class RadiusRequest {
     }
 
     /**
-     * @return The ID of the request.
+     * @return The ID of the request. This is is a unique id created for each RadiusRequest.
      */
     public synchronized String getRequestId() {
         if (this.requestId == null) {
             StringBuilder sb = new StringBuilder(UUID.randomUUID().toString());
-            if (this.requestPacket != null) {
-                short reqId = requestPacket.getIdentifier();
-                sb.append("-rid-").append(Short.toString(reqId));
-            }
             requestId = sb.toString();
         }
         return requestId;

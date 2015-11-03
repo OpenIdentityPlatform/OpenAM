@@ -23,7 +23,7 @@ import org.forgerock.openam.radius.server.events.AuthRequestRejectedEvent;
 /**
  * Interface through which audit logs may be made.
  */
-public interface RadiusAuditLogger {
+public interface RadiusAuditor {
 
     /**
      * Creates an Access Request entry to the Common Audit Framework.

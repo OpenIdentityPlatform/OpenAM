@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import org.forgerock.openam.radius.server.RadiusLifecycleException;
 import org.forgerock.openam.radius.server.RadiusRequestListener;
 import org.forgerock.openam.radius.server.RequestListenerFactory;
-import org.forgerock.openam.radius.server.audit.RadiusAuditLogger;
+import org.forgerock.openam.radius.server.audit.RadiusAuditor;
 import org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrator;
 
 import com.sun.identity.setup.AMSetupServlet;
@@ -79,7 +79,7 @@ public final class RadiusServerManager implements Runnable, RadiusServer {
     /**
      * Class responsible for logging radius audit messages
      */
-    private final RadiusAuditLogger auditLogger;
+    private final RadiusAuditor auditLogger;
 
     /**
      * Creates the instance of the starter.
@@ -88,7 +88,7 @@ public final class RadiusServerManager implements Runnable, RadiusServer {
     @Singleton
     public RadiusServerManager(RadiusServerEventRegistrator eventRegistrator, ConfigLoader configLoader,
             ConfigChangeListener configChangeListener, RequestListenerFactory requestListenerFactory,
-            RadiusAuditLogger auditLogger) {
+            RadiusAuditor auditLogger) {
         logger.message("Constructing RadiusServiceStarter");
         this.eventRegistrator = eventRegistrator;
         this.configLoader = configLoader;

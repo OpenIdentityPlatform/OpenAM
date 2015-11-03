@@ -46,9 +46,7 @@ public class RadiusResponse {
      * Constructor
      */
     public RadiusResponse() {
-        LOG.message("Entering RadiusResponse.RadiusResponse()");
-
-        LOG.message("Leaving RadiusResponse.RadiusResponse()");
+        LOG.message("Constructing RadiusResponse.RadiusResponse()");
     }
 
     /**

@@ -31,7 +31,6 @@ public class RadiusRequestTest {
         RadiusRequest request = new RadiusRequest(packet);
         // Then
         String reqId = request.getRequestId();
-        assertThat(reqId).contains("-rid-1");
 
         String reqId2 = request.getRequestId();
         assertThat(reqId2).isEqualTo(reqId);

@@ -145,10 +145,6 @@ public class RadiusRequestHandler implements Runnable {
                 return;
             }
 
-            /////////////////////////////////////////////////////////////
-            // Hand responsibility over to the client specific handler.
-            // final RadiusResponseHandler receiver = new RadiusResponseHandler(requestContext);
-
             final RadiusRequest request = new RadiusRequest(accessRequest);
             final RadiusResponse response = new RadiusResponse();
 

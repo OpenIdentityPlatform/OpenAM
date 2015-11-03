@@ -48,10 +48,11 @@ public class AccessRequestHandlerFactory {
     public AccessRequestHandler getAccessRequestHandler(RadiusRequestContext reqCtx) {
         LOG.message("Entering RadiusRequestHandler.getAccessRequestHandler()");
         AccessRequestHandler accessRequestHandler = null;
-        final Class accessRequestHandlerClass = reqCtx.getClientConfig().getAccessRequestHandlerClass();
+        final Class<? extends AccessRequestHandler> accessRequestHandlerClass = reqCtx.getClientConfig()
+                .getAccessRequestHandlerClass();
 
         try {
-            accessRequestHandler = (AccessRequestHandler) InjectorHolder.getInstance(accessRequestHandlerClass);
+            accessRequestHandler = InjectorHolder.getInstance(accessRequestHandlerClass);
         } catch (final Exception e) {
             final StringBuilder sb = new StringBuilder("Unable to instantiate declared handler class '")
                     .append(accessRequestHandlerClass.getName()).append("' for RADIUS client '")

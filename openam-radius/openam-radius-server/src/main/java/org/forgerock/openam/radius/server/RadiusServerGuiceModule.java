@@ -23,8 +23,8 @@ import javax.inject.Singleton;
 
 import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.radius.server.audit.RadiusAuditLogger;
 import org.forgerock.openam.radius.server.audit.RadiusAuditLoggerEventBus;
+import org.forgerock.openam.radius.server.audit.RadiusAuditor;
 import org.forgerock.openam.radius.server.config.RadiusServer;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import org.forgerock.openam.radius.server.config.RadiusServerManager;
@@ -65,7 +65,7 @@ public class RadiusServerGuiceModule extends AbstractModule {
         // relies on this being called from the AMSetupServlet. Eager Singletons get created before
         // that.
         bind(RadiusServer.class).to(RadiusServerManager.class).in(Singleton.class);
-        bind(RadiusAuditLogger.class).to(RadiusAuditLoggerEventBus.class).in(Singleton.class);
+        bind(RadiusAuditor.class).to(RadiusAuditLoggerEventBus.class).in(Singleton.class);
         LOG.message("RadiusServerGuiceModule - Leaving configure.");
     }
 
@@ -98,7 +98,7 @@ public class RadiusServerGuiceModule extends AbstractModule {
     @Provides
     @Singleton
     @Inject
-    public RadiusServerEventRegistrator getRadiusServerEventRegistrator(@Named("RadiusEventBus") EventBus eventBus) {
+    public RadiusServerEventRegistrator getRadiusServerEventRegistrator() {
         return eventRegistrar;
     }
 }
