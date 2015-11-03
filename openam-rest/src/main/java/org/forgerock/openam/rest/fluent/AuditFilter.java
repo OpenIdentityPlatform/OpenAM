@@ -31,6 +31,7 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Response;
@@ -38,6 +39,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.services.context.Context;
+import org.forgerock.util.Reject;
 import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.ResultHandler;
@@ -93,7 +95,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleAction(context, request), auditor);
+        return auditResponse(next.handleAction(context, request), auditor, request);
     }
 
     /**
@@ -118,7 +120,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleCreate(context, request), auditor);
+        return auditResponse(next.handleCreate(context, request), auditor, request);
     }
 
     /**
@@ -143,7 +145,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleDelete(context, request), auditor);
+        return auditResponse(next.handleDelete(context, request), auditor, request);
     }
 
     /**
@@ -168,7 +170,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handlePatch(context, request), auditor);
+        return auditResponse(next.handlePatch(context, request), auditor, request);
     }
 
     /**
@@ -194,7 +196,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleQuery(context, request, handler), auditor);
+        return auditResponse(next.handleQuery(context, request, handler), auditor, request);
     }
 
     /**
@@ -219,7 +221,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleRead(context, request), auditor);
+        return auditResponse(next.handleRead(context, request), auditor, request);
     }
 
     /**
@@ -244,16 +246,16 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleUpdate(context, request), auditor);
+        return auditResponse(next.handleUpdate(context, request), auditor, request);
     }
 
     private <T extends Response> Promise<T, ResourceException> auditResponse(Promise<T, ResourceException> promise,
-            final CrestAuditor auditingHandler) {
+            final CrestAuditor auditingHandler, final Request request) {
         return promise
                 .thenOnResult(new ResultHandler<Response>() {
                     @Override
                     public void handleResult(Response response) {
-                        auditingHandler.auditAccessSuccess(getDetail(response));
+                        auditingHandler.auditAccessSuccess(getDetail(request, response));
                     }
                 })
                 .thenOnException(new ExceptionHandler<ResourceException>() {
@@ -269,15 +271,134 @@ public class AuditFilter implements Filter {
     }
 
     /**
-     * Provides additional details (e.g. failure description or summary of the payload) relating to the response
-     * to a successful access event. This information is logged in the access audit log. Subclasses can implement
-     * this method if they need to return details.
+     * Provides additional details (e.g. failure description or summary of the payload) relating to the a successful
+     * {@link Response} to a {@link Request}. This information is logged in the access audit log.
      *
+     * @param request The {@link Request} instance from which details may be taken. Cannot be null.
      * @param response The {@link Response} instance from which details may be taken. Cannot be null.
-     * @return Defaults to null. Overriders of this method can return {@link JsonValue} free-form details, or null
-     * to indicate no details.
+     * @return {@link JsonValue} free-form details, or null to indicate no details.
      */
-    public JsonValue getDetail(Response response) {
+    private JsonValue getDetail(Request request, Response response) {
+        Reject.ifNull(request, "request cannot be null.");
+        Reject.ifNull(request, "response cannot be null.");
+
+        RequestType requestType = request.getRequestType();
+
+        switch (requestType) {
+            case CREATE:
+                return getCreateSuccessDetail((CreateRequest) request, (ResourceResponse) response);
+            case READ:
+                return getReadSuccessDetail((ReadRequest) request, (ResourceResponse) response);
+            case UPDATE:
+                return getUpdateSuccessDetail((UpdateRequest) request, (ResourceResponse) response);
+            case DELETE:
+                return getDeleteSuccessDetail((UpdateRequest) request, (ResourceResponse) response);
+            case PATCH:
+                return getPatchSuccessDetail((PatchRequest) request, (ResourceResponse) response);
+            case ACTION:
+                return getActionSuccessDetail((ActionRequest) request, (ActionResponse) response);
+            case QUERY:
+                return getQuerySuccessDetail((QueryRequest) request, (QueryResponse) response);
+            default:
+                throw new IllegalStateException("Unknown RequestType");
+        }
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link CreateRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link CreateRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    private JsonValue getCreateSuccessDetail(CreateRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link ReadRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link ReadRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    private JsonValue getReadSuccessDetail(ReadRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link UpdateRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link UpdateRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    private JsonValue getUpdateSuccessDetail(UpdateRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link UpdateRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link UpdateRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    private JsonValue getDeleteSuccessDetail(UpdateRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link PatchRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link PatchRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    private JsonValue getPatchSuccessDetail(PatchRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ActionResponse} to a successful {@link ActionRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link ActionRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ActionResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    public JsonValue getActionSuccessDetail(ActionRequest request, ActionResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link QueryResponse} to a successful {@link QueryRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link QueryRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link QueryResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    private JsonValue getQuerySuccessDetail(QueryRequest request, QueryResponse response) {
         return null;
     }
 }

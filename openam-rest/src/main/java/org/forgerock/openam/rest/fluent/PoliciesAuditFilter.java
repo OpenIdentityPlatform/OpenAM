@@ -17,18 +17,18 @@ package org.forgerock.openam.rest.fluent;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.Response;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
  * Filter which will audit any policy requests that pass through it. Acts exactly as the {@link AuditFilter} and
- * exists solely to provide an implementation of the {@link #getDetail(Response)}} method.
+ * exists solely to provide an implementation of the
+ * {@link #getActionSuccessDetail(ActionRequest, ActionResponse)}} method.
  *
  * @since 13.0.0
  */
@@ -51,21 +51,12 @@ public class PoliciesAuditFilter extends AuditFilter {
      * {@inheritDoc}
      */
     @Override
-    public JsonValue getDetail(Response response) {
-        Reject.ifNull(response, "response cannot be null.");
-
-        JsonValue detail;
-        try {
-            //Currently the only action org.forgerock.openam.entitlement.rest.PolicyResource implements is the
-            //policy evaluation action, so if we can do .asSubclass(ActionResponse.class), then the response
-            //is a policy evaluation response. In the event of future amendments to the action implementation
-            //within org.forgerock.openam.entitlement.rest.PolicyResource, a more sophisticated method for
-            //performing this check may be needed.
-            response.getClass().asSubclass(ActionResponse.class);
-            detail = ((ActionResponse) response).getJsonContent();
-        } catch (ClassCastException cce) {
-            detail = null;
-        }
-        return detail;
+    public JsonValue getActionSuccessDetail(ActionRequest request, ActionResponse response) {
+        //Currently the only action org.forgerock.openam.entitlement.rest.PolicyResource implements is the
+        //policy evaluation action, so if we get here, then the response is a successful policy evaluation response.
+        //In the event of future amendments to the action implementation within
+        //org.forgerock.openam.entitlement.rest.PolicyResource, a more sophisticated method for checking that the
+        //ActionResponse is a response to a policy evaluation request, may be needed.
+        return response.getJsonContent();
     }
 }
