@@ -44,8 +44,10 @@ public class UMAAccessAuditFilter extends OAuth2AbstractAccessAuditFilter {
      * @param providers The OAuth2 audit context providers, responsible for finding details which can be audit
      */
     public UMAAccessAuditFilter(Restlet restlet, AuditEventPublisher auditEventPublisher,
-                                AuditEventFactory auditEventFactory, Set<OAuth2AuditContextProvider> providers) {
-        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, providers);
+            AuditEventFactory auditEventFactory, Set<OAuth2AuditContextProvider> providers,
+            RestletBodyAuditor<?> requestDetailCreator, RestletBodyAuditor<?> responseDetailCreator) {
+        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, providers, requestDetailCreator,
+                responseDetailCreator);
     }
 
     /**

@@ -23,6 +23,9 @@ package org.forgerock.openam.uma;
  */
 public final class UmaConstants {
 
+    public static final String RESOURCE_SET_ID = "resource_set_id";
+    public static final String SCOPES = "scopes";
+
     private UmaConstants() {
         //Private utility constructor
     }
@@ -73,8 +76,6 @@ public final class UmaConstants {
     static final String EXPIRED_TICKET_ERROR_CODE = "expired_ticket";
 
     static final class Introspection {
-        static final String RESOURCE_SET_ID = "resource_set_id";
-        static final String SCOPES = "scopes";
         static final String PERMISSIONS = "permissions";
     }
 

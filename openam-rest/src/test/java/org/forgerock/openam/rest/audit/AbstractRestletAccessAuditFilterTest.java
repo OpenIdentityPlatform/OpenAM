@@ -15,10 +15,16 @@
  */
 package org.forgerock.openam.rest.audit;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
-import static org.forgerock.openam.audit.AuditConstants.USER_ID;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.audit.AuditConstants.Component.*;
+import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.mockito.Mockito.*;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditServiceBuilder;
@@ -30,16 +36,15 @@ import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.audit.DefaultAuditServiceProxy;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.mockito.ArgumentCaptor;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.Status;
+import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class AbstractRestletAccessAuditFilterTest {
 
@@ -62,7 +67,7 @@ public class AbstractRestletAccessAuditFilterTest {
 
         eventFactory = new AuditEventFactory(auditServiceProvider);
         eventPublisher = mock(AuditEventPublisher.class);
-        auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory);
+        auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory, null, null);
     }
 
     @Test
@@ -106,13 +111,60 @@ public class AbstractRestletAccessAuditFilterTest {
         verify(restlet, times(1)).handle(any(Request.class), any(Response.class));
     }
 
+    @Test
+    public void shouldCaptureRequestBodyProperties() throws Exception {
+        // Given
+        auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory,
+                RestletBodyAuditor.jsonAuditor("fred"), RestletBodyAuditor.jsonAuditor("gary"));
+        Request request = new Request();
+        request.setDate(new Date());
+        Response response = new Response(request);
+        request.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
+        when(eventPublisher.isAuditing(anyString(), anyString())).thenReturn(true);
+
+        // When
+        auditFilter.beforeHandle(request, response);
+
+        // Then
+        ArgumentCaptor<AuditEvent> captor = ArgumentCaptor.forClass(AuditEvent.class);
+        verify(eventPublisher).publish(anyString(), captor.capture());
+        assertThat(captor.getValue().getValue()).isObject()
+                .hasObject("request")
+                .hasObject("detail")
+                .contains("fred", "v");
+    }
+
+    @Test
+    public void shouldCaptureResponseBodyProperties() throws Exception {
+        // Given
+        auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory,
+                RestletBodyAuditor.jsonAuditor("fred"), RestletBodyAuditor.jsonAuditor("gary"));
+        Request request = new Request();
+        request.setDate(new Date());
+        Response response = new Response(request);
+        response.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
+        when(eventPublisher.isAuditing(anyString(), anyString())).thenReturn(true);
+
+        // When
+        auditFilter.afterHandle(request, response);
+
+        // Then
+        ArgumentCaptor<AuditEvent> captor = ArgumentCaptor.forClass(AuditEvent.class);
+        verify(eventPublisher).tryPublish(anyString(), captor.capture());
+        assertThat(captor.getValue().getValue()).isObject()
+                .hasObject("response")
+                .hasObject("detail")
+                .contains("gary", 7);
+    }
+
     /**
      * Class to test AbstractRestletAccessAuditFilter.
      */
     private class RestletAccessAuditFilterTest extends AbstractRestletAccessAuditFilter {
 
-        public RestletAccessAuditFilterTest(Restlet restlet, AuditEventPublisher publisher, AuditEventFactory factory) {
-            super(AUTHENTICATION, restlet, publisher, factory);
+        public RestletAccessAuditFilterTest(Restlet restlet, AuditEventPublisher publisher, AuditEventFactory factory,
+                RestletBodyAuditor requestBodyAuditor, RestletBodyAuditor responseBodyAuditor) {
+            super(AUTHENTICATION, restlet, publisher, factory, requestBodyAuditor, responseBodyAuditor);
         }
     }
 

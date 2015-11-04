@@ -43,6 +43,8 @@ import org.restlet.routing.Filter;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Set;
 
+import com.sun.identity.shared.debug.Debug;
+
 /**
  * Responsible for logging access audit events for restlet requests.
  *
@@ -50,25 +52,32 @@ import java.util.Set;
  */
 public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
+    private static Debug debug = Debug.getInstance("amAudit");
+
     private final AuditEventPublisher auditEventPublisher;
     private final AuditEventFactory auditEventFactory;
     private final Component component;
+    private final RestletBodyAuditor<?> requestDetailCreator;
+    private final RestletBodyAuditor<?> responseDetailCreator;
 
     /**
      * Create a new filter for the given component and restlet.
-     *
-     * @param component The component for which events will be logged.
+     *  @param component The component for which events will be logged.
      * @param restlet The restlet for which events will be logged.
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
+     * @param requestDetailCreator
+     * @param responseDetailCreator
      */
     public AbstractRestletAccessAuditFilter(Component component, Restlet restlet,
-                                            AuditEventPublisher auditEventPublisher,
-                                            AuditEventFactory auditEventFactory) {
-        setNext(restlet);
+            AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
+            RestletBodyAuditor<?> requestDetailCreator, RestletBodyAuditor<?> responseDetailCreator) {
+        this.requestDetailCreator = requestDetailCreator;
+        this.responseDetailCreator = responseDetailCreator;
         this.auditEventPublisher = auditEventPublisher;
         this.auditEventFactory = auditEventFactory;
         this.component = component;
+        setNext(restlet);
     }
 
     @Override
@@ -111,6 +120,10 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .authentication(getUserIdForAccessAttempt(request))
                     .trackingIds(getTrackingIdsForAccessAttempt(request));
 
+            if (requestDetailCreator != null) {
+                builder.requestDetail(requestDetailCreator.apply(request.getEntity()));
+            }
+
             addHttpData(request, builder);
 
             auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
@@ -124,14 +137,25 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - request.getDate().getTime();
 
+            final Representation entity = response.getEntity();
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(request, response))
-                    .trackingIds(getTrackingIdsForAccessOutcome(request, response))
-                    .response(SUCCESS, "", elapsedTime, MILLISECONDS);
+                    .trackingIds(getTrackingIdsForAccessOutcome(request, response));
+
+            if (responseDetailCreator != null) {
+                try {
+                    JsonValue detail = responseDetailCreator.apply(entity);
+                    builder.responseWithDetail(SUCCESS, "", elapsedTime, MILLISECONDS, detail);
+                } catch (AuditException e) {
+                    debug.warning("An error occured when fetching response body details for audit", e);
+                }
+            } else {
+                builder.response(SUCCESS, "", elapsedTime, MILLISECONDS);
+            }
 
             addHttpData(request, builder);
 

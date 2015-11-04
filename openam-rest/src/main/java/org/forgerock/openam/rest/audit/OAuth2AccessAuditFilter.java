@@ -40,7 +40,9 @@ public class OAuth2AccessAuditFilter extends OAuth2AbstractAccessAuditFilter {
      *                  logged from various tokens which may be attached to requests and/or responses.
      */
     public OAuth2AccessAuditFilter(Restlet restlet, AuditEventPublisher auditEventPublisher,
-                                   AuditEventFactory auditEventFactory, Set<OAuth2AuditContextProvider> providers) {
-        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, providers);
+            AuditEventFactory auditEventFactory, Set<OAuth2AuditContextProvider> providers,
+            RestletBodyAuditor<?> requestDetailCreator, RestletBodyAuditor<?> responseDetailCreator) {
+        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, providers, requestDetailCreator,
+                responseDetailCreator);
     }
 }
