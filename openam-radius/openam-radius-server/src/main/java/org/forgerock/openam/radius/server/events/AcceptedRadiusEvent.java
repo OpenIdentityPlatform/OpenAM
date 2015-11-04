@@ -75,6 +75,15 @@ public class AcceptedRadiusEvent extends RadiusEvent {
     }
 
     /**
+     * Get the universalId of the authenticating entity.
+     * 
+     * @return the universalId of the authenticating entity.
+     */
+    public String getUniversalId() {
+        return this.response.getUniversalId();
+    }
+
+    /**
      * Get the realm that the access request will be authenticated against.
      * 
      * @return the realm that the access request will be authenticated against.

@@ -142,8 +142,14 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
                 .transactionId(accessRequestEvent.getRequestId())
                 .eventName(eventName)
                 .component(Component.RADIUS)
-                .authentication(accessRequestEvent.getUsername())
                 .trackingIds(trackingIds);
+
+        String uid = accessRequestEvent.getUniversalId();
+        if (!Strings.isNullOrEmpty(uid)) {
+            builder.authentication(uid);
+        } else {
+            LOG.message("Not setting authentication to universal Id. None available.");
+        }
 
         setRequestDetails(builder, accessRequestEvent);
 

@@ -481,6 +481,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      */
     private void rejectAccessAndTerminateProcess(RadiusResponse response, ContextHolder holder) {
         response.setResponsePacket(new AccessReject());
+        response.setUniversalId(holder.getUniversalId());
         terminateAuthnProcess(holder);
     }
 
@@ -494,6 +495,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
     private void allowAccessAndTerminateProcess(RadiusResponse response, ContextHolder holder)
             throws RadiusProcessingException {
         response.setResponsePacket(new AccessAccept());
+        response.setUniversalId(holder.getUniversalId());
         terminateAuthnProcess(holder);
     }
 

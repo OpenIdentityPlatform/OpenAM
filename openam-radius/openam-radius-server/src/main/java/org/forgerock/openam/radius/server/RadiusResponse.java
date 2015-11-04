@@ -41,6 +41,8 @@ public class RadiusResponse {
      */
     private long timeToServiceRequestInMilliSeconds;
 
+    private String universalId;
+
 
     /**
      * Constructor
@@ -103,5 +105,24 @@ public class RadiusResponse {
      */
     public long getTimeToServiceRequestInMilliSeconds() {
         return timeToServiceRequestInMilliSeconds;
+    }
+
+    /**
+     * Set the Universal ID of the principal of the AuthContext.
+     * 
+     * @param uid
+     *            the principal of the response.
+     */
+    public void setUniversalId(String uid) {
+        this.universalId = uid;
+    }
+
+    /**
+     * Get the universal ID of the principal of the AuthContext, or null if none has been set.
+     * 
+     * @return the universal ID of the principal of the AuthContext, or null if none has been set.
+     */
+    public String getUniversalId() {
+        return this.universalId;
     }
 }

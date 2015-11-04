@@ -20,14 +20,25 @@ package org.forgerock.openam.radius.server.spi.handlers.amhandler;
 
 import javax.security.auth.callback.Callback;
 
+import org.forgerock.openam.radius.server.config.RadiusServerConstants;
+
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.L10NMessageImpl;
 
 /**
  * Holds server side info for an authentication conversation in progress for a user via a radius client.
  * <p/>
  */
 public class ContextHolder {
+
+    /**
+     * Debug logs
+     */
+    private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
     /**
      * The page properties callback class that encapsulates properties related to the callback set including some
@@ -339,5 +350,28 @@ public class ContextHolder {
      */
     public void setAuthPhase(AuthPhase authPhase) {
         this.authPhase = authPhase;
+    }
+
+    /**
+     * Obtain the universal ID from the SSO token held by the auth context. If there is no SSO token available or there
+     * is no universal id available then null will be returned.
+     * 
+     * @return the universalId, or null if none is available.
+     */
+    public String getUniversalId() {
+        LOG.message("Entering ContextHolder.getUniversalId()");
+        String universalId = null;
+        try {
+            SSOToken token = this.authContext.getSSOToken();
+            if (token != null) {
+                universalId = token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
+            } else {
+                LOG.message("No SSO token available from the auth context.");
+            }
+        } catch (L10NMessageImpl e) {
+            LOG.warning("Could not get universal ID from the SSOToken.", e);
+        }
+        LOG.message("Leaving ContextHolder.getUniversalId()");
+        return universalId;
     }
 }
