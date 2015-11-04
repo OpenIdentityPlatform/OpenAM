@@ -50,7 +50,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>forgerock-parent</artifactId>
-        <version>2.0.4-SNAPSHOT</version>
+        <version>2.0.4</version>
     </parent>
 
     <!-- Component Definition -->
@@ -116,13 +116,11 @@
         <opendj.server.version>2.6.2</opendj.server.version>
         <opendj.sdk.version>2.6.10</opendj.sdk.version>
 
+        <!-- Required for setting classpaths on tools and fedlet -->
         <forgerock.util.version>2.0.0</forgerock.util.version>
+
         <forgerock.bloomfilter.version>1.0.0</forgerock.bloomfilter.version>
-        <forgerock.http.version>1.0.0</forgerock.http.version>
-        <forgerock.authfilters.version>2.0.0</forgerock.authfilters.version>
-        <forgerock.rest.version>3.0.0</forgerock.rest.version>
         <forgerock.ui.version>8.4.0</forgerock.ui.version>
-        <forgerock.guava.version>18.0.3</forgerock.guava.version>
         <forgerock.audit.version>0.9.0-SNAPSHOT</forgerock.audit.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
         <forgerock.selfservice.version>0.6.0-SNAPSHOT</forgerock.selfservice.version>
@@ -491,6 +489,13 @@
     <!-- Dependency Management -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-bom</artifactId>
+                <version>2.0.0</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
             <!-- OpenAM project dependencies -->
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
@@ -1651,41 +1656,6 @@
 
             <!-- Commons Dependencies -->
             <dependency>
-                <groupId>org.forgerock.http</groupId>
-                <artifactId>chf-http-core</artifactId>
-                <version>${forgerock.http.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.http</groupId>
-                <artifactId>chf-client-apache-sync</artifactId>
-                <version>${forgerock.http.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.http</groupId>
-                <artifactId>chf-http-servlet</artifactId>
-                <version>${forgerock.http.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-resource</artifactId>
-                <version>${forgerock.rest.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-resource-http</artifactId>
-                <version>${forgerock.rest.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-web-token</artifactId>
-                <version>${forgerock.rest.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-util</artifactId>
-                <version>${forgerock.util.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-bloomfilter-core</artifactId>
                 <version>${forgerock.bloomfilter.version}</version>
@@ -1694,56 +1664,6 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-bloomfilter-monitoring</artifactId>
                 <version>${forgerock.bloomfilter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-auth-filter-common</artifactId>
-                <version>${forgerock.authfilters.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-jaspi-runtime</artifactId>
-                <version>${forgerock.authfilters.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
-                <version>${forgerock.authfilters.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>authz-framework-api</artifactId>
-                <version>${forgerock.authfilters.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>authz-framework</artifactId>
-                <version>${forgerock.authfilters.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-jaspi-openid-connect-module</artifactId>
-                <version>${forgerock.authfilters.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons.guava</groupId>
-                <artifactId>forgerock-guava-eventbus</artifactId>
-                <version>${forgerock.guava.version}</version>
-            </dependency>            
-            <dependency>
-                <groupId>org.forgerock.commons.guava</groupId>
-                <artifactId>forgerock-guava-collect</artifactId>
-                <version>${forgerock.guava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons.guava</groupId>
-                <artifactId>forgerock-guava-cache</artifactId>
-                <version>${forgerock.guava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons.guava</groupId>
-                <artifactId>forgerock-guava-io</artifactId>
-                <version>${forgerock.guava.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
@@ -1930,11 +1850,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-test-utils</artifactId>
-                <version>${forgerock.util.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
                 <version>3.2</version>
@@ -2011,13 +1926,6 @@
                 <groupId>javassist</groupId>
                 <artifactId>javassist</artifactId>
                 <version>3.12.1.GA</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-resource</artifactId>
-                <type>test-jar</type>
-                <version>${forgerock.rest.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
