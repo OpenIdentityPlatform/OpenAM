@@ -63,7 +63,7 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Override
     protected void configure() {
-        bind(ProcessStore.class).to(CTSProcessStoreImpl.class);
+        bind(ProcessStore.class).to(ProcessStoreImpl.class);
         bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
         bind(SnapshotTokenHandlerFactory.class).to(SnapshotTokenHandlerFactoryImpl.class);
         bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);

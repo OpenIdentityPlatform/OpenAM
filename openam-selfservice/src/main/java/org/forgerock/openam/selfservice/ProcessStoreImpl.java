@@ -18,31 +18,21 @@ package org.forgerock.openam.selfservice;
 import org.forgerock.json.JsonValue;
 import org.forgerock.selfservice.core.ProcessStore;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * Implements an AM local store for process state.
  *
  * @since 13.0.0
  */
-final class CTSProcessStoreImpl implements ProcessStore {
-
-    // This shall be replaced with integration to CTS
-    private final Map<String, JsonValue> interimCache;
-
-    CTSProcessStoreImpl() {
-        interimCache = new ConcurrentHashMap<>();
-    }
+final class ProcessStoreImpl implements ProcessStore {
 
     @Override
     public void add(String key, JsonValue state) {
-        interimCache.put(key, state);
+        throw new UnsupportedOperationException("Local storage for self service is not currently supported");
     }
 
     @Override
     public JsonValue remove(String key) {
-        return interimCache.remove(key);
+        throw new UnsupportedOperationException("Local storage for self service is not currently supported");
     }
 
 }
