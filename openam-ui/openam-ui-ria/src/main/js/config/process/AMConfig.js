@@ -20,11 +20,9 @@ define("config/process/AMConfig", [
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/openam/ui/common/util/ThemeManager",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, UMADelegate, ThemeManager, URIUtils) {
+], function ($, _, Constants, EventManager, Router, ThemeManager, URIUtils) {
     return [{
         startEvent: Constants.EVENT_LOGOUT,
         description: "used to override common logout event",
@@ -152,46 +150,14 @@ define("config/process/AMConfig", [
         dependencies: [
             "underscore",
             "org/forgerock/commons/ui/common/main/Configuration",
-            "org/forgerock/commons/ui/common/components/Navigation"
+            "org/forgerock/openam/ui/common/util/NavigationHelper"
         ],
-        processDescription: function (event, _, Configuration, Navigation) {
+        processDescription: function (event, _, Configuration, NavigationHelper) {
             ThemeManager.getTheme(true);
-
             if (_.contains(Configuration.loggedUser.uiroles, "ui-admin")) {
-                SMSGlobalDelegate.realms.all().done(function (data) {
-                    Navigation.addLink({
-                        "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
-                            [encodeURIComponent("/")]),
-                        "name": $.t("console.common.topLevelRealm"),
-                        "cssClass": "dropdown-sub"
-                    }, "admin", "realms");
-
-                    _.forEach(data.result, function (realm) {
-                        if (realm.active === true && realm.path !== "/") {
-                            Navigation.addLink({
-                                "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
-                                    [encodeURIComponent(realm.path)]),
-                                "name": realm.name,
-                                "cssClass": "dropdown-sub"
-                            }, "admin", "realms");
-                        }
-                    });
-
-                    Navigation.addLink({
-                        "url": "#realms",
-                        "name": $.t("config.AppConfiguration.Navigation.links.realms.viewAll"),
-                        "cssClass": "dropdown-sub"
-                    }, "admin", "realms");
-
-                    Navigation.reload();
-                });
+                NavigationHelper.setAdminNav();
             } else {
-                UMADelegate.getUmaConfig().then(function (umaConfiguration) {
-                    if (umaConfiguration.enabled) {
-                        delete Navigation.configuration.links.user.urls.uma.cssClass;
-                        Navigation.reload();
-                    }
-                });
+                NavigationHelper.setUserNav();
             }
         }
     }];
