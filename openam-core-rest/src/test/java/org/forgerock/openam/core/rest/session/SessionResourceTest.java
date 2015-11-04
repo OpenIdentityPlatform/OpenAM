@@ -29,6 +29,7 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.testng.AssertJUnit.assertTrue;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -596,7 +598,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldDeleteWhitelistedProperty() throws SSOException {
+    public void shouldDeleteWhitelistedProperty() throws SSOException, ExecutionException, InterruptedException {
 
         //given
         final String resourceId = "SSO_TOKEN_ID";
@@ -616,6 +618,7 @@ public class SessionResourceTest {
         //then
         verify(ssoToken).setProperty(eq("one"), eq(""));
         assertThat(promise).succeeded();
+        assertTrue(promise.get().getJsonContent().get("success").asBoolean().equals(true));
     }
 
 

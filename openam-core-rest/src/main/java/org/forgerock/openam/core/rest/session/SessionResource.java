@@ -35,10 +35,10 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -68,7 +68,6 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
-import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionPropertyList;
@@ -768,7 +767,8 @@ public class SessionResource implements CollectionResourceProvider {
             final JsonValue result = json(object());
             try {
                 final SSOToken token = getToken(tokenId);
-                final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+                final AMIdentity identity = getIdentity(token);
+                final String realm = convertDNToRealm(identity.getRealm());
 
                 if (request.getContent() == null || request.getContent().get(KEYWORD_PROPERTIES).isNull()) {
                     for (String property : sessionPropertyWhitelist.getAllListedProperties(token, realm)) {
@@ -790,7 +790,7 @@ public class SessionResource implements CollectionResourceProvider {
 
                 }
 
-            } catch (SSOException e) {
+            } catch (SSOException | IdRepoException e) {
                 LOGGER.message("Unable to read session property due to unreadable SSOToken", e);
             }
             return newResultPromise(newActionResponse(result));
@@ -809,7 +809,8 @@ public class SessionResource implements CollectionResourceProvider {
                 final ActionRequest request) {
             try {
                 final SSOToken token = getToken(tokenId);
-                final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+                final AMIdentity identity = getIdentity(token);
+                final String realm = convertDNToRealm(identity.getRealm());
 
                 if (request.getContent() == null || request.getContent().isNull() ||
                         request.getContent().asMap(String.class).size() == 0) {
@@ -827,7 +828,7 @@ public class SessionResource implements CollectionResourceProvider {
                             token.getPrincipal(), entrySet.toString());
                     return new ForbiddenException().asPromise();
                 }
-            } catch (SSOException e) {
+            } catch (SSOException | IdRepoException e) {
                 LOGGER.message("Unable to set session property due to unreadable SSOToken", e);
             }
 
@@ -847,7 +848,8 @@ public class SessionResource implements CollectionResourceProvider {
                 final ActionRequest request) {
             try {
                 final SSOToken token = getToken(tokenId);
-                final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+                final AMIdentity identity = getIdentity(token);
+                final String realm = convertDNToRealm(identity.getRealm());
 
                 JsonValue content = request.getContent().get(KEYWORD_PROPERTIES);
 
@@ -868,7 +870,7 @@ public class SessionResource implements CollectionResourceProvider {
                     return new ForbiddenException().asPromise();
                 }
 
-            } catch (SSOException e) {
+            } catch (SSOException | IdRepoException e) {
                 LOGGER.message("Unable to delete session property due to unreadable SSOToken", e);
             }
 
@@ -887,12 +889,13 @@ public class SessionResource implements CollectionResourceProvider {
         public Promise<ActionResponse, ResourceException> handle(final String tokenId, final Context context,
                                                                  final ActionRequest request) {
             try {
-                final String realm = context.asContext(RealmContext.class).getResolvedRealm();
                 final SSOToken token = getToken(tokenId);
+                final AMIdentity identity = getIdentity(token);
+                final String realm = convertDNToRealm(identity.getRealm());
 
                 return newResultPromise(newActionResponse(json(object(field(KEYWORD_PROPERTIES,
                         sessionPropertyWhitelist.getAllListedProperties(token, realm))))));
-            } catch (SSOException e) {
+            } catch (SSOException | IdRepoException e) {
                 LOGGER.message("Unable to read all whitelisted session properties.", e);
             }
 
