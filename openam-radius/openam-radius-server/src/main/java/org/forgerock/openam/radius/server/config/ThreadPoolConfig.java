@@ -47,7 +47,7 @@ public class ThreadPoolConfig {
      *            threads will wait for new tasks before terminating.
      */
     public ThreadPoolConfig(int core, int max, int queueSize, int keepAliveSeconds) {
-        if (core < 2) {
+        if (core < 1) {
             this.coreThreads = defaultCoreThreads;
             logger.warning("System configured to used invalid Radius Thread Pool Core size of " + core
                     + ". Using the value of " + defaultCoreThreads + " instead.");
