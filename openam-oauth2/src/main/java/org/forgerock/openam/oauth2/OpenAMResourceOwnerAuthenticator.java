@@ -98,7 +98,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
 
                 long authTime = stringToDate(token.getProperty(ISAuthConstants.AUTH_INSTANT)).getTime();
 
-                return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id, authTime);
+                return new OpenAMResourceOwner(id.getName(), id, authTime);
             } catch (SSOException e) {
                 logger.error("Unable to create ResourceOwner", e);
             } catch (ParseException e) {
@@ -178,6 +178,6 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         final AMIdentity id = IdUtils.getIdentity(
                 AccessController.doPrivileged(AdminTokenAction.getInstance()),
                 token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
-        return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id);
+        return new OpenAMResourceOwner(id.getName(), id);
     }
 }

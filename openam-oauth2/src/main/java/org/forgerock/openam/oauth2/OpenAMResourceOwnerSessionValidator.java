@@ -188,7 +188,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                             AccessController.doPrivileged(AdminTokenAction.getInstance()),
                             token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
 
-                    return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id, authTime);
+                    return new OpenAMResourceOwner(id.getName(), id, authTime);
 
                 } catch (Exception e) { //Exception as chance of MANY exception types here.
                     logger.error("Error authenticating user against OpenAM: ", e);
