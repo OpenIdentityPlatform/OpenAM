@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+<!--
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
+ *
+ * Copyright 2012-2015 ForgeRock AS.
+ */
+-->
+
+<ServicesConfiguration>
+<Service name="SessionPropertyWhitelistService" version="1.0">
+    <Schema
+        serviceHierarchy="/DSAMEConfig/SessionPropertyWhitelistService"
+        i18nFileName="amSessionPropertyWhitelist"
+        revisionNumber="1"
+        resourceName="amSessionPropertyWhitelist"
+        i18nKey="forgerock-session-property-whitelist-service-description">
+        <Organization>
+
+            <AttributeSchema name="forgerock-session-property-whitelist"
+                             type="list"
+                             syntax="string"
+                             i18nKey="a100"
+                             resourceName="sessionPropertyWhitelist">
+            </AttributeSchema>
+
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

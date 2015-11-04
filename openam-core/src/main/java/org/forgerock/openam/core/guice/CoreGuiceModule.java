@@ -67,7 +67,20 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import com.sun.identity.sm.ldap.ConfigAuditorFactory;
-
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.ServletContext;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
@@ -97,6 +110,8 @@ import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPollerPool;
+import org.forgerock.openam.session.SessionPropertyList;
+import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.session.SessionURL;
 import org.forgerock.openam.session.blacklist.BloomFilterSessionBlacklist;
@@ -117,21 +132,6 @@ import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.thread.ExecutorServiceFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.ServletContext;
-import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -227,6 +227,7 @@ public class CoreGuiceModule extends AbstractModule {
         /**
          * Session related dependencies.
          */
+        bind(SessionPropertyList.class).to(SessionPropertyWhitelist.class);
         bind(SessionOperationStrategy.class).to(ServerSessionOperationStrategy.class);
         // TODO: Investigate whether or not this lazy-loading "Config<SessionService>" wrapper is still needed
         bind(new TypeLiteral<Config<SessionService>>() {

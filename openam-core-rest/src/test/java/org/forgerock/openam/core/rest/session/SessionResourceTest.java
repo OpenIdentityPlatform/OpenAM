@@ -22,6 +22,10 @@ import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.forgerock.json.JsonValue.*;
+import static org.mockito.BDDMockito.anySetOf;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -36,17 +40,23 @@ import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.AdviceContext;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.session.SessionPropertyList;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
@@ -57,10 +67,11 @@ import org.testng.annotations.Test;
 public class SessionResourceTest {
 
     private SessionResource sessionResource;
-
     private SessionQueryManager sessionQueryManager;
     private SSOTokenManager ssoTokenManager;
     private AuthUtilsWrapper authUtilsWrapper;
+    private SessionPropertyList propertyWhitelist;
+    private RealmContext realmContext;
 
     private AMIdentity amIdentity;
 
@@ -68,18 +79,26 @@ public class SessionResourceTest {
     private String urlResponse;
     private String cookieResponse;
 
+    private Set<String> whitelist;
+
     @BeforeMethod
     public void setUp() throws IdRepoException {
         sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
+        propertyWhitelist = mock(SessionPropertyList.class);
         headerResponse = null;
         urlResponse = null;
         cookieResponse = null;
+        realmContext = mock(RealmContext.class);
+
+        given(realmContext.getResolvedRealm()).willReturn("/");
 
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
-        sessionResource = new SessionResource(sessionQueryManager, ssoTokenManager, authUtilsWrapper) {
+        configureWhitelist();
+        sessionResource = new SessionResource(sessionQueryManager, ssoTokenManager, authUtilsWrapper,
+                propertyWhitelist) {
             @Override
             AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
                 return amIdentity;
@@ -107,6 +126,16 @@ public class SessionResourceTest {
         };
     }
 
+    private void configureWhitelist() {
+        whitelist = new HashSet<>();
+        whitelist.add("one");
+        whitelist.add("two");
+        whitelist.add("three");
+
+        given(propertyWhitelist.getAllListedProperties(any(SSOToken.class), any(String.class))).willReturn(whitelist);
+
+    }
+
     @Test
     public void shouldUseSessionQueryManagerForAllSessionsQuery() {
         // Given
@@ -118,7 +147,7 @@ public class SessionResourceTest {
         given(request.getQueryId()).willReturn(SessionResource.KEYWORD_ALL);
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
 
-        SessionResource resource = spy(new SessionResource(mockManager, null, null));
+        SessionResource resource = spy(new SessionResource(mockManager, null, null, null));
         List<String> list = Arrays.asList(badger, weasel);
         doReturn(list).when(resource).getAllServerIds();
 
@@ -140,7 +169,7 @@ public class SessionResourceTest {
         QueryRequest request = mock(QueryRequest.class);
         given(request.getQueryId()).willReturn(badger);
 
-        SessionResource resource = spy(new SessionResource(mockManager, null, null));
+        SessionResource resource = spy(new SessionResource(mockManager, null, null, null));
 
         // When
         resource.queryCollection(null, request, mockHandler);
@@ -413,4 +442,227 @@ public class SessionResourceTest {
         //Then
         assertThat(promise).failedWithException().isExactlyInstanceOf(NotSupportedException.class);
     }
+
+    @Test
+    public void shouldReturnListOfWhitelistedProperties() throws SSOException {
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(GET_PROPERTY_NAMES_ACTION_ID);
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).succeeded().withContent().hasArray("properties").hasSize(3);
+        assertThat(promise).succeeded().withContent().hasArray("properties").containsOnly("one", "two", "three");
+    }
+
+    @Test
+    public void shouldReturnAllWhitelistedProperties() throws SSOException {
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(GET_PROPERTY_ACTION_ID);
+
+        given(ssoToken.getProperty(eq("one"))).willReturn("testOne");
+        given(ssoToken.getProperty(eq("two"))).willReturn("testTwo");
+        given(ssoToken.getProperty(eq("three"))).willReturn("testThree");
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).succeeded().withContent().stringAt("one").isEqualTo("testOne");
+        assertThat(promise).succeeded().withContent().stringAt("two").isEqualTo("testTwo");
+        assertThat(promise).succeeded().withContent().stringAt("three").isEqualTo("testThree");
+    }
+
+    @Test
+    public void shouldFailToGetNonWhitelistedProperty() throws SSOException {
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final JsonValue content = json(object(field("properties", array("invalid"))));
+
+        given(request.getContent()).willReturn(content);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(GET_PROPERTY_ACTION_ID);
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void shouldGetWhitelistedProperty() throws SSOException {
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+
+        final JsonValue content = json(object(field("properties", array("one"))));
+
+        given(request.getContent()).willReturn(content);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(GET_PROPERTY_ACTION_ID);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(true);
+        given(ssoToken.getProperty(eq("one"))).willReturn("testOne");
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).succeeded().withContent().stringAt("one").isEqualTo("testOne");
+    }
+
+    @Test
+    public void shouldSetWhitelistedProperty() throws SSOException {
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+
+        JsonValue jsonContent = json(object(field("one", "testOne")));
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(SET_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(jsonContent);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(true);
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        verify(ssoToken).setProperty(eq("one"), eq("testOne"));
+        assertThat(promise).succeeded();
+    }
+
+    @Test
+    public void shouldFailToSetNonWhitelistedProperty() throws SSOException {
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+
+        JsonValue jsonContent = json(object(field("invalid", "testInvalid")));
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(SET_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(jsonContent);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(false);
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void shouldFailToSetInvalidRequest() throws SSOException {
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+
+        JsonValue jsonContent = json(object());
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(SET_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(jsonContent);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(false);
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    public void shouldDeleteWhitelistedProperty() throws SSOException {
+
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final JsonValue content = json(object(field("properties", array("one"))));
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(content);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(true);
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        verify(ssoToken).setProperty(eq("one"), eq(""));
+        assertThat(promise).succeeded();
+    }
+
+
+    @Test
+    public void shouldFailToDeleteNonWhitelistedProperty() throws SSOException {
+
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+
+        final JsonValue content = json(object(field("properties", array("invalid"))));
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(content);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(false);
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void shouldFailToDeleteInvalidRequest() throws SSOException {
+
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+
+        final JsonValue content = json(object());
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(content);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(false);
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(BadRequestException.class);
+    }
+
 }

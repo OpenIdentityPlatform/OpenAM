@@ -38,6 +38,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
@@ -52,6 +54,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
@@ -65,8 +68,10 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionPropertyList;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
@@ -83,7 +88,8 @@ import org.forgerock.util.promise.Promise;
  *     <li>[server-id] - Lists the servers for that server instance.</li>
  * </ul>
  *
- * This resources acts as a read only resource for the moment.
+ * This resources acts as a read only resource for the most part, allowing only
+ * specific, whitelisted properties to be set through it.
  */
 public class SessionResource implements CollectionResourceProvider {
 
@@ -94,7 +100,14 @@ public class SessionResource implements CollectionResourceProvider {
     public static final String IS_ACTIVE_ACTION_ID = "isActive";
     public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime";
     public static final String GET_IDLE_ACTION_ID = "getIdle";
+    public static final String GET_PROPERTY_ACTION_ID = "getProperty";
+    public static final String SET_PROPERTY_ACTION_ID = "setProperty";
+    public static final String DELETE_PROPERTY_ACTION_ID = "deleteProperty";
+    public static final String GET_PROPERTY_NAMES_ACTION_ID = "getPropertyNames";
 
+    public static final String KEYWORD_PROPERTIES = "properties";
+    public static final String KEYWORD_RESULT = "result";
+    public static final String KEYWORD_SUCCESS = "success";
     public static final String KEYWORD_ALL = "all";
     public static final String KEYWORD_LIST = "list";
     public static final String HEADER_USER_ID = "userid";
@@ -104,27 +117,34 @@ public class SessionResource implements CollectionResourceProvider {
     private final SSOTokenManager ssoTokenManager;
     private final AuthUtilsWrapper authUtilsWrapper;
     private final Map<String, ActionHandler> actionHandlers;
+    private final SessionPropertyList sessionPropertyWhitelist;
 
     /**
      * Dependency Injection constructor allowing the SessionResource dependency to be provided.
-     *
-     * @param sessionQueryManager An instance of the SessionQueryManager. Must not null.
+     *  @param sessionQueryManager An instance of the SessionQueryManager. Must not null.
      * @param ssoTokenManager An instance of the SSOTokenManager.
      * @param authUtilsWrapper A wrapper around AuthUtils static methods to facilitate testing.
+     * @param sessionPropertyWhitelist A session property whitelist
      */
     @Inject
     public SessionResource(final SessionQueryManager sessionQueryManager,
                            final SSOTokenManager ssoTokenManager,
-                           final AuthUtilsWrapper authUtilsWrapper) {
+                           final AuthUtilsWrapper authUtilsWrapper,
+                           final SessionPropertyList sessionPropertyWhitelist) {
         this.queryManager = sessionQueryManager;
         this.ssoTokenManager = ssoTokenManager;
         this.authUtilsWrapper = authUtilsWrapper;
-        actionHandlers = new CaseInsensitiveHashMap();
+        this.sessionPropertyWhitelist = sessionPropertyWhitelist;
+        actionHandlers = new CaseInsensitiveHashMap<>();
         actionHandlers.put(VALIDATE_ACTION_ID, new ValidateActionHandler());
         actionHandlers.put(LOGOUT_ACTION_ID, new LogoutActionHandler());
         actionHandlers.put(IS_ACTIVE_ACTION_ID, new IsActiveActionHandler());
         actionHandlers.put(GET_IDLE_ACTION_ID, new GetIdleTimeActionHandler());
         actionHandlers.put(GET_MAX_TIME_ACTION_ID, new GetMaxTimeActionHandler());
+        actionHandlers.put(GET_PROPERTY_ACTION_ID, new GetPropertyActionHandler());
+        actionHandlers.put(SET_PROPERTY_ACTION_ID, new SetPropertyActionHandler());
+        actionHandlers.put(DELETE_PROPERTY_ACTION_ID, new DeletePropertyActionHandler());
+        actionHandlers.put(GET_PROPERTY_NAMES_ACTION_ID, new GetPropertyNamesActionHandler());
     }
 
     /**
@@ -501,7 +521,7 @@ public class SessionResource implements CollectionResourceProvider {
                 ssoToken = ssoTokenManager.createSSOToken(tokenId);
             } catch (SSOException ex) {
                 Map<String, Object> map = new HashMap<String, Object>();
-                map.put("result", "Token has expired");
+                map.put(KEYWORD_RESULT, "Token has expired");
                 if (LOGGER.messageEnabled()) {
                     LOGGER.message("SessionResource.logout() :: Token ID, " + tokenId + ", already expired.");
                 }
@@ -544,9 +564,7 @@ public class SessionResource implements CollectionResourceProvider {
             }
 
             map.put("result", "Successfully logged out");
-
             LOGGER.message("SessionResource.logout() :: Successfully logged out token, {}", tokenId);
-
             return new JsonValue(map);
         }
     }
@@ -732,6 +750,153 @@ public class SessionResource implements CollectionResourceProvider {
             } catch (SSOException ignored) {
             }
             return json(object(field(IDLE_TIME, idleTime)));
+        }
+    }
+
+    /**
+     * Handles 'getProperty' actions. If a field is requested, return only that field. If no field is
+     * specified, return the key/value of all whitelisted fields.
+     *
+     * REQUEST: { 'properties' : [ 'property1', 'property2'] }
+     * RESPONSE: { 'property1' : 'value1', 'property2' : 'value2' }
+     */
+    private class GetPropertyActionHandler implements ActionHandler {
+        @Override
+        public Promise<ActionResponse, ResourceException> handle(final String tokenId, final Context context,
+                final ActionRequest request) {
+
+            final JsonValue result = json(object());
+            try {
+                final SSOToken token = getToken(tokenId);
+                final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+
+                if (request.getContent() == null || request.getContent().get(KEYWORD_PROPERTIES).isNull()) {
+                    for (String property : sessionPropertyWhitelist.getAllListedProperties(token, realm)) {
+                        final String value = token.getProperty(property);
+                        result.add(property, value == null ? "" : value);
+                    }
+                } else {
+                    for (String requestedResult : request.getContent().get(KEYWORD_PROPERTIES).asSet(String.class)) {
+                        if (sessionPropertyWhitelist.isPropertyListed(token, realm,
+                                Collections.singleton(requestedResult))) {
+                            final String value = token.getProperty(requestedResult);
+                            result.add(requestedResult, value == null ? "" : value);
+                        } else {
+                            LOGGER.warning("User {} requested property {} to get which was not whitelisted or "
+                                    + "was protected.", token.getPrincipal(), requestedResult);
+                            return new ForbiddenException().asPromise();
+                        }
+                    }
+
+                }
+
+            } catch (SSOException e) {
+                LOGGER.message("Unable to read session property due to unreadable SSOToken", e);
+            }
+            return newResultPromise(newActionResponse(result));
+        }
+    }
+
+    /**
+     * Handles 'setProperty' actions.
+     *
+     * REQUEST: { 'property1' : 'value1', 'property2' : 'value2' }
+     * RESPONSE: { 'success' : true }
+     */
+    private class SetPropertyActionHandler implements ActionHandler {
+        @Override
+        public Promise<ActionResponse, ResourceException> handle(final String tokenId, final Context context,
+                final ActionRequest request) {
+            try {
+                final SSOToken token = getToken(tokenId);
+                final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+
+                if (request.getContent() == null || request.getContent().isNull() ||
+                        request.getContent().asMap(String.class).size() == 0) {
+                    return new BadRequestException().asPromise();
+                }
+
+                final Map<String, String> entrySet = request.getContent().asMap(String.class);
+
+                if (sessionPropertyWhitelist.isPropertyListed(token, realm, entrySet.keySet())) {
+                    for (Map.Entry<String, String> entry : request.getContent().asMap(String.class).entrySet()) {
+                        token.setProperty(entry.getKey(), entry.getValue());
+                    }
+                } else {
+                    LOGGER.warning("User {} requested property/ies {} to set which was not whitelisted.",
+                            token.getPrincipal(), entrySet.toString());
+                    return new ForbiddenException().asPromise();
+                }
+            } catch (SSOException e) {
+                LOGGER.message("Unable to set session property due to unreadable SSOToken", e);
+            }
+
+            return newResultPromise(newActionResponse(json(object(field(KEYWORD_SUCCESS, true)))));
+        }
+    }
+
+    /**
+     * Handles 'deleteProperty' actions.
+     *
+     * REQUEST: { 'properties' : [ 'property1', 'property2'] }
+     * RESPONSE: { 'success' : true }
+     */
+    private class DeletePropertyActionHandler implements ActionHandler {
+        @Override
+        public Promise<ActionResponse, ResourceException> handle(final String tokenId, final Context context,
+                final ActionRequest request) {
+            try {
+                final SSOToken token = getToken(tokenId);
+                final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+
+                JsonValue content = request.getContent().get(KEYWORD_PROPERTIES);
+
+                if (content == null || content.isNull()) {
+                    return newExceptionPromise(ResourceException.newResourceException(400)); //no properties = bad request
+                }
+
+                final Set<String> propSet = request.getContent().get(KEYWORD_PROPERTIES).asSet(String.class);
+
+                if (sessionPropertyWhitelist.isPropertyListed(token, realm, propSet)) {
+                    for (String entry : propSet) {
+                        //there is no "delete" function - we can't store null in the property map so blank it
+                        token.setProperty(entry, "");
+                    }
+                } else {
+                    LOGGER.message("User {} requested property/ies {} to delete which was not whitelisted.",
+                            token.getPrincipal(), propSet.toString());
+                    return new ForbiddenException().asPromise();
+                }
+
+            } catch (SSOException e) {
+                LOGGER.message("Unable to delete session property due to unreadable SSOToken", e);
+            }
+
+            return newResultPromise(newActionResponse(json(object(field(KEYWORD_SUCCESS, true)))));
+        }
+    }
+
+    /**
+     * Handles 'getPropertyNames' actions.
+     *
+     * REQUEST:
+     * RESPONSE: { 'properties' : [ 'property1', 'property2' ] }
+     */
+    private class GetPropertyNamesActionHandler implements ActionHandler {
+        @Override
+        public Promise<ActionResponse, ResourceException> handle(final String tokenId, final Context context,
+                                                                 final ActionRequest request) {
+            try {
+                final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+                final SSOToken token = getToken(tokenId);
+
+                return newResultPromise(newActionResponse(json(object(field(KEYWORD_PROPERTIES,
+                        sessionPropertyWhitelist.getAllListedProperties(token, realm))))));
+            } catch (SSOException e) {
+                LOGGER.message("Unable to read all whitelisted session properties.", e);
+            }
+
+            return new InternalServerErrorException().asPromise();
         }
     }
 }

@@ -43,7 +43,7 @@ public class SessionResourceAuthzModuleTest {
         Config<SessionService> mockConfig = mock(Config.class);
         SessionService mockService = mock(SessionService.class);
         given(mockConfig.get()).willReturn(mockService);
-        testModule = new SessionResourceAuthzModule(mockConfig, mock(Debug.class));
+        testModule = new SessionResourceAuthzModule(mockConfig, mock(Debug.class), null);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class SessionResourceAuthzModuleTest {
         testModule.authorizeAction(rootContext, mockRequest);
 
         //then
-        // we should catch an IllegalArgumentException as we pass into super.authorize, as we have no SSOTokenContext
+        // we should catch an IllegalArgumentException as we pass into super.authorizeAction, as we have no SSOTokenContext
     }
 
 }
