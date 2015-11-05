@@ -18,6 +18,9 @@ package org.forgerock.openam.selfservice.config;
 
 import org.forgerock.util.Reject;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Represents forgotten password console configuration.
  *
@@ -46,7 +49,8 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
 
         private int minAnswersToProvide;
 
-        private UserRegistrationBuilder() {
+        private UserRegistrationBuilder(Map<String, Set<String>> consoleAttributes) {
+            super(consoleAttributes);
         }
 
         UserRegistrationBuilder setMinAnswersToProvide(int minAnswersToProvide) {
@@ -66,7 +70,8 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
         }
     }
 
-    static UserRegistrationBuilder newBuilder() {
-        return new UserRegistrationBuilder();
+    static UserRegistrationBuilder newBuilder(Map<String, Set<String>> consoleAttributes) {
+        return new UserRegistrationBuilder(consoleAttributes);
     }
+
 }

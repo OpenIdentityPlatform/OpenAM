@@ -56,10 +56,12 @@ public final class ForgottenPasswordExtractor implements ConsoleConfigExtractor<
     public ForgottenPasswordConsoleConfig extract(Map<String, Set<String>> consoleAttributes) {
         try {
             return ForgottenPasswordConsoleConfig
-                    .newBuilder()
+                    .newBuilder(consoleAttributes)
                     .setEnabled(getBooleanMapAttrThrows(consoleAttributes, ENABLED_KEY))
                     .setEmailVerificationEnabled(getBooleanMapAttrThrows(consoleAttributes, EMAIL_VERIFICATION_ENABLED))
                     .setEmailUrl(getMapAttrThrows(consoleAttributes, EMAIL_URL_KEY))
+                    .setSubjectTranslations(getLocaleMapAttrThrows(consoleAttributes, SUBJECT_MAP))
+                    .setMessageTranslations(getLocaleMapAttrThrows(consoleAttributes, BODY_TEXT_MAP))
                     .setCaptchaEnabled(getBooleanMapAttrThrows(consoleAttributes, CAPTCHA_ENABLED_KEY))
                     .setSiteKey(getMapAttr(consoleAttributes, CAPTCHA_SITE_KEY))
                     .setSecretKey(getMapAttr(consoleAttributes, CAPTCHA_SECRET_KEY))
@@ -69,12 +71,11 @@ public final class ForgottenPasswordExtractor implements ConsoleConfigExtractor<
                     .setMinQuestionsToAnswer(getIntMapAttrThrows(consoleAttributes, MIN_QUESTIONS_TO_ANSWERED_KEY))
                     .setTokenExpiry(getLongMapAttrThrows(consoleAttributes, TOKEN_EXPIRY_KEY))
                     .setConfigProviderClass(getMapAttrThrows(consoleAttributes, SERVICE_CONFIG_CLASS_KEY))
-                    .setSubjectTranslations(getLocaleMapAttrThrows(consoleAttributes, SUBJECT_MAP))
-                    .setMessageTranslations(getLocaleMapAttrThrows(consoleAttributes, BODY_TEXT_MAP))
                     .build();
 
         } catch (ValueNotFoundException e) {
             throw new IllegalArgumentException("Invalid console values", e);
         }
     }
+
 }

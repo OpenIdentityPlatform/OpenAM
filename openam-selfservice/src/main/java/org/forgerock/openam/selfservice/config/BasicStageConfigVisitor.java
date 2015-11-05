@@ -56,6 +56,7 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
     private final SecurityAnswerVerificationStage securityAnswerVerificationStage;
     private final ResetStage resetStage;
     private final CaptchaStage captchaStage;
+    private final RetrieveUsernameStage retrieveUsernameStage;
 
     private final DynamicConfigVisitor dynamicConfigVisitor;
 
@@ -76,6 +77,8 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
      *         reset password stage
      * @param captchaStage
      *         captcha stage
+     * @param retrieveUsernameStage
+     *         retrieve username stage
      * @param dynamicConfigVisitor
      *         dynamic config visitor
      */
@@ -84,7 +87,7 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
             SecurityAnswerDefinitionStage securityAnswerDefinitionStage, UserRegistrationStage userRegistrationStage,
             UserDetailsStage userDetailsStage, UserQueryStage userQueryStage, ResetStage resetStage,
             CaptchaStage captchaStage, SecurityAnswerVerificationStage securityAnswerVerificationStage,
-            DynamicConfigVisitor dynamicConfigVisitor) {
+            RetrieveUsernameStage retrieveUsernameStage, DynamicConfigVisitor dynamicConfigVisitor) {
         this.verifyEmailAccountStage = verifyEmailAccountStage;
         this.securityAnswerDefinitionStage = securityAnswerDefinitionStage;
         this.userRegistrationStage = userRegistrationStage;
@@ -93,7 +96,7 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
         this.securityAnswerVerificationStage = securityAnswerVerificationStage;
         this.resetStage = resetStage;
         this.captchaStage = captchaStage;
-
+        this.retrieveUsernameStage = retrieveUsernameStage;
         this.dynamicConfigVisitor = dynamicConfigVisitor;
     }
 
@@ -139,7 +142,7 @@ public final class BasicStageConfigVisitor implements CommonConfigVisitor {
 
     @Override
     public ProgressStageBinder<?> build(RetrieveUsernameConfig retrieveUsernameConfig) {
-        return ProgressStageBinder.bind(new RetrieveUsernameStage(), retrieveUsernameConfig);
+        return ProgressStageBinder.bind(retrieveUsernameStage, retrieveUsernameConfig);
     }
 
     @Override

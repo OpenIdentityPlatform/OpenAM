@@ -15,11 +15,12 @@
  */
 package org.forgerock.openam.selfservice.config;
 
-import java.util.Locale;
 import org.forgerock.util.Reject;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents common console configuration used by all self services.
@@ -28,6 +29,7 @@ import java.util.Map;
  */
 abstract class CommonConsoleConfig implements ConsoleConfig {
 
+    private final Map<String, Set<String>> consoleAttributes;
     private final boolean enabled;
     private final boolean emailVerificationEnabled;
     private final String emailUrl;
@@ -43,6 +45,7 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
     private final Map<Locale, String> messageTranslations;
 
     protected CommonConsoleConfig(Builder builder) {
+        consoleAttributes = builder.consoleAttributes;
         configProviderClass = builder.configProviderClass;
         enabled = builder.enabled;
         emailVerificationEnabled = builder.emailVerificationEnabled;
@@ -172,7 +175,35 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
         return messageTranslations;
     }
 
+    /**
+     * Retrieves the underlying console attribute for the key.
+     *
+     * @param key
+     *         console attribute key
+     *
+     * @return corresponding string value
+     */
+    public String getAttributeAsString(String key) {
+        Set<String> attribute = consoleAttributes.get(key);
+        return attribute == null || attribute.isEmpty()
+                ? null : attribute.iterator().next();
+    }
+
+    /**
+     * Retrieves the underlying console attribute for the key.
+     *
+     * @param key
+     *         console attribute key
+     *
+     * @return corresponding set value
+     */
+    public Set<String> getAttributeAsSet(String key) {
+        return consoleAttributes.get(key);
+    }
+
     abstract static class Builder<C extends ConsoleConfig, B extends Builder<C, B>> {
+
+        private final Map<String, Set<String>> consoleAttributes;
 
         private boolean enabled;
         private boolean emailVerificationEnabled;
@@ -188,7 +219,10 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
         private final Map<Locale, String> subjectTranslations;
         private final Map<Locale, String> messageTranslations;
 
-        protected Builder() {
+        protected Builder(Map<String, Set<String>> consoleAttributes) {
+            Reject.ifNull(consoleAttributes);
+            this.consoleAttributes = consoleAttributes;
+
             securityQuestions = new HashMap<>();
             subjectTranslations = new HashMap<>();
             messageTranslations = new HashMap<>();
@@ -265,12 +299,14 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
 
             if (emailVerificationEnabled) {
                 Reject.ifNull(emailUrl, "Email verification url required");
-                Reject.ifTrue(this.subjectTranslations.isEmpty(), "Subject translations are missing");
-                Reject.ifTrue(this.messageTranslations.isEmpty(), "Message translations are missing");
+                Reject.ifTrue(subjectTranslations.isEmpty(), "Subject translations are missing");
+                Reject.ifTrue(messageTranslations.isEmpty(), "Message translations are missing");
             }
 
             if (captchaEnabled) {
-                Reject.ifNull(siteKey, secretKey, verificationUrl, "Captcha config required");
+                Reject.ifNull(siteKey, "Captcha site key is required");
+                Reject.ifNull(secretKey, "Captcha secret key is required");
+                Reject.ifNull(verificationUrl, "Captcha verification url is required");
             }
 
             if (kbaEnabled) {
@@ -284,4 +320,5 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
 
         abstract C internalBuild();
     }
+
 }

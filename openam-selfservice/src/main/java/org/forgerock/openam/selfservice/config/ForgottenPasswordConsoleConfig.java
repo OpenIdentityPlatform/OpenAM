@@ -18,6 +18,9 @@ package org.forgerock.openam.selfservice.config;
 
 import org.forgerock.util.Reject;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Represents forgotten password console configuration.
  *
@@ -46,7 +49,8 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
 
         private int minQuestionsToAnswer;
 
-        private ForgottenPasswordBuilder() {
+        private ForgottenPasswordBuilder(Map<String, Set<String>> consoleAttributes) {
+            super(consoleAttributes);
         }
 
         ForgottenPasswordBuilder setMinQuestionsToAnswer(int minQuestionsToAnswer) {
@@ -66,7 +70,8 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
         }
     }
 
-    static ForgottenPasswordBuilder newBuilder() {
-        return new ForgottenPasswordBuilder();
+    static ForgottenPasswordBuilder newBuilder(Map<String, Set<String>> consoleAttributes) {
+        return new ForgottenPasswordBuilder(consoleAttributes);
     }
+
 }

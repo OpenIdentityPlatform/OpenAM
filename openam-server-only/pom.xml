@@ -330,6 +330,14 @@
                             <targetPath>WEB-INF/classes</targetPath>
                             <filtering>false</filtering>
                         </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-rest/src/main/resources</directory>
+                            <includes>
+                                <include>RestSecurity*.properties</include>
+                            </includes>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
                     </webResources>
                 </configuration>
 
