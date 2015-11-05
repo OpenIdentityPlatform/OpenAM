@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
-    "backgrid",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/uma/views/share/CommonShare",

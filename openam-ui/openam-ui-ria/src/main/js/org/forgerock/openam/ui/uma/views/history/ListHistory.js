@@ -28,16 +28,16 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "underscore",
     "backbone",
     "backbone.paginator",
-    "backgrid",
     "backgrid-filter",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, AbstractView, BackgridUtils, Configuration,
-             Constants, RealmHelper) {
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, AbstractView,
+             Configuration, Constants, BackgridUtils, RealmHelper) {
     var HistoryView = AbstractView.extend({
         template: "templates/uma/views/history/ListHistory.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",

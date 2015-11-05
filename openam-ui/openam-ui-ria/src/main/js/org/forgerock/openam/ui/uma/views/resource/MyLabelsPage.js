@@ -17,7 +17,7 @@
 define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
     "jquery",
     "backbone",
-    "backgrid",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/views/resource/BasePage",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",

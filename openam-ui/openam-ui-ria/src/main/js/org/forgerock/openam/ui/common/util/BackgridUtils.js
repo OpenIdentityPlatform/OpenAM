@@ -18,13 +18,13 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     "jquery",
     "underscore",
     "backbone",
-    "backgrid",
     "moment",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeableServerSideFilter",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/backgrid/extension/ThemeableServerSideFilter",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, Backbone, Backgrid, moment, Messages, Router, ThemeableServerSideFilter, UIUtils) {
+], function ($, _, Backbone, moment, Backgrid, ThemeableServerSideFilter, Messages, Router, UIUtils) {
     /**
      * @exports org/forgerock/openam/ui/common/util/BackgridUtils
      */

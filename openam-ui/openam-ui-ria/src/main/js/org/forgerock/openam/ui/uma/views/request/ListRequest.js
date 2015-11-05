@@ -18,8 +18,8 @@ define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
     "jquery",
     "backbone",
     "backbone.paginator",
-    "backgrid",
     "backgrid-filter",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function ($, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator,
+], function ($, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator,
              AbstractView, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMADelegate) {
     var ListRequest = AbstractView.extend({
         template: "templates/uma/views/request/ListRequestTemplate.html",

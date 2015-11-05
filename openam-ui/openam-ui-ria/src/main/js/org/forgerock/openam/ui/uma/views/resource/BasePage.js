@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
     "backbone.paginator",
-    "backgrid",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "backgrid-filter",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/views/share/CommonShare",
