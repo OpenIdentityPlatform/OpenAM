@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2015 ForgeRock AS.
+ * Copyright 2011-2015 ForgeRock AS.
  * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -23,59 +23,62 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.shared.encode.CookieUtils;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.xui.XUIState;
 import org.owasp.esapi.ESAPI;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
-
 /*
  * OAuth module specific Get2Post gateway. 
- * In some conditions OpenAM would prefer POST method over GET.
- * OAuthProxy is more like workaround over some specific scenarios,
- * that did not work. OAuthProxy may not be needed with future
- * versions of OpenAM.
+ * When using the legacy authentication UI we need to transform the incoming GET request (from the OAuth2 AS) to a POST
+ * request, so that the authentication framework can remain to use the same authentication session for the corresponding
+ * authentication attempt (this is because GET requests made to /UI/Login always result in a new authentication
+ * session).
+ * The XUI on the other hand currently does not have a way to continue an existing authentication process, hence the
+ * OAuth module currently just redirects to /openam retaining the query string that was used to access the
+ * OAuthProxy.jsp. Since performing a POST request against a static resource can result in HTTP 405 (e.g. on WildFly),
+ * in case XUI is enabled we perform a redirect instead to "continue" the authentication process.
  */
 public class OAuthProxy  {
 
+    public static void continueAuthentication(HttpServletRequest req, HttpServletResponse res, PrintWriter out) {
+        OAuthUtil.debugMessage("toPostForm: started");
 
-    public static String toPostForm(HttpServletRequest req,
-            HttpServletResponse res) {
-
-            OAuthUtil.debugMessage("toPostForm: started");
-
- 
         String action = OAuthUtil.findCookie(req, COOKIE_ORIG_URL);
         
         if (OAuthUtil.isEmpty(action)) {
-            return getError("Request not valid !");
+            out.println(getError("Request not valid !"));
+            return;
         }
 
         Map<String, String[]> params = req.getParameterMap();
         
-        if (!params.keySet().contains(PARAM_CODE)
-                && !params.keySet().contains(PARAM_ACTIVATION)) {
-            OAuthUtil.debugError("OAuthProxy.toPostForm: Parameters " + PARAM_CODE
-                    + " or " + PARAM_ACTIVATION + " were not present in the request");
-            return getError("Request not valid, perhaps a permission problem");
+        if (!params.containsKey(PARAM_CODE) && !params.containsKey(PARAM_ACTIVATION)) {
+            OAuthUtil.debugError("OAuthProxy.toPostForm: Parameters " + PARAM_CODE + " or " + PARAM_ACTIVATION
+                    + " were not present in the request");
+            out.println(getError("Request not valid, perhaps a permission problem"));
+            return;
         }
         
         StringBuilder html = new StringBuilder();
-        
+
         try {
             String code = req.getParameter(PARAM_CODE);
             if (code != null && !OAuthUtil.isEmpty(code)) {
                 if (!ESAPI.validator().isValidInput(PARAM_CODE, code, "HTTPParameterValue", 512, true)) {
                     OAuthUtil.debugError("OAuthProxy.toPostForm: Parameter " + PARAM_CODE
                             + " is not valid!! : " + code);
-                    return getError("Request not valid");
+                    out.println(getError("Request not valid"));
+                    return;
                 }
             }
             if (action.contains("?")) {
@@ -84,31 +87,40 @@ public class OAuthProxy  {
                 action += "?" + req.getQueryString();
             }
 
-            action = ESAPI.encoder().encodeForHTMLAttribute(action);
+            XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
+            if (xuiState.isXUIEnabled()) {
+                // OAuthProxy.jsp should be always accessed via GET, hence the querystring should contain all important
+                // parameters already.
+                res.sendRedirect(action);
+                return;
+            } else {
+                action = ESAPI.encoder().encodeForHTMLAttribute(action);
 
-            String onLoad = "document.postform.submit()";
+                String onLoad = "document.postform.submit()";
 
-            html.append("<html>\n").append("<body onLoad=\"")
-                .append(onLoad).append("\">\n");
-            html.append("<form name=\"postform\" action=\"")
-                .append(action).append("\" method=\"post\">\n");
+                html.append("<html>\n").append("<body onLoad=\"")
+                        .append(onLoad).append("\">\n");
+                html.append("<form name=\"postform\" action=\"")
+                        .append(action).append("\" method=\"post\">\n");
 
-            String activation = req.getParameter(PARAM_ACTIVATION);
-            if (activation != null && !OAuthUtil.isEmpty(activation)) {
-                if (ESAPI.validator().isValidInput(PARAM_ACTIVATION, activation,
-                        "HTTPParameterValue", 512, true)) {
-                    html.append(input(PARAM_ACTIVATION, activation));
-                } else {
-                    OAuthUtil.debugError("OAuthProxy.toPostForm: Parameter " + PARAM_ACTIVATION
-                            + " is not valid!! : " + activation);
-                    return getError("Request not valid");
+                String activation = req.getParameter(PARAM_ACTIVATION);
+                if (activation != null && !OAuthUtil.isEmpty(activation)) {
+                    if (ESAPI.validator().isValidInput(PARAM_ACTIVATION, activation,
+                            "HTTPParameterValue", 512, true)) {
+                        html.append(input(PARAM_ACTIVATION, activation));
+                    } else {
+                        OAuthUtil.debugError("OAuthProxy.toPostForm: Parameter " + PARAM_ACTIVATION
+                                + " is not valid!! : " + activation);
+                        out.println(getError("Request not valid"));
+                        return;
+                    }
                 }
             }
-            
         } catch (Exception e) {
-            return getError(e.getMessage());
+            out.println(getError(e.getMessage()));
+            return;
         }
-        
+
         html.append("<noscript>\n<center>\n");
         html.append("<p>Your browser does not have JavaScript enabled, you must click"
                 + " the button below to continue</p>\n");
@@ -124,7 +136,7 @@ public class OAuthProxy  {
         for (String cookieDomain : cookieDomains) {
             CookieUtils.addCookieToResponse(res, CookieUtils.newCookie(COOKIE_ORIG_URL, "", 0, "/", cookieDomain));
         }
-        return html.toString();
+        out.println(html.toString());
     }
    
     private static StringBuilder input(String name, String value) {

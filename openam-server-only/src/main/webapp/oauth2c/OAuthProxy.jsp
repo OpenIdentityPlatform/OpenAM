@@ -1,7 +1,7 @@
 <%--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
-   Copyright � 2011 ForgeRock AS. All rights reserved.
+   Copyright 2011-2015 ForgeRock AS. All rights reserved.
    Copyright 2011 Cybernetica AS.
 
    The contents of this file are subject to the terms
@@ -22,8 +22,5 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
                                                               
---%>
-
-<%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthProxy" %>
-
-<%= OAuthProxy.toPostForm(request, response) %>
+--%><%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthProxy,java.io.PrintWriter" %><%
+    OAuthProxy.continueAuthentication(request, response, new PrintWriter(out, true)); %>
