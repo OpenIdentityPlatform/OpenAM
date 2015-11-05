@@ -767,8 +767,7 @@ public class SessionResource implements CollectionResourceProvider {
             final JsonValue result = json(object());
             try {
                 final SSOToken token = getToken(tokenId);
-                final AMIdentity identity = getIdentity(token);
-                final String realm = convertDNToRealm(identity.getRealm());
+                final String realm = getRealm(token);
 
                 if (request.getContent() == null || request.getContent().get(KEYWORD_PROPERTIES).isNull()) {
                     for (String property : sessionPropertyWhitelist.getAllListedProperties(token, realm)) {
@@ -809,8 +808,7 @@ public class SessionResource implements CollectionResourceProvider {
                 final ActionRequest request) {
             try {
                 final SSOToken token = getToken(tokenId);
-                final AMIdentity identity = getIdentity(token);
-                final String realm = convertDNToRealm(identity.getRealm());
+                final String realm = getRealm(token);
 
                 if (request.getContent() == null || request.getContent().isNull() ||
                         request.getContent().asMap(String.class).size() == 0) {
@@ -848,8 +846,7 @@ public class SessionResource implements CollectionResourceProvider {
                 final ActionRequest request) {
             try {
                 final SSOToken token = getToken(tokenId);
-                final AMIdentity identity = getIdentity(token);
-                final String realm = convertDNToRealm(identity.getRealm());
+                final String realm = getRealm(token);
 
                 JsonValue content = request.getContent().get(KEYWORD_PROPERTIES);
 
@@ -890,9 +887,7 @@ public class SessionResource implements CollectionResourceProvider {
                                                                  final ActionRequest request) {
             try {
                 final SSOToken token = getToken(tokenId);
-                final AMIdentity identity = getIdentity(token);
-                final String realm = convertDNToRealm(identity.getRealm());
-
+                final String realm = getRealm(token);
                 return newResultPromise(newActionResponse(json(object(field(KEYWORD_PROPERTIES,
                         sessionPropertyWhitelist.getAllListedProperties(token, realm))))));
             } catch (SSOException | IdRepoException e) {
@@ -901,5 +896,10 @@ public class SessionResource implements CollectionResourceProvider {
 
             return new InternalServerErrorException().asPromise();
         }
+    }
+
+    private String getRealm(SSOToken token) throws IdRepoException, SSOException {
+        final AMIdentity identity = getIdentity(token);
+        return convertDNToRealm(identity.getRealm());
     }
 }
