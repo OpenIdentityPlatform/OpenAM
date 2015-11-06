@@ -198,7 +198,7 @@ public  class AuthPropertiesViewBean
             try {
                 String redirectRealm = getRedirectRealm(this);
                 redirectToXui(getRequestContext().getRequest(), redirectRealm,
-                        MessageFormat.format("realms/{0}/authentication", URLEncoder.encode(redirectRealm, "UTF-8")));
+                        MessageFormat.format("realms/{0}/authentication/settings", URLEncoder.encode(redirectRealm, "UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalStateException("UTF-8 encoding not supported", e);
             }
