@@ -44,6 +44,7 @@ import java.io.IOException;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.shared.Constants;
 import org.forgerock.openam.upgrade.VersionUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 /**
  * This filter brings administrator to a configuration page
@@ -64,6 +65,17 @@ public final class AMSetupFilter implements Filter {
         "setUpgradeProgress", "/legal-notices/"
     }; 
 
+    private final AMSetupWrapper setupWrapper;
+
+    public AMSetupFilter() {
+        this(new AMSetupWrapper());
+    }
+
+    @VisibleForTesting
+    AMSetupFilter(AMSetupWrapper setupWrapper) {
+        this.setupWrapper = setupWrapper;
+    }
+
     /**
      * Redirects request to configuration page if the product is not yet 
      * configured.
@@ -79,7 +91,7 @@ public final class AMSetupFilter implements Filter {
         HttpServletRequest  httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         try {
-            if (AMSetupServlet.isCurrentConfigurationValid()) {
+            if (setupWrapper.isCurrentConfigurationValid()) {
                 String incomingURL = httpRequest.getRequestURI();
                 if (incomingURL.endsWith(SETUP_URI) || incomingURL.endsWith(UPGRADE_URI)
                         || incomingURL.endsWith(SETUP_PROGRESS_URI) || incomingURL.endsWith(UPGRADE_PROGESS_URI)) {
@@ -90,8 +102,8 @@ public final class AMSetupFilter implements Filter {
                     filterChain.doFilter(httpRequest, httpResponse);
                 }
             } else {
-                if (AMSetupServlet.getBootStrapFile() != null && !VersionUtils.isVersionNewer()
-                        && !AMSetupServlet.isUpgradeCompleted()) {
+                if (setupWrapper.getBootStrapFile() != null && !setupWrapper.isVersionNewer()
+                        && !setupWrapper.isUpgradeCompleted()) {
                     String redirectUrl = System.getProperty(Constants.CONFIG_STORE_DOWN_REDIRECT_URL);
                     if (redirectUrl != null && redirectUrl.length() > 0) {
                         httpResponse.sendRedirect(redirectUrl);
@@ -108,7 +120,7 @@ public final class AMSetupFilter implements Filter {
                         } else {
                             String url = httpRequest.getScheme() + "://" + httpRequest.getServerName() + ":"
                                     + httpRequest.getServerPort() + httpRequest.getContextPath();
-                            if (new File(System.getProperty("user.home")).canWrite()) {
+                            if (setupWrapper.getUserHomeDirectory().canWrite()) {
                                 url += SETUP_URI;
                             } else {
                                 url += NOWRITE_PERMISSION;
@@ -119,7 +131,7 @@ public final class AMSetupFilter implements Filter {
                     }
                 }
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw new ServletException("AMSetupFilter.doFilter", ex);
         }
@@ -153,12 +165,12 @@ public final class AMSetupFilter implements Filter {
      */
     public void init(FilterConfig filterConfig) {
         ServletContext servletCtx = filterConfig.getServletContext();
-        if (!AMSetupServlet.checkInitState(servletCtx)) {
+        if (!setupWrapper.checkInitState(servletCtx)) {
             //Set the encryption Key
-            servletCtx.setAttribute("am.enc.pwd", AMSetupUtils.getRandomString());
+            servletCtx.setAttribute("am.enc.pwd", setupWrapper.getRandomString());
         }
     }
-    
+
     /**
      * Returns <code>true</code> if the request is allowed without processing.
      *
@@ -173,5 +185,36 @@ public final class AMSetupFilter implements Filter {
      */
     private void markPassthrough() {
         passthrough = true;
+    }
+
+    static class AMSetupWrapper {
+
+        boolean checkInitState(ServletContext context) {
+            return AMSetupServlet.checkInitState(context);
+        }
+
+        String getRandomString() {
+            return AMSetupUtils.getRandomString();
+        }
+
+        boolean isCurrentConfigurationValid() {
+            return AMSetupServlet.isCurrentConfigurationValid();
+        }
+
+        String getBootStrapFile() {
+            return AMSetupServlet.getBootStrapFile();
+        }
+
+        boolean isVersionNewer() {
+            return VersionUtils.isVersionNewer();
+        }
+
+        boolean isUpgradeCompleted() {
+            return AMSetupServlet.isUpgradeCompleted();
+        }
+
+        File getUserHomeDirectory() {
+            return new File(System.getProperty("user.home"));
+        }
     }
 }
