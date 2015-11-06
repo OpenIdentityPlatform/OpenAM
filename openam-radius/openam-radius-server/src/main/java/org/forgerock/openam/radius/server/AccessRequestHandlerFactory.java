@@ -33,7 +33,7 @@ public class AccessRequestHandlerFactory {
     private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
     /**
-     * Constructor
+     * Constructor.
      */
     public AccessRequestHandlerFactory() {
         LOG.message("Constructing AccessRequestHandlerFactory.AccessRequestHandlerFactory()");
@@ -43,6 +43,8 @@ public class AccessRequestHandlerFactory {
      * Factory that creates and returns and instance of the AccessRequestHandler class defined in the config for a
      * specific radius client. If the class could not be created then a log message is made.
      *
+     * @param reqCtx - the request context that holds information about the configuration of the RADIUS server at the
+     *            point at which the request was received.
      * @return an instance of an <code>AccessRequestHandler</code> object or null if it could not be created.
      */
     public AccessRequestHandler getAccessRequestHandler(RadiusRequestContext reqCtx) {

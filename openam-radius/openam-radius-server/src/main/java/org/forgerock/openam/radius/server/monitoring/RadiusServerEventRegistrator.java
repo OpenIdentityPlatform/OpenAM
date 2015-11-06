@@ -41,20 +41,24 @@ public interface RadiusServerEventRegistrator {
     /**
      * Notify the event Registrar that a packet has been processed. The authentication may have succeeded, or failed,
      * but it has been processed to completion.
+     *
+     * @return the total number of packets that have been processed.
      */
     long packetProcessed();
 
     /**
      * Notify the event Registrar that an auth request has been accepted. That is an AccessAccept packet has been sent
      * to the client in response to the AccessRequest.
-     * 
-     * @return
+     *
+     * @return the total number of authentication requests that have been accepted.
      */
     long authRequestAccepted();
 
     /**
      * Notify the event Registrar that an auth request has been rejected. That is, an AccessReject packet has been sent
      * to the client in response to the AccessRequest.
+     *
+     * @return the total number of authentication requests that have been rejected.
      */
     long authRequestRejected();
 }

@@ -33,7 +33,8 @@ public class RadiusThreadFactory implements ThreadFactory {
     @Override
     public Thread newThread(Runnable task) {
         final ThreadGroup grp = Thread.currentThread().getThreadGroup();
-        final String name = MessageFormat.format(RadiusServerConstants.REQUEST_HANDLER_THREAD_NAME, idx.incrementAndGet());
+        final String name = MessageFormat.format(RadiusServerConstants.REQUEST_HANDLER_THREAD_NAME,
+                idx.incrementAndGet());
         final Thread t = new Thread(grp, task, name);
         t.setPriority(Math.min(Thread.NORM_PRIORITY, grp.getMaxPriority()));
         return t;

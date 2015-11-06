@@ -15,9 +15,7 @@
  */
 package org.forgerock.openam.radius.server.audit;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -73,6 +71,15 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
      */
     private AuditEventPublisher auditEventPublisher;
 
+    /**
+     * Constructor.
+     *
+     * @param eventBus - and event bus that the constructed object will register with in order to be notified of RADIUS
+     *            events.
+     * @param eventFactory - a factory from which Audit events may be built.
+     * @param eventPublisher - the interface through which audit events may be published to the audit handler
+     *            sub-system.
+     */
     @Inject
     public RadiusAuditLoggerEventBus(@Named("RadiusEventBus") EventBus eventBus, AuditEventFactory eventFactory,
             AuditEventPublisher eventPublisher) {
@@ -85,7 +92,8 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
     }
 
     /* (non-Javadoc)
-     * @see org.forgerock.openam.radius.server.audit.RadiusAuditLogger#recordAccessRequest(org.forgerock.openam.radius.server.events.AccessRequestEvent)
+     * @see org.forgerock.openam.radius.server.audit.RadiusAuditLogger#recordAccessRequest
+     * (org.forgerock.openam.radius.server.events.AccessRequestEvent)
      */
     @Override
     @Subscribe
@@ -102,8 +110,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
         makeLogEntry(EventName.AM_ACCESS_OUTCOME, authRequestAcceptedEvent);
         LOG.message("Leaving RadiusAuditLoggerEventBus.recordAuthRequestAcceptedEvent()");
     }
-    
-    
+
     @Override
     @Subscribe
     public void recordAuthRequestRejectedEvent(AuthRequestRejectedEvent authRequestRejectedEvent) {
@@ -122,11 +129,9 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
 
     /**
      * Makes an 'access' audit log entry.
-     * 
-     * @param eventName
-     *            - the name of the event.
-     * @param accessRequestEvent
-     *            - the access request event.
+     *
+     * @param eventName - the name of the event.
+     * @param accessRequestEvent - the access request event.
      */
     public void makeLogEntry(EventName eventName, AcceptedRadiusEvent accessRequestEvent) {
         LOG.message("Entering RadiusAuditLoggerEventBus.makeLogEntry()");
@@ -163,7 +168,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
         } catch (RadiusAuditLoggingException e) {
             LOG.warning("Failed to set client details on access audit event. Reason; {}", e.getMessage());
         }
-        
+
         try {
             this.auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
         } catch (AuditException e) {
@@ -196,9 +201,8 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
 
     /**
      * Sets the client details via the access event builder.
-     * 
-     * @param builder
-     *            - the AccessAuditEventBuilder to which the client details should be added.
+     *
+     * @param builder - the AccessAuditEventBuilder to which the client details should be added.
      * @param radiusRequestContext
      * @throws RadiusAuditLoggingException
      */
@@ -226,8 +230,8 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
     }
 
     /**
-     * Sets the response details of the builder, using the details provided in the <code>RadiusResponse</code>
-     * 
+     * Sets the response details of the builder, using the details provided in the <code>RadiusResponse</code>.
+     *
      * @param builder
      * @param response
      */
@@ -235,9 +239,9 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
         LOG.message("Entering RadiusAuditLoggerEventBus.setResponseDetails()");
         ResponseStatus responseStatus = null;
         PacketType packetType = response.getResponsePacket().getType();
-        
-        if ((packetType == PacketType.ACCESS_ACCEPT) ||
-                (packetType == PacketType.ACCESS_CHALLENGE)) {
+
+        if ((packetType == PacketType.ACCESS_ACCEPT)
+                || (packetType == PacketType.ACCESS_CHALLENGE)) {
             responseStatus = ResponseStatus.SUCCESS;
         } else if (packetType == PacketType.ACCESS_REJECT) {
             responseStatus = ResponseStatus.FAILURE;
@@ -249,9 +253,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
                 packetType.toString(),
                 response.getTimeToServiceRequestInMilliSeconds(),
                 TimeUnit.MILLISECONDS);
-        
+
         LOG.message("Leaving RadiusAuditLoggerEventBus.setResponseDetails()");
     }
-
-
 }

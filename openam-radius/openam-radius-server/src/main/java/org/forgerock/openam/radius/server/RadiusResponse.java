@@ -45,7 +45,7 @@ public class RadiusResponse {
 
 
     /**
-     * Constructor
+     * Constructor.
      */
     public RadiusResponse() {
         LOG.message("Constructing RadiusResponse.RadiusResponse()");
@@ -53,11 +53,8 @@ public class RadiusResponse {
 
     /**
      * Set the response packet to be sent the the requester.
-     * 
-     * @param responsePacket
-     *            the packet to be sent to the requester. Must not be null.
-     * @param authResult
-     *            indicates if the type of the response. Must not be null.
+     *
+     * @param responsePacket the packet to be sent to the requester. Must not be null.
      */
     public void setResponsePacket(Packet responsePacket) {
         Preconditions.checkNotNull(responsePacket, "Argument supplied to responsePacket param was null.");
@@ -66,7 +63,7 @@ public class RadiusResponse {
 
     /**
      * Get the response packet to be sent to the requester.
-     * 
+     *
      * @return the response packet to be sent to the requester.
      */
     public Packet getResponsePacket() {
@@ -74,6 +71,8 @@ public class RadiusResponse {
     }
 
     /**
+     * Return the realm that the authentication was made against.
+     *
      * @return the realm
      */
     public String getRealm() {
@@ -81,8 +80,9 @@ public class RadiusResponse {
     }
 
     /**
-     * @param realm
-     *            the realm to set
+     * Sets the realm against which hte authentication was made.
+     *
+     * @param realm the realm to set
      */
     public void setRealm(String realm) {
         this.realm = realm;
@@ -90,9 +90,8 @@ public class RadiusResponse {
 
     /**
      * Set the time to service the request for which the response is being made.
-     * 
-     * @param timeToServeRequestInthe
-     *            time to service the request for which the response is being made.
+     *
+     * @param timeToServeRequestInMS time to service the request for which the response is being made.
      */
     public void setTimeToServiceRequestInMilliSeconds(long timeToServeRequestInMS) {
         this.timeToServiceRequestInMilliSeconds = timeToServeRequestInMS;
@@ -100,7 +99,7 @@ public class RadiusResponse {
 
     /**
      * Set the time to service the request for which the response is being made.
-     * 
+     *
      * @return the time to service the request for which the response is being made.
      */
     public long getTimeToServiceRequestInMilliSeconds() {
@@ -109,9 +108,8 @@ public class RadiusResponse {
 
     /**
      * Set the Universal ID of the principal of the AuthContext.
-     * 
-     * @param uid
-     *            the principal of the response.
+     *
+     * @param uid the principal of the response.
      */
     public void setUniversalId(String uid) {
         this.universalId = uid;
@@ -119,7 +117,7 @@ public class RadiusResponse {
 
     /**
      * Get the universal ID of the principal of the AuthContext, or null if none has been set.
-     * 
+     *
      * @return the universal ID of the principal of the AuthContext, or null if none has been set.
      */
     public String getUniversalId() {

@@ -143,9 +143,8 @@ public class RadiusRequestContext {
      * Takes the passed-in packet, injects the ID of the request and a response authenticator and sends it to the source
      * of the request.
      *
-     * @param response
-     *            The packet to be sent to the client.
-     * @throws IOException
+     * @param response The packet to be sent to the client.
+     * @throws RadiusProcessingException - if the request can not be sent due to network issues etc.
      */
     public void send(Packet response) throws RadiusProcessingException {
         if (sendWasCalled) {
@@ -302,6 +301,8 @@ public class RadiusRequestContext {
     }
 
     /**
+     * Get the name of the client from which the request was made.
+     *
      * @return the name of the client from which this request was made.
      */
     public String getClientName() {
@@ -309,6 +310,8 @@ public class RadiusRequestContext {
     }
 
     /**
+     * Get the client secret.
+     *
      * @return the client secret for the client from which the request was made.
      */
     public String getClientSecret() {

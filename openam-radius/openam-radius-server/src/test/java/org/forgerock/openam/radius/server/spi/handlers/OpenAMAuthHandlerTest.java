@@ -15,12 +15,9 @@
  */
 package org.forgerock.openam.radius.server.spi.handlers;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -51,23 +48,35 @@ import com.sun.identity.authentication.AuthContext.Status;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 
+/**
+ * Test methods for <code>OpenAMAuthHandler</code>.
+ *
+ * @see org.forgerock.openam.radius.server.spi.handlers.OpenAMAuthHandler
+ */
 public class OpenAMAuthHandlerTest {
 
+    /**
+     * Test the following method;.
+     *
+     * @see org.forgerock.openam.radius.server.spi.handlers.OpenAMAuthHandler#handle
+     * @throws RadiusProcessingException - should not happen.
+     * @throws AuthLoginException - should not happen.
+     * @throws IOException - should not happen.
+     */
     @Test(enabled = true)
     public void handle() throws RadiusProcessingException, AuthLoginException, IOException {
         // given
         final Callback pagePropCallback = new PagePropertiesCallback("test_module", null, null, 0, null, false, null);
         final Callback nameCallback = new NameCallback("Username:");
         final Callback pwCallback = new PasswordCallback("pw_prompt", false);
-        final Callback callbacks[] = new Callback[] { pagePropCallback, nameCallback, pwCallback };
+        final Callback[] callbacks = new Callback[] { pagePropCallback, nameCallback, pwCallback };
 
-        final String TEST_REALM = "test_realm";
-        final String TEST_CHAIN = "test_chain";
-        final String CACHE_KEY = "cache_key";
-        final String PASSWORD = "password";
+        final String testRealm = "test_realm";
+        final String testChain = "test_chain";
+        final String cacheKey = "cache_key";
         final Properties props = new Properties();
-        props.setProperty("realm", TEST_REALM);
-        props.setProperty("chain", TEST_CHAIN);
+        props.setProperty("realm", testRealm);
+        props.setProperty("chain", testChain);
 
         final Status status = mock(Status.class);
         final AuthContext authContext = mock(AuthContext.class);
@@ -79,7 +88,7 @@ public class OpenAMAuthHandlerTest {
         // Context and context holder
         final ContextHolder holder = mock(ContextHolder.class);
         final OpenAMAuthFactory ctxHolderFactory = mock(OpenAMAuthFactory.class);
-        when(holder.getCacheKey()).thenReturn(CACHE_KEY);
+        when(holder.getCacheKey()).thenReturn(cacheKey);
         when(holder.getAuthContext()).thenReturn(authContext);
         when(holder.getAuthPhase()).thenReturn(AuthPhase.STARTING, AuthPhase.GATHERING_INPUT, AuthPhase.FINALIZING);
         when(holder.getCallbacks()).thenReturn(callbacks, callbacks, (Callback[]) null);
@@ -131,8 +140,8 @@ public class OpenAMAuthHandlerTest {
         handler.handle(request, response, reqCtx);
 
         // then
-        verify(authContext, times(1)).login(AuthContext.IndexType.SERVICE, TEST_CHAIN);
-        verify(ctxHolderFactory, times(1)).getAuthContext(TEST_REALM);
+        verify(authContext, times(1)).login(AuthContext.IndexType.SERVICE, testChain);
+        verify(ctxHolderFactory, times(1)).getAuthContext(testRealm);
         verify(holder, times(3)).getCallbacks();
         verify(holder, times(1)).setAuthPhase(ContextHolder.AuthPhase.TERMINATED);
         verify(authContext, times(1)).logout();

@@ -39,7 +39,6 @@ public interface AccessRequestHandler {
     /**
      * Passes to the handler configuration parameters declared in OpenAM's admin console for the client's declared
      * handler class.
-     * @param ipAddress - the ipAddress of the client from which the access request was received.
      *
      * @param config
      *            - the handler configuration parameters.
@@ -61,7 +60,6 @@ public interface AccessRequestHandler {
      *            - provides methods that the handler can use to obtain information about the context in which the
      *            request was made, for example the name and IP address of the client from which the request was
      *            received.
-     * @return void
      * @throws RadiusProcessingException
      *             when a response to the request can not be sent.
      */

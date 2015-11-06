@@ -71,9 +71,9 @@ public class RadiusServerGuiceModule extends AbstractModule {
 
     /**
      * Guice provider for the ServiceConfigManager.
-     * 
+     *
      * @return a ServiceConfigurationManager that can be used
-     * @throws RadiusLifecycleException
+     * @throws RadiusLifecycleException - when the service config manager can not be obtained.
      */
     @Provides
     @Named("RadiusServer")
@@ -89,12 +89,22 @@ public class RadiusServerGuiceModule extends AbstractModule {
         return mgr;
     }
 
+    /**
+     * Get the radius eventBus.
+     *
+     * @return the event bus used by radius components to publish and subscribe for events.
+     */
     @Provides
     @Named("RadiusEventBus")
     protected EventBus getRadiusEventBus() {
         return radiusEventBus;
     }
 
+    /**
+     * Get the RadiusServerEventRegistrator.
+     *
+     * @return the RadiusServerEventRegistrator.
+     */
     @Provides
     @Singleton
     @Inject

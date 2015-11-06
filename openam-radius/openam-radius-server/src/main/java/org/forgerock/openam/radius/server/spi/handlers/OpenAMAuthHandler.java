@@ -161,18 +161,19 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
     private final OpenAMAuthFactory amAuthFactory;
 
     /**
-     * The radius event bus
+     * The radius event bus that will be used to notify interested parties of events as they occur.
      */
     private EventBus eventBus;
 
     /**
      * Constructor.
      *
-     * @param amAuthFactory
-     *            - a factory that provides OpenAM auth entities such as AuthContexts.
-     * @param contextHolderCache
-     *            - the cache to be used to hold ContextHolder objects that persist state in the server (here) when
-     *            control is with the client, e.g. when the client is providing user input to meet a challenge request.
+     * @param amAuthFactory - a factory that provides OpenAM auth entities such as AuthContexts.
+     * @param contextHolderCache - the cache to be used to hold ContextHolder objects that persist state in the server
+     *            (here) when control is with the client, e.g. when the client is providing user input to meet a
+     *            challenge request.
+     * @param eventBus - the Radius event bus that will be used to notify interested parties of
+     *            <code>org.forgerock.openam.radius.server.events</code> as they occur.
      */
     @Inject
     public OpenAMAuthHandler(OpenAMAuthFactory amAuthFactory, ContextHolderCache contextHolderCache,
@@ -245,14 +246,14 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             LOG.message("Leaving OpenAMAuthHandler.handle();");
             return;
         }
-        
+
         if (holder == null) {
             holder = this.contextCache.createCachedContextHolder();
             request.setContextHolderKey(holder.getCacheKey());
             eventBus.post(new AuthRequestReceivedEvent(request, response, context));
 
             final UserNameAttribute usrAtt = (UserNameAttribute) request.getAttribute(UserNameAttribute.class);
-            
+
             holder = startAuthProcess(holder, response, usrAtt, credential);
             if (holder == null || holder.getAuthPhase() == ContextHolder.AuthPhase.TERMINATED) {
                 // oops. something happened and reject message was already sent. so drop out here.

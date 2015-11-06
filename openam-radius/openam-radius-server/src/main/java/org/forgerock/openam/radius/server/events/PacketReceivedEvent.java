@@ -20,6 +20,9 @@ package org.forgerock.openam.radius.server.events;
  */
 public class PacketReceivedEvent extends RadiusEvent {
 
+    /**
+     * Constructor.
+     */
     public PacketReceivedEvent() {
 
     }

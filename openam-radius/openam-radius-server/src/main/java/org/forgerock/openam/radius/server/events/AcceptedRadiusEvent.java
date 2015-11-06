@@ -42,13 +42,10 @@ public class AcceptedRadiusEvent extends RadiusEvent {
 
     /**
      * Constructor.
-     * 
-     * @param request
-     *            the request associated with the event
-     * @param response
-     *            the response to the request (if available), null if not.
-     * @param context
-     *            the context in which the request was received.
+     *
+     * @param request the request associated with the event
+     * @param response the response to the request (if available), null if not.
+     * @param context the context in which the request was received.
      */
     public AcceptedRadiusEvent(RadiusRequest request, RadiusResponse response, RadiusRequestContext context) {
         this.request = request;
@@ -58,7 +55,7 @@ public class AcceptedRadiusEvent extends RadiusEvent {
 
     /**
      * Get the request id of the access request.
-     * 
+     *
      * @return the request id of the access request.
      */
     public String getRequestId() {
@@ -67,7 +64,7 @@ public class AcceptedRadiusEvent extends RadiusEvent {
 
     /**
      * Get the name of the authenticating entity.
-     * 
+     *
      * @return the name of the authenticating entity.
      */
     public String getUsername() {
@@ -76,7 +73,7 @@ public class AcceptedRadiusEvent extends RadiusEvent {
 
     /**
      * Get the universalId of the authenticating entity.
-     * 
+     *
      * @return the universalId of the authenticating entity.
      */
     public String getUniversalId() {
@@ -85,7 +82,7 @@ public class AcceptedRadiusEvent extends RadiusEvent {
 
     /**
      * Get the realm that the access request will be authenticated against.
-     * 
+     *
      * @return the realm that the access request will be authenticated against.
      */
     public String getRealm() {
@@ -94,7 +91,7 @@ public class AcceptedRadiusEvent extends RadiusEvent {
 
     /**
      * Get the request context in which the access request was made.
-     * 
+     *
      * @return the request context in which the access request was made.
      */
     public RadiusRequestContext getRequestContext() {
@@ -103,7 +100,7 @@ public class AcceptedRadiusEvent extends RadiusEvent {
 
     /**
      * Return the response to the request, or null if none has been sent.
-     * 
+     *
      * @return the response to the request, or null if none has been sent.
      */
     public RadiusResponse getResponse() {
@@ -112,7 +109,7 @@ public class AcceptedRadiusEvent extends RadiusEvent {
 
     /**
      * Return the request.
-     * 
+     *
      * @return the request.
      */
     public RadiusRequest getRequest() {

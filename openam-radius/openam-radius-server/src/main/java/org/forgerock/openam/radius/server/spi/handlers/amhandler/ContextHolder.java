@@ -36,7 +36,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
 public class ContextHolder {
 
     /**
-     * Debug logs
+     * Debug logger.
      */
     private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
@@ -355,7 +355,7 @@ public class ContextHolder {
     /**
      * Obtain the universal ID from the SSO token held by the auth context. If there is no SSO token available or there
      * is no universal id available then null will be returned.
-     * 
+     *
      * @return the universalId, or null if none is available.
      */
     public String getUniversalId() {

@@ -24,9 +24,9 @@ public class ThreadPoolConfig {
 
     private static final Debug logger = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
-    private static final int defaultCoreThreads = 2;
-    private static final int defaultKeepAliveSeconds = 10;
-    private static final int defaultQueueSize = 10;
+    private static final int DEFAULT_CORE_THREADS = 1;
+    private static final int DEFAULT_KEEP_ALIVE_SECONDS = 10;
+    private static final int DEFAULT_QUEUE_SIZE = 20;
 
     private final int keepAliveSeconds;
     private final int queueSize;
@@ -48,9 +48,9 @@ public class ThreadPoolConfig {
      */
     public ThreadPoolConfig(int core, int max, int queueSize, int keepAliveSeconds) {
         if (core < 1) {
-            this.coreThreads = defaultCoreThreads;
+            this.coreThreads = DEFAULT_CORE_THREADS;
             logger.warning("System configured to used invalid Radius Thread Pool Core size of " + core
-                    + ". Using the value of " + defaultCoreThreads + " instead.");
+                    + ". Using the value of " + DEFAULT_CORE_THREADS + " instead.");
         } else {
             this.coreThreads = core;
         }
@@ -64,20 +64,20 @@ public class ThreadPoolConfig {
         }
 
         if (queueSize < 1 || queueSize > 1000) {
-            this.queueSize = defaultQueueSize;
+            this.queueSize = DEFAULT_QUEUE_SIZE;
             logger.warning("System configured to use an invalid Radius Server 'Thread Pool Queue Size' value of '"
-                    + queueSize + "'. Using the default value of '" + defaultQueueSize + "' instead.");
+                    + queueSize + "'. Using the default value of '" + DEFAULT_QUEUE_SIZE + "' instead.");
         } else {
             this.queueSize = queueSize;
         }
 
         if (keepAliveSeconds < 1 || keepAliveSeconds > 3600) {
-            this.keepAliveSeconds = defaultKeepAliveSeconds;
+            this.keepAliveSeconds = DEFAULT_KEEP_ALIVE_SECONDS;
             logger.warning("System configured to use an invalid Radius Server 'Thread Pool Keep-Alive Seconds' value of"
                     + " '"
                     + keepAliveSeconds
                     + "'. Using the default value of '"
-                    + defaultKeepAliveSeconds
+                    + DEFAULT_KEEP_ALIVE_SECONDS
                     + "' instead.");
         } else {
             this.keepAliveSeconds = keepAliveSeconds;

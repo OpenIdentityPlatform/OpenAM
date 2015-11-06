@@ -13,11 +13,12 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-/**
- *
- */
+
 package org.forgerock.openam.radius.server;
 
+/**
+ * Enum that describes the nature of the exception.
+ */
 public enum RadiusProcessingExceptionNature {
     /**
      * Indicates that the exception is unrecoverable and no further responses will be sent. The likely course of

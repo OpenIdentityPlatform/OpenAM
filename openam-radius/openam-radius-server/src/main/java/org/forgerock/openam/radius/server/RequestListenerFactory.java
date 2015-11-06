@@ -41,7 +41,7 @@ public class RequestListenerFactory {
     private static final Debug logger = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
     /**
-     * The executor service factory that should be used to create the ExecutorService used by the created
+     * The executor service factory that should be used to create the ExecutorService used by the created.
      * <code>RadiusRequestListener</code>s
      */
     private final ExecutorServiceFactory executorServiceFactory;
@@ -57,12 +57,11 @@ public class RequestListenerFactory {
     private AccessRequestHandlerFactory accessRequestHandlerFactory;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param eventRegistrar
-     *            - An object that should be notified of system events, so that they may be tracked across the system.
-     * @param serviceFactory
-     *            - a factory from which a ThreadPoolExecutor may be obtained.
+     * @param serviceFactory - a factory from which a ThreadPoolExecutor may be obtained.
+     * @param eventBus is used to publish or register for notifications of RADIUS server events.
+     * @param accessRequestHandlerFactory may be used to obtain access request handlers.
      */
     @Inject
     public RequestListenerFactory(ExecutorServiceFactory serviceFactory,
@@ -74,13 +73,11 @@ public class RequestListenerFactory {
     }
 
     /**
-     * Factory method to obtain a new RadiusRequestListener
+     * Factory method to obtain a new RadiusRequestListener.
      *
-     * @param serviceConfig
-     *            - the configuration of the RADIUS service.
+     * @param serviceConfig - the configuration of the RADIUS service.
      * @return a <code>RadiusRquestListener</code>
-     * @throws RadiusLifecycleException
-     *             - if a RquestListener can not be created.
+     * @throws RadiusLifecycleException - if a RquestListener can not be created.
      */
     public RadiusRequestListener getRadiusRequestListener(RadiusServiceConfig serviceConfig)
             throws RadiusLifecycleException {

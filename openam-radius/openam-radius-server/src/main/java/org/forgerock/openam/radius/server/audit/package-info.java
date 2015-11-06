@@ -11,25 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyrighted 2015 ForgeRock AS
  */
-package org.forgerock.openam.radius.server.events;
-
-import org.forgerock.openam.radius.server.config.RadiusServerConstants;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
- * Event submitted to the event bus when a packet is received from the socket.
+ * This package contains classes responsible for listening to RADIUS events and sending them on to the Common Audit
+ * framework sub-system.
  */
-public class PacketProcessedEvent extends RadiusEvent {
-
-    private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
-
-    /**
-     * Constructor.
-     */
-    public PacketProcessedEvent() {
-        LOG.message("Constructing PacketProcessedEvent.PacketProcessedEvent()");
-    }
-}
+package org.forgerock.openam.radius.server.audit;

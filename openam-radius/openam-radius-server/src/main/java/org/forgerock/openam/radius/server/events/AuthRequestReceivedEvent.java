@@ -23,7 +23,7 @@ import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
- * Event submitted to the event bus when a radius request has been parsed, understood and is an Access-Request message
+ * Event submitted to the event bus when a radius request has been parsed, understood and is an Access-Request message.
  */
 public class AuthRequestReceivedEvent extends AcceptedRadiusEvent {
 
@@ -31,13 +31,10 @@ public class AuthRequestReceivedEvent extends AcceptedRadiusEvent {
 
     /**
      * Constructor.
-     * 
-     * @param request
-     *            the request associated with the event
-     * @param response
-     *            the response to the request (if available), null if not.
-     * @param context
-     *            the context in which the request was received.
+     *
+     * @param request the request associated with the event.
+     * @param response the response to the request (if available), null if not.
+     * @param context the context in which the request was received.
      */
     public AuthRequestReceivedEvent(RadiusRequest request, RadiusResponse response, RadiusRequestContext context) {
         super(request, response, context);

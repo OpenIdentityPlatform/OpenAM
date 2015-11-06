@@ -100,13 +100,17 @@ public class RadiusRequestListener implements Runnable {
      * Construct listener, opens the DatagramChannel to receive requests, sets up the thread pool, and launches the
      * listener's thread which will capture the requests, drop unauthorized clients, and spool to the thread pool.
      *
-     * @param config
-     *            the configuration loaded from our admin console pages
-     * @throws RadiusLifecycleException
+     * @param config the configuration loaded from our admin console pages
+     * @param executorService the thread pool executor to process radius requests.
+     * @param eventBus may used to notify interested parties when events occur during the processing of radius events.
+     * @param accessRequestHandlerFactory used to obtain access request handler classes for specific clients, as defined
+     *            in the configuration.
+     * @throws RadiusLifecycleException when the config is insufficient or invalid.
      */
-    public RadiusRequestListener(RadiusServiceConfig config,
-            ExecutorService executorService, EventBus eventBus,
-            AccessRequestHandlerFactory accessRequestHandlerFactory)
+    public RadiusRequestListener(final RadiusServiceConfig config,
+            final ExecutorService executorService,
+            final EventBus eventBus,
+            final AccessRequestHandlerFactory accessRequestHandlerFactory)
             throws RadiusLifecycleException {
         LOG.warning("RADIUS service enabled. Starting Listener.");
         this.config = config;

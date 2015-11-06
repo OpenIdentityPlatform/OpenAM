@@ -62,7 +62,7 @@ public class RadiusRequest {
     private volatile DateTime requestStartTime = DateTime.now();
 
     /**
-     * The radius packet received by the radius server (the request)
+     * The radius packet received by the radius server (the request).
      */
     private final Packet requestPacket;
 
@@ -76,6 +76,11 @@ public class RadiusRequest {
     private String contextHolderKey;
 
 
+    /**
+     * Constructor.
+     *
+     * @param requestPacket - the Packet that is the basis of the RADIUS request.
+     */
     public RadiusRequest(Packet requestPacket) {
         this.requestPacket = requestPacket;
 
@@ -83,6 +88,8 @@ public class RadiusRequest {
     }
 
     /**
+     * Get the packet that is to be sent as part of the request.
+     *
      * @return the requestPacket
      */
     public Packet getRequestPacket() {
@@ -92,8 +99,8 @@ public class RadiusRequest {
     /**
      * Get an attribute that was sent in the requestPacket, or return null if no attribute of the requested type was in
      * the packet.
-     * 
-     * @param attributeType
+     *
+     * @param attributeType - the <code>Class</code> of the attribute to be obtained.
      * @return the Attribute of the requested type, or NULL if non exists.
      */
     public Attribute getAttribute(Class attributeType) {
@@ -115,6 +122,11 @@ public class RadiusRequest {
         }
     }
 
+    /**
+     * Get the username of the user that the authentication was for.
+     *
+     * @return the username or null if none is available.
+     */
     public String getUsername() {
         if (Strings.isNullOrEmpty(userName)) {
             UserNameAttribute userNameAttribute = (UserNameAttribute) attributeMap.get(UserNameAttribute.class);
@@ -126,6 +138,9 @@ public class RadiusRequest {
     }
 
     /**
+     * Get the radius request id. The RADIUS protocol specifies that each packet holds an Identifier to help with
+     * de-dupe of requests.
+     *
      * @return The ID of the request. This is is a unique id created for each RadiusRequest.
      */
     public synchronized String getRequestId() {
@@ -138,7 +153,7 @@ public class RadiusRequest {
 
     /**
      * Get the number of milliseconds since the Unix epoch at which the request was made.
-     * 
+     *
      * @return the number of milliseconds since the Unix epoch at which the request was made.
      */
     public long getStartTimestampInMillis() {
@@ -151,9 +166,8 @@ public class RadiusRequest {
      * Access-Challenge, this is the key that will be in the Access-Challenge request and provided in the StateAttribute
      * an subsequently used to obtain the cached AuthContext associated with the initial request. It is used in Audit
      * Logging to tie up the two requests.
-     * 
-     * @param cacheKey
-     *            the key used to store the ContextHolder in the ContextHolder cache.
+     *
+     * @param cacheKey the key used to store the ContextHolder in the ContextHolder cache.
      */
     public void setContextHolderKey(String cacheKey) {
         this.contextHolderKey = cacheKey;
@@ -165,8 +179,8 @@ public class RadiusRequest {
      * Access-Challenge, this is the key that will be in the Access-Challenge request and provided in the StateAttribute
      * an subsequently used to obtain the cached AuthContext associated with the initial request. It is used in Audit
      * Logging to tie up the two requests.
-     * 
-     * @return
+     *
+     * @return the context holder key.
      */
     public String getContextHolderKey() {
         return contextHolderKey;

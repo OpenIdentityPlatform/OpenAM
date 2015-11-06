@@ -47,7 +47,7 @@ public class RadiusEvent {
 
     /**
      * Get the time at which the event occurred in ISO format.
-     * 
+     *
      * @return a String containing an ISO date format representation of the time at which the event occurred.
      */
     public String getTimeOfEventAsString() {

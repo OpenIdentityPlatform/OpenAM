@@ -19,15 +19,10 @@
 
 package org.forgerock.openam.radius.server;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
-import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -45,6 +40,11 @@ import org.forgerock.openam.radius.server.spi.handlers.RejectAllHandler;
 import org.forgerock.util.promise.PromiseImpl;
 import org.testng.annotations.Test;
 
+/**
+ * Test for the <code>RadiusRequestHandler</code> class.
+ *
+ * @see org.forgerock.openam.radius.server.RadiusRequestHandler
+ */
 public class RadiusRequestHandlerTest {
 
     private final String res = "01 00 00 38 0f 40 3f 94 73 97 80 57 bd 83 d5 cb "
@@ -55,14 +55,12 @@ public class RadiusRequestHandlerTest {
      * Test that when run is called with an AcceptAllHandler then the RadiusAuthResponse contains a success code and an
      * AcceptResponse is sent.
      *
-     * @throws UnsupportedEncodingException
-     * @throws InterruptedException
-     * @throws RadiusProcessingException
-     * @throws UnknownHostException
+     * @throws InterruptedException - when an interrupt occurs.
+     * @throws RadiusProcessingException - when something goes wrong processing a RADIUS packet.
+     * @throws UnknownHostException - if the host can't be determined
      */
     @Test(enabled = true)
-    public void testRun()
-            throws UnsupportedEncodingException, InterruptedException, RadiusProcessingException, UnknownHostException {
+    public void testRun() throws UnknownHostException, InterruptedException, RadiusProcessingException {
 
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
@@ -90,11 +88,19 @@ public class RadiusRequestHandlerTest {
         // then
         assertThat(result.getResponsePacket().getType()).isEqualTo(PacketType.ACCESS_ACCEPT);
         verify(reqCtx, times(1)).send(isA(AccessAccept.class));
-  }
+    }
 
+    /**
+     * Test that when run is called with an RejectAllHandler that the resultant promise returns a RadiusResponse
+     * containing an ACCESS_REJECT packet.
+     *
+     * @throws InterruptedException - when an interrupt occurs.
+     * @throws RadiusProcessingException - when something goes wrong processing a RADIUS packet.
+     * @throws UnknownHostException - if the host can't be determined
+     */
     @Test(enabled = true)
     public void testRunReject()
-            throws UnsupportedEncodingException, InterruptedException, RadiusProcessingException, UnknownHostException {
+            throws UnknownHostException, InterruptedException, RadiusProcessingException {
 
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
@@ -106,7 +112,6 @@ public class RadiusRequestHandlerTest {
         when(reqCtx.getSource()).thenReturn(socketAddress);
         when(clientConfig.getName()).thenReturn("TestConfig");
         when(clientConfig.getAccessRequestHandlerClass()).thenReturn(RejectAllHandler.class);
-
 
         final ByteBuffer bfr = Utils.toBuffer(res);
         final PromiseImpl<RadiusResponse, RadiusProcessingException> promise = PromiseImpl.create();
@@ -127,9 +132,15 @@ public class RadiusRequestHandlerTest {
         verify(reqCtx, times(1)).send(isA(AccessReject.class));
     }
 
+    /**
+     * Test that when run is called with an CatestrophicHandler that the promise returns a RadiusProcessingException.
+     *
+     * @throws InterruptedException - when an interrupt occurs.
+     * @throws RadiusProcessingException - when something goes wrong processing a RADIUS packet.
+     * @throws UnknownHostException - if the host can't be determined
+     */
     @Test(expectedExceptions = RadiusProcessingException.class)
-    public void testRunCatestrophic() throws UnsupportedEncodingException, InterruptedException,
- RadiusProcessingException, UnknownHostException {
+    public void testRunCatestrophic() throws InterruptedException, RadiusProcessingException, UnknownHostException {
 
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);

@@ -15,15 +15,25 @@
  */
 package org.forgerock.openam.radius.server.monitoring;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import org.forgerock.guava.common.eventbus.EventBus;
 import org.testng.annotations.Test;
 
+/**
+ * Test methods for the <code>RadiusServerEventRegistrar</code> class.
+ *
+ * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar
+ */
 public class RadiusServerEventRegistrarTest {
 
+    /**
+     * Test the constructor.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#RadiusServerEventRegistrar
+     */
     @Test(enabled = true)
-    public void RadiusServerEventRegistrar() {
+    public void testRadiusServerEventRegistrar() {
         // Given
         EventBus eventBus = new EventBus();
         // When
@@ -32,6 +42,11 @@ public class RadiusServerEventRegistrarTest {
         assertThat(eventRegistrar).isNotNull();
     }
 
+    /**
+     * Test the following method;.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#authRequestAccepted
+     */
     @Test(enabled = true)
     public void authRequestAccepted() {
         // Given
@@ -43,6 +58,11 @@ public class RadiusServerEventRegistrarTest {
         assertThat(eventRegistrar.getNumberOfAuthRequestsAccepted()).isEqualTo(1);
     }
 
+    /**
+     * Test the following method.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#authRequestRejected
+     */
     @Test(enabled = true)
     public void authRequestRejected() {
         // Given
@@ -54,6 +74,11 @@ public class RadiusServerEventRegistrarTest {
         assertThat(eventRegistrar.getNumberOfAuthRequestsRejected()).isEqualTo(1);
     }
 
+    /**
+     * Test the following method.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#packetAccepted
+     */
     @Test(enabled = true)
     public void packetAccepted() {
         // Given
@@ -65,6 +90,11 @@ public class RadiusServerEventRegistrarTest {
         assertThat(eventRegistrar.getNumberOfAcceptedPackets()).isEqualTo(1);
     }
 
+    /**
+     * Test the following method.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#packetProcessed
+     */
     @Test(enabled = true)
     public void packetProcessed() {
         // Given
@@ -76,6 +106,11 @@ public class RadiusServerEventRegistrarTest {
         assertThat(eventRegistrar.getNumberOfPacketsProcessed()).isEqualTo(1);
     }
 
+    /**
+     * Test the following method.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#packetReceived
+     */
     @Test(enabled = true)
     public void packetReceived() {
         // Given

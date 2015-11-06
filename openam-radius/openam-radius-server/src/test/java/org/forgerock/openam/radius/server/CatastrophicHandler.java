@@ -35,8 +35,10 @@ public class CatastrophicHandler implements AccessRequestHandler {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.forgerock.openam.radius.server.spi.AccessRequestHandler#handle(org.forgerock.openam.radius.common.AccessRequest, org.forgerock.openam.radius.server.RadiusResponseHandler)
+    /*
+     * (non-Javadoc)
+     * @see org.forgerock.openam.radius.server.spi.AccessRequestHandler#handle
+     * (org.forgerock.openam.radius.common.AccessRequest, org.forgerock.openam.radius.server.RadiusResponseHandler)
      */
     @Override
     public void handle(RadiusRequest request, RadiusResponse response, RadiusRequestContext context)

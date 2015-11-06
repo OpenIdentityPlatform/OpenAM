@@ -23,24 +23,22 @@ package org.forgerock.openam.radius.server;
  */
 public class RadiusLifecycleException extends Exception {
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param message
-     *            - the detail message. The detail message is saved for later retrieval by the Throwable.getMessage()
-     *            method.
+     * @param message - the detail message. The detail message is saved for later retrieval by the
+     *            Throwable.getMessage() method.
      */
     public RadiusLifecycleException(String message) {
         super(message);
     }
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param message
-     *            - the detail message. The detail message is saved for later retrieval by the Throwable.getMessage()
-     *            method.
-     * @param - cause - the cause (which is saved for later retrieval by the Throwable.getCause() method). (A null value
-     *        is permitted, and indicates that the cause is nonexistent or unknown.)
+     * @param message - the detail message. The detail message is saved for later retrieval by the
+     *            Throwable.getMessage() method.
+     * @param cause - the cause (which is saved for later retrieval by the Throwable.getCause() method). (A null value
+     *            is permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public RadiusLifecycleException(String message, Throwable cause) {
         super(message, cause);

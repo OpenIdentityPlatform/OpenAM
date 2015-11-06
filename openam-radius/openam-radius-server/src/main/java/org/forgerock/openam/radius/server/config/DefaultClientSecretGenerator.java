@@ -50,8 +50,8 @@ public class DefaultClientSecretGenerator extends DefaultValues {
     /**
      * Generates client secret of 16 octets in length with characters selected randomly from allowedChars.
      *
-     * @return a set containing a string (Base64) encoded that may server as the secret between RADIUS client and 
-     * server.
+     * @return a set containing a string (Base64) encoded that may server as the secret between RADIUS client and
+     *         server.
      */
     private Set<String> generateSecretHolder() {
         // rfc2865 says "It is preferred that the secret be 16 octets". However, we use 16 characters since ascii

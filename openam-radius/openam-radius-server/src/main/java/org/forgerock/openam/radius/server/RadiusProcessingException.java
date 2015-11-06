@@ -29,14 +29,12 @@ public class RadiusProcessingException extends Exception {
     private static final long serialVersionUID = 1949778158880857742L;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param nature
-     *            - an enum value indicating whether an attempt should be made to re-send the Radius Response or if the
-     *            error is more fundamental and further attempts to send the request will be met with failure.
-     * @param message
-     *            - the detail message. The detail message is saved for later retrieval by the Throwable.getMessage()
-     *            method.
+     * @param nature - an enum value indicating whether an attempt should be made to re-send the Radius Response or if
+     *            the error is more fundamental and further attempts to send the request will be met with failure.
+     * @param message - the detail message. The detail message is saved for later retrieval by the
+     *            Throwable.getMessage() method.
      */
     public RadiusProcessingException(RadiusProcessingExceptionNature nature, String message) {
         super(message);
@@ -44,16 +42,14 @@ public class RadiusProcessingException extends Exception {
     }
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param nature
-     *            - an enum value indicating whether an attempt should be made to re-send the Radius Response or if the
-     *            error is more fundamental and further attempts to send the request will be met with failure.
-     * @param message
-     *            - the detail message. The detail message is saved for later retrieval by the Throwable.getMessage()
-     *            method.
-     * @param - cause - the cause (which is saved for later retrieval by the Throwable.getCause() method). (A null value
-     *        is permitted, and indicates that the cause is nonexistent or unknown.)
+     * @param nature - an enum value indicating whether an attempt should be made to re-send the Radius Response or if
+     *            the error is more fundamental and further attempts to send the request will be met with failure.
+     * @param message - the detail message. The detail message is saved for later retrieval by the
+     *            Throwable.getMessage() method.
+     * @param cause - the cause (which is saved for later retrieval by the Throwable.getCause() method). (A null value
+     *            is permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public RadiusProcessingException(RadiusProcessingExceptionNature nature, String message, Throwable cause) {
         super(message, cause);
@@ -61,7 +57,9 @@ public class RadiusProcessingException extends Exception {
     }
 
     /**
-     * @return the nature
+     * Get the nature of the exception.
+     *
+     * @return the nature.
      */
     public RadiusProcessingExceptionNature getNature() {
         return nature;

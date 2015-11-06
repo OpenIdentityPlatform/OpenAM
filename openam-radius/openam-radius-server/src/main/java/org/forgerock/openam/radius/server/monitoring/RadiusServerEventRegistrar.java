@@ -52,7 +52,12 @@ public class RadiusServerEventRegistrar implements RadiusServerEventRegistrator,
     private final AtomicLong noOfAuthRequestsRejected = new AtomicLong();
 
     /**
-     * Constructor
+     * Constructor. Registers this class with the radius events bus, such that it will be a subscriber to radius events.
+     * So that the radius packet and request statistics can be reported to JMX clients such as visualvm this class
+     * registers itself with the platforms MBean server. If this bean is already registered with the server, then it
+     * will be unregistered and then re-registered.
+     *
+     * @param eventBus - the event bus that this class will register as a subscriber with.
      */
     @Inject
     public RadiusServerEventRegistrar(@Named("RadiusEventBus") EventBus eventBus) {
@@ -83,6 +88,12 @@ public class RadiusServerEventRegistrar implements RadiusServerEventRegistrator,
     ///////////////////
     // Packets Received
 
+    /**
+     * Once an object of this class has registered with the eventBus (passed into the constructor) the
+     * <code>EventBus</code> will call this method when any <code>PacketReceivedEvent</code> objects are posted.
+     *
+     * @param receivedEvent - the event that was posted to the <code>EventBus</code>
+     */
     @Subscribe
     public void packetReceived(PacketReceivedEvent receivedEvent) {
         LOG.message("RadiusServerEventRegistrar.packetReceived() called by EventBus");
@@ -113,6 +124,12 @@ public class RadiusServerEventRegistrar implements RadiusServerEventRegistrator,
     ////////////////////
     // Packets accepted.
 
+    /**
+     * Once an object of this class has registered with the eventBus (passed into the constructor) the
+     * <code>EventBus</code> will call this method when any <code>AuthRequestReceivedEvent</code> objects are posted.
+     *
+     * @param receivedRadiusEvent - the event that was posted to the <code>EventBus</code>
+     */
     @Subscribe
     public void packetAccepted(AuthRequestReceivedEvent receivedRadiusEvent) {
         LOG.message("RadiusServerEventRegistrar.packetAccepted() called by EventBus");
@@ -144,8 +161,14 @@ public class RadiusServerEventRegistrar implements RadiusServerEventRegistrator,
     /////////////////////
     // Packets processed.
 
+    /**
+     * Once an object of this class has registered with the eventBus (passed into the constructor) the
+     * <code>EventBus</code> will call this method when any <code>PacketProcessedEvent</code> objects are posted.
+     *
+     * @param packetProcessedEvent - the event that was posted to the <code>EventBus</code>
+     */
     @Subscribe
-    public void packetProcessed(PacketProcessedEvent ppe) {
+    public void packetProcessed(PacketProcessedEvent packetProcessedEvent) {
         LOG.message("RadiusServerEventRegistrar.packetProcessed() called by EventBus");
         packetProcessed();
     }
@@ -179,6 +202,13 @@ public class RadiusServerEventRegistrar implements RadiusServerEventRegistrator,
      * (non-Javadoc)
      * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrator#authRequestAccepted()
      */
+
+    /**
+     * Once an object of this class has registered with the eventBus (passed into the constructor) the
+     * <code>EventBus</code> will call this method when any <code>AuthRequestAcceptedEvent</code> objects are posted.
+     *
+     * @param acceptedEvent - the event that was posted to the <code>EventBus</code>
+     */
     @Subscribe
     public void authRequestAccepted(AuthRequestAcceptedEvent acceptedEvent) {
         LOG.message("RadiusServerEventRegistrar.authRequestAccepted() called by EventBus");
@@ -207,9 +237,14 @@ public class RadiusServerEventRegistrar implements RadiusServerEventRegistrator,
 
     /////////////////////
     // Requests Rejected.
-
+    /**
+     * Once an object of this class has registered with the eventBus (passed into the constructor) the
+     * <code>EventBus</code> will call this method when any <code>AuthRequestRejectedEvent</code> objects are posted.
+     *
+     * @param authRequestRejectedEvent - the event that was posted to the <code>EventBus</code>
+     */
     @Subscribe
-    public void authRequestRejected(AuthRequestRejectedEvent event) {
+    public void authRequestRejected(AuthRequestRejectedEvent authRequestRejectedEvent) {
         LOG.message("Entering RadiusServerEventRegistrar.authRequestRejected()");
         authRequestRejected();
     }

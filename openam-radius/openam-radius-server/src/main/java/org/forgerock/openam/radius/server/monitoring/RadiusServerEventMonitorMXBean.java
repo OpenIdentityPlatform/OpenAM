@@ -13,9 +13,7 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-/**
- *
- */
+
 package org.forgerock.openam.radius.server.monitoring;
 
 /**
@@ -47,16 +45,16 @@ public interface RadiusServerEventMonitorMXBean {
 
     /**
      * get the number of auth requests (AccessRequest packets) that resulted in AccessAccept packets being returned in
-     * response to the request
-     * 
+     * response to the request.
+     *
      * @return a <code>long</code> indicating the number of requests that resulted in acceptance.
      */
     long getNumberOfAuthRequestsAccepted();
 
     /**
      * get the number of auth requests (AccessRequest packets) that resulted in AccessReject packets being returned in
-     * response to the request
-     * 
+     * response to the request.
+     *
      * @return a <code>long</code> indicating the number of requests that resulted in rejection.
      */
     long getNumberOfAuthRequestsRejected();

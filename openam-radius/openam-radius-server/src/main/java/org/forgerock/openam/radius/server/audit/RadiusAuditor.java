@@ -27,33 +27,29 @@ public interface RadiusAuditor {
 
     /**
      * Creates an Access Request entry to the Common Audit Framework.
-     * 
-     * @param accessRequestEvent
-     *            a <code>RadiusEvent</code> containing details of the access request
+     *
+     * @param authRequestReceivedEvent a <code>RadiusEvent</code> containing details of the access request
      */
     void recordAuthRequestReceivedEvent(AuthRequestReceivedEvent authRequestReceivedEvent);
 
     /**
      * Creates and Access Request entry to the Common Audit Framework with successful response info.
-     * 
-     * @param authRequestAcceptedEvent
-     *            an event containing details of the access request and response.
+     *
+     * @param authRequestAcceptedEvent an event containing details of the access request and response.
      */
     void recordAuthRequestAcceptedEvent(AuthRequestAcceptedEvent authRequestAcceptedEvent);
 
     /**
      * Creates and Access Request entry to the Common Audit Framework with rejected response info.
-     * 
-     * @param authRequestRejectedEvent
-     *            an event containing details of the access request and response.
+     *
+     * @param authRequestRejectedEvent an event containing details of the access request and response.
      */
     void recordAuthRequestRejectedEvent(AuthRequestRejectedEvent authRequestRejectedEvent);
 
     /**
      * Creates and Access Request entry to the Common Audit Framework with rejected response info.
-     * 
-     * @param authRequestChallengedEvent
-     *            an event containing details of the access request and challenge response.
+     *
+     * @param authRequestChallengedEvent an event containing details of the access request and challenge response.
      */
     void recordAuthRequestChallengedEvent(AuthRequestChallengedEvent authRequestChallengedEvent);
 

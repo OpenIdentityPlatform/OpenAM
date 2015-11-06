@@ -16,8 +16,6 @@
 package org.forgerock.openam.radius.server.config;
 
 import java.text.MessageFormat;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,8 +23,6 @@ import javax.inject.Singleton;
 import org.forgerock.openam.radius.server.RadiusLifecycleException;
 import org.forgerock.openam.radius.server.RadiusRequestListener;
 import org.forgerock.openam.radius.server.RequestListenerFactory;
-import org.forgerock.openam.radius.server.audit.RadiusAuditor;
-import org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrator;
 
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.debug.Debug;
@@ -46,19 +42,10 @@ public final class RadiusServerManager implements Runnable, RadiusServer {
 
     private static final Debug logger = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
-
-    private final BlockingQueue<String> configChangedQueue = new ArrayBlockingQueue<String>(2);
-
-
     /**
      * The thread that we launch to run this Runnable. Reference is needed in the event we need to shut down.
      */
     private volatile Thread coordinatingThread = null;
-
-    /**
-     * Object that we should notify about events so they may be made visible to JMX
-     */
-    private final RadiusServerEventRegistrator eventRegistrator;
 
     /**
      * Loads config from openam.
@@ -76,25 +63,23 @@ public final class RadiusServerManager implements Runnable, RadiusServer {
      */
     private final RequestListenerFactory requestListenerFactory;
 
-    /**
-     * Class responsible for logging radius audit messages
-     */
-    private final RadiusAuditor auditLogger;
 
     /**
      * Creates the instance of the starter.
+     *
+     * @param configLoader - An object used to load and read Radius config from.
+     * @param configChangeListener - An object responsible for listening to config changes. Can make blocking calls to
+     *            this class that will only return when new config is available.
+     * @param requestListenerFactory - a factory from which a request listener may be obtained.
      */
     @Inject
     @Singleton
-    public RadiusServerManager(RadiusServerEventRegistrator eventRegistrator, ConfigLoader configLoader,
-            ConfigChangeListener configChangeListener, RequestListenerFactory requestListenerFactory,
-            RadiusAuditor auditLogger) {
+    public RadiusServerManager(ConfigLoader configLoader, ConfigChangeListener configChangeListener,
+            RequestListenerFactory requestListenerFactory) {
         logger.message("Constructing RadiusServiceStarter");
-        this.eventRegistrator = eventRegistrator;
         this.configLoader = configLoader;
         this.configChangeListener = configChangeListener;
         this.requestListenerFactory = requestListenerFactory;
-        this.auditLogger = auditLogger;
     }
 
     /*
@@ -132,8 +117,6 @@ public final class RadiusServerManager implements Runnable, RadiusServer {
     public synchronized void startUp() {
         if (coordinatingThread == null) {
 
-            // force a change event to tell the controller to load handlerConfig
-            // configChangedQueue.offer("Loading RADIUS Config...");
             configChangeListener.startListening();
 
             final Thread t = new Thread(this);
@@ -162,23 +145,15 @@ public final class RadiusServerManager implements Runnable, RadiusServer {
         }
 
         // kick off config loading and registration of change listener
-        // final ConfigLoader loader = new ConfigLoader();
         String changeMsg = null;
 
         RadiusRequestListener listener = null;
 
         // The current handlerConfig loaded from openAM's admin console constructs. When handlerConfig changes are
-        // detected we reload and compare the new to the old and adjust accordingly. The defaults have RADIUS
-        // authentication disabled, and no thread pool handlerConfig which is ok since these won't be used due to
-        // injecting the offer into the configChangedQueue causes immediate loading from openAM persisted values.
+        // detected we reload and compare the new to the old and adjust accordingly.
         RadiusServiceConfig currentCfg = new RadiusServiceConfig(false, RadiusServerConstants.RADIUS_AUTHN_PORT, null);
 
-
         try {
-            // This can throw RadiusLifecycleException, but there's no point in handling it here
-            // and waiting for a config update. Something's really wrong if we can get the service manager.
-            // final ServiceConfigManager scm = getRadiusServiceConfigManager();
-            // final String listenerId = scm.addListener(new ConfigChangeListener(configChangedQueue));
 
             while (true) {
                 // wait until we see a handlerConfig change

@@ -88,15 +88,20 @@ public class RadiusRequestHandler implements Runnable {
     /**
      * Constructs a request handler.
      *
-     * @param reqCtx
-     *            a <code>RadiusRequestContext</code> object. Must be non-null.
-     * @param buffer
-     *            an {@code ByteBuffer} containing the bytes received by a radius handler.
+     * @param accessRequestHandlerFactory - a factory object that will construct access request handlers used to handle
+     *            the radius requests.
+     * @param reqCtx a <code>RadiusRequestContext</code> object. Must be non-null.
+     * @param buffer an {@code ByteBuffer} containing the bytes received by a radius handler.
+     * @param resultHandler - a promise handler that this class can use to notify calling threads of the results of
+     *            processing.
+     * @param errorHandler used to notify the calling thread if an exception occurs during processing.
+     * @param eventBus used to notify interested parties of events occurring during the processing of radius requests.
      */
     public RadiusRequestHandler(AccessRequestHandlerFactory accessRequestHandlerFactory,
             final RadiusRequestContext reqCtx, final ByteBuffer buffer,
             final ResultHandler<RadiusResponse> resultHandler,
-            ExceptionHandler<RadiusProcessingException> errorHandler, EventBus eventBus) {
+            final ExceptionHandler<RadiusProcessingException> errorHandler,
+            final EventBus eventBus) {
         LOG.message("Entering RadiusRequestHandler.RadiusRequestHandler()");
         this.requestContext = reqCtx;
         this.buffer = buffer;

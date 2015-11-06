@@ -13,23 +13,8 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.radius.server.events;
-
-import org.forgerock.openam.radius.server.config.RadiusServerConstants;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
- * Event submitted to the event bus when a packet is received from the socket.
+ * Subsystem for keeping counts of various radius system events and exposing them to JMX listeners.
  */
-public class PacketProcessedEvent extends RadiusEvent {
-
-    private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
-
-    /**
-     * Constructor.
-     */
-    public PacketProcessedEvent() {
-        LOG.message("Constructing PacketProcessedEvent.PacketProcessedEvent()");
-    }
-}
+package org.forgerock.openam.radius.server.monitoring;

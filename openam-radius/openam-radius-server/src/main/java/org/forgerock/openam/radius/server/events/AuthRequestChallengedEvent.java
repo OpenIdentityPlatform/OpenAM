@@ -32,13 +32,10 @@ public class AuthRequestChallengedEvent extends AcceptedRadiusEvent {
 
     /**
      * Constructor.
-     * 
-     * @param request
-     *            the request associated with the event
-     * @param response
-     *            the response to the request (if available), null if not.
-     * @param context
-     *            the context in which the request was received.
+     *
+     * @param request the request associated with the event
+     * @param response the response to the request (if available), null if not.
+     * @param context the context in which the request was received.
      */
     public AuthRequestChallengedEvent(RadiusRequest request, RadiusResponse response, RadiusRequestContext context) {
         super(request, response, context);

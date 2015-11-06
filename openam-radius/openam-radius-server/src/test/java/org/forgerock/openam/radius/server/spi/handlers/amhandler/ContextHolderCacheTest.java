@@ -15,14 +15,23 @@
  */
 package org.forgerock.openam.radius.server.spi.handlers.amhandler;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import org.testng.annotations.Test;
 
+/**
+ * Test methods for the <code>ContextHolderCacheTest</code> class.
+ *
+ * @see org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolderCache
+ */
 public class ContextHolderCacheTest {
 
+    /**
+     * Test for the following method;.
+     *
+     * @see org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolderCache#createCachedContextHolder
+     */
     @Test
     public void createCachedContextHolder() {
         // Given
@@ -36,6 +45,11 @@ public class ContextHolderCacheTest {
         assertThat(cachedContext.getCacheKey()).isNotNull();
     }
 
+    /**
+     * Test for the following method;.
+     *
+     * @see org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolderCache#get
+     */
     @Test
     public void getReturnsCreatedValue() {
         // Given
@@ -50,6 +64,11 @@ public class ContextHolderCacheTest {
         assertThat(cachedEntry).isSameAs(cachedContext);
     }
 
+    /**
+     * Test for the following method;.
+     *
+     * @see org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolderCache#getCacheKey
+     */
     @Test
     public void removeReducesSizeByOne() {
         // Given
@@ -66,7 +85,9 @@ public class ContextHolderCacheTest {
     }
 
     /**
+     * Test the cache resizing;.
      *
+     * @see org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolderCache#get
      */
     @Test
     public void updateCacheSize() {
