@@ -22,9 +22,9 @@
                             <ul class="dropdown-menu pull-left" role="menu">
                                 <li><a href="#" class="edit-realm"><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
                                 {{#if active}}
-                                    <li><a href="#" class="toggle-realm-active"><i class="fa fa-ban"></i> {{t "common.form.disable"}}</a></li>
+                                    <li><a href="#" class="toggle-realm-active"><i class="fa fa-ban"></i> {{t "common.form.deactivate"}}</a></li>
                                 {{else}}
-                                    <li><a href="#" class="toggle-realm-active"><i class="fa fa-check"></i> {{t "common.form.enable"}}</a></li>
+                                    <li><a href="#" class="toggle-realm-active"><i class="fa fa-check"></i> {{t "common.form.activate"}}</a></li>
                                 {{/if}}
                                 <li class="divider"></li>
                                 <li {{#unless canDelete}} class="disabled" {{/unless}}><a href="#" class="delete-realm"><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
@@ -52,9 +52,9 @@
                             </div>
                             <div class="card-footer">
                                 {{#if active}}
-                                    <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.enabled"}}</span>
+                                    <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.activated"}}</span>
                                 {{else}}
-                                    <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.disabled"}}</span>
+                                    <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.deactivated"}}</span>
                                 {{/if}}
                             </div>
                         </a>
@@ -83,9 +83,9 @@
                                 <td class="wordwrap"><a href="{{routeTo 'realmDefault' path}}">{{name}}</a></td>
                                 <td class="wordwrap">
                                     {{#if active}}
-                                        <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.enabled"}}</span>
+                                        <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.activated"}}</span>
                                     {{else}}
-                                        <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.disabled"}}</span>
+                                        <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.deactivated"}}</span>
                                     {{/if}}
                                 </td>
                                 <td class="wordwrap">{{path}}</td>
