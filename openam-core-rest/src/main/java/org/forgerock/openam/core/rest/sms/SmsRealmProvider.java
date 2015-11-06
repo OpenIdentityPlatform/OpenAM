@@ -31,6 +31,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -38,8 +42,12 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.session.SessionCache;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -83,6 +91,13 @@ public class SmsRealmProvider implements RequestHandler {
     private static final String PARENT_I18N_KEY = "a109";
     private static final String ACTIVE_I18N_KEY = "a108";
     public static final String ROOT_SERVICE = "";
+    private final SessionCache sessionCache;
+    private final CoreWrapper coreWrapper;
+
+    public SmsRealmProvider(SessionCache sessionCache, CoreWrapper coreWrapper) {
+        this.sessionCache = sessionCache;
+        this.coreWrapper = coreWrapper;
+    }
 
     /**
      * Create an amAdmin SSOToken
@@ -307,10 +322,11 @@ public class SmsRealmProvider implements RequestHandler {
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-        final RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realmPath = realmContext.getResolvedRealm();
 
         try {
+            final SessionID sessionID = new SessionID(getUserSsoToken(context).getTokenID().toString());
+            final String realmPath = coreWrapper.convertOrgNameToRealmName(sessionCache.getSession(sessionID).getClientDomain());
+
             final OrganizationConfigManager ocm = new OrganizationConfigManager(getUserSsoToken(context), realmPath);
 
             //Return realm query is being performed on
@@ -330,6 +346,9 @@ public class SmsRealmProvider implements RequestHandler {
         } catch (SSOException ex) {
             debug.error("RealmResource :: QUERY by " + principalName + " failed : " + ex);
             return new ForbiddenException().asPromise();
+        } catch (SessionException ex) {
+            debug.error("RealmResource :: QUERY by " + principalName + " failed : " + ex);
+            return new InternalServerErrorException().asPromise();
         } catch (SMSException ex) {
             debug.error("RealmResource :: QUERY by " + principalName + " failed :" + ex);
             switch (ex.getExceptionCode()) {
