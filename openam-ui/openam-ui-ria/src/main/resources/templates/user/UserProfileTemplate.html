@@ -1,0 +1,55 @@
+<div class="container">
+    <div class="page-header">
+        <h1>{{t "common.user.userProfile"}}</h1>
+    </div>
+    <div class="tab-menu">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="active"><a href="#userDetailsTab" role="tab" data-toggle="tab">{{t "common.user.basicInfo"}}</a></li>
+            <li><a href="#userPasswordTab" role="tab" data-toggle="tab">{{t "common.user.password"}}</a></li>
+        </ul>
+    </div>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active panel panel-default fr-panel-tab" id="userDetailsTab">
+            <form class="form-horizontal" id="details">
+                <div class="panel-body">
+                    {{#user}}
+                        {{> form/_basicInput property="username" label="common.user.username" readonly=true}}
+                        {{> form/_basicInput property="givenName" label="common.user.givenName"}}
+                        {{> form/_basicInput property="sn" label="common.user.sn"}}
+                        {{> form/_basicInput type="email" property="mail" label="common.user.emailAddress"}}
+                        {{> form/_basicInput type="tel" property="telephoneNumber" label="common.user.phoneNumber"}}
+                    {{/user}}
+                </div>
+                <div class="panel-footer clearfix">
+                    {{> form/_basicSaveReset}}
+                </div>
+            </form>
+        </div>
+
+        <div role="tabpanel" class="tab-pane panel panel-default fr-panel-tab" id="userPasswordTab">
+            <form class="form-horizontal" id="password">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="input-password">{{t "common.user.password"}}</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" type="password" id="input-password" name="password" value="" data-validation-dependents="passwordConfirm" data-validator-event="keyup" placeholder="{{t 'common.form.passwordPlaceholder'}}" />
+                            <div class="validation-message"></div>
+                            <span class="form-control-feedback"><i class='fa validation-icon'></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="input-confirmPassword">{{t 'common.user.confirmPassword'}}</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" type="password" id="input-confirmPassword" value="" data-validator="passwordConfirm" data-validator-event="keyup" placeholder="{{t 'common.form.passwordPlaceholder'}}" />
+                            <div class="validation-message"></div>
+                            <span class="form-control-feedback"><i class='fa validation-icon'></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer clearfix">
+                    {{> form/_basicSaveReset}}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
