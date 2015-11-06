@@ -122,7 +122,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
          * @returns {Promise} Service promise
          */
         remove: function (path) {
-            return obj.serviceCall({ url: "realms" + path, type: "DELETE" });
+            return obj.serviceCall({ url: "realms" + path, type: "DELETE", suppressEvents: true });
         },
 
         /**

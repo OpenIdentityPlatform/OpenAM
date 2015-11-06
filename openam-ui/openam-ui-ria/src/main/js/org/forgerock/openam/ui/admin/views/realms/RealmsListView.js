@@ -146,6 +146,11 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                         message: $.t("console.realms.parentRealmCannotDeleted"),
                         type: Messages.TYPE_DANGER
                     });
+                } else {
+                    Messages.addMessage({
+                        response: response,
+                        type: Messages.TYPE_DANGER
+                    });
                 }
             });
         },
