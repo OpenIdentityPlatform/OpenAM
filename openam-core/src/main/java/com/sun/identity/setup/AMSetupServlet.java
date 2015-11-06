@@ -443,7 +443,7 @@ public class AMSetupServlet extends HttpServlet {
      * @param servletctx is the Servlet Context
      * @return true if AM is already configured, false otherwise 
      */
-    public static boolean checkInitState(ServletContext servletctx) {
+    public static boolean isConfigured(ServletContext servletctx) {
         return isConfiguredFlag;
     }
 

@@ -29,6 +29,9 @@
 
 package com.sun.identity.setup;
 
+import java.io.IOException;
+import java.util.Collection;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -38,183 +41,136 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.shared.Constants;
-import org.forgerock.openam.upgrade.VersionUtils;
-import org.forgerock.util.annotations.VisibleForTesting;
 
 /**
- * This filter brings administrator to a configuration page
- * where the product can be configured if the product is not
- * yet configured.
+ * This filter brings the administrator to a configuration page where the product can be configured
+ * if the product is not yet configured.
 */
 public final class AMSetupFilter implements Filter {
 
-    private boolean passthrough;
     private static final String SETUP_URI = "/config/options.htm";
     private static final String UPGRADE_URI = "/config/upgrade/upgrade.htm";
     private static final String SETUP_PROGRESS_URI = "/setup/setSetupProgress";
     private static final String UPGRADE_PROGESS_URI = "/upgrade/setUpgradeProgress";
     private static final String NOWRITE_PERMISSION = "/nowritewarning.jsp";
+    private static final String CONFIGURATOR_URI = "configurator";
 
-    private static String[] fList = { 
-        ".ico", ".htm", ".css", ".js", ".jpg", ".gif", ".png",".JPG", "SMSObjectIF" , "setSetupProgress",
-        "setUpgradeProgress", "/legal-notices/"
-    }; 
+    private static final String AM_ENCRYPTION_PASSWORD_PROPERTY_KEY = "am.enc.pwd";
+    private static final String CONFIG_STORE_DOWN_ERROR_CODE = "configstore.down";
 
-    private final AMSetupWrapper setupWrapper;
+    private static final Collection<String> ALLOWED_RESOURCES = CollectionUtils.asSet(".ico", ".htm", ".css", ".js",
+            ".jpg", ".gif", ".png", ".JPG", "SMSObjectIF", "setSetupProgress", "setUpgradeProgress", "/legal-notices/");
 
-    public AMSetupFilter() {
-        this(new AMSetupWrapper());
-    }
+    private AMSetupManager setupManager;
+    private volatile boolean isPassthrough;
 
-    @VisibleForTesting
-    AMSetupFilter(AMSetupWrapper setupWrapper) {
-        this.setupWrapper = setupWrapper;
+    @Override
+    public void init(FilterConfig config) throws ServletException {
+        ServletContext servletContext = config.getServletContext();
+        SystemStartupInjectorHolder startupInjectorHolder = SystemStartupInjectorHolder.getInstance();
+        setupManager = startupInjectorHolder.getInstance(AMSetupManager.class);
+        if (!setupManager.isConfigured()) {
+            // TASK TODO figure out if and why we need to do this here
+            servletContext.setAttribute(AM_ENCRYPTION_PASSWORD_PROPERTY_KEY, AMSetupUtils.getRandomString());
+        }
     }
 
     /**
-     * Redirects request to configuration page if the product is not yet 
-     * configured.
+     * Redirects requests to configuration page if the product is not yet configured.
      *
-     * @param request Servlet Request.
-     * @param response Servlet Response.
-     * @param filterChain Filter Chain.
-     * @throws IOException if configuration file cannot be read.
-     * @throws ServletException if there are errors in the servlet space.
+     * @param req The HTTP request.
+     * @param resp The HTTP response.
+     * @param filterChain The filter chain.
+     * @throws IOException If configuration file cannot be read.
+     * @throws ServletException If there are errors in the servlet space.
      */
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException,
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain filterChain) throws IOException,
             ServletException {
-        HttpServletRequest  httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        HttpServletRequest  request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) resp;
+
         try {
-            if (setupWrapper.isCurrentConfigurationValid()) {
-                String incomingURL = httpRequest.getRequestURI();
-                if (incomingURL.endsWith(SETUP_URI) || incomingURL.endsWith(UPGRADE_URI)
-                        || incomingURL.endsWith(SETUP_PROGRESS_URI) || incomingURL.endsWith(UPGRADE_PROGESS_URI)) {
-                    String url = httpRequest.getScheme() + "://" + httpRequest.getServerName() + ":"
-                            + httpRequest.getServerPort() + httpRequest.getContextPath();
-                    httpResponse.sendRedirect(url);
+            if (setupManager.isCurrentConfigurationValid()) {
+                if (isSetupRequest(request.getRequestURI())) {
+                    response.sendRedirect(createCleanUrl(request));
                 } else {
-                    filterChain.doFilter(httpRequest, httpResponse);
+                    filterChain.doFilter(request, response);
                 }
             } else {
-                if (setupWrapper.getBootStrapFile() != null && !setupWrapper.isVersionNewer()
-                        && !setupWrapper.isUpgradeCompleted()) {
+                if (isConfigStoreDown()) {
                     String redirectUrl = System.getProperty(Constants.CONFIG_STORE_DOWN_REDIRECT_URL);
-                    if (redirectUrl != null && redirectUrl.length() > 0) {
-                        httpResponse.sendRedirect(redirectUrl);
+                    if (StringUtils.isNotEmpty(redirectUrl)) {
+                        response.sendRedirect(redirectUrl);
                     } else {
-                        throw new ConfigurationException("configstore.down", null);
+                        throw new ConfigurationException(CONFIG_STORE_DOWN_ERROR_CODE, null);
                     }
                 } else {
-                    if (isPassthrough() && validateStream(httpRequest)) {
-                        filterChain.doFilter(httpRequest, httpResponse);
-                    } else {        
-                        String incomingURL = httpRequest.getRequestURI();
-                        if (incomingURL.endsWith("configurator")) {
-                            filterChain.doFilter(httpRequest, httpResponse);  
+                    if (isPassthrough && isRequestForAllowedResource(request.getRequestURI())) {
+                        filterChain.doFilter(request, response);
+                    } else if (isConfiguratorRequest(request.getRequestURI())) {
+                        filterChain.doFilter(request, response);
+                    } else {
+                        String url = createCleanUrl(request);
+                        if (hasWritePermissionOnUserHomeDirectory()) {
+                            url += SETUP_URI;
                         } else {
-                            String url = httpRequest.getScheme() + "://" + httpRequest.getServerName() + ":"
-                                    + httpRequest.getServerPort() + httpRequest.getContextPath();
-                            if (setupWrapper.getUserHomeDirectory().canWrite()) {
-                                url += SETUP_URI;
-                            } else {
-                                url += NOWRITE_PERMISSION;
-                            }
-                            httpResponse.sendRedirect(url);
-                            markPassthrough();
-                        }    
+                            url += NOWRITE_PERMISSION;
+                        }
+                        response.sendRedirect(url);
+                        enablePassthrough();
                     }
                 }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new ServletException("AMSetupFilter.doFilter", ex);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServletException("AMSetupFilter.doFilter", e);
         }
     }
 
-    /**
-     * Returns <code>true</code> if the request for resources.
-     *
-     * @param httpRequest HTTP Servlet request.
-     * @return <code>true</code> if the request for resources.
-     */
-    private boolean validateStream(HttpServletRequest httpRequest) {
-        String uri = httpRequest.getRequestURI();
-        boolean ok = false;
-        for (int i = 0; (i < fList.length) && !ok; i++) {
-            ok = uri.contains(fList[i]);
-        }
-        return ok;     
-    }
-
-    /**
-     * Destroy the filter config on sever shutdowm 
-     */
+    @Override
     public void destroy() {
     }
-    
-    /**
-     * Initializes the filter.
-     *
-     * @param filterConfig Filter Configuration.
-     */
-    public void init(FilterConfig filterConfig) {
-        ServletContext servletCtx = filterConfig.getServletContext();
-        if (!setupWrapper.checkInitState(servletCtx)) {
-            //Set the encryption Key
-            servletCtx.setAttribute("am.enc.pwd", setupWrapper.getRandomString());
-        }
+
+    private boolean isConfigStoreDown() {
+        return setupManager.getBootStrapFileLocation() != null && !setupManager.isVersionNewer()
+                && !setupManager.isUpgradeCompleted();
     }
 
-    /**
-     * Returns <code>true</code> if the request is allowed without processing.
-     *
-     * @return <code>true</code> if the request is allowed without processing.
-     */
-    private boolean isPassthrough() {
-        return passthrough;
+    private boolean isSetupRequest(String requestUri) {
+        return requestUri.endsWith(SETUP_URI) || requestUri.endsWith(SETUP_PROGRESS_URI)
+                || requestUri.endsWith(UPGRADE_URI) || requestUri.endsWith(UPGRADE_PROGESS_URI);
     }
 
-    /**
-     * Sets the request for images such that they are not processed.
-     */
-    private void markPassthrough() {
-        passthrough = true;
+    private String createCleanUrl(HttpServletRequest request) {
+        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                + request.getContextPath();
     }
 
-    static class AMSetupWrapper {
-
-        boolean checkInitState(ServletContext context) {
-            return AMSetupServlet.checkInitState(context);
+    private boolean isRequestForAllowedResource(String requestUri) {
+        for (String allowedResource : ALLOWED_RESOURCES) {
+            if (requestUri.contains(allowedResource)) {
+                return true;
+            }
         }
+        return false;
+    }
 
-        String getRandomString() {
-            return AMSetupUtils.getRandomString();
-        }
+    private boolean isConfiguratorRequest(String requestUri) {
+        return requestUri.endsWith(CONFIGURATOR_URI);
+    }
 
-        boolean isCurrentConfigurationValid() {
-            return AMSetupServlet.isCurrentConfigurationValid();
-        }
+    private boolean hasWritePermissionOnUserHomeDirectory() {
+        return setupManager.getUserHomeDirectory().canWrite();
+    }
 
-        String getBootStrapFile() {
-            return AMSetupServlet.getBootStrapFile();
-        }
-
-        boolean isVersionNewer() {
-            return VersionUtils.isVersionNewer();
-        }
-
-        boolean isUpgradeCompleted() {
-            return AMSetupServlet.isUpgradeCompleted();
-        }
-
-        File getUserHomeDirectory() {
-            return new File(System.getProperty("user.home"));
-        }
+    private void enablePassthrough() {
+        isPassthrough = true;
     }
 }

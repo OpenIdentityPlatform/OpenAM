@@ -19,7 +19,10 @@ package com.sun.identity.setup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static org.testng.Assert.fail;
+
+import java.io.File;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -28,28 +31,37 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
-
-import com.sun.identity.common.configuration.ConfigurationException;
-import com.sun.identity.shared.Constants;
+import org.mockito.Mock;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.google.inject.Injector;
+import com.sun.identity.common.configuration.ConfigurationException;
+import com.sun.identity.shared.Constants;
+
 public class AMSetupFilterTest {
 
     private AMSetupFilter setupFilter;
-    private ServletContext context;
 
-    private AMSetupFilter.AMSetupWrapper setupWrapper;
+    @Mock
+    private AMSetupManager setupManager;
+    private Injector injector;
+
+    @BeforeClass
+    public void setupClass() {
+        injector = mock(Injector.class);
+        SystemStartupInjectorHolder.initialise(injector);
+    }
 
     @BeforeMethod
     public void setup() {
-        setupWrapper = mock(AMSetupFilter.AMSetupWrapper.class);
-        setupFilter = new AMSetupFilter(setupWrapper);
+        initMocks(this);
+        given(injector.getInstance(AMSetupManager.class)).willReturn(setupManager);
 
-        context = mock(ServletContext.class);
+        setupFilter = new AMSetupFilter();
     }
 
     @AfterMethod
@@ -63,9 +75,7 @@ public class AMSetupFilterTest {
         //Given
         FilterConfig config = mock(FilterConfig.class);
         ServletContext context = mock(ServletContext.class);
-
         given(config.getServletContext()).willReturn(context);
-        given(setupWrapper.getRandomString()).willReturn("RANDOM_STRING");
 
         systemIsNotConfigured();
 
@@ -73,7 +83,7 @@ public class AMSetupFilterTest {
         setupFilter.init(config);
 
         //Then
-        verify(context).setAttribute("am.enc.pwd", "RANDOM_STRING");
+        verify(context).setAttribute(eq("am.enc.pwd"), anyString());
     }
 
     @Test
@@ -81,7 +91,7 @@ public class AMSetupFilterTest {
 
         //Given
         FilterConfig config = mock(FilterConfig.class);
-
+        ServletContext context = mock(ServletContext.class);
         given(config.getServletContext()).willReturn(context);
 
         systemIsConfigured();
@@ -97,6 +107,7 @@ public class AMSetupFilterTest {
     public void filterShouldAllowRequestsThroughIfConfigured() throws Exception {
 
         //Given
+        initializeFilter();
         HttpServletRequest request = mockRequest("REQUEST_URI");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
@@ -110,8 +121,8 @@ public class AMSetupFilterTest {
         verify(chain).doFilter(request, response);
     }
 
-    @DataProvider(name = "setupRequestUris")
-    private Object[][] getSetupRequestUris() {
+    @DataProvider
+    private Object[][] setupRequestUris() {
         return new Object[][]{
             {"/config/options.htm"},
             {"/setup/setSetupProgress"},
@@ -124,6 +135,7 @@ public class AMSetupFilterTest {
     public void filterShouldRedirectSetupRequestsIfConfigured(String requestUri) throws Exception {
 
         //Given
+        initializeFilter();
         HttpServletRequest request = mockRequest(requestUri);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
@@ -142,6 +154,7 @@ public class AMSetupFilterTest {
     public void filterShouldRedirectRequestsIfUpgradeInProgressButConfigStoreIsDown() throws Exception {
 
         //Given
+        initializeFilter();
         HttpServletRequest request = mockRequest("REQUEST_URI");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
@@ -162,6 +175,7 @@ public class AMSetupFilterTest {
             throws Exception {
 
         //Given
+        initializeFilter();
         HttpServletRequest request = mockRequest("REQUEST_URI");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
@@ -184,6 +198,7 @@ public class AMSetupFilterTest {
     public void filterShouldAllowConfiguratorRequestsThroughIfNotConfigured() throws Exception {
 
         //Given
+        initializeFilter();
         HttpServletRequest request = mockRequest("/configurator");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
@@ -201,12 +216,13 @@ public class AMSetupFilterTest {
     public void filterShouldRedirectRequestsToSetupPageIfNotConfigured() throws Exception {
 
         //Given
+        initializeFilter();
         HttpServletRequest request = mockRequest("REQUEST_URI");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
         systemIsNotConfigured();
-        withWritePermissionsOnUserHomeDirectory();
+        withWritePermissionsOnBootstrapRootDirectory();
 
         //When
         setupFilter.doFilter(request, response, chain);
@@ -221,12 +237,13 @@ public class AMSetupFilterTest {
             throws Exception {
 
         //Given
+        initializeFilter();
         HttpServletRequest request = mockRequest("REQUEST_URI");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
         systemIsNotConfigured();
-        noWritePermissionsOnUserHomeDirectory();
+        noWritePermissionsOnBootstrapRootDirectory();
 
         //When
         setupFilter.doFilter(request, response, chain);
@@ -236,8 +253,8 @@ public class AMSetupFilterTest {
         verifyZeroInteractions(chain);
     }
 
-    @DataProvider(name = "allowedRequests")
-    private Object[][] getAllowedRequestsWhilstConfiguring() {
+    @DataProvider
+    private Object[][] allowedRequestsWhilstConfiguring() {
         return new Object[][]{
             {".ico"},
             {".htm"},
@@ -254,7 +271,7 @@ public class AMSetupFilterTest {
         };
     }
 
-    @Test(dataProvider = "allowedRequests")
+    @Test(dataProvider = "allowedRequestsWhilstConfiguring")
     public void filterShouldAllowCertainRequestsThroughIfNotConfiguredAndInConfigurationMode(String requestUriSuffix)
             throws Exception {
 
@@ -265,8 +282,6 @@ public class AMSetupFilterTest {
         HttpServletRequest request = mockRequest("REQUEST_URI" + requestUriSuffix);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
-
-        systemIsNotConfigured();
 
         //When
         setupFilter.doFilter(request, response, chain);
@@ -286,27 +301,34 @@ public class AMSetupFilterTest {
         filterShouldRedirectRequestsToSetupPageIfNotConfigured();
     }
 
+    private void initializeFilter() throws ServletException {
+        FilterConfig config = mock(FilterConfig.class);
+        ServletContext context = mock(ServletContext.class);
+        given(config.getServletContext()).willReturn(context);
+        setupFilter.init(config);
+    }
+
     private void systemIsNotConfigured() {
-        given(setupWrapper.checkInitState(context)).willReturn(false);
-        given(setupWrapper.isCurrentConfigurationValid()).willReturn(false);
+        given(setupManager.isConfigured()).willReturn(false);
+        given(setupManager.isCurrentConfigurationValid()).willReturn(false);
     }
 
     private void systemIsConfigured() {
-        given(setupWrapper.checkInitState(context)).willReturn(true);
-        given(setupWrapper.isCurrentConfigurationValid()).willReturn(true);
+        given(setupManager.isConfigured()).willReturn(true);
+        given(setupManager.isCurrentConfigurationValid()).willReturn(true);
     }
 
     private void systemIsBeingUpgraded() {
-        given(setupWrapper.isCurrentConfigurationValid()).willReturn(false);
+        given(setupManager.isCurrentConfigurationValid()).willReturn(false);
     }
 
     private void configStoreIsDown(String redirectUri) {
         if (redirectUri != null) {
             System.setProperty(Constants.CONFIG_STORE_DOWN_REDIRECT_URL, redirectUri);
         }
-        given(setupWrapper.getBootStrapFile()).willReturn("BOOTSTRAP_FILE_LOCATION");
-        given(setupWrapper.isVersionNewer()).willReturn(false);
-        given(setupWrapper.isUpgradeCompleted()).willReturn(false);
+        given(setupManager.getBootStrapFileLocation()).willReturn("BOOTSTRAP_FILE_LOCATION");
+        given(setupManager.isVersionNewer()).willReturn(false);
+        given(setupManager.isUpgradeCompleted()).willReturn(false);
     }
 
     private HttpServletRequest mockRequest(String requestUri) {
@@ -319,15 +341,15 @@ public class AMSetupFilterTest {
         return request;
     }
 
-    private void withWritePermissionsOnUserHomeDirectory() {
-        File userHomeDirectory = mock(File.class);
-        given(setupWrapper.getUserHomeDirectory()).willReturn(userHomeDirectory);
-        given(userHomeDirectory.canWrite()).willReturn(true);
+    private void withWritePermissionsOnBootstrapRootDirectory() {
+        File bootstrapRootDirectory = mock(File.class);
+        given(setupManager.getUserHomeDirectory()).willReturn(bootstrapRootDirectory);
+        given(bootstrapRootDirectory.canWrite()).willReturn(true);
     }
 
-    private void noWritePermissionsOnUserHomeDirectory() {
-        File userHomeDirectory = mock(File.class);
-        given(setupWrapper.getUserHomeDirectory()).willReturn(userHomeDirectory);
-        given(userHomeDirectory.canWrite()).willReturn(false);
+    private void noWritePermissionsOnBootstrapRootDirectory() {
+        File bootstrapRootDirectory = mock(File.class);
+        given(setupManager.getUserHomeDirectory()).willReturn(bootstrapRootDirectory);
+        given(bootstrapRootDirectory.canWrite()).willReturn(false);
     }
 }
