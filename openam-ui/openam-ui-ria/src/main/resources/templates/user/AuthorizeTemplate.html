@@ -15,7 +15,7 @@
     </div>
     {{else}}
 
-    <div class="page-header col-md-6 col-md-offset-3">
+    <div class="page-header col-md-6 col-md-offset-3 wordwrap">
         <h1 class="text-center">{{oauth2Data.displayName}}</h1>
         {{#if oauth2Data.displayDescription}}
         <p class="text-center"><em>{{oauth2Data.displayDescription}}</em></p>
@@ -85,7 +85,7 @@
             </div>
 
             {{#if oauth2Data.userName}}
-            <p>{{t 'form.signedInAs'}} {{oauth2Data.userName}}</p>
+            <p>{{t 'form.signedInAs'}} <span class="text-primary">{{oauth2Data.userName}}</span></p>
             {{/if}}
 
             <!-- Optional parameters -->

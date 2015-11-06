@@ -52,10 +52,11 @@ require([
     "text!templates/user/DeviceDoneTemplate.html",
     "text!templates/common/LoginBaseTemplate.html",
     "text!templates/common/FooterTemplate.html",
+    "text!templates/common/LoginHeaderTemplate.html",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "ThemeManager"
 ], function ($, HandleBars, Configuration, Constants, DeviceTemplate, DeviceDoneTemplate,
-            LoginBaseTemplate, FooterTemplate, i18nManager, ThemeManager) {
+            LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate, i18nManager, ThemeManager) {
     var data = window.pageData,
         template = data.done ? DeviceDoneTemplate : DeviceTemplate;
 
@@ -74,6 +75,7 @@ require([
 
         $("#wrapper").html(HandleBars.compile(LoginBaseTemplate)(data));
         $("#footer").html(HandleBars.compile(FooterTemplate)(data));
+        $("#loginBaseLogo").html(HandleBars.compile(LoginHeaderTemplate)(data));
         $("#content").html(HandleBars.compile(template)(data));
     });
 });

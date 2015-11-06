@@ -63,10 +63,11 @@ require([
     "text!templates/user/AuthorizeTemplate.html",
     "text!templates/common/LoginBaseTemplate.html",
     "text!templates/common/FooterTemplate.html",
+    "text!templates/common/LoginHeaderTemplate.html",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "ThemeManager"
 ], function ($, _, HandleBars, Configuration, Constants, AuthorizeTemplate,
-            LoginBaseTemplate, FooterTemplate, i18nManager, ThemeManager) {
+            LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate, i18nManager, ThemeManager) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;
@@ -75,6 +76,7 @@ require([
     var formTemplate,
         baseTemplate,
         footerTemplate,
+        loginHeaderTemplate,
         data = window.pageData;
 
     i18nManager.init({
@@ -92,9 +94,11 @@ require([
         baseTemplate = HandleBars.compile(LoginBaseTemplate);
         formTemplate = HandleBars.compile(AuthorizeTemplate);
         footerTemplate = HandleBars.compile(FooterTemplate);
+        loginHeaderTemplate = HandleBars.compile(LoginHeaderTemplate);
 
         $("#wrapper").html(baseTemplate(data));
         $("#footer").html(footerTemplate(data));
+        $("#loginBaseLogo").html(loginHeaderTemplate(data));
         $("#content").html(formTemplate(data)).find(".panel-heading")
         .click(function () {
             $(this).toggleClass("expanded").next(".panel-collapse").slideToggle();
