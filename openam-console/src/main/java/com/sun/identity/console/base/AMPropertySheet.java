@@ -647,7 +647,7 @@ public class AMPropertySheet
             } else {
                 values = (Set)multipleChoiceValues.get(name);
                 if (values == null) {
-                    values = AMAdminUtils.toSet(model.getValues(name));
+                    values = AMAdminUtils.toSetIgnoreEmpty(model.getValues(name));
                 }
             }
 
