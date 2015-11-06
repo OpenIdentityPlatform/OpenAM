@@ -2796,7 +2796,6 @@ public abstract class AMLoginModule implements LoginModule {
         }
 
         details.put(AUTH_LEVEL.toString(), String.valueOf(getAuthLevel()));
-        details.put(MODULE_NAME.toString(), moduleName);
         details.put(MODULE_CLASS.toString(), moduleClass);
 
         return details;
