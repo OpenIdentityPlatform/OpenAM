@@ -258,7 +258,7 @@ public class OpenSSOConfigurator {
                     System.out.println(str);
                 }
             } else {
-                System.out.println(rb.getString("configFailed"));
+                System.out.println(rb.getString("configFailed") + responseCode);
                 if ((userStoreType != null) &&
                         (userStoreType.equals("LDAPv3ForADDC"))) {
                     System.out.println(rb.getString("cannot.connect.to.UM.datastore"));
