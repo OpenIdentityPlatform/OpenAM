@@ -39,6 +39,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.audit.AuthenticationProcessEventAuditor;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.client.ZeroPageLoginConfig;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
@@ -87,6 +88,8 @@ import javax.security.auth.login.Configuration;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.util.Reject;
@@ -123,6 +126,7 @@ public class AuthUtils extends AuthClientUtils {
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR) + "/UI/Login";
 
     private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE = SessionServiceURLService.getInstance();
+    private static AuthenticationProcessEventAuditor auditor;
 
     /*
      * Private constructor to prevent any instances being created
@@ -1599,7 +1603,7 @@ public class AuthUtils extends AuthClientUtils {
                 }
                 if (returnAuthInstances.isEmpty()) {
                     returnAuthInstances.put(
-                        AuthSchemeCondition.AUTH_SCHEME_CONDITION_ADVICE, 
+                        AuthSchemeCondition.AUTH_SCHEME_CONDITION_ADVICE,
                             returnModuleInstances);
                 }
             }
@@ -1957,7 +1961,7 @@ public class AuthUtils extends AuthClientUtils {
      */
     public static boolean logout(String sessionID, HttpServletRequest request, HttpServletResponse response)
     throws SSOException {
-        return logout(AuthD.getSession(sessionID), 
+        return logout(AuthD.getSession(sessionID),
                 SSOTokenManager.getInstance().createSSOToken(sessionID), request, response);
     }
     
@@ -2057,6 +2061,7 @@ public class AuthUtils extends AuthClientUtils {
             
             if (isTokenValid) {
                 AuthD.getAuth().logLogout(token);
+                auditLogout(token);
                 SSOTokenManager.getInstance().logout(token);
 
                 if (utilDebug.messageEnabled()) {
@@ -2071,6 +2076,15 @@ public class AuthUtils extends AuthClientUtils {
         }
         
         return isTokenValid;
+    }
+
+    private static void auditLogout(SSOToken token) {
+        if (SystemProperties.isServerMode()) {
+            if (auditor == null) {
+                auditor = InjectorHolder.getInstance(AuthenticationProcessEventAuditor.class);
+            }
+            auditor.auditLogout(token);
+        }
     }
 
     /**

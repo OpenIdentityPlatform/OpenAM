@@ -21,10 +21,8 @@ import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
 import org.forgerock.audit.events.AuthenticationAuditEventBuilder;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
-import org.forgerock.openam.utils.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +31,7 @@ import java.util.Map;
  *
  * @since 13.0.0
  */
-public class AMAuthenticationAuditEventBuilder extends
+public final class AMAuthenticationAuditEventBuilder extends
         AuthenticationAuditEventBuilder<AMAuthenticationAuditEventBuilder> {
 
     /**
@@ -70,18 +68,9 @@ public class AMAuthenticationAuditEventBuilder extends
      * @return this builder for method chaining.
      */
     public AMAuthenticationAuditEventBuilder entry(AuthenticationAuditEntry authenticationAuditEntry) {
-        Map<String, Object> map = new HashMap<>();
-        if (StringUtils.isNotEmpty(authenticationAuditEntry.getModuleId())) {
-            map.put("moduleId", authenticationAuditEntry.getModuleId());
+        if (authenticationAuditEntry != null) {
+            super.entries(singletonList(authenticationAuditEntry.toMap()));
         }
-        if (StringUtils.isNotEmpty(authenticationAuditEntry.getResult().toString())) {
-            map.put("result", authenticationAuditEntry.getResult());
-        }
-        Map<String, String> info = authenticationAuditEntry.getInfo();
-        if (info != null && !info.isEmpty()) {
-            map.put("info", info);
-        }
-        entries(singletonList(map));
         return this;
     }
 

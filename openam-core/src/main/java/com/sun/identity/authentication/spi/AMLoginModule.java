@@ -45,7 +45,8 @@ import com.iplanet.dpro.session.service.SessionCount;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.audit.LoginModuleEventAuditor;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.audit.AuthenticationModuleEventAuditor;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
@@ -72,6 +73,7 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 import org.forgerock.openam.ldap.LDAPUtils;
 
 import javax.security.auth.Subject;
@@ -266,13 +268,13 @@ public abstract class AMLoginModule implements LoginModule {
     protected static AMResourceBundleCache amCache =
         AMResourceBundleCache.getInstance();
 
-    protected final LoginModuleEventAuditor auditor;
+    protected final AuthenticationModuleEventAuditor auditor;
 
     /**
      * No argument constructor for {@link AMLoginModule}.
      */
     public AMLoginModule() {
-        auditor = InjectorHolder.getInstance(LoginModuleEventAuditor.class);
+        auditor = InjectorHolder.getInstance(AuthenticationModuleEventAuditor.class);
     }
     
     /**
@@ -2108,7 +2110,7 @@ public abstract class AMLoginModule implements LoginModule {
             loginState.saveAuthenticatedPrincipal(getPrincipal().getName());
         }
 
-        auditor.auditAuthenticationSuccess(moduleName, loginState, getPrincipal(), getAuditEntryDetail());
+        auditor.auditModuleSuccess(loginState, getPrincipal(), getAuditEntryDetail());
     }
     
     /**
@@ -2293,7 +2295,7 @@ public abstract class AMLoginModule implements LoginModule {
         loginState.setFailureModuleName(moduleName);
         loginState.saveSharedStateAttributes();
 
-        auditor.auditAuthenticationFailure(moduleName, loginState, getPrincipal(), getAuditEntryDetail());
+        auditor.auditModuleFailure(loginState, getPrincipal(), getAuditEntryDetail());
     }
     
     /**
@@ -2787,17 +2789,21 @@ public abstract class AMLoginModule implements LoginModule {
      *
      * @return The audit entry detail.
      */
-    protected Map<String, String> getAuditEntryDetail() {
-        Map<String, String> details = new HashMap<>();
+    protected AuthenticationAuditEntry getAuditEntryDetail() {
+        AuthenticationAuditEntry entryDetail = new AuthenticationAuditEntry();
+        entryDetail.setModuleId(moduleName);
 
         String ip = loginState.getClient();
         if (isNotEmpty(ip)) {
-            details.put(IP_ADDRESS.toString(), ip);
+            entryDetail.addInfo(IP_ADDRESS, ip);
         }
+        AuthContext.IndexType indexType = loginState.getIndexType();
+        if (indexType != null) {
+            entryDetail.addInfo(AUTH_INDEX, indexType.toString());
+        }
+        entryDetail.addInfo(AUTH_LEVEL, String.valueOf(getAuthLevel()));
+        entryDetail.addInfo(MODULE_CLASS, moduleClass);
 
-        details.put(AUTH_LEVEL.toString(), String.valueOf(getAuthLevel()));
-        details.put(MODULE_CLASS.toString(), moduleClass);
-
-        return details;
+        return entryDetail;
     }
 }

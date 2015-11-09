@@ -30,6 +30,7 @@
 package com.sun.identity.authentication.service;
 
 import static java.util.Collections.unmodifiableSet;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
@@ -72,6 +73,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.audit.AuthenticationProcessEventAuditor;
 import com.sun.identity.authentication.client.ZeroPageLoginConfig;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
@@ -80,6 +82,7 @@ import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthenticationException;
+import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
@@ -109,6 +112,7 @@ import com.sun.identity.sm.ServiceManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guava.common.collect.ImmutableList;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
@@ -343,6 +347,9 @@ public class LoginState {
      * session.
      */
     private final Set<String> authenticatedPrincipals = new HashSet<String>();
+
+    private final AuthenticationProcessEventAuditor auditor = InjectorHolder.getInstance(
+            AuthenticationProcessEventAuditor.class);
 
     /**
      * Attempts to load the configured session property upgrader class.
@@ -628,6 +635,7 @@ public class LoginState {
                 // org inactive
                 logFailed(AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_ORG_INACTIVE,
                         AuthUtils.ERROR_MESSAGE), "ORGINACTIVE");
+                auditor.auditLoginFailure(this, REALM_INACTIVE);
                 throw new AuthException(AMAuthErrorCode.AUTH_ORG_INACTIVE, null);
             }
             // get handle to org config manager object to retrieve auth service
@@ -1735,6 +1743,7 @@ public class LoginState {
         if ((this.userOrg == null) || this.userOrg.length() == 0) {
             DEBUG.message("domain is null, error condtion");
             logFailed(LazyConfig.AUTHD.bundle.getString("invalidDomain"), "INVALIDDOMAIN");
+            auditor.auditLoginFailure(this, INVALID_REALM);
             throw new AuthException(AMAuthErrorCode.AUTH_INVALID_DOMAIN, null);
         }
 
@@ -2573,6 +2582,7 @@ public class LoginState {
                                 logFailed(AuthUtils.getErrorVal(AMAuthErrorCode.
                                                 AUTH_USER_NOT_FOUND, AuthUtils.ERROR_MESSAGE),
                                         "USERNOTFOUND");
+                                auditor.auditLoginFailure(this, USER_NOT_FOUND);
                                 throw new AuthException(
                                         AMAuthErrorCode.AUTH_USER_NOT_FOUND, null);
                             }
@@ -2648,6 +2658,7 @@ public class LoginState {
                             logFailed(AuthUtils.getErrorVal(AMAuthErrorCode.
                                             AUTH_USER_NOT_FOUND, AuthUtils.ERROR_MESSAGE),
                                     "USERNOTFOUND");
+                            auditor.auditLoginFailure(this, USER_NOT_FOUND);
                             throw new AuthException(
                                     AMAuthErrorCode.AUTH_USER_NOT_FOUND, null);
                         }
@@ -2948,6 +2959,15 @@ public class LoginState {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("setAuthModuleName: " + this.authMethName);
         }
+    }
+
+    /**
+     * Get the auth module name(s).
+     *
+     * @return The list of auth module names in a pipe separated string.
+     */
+    public String getAuthModuleNames() {
+        return authMethName;
     }
 
     /**
@@ -4085,6 +4105,7 @@ public class LoginState {
         if ((this.userOrg == null) || (this.userOrg.equals(""))) {
             DEBUG.error("domain is null, error condtion");
             logFailed(LazyConfig.AUTHD.bundle.getString("invalidDomain"), "INVALIDDOMAIN");
+            auditor.auditLoginFailure(this, INVALID_REALM);
             throw new AuthException(AMAuthErrorCode.AUTH_INVALID_DOMAIN, null);
         }
 
@@ -5306,6 +5327,15 @@ public class LoginState {
     }
 
     /**
+     * Get all the received Callbacks.
+     *
+     * @return The received Callbacks.
+     */
+    public Map<String, Callback[]> getAllReceivedCallbacks() {
+        return callbacksPerState;
+    }
+
+    /**
      * Returns Callbacks per Page state.
      *
      * @return Callbacks per Page state.
@@ -5452,6 +5482,15 @@ public class LoginState {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("failureModulelist :" + failureModuleList);
         }
+    }
+
+    /**
+     * Gets the failure module names.
+     *
+     * @return The list of failure auth module names in a pipe separated string.
+     */
+    public String getFailureModuleNames() {
+        return failureModuleList;
     }
 
     /**

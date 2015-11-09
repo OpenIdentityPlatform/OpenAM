@@ -16,9 +16,10 @@
 
 package org.forgerock.openam.authentication.modules.deviceprint;
 
-import org.forgerock.openam.authentication.modules.scripted.Scripted;
+import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.DEVICE_ID;
 
-import java.util.Map;
+import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
+import org.forgerock.openam.authentication.modules.scripted.Scripted;
 
 /**
  * Scripted Device Id (Match) Authentication module.
@@ -28,14 +29,14 @@ import java.util.Map;
 public class DeviceIdMatch extends Scripted {
 
     @Override
-    protected Map<String, String> getAuditEntryDetail() {
-        Map<String, String> detail = super.getAuditEntryDetail();
+    protected AuthenticationAuditEntry getAuditEntryDetail() {
+        AuthenticationAuditEntry entryDetail = super.getAuditEntryDetail();
 
         Object deviceId = sharedState.get(CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME);
         if (deviceId != null && deviceId instanceof String) {
-            detail.put("deviceId", (String) deviceId);
+            entryDetail.addInfo(DEVICE_ID, (String) deviceId);
         }
 
-        return detail;
+        return entryDetail;
     }
 }

@@ -16,6 +16,7 @@
 package org.forgerock.openam.audit.model;
 
 import org.forgerock.audit.events.AuthenticationAuditEventBuilder;
+import org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,15 @@ public class AuthenticationAuditEntry {
     private static final String RESULT_KEY = "result";
     private static final String INFO_KEY = "info";
 
-    private Map<String, Object> entry = new HashMap<>();
+    private final Map<String, Object> entry = new HashMap<>();
+    private final Map<String, String> entryInfo = new HashMap<>();
+
+    /**
+     * Create an instance of {@link AuthenticationAuditEntry}.
+     */
+    public AuthenticationAuditEntry() {
+        entry.put(INFO_KEY, entryInfo);
+    }
 
     /**
      * Get the module id.
@@ -59,7 +68,7 @@ public class AuthenticationAuditEntry {
      * @return The {@code Map} of all info values.
      */
     public Map<String, String> getInfo() {
-        return (Map<String, String>) this.entry.get(INFO_KEY);
+        return entryInfo;
     }
 
     /**
@@ -81,12 +90,13 @@ public class AuthenticationAuditEntry {
     }
 
     /**
-     * Set the info values.
+     * Add an info value.
      *
-     * @param info The {@code Map} for the info values.
+     * @param key The info entry key.
+     * @param value The value of the info entry.
      */
-    public void setInfo(Map<String, String> info) {
-        this.entry.put(INFO_KEY, info);
+    public void addInfo(EntriesInfoFieldKey key, String value) {
+        this.entryInfo.put(key.toString(), value);
     }
 
     /**
