@@ -23,7 +23,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
@@ -41,6 +40,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.URLEncDec;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
@@ -55,6 +55,7 @@ import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.xui.XUIState;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owasp.esapi.ESAPI;
@@ -141,23 +142,41 @@ public class OAuth extends AMLoginModule {
             case ISAuthConstants.LOGIN_START: {
                 config.validateConfiguration();
                 serverName = request.getServerName();
-                String requestedURI = request.getRequestURI();
+                StringBuilder originalUrl = new StringBuilder();
                 String requestedQuery = request.getQueryString();
+                String realm = null;
 
                 String authCookieName = AuthUtils.getAuthCookieName();
+
+                final XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
+
+                if (xuiState.isXUIEnabled()) {
+                    // When XUI is in use the request URI points to the authenticate REST endpoint, which shouldn't be
+                    // presented to the end-user, hence we use the contextpath only and rely on index.html and the
+                    // XUIFilter to direct the user towards the XUI.
+                    originalUrl.append(request.getContextPath());
+                    // The REST endpoint always exposes the realm parameter even if it is not actually present on the
+                    // query string (e.g. DNS alias or URI segment was used), so this logic here is just to make sure if
+                    // the realm parameter was not present on the querystring, then we add it there.
+                    if (requestedQuery != null && !requestedQuery.contains("realm=")) {
+                        realm = request.getParameter("realm");
+                    }
+                } else {
+                    //In case of legacy UI the request URI will be /openam/UI/Login, which is safe to use.
+                    originalUrl.append(request.getRequestURI());
+                }
+
+                if (StringUtils.isNotEmpty(realm)) {
+                    originalUrl.append("?realm=").append(URLEncDec.encode(realm));
+                }
 
                 if (requestedQuery != null) {
                     if (requestedQuery.endsWith(authCookieName + "=")) {
                         requestedQuery = requestedQuery.substring(0,
                                 requestedQuery.length() - authCookieName.length() - 1);
                     }
-                    requestedURI += "?" + requestedQuery;
-                }
-
-                // Bit of a hack but required for when the XUI is using the OAuth module so the redirect goes back to
-                // the XUI to handle the next authentication stage and not straight to the authenticate REST endpoint
-                if (requestedURI.contains("/json/authenticate")) {
-                    requestedURI = requestedURI.replace("/json/authenticate", "");
+                    originalUrl.append(originalUrl.indexOf("?") == - 1 ? '?' : '&');
+                    originalUrl.append(requestedQuery);
                 }
 
                 // Find the domains for which we are configured
@@ -187,7 +206,7 @@ public class OAuth extends AMLoginModule {
                     CookieUtils.addCookieToResponse(response,
                             CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
                     CookieUtils.addCookieToResponse(response,
-                            CookieUtils.newCookie(COOKIE_ORIG_URL, requestedURI, "/", domain));
+                            CookieUtils.newCookie(COOKIE_ORIG_URL, originalUrl.toString(), "/", domain));
                     CookieUtils.addCookieToResponse(response,
                             CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", domain));
                     if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
@@ -197,8 +216,7 @@ public class OAuth extends AMLoginModule {
                 }
 
                 // The Proxy is used to return with a POST to the module
-                setUserSessionProperty(ISAuthConstants.FULL_LOGIN_URL,
-                        requestedURI);
+                setUserSessionProperty(ISAuthConstants.FULL_LOGIN_URL, originalUrl.toString());
 
                 setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
@@ -391,7 +409,7 @@ public class OAuth extends AMLoginModule {
                 String mail = getMail(profileSvcResponse, config.getMailAttribute());
                 OAuthUtil.debugMessage("Mail found = " + mail);
                 try {
-                    OAuthUtil.sendEmail(config.getEmailFrom(), mail, data, 
+                    OAuthUtil.sendEmail(config.getEmailFrom(), mail, data,
                             config.getSMTPConfig(), bundle, proxyURL);
                 } catch (NoEmailSentException ex) {
                     OAuthUtil.debugError("No mail sent due to error", ex);

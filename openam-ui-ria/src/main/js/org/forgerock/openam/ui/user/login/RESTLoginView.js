@@ -57,8 +57,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             //save the login params in a cookie for use with the cancel button on forgotPassword/register page 
             //and also the "proceed to login" link once password has been successfully changed or registration is complete
             var expire = new Date(),
-                realm = RealmHelper.getOverrideRealm() || RealmHelper.getSubRealm(),
-                cookieVal = (realm.substring(0, 1) === '/') ? realm : '/' + realm,
+                cookieVal = '/' + RealmHelper.getRealm(),
                 href = e.target.href + "/";
             if (conf.globalData.auth.urlParams) {
                 cookieVal += restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
@@ -156,7 +155,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     // if simply by asking for the requirements, we end up with a token, then we must have auto-logged-in somehow
                     if (reqs.hasOwnProperty("tokenId") && urlParams.ForceAuth !== 'true') {
                         //set a variable for the realm passed into the browser so there can be a check to make sure it is the same as the current user's realm
-                        conf.globalData.auth.passedInRealm = conf.globalData.auth.subRealm;
+                        conf.globalData.auth.passedInRealm = RealmHelper.getRealm();
                         // if we have a token, let's see who we are logged in as....
                         sessionManager.getLoggedUser(function(user) {
                             if(String(conf.globalData.auth.passedInRealm).toLowerCase() === conf.globalData.auth.subRealm.toLowerCase()){
