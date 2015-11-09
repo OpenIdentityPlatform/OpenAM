@@ -100,6 +100,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     }
                 });
 
+                user.id = user.uid;
                 if (!_.has(user, "roles")) {
                     this.uiroles = [];
                 } else if (_.isString(user.roles)) {
