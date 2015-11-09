@@ -135,7 +135,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                     final AMIdentity id = IdUtils.getIdentity(
                             AccessController.doPrivileged(AdminTokenAction.getInstance()),
                             token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
-                    return new OpenAMResourceOwner(token.getProperty("UserToken"), id);
+                    return new OpenAMResourceOwner(id.getName(), id);
                 } catch (SSOException e) {
                     logger.error("Error authenticating user against OpenAM: ", e);
                     throw new LoginRequiredException();

@@ -88,7 +88,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
                 final AMIdentity id = IdUtils.getIdentity(
                         AccessController.doPrivileged(AdminTokenAction.getInstance()),
                         token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
-                return new OpenAMResourceOwner(token.getProperty("UserToken"), id);
+                return new OpenAMResourceOwner(id.getName(), id);
             } catch (Exception e) {
                 logger.error("Unable to create ResourceOwner", e);
             }
@@ -164,6 +164,6 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         final AMIdentity id = IdUtils.getIdentity(
                 AccessController.doPrivileged(AdminTokenAction.getInstance()),
                 token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
-        return new OpenAMResourceOwner(token.getProperty("UserToken"), id);
+        return new OpenAMResourceOwner(id.getName(), id);
     }
 }
