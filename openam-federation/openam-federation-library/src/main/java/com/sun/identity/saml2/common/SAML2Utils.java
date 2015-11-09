@@ -28,6 +28,7 @@
 package com.sun.identity.saml2.common;
 
 import com.sun.identity.common.HttpURLConnectionManager;
+import com.sun.identity.common.SystemConfigurationException;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.cot.COTException;
 import com.sun.identity.cot.CircleOfTrustDescriptor;
@@ -1533,14 +1534,18 @@ public class SAML2Utils extends SAML2SDKUtils {
     }
 
     /**
-     * Gets remote service URL according to server id embedded in specified id.
+     * Gets remote service URL according to server id embedded in the provided ID.
      *
-     * @param id an id.
-     * @return remote service URL or null if it is local or an error occurred.
+     * @param id The server's ID or a user's sessionIndex.
+     * @return Remote service URL corresponding to the ID, or null if the ID is local, or an error occurred.
      */
     public static String getRemoteServiceURL(String id) {
         if (debug.messageEnabled()) {
             debug.message("SAML2Utils.getRemoteServiceURL: id = " + id);
+        }
+
+        if (StringUtils.isEmpty(id)) {
+            return null;
         }
 
         String serverID = extractServerId(id);
@@ -1560,9 +1565,9 @@ public class SAML2Utils extends SAML2SDKUtils {
             }
 
             return SystemConfigurationUtil.getServerFromID(serverID);
-        } catch (Exception ex) {
+        } catch (SystemConfigurationException sce) {
             if (debug.messageEnabled()) {
-                debug.message("SAML2Utils.getRemoteServiceURL:", ex);
+                debug.message("SAML2Utils.getRemoteServiceURL:", sce);
             }
             return null;
         }
