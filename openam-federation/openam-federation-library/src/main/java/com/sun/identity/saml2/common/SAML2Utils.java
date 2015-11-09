@@ -345,14 +345,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 }
             }
         }
-
-        if (reqInfo == null) {
-            debug.error(method + "InResponseTo attribute in Response"
-                    + " is invalid: " + inRespToResp + ", SAML2 failover is enabled");
-            String[] data = {respID};
-            LogUtil.error(Level.INFO, LogUtil.INVALID_INRESPONSETO_RESPONSE, data, null);
-            throw new SAML2Exception(bundle.getString("invalidInResponseToInResponse"));
-        }
+        // reqInfo can remain null and will do for IDP initiated SSO requests
 
         // invoke SP Adapter
         SAML2ServiceProviderAdapter spAdapter =
