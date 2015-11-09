@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 import org.forgerock.openam.audit.context.AuditContextFilter;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.openam.audit.context.TransactionId;
+import org.forgerock.audit.events.TransactionId;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;

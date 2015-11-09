@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.audit.context;
 
+import org.forgerock.audit.events.TransactionId;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
