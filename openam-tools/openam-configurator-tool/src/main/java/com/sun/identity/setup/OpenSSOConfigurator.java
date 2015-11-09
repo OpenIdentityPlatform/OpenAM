@@ -24,7 +24,7 @@
  *
  * $Id: OpenSSOConfigurator.java,v 1.4 2009/08/11 23:50:42 goodearth Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -258,7 +258,7 @@ public class OpenSSOConfigurator {
                     System.out.println(str);
                 }
             } else {
-                System.out.println(rb.getString("configFailed"));
+                System.out.println(rb.getString("configFailed") + responseCode);
                 if ((userStoreType != null) &&
                         (userStoreType.equals("LDAPv3ForADDC"))) {
                     System.out.println(rb.getString("cannot.connect.to.UM.datastore"));
