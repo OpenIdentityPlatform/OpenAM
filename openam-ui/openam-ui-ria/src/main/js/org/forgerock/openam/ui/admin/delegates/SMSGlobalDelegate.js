@@ -75,13 +75,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                 data.result = _.each(data.result, function (realm) {
                     realm.path = getRealmPath(realm);
                 }).sort(function (a, b) {
-                    if (a.active === b.active) {
-                        // Within the active 'catagories' sort alphabetically
-                        return a.path < b.path ? -1 : 1;
-                    } else {
-                        // Sort active realms before inactive realms
-                        return a.active === true ? -1 : 1;
-                    }
+                    return a.path < b.path ? -1 : 1;
                 });
             });
         },
