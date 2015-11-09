@@ -97,8 +97,10 @@ public class SessionResource implements CollectionResourceProvider {
     public static final String LOGOUT_ACTION_ID = "logout";
     public static final String VALIDATE_ACTION_ID = "validate";
     public static final String IS_ACTIVE_ACTION_ID = "isActive";
-    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime";
-    public static final String GET_IDLE_ACTION_ID = "getIdle";
+    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime"; //time remaining
+    public static final String GET_IDLE_ACTION_ID = "getIdle"; //current idle time
+    public static final String GET_MAX_IDLE_ACTION_ID = "getMaxIdle"; //max idle time
+    public static final String GET_MAX_SESSION_TIME_ID = "getMaxSessionTime"; //max session time
     public static final String GET_PROPERTY_ACTION_ID = "getProperty";
     public static final String SET_PROPERTY_ACTION_ID = "setProperty";
     public static final String DELETE_PROPERTY_ACTION_ID = "deleteProperty";
@@ -139,6 +141,8 @@ public class SessionResource implements CollectionResourceProvider {
         actionHandlers.put(LOGOUT_ACTION_ID, new LogoutActionHandler());
         actionHandlers.put(IS_ACTIVE_ACTION_ID, new IsActiveActionHandler());
         actionHandlers.put(GET_IDLE_ACTION_ID, new GetIdleTimeActionHandler());
+        actionHandlers.put(GET_MAX_IDLE_ACTION_ID, new GetMaxIdleTimeActionHandler());
+        actionHandlers.put(GET_MAX_SESSION_TIME_ID, new GetMaxSessionTimeActionHandler());
         actionHandlers.put(GET_MAX_TIME_ACTION_ID, new GetMaxTimeActionHandler());
         actionHandlers.put(GET_PROPERTY_ACTION_ID, new GetPropertyActionHandler());
         actionHandlers.put(SET_PROPERTY_ACTION_ID, new SetPropertyActionHandler());
@@ -691,7 +695,7 @@ public class SessionResource implements CollectionResourceProvider {
     }
 
     /**
-     * Handler for 'getMaxTime' action
+     * Handler for 'getMaxTime' action - from CREST 12.0.0 onwards this means 'get remaining session time'.
      */
     private class GetMaxTimeActionHandler implements ActionHandler {
 
@@ -706,8 +710,10 @@ public class SessionResource implements CollectionResourceProvider {
         /**
          * Using the token id specified by the invoker, find the token and if valid, return its remaining life in
          * seconds.
+         *
          * @param tokenId The SSO Token Id.
-         * @return jsonic representation of the number of seconds of remaining life, or a representation of -1 if invalid
+         * @return jsonic representation of the number of seconds of remaining life, or a representation of -1 if
+         * invalid.
          */
         private JsonValue getMaxTime(String tokenId) {
 
@@ -718,6 +724,73 @@ public class SessionResource implements CollectionResourceProvider {
             } catch (SSOException ignored) {
             }
             return json(object(field(MAX_TIME, maxTime)));
+        }
+    }
+
+    /**
+     * Handler for 'getMaxSessionTime' action - from CREST 12.0.0 onwards this means 'get maximum possible
+     * length of session'
+     */
+    private class GetMaxSessionTimeActionHandler implements ActionHandler {
+
+        private static final String MAX_SESSION_TIME = "maxsessiontime";
+
+        @Override
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, Context context,
+                                                                 ActionRequest request) {
+            return newResultPromise(newActionResponse(getMaxSessionTime(tokenId)));
+        }
+
+        /**
+         * Using the token id specified by the invoker, find the token and if valid, return the max idle time in
+         * seconds.
+         *
+         * @param tokenId The SSO Token Id.
+         * @return jsonic representation of the number of seconds a session may exist, or a representation of -1 if
+         * token is invalid.
+         */
+        private JsonValue getMaxSessionTime(String tokenId) {
+
+            long maxSessionTime = -1;
+            try {
+                SSOToken theToken = getToken(tokenId);
+                maxSessionTime = theToken.getMaxSessionTime();
+            } catch (SSOException ignored) {
+            }
+            return json(object(field(MAX_SESSION_TIME, maxSessionTime)));
+        }
+    }
+
+    /**
+     * Handler for 'getMaxIdle' action
+     */
+    private class GetMaxIdleTimeActionHandler implements ActionHandler {
+
+        private static final String MAX_IDLE_TIME = "maxidletime";
+
+        @Override
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, Context context,
+                                                                 ActionRequest request) {
+            return newResultPromise(newActionResponse(getMaxIdleTime(tokenId)));
+        }
+
+        /**
+         * Using the token id specified by the invoker, find the token and if valid, return the max idle time in
+         * seconds.
+         *
+         * @param tokenId The SSO Token Id.
+         * @return jsonic representation of the number of seconds a session may be idle, or a representation of -1
+         * if token is invalid.
+         */
+        private JsonValue getMaxIdleTime(String tokenId) {
+
+            long maxIdleTime = -1;
+            try {
+                SSOToken theToken = getToken(tokenId);
+                maxIdleTime = theToken.getMaxIdleTime();
+            } catch (SSOException ignored) {
+            }
+            return json(object(field(MAX_IDLE_TIME, maxIdleTime)));
         }
     }
 
@@ -737,8 +810,10 @@ public class SessionResource implements CollectionResourceProvider {
         /**
          * Using the token id specified by the invoker, find the token and if valid, return the remaining idle time in
          * seconds.
+         *
          * @param tokenId The SSO Token Id.
-         * @return jsonic representation of the number of seconds of idle time, or a representation of -1 if token invalid
+         * @return jsonic representation of the number of seconds of idle time, or a representation of -1 if token
+         * invalid.
          */
         private JsonValue getIdleTime(String tokenId) {
 
