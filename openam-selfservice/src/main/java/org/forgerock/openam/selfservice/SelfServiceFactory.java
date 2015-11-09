@@ -18,7 +18,6 @@ package org.forgerock.openam.selfservice;
 
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
-import org.forgerock.selfservice.stages.CommonConfigVisitor;
 
 /**
  * Creates new self service instances.
@@ -35,6 +34,6 @@ public interface SelfServiceFactory {
      *
      * @return new self service instance
      */
-    RequestHandler getService(ProcessInstanceConfig<CommonConfigVisitor> serviceConfig);
+    RequestHandler getService(ProcessInstanceConfig serviceConfig);
 
 }

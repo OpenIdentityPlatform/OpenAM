@@ -17,12 +17,11 @@
 package org.forgerock.openam.selfservice;
 
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.openam.selfservice.config.BasicStageConfigVisitor;
 import org.forgerock.selfservice.core.AnonymousProcessService;
 import org.forgerock.selfservice.core.ProcessStore;
+import org.forgerock.selfservice.core.ProgressStageProvider;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
-import org.forgerock.selfservice.stages.CommonConfigVisitor;
 
 import javax.inject.Inject;
 
@@ -33,31 +32,31 @@ import javax.inject.Inject;
  */
 class SelfServiceFactoryImpl implements SelfServiceFactory {
 
+    private final ProgressStageProvider stageProvider;
     private final SnapshotTokenHandlerFactory tokenHandlerFactory;
     private final ProcessStore processStore;
-    private final BasicStageConfigVisitor stageConfigVisitor;
 
     /**
      * Constructs the default forgotten password service provider.
      *
+     * @param stageProvider
+     *         progress stage provider
      * @param tokenHandlerFactory
      *         snapshot token handler factory
      * @param processStore
      *         local process store
-     * @param stageConfigVisitor
-     *         stage config visitor
      */
     @Inject
-    SelfServiceFactoryImpl(SnapshotTokenHandlerFactory tokenHandlerFactory,
-            ProcessStore processStore, BasicStageConfigVisitor stageConfigVisitor) {
+    SelfServiceFactoryImpl(ProgressStageProvider stageProvider,
+            SnapshotTokenHandlerFactory tokenHandlerFactory, ProcessStore processStore) {
+        this.stageProvider = stageProvider;
         this.tokenHandlerFactory = tokenHandlerFactory;
         this.processStore = processStore;
-        this.stageConfigVisitor = stageConfigVisitor;
     }
 
     @Override
-    public RequestHandler getService(ProcessInstanceConfig<CommonConfigVisitor> serviceConfig) {
-        return new AnonymousProcessService<>(serviceConfig, stageConfigVisitor, tokenHandlerFactory, processStore);
+    public RequestHandler getService(ProcessInstanceConfig serviceConfig) {
+        return new AnonymousProcessService(serviceConfig, stageProvider, tokenHandlerFactory, processStore);
     }
 
 }

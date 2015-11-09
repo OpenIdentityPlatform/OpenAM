@@ -31,8 +31,6 @@ import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
-import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
-import org.forgerock.selfservice.stages.CommonConfigVisitor;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.slf4j.Logger;
@@ -131,10 +129,7 @@ final class SelfServiceRequestHandler<C extends ConsoleConfig>
             throw new NotSupportedException("Service not configured");
         }
 
-        ProcessInstanceConfig<CommonConfigVisitor> serviceConfig =
-                serviceConfigProvider.getServiceConfig(consoleConfig, context, realm);
-
-        return serviceFactory.getService(serviceConfig);
+        return serviceFactory.getService(serviceConfigProvider.getServiceConfig(consoleConfig, context, realm));
     }
 
     @Override

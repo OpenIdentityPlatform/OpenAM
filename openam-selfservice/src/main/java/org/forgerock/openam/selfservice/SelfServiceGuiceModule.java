@@ -30,7 +30,6 @@ import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
-import org.forgerock.openam.selfservice.config.BasicStageConfigVisitor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandlerImpl;
@@ -42,13 +41,10 @@ import org.forgerock.openam.selfservice.config.UserRegistrationConsoleConfig;
 import org.forgerock.openam.selfservice.config.UserRegistrationExtractor;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStage;
+import org.forgerock.selfservice.core.ProgressStageProvider;
+import org.forgerock.selfservice.core.annotations.SelfService;
+import org.forgerock.selfservice.core.config.StageConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
-import org.forgerock.selfservice.stages.CommonConfigVisitor;
-import org.forgerock.selfservice.stages.SelfService;
-import org.forgerock.selfservice.stages.dynamic.DynamicConfigVisitor;
-import org.forgerock.selfservice.stages.dynamic.DynamicConfigVisitorImpl;
-import org.forgerock.selfservice.stages.dynamic.DynamicProgressStageProvider;
-import org.forgerock.selfservice.stages.dynamic.DynamicStageConfig;
 
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
@@ -67,7 +63,6 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
         bind(SnapshotTokenHandlerFactory.class).to(SnapshotTokenHandlerFactoryImpl.class);
         bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
-        bind(CommonConfigVisitor.class).to(BasicStageConfigVisitor.class);
         bind(SelfServiceFactory.class).to(SelfServiceFactoryImpl.class);
 
         bind(new TypeLiteral<ConsoleConfigExtractor<UserRegistrationConsoleConfig>>() {})
@@ -122,16 +117,15 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Provides
     @Singleton
-    DynamicConfigVisitor getCustomConfigVisitor(final Injector injector) {
-        return new DynamicConfigVisitorImpl(new DynamicProgressStageProvider() {
+    ProgressStageProvider getProgressStageProvider(final Injector injector) {
+        return new ProgressStageProvider() {
 
             @Override
-            public ProgressStage<DynamicStageConfig> get(
-                    Class<? extends ProgressStage<DynamicStageConfig>> progressStageClass) {
+            public ProgressStage<StageConfig> get(Class<? extends ProgressStage<StageConfig>> progressStageClass) {
                 return injector.getInstance(progressStageClass);
             }
 
-        });
+        };
     }
 
 }

@@ -34,7 +34,6 @@ import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
-import org.forgerock.selfservice.stages.CommonConfigVisitor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -87,7 +86,7 @@ public final class SelfServiceRequestHandlerTest {
         given(consoleConfigHandler.getConfig("/", configExtractor)).willReturn(consoleConfig);
         given(providerFactory.getProvider(consoleConfig)).willReturn(configProvider);
         given(configProvider.isServiceEnabled(consoleConfig)).willReturn(true);
-        ProcessInstanceConfig<CommonConfigVisitor> config = new ProcessInstanceConfig<>();
+        ProcessInstanceConfig config = new ProcessInstanceConfig();
         given(configProvider.getServiceConfig(consoleConfig, context, "/")).willReturn(config);
         given(serviceFactory.getService(config)).willReturn(underlyingService);
 
@@ -106,7 +105,7 @@ public final class SelfServiceRequestHandlerTest {
         given(consoleConfigHandler.getConfig("/", configExtractor)).willReturn(consoleConfig);
         given(providerFactory.getProvider(consoleConfig)).willReturn(configProvider);
         given(configProvider.isServiceEnabled(consoleConfig)).willReturn(true);
-        ProcessInstanceConfig<CommonConfigVisitor> config = new ProcessInstanceConfig<>();
+        ProcessInstanceConfig config = new ProcessInstanceConfig();
         given(configProvider.getServiceConfig(consoleConfig, context, "/")).willReturn(config);
         given(serviceFactory.getService(config)).willReturn(underlyingService);
 

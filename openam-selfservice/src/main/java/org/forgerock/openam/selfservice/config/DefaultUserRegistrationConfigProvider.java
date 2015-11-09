@@ -24,7 +24,6 @@ import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.config.StageConfig;
-import org.forgerock.selfservice.stages.CommonConfigVisitor;
 import org.forgerock.selfservice.stages.captcha.CaptchaStageConfig;
 import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
 import org.forgerock.selfservice.stages.kba.KbaConfig;
@@ -51,10 +50,10 @@ public final class DefaultUserRegistrationConfigProvider
     }
 
     @Override
-    public ProcessInstanceConfig<CommonConfigVisitor> getServiceConfig(
+    public ProcessInstanceConfig getServiceConfig(
             UserRegistrationConsoleConfig config, Context context, String realm) {
 
-        List<StageConfig<? super CommonConfigVisitor>> stages = new ArrayList<>();
+        List<StageConfig> stages = new ArrayList<>();
 
         if (config.isCaptchaEnabled()) {
             stages.add(new CaptchaStageConfig()
@@ -97,7 +96,7 @@ public final class DefaultUserRegistrationConfigProvider
                 .setJwsAlgorithm(JwsAlgorithm.HS256)
                 .setTokenLifeTimeInSeconds(config.getTokenExpiry());
 
-        return new ProcessInstanceConfig<CommonConfigVisitor>()
+        return new ProcessInstanceConfig()
                 .setStageConfigs(stages)
                 .setSnapshotTokenConfig(jwtTokenConfig)
                 .setStorageType(StorageType.STATELESS);

@@ -17,7 +17,6 @@
 package org.forgerock.openam.selfservice.config;
 
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
-import org.forgerock.selfservice.stages.CommonConfigVisitor;
 import org.forgerock.services.context.Context;
 
 /**
@@ -53,6 +52,6 @@ public interface ServiceConfigProvider<C extends ConsoleConfig> {
      *
      * @return service config
      */
-    ProcessInstanceConfig<CommonConfigVisitor> getServiceConfig(C config, Context context, String realm);
+    ProcessInstanceConfig getServiceConfig(C config, Context context, String realm);
 
 }
