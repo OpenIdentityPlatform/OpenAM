@@ -17,7 +17,7 @@ package org.forgerock.openam.audit;
 
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.audit.JsonUtils.*;
 
@@ -41,13 +41,13 @@ public class AMAccessAuditEventBuilderTest {
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.CREST)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
-                .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
+                .userId("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
                 .trackingId("12345")
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
                 .request("CREST", "READ")
                 .http("GET", "/some/path", getQueryParameters(), getHeaders())
-                .response(SUCCESS, "200", 42, MILLISECONDS)
+                .response(SUCCESSFUL, "200", 42, MILLISECONDS)
                 .toEvent();
 
         assertJsonValue(accessEvent.getValue(), "/access-event.json");
@@ -60,13 +60,13 @@ public class AMAccessAuditEventBuilderTest {
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.CREST)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
-                .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
+                .userId("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
                 .trackingId("12345")
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
                 .request("CREST", "READ")
                 .http("GET", "/some/path", getQueryParameters(), getHeaders())
-                .response(SUCCESS, "200", 42, MILLISECONDS)
+                .response(SUCCESSFUL, "200", 42, MILLISECONDS)
                 .toEvent();
 
         assertJsonValue(accessEvent.getValue(), "/access-event.json");

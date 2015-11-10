@@ -58,6 +58,7 @@ public class CsvAuditEventHandlerFactoryTest {
     private void shouldCreateCsvEventHandler() throws AuditException {
         // Given
         Map<String, Set<String>> configAttributes = new HashMap<>();
+        configAttributes.put("enabled", singleton("true"));
         configAttributes.put("topics", singleton("access"));
         configAttributes.put("location", singleton(logDirName));
         AuditEventHandlerConfiguration configuration = AuditEventHandlerConfiguration.builder()
@@ -71,13 +72,16 @@ public class CsvAuditEventHandlerFactoryTest {
         // Then
         assertThat(handler).isInstanceOf(CSVAuditEventHandler.class);
         assertThat(handler.getConfigurationClass()).isEqualTo(CSVAuditEventHandlerConfiguration.class);
+        assertThat(handler.isEnabled()).isTrue();
     }
 
     @Test
-    private void shouldNotCreateCsvEventHandlerWhenDisabled() throws AuditException {
+    private void shouldCreateCsvEventHandlerWhenDisabled() throws AuditException {
         // Given
         Map<String, Set<String>> configAttributes = new HashMap<>();
         configAttributes.put("enabled", singleton("false"));
+        configAttributes.put("topics", singleton("access"));
+        configAttributes.put("location", singleton(logDirName));
         AuditEventHandlerConfiguration configuration = AuditEventHandlerConfiguration.builder()
                 .withName("CSV Handler")
                 .withAttributes(configAttributes)
@@ -87,6 +91,8 @@ public class CsvAuditEventHandlerFactoryTest {
         AuditEventHandler handler = factory.create(configuration);
 
         // Then
-        assertThat(handler).isNull();
+        assertThat(handler).isInstanceOf(CSVAuditEventHandler.class);
+        assertThat(handler.getConfigurationClass()).isEqualTo(CSVAuditEventHandlerConfiguration.class);
+        assertThat(handler.isEnabled()).isFalse();
     }
 }

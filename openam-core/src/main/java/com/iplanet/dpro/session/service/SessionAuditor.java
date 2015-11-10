@@ -74,7 +74,7 @@ public final class SessionAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(eventName)
                     .component(Component.SESSION)
-                    .authentication(session.getProperty(Constants.UNIVERSAL_IDENTIFIER))
+                    .userId(session.getProperty(Constants.UNIVERSAL_IDENTIFIER))
                     .trackingId(contextId)
                     .runAs(getUserId(getAdminToken()))
                     .objectId(contextId)

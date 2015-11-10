@@ -42,9 +42,6 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
     @Override
     public AuditEventHandler create(AuditEventHandlerConfiguration configuration) throws AuditException {
         Map<String, Set<String>> attributes = configuration.getAttributes();
-        if (!getBooleanMapAttr(attributes, "enabled", true)) {
-            return null;
-        }
 
         CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
         String location = getMapAttr(attributes, "location");
@@ -52,6 +49,7 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
                 replaceAll("%SERVER_URI%", SystemProperties.get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
         csvHandlerConfiguration.setTopics(attributes.get("topics"));
         csvHandlerConfiguration.setName(configuration.getHandlerName());
+        csvHandlerConfiguration.setEnabled(getBooleanMapAttr(attributes, "enabled", true));
 
         return new CSVAuditEventHandler(csvHandlerConfiguration, configuration.getEventTopicsMetaData());
     }

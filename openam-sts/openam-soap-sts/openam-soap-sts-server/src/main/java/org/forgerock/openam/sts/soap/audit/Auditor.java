@@ -17,8 +17,8 @@
 package org.forgerock.openam.sts.soap.audit;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILED;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -94,7 +94,7 @@ public class Auditor {
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_OUTCOME)
                 .component(STS)
-                .response(SUCCESS, "", elapsedTime, MILLISECONDS)
+                .response(SUCCESSFUL, "", elapsedTime, MILLISECONDS)
                 .toEvent();
     }
 
@@ -113,7 +113,7 @@ public class Auditor {
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_OUTCOME)
                 .component(STS)
-                .responseWithDetail(FAILURE, statusCode, elapsedTime, MILLISECONDS, responseDetail)
+                .responseWithDetail(FAILED, statusCode, elapsedTime, MILLISECONDS, responseDetail)
                 .toEvent();
     }
 

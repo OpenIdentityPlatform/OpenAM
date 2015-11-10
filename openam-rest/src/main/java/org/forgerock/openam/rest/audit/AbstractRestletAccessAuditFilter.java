@@ -117,7 +117,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
-                    .authentication(getUserIdForAccessAttempt(request))
+                    .userId(getUserIdForAccessAttempt(request))
                     .trackingIds(getTrackingIdsForAccessAttempt(request));
 
             if (requestDetailCreator != null) {
@@ -143,6 +143,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
+<<<<<<< HEAD
                     .authentication(getUserIdForAccessOutcome(request, response))
                     .trackingIds(getTrackingIdsForAccessOutcome(request, response));
 
@@ -156,6 +157,11 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
             } else {
                 builder.response(SUCCESS, "", elapsedTime, MILLISECONDS);
             }
+=======
+                    .userId(getUserIdForAccessOutcome(request, response))
+                    .trackingIds(getTrackingIdsForAccessOutcome(request, response))
+                    .response(SUCCESSFUL, "", elapsedTime, MILLISECONDS);
+>>>>>>> AME-8993 AME-8994 Migrate OpenAM Common Audit from 0.9.0-SNAPSHOT to 0.10.0-SNAPSHOT
 
             addHttpData(request, builder);
 
@@ -178,9 +184,9 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .authentication(getUserIdForAccessOutcome(request, response))
+                    .userId(getUserIdForAccessOutcome(request, response))
                     .trackingIds(getTrackingIdsForAccessOutcome(request, response))
-                    .responseWithDetail(FAILURE, responseCode, elapsedTime, MILLISECONDS, responseDetail);
+                    .responseWithDetail(FAILED, responseCode, elapsedTime, MILLISECONDS, responseDetail);
 
             addHttpData(request, builder);
 

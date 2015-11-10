@@ -15,8 +15,7 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.audit.events.AuditEventBuilder.AUTHENTICATION;
-import static org.forgerock.audit.events.AuditEventBuilder.ID;
+import org.forgerock.audit.events.AuditEventBuilder;
 
 import org.forgerock.openam.audit.context.AuditRequestContext;
 
@@ -273,7 +272,7 @@ public final class AuditConstants {
     /**
      * Names of fields on an audit events.
      */
-    public static final String USER_ID = AUTHENTICATION + "." + ID;
+    public static final String USER_ID = AuditEventBuilder.USER_ID;
 
     /**
      * Names of the realm field on an audit event.

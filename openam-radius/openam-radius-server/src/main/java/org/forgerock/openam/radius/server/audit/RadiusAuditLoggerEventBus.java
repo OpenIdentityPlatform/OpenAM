@@ -151,7 +151,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
 
         String uid = accessRequestEvent.getUniversalId();
         if (!Strings.isNullOrEmpty(uid)) {
-            builder.authentication(uid);
+            builder.userId(uid);
         } else {
             LOG.message("Not setting authentication to universal Id. None available.");
         }
@@ -242,9 +242,9 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
 
         if ((packetType == PacketType.ACCESS_ACCEPT)
                 || (packetType == PacketType.ACCESS_CHALLENGE)) {
-            responseStatus = ResponseStatus.SUCCESS;
+            responseStatus = ResponseStatus.SUCCESSFUL;
         } else if (packetType == PacketType.ACCESS_REJECT) {
-            responseStatus = ResponseStatus.FAILURE;
+            responseStatus = ResponseStatus.FAILED;
         } else {
             LOG.warning("Unexpected packet type in RadiusAuditLoggerEventBus.setResponseDetails()");
         }

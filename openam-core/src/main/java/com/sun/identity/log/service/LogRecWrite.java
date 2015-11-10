@@ -234,7 +234,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.POLICY_AGENT)
-                .authentication(clientId)
+                .userId(clientId)
                 .http("UNKNOWN", path, queryParameters, Collections.<String, List<String>>emptyMap())
                 .request("HTTP", "UNKNOWN")
                 .client(clientIp)

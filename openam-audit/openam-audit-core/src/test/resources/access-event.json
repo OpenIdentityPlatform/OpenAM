@@ -3,9 +3,7 @@
   "eventName": "AM-ACCESS-ATTEMPT",
   "component": "CREST",
   "transactionId": "ad1f26e3-1ced-418d-b6ec-c8488411a625",
-  "authentication": {
-    "id": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org"
-  },
+  "userId": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
   "client": {
     "host": null,
     "ip": "172.16.101.7",
@@ -31,7 +29,7 @@
     }
   },
   "response": {
-    "status": "SUCCESS",
+    "status": "SUCCESSFUL",
     "statusCode": "200",
     "elapsedTime": 42,
     "elapsedTimeUnits": "MILLISECONDS"

@@ -18,7 +18,7 @@ package org.forgerock.openam.audit;
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.audit.AuditConstants.EventName;
@@ -68,6 +68,7 @@ public class AuditEventPublisherTest {
     protected void setUp() throws Exception {
         mockHandler = mock(AuditEventHandler.class);
         when(mockHandler.getHandledTopics()).thenReturn(asSet("access"));
+        when(mockHandler.isEnabled()).thenReturn(true);
         auditServiceProvider = mock(AuditServiceProvider.class);
         auditEventPublisher = new AuditEventPublisher(auditServiceProvider);
         auditEventCaptor = ArgumentCaptor.forClass(JsonValue.class);
@@ -87,6 +88,7 @@ public class AuditEventPublisherTest {
         auditEventPublisher.publish("access", auditEvent);
 
         // Then
+        //verify(mockHandler.publishEvent(any(Context.class), any(String.class), auditEventCaptor.capture()));
         assertThat(auditEventCaptor.getValue()).isEqualTo(auditEvent.getValue());
     }
 
@@ -176,12 +178,12 @@ public class AuditEventPublisherTest {
         return new AMAccessAuditEventBuilder()
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .transactionId(UUID.randomUUID().toString())
-                .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
+                .userId("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
                 .request("CREST", "READ")
                 .http("GET", "/some/path", getQueryParameters(), Collections.<String, List<String>>emptyMap())
-                .response(SUCCESS, "200", 42, MILLISECONDS)
+                .response(SUCCESSFUL, "200", 42, MILLISECONDS)
                 .realm(realm)
                 .toEvent();
     }

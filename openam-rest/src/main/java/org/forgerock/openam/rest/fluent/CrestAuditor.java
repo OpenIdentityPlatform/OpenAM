@@ -125,9 +125,9 @@ class CrestAuditor {
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component);
             if (responseDetail == null) {
-                builder.response(SUCCESS, "", elapsedTime, MILLISECONDS);
+                builder.response(SUCCESSFUL, "", elapsedTime, MILLISECONDS);
             } else {
-                builder.responseWithDetail(SUCCESS, "", elapsedTime, MILLISECONDS, responseDetail);
+                builder.responseWithDetail(SUCCESSFUL, "", elapsedTime, MILLISECONDS, responseDetail);
             }
             addSessionDetailsFromSSOTokenContext(builder, context);
 
@@ -156,7 +156,7 @@ class CrestAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .responseWithDetail(FAILURE, Integer.toString(resultCode), elapsedTime, MILLISECONDS, detail);
+                    .responseWithDetail(FAILED, Integer.toString(resultCode), elapsedTime, MILLISECONDS, detail);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
