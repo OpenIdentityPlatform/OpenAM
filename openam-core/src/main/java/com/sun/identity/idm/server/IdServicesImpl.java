@@ -386,12 +386,12 @@ public class IdServicesImpl implements IdServices {
            OrganizationConfigManager orgMgr = new OrganizationConfigManager(
                    token, orgName);
 
-           if (!attrMap.containsKey(IdConstants.ORGANIZATION_STATUS_ATTR)) {
-               Map<String, Set<String>> newAttrMap = new HashMap<>(attrMap);
+           Map<String, Set<String>> newAttrMap = new HashMap<>(attrMap);
+           if (!newAttrMap.containsKey(IdConstants.ORGANIZATION_STATUS_ATTR)) {
                newAttrMap.put(IdConstants.ORGANIZATION_STATUS_ATTR, CollectionUtils.asSet("Active"));
            }
            Map serviceAttrsMap = new HashMap();
-           serviceAttrsMap.put(IdConstants.REPO_SERVICE, attrMap);
+           serviceAttrsMap.put(IdConstants.REPO_SERVICE, newAttrMap);
 
            orgMgr.createSubOrganization(name, serviceAttrsMap);
 
