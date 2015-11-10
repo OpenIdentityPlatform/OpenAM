@@ -23,17 +23,20 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/EditModuleDial
         dialog.close();
     }
     function redirectAndClose (dialog) {
-        Router.setUrl(event.currentTarget.href);
+        Router.setUrl(dialog.options.data.link);
         dialog.close();
     }
 
-    return function (name, chains) {
+    return function (name, chains, href) {
         BootstrapDialog.show({
             title: $.t("console.authentication.modules.inUse.title"),
             message: $.t("console.authentication.modules.inUse.message", {
                 moduleName: name,
                 usedChains: chains
             }),
+            data: {
+                link : href
+            },
             buttons: [{
                 label: $.t("common.form.cancel"),
                 cssClass: "btn-default",

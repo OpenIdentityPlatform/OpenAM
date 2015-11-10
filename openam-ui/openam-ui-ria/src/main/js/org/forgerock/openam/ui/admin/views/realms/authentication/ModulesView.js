@@ -82,9 +82,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         },
         editModule: function (event) {
             event.preventDefault();
-            var data = $(event.currentTarget).closest("tr").data();
+            var data = $(event.currentTarget).closest("tr").data(),
+                href = event.currentTarget.href;
 
-            EditModuleDialog(data.moduleName, data.moduleChains);
+            EditModuleDialog(data.moduleName, data.moduleChains, href);
         },
         deleteModule: function (event) {
             var self = this,
