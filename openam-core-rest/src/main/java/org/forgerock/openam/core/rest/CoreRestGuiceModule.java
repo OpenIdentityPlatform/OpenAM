@@ -16,19 +16,12 @@
 
 package org.forgerock.openam.core.rest;
 
-import static com.google.inject.multibindings.MapBinder.newMapBinder;
-import static org.forgerock.http.handler.Handlers.chainOf;
-import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
-import static org.forgerock.http.routing.RoutingMode.EQUALS;
-import static org.forgerock.http.routing.Version.version;
-import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.Set;
+import static com.google.inject.multibindings.MapBinder.*;
+import static org.forgerock.http.handler.Handlers.*;
+import static org.forgerock.http.routing.RouteMatchers.*;
+import static org.forgerock.http.routing.RoutingMode.*;
+import static org.forgerock.http.routing.Version.*;
+import static org.forgerock.openam.audit.AuditConstants.Component.*;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -39,13 +32,20 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
-import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.http.routing.RouteMatchers;
 import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
 import org.forgerock.openam.audit.AuditConstants.Component;
@@ -58,6 +58,8 @@ import org.forgerock.openam.core.rest.cts.CoreTokenResource;
 import org.forgerock.openam.core.rest.cts.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.core.rest.record.DebugRecorder;
 import org.forgerock.openam.core.rest.record.DefaultDebugRecorder;
+import org.forgerock.openam.core.rest.session.AggregateAuthzModule;
+import org.forgerock.openam.core.rest.session.SessionResourceAuthzModule;
 import org.forgerock.openam.core.rest.sms.SmsCollectionProvider;
 import org.forgerock.openam.core.rest.sms.SmsCollectionProviderFactory;
 import org.forgerock.openam.core.rest.sms.SmsGlobalSingletonProvider;
@@ -69,10 +71,13 @@ import org.forgerock.openam.core.rest.sms.SmsSingletonProviderFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.http.annotations.Endpoints;
+import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.Config;
+import org.forgerock.services.routing.RouteMatcher;
 
 /**
  * Guice module for binding the core REST endpoints.
@@ -273,5 +278,19 @@ public class CoreRestGuiceModule extends AbstractModule {
         Properties titleProperties = new Properties();
         titleProperties.load(getClass().getClassLoader().getResourceAsStream("amConsole.properties"));
         return titleProperties;
+    }
+
+    @Provides
+    @Inject
+    public AggregateAuthzModule getSessionResourceAuthzModule(SSOTokenManager ssoTokenManager,
+                                                              PrivilegeAuthzModule privilegeAuthzModule,
+                                                              AdminOnlyAuthzModule adminOnlyAuthzModule) {
+        SessionResourceAuthzModule sessionResourceAuthzModule = new SessionResourceAuthzModule(ssoTokenManager);
+        CrestAuthorizationModule[] authzList = new CrestAuthorizationModule[3];
+        authzList[0] = adminOnlyAuthzModule;
+        authzList[1] = privilegeAuthzModule;
+        authzList[2] = sessionResourceAuthzModule;
+        return new AggregateAuthzModule(authzList);
+
     }
 }

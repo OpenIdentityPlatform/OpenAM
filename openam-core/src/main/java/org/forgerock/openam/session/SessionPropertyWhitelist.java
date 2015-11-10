@@ -18,6 +18,10 @@ package org.forgerock.openam.session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
+import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.delegation.DelegationPermission;
+import com.sun.identity.delegation.DelegationPermissionFactory;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -41,7 +45,7 @@ import javax.inject.Singleton;
  * update cached map if config changes.
  **/
 @Singleton
-public class SessionPropertyWhitelist implements SessionPropertyList {
+public class SessionPropertyWhitelist {
 
     /**
      * The name of the service implemented.
@@ -56,6 +60,7 @@ public class SessionPropertyWhitelist implements SessionPropertyList {
     private static final Debug LOGGER = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
     private static final String WHITELIST_ATTRIBUTE_NAME = "forgerock-session-property-whitelist";
+
     private final Map<String, Set<String>> WHITELIST_REALM_MAP = new ConcurrentHashMap<>();
     private ServiceConfigManager serviceConfigManager;
 
@@ -77,18 +82,25 @@ public class SessionPropertyWhitelist implements SessionPropertyList {
         }
     }
 
-    @Override
-    public Set<String> getAllListedProperties(SSOToken token, String realm) {
+    /**
+     * Get the properties listed for the provided realm, using the caller token to check
+     * they have permission to see this result.
+     *
+     * @param caller The token responsible for calling this method.
+     * @param realm The realm in which this operation is taking place.
+     * @return The set of allowed listed properties.
+     */
+    public Set<String> getAllListedProperties(SSOToken caller, String realm) {
 
         final Set<String> allowed = getWhitelist(realm);
 
         Iterator<String> it = allowed.iterator();
         while (it.hasNext()) {
-            String itN = it.next();
+            String key = it.next();
             try {
-                SessionUtils.checkPermissionToSetProperty(token, itN, null);
+                SessionUtils.checkPermissionToSetProperty(caller, key, null);
             } catch (SessionException e) {
-                LOGGER.message("Removed {} from list as protected property ", itN);
+                LOGGER.message("Removed {} from list as protected property ", key);
                 it.remove();
             }
         }
@@ -96,17 +108,42 @@ public class SessionPropertyWhitelist implements SessionPropertyList {
         return allowed;
     }
 
-    @Override
-    public boolean isPropertyListed(SSOToken token, String realm, Set<String> propertyNames) {
+    /**
+     * Returns true if the user is an administrator, or if it has delegated permissions to perform this
+     * request.
+     *
+     * @param token SSOToken performing the request.
+     * @param realm in which the request is taking place.
+     */
+    public boolean userHasReadAdminPrivs(SSOToken token, String realm)
+            throws DelegationException, SSOException {
+
+        DelegationPermission dp = new DelegationPermissionFactory()
+                .newInstance(realm, "rest", "1.0", "sessions", "getProperty", Collections.singleton("READ"),
+                        Collections.<String, String>emptyMap());
+        return new DelegationEvaluatorImpl().isAllowed(token, dp, Collections.<String, Set<String>>emptyMap());
+    }
+
+    /**
+     * Whether or not the property is listed in the whitelist. If the caller has permission to see a protected
+     * property they will, otherwise protected properties are removed from the returned set before being returned.
+     *
+     * @param caller The user checking their permission.
+     * @param realm The realm in which this request is occurring.
+     * @param propertyNames The names they wish for a response to.
+     * @return true if all requested properties are whitelisted.
+     */
+    public boolean isPropertyListed(SSOToken caller, String realm, Set<String> propertyNames)
+            throws DelegationException, SSOException {
         for (String prop : propertyNames) {
             try {
-                SessionUtils.checkPermissionToSetProperty(token, prop, null);
+                SessionUtils.checkPermissionToSetProperty(caller, prop, null);
             } catch (SessionException e) {
                 return false;
             }
         }
 
-        return getWhitelist(realm).containsAll(propertyNames);
+        return userHasReadAdminPrivs(caller, realm) || getWhitelist(realm).containsAll(propertyNames);
     }
 
     private void installWhitelist(String realm) throws SSOException, SMSException {

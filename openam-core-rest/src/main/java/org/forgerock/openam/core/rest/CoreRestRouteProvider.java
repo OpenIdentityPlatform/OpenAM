@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.core.rest;
 
-import static org.forgerock.http.routing.RoutingMode.EQUALS;
+import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
-import static org.forgerock.openam.rest.Routers.ssoToken;
+import static org.forgerock.openam.rest.Routers.*;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;

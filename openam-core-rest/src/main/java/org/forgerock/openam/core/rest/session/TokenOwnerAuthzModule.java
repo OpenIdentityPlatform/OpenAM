@@ -15,21 +15,26 @@
 */
 package org.forgerock.openam.core.rest.session;
 
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.Constants;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import javax.inject.Named;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.authz.filter.api.AuthorizationResult;
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
-import org.forgerock.openam.utils.Config;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
@@ -48,12 +53,11 @@ import org.forgerock.util.promise.Promises;
  * universal id of the token provided by the context of the request, this module will
  * return true.
  *
- * In all other circumstances this module will defer to the admin module, allowing
- * any action to be performed by them against any valid tokenId.
+ * In all other circumstances this module will return a failure.
  */
-public class TokenOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
+public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
 
-    public final static String NAME = "TokenOwnerOrSuperUserAuthzModuleFilter";
+    public final static String NAME = "TokenOwnerAuthzModuleFilter";
 
     private final SSOTokenManager ssoTokenManager;
     private final Set<String> allowedActions;
@@ -63,16 +67,12 @@ public class TokenOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
      * Creates an authz module that will verify that a tokenId provided by the user (via query params)
      * is the same user (via universal identifier) as the user requesting the action.
      *
-     * @param sessionService The session service necessary for the parent AdminOnlyAuthzModule.
-     * @param debug A debug instance.
      * @param tokenId The tokenId query parameter. May not be null.
      * @param ssoTokenManager An instance of the SSOTokenManager.
      * @param allowedActions A list of allowed actions. Will be matched ignoring case.
      */
-    public TokenOwnerOrSuperUserAuthzModule(Config<SessionService> sessionService, @Named("frRest") Debug debug,
-                                            String tokenId, SSOTokenManager ssoTokenManager, String... allowedActions) {
-        super(sessionService, debug);
-
+    public TokenOwnerAuthzModule(String tokenId, SSOTokenManager ssoTokenManager,
+                                 String... allowedActions) {
         Reject.ifNull(allowedActions);
         Reject.ifTrue(StringUtils.isEmpty(tokenId));
 
@@ -84,6 +84,31 @@ public class TokenOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @Override
+    public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context context, CreateRequest createRequest) {
+        return new ForbiddenException().asPromise();
+    }
+
+    @Override
+    public Promise<AuthorizationResult, ResourceException> authorizeRead(Context context, ReadRequest readRequest) {
+        return new ForbiddenException().asPromise();
+    }
+
+    @Override
+    public Promise<AuthorizationResult, ResourceException> authorizeUpdate(Context context, UpdateRequest updateRequest) {
+        return new ForbiddenException().asPromise();
+    }
+
+    @Override
+    public Promise<AuthorizationResult, ResourceException> authorizeDelete(Context context, DeleteRequest deleteRequest) {
+        return new ForbiddenException().asPromise();
+    }
+
+    @Override
+    public Promise<AuthorizationResult, ResourceException> authorizePatch(Context context, PatchRequest patchRequest) {
+        return new ForbiddenException().asPromise();
     }
 
     @Override
@@ -99,7 +124,12 @@ public class TokenOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
             return new ForbiddenException().asPromise();
         }
 
-        return super.authorizeAction(context, request);
+        return new ForbiddenException().asPromise();
+    }
+
+    @Override
+    public Promise<AuthorizationResult, ResourceException> authorizeQuery(Context context, QueryRequest queryRequest) {
+        return null;
     }
 
     private boolean isTokenOwner(Context context, ActionRequest request)
@@ -123,5 +153,16 @@ public class TokenOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
         }
 
         return false;
+    }
+
+    private String getUserId(Context context) throws ResourceException {
+        SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
+
+        try {
+            SSOToken token = tokenContext.getCallerSSOToken();
+            return token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
+        } catch (SSOException e) {
+            throw new ForbiddenException(e.getMessage(), e);
+        }
     }
 }

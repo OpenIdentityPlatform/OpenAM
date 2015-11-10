@@ -110,8 +110,6 @@ import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPollerPool;
-import org.forgerock.openam.session.SessionPropertyList;
-import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.session.SessionURL;
 import org.forgerock.openam.session.blacklist.BloomFilterSessionBlacklist;
@@ -227,7 +225,6 @@ public class CoreGuiceModule extends AbstractModule {
         /**
          * Session related dependencies.
          */
-        bind(SessionPropertyList.class).to(SessionPropertyWhitelist.class);
         bind(SessionOperationStrategy.class).to(ServerSessionOperationStrategy.class);
         // TODO: Investigate whether or not this lazy-loading "Config<SessionService>" wrapper is still needed
         bind(new TypeLiteral<Config<SessionService>>() {

@@ -486,6 +486,48 @@
                             <Value>MODIFY</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <SubConfiguration name="SessionPropertiesGetProperty" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/sessions/getProperty</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SessionPropertiesGetPropertyNames" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/sessions/getPropertyNames</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SessionPropertiesDeleteProperty" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/sessions/deleteProperty</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SessionPropertiesSetProperty" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/sessions/setProperty</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                 </SubConfiguration>
 
 
@@ -568,6 +610,7 @@
                             <Value>ConditionTypesResourceRead</Value>
                             <Value>DecisionCombinersResourceRead</Value>
                             <Value>SubjectAttributesResourceRead</Value>
+                            <Value>SessionPropertiesResourceModify</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="defaultSubjectInLegacyMode" />
@@ -662,6 +705,15 @@
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
                             <Value>SubjectAttributesResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SessionPropertyModifyAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>SessionPropertiesGetProperty</Value>
+                            <Value>SessionPropertiesGetPropertyNames</Value>
+                            <Value>SessionPropertiesDeleteProperty</Value>
+                            <Value>SessionPropertiesSetProperty</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>

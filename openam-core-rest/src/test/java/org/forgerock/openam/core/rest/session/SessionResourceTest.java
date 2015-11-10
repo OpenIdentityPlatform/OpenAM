@@ -16,32 +16,33 @@
 
 package org.forgerock.openam.core.rest.session;
 
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.*;
 import static org.forgerock.openam.core.rest.session.SessionResource.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.mock;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anySetOf;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.forgerock.json.JsonValue.*;
-import static org.mockito.BDDMockito.anySetOf;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.forgerock.json.JsonValue;
@@ -58,7 +59,7 @@ import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.session.SessionPropertyList;
+import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
@@ -68,11 +69,13 @@ import org.testng.annotations.Test;
 
 public class SessionResourceTest {
 
+    final SSOToken ssoToken = mock(SSOToken.class);
+    final SSOTokenContext mockContext = mock(SSOTokenContext.class);
+
     private SessionResource sessionResource;
-    private SessionQueryManager sessionQueryManager;
     private SSOTokenManager ssoTokenManager;
     private AuthUtilsWrapper authUtilsWrapper;
-    private SessionPropertyList propertyWhitelist;
+    private SessionPropertyWhitelist propertyWhitelist;
     private RealmContext realmContext;
 
     private AMIdentity amIdentity;
@@ -81,20 +84,19 @@ public class SessionResourceTest {
     private String urlResponse;
     private String cookieResponse;
 
-    private Set<String> whitelist;
-
     @BeforeMethod
-    public void setUp() throws IdRepoException {
-        sessionQueryManager = mock(SessionQueryManager.class);
+    public void setUp() throws IdRepoException, SSOException {
+        SessionQueryManager sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
-        propertyWhitelist = mock(SessionPropertyList.class);
+        propertyWhitelist = mock(SessionPropertyWhitelist.class);
         headerResponse = null;
         urlResponse = null;
         cookieResponse = null;
-        realmContext = mock(RealmContext.class);
 
-        given(realmContext.getResolvedRealm()).willReturn("/");
+        given(mockContext.getCallerSSOToken()).willReturn(ssoToken);
+
+        realmContext = new RealmContext(mockContext);
 
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
@@ -129,7 +131,7 @@ public class SessionResourceTest {
     }
 
     private void configureWhitelist() {
-        whitelist = new HashSet<>();
+        Set<String> whitelist = new HashSet<>();
         whitelist.add("one");
         whitelist.add("two");
         whitelist.add("three");
@@ -488,17 +490,17 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldFailToGetNonWhitelistedProperty() throws SSOException {
+    public void shouldFailToGetNonWhitelistedProperty() throws SSOException, DelegationException {
         //given
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
-        final SSOToken ssoToken = mock(SSOToken.class);
         final JsonValue content = json(object(field("properties", array("invalid"))));
 
         given(request.getContent()).willReturn(content);
         given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(request.getAction()).willReturn(GET_PROPERTY_ACTION_ID);
+        given(propertyWhitelist.userHasReadAdminPrivs(eq(ssoToken), any(String.class))).willReturn(false);
 
         //when
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
@@ -508,7 +510,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldGetWhitelistedProperty() throws SSOException {
+    public void shouldGetWhitelistedProperty() throws SSOException, DelegationException {
         //given
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
@@ -531,7 +533,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldSetWhitelistedProperty() throws SSOException {
+    public void shouldSetWhitelistedProperty() throws SSOException, DelegationException {
         //given
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
@@ -554,7 +556,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldFailToSetNonWhitelistedProperty() throws SSOException {
+    public void shouldFailToSetNonWhitelistedProperty() throws SSOException, DelegationException {
         //given
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
@@ -576,7 +578,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldFailToSetInvalidRequest() throws SSOException {
+    public void shouldFailToSetInvalidRequest() throws SSOException, DelegationException {
         //given
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
@@ -598,12 +600,11 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldDeleteWhitelistedProperty() throws SSOException, ExecutionException, InterruptedException {
+    public void shouldDeleteWhitelistedProperty() throws SSOException, ExecutionException, InterruptedException, DelegationException {
 
         //given
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
-        final SSOToken ssoToken = mock(SSOToken.class);
         final JsonValue content = json(object(field("properties", array("one"))));
 
         given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
@@ -621,15 +622,12 @@ public class SessionResourceTest {
         assertTrue(promise.get().getJsonContent().get("success").asBoolean().equals(true));
     }
 
-
     @Test
-    public void shouldFailToDeleteNonWhitelistedProperty() throws SSOException {
+    public void shouldFailToDeleteNonWhitelistedProperty() throws SSOException, DelegationException {
 
         //given
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
-        final SSOToken ssoToken = mock(SSOToken.class);
-
         final JsonValue content = json(object(field("properties", array("invalid"))));
 
         given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
@@ -637,6 +635,8 @@ public class SessionResourceTest {
         given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(content);
         given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(false);
+        given(mockContext.getCallerSSOToken()).willReturn(ssoToken);
+        given(propertyWhitelist.userHasReadAdminPrivs(eq(ssoToken), any(String.class))).willReturn(false);
 
         //when
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
@@ -646,7 +646,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldFailToDeleteInvalidRequest() throws SSOException {
+    public void shouldFailToDeleteInvalidRequest() throws SSOException, DelegationException {
 
         //given
         final String resourceId = "SSO_TOKEN_ID";

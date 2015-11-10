@@ -16,19 +16,18 @@
 
 package org.forgerock.openam.core.rest.session;
 
-import static org.mockito.BDDMockito.given;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.*;
 
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
-import org.forgerock.services.context.RootContext;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.services.context.Context;
-import org.forgerock.openam.utils.Config;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -39,11 +38,7 @@ public class SessionResourceAuthzModuleTest {
 
     @BeforeTest
     public void beforeTest() {
-        @SuppressWarnings("unchecked")
-        Config<SessionService> mockConfig = mock(Config.class);
-        SessionService mockService = mock(SessionService.class);
-        given(mockConfig.get()).willReturn(mockService);
-        testModule = new SessionResourceAuthzModule(mockConfig, mock(Debug.class), null);
+        testModule = new SessionResourceAuthzModule(null);
     }
 
     @Test
@@ -76,7 +71,7 @@ public class SessionResourceAuthzModuleTest {
         assertTrue(result.get().isAuthorized());
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void shouldDeferAllOthers() {
         //given
         RootContext rootContext = new RootContext();
@@ -85,10 +80,10 @@ public class SessionResourceAuthzModuleTest {
         given(mockRequest.getAction()).willReturn("something else");
 
         //when
-        testModule.authorizeAction(rootContext, mockRequest);
+        Promise<AuthorizationResult, ResourceException> promise = testModule.authorizeAction(rootContext, mockRequest);
 
         //then
-        // we should catch an IllegalArgumentException as we pass into super.authorizeAction, as we have no SSOTokenContext
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
     }
 
 }
