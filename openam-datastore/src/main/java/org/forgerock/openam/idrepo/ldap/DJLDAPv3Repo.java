@@ -2156,7 +2156,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         //order in the configuration.
         LDAPURL[] servers = ldapServers.toArray(new LDAPURL[ldapServers.size()]);
         Arrays.sort(servers);
-        String psIdKey = Arrays.toString(servers) + psearchBase + pfilter + scope;
+        String psIdKey = Arrays.toString(servers) + psearchBase + pfilter + scope + userSearchAttr;
         return psIdKey;
     }
 

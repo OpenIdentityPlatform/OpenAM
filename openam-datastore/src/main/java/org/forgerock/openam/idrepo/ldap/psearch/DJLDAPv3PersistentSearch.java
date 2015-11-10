@@ -73,6 +73,7 @@ public class DJLDAPv3PersistentSearch {
     private final DN pSearchBaseDN;
     private final Filter pSearchFilter;
     private final SearchScope pSearchScope;
+    private final String usersSearchAttributeName;
     private volatile boolean shutdown = false;
     private volatile Connection conn;
     private FutureResult<Result> futureResult;
@@ -89,8 +90,9 @@ public class DJLDAPv3PersistentSearch {
         pSearchBaseDN = DN.valueOf(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN));
         pSearchFilter = LDAPUtils.parseFilter(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_FILTER),
                 Filter.objectClassPresent());
-        pSearchScope = LDAPUtils.getSearchScope(
-                CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_SCOPE), SearchScope.WHOLE_SUBTREE);
+        pSearchScope = LDAPUtils.getSearchScope(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_SCOPE),
+                SearchScope.WHOLE_SUBTREE);
+        usersSearchAttributeName = CollectionHelper.getMapAttr(configMap, LDAP_USER_SEARCH_ATTR);
         this.factory = factory;
     }
 
@@ -193,14 +195,15 @@ public class DJLDAPv3PersistentSearch {
                 return;
             }
             case STANDARD: {
-                control = PersistentSearchRequestControl.newControl(true, true, true,
-                        EnumSet.allOf(PersistentSearchChangeType.class));
-                attrs = new String[]{DN_ATTR};
+                control = PersistentSearchRequestControl
+                        .newControl(true, true, true, EnumSet.allOf(PersistentSearchChangeType.class));
+                attrs = new String[] { DN_ATTR, usersSearchAttributeName };
             }
             break;
             case AD: {
                 control = GenericControl.newControl(AD_NOTIFICATION_OID, true);
-                attrs = new String[]{DN_ATTR, AD_IS_DELETED_ATTR, AD_WHEN_CHANGED_ATTR, AD_WHEN_CREATED_ATTR};
+                attrs = new String[] { DN_ATTR, AD_IS_DELETED_ATTR, AD_WHEN_CHANGED_ATTR, AD_WHEN_CREATED_ATTR,
+                        usersSearchAttributeName };
             }
         }
         SearchRequest searchRequest = Requests.newSearchRequest(pSearchBaseDN, pSearchScope, pSearchFilter, attrs);
@@ -339,6 +342,10 @@ public class DJLDAPv3PersistentSearch {
 
                     for (IdType idType : listenerEntry.getValue()) {
                         listener.objectChanged(dn, idType, type, listener.getConfigMap());
+                        if (idType.equals(IdType.USER)) {
+                            listener.objectChanged(entry.parseAttribute(usersSearchAttributeName).asString(), idType,
+                                    type, listener.getConfigMap());
+                        }
                     }
                 }
             }
