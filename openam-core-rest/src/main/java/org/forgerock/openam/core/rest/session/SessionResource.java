@@ -98,8 +98,12 @@ public class SessionResource implements CollectionResourceProvider {
     public static final String VALIDATE_ACTION_ID = "validate";
     public static final String IS_ACTIVE_ACTION_ID = "isActive";
 
+    /**
+     * @deprecated use getTimeLeft instead.
+     */
     @Deprecated
-    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime"; //time remaining - deprecated
+    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime"; //time remaining
+
     public static final String GET_TIME_LEFT_ACTION_ID = "getTimeLeft"; //time remaining
     public static final String GET_IDLE_ACTION_ID = "getIdle"; //current idle time
     public static final String GET_MAX_IDLE_ACTION_ID = "getMaxIdle"; //max idle time

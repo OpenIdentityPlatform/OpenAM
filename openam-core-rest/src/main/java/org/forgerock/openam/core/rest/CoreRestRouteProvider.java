@@ -110,7 +110,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .authenticateWith(ssoToken().exceptActions("validate"))
                 .auditAs(SESSION)
                 .authorizeWith(SessionResourceAuthzModule.class)
-                .forVersion(1, 1)
+                .forVersion(1, 2)
                 .toCollection(SessionResource.class);
 
         rootRouter.route("tokens")
