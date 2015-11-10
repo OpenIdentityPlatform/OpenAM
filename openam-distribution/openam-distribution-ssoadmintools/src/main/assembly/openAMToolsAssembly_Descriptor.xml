@@ -92,6 +92,7 @@
                 <include>org.codehaus.groovy:groovy-jsr223:jar</include>
                 <include>org.forgerock.opendj:opendj-ldap-sdk</include>
                 <include>org.forgerock.commons:i18n-core</include>
+                <include>org.forgerock.commons:forgerock-audit-core</include>
                 <include>org.glassfish.grizzly:grizzly-framework</include>
             </includes>
         </dependencySet>
