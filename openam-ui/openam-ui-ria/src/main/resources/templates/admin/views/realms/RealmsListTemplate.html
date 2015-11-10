@@ -52,9 +52,9 @@
                             </div>
                             <div class="card-footer">
                                 {{#if active}}
-                                    <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.activated"}}</span>
+                                    <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.active"}}</span>
                                 {{else}}
-                                    <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.deactivated"}}</span>
+                                    <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.inactive"}}</span>
                                 {{/if}}
                             </div>
                         </a>
@@ -83,9 +83,9 @@
                                 <td class="wordwrap"><a href="{{routeTo 'realmDefault' path}}">{{name}}</a></td>
                                 <td class="wordwrap">
                                     {{#if active}}
-                                        <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.activated"}}</span>
+                                        <span class="text-success"><i class="fa fa-check-circle"></i> {{t "common.form.active"}}</span>
                                     {{else}}
-                                        <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.deactivated"}}</span>
+                                        <span class="text-warning"><i class="fa fa-ban"></i> {{t "common.form.inactive"}}</span>
                                     {{/if}}
                                 </td>
                                 <td class="wordwrap">{{path}}</td>
