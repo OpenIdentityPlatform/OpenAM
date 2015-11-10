@@ -70,6 +70,7 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
@@ -385,6 +386,10 @@ public class IdServicesImpl implements IdServices {
            OrganizationConfigManager orgMgr = new OrganizationConfigManager(
                    token, orgName);
 
+           if (!attrMap.containsKey(IdConstants.ORGANIZATION_STATUS_ATTR)) {
+               Map<String, Set<String>> newAttrMap = new HashMap<>(attrMap);
+               newAttrMap.put(IdConstants.ORGANIZATION_STATUS_ATTR, CollectionUtils.asSet("Active"));
+           }
            Map serviceAttrsMap = new HashMap();
            serviceAttrsMap.put(IdConstants.REPO_SERVICE, attrMap);
 
