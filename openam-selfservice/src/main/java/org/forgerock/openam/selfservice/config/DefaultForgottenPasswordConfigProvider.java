@@ -67,6 +67,7 @@ public final class DefaultForgottenPasswordConfigProvider
         stages.add(new UserQueryConfig()
                 .setValidQueryFields(new HashSet<>(Arrays.asList("uid", "mail", "sn", "givenName")))
                 .setIdentityIdField("/uid/0")
+                .setIdentityUsernameField("/username")
                 .setIdentityEmailField("/mail/0")
                 .setIdentityServiceUrl("/users"));
 
