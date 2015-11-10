@@ -64,11 +64,6 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                     action: function (dialog) {
                         self.performDeleteRealm(realm.path).always(function () {
                             dialog.close();
-                        }).fail(function (response) {
-                            Messages.addMessage({
-                                type: Messages.TYPE_DANGER,
-                                response: response
-                            });
                         });
                     }
                 }];
@@ -85,11 +80,6 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                         SMSGlobalDelegate.realms.update(realm).always(function () {
                             self.render();
                             dialog.close();
-                        }).fail(function (response) {
-                            Messages.addMessage({
-                                type: Messages.TYPE_DANGER,
-                                response: response
-                            });
                         });
                     }
                 });
@@ -183,11 +173,6 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                         callback();
                     }
                 });
-            }, function (response) {
-                Messages.addMessage({
-                    type: Messages.TYPE_DANGER,
-                    response: response
-                });
             });
         },
         toggleRealmActive: function (event) {
@@ -198,11 +183,6 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             realm.active = !realm.active;
             SMSGlobalDelegate.realms.update(realm).always(function () {
                 self.render();
-            }).fail(function (response) {
-                Messages.addMessage({
-                    type: Messages.TYPE_DANGER,
-                    response: response
-                });
             });
         }
     });
