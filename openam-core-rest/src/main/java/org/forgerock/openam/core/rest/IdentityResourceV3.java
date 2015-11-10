@@ -107,11 +107,11 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
      *         set of acceptable patchable attributes
      */
     public IdentityResourceV3(String objectType, MailServerLoader mailServerLoader,
-                              IdentityServicesImpl identityServices,
-                              CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-                              BaseURLProviderFactory baseURLProviderFactory, Set<String> patchableAttributes) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            BaseURLProviderFactory baseURLProviderFactory, Set<String> patchableAttributes,
+            Set<UiRolePredicate> uiRolePredicates) {
         this.identityResourceV2 = new IdentityResourceV2(objectType, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory);
+                restSecurityProvider, baseURLProviderFactory, uiRolePredicates);
         this.objectType = objectType;
         this.identityServices = identityServices;
         this.patchableAttributes = patchableAttributes;

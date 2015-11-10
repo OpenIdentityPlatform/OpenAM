@@ -32,6 +32,7 @@ import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -43,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -57,6 +59,7 @@ import com.sun.identity.idsvcs.NeedMoreCredentials;
 import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
@@ -65,8 +68,10 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
+import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.selfservice.core.SelfServiceContext;
+import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -98,6 +103,7 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.email.MailServer;
@@ -147,6 +153,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     public static final String OLD_PASSWORD = "olduserpassword";
 
     private final RestSecurityProvider restSecurityProvider;
+    private final Set<UiRolePredicate> uiRolePredicates;
     private final IdentityServicesImpl identityServices;
 
     private final MailServerLoader mailServerLoader;
@@ -157,8 +164,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * Creates a backend
      */
     public IdentityResourceV1(String objectType, MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
-        this(objectType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider);
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            Set<UiRolePredicate> uiRolePredicates) {
+        this(objectType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
+                uiRolePredicates);
     }
 
     /**
@@ -181,7 +190,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     // Constructor used for testing...
     IdentityResourceV1(String objectType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
             MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-            RestSecurityProvider restSecurityProvider) {
+            RestSecurityProvider restSecurityProvider, Set<UiRolePredicate> uiRolePredicates) {
         this.objectType = objectType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
@@ -189,6 +198,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         this.identityServices = identityServices;
         this.coreWrapper = coreWrapper;
         this.restSecurityProvider = restSecurityProvider;
+        this.uiRolePredicates = uiRolePredicates;
     }
 
     /**
@@ -1279,8 +1289,14 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * package private for visibility to IdentityResourceV2.
      */
     JsonValue addRoleInformation(Context context, String resourceId, JsonValue value) {
-        if (isAdmin(context) && authenticatedUserMatchesUserProfile(context, resourceId)) {
-            value.put("roles", array("ui-admin"));
+        if (authenticatedUserMatchesUserProfile(context, resourceId)) {
+            Set<String> roles = Sets.newHashSet();
+            for (UiRolePredicate predicate : uiRolePredicates) {
+                if (predicate.apply(context)) {
+                    roles.add(predicate.getRole());
+                }
+            }
+            value.put("roles", roles);
         }
         return value;
     }

@@ -72,6 +72,15 @@ public class RealmContext extends AbstractContext {
     }
 
     /**
+     * Determines if the resolved realm is the top level realm.
+     *
+     * @return True if the resolved realm is the top level realm, false otherwise.
+     */
+    public boolean isRootRealm() {
+        return getResolvedRealm().equals(ROOT_REALM);
+    }
+
+    /**
      * Adds a mapping from the DNS to the resolved DNS realm alias.
      *
      * @param dnsAlias The DNS.

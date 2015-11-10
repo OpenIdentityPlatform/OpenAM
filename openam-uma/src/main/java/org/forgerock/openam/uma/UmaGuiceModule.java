@@ -46,6 +46,7 @@ import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
+import org.forgerock.openam.core.rest.UiRolePredicate;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.entitlement.rest.PolicyResource;
@@ -95,6 +96,9 @@ public class UmaGuiceModule extends AbstractModule {
 
         Multibinder.newSetBinder(binder(), SMSAuditFilter.class)
                 .addBinding().to(UmaAuditFilter.class);
+
+        Multibinder.newSetBinder(binder(), UiRolePredicate.class)
+                .addBinding().to(UmaUserUiRolePredicate.class);
     }
 
     @Provides

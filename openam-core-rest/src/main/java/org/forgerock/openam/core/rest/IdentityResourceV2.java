@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -66,6 +67,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -164,8 +166,10 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * Creates a backend
      */
     public IdentityResourceV2(String userType, MailServerLoader mailServerLoader, IdentityServicesImpl identityServices,
-            CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
-        this(userType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider, baseURLProviderFactory);
+            CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
+        this(userType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
+                baseURLProviderFactory, uiRolePredicates);
     }
 
     /**
@@ -188,14 +192,15 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     // Constructor used for testing...
     IdentityResourceV2(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
             MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-            RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+            RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory,
+            Set<UiRolePredicate> uiRolePredicates) {
         this.objectType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
         this.restSecurityProvider = restSecurityProvider;
         this.identityResourceV1 = new IdentityResourceV1(userType, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
+                restSecurityProvider, uiRolePredicates);
         this.identityServices = identityServices;
         this.baseURLProviderFactory = baseURLProviderFactory;
     }
