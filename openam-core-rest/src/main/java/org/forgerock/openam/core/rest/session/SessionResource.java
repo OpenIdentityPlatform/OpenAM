@@ -97,7 +97,10 @@ public class SessionResource implements CollectionResourceProvider {
     public static final String LOGOUT_ACTION_ID = "logout";
     public static final String VALIDATE_ACTION_ID = "validate";
     public static final String IS_ACTIVE_ACTION_ID = "isActive";
-    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime"; //time remaining
+
+    @Deprecated
+    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime"; //time remaining - deprecated
+    public static final String GET_TIME_LEFT_ACTION_ID = "getTimeLeft"; //time remaining
     public static final String GET_IDLE_ACTION_ID = "getIdle"; //current idle time
     public static final String GET_MAX_IDLE_ACTION_ID = "getMaxIdle"; //max idle time
     public static final String GET_MAX_SESSION_TIME_ID = "getMaxSessionTime"; //max session time
@@ -143,7 +146,8 @@ public class SessionResource implements CollectionResourceProvider {
         actionHandlers.put(GET_IDLE_ACTION_ID, new GetIdleTimeActionHandler());
         actionHandlers.put(GET_MAX_IDLE_ACTION_ID, new GetMaxIdleTimeActionHandler());
         actionHandlers.put(GET_MAX_SESSION_TIME_ID, new GetMaxSessionTimeActionHandler());
-        actionHandlers.put(GET_MAX_TIME_ACTION_ID, new GetMaxTimeActionHandler());
+        actionHandlers.put(GET_MAX_TIME_ACTION_ID, new GetTimeLeftActionHandler());
+        actionHandlers.put(GET_TIME_LEFT_ACTION_ID, new GetTimeLeftActionHandler());
         actionHandlers.put(GET_PROPERTY_ACTION_ID, new GetPropertyActionHandler());
         actionHandlers.put(SET_PROPERTY_ACTION_ID, new SetPropertyActionHandler());
         actionHandlers.put(DELETE_PROPERTY_ACTION_ID, new DeletePropertyActionHandler());
@@ -697,7 +701,7 @@ public class SessionResource implements CollectionResourceProvider {
     /**
      * Handler for 'getMaxTime' action - from CREST 12.0.0 onwards this means 'get remaining session time'.
      */
-    private class GetMaxTimeActionHandler implements ActionHandler {
+    private class GetTimeLeftActionHandler implements ActionHandler {
 
         private static final String MAX_TIME = "maxtime";
 
