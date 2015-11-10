@@ -39,22 +39,8 @@ goto WHILE
 :WEND
 
 set CLASSPATH="@CONFIG_DIR@"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/classes"
-set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${forgerock.util.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/opendj-server-${opendj.server.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/mail-${mail.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/servlet-api-${servlet-api.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/webservices-api-${webservices-api.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/webservices-rt-${webservices-rt.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/json-${json.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/xalan-${xalan.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/xercesImpl-${xercesj.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/xml-apis-${xercesj.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/xmlsec-${santuario.xmlsec.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-core-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-shared-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-rest-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;${windows.setup.classpath}"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/resources"
 
 "\@JAVA_HOME@/bin/java.exe" -Xms64m -Xmx256m -classpath %CLASSPATH% -D"bootstrap.dir=@CONFIG_DIR@" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+"  -D"am.version.current=com.iplanet.am.version" -D"am.version.expected=@AM_VERSION@" -D"amconfig=AMConfig" -D"max_conn_pool=10" -D"min_conn_pool=1" -D"s1is.java.util.logging.config.class=com.sun.identity.log.s1is.LogConfigReader" -D"com.iplanet.services.configpath=@CONFIG_DIR@" -D"com.sun.identity.configFilePath=@CONFIG_DIR@" -D"com.iplanet.coreservices.configpath=@CONFIG_DIR@"  -D"LOG_COMPATMODE=Off" -D"com.iplanet.am.logstatus=INACTIVE" -D"com.iplanet.am.serverMode=false" com.sun.identity.log.cli.ISArchiveVerify %PARAMS%
 endlocal
