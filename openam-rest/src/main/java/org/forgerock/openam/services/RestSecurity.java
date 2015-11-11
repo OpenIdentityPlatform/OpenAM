@@ -52,6 +52,7 @@ public class RestSecurity {
     private final static String FORGOT_PASSWORD_CONFIRMATION_URL = "forgerockRESTSecurityForgotPassConfirmationUrl";
     private final static String PROTECTED_USER_ATTRIBUTES = "forgerockRESTSecurityProtectedUserAttributes";
     private final static String SUCCESSFUL_USER_REGISTRATION_DESTINATION = "forgerockRESTSecuritySuccessfulUserRegistrationDestination";
+    private final static String SELF_REG_VALID_ATTRIBUTES = "forgerockRESTSecuritySelfRegistrationValidUserAttributes";
 
     private final static String SERVICE_NAME = "RestSecurity";
     private final static String SERVICE_VERSION = "1.0";
@@ -118,11 +119,13 @@ public class RestSecurity {
         final Set<String> protectedUserAttributes;
         final String successfulUserRegistrationDestination;
         final Boolean twoFactorAuthEnabled;
+        final Set<String> selfRegistrationValidAttributes;
 
         private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl,
                 Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, Boolean selfRegistration,
                 Boolean forgotPassword, Set<String> protectedUserAttributes,
-                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled) {
+                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled,
+                Set<String> selfRegistrationValidAttributes) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
             this.selfRegistrationConfirmationUrl = selfRegistrationConfirmationUrl;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
@@ -132,6 +135,7 @@ public class RestSecurity {
             this.protectedUserAttributes = protectedUserAttributes;
             this.successfulUserRegistrationDestination = successfulUserRegistrationDestination;
             this.twoFactorAuthEnabled = twoFactorAuthEnabled;
+            this.selfRegistrationValidAttributes = selfRegistrationValidAttributes;
         }
     }
 
@@ -147,6 +151,7 @@ public class RestSecurity {
             Set<String> protectedUserAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
             String successfulUserRegistrationDestination = ServiceConfigUtils.getStringAttribute(serviceConfig, SUCCESSFUL_USER_REGISTRATION_DESTINATION);
             Boolean twoFactorAuthEnabled = ServiceConfigUtils.getBooleanAttribute(serviceConfig, TWO_FACTOR_AUTH_ENABLED);
+            Set<String> selfRegistrationValidAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, SELF_REG_VALID_ATTRIBUTES);
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
                     selfRegistrationConfirmationUrl,
@@ -156,7 +161,8 @@ public class RestSecurity {
                     forgotPassword,
                     protectedUserAttributes,
                     successfulUserRegistrationDestination,
-                    twoFactorAuthEnabled);
+                    twoFactorAuthEnabled,
+                    selfRegistrationValidAttributes);
 
             setProviderConfig(newRestSecuritySettings);
             if (debug.messageEnabled()) {
@@ -265,5 +271,15 @@ public class RestSecurity {
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }
+    }
+
+    /**
+     * Retrieve the set of attribute names which are valid for self registration (i.e. user creation).
+     *
+     * @return Set of strings representing valid attributes when creating the user - anything not in this list will be
+     * removed when the user is created.
+     */
+    public Set<String> getSelfRegistrationValidUserAttributes() {
+        return restSecurityConfiguration.selfRegistrationValidAttributes;
     }
 }

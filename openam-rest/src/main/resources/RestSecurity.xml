@@ -333,6 +333,23 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="forgerockRESTSecuritySelfRegistrationValidUserAttributes"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="selfRegistrationValidAttributes"
+                                 i18nKey="a500">
+                    <DefaultValues>
+                        <Value>mail</Value>
+                        <Value>inetUserStatus</Value>
+                        <Value>sn</Value>
+                        <Value>username</Value>
+                        <Value>userPassword</Value>
+                        <Value>kbaInfo</Value>
+                        <Value>kbaInformation</Value>
+                        <Value>givenName</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
             </Organization>
         </Schema>
     </Service>

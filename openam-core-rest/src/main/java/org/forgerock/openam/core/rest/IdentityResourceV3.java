@@ -28,6 +28,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -52,9 +53,11 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.selfservice.core.SelfServiceContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
@@ -63,6 +66,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +85,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
     private final String objectType;
     private final IdentityServicesImpl identityServices;
     private final IdentityResourceV2 identityResourceV2;
+    private final RestSecurityProvider restSecurityProvider;
 
     private static Debug logger = Debug.getInstance("frRest");
 
@@ -106,6 +111,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                 restSecurityProvider, baseURLProviderFactory);
         this.objectType = objectType;
         this.identityServices = identityServices;
+        this.restSecurityProvider = restSecurityProvider;
     }
 
     /**
@@ -133,6 +139,11 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(final Context context,
             final CreateRequest request) {
+
+        if (isSelfService(context)) {
+            return createInstanceViaSelfService(context, request);
+        }
+
         return identityResourceV2.createInstance(context, request);
     }
 
@@ -392,5 +403,49 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
      */
     private IdentityServicesImpl getIdentityServices() {
         return identityServices;
+    }
+
+    private boolean isSelfService(Context context) {
+        return context.asContext(SelfServiceContext.class) != null;
+    }
+
+    /**
+     * When an instance of a user is created via self service, we impose additional rules for security purposes.
+     * Namely, we strictly apply a whitelist of valid attribute names to ensure a hacker can't manipulate the incoming
+     * JSON and pretend to be a manager, demigod or other individual.
+     *
+     * @param context The context
+     * @param request The request
+     * @return A {@code Promise} containing the result of the operation.
+     */
+    private Promise<ResourceResponse, ResourceException> createInstanceViaSelfService(final Context context,
+                                                                                      final CreateRequest request) {
+
+        if (!objectType.equals(IdentityRestUtils.USER_TYPE)) {
+            return new BadRequestException("Cannot create object type " + objectType + " via self service").asPromise();
+        }
+
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        final String realm = realmContext.getResolvedRealm();
+        RestSecurity restSecurity = restSecurityProvider.get(realm);
+
+        Set<String> validUserAttributes = restSecurity.getSelfRegistrationValidUserAttributes();
+        final JsonValue jsonValue = request.getContent();
+
+        if (validUserAttributes == null || validUserAttributes.isEmpty()) {
+            return new BadRequestException("Could not determine whitelist of valid attributes for self service user creation").asPromise();
+        }
+
+        IdentityDetails identityDetails = identityResourceV2.jsonValueToIdentityDetails(jsonValue, realm);
+        Attribute[] attributes = identityDetails.getAttributes();
+        for (Attribute attribute : attributes) {
+            if (!validUserAttributes.contains(attribute.getName())) {
+                return new BadRequestException("User attribute "
+                                + attribute.getName()
+                                + " is not valid for self service creation").asPromise();
+            }
+        }
+
+        return identityResourceV2.createInstance(context, request);
     }
 }

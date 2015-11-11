@@ -1258,12 +1258,13 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     }
 
     /**
-     * Returns an IdentityDetails from a JsonValue
+     * Returns an IdentityDetails from a JsonValue.  Package private - may be invoked by IdentityResourceV3, for
+     * instance.
      *
      * @param jVal The JsonValue Object to be converted
      * @return The IdentityDetails object
      */
-    private IdentityDetails jsonValueToIdentityDetails(final JsonValue jVal, final String realm) {
+     IdentityDetails jsonValueToIdentityDetails(final JsonValue jVal, final String realm) {
 
         IdentityDetails identity = new IdentityDetails();
         Map<String, Set<String>> identityAttrList = new HashMap<>();
