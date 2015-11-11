@@ -18,7 +18,7 @@ package org.forgerock.openam.session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.delegation.DelegationEvaluatorImpl;
+import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPermissionFactory;
@@ -64,12 +64,19 @@ public class SessionPropertyWhitelist {
     private final Map<String, Set<String>> WHITELIST_REALM_MAP = new ConcurrentHashMap<>();
     private ServiceConfigManager serviceConfigManager;
 
+    private final DelegationEvaluator delegationEvaluator;
+    private final DelegationPermissionFactory delegationPermissionFactory;
+
     /**
      * Constructor (called by Guice), registers a listener for this class against all
      * SessionPropertyWhitelist changes.
      */
     @Inject
-    public SessionPropertyWhitelist() {
+    public SessionPropertyWhitelist(DelegationEvaluator delegationEvaluator,
+                                    DelegationPermissionFactory delegationPermissionFactory) {
+        this.delegationEvaluator = delegationEvaluator;
+        this.delegationPermissionFactory = delegationPermissionFactory;
+
         try {
             serviceConfigManager = new ServiceConfigManager(AccessController
                     .doPrivileged(AdminTokenAction.getInstance()), SERVICE_NAME, SERVICE_VERSION);
@@ -118,10 +125,10 @@ public class SessionPropertyWhitelist {
     public boolean userHasReadAdminPrivs(SSOToken token, String realm)
             throws DelegationException, SSOException {
 
-        DelegationPermission dp = new DelegationPermissionFactory()
+        DelegationPermission dp = delegationPermissionFactory
                 .newInstance(realm, "rest", "1.0", "sessions", "getProperty", Collections.singleton("READ"),
                         Collections.<String, String>emptyMap());
-        return new DelegationEvaluatorImpl().isAllowed(token, dp, Collections.<String, Set<String>>emptyMap());
+        return delegationEvaluator.isAllowed(token, dp, Collections.<String, Set<String>>emptyMap());
     }
 
     /**

@@ -877,8 +877,10 @@ public class SessionResource implements CollectionResourceProvider {
 
                 }
 
-            } catch (SSOException | DelegationException e) {
+            } catch (SSOException e) {
                 LOGGER.message("Unable to read session property due to unreadable SSOToken", e);
+            } catch (DelegationException e) {
+                LOGGER.message("Unable to read session property due to delegation match internal error", e);
             }
 
             return newResultPromise(newActionResponse(result));
@@ -916,8 +918,10 @@ public class SessionResource implements CollectionResourceProvider {
                             caller.getPrincipal(), target.getPrincipal(), entrySet.toString());
                     return new ForbiddenException().asPromise();
                 }
-            } catch (SSOException | DelegationException e) {
+            } catch (SSOException e) {
                 LOGGER.message("Unable to set session property due to unreadable SSOToken", e);
+            } catch (DelegationException e) {
+                LOGGER.message("Unable to read session property due to delegation match internal error", e);
             }
 
             return newResultPromise(newActionResponse(json(object(field(KEYWORD_SUCCESS, true)))));
@@ -958,8 +962,10 @@ public class SessionResource implements CollectionResourceProvider {
                     return new ForbiddenException().asPromise();
                 }
 
-            } catch (SSOException | DelegationException e) {
+            } catch (SSOException e) {
                 LOGGER.message("Unable to delete session property due to unreadable SSOToken", e);
+            } catch (DelegationException e) {
+                LOGGER.message("Unable to read session property due to delegation match internal error", e);
             }
 
             return newResultPromise(newActionResponse(json(object(field(KEYWORD_SUCCESS, true)))));

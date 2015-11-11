@@ -199,6 +199,7 @@ public class DelegationEvaluatorImpl implements DelegationEvaluator {
     @Override
     public boolean isAllowed(SSOToken token, DelegationPermission permission,
             Map envParameters) throws SSOException, DelegationException {
+        
         boolean result = false;
         
         if ((permission != null) && (token != null)) {

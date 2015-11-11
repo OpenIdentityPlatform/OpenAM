@@ -15,7 +15,7 @@
 */
 package org.forgerock.openam.core.rest.session;
 
-import java.util.Arrays;
+import com.sun.identity.shared.debug.Debug;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
@@ -34,25 +34,26 @@ import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 
 /**
- * This module does not fail on the first failure it encounters. Rather it attempts
- * each of the modules contained within in in turn, if all of them return false it
- * will return false. The order of inserted authz modules is significant as the
- * first module to return success will end the execution chain.
+ * This module takes a collection of authz modules and runs them, returning the first
+ * success and ignoring all failures. Once all authz modules have been run - if they
+ * all failed - a failure is returned.
  */
-public class AggregateAuthzModule implements CrestAuthorizationModule {
+public final class AnyOfAuthzModule implements CrestAuthorizationModule {
 
     final List<CrestAuthorizationModule> filters;
+
+    private static final Debug debug = Debug.getInstance("frRest");
 
     /**
      * Generate a new AggregateAuthzModule with the list of filters supplied.
      *
      * @param filters Filters appropriate to this aggregate module.
      */
-    public AggregateAuthzModule(CrestAuthorizationModule... filters) {
+    public AnyOfAuthzModule(List<CrestAuthorizationModule> filters) {
         Reject.ifNull(filters);
-        Reject.ifTrue(filters.length == 0);
+        Reject.ifTrue(filters.size() == 0);
 
-        this.filters = Arrays.asList(filters);
+        this.filters = filters;
     }
 
     @Override
@@ -72,7 +73,11 @@ public class AggregateAuthzModule implements CrestAuthorizationModule {
                 if (response.get().isAuthorized()) {
                     return response;
                 }
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException e) {
+                debug.warning("Execution exception thrown retrieving response from module", e);
+                return new ForbiddenException().asPromise();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return new ForbiddenException().asPromise();
             }
         }
@@ -91,7 +96,11 @@ public class AggregateAuthzModule implements CrestAuthorizationModule {
                 if (response.get().isAuthorized()) {
                     return response;
                 }
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException e) {
+                debug.warning("Execution exception thrown retrieving response from module", e);
+                return new ForbiddenException().asPromise();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return new ForbiddenException().asPromise();
             }
         }
@@ -111,7 +120,11 @@ public class AggregateAuthzModule implements CrestAuthorizationModule {
                 if (response.get().isAuthorized()) {
                     return response;
                 }
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException e) {
+                debug.warning("Execution exception thrown retrieving response from module", e);
+                return new ForbiddenException().asPromise();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return new ForbiddenException().asPromise();
             }
         }
@@ -131,7 +144,11 @@ public class AggregateAuthzModule implements CrestAuthorizationModule {
                 if (response.get().isAuthorized()) {
                     return response;
                 }
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException e) {
+                debug.warning("Execution exception thrown retrieving response from module", e);
+                return new ForbiddenException().asPromise();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return new ForbiddenException().asPromise();
             }
         }
@@ -151,7 +168,11 @@ public class AggregateAuthzModule implements CrestAuthorizationModule {
                 if (response.get().isAuthorized()) {
                     return response;
                 }
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException e) {
+                debug.warning("Execution exception thrown retrieving response from module", e);
+                return new ForbiddenException().asPromise();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return new ForbiddenException().asPromise();
             }
         }
@@ -171,7 +192,11 @@ public class AggregateAuthzModule implements CrestAuthorizationModule {
                 if (response.get().isAuthorized()) {
                     return response;
                 }
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException e) {
+                debug.warning("Execution exception thrown retrieving response from module", e);
+                return new ForbiddenException().asPromise();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return new ForbiddenException().asPromise();
             }
         }
@@ -190,7 +215,11 @@ public class AggregateAuthzModule implements CrestAuthorizationModule {
                 if (response.get().isAuthorized()) {
                     return response;
                 }
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException e) {
+                debug.warning("Execution exception thrown retrieving response from module", e);
+                return new ForbiddenException().asPromise();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return new ForbiddenException().asPromise();
             }
         }

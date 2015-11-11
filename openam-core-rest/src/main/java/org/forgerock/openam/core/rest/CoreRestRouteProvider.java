@@ -34,8 +34,8 @@ import org.forgerock.openam.core.rest.record.RecordConstants;
 import org.forgerock.openam.core.rest.record.RecordResource;
 import org.forgerock.openam.core.rest.server.ServerInfoResource;
 import org.forgerock.openam.core.rest.server.ServerVersionResource;
+import org.forgerock.openam.core.rest.session.AnyOfAuthzModule;
 import org.forgerock.openam.core.rest.session.SessionResource;
-import org.forgerock.openam.core.rest.session.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
@@ -109,7 +109,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
         realmRouter.route("sessions")
                 .authenticateWith(ssoToken().exceptActions("validate"))
                 .auditAs(SESSION)
-                .authorizeWith(SessionResourceAuthzModule.class)
+                .authorizeWith(AnyOfAuthzModule.class)
                 .forVersion(1, 2)
                 .toCollection(SessionResource.class);
 

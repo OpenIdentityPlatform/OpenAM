@@ -71,8 +71,7 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
      * @param ssoTokenManager An instance of the SSOTokenManager.
      * @param allowedActions A list of allowed actions. Will be matched ignoring case.
      */
-    public TokenOwnerAuthzModule(String tokenId, SSOTokenManager ssoTokenManager,
-                                 String... allowedActions) {
+    public TokenOwnerAuthzModule(String tokenId, SSOTokenManager ssoTokenManager, String... allowedActions) {
         Reject.ifNull(allowedActions);
         Reject.ifTrue(StringUtils.isEmpty(tokenId));
 

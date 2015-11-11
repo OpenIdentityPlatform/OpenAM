@@ -37,6 +37,8 @@ import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import javax.inject.Inject;
@@ -58,7 +60,7 @@ import org.forgerock.openam.core.rest.cts.CoreTokenResource;
 import org.forgerock.openam.core.rest.cts.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.core.rest.record.DebugRecorder;
 import org.forgerock.openam.core.rest.record.DefaultDebugRecorder;
-import org.forgerock.openam.core.rest.session.AggregateAuthzModule;
+import org.forgerock.openam.core.rest.session.AnyOfAuthzModule;
 import org.forgerock.openam.core.rest.session.SessionResourceAuthzModule;
 import org.forgerock.openam.core.rest.sms.SmsCollectionProvider;
 import org.forgerock.openam.core.rest.sms.SmsCollectionProviderFactory;
@@ -282,15 +284,15 @@ public class CoreRestGuiceModule extends AbstractModule {
 
     @Provides
     @Inject
-    public AggregateAuthzModule getSessionResourceAuthzModule(SSOTokenManager ssoTokenManager,
+    public AnyOfAuthzModule getSessionResourceAuthzModule(SSOTokenManager ssoTokenManager,
                                                               PrivilegeAuthzModule privilegeAuthzModule,
                                                               AdminOnlyAuthzModule adminOnlyAuthzModule) {
         SessionResourceAuthzModule sessionResourceAuthzModule = new SessionResourceAuthzModule(ssoTokenManager);
-        CrestAuthorizationModule[] authzList = new CrestAuthorizationModule[3];
-        authzList[0] = adminOnlyAuthzModule;
-        authzList[1] = privilegeAuthzModule;
-        authzList[2] = sessionResourceAuthzModule;
-        return new AggregateAuthzModule(authzList);
+        List<CrestAuthorizationModule> authzList = new ArrayList<>(3);
+        authzList.add(adminOnlyAuthzModule);
+        authzList.add(privilegeAuthzModule);
+        authzList.add(sessionResourceAuthzModule);
+        return new AnyOfAuthzModule(authzList);
 
     }
 }
