@@ -2467,8 +2467,7 @@ public class LoginState {
                     Set tmpIdentityTypes = new HashSet(identityTypes);
                     if (identityTypes.contains("user")) {
                         tmpIdentityTypes.remove("user");
-                        searchResults = searchIdentity(IdUtils.getType("user"),
-                            userTokenID);
+                        searchResults = searchIdentity(IdUtils.getType("user"), userTokenID, populate);
                         if (searchResults != null) {
                             amIdentitySet = searchResults.getSearchResults();
                         }
@@ -2478,8 +2477,7 @@ public class LoginState {
                          while (identityIterator.hasNext()) {
                              String strIdType = (String) identityIterator.next();
                              // Get identity by searching
-                             searchResults = searchIdentity(
-                                 IdUtils.getType(strIdType),userTokenID);
+                             searchResults = searchIdentity(IdUtils.getType(strIdType), userTokenID, populate);
                              if (searchResults != null) {
                                 amIdentitySet = searchResults.getSearchResults();
                              }
@@ -6323,11 +6321,12 @@ public class LoginState {
      *  Use common method from AuthD for getIdentity
      *  @param idType identity type for user
      *  @param userTokenID user token identifier
+     *  @param populate whether to retrieve all attributes or not
      *  @return IdSearchResults for given the identity type and identity name
      *  @throws IdRepoException if it fails to search user
      *  @throws SSOException if <code>SSOToken</code> is not valid
      */
-    IdSearchResults searchIdentity(IdType idType,String userTokenID)
+    IdSearchResults searchIdentity(IdType idType, String userTokenID, boolean populate)
             throws IdRepoException,SSOException  {
         if (messageEnabled) {
             debug.message("In searchAutehnticatedUser: idType " + idType);
@@ -6345,8 +6344,11 @@ public class LoginState {
         IdSearchControl idsc = new IdSearchControl();
         idsc.setRecursive(isRecursive);
         idsc.setTimeOut(maxTime);
-        idsc.setAllReturnAttributes(true);
-        //idsc.setReturnAttributes(returnSet);
+        if (populate) {
+            idsc.setAllReturnAttributes(true);
+        } else {
+            idsc.setReturnAttributes(returnSet);
+        }
         
         if (messageEnabled) {
             debug.message("alias attr=" + aliasAttrNames +
