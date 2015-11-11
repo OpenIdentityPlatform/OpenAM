@@ -26,13 +26,15 @@
 
 --%>
 <%--
-   Portions Copyrighted 2012-2013 ForgeRock AS
+   Portions Copyrighted 2012-2015 ForgeRock AS.
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 
+<%@page import="com.iplanet.am.util.SystemProperties"%>
 <%@page import="com.iplanet.sso.SSOException"%>
 <%@page import="com.iplanet.sso.SSOToken"%>
 <%@page import="com.iplanet.sso.SSOTokenManager"%>
+<%@page import="com.sun.identity.shared.Constants"%>
 <%@page import="java.io.*" %>
 <%@page import="java.util.*" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
@@ -66,18 +68,17 @@
 
         try {
             boolean limitExceeded = false;
-            StringBuffer buff = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             is = request.getInputStream();
             bos = new BufferedReader(new InputStreamReader(is));
             String line = bos.readLine();
             while (line != null) {
-                buff.append(line).append("\n");
+                sb.append(line).append("\n");
                 line = bos.readLine();
-                if (buff.length() > (1024 * 50)) {
+                if (sb.length() > SystemProperties.getAsInt(Constants.MAX_FILE_UPLOAD_SIZE, 750 * 1024)) {
                     limitExceeded = true;
                     break;
                 }
-
             }
 
             if (limitExceeded) {
@@ -103,7 +104,7 @@
                     }
                 }
 
-                String data = buff.toString();
+                String data = sb.toString();
                 int idx = data.indexOf("filename=\"");
                 idx = data.indexOf("\n\n", idx);
                 data = data.substring(idx + 2);
