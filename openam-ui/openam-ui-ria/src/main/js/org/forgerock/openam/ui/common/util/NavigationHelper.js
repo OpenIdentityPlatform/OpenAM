@@ -17,23 +17,16 @@
 define("org/forgerock/openam/ui/common/util/NavigationHelper", [
     "lodash",
     "jquery",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/components/Navigation",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/commons/ui/common/main/Router"
-], function (_, $, Configuration, Navigation, Constants, UMADelegate, SMSGlobalDelegate, Router) {
-
-    var obj = {},
-
-        populateRealmsDropdown = function () {
-
+], function (_, $, Navigation, SMSGlobalDelegate, Router) {
+    return {
+        populateRealmsDropdown: function () {
             var maxRealms = 4,
                 name;
 
             SMSGlobalDelegate.realms.all().done(function (data) {
-
                 _(data.result).filter("active").sortBy("path").take(maxRealms).forEach(function (realm) {
                     name = realm.name === "/" ? $.t("console.common.topLevelRealm") : realm.name;
                     Navigation.addLink({
@@ -52,26 +45,6 @@ define("org/forgerock/openam/ui/common/util/NavigationHelper", [
 
                 Navigation.reload();
             });
-
-        },
-
-        populateUMA = function () {
-            UMADelegate.getUmaConfig().then(function (umaConfiguration) {
-                if (umaConfiguration.enabled) {
-                    delete Navigation.configuration.links.user.urls.uma.cssClass;
-                    Navigation.reload();
-                }
-            });
-        };
-
-    obj.setAdminNav = function () {
-        populateRealmsDropdown();
-        populateUMA();
+        }
     };
-
-    obj.setUserNav = function () {
-        populateUMA();
-    };
-
-    return obj;
 });

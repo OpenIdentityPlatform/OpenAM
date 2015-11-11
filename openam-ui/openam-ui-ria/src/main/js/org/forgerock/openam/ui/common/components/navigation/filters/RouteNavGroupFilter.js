@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -14,24 +14,19 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/components/Footer", [
-    "underscore",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/components/Footer",
-    "org/forgerock/openam/ui/common/delegates/ServerDelegate"
-], function (_, Configuration, Footer, ServerDelegate) {
-    function isAdmin () {
-        return Configuration.loggedUser && _.contains(Configuration.loggedUser.uiroles, "ui-realm-admin");
-    }
-
-    var Component = Footer.extend({
-        getVersion: function () {
-            return ServerDelegate.version();
-        },
-        showVersion: function () {
-            return isAdmin();
+/**
+ * Filters links on the navigation group of the current route.
+ *
+ * @module org/forgerock/openam/ui/common/components/navigation/filters/RouteNavGroupFilter
+ */
+define("org/forgerock/openam/ui/common/components/navigation/filters/RouteNavGroupFilter", [
+    "org/forgerock/commons/ui/common/main/Router"
+], function (Router) {
+    return {
+        filter: function (links) {
+            if (Router.currentRoute.navGroup) {
+                return links[Router.currentRoute.navGroup];
+            }
         }
-    });
-
-    return new Component();
+    };
 });

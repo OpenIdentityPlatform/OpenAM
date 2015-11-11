@@ -128,10 +128,20 @@ define("config/process/AMConfig", [
         startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,
         description: "",
         dependencies: [
+            "org/forgerock/commons/ui/common/main/Configuration",
             "org/forgerock/commons/ui/common/main/Router"
         ],
-        processDescription: function (event, Router) {
-            Router.routeTo(Router.configuration.routes.profile, { trigger: true });
+        processDescription: function (event, Configuration, Router) {
+            if (!Configuration.loggedUser) {
+                Router.routeTo(Router.configuration.routes.login, { trigger: true });
+            } else if (_.contains(Configuration.loggedUser.uiroles, "ui-realm-admin")) {
+                Router.routeTo(Router.configuration.routes.realms, {
+                    args: [],
+                    trigger: true
+                });
+            } else {
+                Router.routeTo(Router.configuration.routes.profile, { trigger: true });
+            }
         }
     }, {
         startEvent: Constants.EVENT_THEME_CHANGED,
@@ -154,8 +164,8 @@ define("config/process/AMConfig", [
         ],
         processDescription: function (event, _, Configuration, NavigationHelper) {
             ThemeManager.getTheme(true);
-            if (_.contains(Configuration.loggedUser.uiroles, "ui-admin")) {
-                NavigationHelper.setAdminNav();
+            if (_.contains(Configuration.loggedUser.uiroles, "ui-realm-admin")) {
+                NavigationHelper.populateRealmsDropdown();
             }
         }
     },

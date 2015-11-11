@@ -117,7 +117,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 promise.reject();
             });
         } else {
-            if (url !== Constants.CONSOLE_PATH || _.contains(Configuration.loggedUser.uiroles, "ui-admin")) {
+            if (url !== Constants.CONSOLE_PATH) {
                 if (!Configuration.globalData.auth.urlParams) {
                     Configuration.globalData.auth.urlParams = {};
                 }

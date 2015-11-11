@@ -20,25 +20,29 @@ define("config/routes/admin/AdminRoutes", function () {
             view: "org/forgerock/openam/ui/admin/views/commonTasks/CommonTasksView",
             url: /^commonTasks\/?$/,
             pattern: "commonTasks",
-            role: "ui-admin"
+            role: "ui-global-admin",
+            navGroup: "admin"
         },
         federation: {
             view: "org/forgerock/openam/ui/admin/views/federation/FederationView",
             url: /^federation\/?$/,
             pattern: "federation",
-            role: "ui-admin"
+            role: "ui-global-admin",
+            navGroup: "admin"
         },
         configuration: {
             view: "org/forgerock/openam/ui/admin/views/configuration/ConfigurationView",
             url: /^configuration\/?$/,
             pattern: "configuration",
-            role: "ui-admin"
+            role: "ui-global-admin",
+            navGroup: "admin"
         },
         sessions: {
             view: "org/forgerock/openam/ui/admin/views/sessions/SessionsView",
             url: /^sessions\/?$/,
             pattern: "sessions",
-            role: "ui-admin"
+            role: "ui-global-admin",
+            navGroup: "admin"
         }
     };
 });
