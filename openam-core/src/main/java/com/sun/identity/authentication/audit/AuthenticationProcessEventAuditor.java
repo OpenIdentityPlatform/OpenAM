@@ -89,7 +89,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
                     .realm(realm)
                     .entry(getAuditEntryDetail(moduleName, loginState))
                     .trackingIds(getTrackingIds(loginState))
-                    .authentication(userDN == null ? "" : userDN)
+                    .userId(userDN == null ? "" : userDN)
                     .principal(DNUtils.DNtoName(userDN));
 
             eventPublisher.tryPublish(AUTHENTICATION_TOPIC, builder.toEvent());
@@ -133,7 +133,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
                     .realm(realm)
                     .entry(entryDetail)
                     .trackingIds(getTrackingIds(loginState))
-                    .authentication(getUserId(principal, realm))
+                    .userId(getUserId(principal, realm))
                     .principal(principal);
 
             eventPublisher.tryPublish(AUTHENTICATION_TOPIC, builder.toEvent());
@@ -176,7 +176,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
                     .realm(realm)
                     .entry(entryDetail)
                     .trackingId(trackingId == null ? "" : trackingId)
-                    .authentication(userId == null ? "" : userId)
+                    .userId(userId == null ? "" : userId)
                     .principal(principalName);
 
             eventPublisher.tryPublish(AUTHENTICATION_TOPIC, builder.toEvent());

@@ -230,12 +230,21 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         String path = resourceUrl.replace(queryString, "");
         Map<String, List<String>> queryParameters = AMAuditEventBuilderUtils.getQueryParametersAsMap(queryString);
 
+        boolean isSecure = false;
+        resourceUrl.substring(0, resourceUrl.indexOf(":"));
+        if (resourceUrl.indexOf(":") != -1) {
+            String scheme = resourceUrl.substring(0, resourceUrl.indexOf(":"));
+            if ("https".equals(scheme)) {
+                isSecure = true;
+            }
+        }
+
         AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.POLICY_AGENT)
                 .userId(clientId)
-                .http("UNKNOWN", path, queryParameters, Collections.<String, List<String>>emptyMap())
+                .httpRequest(isSecure, "UNKNOWN", path, queryParameters, Collections.<String, List<String>>emptyMap())
                 .request("HTTP", "UNKNOWN")
                 .client(clientIp)
                 .trackingId(contextId)

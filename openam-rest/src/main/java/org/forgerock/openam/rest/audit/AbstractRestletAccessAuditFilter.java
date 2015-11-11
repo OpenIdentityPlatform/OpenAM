@@ -143,25 +143,19 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-<<<<<<< HEAD
-                    .authentication(getUserIdForAccessOutcome(request, response))
+                    .userId(getUserIdForAccessOutcome(request, response))
                     .trackingIds(getTrackingIdsForAccessOutcome(request, response));
 
             if (responseDetailCreator != null) {
                 try {
                     JsonValue detail = responseDetailCreator.apply(entity);
-                    builder.responseWithDetail(SUCCESS, "", elapsedTime, MILLISECONDS, detail);
+                    builder.responseWithDetail(SUCCESSFUL, "", elapsedTime, MILLISECONDS, detail);
                 } catch (AuditException e) {
                     debug.warning("An error occured when fetching response body details for audit", e);
                 }
             } else {
-                builder.response(SUCCESS, "", elapsedTime, MILLISECONDS);
+                builder.response(SUCCESSFUL, "", elapsedTime, MILLISECONDS);
             }
-=======
-                    .userId(getUserIdForAccessOutcome(request, response))
-                    .trackingIds(getTrackingIdsForAccessOutcome(request, response))
-                    .response(SUCCESSFUL, "", elapsedTime, MILLISECONDS);
->>>>>>> AME-8993 AME-8994 Migrate OpenAM Common Audit from 0.9.0-SNAPSHOT to 0.10.0-SNAPSHOT
 
             addHttpData(request, builder);
 

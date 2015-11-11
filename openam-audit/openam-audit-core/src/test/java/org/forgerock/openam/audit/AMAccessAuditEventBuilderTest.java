@@ -46,7 +46,7 @@ public class AMAccessAuditEventBuilderTest {
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
                 .request("CREST", "READ")
-                .http("GET", "/some/path", getQueryParameters(), getHeaders())
+                .httpRequest(false, "GET", "/some/path", getQueryParameters(), getHeaders())
                 .response(SUCCESSFUL, "200", 42, MILLISECONDS)
                 .toEvent();
 
@@ -65,7 +65,7 @@ public class AMAccessAuditEventBuilderTest {
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
                 .request("CREST", "READ")
-                .http("GET", "/some/path", getQueryParameters(), getHeaders())
+                .httpRequest(false, "GET", "/some/path", getQueryParameters(), getHeaders())
                 .response(SUCCESSFUL, "200", 42, MILLISECONDS)
                 .toEvent();
 

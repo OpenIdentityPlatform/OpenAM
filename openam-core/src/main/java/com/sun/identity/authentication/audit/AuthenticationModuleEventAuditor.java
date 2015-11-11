@@ -102,7 +102,7 @@ public class AuthenticationModuleEventAuditor extends AbstractAuthenticationEven
         }
     }
 
-    private void auditModuleEvent(LoginState loginState, String realm, String principal, String authentication,
+    private void auditModuleEvent(LoginState loginState, String realm, String principal, String userId,
             Status result, AuthenticationAuditEntry auditEntryDetail) {
 
         String controlFlag = AuditRequestContext.getProperty(LOGIN_MODULE_CONTROL_FLAG);
@@ -118,7 +118,7 @@ public class AuthenticationModuleEventAuditor extends AbstractAuthenticationEven
                 .realm(realm)
                 .entry(auditEntryDetail)
                 .trackingIds(getTrackingIds(loginState))
-                .authentication(authentication)
+                .userId(userId)
                 .principal(principal);
 
         eventPublisher.tryPublish(AUTHENTICATION_TOPIC, builder.toEvent());

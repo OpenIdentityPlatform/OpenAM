@@ -87,7 +87,8 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
                 request.getLocalAddr(),
                 request.getLocalPort(),
                 request.getLocalName());
-        http(
+        httpRequest(
+                request.isSecure(),
                 request.getMethod(),
                 request.getRequestURL().toString(),
                 getQueryParametersAsMap(request),
@@ -109,7 +110,9 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
                 clientInfo.getRemotePort(),
                 isReverseDnsLookupEnabled() ? clientInfo.getRemoteHost() : "");
         MutableUri uri = request.getUri();
-        http(
+        boolean isSecure = "https".equals(request.getUri().getScheme());
+        httpRequest(
+                isSecure,
                 request.getMethod(),
                 uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + uri.getPath(),
                 getQueryParametersAsMap(request.getForm()),

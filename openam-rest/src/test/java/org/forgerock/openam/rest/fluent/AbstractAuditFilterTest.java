@@ -31,6 +31,7 @@ import static org.mockito.Mockito.verify;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.RequestAuditContext;
 import org.forgerock.json.resource.ActionRequest;
@@ -191,7 +192,8 @@ public abstract class AbstractAuditFilterTest {
                 return callerSubject;
             }
         };
-        return new AuditInfoContext(subjectContext, AuditConstants.Component.CREST);
+        final Context clientContext = ClientContext.newInternalClientContext(subjectContext);
+        return new AuditInfoContext(clientContext, AuditConstants.Component.CREST);
     }
 
     private AuditEventFactory mockAuditEventFactory() {

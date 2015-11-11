@@ -246,10 +246,10 @@ public class AbstractHttpAccessAuditFilterTest {
         assertThat(auditEvent).stringAt("client/host").isEqualTo("");
         assertThat(auditEvent).stringAt("client/ip").isEqualTo("REMOTE_ADDRESS");
         assertThat(auditEvent).integerAt("client/port").isEqualTo(9000);
-        assertThat(auditEvent).stringAt("http/method").isEqualTo("GET");
-        assertThat(auditEvent).stringAt("http/path").isEqualTo("http://example.com:8080");
-        assertThat(auditEvent).hasArray("http/queryParameters/query").contains("value");
-        assertThat(auditEvent).hasArray("http/headers/" + ContentTypeHeader.NAME).contains("CONTENT_TYPE");
+        assertThat(auditEvent).stringAt("http/request/method").isEqualTo("GET");
+        assertThat(auditEvent).stringAt("http/request/path").isEqualTo("http://example.com:8080");
+        assertThat(auditEvent).hasArray("http/request/queryParameters/query").contains("value");
+        assertThat(auditEvent).hasArray("http/request/headers/" + ContentTypeHeader.NAME).contains("CONTENT_TYPE");
     }
 
     private class MockAccessAuditFilter extends AbstractHttpAccessAuditFilter {

@@ -22,8 +22,8 @@ import static com.sun.identity.shared.datastruct.CollectionHelper.*;
 import com.iplanet.am.util.SystemProperties;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
-import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandler;
-import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandlerConfiguration;
+import org.forgerock.audit.handlers.csv.CSVAuditEventHandler;
+import org.forgerock.audit.handlers.csv.CSVAuditEventHandlerConfiguration;
 import org.forgerock.openam.audit.AuditEventHandlerFactory;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
 
