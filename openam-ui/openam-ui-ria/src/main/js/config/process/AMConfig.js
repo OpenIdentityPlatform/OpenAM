@@ -156,8 +156,75 @@ define("config/process/AMConfig", [
             ThemeManager.getTheme(true);
             if (_.contains(Configuration.loggedUser.uiroles, "ui-admin")) {
                 NavigationHelper.setAdminNav();
+            }
+        }
+    },
+    {
+        startEvent: Constants.EVENT_UNAUTHORIZED,
+        description: "",
+        override: true,
+        dependencies: [
+            "org/forgerock/commons/ui/common/main/Router",
+            "org/forgerock/commons/ui/common/main/Configuration",
+            "org/forgerock/commons/ui/common/main/SessionManager"
+        ],
+        processDescription: function (event, Router, Configuration, SessionManager) {
+            var loggedIn = Configuration.loggedUser,
+                setGoToUrlProperty = function () {
+                    var hash = Router.getCurrentHash();
+                    if (!Configuration.gotoURL && !hash.match(Router.configuration.routes.login.url)) {
+                        Configuration.setProperty("gotoURL", "#" + hash);
+                    }
+                },
+                forbiddenPage = function () {
+                    delete Configuration.globalData.authorizationFailurePending;
+                    return EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                        route: {
+                            view: "org/forgerock/openam/ui/common/views/error/ForbiddenView",
+                            url: /.*/
+                        },
+                        fromRouter: true
+                    });
+                },
+                forbiddenError = function () {
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
+                },
+                logout = function () {
+                    setGoToUrlProperty();
+
+                    return SessionManager.logout().then(function () {
+                        EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
+                            anonymousMode: true
+                        });
+                        return EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                            route: Router.configuration.routes.login
+                        });
+                    });
+
+                },
+                loginDialog = function () {
+                    return EventManager.sendEvent(Constants.EVENT_SHOW_LOGIN_DIALOG);
+                };
+
+            // Multiple rest calls that all return authz failures will cause this event to be called multiple times
+            if (Configuration.globalData.authorizationFailurePending !== undefined) {
+                return;
+            }
+            Configuration.globalData.authorizationFailurePending = true;
+
+
+            if (!loggedIn) {
+                // 401 no session
+                return logout();
+            } else if (_.get(event, "error.status") === 401) {
+                // 401 session timeout
+                return loginDialog();
+            } else if (event.fromRouter) {
+                // 403 route change
+                return forbiddenPage();
             } else {
-                NavigationHelper.setUserNav();
+                // 403 rest call
+                return forbiddenError();
             }
         }
     }];

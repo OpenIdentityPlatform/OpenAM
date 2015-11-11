@@ -142,6 +142,10 @@
                 "pageNotFound" : "Page not found",
                 "requestedPageCouldNotBeFound" : "The requested page could not be found."
             },
+            "403" : {
+                "title" : "Forbidden",
+                "description" : "You are not authorized to view this page."
+            },
             "DefaultBaseTemplate" : {
                 "orPhone" : ", or phone"
             },
