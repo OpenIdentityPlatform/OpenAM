@@ -20,15 +20,19 @@ import static java.util.Collections.emptyMap;
 import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status.*;
 import static org.forgerock.openam.audit.AuditConstants.AUTHENTICATION_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
+import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.AUTH_CONTROL_FLAG;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_LOGIN_MODULE_COMPLETED;
+import static org.forgerock.openam.audit.AuditConstants.LOGIN_MODULE_CONTROL_FLAG;
 import static org.forgerock.openam.audit.context.AuditRequestContext.getTransactionIdValue;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
 import com.sun.identity.authentication.service.LoginState;
 import org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status;
 import org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 
 import javax.inject.Inject;
@@ -100,6 +104,11 @@ public class AuthenticationModuleEventAuditor extends AbstractAuthenticationEven
 
     private void auditModuleEvent(LoginState loginState, String realm, String principal, String authentication,
             Status result, AuthenticationAuditEntry auditEntryDetail) {
+
+        String controlFlag = AuditRequestContext.getProperty(LOGIN_MODULE_CONTROL_FLAG);
+        if (auditEntryDetail != null && isNotEmpty(controlFlag)) {
+            auditEntryDetail.addInfo(AUTH_CONTROL_FLAG, controlFlag);
+        }
 
         AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent()
                 .transactionId(getTransactionIdValue())

@@ -18,6 +18,8 @@ package org.forgerock.openam.audit;
 import static org.forgerock.audit.events.AuditEventBuilder.AUTHENTICATION;
 import static org.forgerock.audit.events.AuditEventBuilder.ID;
 
+import org.forgerock.openam.audit.context.AuditRequestContext;
+
 /**
  * Collection of constants related to auditing.
  *
@@ -179,6 +181,8 @@ public final class AuditConstants {
         AUTH_LEVEL("authLevel"),
         /** Key for the auth index. */
         AUTH_INDEX("authIndex"),
+        /** Key for the login module control flag. */
+        AUTH_CONTROL_FLAG("authControlFlag"),
         /** Key for the module class. */
         MODULE_CLASS("moduleClass"),
         /** Key for the reason of a failure event. */
@@ -293,6 +297,11 @@ public final class AuditConstants {
      * The field name to use when adding a "reason" string to the /response/detail object of an access event.
      */
     public static final String ACCESS_RESPONSE_DETAIL_REASON = "reason";
+
+    /**
+     *  Key for the login module control flag that can be added {@link AuditRequestContext}.
+     */
+    public static final String LOGIN_MODULE_CONTROL_FLAG = "loginModuleControlFlag";
 
     private AuditConstants() {
         // Prevent instantiation

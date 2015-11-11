@@ -27,9 +27,11 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 package com.sun.identity.authentication.config;
+
+import static javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -55,6 +57,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -957,5 +961,25 @@ public class AMAuthConfigUtils {
         }
 
         return globalAuth;
+    }
+
+    /**
+     * Get the string representation of the {@link LoginModuleControlFlag}.
+     *
+     * @param controlFlag The {@link LoginModuleControlFlag}
+     * @return A string representing the {@link LoginModuleControlFlag}.
+     */
+    public static String getControlFlagAsString(LoginModuleControlFlag controlFlag) {
+        if (REQUIRED.equals(controlFlag)) {
+            return "REQUIRED";
+        } else if (OPTIONAL.equals(controlFlag)) {
+            return "OPTIONAL";
+        } else if (REQUISITE.equals(controlFlag)) {
+            return "REQUISITE";
+        } else if (SUFFICIENT.equals(controlFlag)) {
+            return "SUFFICIENT";
+        } else {
+            return "";
+        }
     }
 }

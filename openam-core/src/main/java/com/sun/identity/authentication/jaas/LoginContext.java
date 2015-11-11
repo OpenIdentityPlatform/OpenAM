@@ -27,13 +27,17 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc.
+ * Portions Copyrighted 2010-2015 ForgeRock Inc.
  */
 
 package com.sun.identity.authentication.jaas;
 
+import static com.sun.identity.authentication.config.AMAuthConfigUtils.getControlFlagAsString;
+import static org.forgerock.openam.audit.AuditConstants.LOGIN_MODULE_CONTROL_FLAG;
+
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.audit.context.AuditRequestContext;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -168,6 +172,7 @@ public class LoginContext {
 
             ModuleInfo info = moduleStack[i];
             LoginModuleControlFlag controlFlag = info.entry.getControlFlag();
+            AuditRequestContext.putProperty(LOGIN_MODULE_CONTROL_FLAG, getControlFlagAsString(controlFlag));
 
             try {
 
@@ -295,6 +300,8 @@ public class LoginContext {
                         throw requiredExceptionHolder.getException();
                     }
                 }
+            } finally {
+                AuditRequestContext.removeProperty(LOGIN_MODULE_CONTROL_FLAG);
             }
         }
 
