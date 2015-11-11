@@ -26,40 +26,45 @@ import org.forgerock.util.query.QueryFilter;
 /**
  * Allows the assembly of {@link TokenFilter} instances for use with the {@link CTSPersistentStore}
  * and other uses of the generic data layer.
- *
- * This builder will guide the caller through some of the detail around creating filter instances
- * and in particular improve code readability.
+ * <p>
+ * The role of a TokenFilter is to restrict the results of a CTS query to both
+ * reduce load on the CTS and make the return results more specific to the
+ * callers query.
+ * <p>
+ * Each TokenFilter can include {@link CoreTokenField} attribute filters which ensure that only CTS
+ * tokens that have the matching attribute are returned.
+ * <p>
+ * In addition the TokenFilter can define the return attributes from matched CTS Tokens. Rather than
+ * returning complete CTS tokens, when a return attribute is defined the CTS Tokens will only contain
+ * the defined subset of {@link CoreTokenField} attributes.
  */
 public class TokenFilterBuilder {
     private TokenFilter tokenFilter = new TokenFilter();
 
-    private static enum Type {
+    private enum Type {
         AND, OR
     }
 
     /**
-     * @return Moves the builder into AND mode.
+     * Creates an AND query where the results must match all provided filters.
+     * @return Non null FilterAttributeBuilder.
      */
     public FilterAttributeBuilder and() {
         return new FilterAttributeBuilder(tokenFilter, Type.AND);
     }
 
     /**
-     * @return Moves the builder into OR mode.
+     * Creates an OR query where the results will match any of the provided filters.
+     * @return Non null FilterAttributeBuilder.
      */
     public FilterAttributeBuilder or() {
         return new FilterAttributeBuilder(tokenFilter, Type.OR);
     }
 
     /**
-     * @return Moves the builder into mode specified by type.
-     */
-    public FilterAttributeBuilder type(Type type) {
-        return new FilterAttributeBuilder(tokenFilter, type);
-    }
-
-    /**
-     * Moves the TokenFilter into AND mode, and filters the query by the given attribute.
+     * Filters the result CTS Tokens to only include those that have the matching
+     * attribute. Will also move this Builder into AND mode as if {@link #and()} had
+     * been called.
      *
      * @see TokenFilterBuilder.FilterAttributeBuilder#withAttribute(CoreTokenField, Object)
      *
@@ -72,7 +77,12 @@ public class TokenFilterBuilder {
     }
 
     /**
-     * Sets the query to use - cannot be followed by {@link #or()}, {@link #and()}, {@link #type(Type)} or
+     * Rather than building up the query using these builder methods, callers can define
+     * the entire query themselves. This option allows for the full range of expressions
+     * provided in the {@link QueryFilter} api.
+     * <p>
+     * Note: Using this option will disable other options in this Builder. E.g. cannot
+     * be followed by {@link #or()}, {@link #and()}, or
      * {@link #withAttribute(org.forgerock.openam.tokens.CoreTokenField, Object)}.
      *
      * @param query The complex token query.
@@ -84,6 +94,10 @@ public class TokenFilterBuilder {
     }
 
     /**
+     * If you only require the returned CTS Tokens to contains a subset of the standard
+     * {@link CoreTokenField#values()} then this method allows the caller to specify the
+     * fields they would like in the returned CTS Tokens.
+     *
      * @param field The required attribute to return from the query.
      * @return This query builder.
      */
@@ -96,36 +110,48 @@ public class TokenFilterBuilder {
      * @return The assembled TokenFilter.
      */
     public TokenFilter build() {
+        if (tokenFilter.getQuery() == null) {
+            tokenFilter.setQuery(QueryFilter.<CoreTokenField>alwaysTrue());
+        }
         return tokenFilter;
     }
 
     /**
-     * Once the TokenFilter has been assigned a mode, then further options can be applied to it.
+     * Used when the {@link TokenFilterBuilder} is in either {@link #and()} or {@link #or()} mode.
      */
-    public static class FilterAttributeBuilder {
-        private final TokenFilter tokenFilter;
+    public class FilterAttributeBuilder {
         private final Type type;
-        private List<QueryFilter<CoreTokenField>> criteria = new ArrayList<QueryFilter<CoreTokenField>>();
+        private List<QueryFilter<CoreTokenField>> criteria = new ArrayList<>();
 
-        public FilterAttributeBuilder(TokenFilter tokenFilter, Type type) {
-            Reject.ifTrue(tokenFilter.getQuery() != null, "QueryFilter already configured");
-            this.tokenFilter = tokenFilter;
+        private FilterAttributeBuilder(TokenFilter tokenFilter, Type type) {
+            Reject.ifTrue(tokenFilter.getQuery() != null, "TokenFilter already has query assigned, invalid state.");
             this.type = type;
         }
 
         /**
-         * Filters the query by the given attribute. This will apply based on the mode of the
-         * TokenFilter.
+         * Filters the result CTS Tokens to only include those that have the matching
+         * attribute. This filter will be combined depending on the mode of the Builder
+         * and so will depend on the preceding call to either {@link #and()} or {@link #or}.
          *
-         * @see #and()
-         * @see #or()
-         *
-         * @param field Non null field to filter Tokens on.
-         * @param value Non null value to filter the field by.
+         * @param field Non null {@link CoreTokenField} to filter on.
+         * @param value Non null value that matching CTS Tokens must contain.
          * @return This FilterAttributeBuilder.
          */
         public FilterAttributeBuilder withAttribute(CoreTokenField field, Object value) {
             criteria.add(QueryFilter.equalTo(field, value));
+            return this;
+        }
+
+        /**
+         * If you only require the returned CTS Tokens to contains a subset of the standard
+         * {@link CoreTokenField#values()} then this method allows the caller to specify the
+         * fields they would like in the returned CTS Tokens.
+         *
+         * @param field The required attribute to return from the query.
+         * @return This query builder.
+         */
+        public FilterAttributeBuilder returnAttribute(CoreTokenField field) {
+            tokenFilter.addReturnAttribute(field);
             return this;
         }
 
