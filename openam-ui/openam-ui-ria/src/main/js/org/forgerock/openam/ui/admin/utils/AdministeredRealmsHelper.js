@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper", [
     return {
         /**
          * Extracts from the URI hash fragment and returns realm which is being currently edited by administrator
-         * @returns String current realm decoded
+         * @returns {String} current realm decoded
          */
         getCurrentRealm: function () {
             return decodeURIComponent(URIUtils.getCurrentFragment().split("/")[1]);

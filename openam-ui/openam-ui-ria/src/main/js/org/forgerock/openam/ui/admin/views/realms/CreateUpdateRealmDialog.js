@@ -40,6 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
          *          self.render();
          *      }
          * });
+         * @param {Map} options A Map containing the options for the create/update realm dialog.
          */
         show: function (options) {
             var self = this,

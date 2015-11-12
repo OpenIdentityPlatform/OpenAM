@@ -77,6 +77,8 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
 
     /**
      * Checks for a change of realm
+     * @returns {Promise} If the realm has changed then a promise that will contain the response from the
+     * serverinfo/* REST call, otherwise an empty successful promise.
      */
     obj.checkForDifferences = function () {
         var currentSubRealm = RealmHelper.getSubRealm(),

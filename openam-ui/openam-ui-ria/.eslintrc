@@ -405,27 +405,9 @@
          */
         "space-unary-ops": 2,
         /**
-         * Disallow comparisons with the constant on the left-hand side.
-         *
-         * var a = (2 === b); # bad
-         *
-         * var a = (b === 2); # good
-         */
-        "yoda": [2, "never"],
-
-        /*
-         * --------------------------------------------------------------------------------
-         * WARNING RULES
-         *
-         * These are rules that we want to turn into errors but can't yet because there are
-         * too many violations. As we fix the violations, we will transition them into
-         * error rules.
-         * --------------------------------------------------------------------------------
-         */
-        /**
          * Validates that JSDoc is syntactically correct.
          */
-        "valid-jsdoc": [1, {
+        "valid-jsdoc": [2, {
             "prefer": {
                 /**
                  * Prefer using returns over return
@@ -440,7 +422,25 @@
              * If there is no return statement, a @returns annotation is not required.
              */
             "requireReturn": false
-        }]
+        }],
+        /**
+         * Disallow comparisons with the constant on the left-hand side.
+         *
+         * var a = (2 === b); # bad
+         *
+         * var a = (b === 2); # good
+         */
+        "yoda": [2, "never"]
+
+        /*
+         * --------------------------------------------------------------------------------
+         * WARNING RULES
+         *
+         * These are rules that we want to turn into errors but can't yet because there are
+         * too many violations. As we fix the violations, we will transition them into
+         * error rules.
+         * --------------------------------------------------------------------------------
+         */
 
         /*
          * --------------------------------------------------------------------------------
