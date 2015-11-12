@@ -68,6 +68,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -259,7 +260,7 @@ public class AMPropertySheet
             ((CCMapList)view).resetStateData();
             CCMapListModel m = (CCMapListModel)model.getModel(name);
             if (Set.class.isInstance(values)) {
-                Set v = new HashSet();
+                Set v = new LinkedHashSet();
                 v.addAll((Set)values);
                 v.remove("[]=");
                 m.setOptionList(AMViewBeanBase.createOptionList(

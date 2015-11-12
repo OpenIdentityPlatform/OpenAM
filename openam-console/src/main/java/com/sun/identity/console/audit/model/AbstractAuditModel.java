@@ -16,7 +16,9 @@
 package com.sun.identity.console.audit.model;
 
 import static com.sun.identity.console.audit.AuditConsoleConstants.AUDIT_SERVICE;
+import static java.util.Arrays.asList;
 import static java.util.Collections.*;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.console.base.model.AMAdminUtils;
@@ -30,14 +32,19 @@ import com.sun.identity.console.property.PropertyXMLBuilder;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceSchema;
+import org.forgerock.openam.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -49,6 +56,9 @@ import java.util.Set;
  * @since 13.0.0
  */
 public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
+
+    private static final String RESOURCE_BUNDLE_NAME = "audit";
+    private static final String SECTION_FILE_NAME = "audit.section.properties";
 
     protected ResourceBundle auditResourceBundle;
 
@@ -84,7 +94,7 @@ public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
     @Override
     protected void initialize(HttpServletRequest req, String rbName) {
         super.initialize(req, rbName);
-        auditResourceBundle = AMResBundleCacher.getBundle("audit", locale);
+        auditResourceBundle = AMResBundleCacher.getBundle(RESOURCE_BUNDLE_NAME, locale);
     }
 
     @Override
@@ -131,7 +141,8 @@ public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
         try {
             String schemaId = getServiceConfig().getSubConfig(handlerName).getSchemaID();
             ServiceSchema handlerSchema = getServiceSchema().getSubSchema(schemaId);
-            xmlBuilder = new PropertyXMLBuilder(handlerSchema, this);
+            xmlBuilder = new PropertyXMLBuilder(handlerSchema, this, getHandlerResourceBundle(handlerSchema),
+                    getSectionsForHandler(schemaId), SECTION_FILE_NAME);
             xmlBuilder.setAllAttributeReadOnly(readOnly);
             xmlBuilder.setSupportSubConfig(false);
             return xmlBuilder.getXML();
@@ -150,7 +161,8 @@ public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
     public String getAddEventHandlerPropertyXML(String schemaId) throws AMConsoleException {
         try {
             ServiceSchema handlerSchema = getServiceSchema().getSubSchema(schemaId);
-            xmlBuilder = new PropertyXMLBuilder(handlerSchema, this);
+            xmlBuilder = new PropertyXMLBuilder(handlerSchema, this, getHandlerResourceBundle(handlerSchema),
+                    getSectionsForHandler(schemaId), SECTION_FILE_NAME);
             xmlBuilder.setSupportSubConfig(false);
             String xml = xmlBuilder.getXML();
             String attributeNameXML = AMAdminUtils.getStringFromInputStream(getClass().getClassLoader()
@@ -359,6 +371,60 @@ public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
             getServiceConfig().addSubConfig(eventHandlerName, eventHandlerType, 0, attributeValues);
         } catch (SSOException | SMSException e) {
             throw new AMConsoleException(getErrorString(e));
+        }
+    }
+
+    private ResourceBundle getHandlerResourceBundle(ServiceSchema handlerSchema) {
+        String handlerBundleName = handlerSchema.getI18NFileName();
+        if (StringUtils.isEmpty(handlerBundleName) || RESOURCE_BUNDLE_NAME.equals(handlerBundleName)) {
+            return auditResourceBundle;
+        } else {
+            return new MultiResourceBundle(locale, handlerSchema.getI18NFileName(), RESOURCE_BUNDLE_NAME);
+        }
+    }
+
+    private Map<SchemaType, List<String>> getSectionsForHandler(String schemaId) {
+        Map<SchemaType, List<String>> sectionMap = new HashMap<>();
+        String sections = getLocalizedString("sections." + schemaId);
+        if (isNotEmpty(sections)) {
+            List<String> sectionList = asList(sections.split(" "));
+            sectionMap.put(SchemaType.GLOBAL, sectionList);
+            sectionMap.put(SchemaType.ORGANIZATION, sectionList);
+
+        }
+        return sectionMap;
+    }
+
+    private static final class MultiResourceBundle extends ResourceBundle {
+
+        private Set<ResourceBundle> resourceBundles = new LinkedHashSet<>();
+
+        private MultiResourceBundle(java.util.Locale locale, String... rbNames) {
+            for (String rbName : rbNames) {
+                ResourceBundle rb = AMResBundleCacher.getBundle(rbName, locale);
+                if (rb != null) {
+                    resourceBundles.add(rb);
+                }
+            }
+        }
+
+        @Override
+        protected Object handleGetObject(String key) {
+            for (ResourceBundle rb : resourceBundles) {
+                if (rb.containsKey(key)) {
+                    return rb.getObject(key);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public Enumeration<String> getKeys() {
+            List<String> keys = new ArrayList<>();
+            for (ResourceBundle rb : resourceBundles) {
+                keys.addAll(Collections.list(rb.getKeys()));
+            }
+            return Collections.enumeration(keys);
         }
     }
 

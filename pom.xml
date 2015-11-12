@@ -185,6 +185,8 @@
         <java-ipv6.version>0.14</java-ipv6.version>
         <json.version>20090211</json.version>
         <javax.inject.version>1</javax.inject.version>
+        <hikaricp.version>2.4.1</hikaricp.version>
+        <h2database.version>1.4.188</h2database.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -1677,6 +1679,11 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-audit-handler-jdbc</artifactId>
+                <version>${forgerock.audit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-selfservice-core</artifactId>
                 <version>${forgerock.selfservice.version}</version>
             </dependency>
@@ -1929,10 +1936,21 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2database.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <!-- License: legal/CC-Public-Domain.txt -->
                 <groupId>org.hdrhistogram</groupId>
                 <artifactId>HdrHistogram</artifactId>
                 <version>2.1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikaricp.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

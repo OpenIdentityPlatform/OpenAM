@@ -247,7 +247,8 @@ public class ServiceSchema {
      * @return the I18N properties file name for the service schema
      */
     public String getI18NFileName() {
-        return (ssm.getI18NFileName());
+        String i18nFileName = ss.getI18NFileName();
+        return i18nFileName == null ? ssm.getI18NFileName() : i18nFileName;
     }
 
     /**

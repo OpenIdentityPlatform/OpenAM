@@ -59,6 +59,8 @@ class ServiceSchemaImpl {
 
     String i18nKey;
 
+    String i18nFileName;
+
     String statusAttribute;
 
     String validate;
@@ -353,6 +355,7 @@ class ServiceSchemaImpl {
             }
             name = "";
             i18nKey = null;
+            i18nFileName = null;
             statusAttribute = null;
             serviceAttributes = new HashSet();
             searchableAttributeNames = new HashSet();
@@ -364,6 +367,7 @@ class ServiceSchemaImpl {
         // Get the name and i18nKey
         name = XMLUtils.getNodeAttributeValue(schemaNode, SMSUtils.NAME);
         i18nKey = XMLUtils.getNodeAttributeValue(schemaNode, SMSUtils.I18N_KEY);
+        i18nFileName = XMLUtils.getNodeAttributeValue(schemaNode, SMSUtils.PROPERTIES_FILENAME);
         statusAttribute = XMLUtils.getNodeAttributeValue(schemaNode,
                 SMSUtils.STATUS_ATTRIBUTE);
         inheritance = XMLUtils.getNodeAttributeValue(schemaNode,
@@ -684,5 +688,14 @@ class ServiceSchemaImpl {
     
     boolean isValid() {
         return valid;
+    }
+
+    /**
+     * Returns the I18N properties file name for the service schema.
+     *
+     * @return the I18N properties file name for the service schema
+     */
+    String getI18NFileName() {
+        return i18nFileName;
     }
 }

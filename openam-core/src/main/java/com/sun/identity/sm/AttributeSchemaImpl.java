@@ -29,14 +29,18 @@
 
 package com.sun.identity.sm;
 
+import static com.sun.identity.sm.AttributeSchema.ListOrder.*;
+import static java.util.Collections.emptySet;
+import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
+
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.security.AccessController;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import org.w3c.dom.Node;
@@ -185,13 +189,7 @@ public class AttributeSchemaImpl {
         if (defaultsObject != null) {
             defaultValues = defaultsObject.getDefaultValues();
         }
-        if ((defaultValues != null) && (!defaultValues.isEmpty())) {
-            HashSet answer = new HashSet();
-            answer.addAll(defaultValues);
-            return (answer);
-        }
-        return (Collections.EMPTY_SET);
-        // return (new HashSet());
+        return getDefaultValuesCopy(defaultValues);
     }
 
     /**
@@ -205,13 +203,18 @@ public class AttributeSchemaImpl {
         if (defaultsObject != null) {
             defaultValues = defaultsObject.getDefaultValues(envParams);
         }
-        if ((defaultValues != null) && (!defaultValues.isEmpty())) {
-            HashSet answer = new HashSet();
-            answer.addAll(defaultValues);
-            return (answer);
+        return getDefaultValuesCopy(defaultValues);
+    }
+
+    private Set<?> getDefaultValuesCopy(Set<?> defaultValues) {
+        if (isEmpty(defaultValues)) {
+            return emptySet();
         }
-        return (Collections.EMPTY_SET);
-        // return (new HashSet());
+        if (INSERTION.equals(listOrder)) {
+            return new LinkedHashSet<>(defaultValues);
+        } else {
+            return new HashSet<>(defaultValues);
+        }
     }
 
     /**

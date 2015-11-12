@@ -29,6 +29,8 @@
 
 package com.sun.identity.console.service;
 
+import static com.sun.identity.console.base.AMServiceProfile.PG_SESSION_PROFILE_VIEWBEANS;
+
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
@@ -286,7 +288,7 @@ public class SubConfigEditViewBean extends DynamicRequestViewBean {
 
     private void backToProfileViewBean() {
         List urls = (List)getPageSessionAttribute(
-            AMServiceProfile.PG_SESSION_PROFILE_VIEWBEANS);
+            PG_SESSION_PROFILE_VIEWBEANS);
         String url = (String)urls.remove(0);
 
         List parentIds = (List)getPageSessionAttribute(
@@ -361,13 +363,14 @@ public class SubConfigEditViewBean extends DynamicRequestViewBean {
     }
 
     private void addViewBeanClassToPageSession() {
-        ArrayList urls = (ArrayList)getPageSessionAttribute(AMServiceProfile.PG_SESSION_PROFILE_VIEWBEANS);
-        if (urls == null) {
-            urls = new ArrayList();
-            setPageSessionAttribute(
-                AMServiceProfile.PG_SESSION_PROFILE_VIEWBEANS, urls);
+        ArrayList<String> urls = new ArrayList<>();
+        @SuppressWarnings("unchecked")
+        List<String> pageSessionAttribute = (List<String>) getPageSessionAttribute(PG_SESSION_PROFILE_VIEWBEANS);
+        if (pageSessionAttribute != null) {
+            urls.addAll(pageSessionAttribute);
         }
         urls.add(0, "../service/SubConfigEdit.jsp");
+        setPageSessionAttribute(PG_SESSION_PROFILE_VIEWBEANS, urls);
     }
 
     /**

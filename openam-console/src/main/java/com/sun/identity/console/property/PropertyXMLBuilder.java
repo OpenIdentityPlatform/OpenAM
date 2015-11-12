@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -82,7 +83,7 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
         svcSchemaManager = new ServiceSchemaManager(
             serviceName, model.getUserSSOToken());
         getServiceResourceBundle();
-        if (getSectionOrder()) {
+        if (loadSectionOrder()) {
             getSectionsForType();
         }
         
@@ -111,6 +112,34 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
             mapTypeToAttributeSchema.put(
                 serviceSchema.getServiceType(),
                 serviceSchema.getAttributeSchemas());
+        }
+    }
+
+    /**
+     * Returns a XML for displaying attribute in property sheet.
+     *
+     * @param serviceSchema Service schemas.
+     * @param model Model for getting localized string and user locale.
+     * @param serviceBundle The service resource bundle.
+     * @param sectionForType A list of section headings for each schema type.
+     * @param sectionOrderFileName The name of the section attribute order file.
+     *
+     * @throws SMSException if attribute schema cannot obtained.
+     * @throws SSOException if single sign on token is invalid.
+     */
+    public PropertyXMLBuilder(ServiceSchema serviceSchema, AMModel model, ResourceBundle serviceBundle,
+            Map<SchemaType, List<String>> sectionForType, String sectionOrderFileName)
+            throws SMSException, SSOException {
+        this.model = model;
+        this.serviceName = serviceSchema.getServiceName();
+        this.serviceBundle = serviceBundle;
+        this.sectionForType = sectionForType;
+
+        loadSectionOrder(sectionOrderFileName);
+
+        if (serviceBundle != null) {
+            mapTypeToAttributeSchema = new HashMap();
+            mapTypeToAttributeSchema.put(serviceSchema.getServiceType(), serviceSchema.getAttributeSchemas());
         }
     }
     
@@ -143,7 +172,7 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
             serviceName, model.getUserSSOToken());
         
         if (schemaType != null) {
-            if (getSectionOrder()) {
+            if (loadSectionOrder()) {
                 schemaTypes = new HashSet<SchemaType>();
                 schemaTypes.add(schemaType);
                 getSectionsForType();
@@ -447,18 +476,28 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
      * 
      * @return true if found, false other wise
      */
-    private boolean getSectionOrder() {
-        InputStream is = 
-                getClass().getClassLoader().getResourceAsStream(serviceName + FILENAME_SUFFIX);
+    private boolean loadSectionOrder() {
+        return loadSectionOrder(serviceName + FILENAME_SUFFIX);
+    }
+
+    /**
+     * Loads the section order (if available) for this service.
+     *
+     * @param fileName The name of the section properties file.
+     * @return true if found, false other wise
+     */
+    private boolean loadSectionOrder(String fileName) {
+        InputStream is =
+                getClass().getClassLoader().getResourceAsStream(fileName);
         
         if (is == null) {
             if (debug.messageEnabled()) {
-                debug.message("getSectionOrder: no section for service" + serviceName);
+                debug.message("loadSectionOrder: no section for service" + serviceName);
             } 
             
             return false;
         }
-        
+
         Map<String, List<String>> map = new HashMap<String, List<String>>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         
@@ -481,7 +520,7 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
             }
         } catch (IOException ioe) {
             if (debug.messageEnabled()) {
-                debug.message("PropertyXMLBuilder:getSectionOrder", ioe);
+                debug.message("PropertyXMLBuilder:loadSectionOrder", ioe);
             }
         } finally {
             if (reader != null) {
@@ -492,11 +531,11 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
                 }
             }
         }
-        
+
         sectionOrder = map;
         
         if (debug.messageEnabled()) {
-            debug.message("getSectionOrder: " + sectionOrder);
+            debug.message("loadSectionOrder: " + sectionOrder);
         }
         
         return true;
