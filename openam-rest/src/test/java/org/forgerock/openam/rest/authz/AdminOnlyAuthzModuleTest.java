@@ -15,6 +15,10 @@
 */
 package org.forgerock.openam.rest.authz;
 
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.*;
+
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -26,10 +30,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -83,8 +83,9 @@ public class AdminOnlyAuthzModuleTest {
 
     }
 
-    @Test(expectedExceptions = ResourceException.class)
-    public void shouldErrorInvalidContext() throws SSOException, ResourceException, InterruptedException {
+    @Test
+    public void shouldErrorInvalidContext()
+            throws SSOException, ResourceException, InterruptedException, ExecutionException {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
@@ -97,7 +98,7 @@ public class AdminOnlyAuthzModuleTest {
         Promise< AuthorizationResult, ResourceException> result = testModule.authorize(mockSSOTokenContext);
 
         //then
-        result.getOrThrow(); //throws ResourceException when attempting to retrieve
+        assertFalse(result.get().isAuthorized());
     }
 }
 

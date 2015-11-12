@@ -174,7 +174,8 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
         } catch (DelegationException dE) {
             return new InternalServerErrorException("Attempt to authorise the user has failed", dE).asPromise();
         } catch (SSOException ssoE) {
-            return new InternalServerErrorException("Attempt to authorise the user has failed", ssoE).asPromise();
+            //you don't have a user so return access denied
+            return Promises.newResultPromise(AuthorizationResult.accessDenied("No user supplied in request."));
         }
 
         return Promises.newResultPromise(AuthorizationResult.accessDenied("The user has insufficient privileges"));

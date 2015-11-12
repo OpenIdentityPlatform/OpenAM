@@ -116,8 +116,10 @@ public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
                 }
                 return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not an administrator."));
             }
-        } catch (ResourceException e) {
-            return e.asPromise();
+        } catch (ForbiddenException e) {
+            return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not an administrator."));
+        } catch (ResourceException re) {
+            return re.asPromise();
         }
     }
 
