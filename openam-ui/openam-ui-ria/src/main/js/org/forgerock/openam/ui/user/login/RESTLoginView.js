@@ -237,7 +237,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     if (error) {
                         Messages.addMessage({
                             type: Messages.TYPE_DANGER,
-                            response: error
+                            message: error.message
                         });
                     }
                 });
