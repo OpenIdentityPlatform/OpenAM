@@ -22,8 +22,9 @@ import static com.sun.identity.shared.datastruct.CollectionHelper.*;
 import com.iplanet.am.util.SystemProperties;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
-import org.forgerock.audit.handlers.csv.CSVAuditEventHandler;
-import org.forgerock.audit.handlers.csv.CSVAuditEventHandlerConfiguration;
+import org.forgerock.audit.handlers.csv.CsvAuditEventHandler;
+import org.forgerock.audit.handlers.csv.CsvAuditEventHandlerConfiguration;
+import org.forgerock.audit.providers.DefaultSecureStorageProvider;
 import org.forgerock.openam.audit.AuditEventHandlerFactory;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
 
@@ -32,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This factory is responsible for creating an instance of the {@link CSVAuditEventHandler}.
+ * This factory is responsible for creating an instance of the {@link CsvAuditEventHandler}.
  *
  * @since 13.0.0
  */
@@ -43,7 +44,7 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
     public AuditEventHandler create(AuditEventHandlerConfiguration configuration) throws AuditException {
         Map<String, Set<String>> attributes = configuration.getAttributes();
 
-        CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
+        CsvAuditEventHandlerConfiguration csvHandlerConfiguration = new CsvAuditEventHandlerConfiguration();
         String location = getMapAttr(attributes, "location");
         csvHandlerConfiguration.setLogDirectory(location.replaceAll("%BASE_DIR%", SystemProperties.get(CONFIG_PATH)).
                 replaceAll("%SERVER_URI%", SystemProperties.get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
@@ -51,6 +52,7 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
         csvHandlerConfiguration.setName(configuration.getHandlerName());
         csvHandlerConfiguration.setEnabled(getBooleanMapAttr(attributes, "enabled", true));
 
-        return new CSVAuditEventHandler(csvHandlerConfiguration, configuration.getEventTopicsMetaData());
+        return new CsvAuditEventHandler(csvHandlerConfiguration, configuration.getEventTopicsMetaData(),
+                new DefaultSecureStorageProvider());
     }
 }
