@@ -40,12 +40,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
     function populateTemplate () {
         var self = this,
-            firstAuthStage = Configuration.globalData.auth.currentStage === 1;
+            firstAuthStage = Configuration.globalData.auth.currentStage === 1,
+            firstUsernamePassStage = firstAuthStage && this.isUsernamePasswordStages;
 
-        // self-service links should be shown only on the first stage
-        this.data.showForgotPassword = firstAuthStage && Configuration.globalData.forgotPassword === "true";
-        this.data.showRegister = firstAuthStage && Configuration.globalData.selfRegistration === "true";
-        this.data.showRememberLogin = firstAuthStage;
+        // self-service links should be shown only on the first stage of the UsernamePassword Stages
+        this.data.showForgotPassword = firstUsernamePassStage && Configuration.globalData.forgotPassword === "true";
+        this.data.showRegister = firstUsernamePassStage && Configuration.globalData.selfRegistration === "true";
+        this.data.showRememberLogin = firstUsernamePassStage;
 
         if (Configuration.backgroundLogin) {
             this.prefillLoginData();
@@ -259,6 +260,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 template,
                 self = this;
 
+            this.isUsernamePasswordStages = _.contains(usernamePasswordStages, reqs.stage);
             cleaned.callbacks = [];
             _.each(reqs.callbacks, function (element) {
 
@@ -326,10 +328,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 Configuration.globalData.auth.autoLoginAttempts++;
             } else {
                 // Attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                template = usernamePasswordStages.indexOf(reqs.stage) !== -1
-                    ? "templates/openam/authn/UsernamePasswordStage.html"
-                    : "templates/openam/authn/" + reqs.stage + ".html";
-
+                template = "templates/openam/authn/" + reqs.stage + ".html";
                 UIUtils.compileTemplate(template, _.extend(Configuration.globalData, this.data))
                     .always(function (compiledTemplate) {
                         // A rendered template will be a string; an error will be an object

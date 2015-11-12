@@ -9,9 +9,31 @@
     <form action="" method="post" class="form col-sm-6 col-sm-offset-3" autocomplete="off">
         <fieldset>
             {{#each reqs.callbacks}}
+            {{#if isSubmit}}
+            <div class="remember-forgot clearfix">
+                {{#if ../../showForgotPassword}}
+                <div class="pull-right">
+                    <a href="#passwordReset/" id="passwordReset">{{t "common.user.forgotPassword" }}</a>
+                </div>
+                {{/if}}
+
+                {{#if ../../showRememberLogin}}
+                <div class="checkbox pull-left">
+                    <label><input type="checkbox" type="checkbox" name="loginRemember" id="remember"> {{t "templates.user.LoginTemplate.loginRemember"}}</label>
+                </div>
+                {{/if}}
+            </div>
+            {{/if}}
+
             <div class="form-group">
                 {{callbackRender}}
             </div>
+
+            {{#if isSubmit}}
+            <div class="text-center">
+                {{#if ../../showRegister}}{{t "templates.login.newHere" }} <a href="#register/" id="register">{{t "templates.login.createAccount" }}</a>{{/if}}
+            </div>
+            {{/if}}
             {{/each}}
         </fieldset>
     </form>
