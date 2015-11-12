@@ -106,18 +106,15 @@ public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
         try {
             String userId = getUserId(context);
             if (isSuperUser(userId)) {
-                if (debug.messageEnabled()) {
-                    debug.message("AdminOnlyAuthZModule :: User, " + userId + " accepted as Administrator.");
-                }
+                debug.message("AdminOnlyAuthZModule :: User, {} accepted as Administrator.", userId);
                 return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             } else {
-                if (debug.messageEnabled()) {
-                    debug.message("AdminOnlyAuthZModule :: Restricted access to " + userId);
-                }
+                debug.message("AdminOnlyAuthZModule :: Restricted access to {}", userId);
                 return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not an administrator."));
             }
         } catch (ForbiddenException e) {
-            return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not an administrator."));
+            debug.message("AdminOnlyAuthZModule :: Request with invalid SSOToken blocked from admin-only resource.");
+            return Promises.newResultPromise(AuthorizationResult.accessDenied("Not authorized."));
         } catch (ResourceException re) {
             return re.asPromise();
         }

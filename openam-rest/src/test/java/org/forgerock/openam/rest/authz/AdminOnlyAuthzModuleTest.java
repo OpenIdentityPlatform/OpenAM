@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.rest.authz;
 
@@ -24,7 +24,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -46,7 +45,7 @@ public class AdminOnlyAuthzModuleTest {
     }
 
     @Test
-    public void shouldAuthorizeValidContext() throws SSOException, ExecutionException, InterruptedException {
+    public void shouldAuthorizeValidContext() throws Exception {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
@@ -65,7 +64,7 @@ public class AdminOnlyAuthzModuleTest {
     }
 
     @Test
-    public void shouldFailNonSuperUser() throws SSOException, ExecutionException, InterruptedException {
+    public void shouldFailNonSuperUser() throws Exception {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
@@ -84,8 +83,7 @@ public class AdminOnlyAuthzModuleTest {
     }
 
     @Test
-    public void shouldErrorInvalidContext()
-            throws SSOException, ResourceException, InterruptedException, ExecutionException {
+    public void shouldErrorInvalidContext() throws Exception {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
