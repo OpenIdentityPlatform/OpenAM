@@ -22,7 +22,7 @@ define([
     "org/forgerock/openam/ui/common/util/Constants"
 ], function ($, _, Squire, sinon, Constants) {
     var baseUrl = "toUrl:",
-        ThemeManager, Configuration, EventManager, URIUtils,
+        ThemeManager, Configuration, EventManager, URIUtils, Router,
         mock$, themeConfig, urlParams, sandbox;
     describe("org/forgerock/openam/ui/common/util/ThemeManager", function () {
         beforeEach(function (done) {
@@ -75,12 +75,17 @@ define([
                 parseQueryString: sinon.stub().returns(urlParams)
             };
 
+            Router = {
+                currentRoute: {}
+            };
+
             injector
                 .mock("jquery", mock$)
                 .mock("config/ThemeConfiguration", themeConfig)
                 .mock("org/forgerock/commons/ui/common/util/URIUtils", URIUtils)
                 .mock("org/forgerock/commons/ui/common/main/Configuration", Configuration)
                 .mock("org/forgerock/commons/ui/common/main/EventManager", EventManager)
+                .mock("Router", Router)
                 .require(["org/forgerock/openam/ui/common/util/ThemeManager"], function (d) {
                     ThemeManager = d;
                     done();
@@ -311,18 +316,8 @@ define([
                     expect(mock$).to.not.be.called;
                 });
             });
-            it("always updates the page if force is true", function () {
-                return ThemeManager.getTheme().then(function () {
-                    mock$.reset();
-                    return ThemeManager.getTheme(true);
-                }).then(function () {
-                    expect(mock$).to.be.called;
-                });
-            });
-            it("overrides the theme's stylesheets if the user is an admin", function () {
-                Configuration.loggedUser = {
-                    uiroles: "ui-admin"
-                };
+            it("overrides the theme's stylesheets if the user is on an admin page", function () {
+                Router.currentRoute.navGroup = "admin";
                 return ThemeManager.getTheme().then(function () {
                     expect(mock$).to.be.calledWith("<link/>", {
                         rel: "stylesheet",

@@ -25,6 +25,7 @@ require.config({
             "UserProfileView"   : "org/forgerock/commons/ui/user/profile/UserProfileView",
             "LoginDialog"       : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
             "NavigationFilter"  : "org/forgerock/openam/ui/common/components/navigation/filters/RouteNavGroupFilter",
+            "Router"            : "org/forgerock/commons/ui/common/main/Router",
             "RegisterView"      : "org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView",
             // TODO: Remove this when there are no longer any references to the "underscore" dependency
             "underscore"        : "lodash"

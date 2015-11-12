@@ -29,8 +29,9 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "config/ThemeConfiguration",
-    "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, Constants, Configuration, EventManager, ThemeConfiguration, URIUtils) {
+    "org/forgerock/commons/ui/common/util/URIUtils",
+    "Router"
+], function ($, _, Constants, Configuration, EventManager, ThemeConfiguration, URIUtils, Router) {
     /**
      * @exports org/forgerock/openam/ui/common/util/ThemeManager
      */
@@ -163,25 +164,25 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
         /**
          * Determine the theme from the current realm and setup the theme on the page. This will
          * clear out any previous theme.
-         * @param {boolean} [force] Perform a forced refresh of the theme
          * @returns {Promise} a promise that is resolved when the theme has been applied.
          */
-        getTheme: function (force) {
+        getTheme: function () {
             validateConfig();
 
             var themeName = findMatchingTheme(Configuration.globalData.realm, getAuthenticationChainName()),
-                isSameTheme = Configuration.globalData.themeName && themeName === Configuration.globalData.themeName,
+                isAdminTheme = Router.currentRoute.navGroup === "admin",
+                hasThemeNameChanged = themeName !== Configuration.globalData.themeName,
+                hasAdminThemeFlagChanged = isAdminTheme !== Configuration.globalData.isAdminTheme,
+                hasThemeChanged = hasThemeNameChanged || hasAdminThemeFlagChanged,
                 defaultTheme,
-                isAdminUser,
                 theme,
                 stylesheets;
 
-            if (!force && isSameTheme) {
+            if (!hasThemeChanged) {
                 return $.Deferred().resolve(Configuration.globalData.theme);
             }
 
             defaultTheme = ThemeConfiguration.themes[defaultThemeName];
-            isAdminUser = Configuration.loggedUser && _.contains(Configuration.loggedUser.uiroles, "ui-admin");
 
             theme = ThemeConfiguration.themes[themeName];
             theme = extendTheme(theme, defaultTheme);
@@ -189,11 +190,12 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
 
             // We don't apply themes to the admin interface because it would take significant effort to make the UI
             // themeable.
-            stylesheets = isAdminUser ? Constants.DEFAULT_STYLESHEETS : theme.stylesheets;
+            stylesheets = isAdminTheme ? Constants.DEFAULT_STYLESHEETS : theme.stylesheets;
 
             applyThemeToPage(theme.path, theme.icon, stylesheets);
             Configuration.globalData.theme = theme;
             Configuration.globalData.themeName = themeName;
+            Configuration.globalData.isAdminTheme = isAdminTheme;
             EventManager.sendEvent(Constants.EVENT_THEME_CHANGED);
             return $.Deferred().resolve(theme);
         }

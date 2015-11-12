@@ -27,6 +27,7 @@ require.config({
     map: {
         "*" : {
             "ThemeManager" : "org/forgerock/openam/ui/common/util/ThemeManager",
+            "Router": "org/forgerock/openam/ui/common/SingleRouteRouter",
             // TODO: Remove this when there are no longer any references to the "underscore" dependency
             "underscore"   : "lodash"
         }
@@ -65,9 +66,10 @@ require([
     "text!templates/common/FooterTemplate.html",
     "text!templates/common/LoginHeaderTemplate.html",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "ThemeManager"
+    "ThemeManager",
+    "Router"
 ], function ($, _, HandleBars, Configuration, Constants, AuthorizeTemplate,
-            LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate, i18nManager, ThemeManager) {
+            LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate, i18nManager, ThemeManager, Router) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;
@@ -88,6 +90,9 @@ require([
     });
 
     Configuration.globalData = { realm : data.realm };
+    Router.currentRoute = {
+        navGroup: "user"
+    };
 
     ThemeManager.getTheme().always(function (theme) {
         data.theme = theme;
