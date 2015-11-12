@@ -121,7 +121,7 @@
 
         <forgerock.bloomfilter.version>1.0.0</forgerock.bloomfilter.version>
         <forgerock.ui.version>8.5.0</forgerock.ui.version>
-        <forgerock.audit.version>0.12.0-SNAPSHOT</forgerock.audit.version>
+        <forgerock.audit.version>1.0.0</forgerock.audit.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
         <forgerock.selfservice.version>0.9.0-SNAPSHOT</forgerock.selfservice.version>
 

@@ -37,6 +37,7 @@ import org.forgerock.http.protocol.Header;
 import org.forgerock.http.protocol.Headers;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
 
@@ -110,7 +111,11 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
                 clientInfo.getRemotePort(),
                 isReverseDnsLookupEnabled() ? clientInfo.getRemoteHost() : "");
         MutableUri uri = request.getUri();
-        boolean isSecure = "https".equals(request.getUri().getScheme());
+        String uriScheme = request.getUri().getScheme();
+        if (StringUtils.isNotEmpty(uriScheme)) {
+            uriScheme = uriScheme.toLowerCase();
+        }
+        boolean isSecure = "https".equals(uriScheme);
         httpRequest(
                 isSecure,
                 request.getMethod(),

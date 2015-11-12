@@ -88,7 +88,7 @@ public class AuditEventPublisherTest {
         auditEventPublisher.publish("access", auditEvent);
 
         // Then
-        //verify(mockHandler.publishEvent(any(Context.class), any(String.class), auditEventCaptor.capture()));
+        verify(mockHandler, times(1)).publishEvent(any(Context.class), any(String.class), any(JsonValue.class));
         assertThat(auditEventCaptor.getValue()).isEqualTo(auditEvent.getValue());
     }
 
