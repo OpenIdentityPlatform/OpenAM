@@ -28,9 +28,9 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.openam.selfservice.config.ConsoleConfig;
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
+import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
@@ -53,13 +53,13 @@ public final class SelfServiceRequestHandlerTest {
     @Mock
     private ConsoleConfigHandler consoleConfigHandler;
     @Mock
-    private ConsoleConfigExtractor<ConsoleConfig> configExtractor;
+    private ConsoleConfigExtractor<SelfServiceConsoleConfig> configExtractor;
     @Mock
     private ServiceConfigProviderFactory providerFactory;
     @Mock
-    private ServiceConfigProvider<ConsoleConfig> configProvider;
+    private ServiceConfigProvider<SelfServiceConsoleConfig> configProvider;
     @Mock
-    private ConsoleConfig consoleConfig;
+    private SelfServiceConsoleConfig consoleConfig;
     @Mock
     private RequestHandler underlyingService;
 

@@ -14,22 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
-
 /**
- * Self service SMS related constants shared by all flows.
- *
- * @since 13.0.0
+ * Contains the default implementations that detail the self service flows.
  */
-final class CommonSmsSelfServiceConstants {
-
-    final static String SECURITY_QUESTIONS_KEY = "forgerockRESTSecurityKBAQuestions";
-    final static String CAPTCHA_SITE_KEY = "forgerockRESTSecurityCaptchaSiteKey";
-    final static String CAPTCHA_SECRET_KEY = "forgerockRESTSecurityCaptchaSecretKey";
-    final static String CAPTCHA_VERIFICATION_URL = "forgerockRESTSecurityCaptchaVerificationUrl";
-
-    private CommonSmsSelfServiceConstants() {
-        throw new UnsupportedOperationException();
-    }
-
-}
+package org.forgerock.openam.selfservice.config.flows;

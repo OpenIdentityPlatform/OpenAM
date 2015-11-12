@@ -46,7 +46,7 @@ public final class ServiceConfigProviderFactoryImpl implements ServiceConfigProv
 
     @Override
     @SuppressWarnings("unchecked")
-    public <C extends ConsoleConfig> ServiceConfigProvider<C> getProvider(C config) {
+    public <C extends SelfServiceConsoleConfig> ServiceConfigProvider<C> getProvider(C config) {
         String providerClassName = config.getConfigProviderClass();
         ServiceConfigProvider<?> provider = providers.get(providerClassName);
 

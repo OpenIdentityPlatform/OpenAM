@@ -45,12 +45,13 @@ public final class ServiceConfigProviderFactoryImplTest {
     @Test
     public void retrievesValidProviderInstance() {
         // Given
-        MockConfig config = new MockConfig();
+        SelfServiceConsoleConfig config = mock(SelfServiceConsoleConfig.class);
+        given(config.getConfigProviderClass()).willReturn(MockConfigProvider.class.getName());
         MockConfigProvider provider = new MockConfigProvider();
         given(injector.getInstance(MockConfigProvider.class)).willReturn(provider);
 
         // When
-        ServiceConfigProvider<MockConfig> providerResult = providerFactory.getProvider(config);
+        ServiceConfigProvider<SelfServiceConsoleConfig> providerResult = providerFactory.getProvider(config);
 
         // Then
         assertThat(providerResult).isEqualTo(provider);
@@ -59,37 +60,29 @@ public final class ServiceConfigProviderFactoryImplTest {
     @Test
     public void retrievesSameInstance() {
         // Given
-        MockConfig config = new MockConfig();
+        SelfServiceConsoleConfig config = mock(SelfServiceConsoleConfig.class);
+        given(config.getConfigProviderClass()).willReturn(MockConfigProvider.class.getName());
         MockConfigProvider provider = new MockConfigProvider();
         given(injector.getInstance(MockConfigProvider.class)).willReturn(provider);
 
         // When
-        ServiceConfigProvider<MockConfig> providerResultA = providerFactory.getProvider(config);
-        ServiceConfigProvider<MockConfig> providerResultB = providerFactory.getProvider(config);
+        ServiceConfigProvider<SelfServiceConsoleConfig> providerResultA = providerFactory.getProvider(config);
+        ServiceConfigProvider<SelfServiceConsoleConfig> providerResultB = providerFactory.getProvider(config);
 
         // Then
         assertThat(providerResultA).isEqualTo(provider);
         assertThat(providerResultA).isEqualTo(providerResultB);
     }
 
-    static final class MockConfig implements ConsoleConfig {
+    static final class MockConfigProvider implements ServiceConfigProvider<SelfServiceConsoleConfig> {
 
         @Override
-        public String getConfigProviderClass() {
-            return MockConfigProvider.class.getName();
-        }
-
-    }
-
-    static final class MockConfigProvider implements ServiceConfigProvider<MockConfig> {
-
-        @Override
-        public boolean isServiceEnabled(MockConfig config) {
+        public boolean isServiceEnabled(SelfServiceConsoleConfig config) {
             return false;
         }
 
         @Override
-        public ProcessInstanceConfig getServiceConfig(MockConfig config, Context context, String realm) {
+        public ProcessInstanceConfig getServiceConfig(SelfServiceConsoleConfig config, Context context, String realm) {
             return null;
         }
 

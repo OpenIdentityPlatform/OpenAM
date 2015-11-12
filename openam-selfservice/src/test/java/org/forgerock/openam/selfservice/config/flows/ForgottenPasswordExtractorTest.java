@@ -14,16 +14,17 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice.config.flows;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
+import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConsoleConfig;
+import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordExtractor;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -52,10 +53,8 @@ public final class ForgottenPasswordExtractorTest {
         consoleAttributes.put("forgerockRESTSecurityCaptchaSiteKey", Collections.singleton("someKey"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaSecretKey", Collections.singleton("someSecret"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaVerificationUrl", Collections.singleton("someUrl"));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassSubjectText",
-                new HashSet<String>(Arrays.asList("en|The Subject!", "fr|Le Sujet!")));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailText",
-                new HashSet<String>(Arrays.asList("de|Hallo Welt!", "fr|Bonjour Monde!")));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailSubject", Collections.singleton("en|The Subject!"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailBody", Collections.singleton("de|Hallo Welt!"));
 
         // When
         ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> extractor = new ForgottenPasswordExtractor();
@@ -63,8 +62,8 @@ public final class ForgottenPasswordExtractorTest {
 
         // Then
         assertThat(config.isEnabled()).isTrue();
-        assertThat(config.isEmailVerificationEnabled()).isTrue();
-        assertThat(config.getEmailUrl()).isEqualTo("someurl");
+        assertThat(config.isEmailEnabled()).isTrue();
+        assertThat(config.getEmailVerificationUrl()).isEqualTo("someurl");
         assertThat(config.getTokenExpiry()).isEqualTo(1234L);
         assertThat(config.getConfigProviderClass()).isEqualTo("someclass");
         assertThat(config.isKbaEnabled()).isTrue();
@@ -74,12 +73,10 @@ public final class ForgottenPasswordExtractorTest {
         assertThat(config.getCaptchaSiteKey()).isEqualTo("someKey");
         assertThat(config.getCaptchaSecretKey()).isEqualTo("someSecret");
         assertThat(config.getCaptchaVerificationUrl()).isEqualTo("someUrl");
-        assertThat(config.getSubjectTranslations()).hasSize(2);
-        assertThat(config.getSubjectTranslations()).containsKey(Locale.ENGLISH);
-        assertThat(config.getSubjectTranslations()).containsKey(Locale.FRENCH);
-        assertThat(config.getMessageTranslations()).hasSize(2);
-        assertThat(config.getMessageTranslations()).containsKey(Locale.GERMAN);
-        assertThat(config.getMessageTranslations()).containsKey(Locale.FRENCH);
+        assertThat(config.getSubjectTranslations()).containsOnlyKeys(Locale.ENGLISH);
+        assertThat(config.getSubjectTranslations()).containsValues("The Subject!");
+        assertThat(config.getMessageTranslations()).containsOnlyKeys(Locale.GERMAN);
+        assertThat(config.getMessageTranslations()).containsValues("Hallo Welt!");
     }
 
 }

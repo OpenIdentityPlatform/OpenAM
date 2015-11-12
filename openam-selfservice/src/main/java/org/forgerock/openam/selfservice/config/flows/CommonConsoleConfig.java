@@ -13,8 +13,9 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice.config.flows;
 
+import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.util.Reject;
 
 import java.util.HashMap;
@@ -27,29 +28,27 @@ import java.util.Set;
  *
  * @since 13.0.0
  */
-abstract class CommonConsoleConfig implements ConsoleConfig {
+abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
 
     private final Map<String, Set<String>> consoleAttributes;
     private final boolean enabled;
-    private final boolean emailVerificationEnabled;
-    private final String emailUrl;
+    private final String configProviderClass;
+    private final long tokenExpiry;
+    private final boolean emailEnabled;
+    private final Map<Locale, String> subjectTranslations;
+    private final Map<Locale, String> messageTranslations;
     private final boolean captchaEnabled;
     private final String siteKey;
     private final String secretKey;
     private final String verificationUrl;
     private final boolean kbaEnabled;
     private final Map<String, Map<String, String>> securityQuestions;
-    private final String configProviderClass;
-    private final long tokenExpiry;
-    private final Map<Locale, String> subjectTranslations;
-    private final Map<Locale, String> messageTranslations;
 
     protected CommonConsoleConfig(Builder builder) {
         consoleAttributes = builder.consoleAttributes;
         configProviderClass = builder.configProviderClass;
         enabled = builder.enabled;
-        emailVerificationEnabled = builder.emailVerificationEnabled;
-        emailUrl = builder.emailUrl;
+        emailEnabled = builder.emailEnabled;
         tokenExpiry = builder.tokenExpiry;
         captchaEnabled = builder.captchaEnabled;
         siteKey = builder.siteKey;
@@ -80,17 +79,8 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
      *
      * @return whether email verification is enabled
      */
-    public boolean isEmailVerificationEnabled() {
-        return emailVerificationEnabled;
-    }
-
-    /**
-     * Gets the url to be used within the email.
-     *
-     * @return the email url
-     */
-    public String getEmailUrl() {
-        return emailUrl;
+    public boolean isEmailEnabled() {
+        return emailEnabled;
     }
 
     /**
@@ -201,23 +191,22 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
         return consoleAttributes.get(key);
     }
 
-    abstract static class Builder<C extends ConsoleConfig, B extends Builder<C, B>> {
+    abstract static class Builder<C, B extends Builder<C, B>> {
 
         private final Map<String, Set<String>> consoleAttributes;
 
         private boolean enabled;
-        private boolean emailVerificationEnabled;
-        private String emailUrl;
+        private String configProviderClass;
+        private long tokenExpiry;
+        private boolean emailEnabled;
+        private final Map<Locale, String> subjectTranslations;
+        private final Map<Locale, String> messageTranslations;
         private boolean captchaEnabled;
         private String siteKey;
         private String secretKey;
         private String verificationUrl;
         private boolean kbaEnabled;
         private final Map<String, Map<String, String>> securityQuestions;
-        private String configProviderClass;
-        private long tokenExpiry;
-        private final Map<Locale, String> subjectTranslations;
-        private final Map<Locale, String> messageTranslations;
 
         protected Builder(Map<String, Set<String>> consoleAttributes) {
             Reject.ifNull(consoleAttributes);
@@ -228,80 +217,69 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
             messageTranslations = new HashMap<>();
         }
 
-        B setConfigProviderClass(String configProviderClass) {
-            this.configProviderClass = configProviderClass;
-            return getThis();
-        }
-
         B setEnabled(boolean enabled) {
             this.enabled = enabled;
-            return getThis();
+            return self();
         }
 
-        B setEmailVerificationEnabled(boolean emailVerificationEnabled) {
-            this.emailVerificationEnabled = emailVerificationEnabled;
-            return getThis();
-        }
-
-        B setEmailUrl(String emailUrl) {
-            this.emailUrl = emailUrl;
-            return getThis();
+        B setConfigProviderClass(String configProviderClass) {
+            this.configProviderClass = configProviderClass;
+            return self();
         }
 
         B setTokenExpiry(long tokenExpiry) {
             this.tokenExpiry = tokenExpiry;
-            return getThis();
+            return self();
         }
 
-        B setCaptchaEnabled(boolean captchaEnabled) {
-            this.captchaEnabled = captchaEnabled;
-            return getThis();
-        }
-
-        B setSiteKey(String siteKey) {
-            this.siteKey = siteKey;
-            return getThis();
-        }
-
-        B setSecretKey(String secretKey) {
-            this.secretKey = secretKey;
-            return getThis();
-        }
-
-        B setVerificationUrl(String verificationUrl) {
-            this.verificationUrl = verificationUrl;
-            return getThis();
-        }
-
-        B setKbaEnabled(boolean kbaEnabled) {
-            this.kbaEnabled = kbaEnabled;
-            return getThis();
-        }
-
-        B setSecurityQuestions(Map<String, Map<String, String>> securityQuestions) {
-            this.securityQuestions.putAll(securityQuestions);
-            return getThis();
+        B setEmailEnabled(boolean emailEnabled) {
+            this.emailEnabled = emailEnabled;
+            return self();
         }
 
         B setSubjectTranslations(Map<Locale, String> subjectTranslations) {
             this.subjectTranslations.putAll(subjectTranslations);
-            return getThis();
+            return self();
         }
 
         B setMessageTranslations(Map<Locale, String> messageTranslations) {
             this.messageTranslations.putAll(messageTranslations);
-            return getThis();
+            return self();
+        }
+
+        B setCaptchaEnabled(boolean captchaEnabled) {
+            this.captchaEnabled = captchaEnabled;
+            return self();
+        }
+
+        B setSiteKey(String siteKey) {
+            this.siteKey = siteKey;
+            return self();
+        }
+
+        B setSecretKey(String secretKey) {
+            this.secretKey = secretKey;
+            return self();
+        }
+
+        B setVerificationUrl(String verificationUrl) {
+            this.verificationUrl = verificationUrl;
+            return self();
+        }
+
+        B setKbaEnabled(boolean kbaEnabled) {
+            this.kbaEnabled = kbaEnabled;
+            return self();
+        }
+
+        B setSecurityQuestions(Map<String, Map<String, String>> securityQuestions) {
+            this.securityQuestions.putAll(securityQuestions);
+            return self();
         }
 
         C build() {
             Reject.ifNull(configProviderClass, "Config provide class name required");
             Reject.ifFalse(tokenExpiry > 0, "Token expiry must be greater than zero");
-
-            if (emailVerificationEnabled) {
-                Reject.ifNull(emailUrl, "Email verification url required");
-                Reject.ifTrue(subjectTranslations.isEmpty(), "Subject translations are missing");
-                Reject.ifTrue(messageTranslations.isEmpty(), "Message translations are missing");
-            }
 
             if (captchaEnabled) {
                 Reject.ifNull(siteKey, "Captcha site key is required");
@@ -309,14 +287,29 @@ abstract class CommonConsoleConfig implements ConsoleConfig {
                 Reject.ifNull(verificationUrl, "Captcha verification url is required");
             }
 
+            if (emailEnabled) {
+                Reject.ifTrue(subjectTranslations.isEmpty(), "Subject translations are required");
+                Reject.ifTrue(messageTranslations.isEmpty(), "Message translations are required");
+                verifyEmailConfig();
+            }
+
             if (kbaEnabled) {
-                Reject.ifTrue(securityQuestions.isEmpty(), "Security questions required");
+                Reject.ifTrue(securityQuestions.isEmpty(), "Security questions are required");
+                verifyKbaConfig();
             }
 
             return internalBuild();
         }
 
-        abstract B getThis();
+        void verifyEmailConfig() {
+            // Can be overwritten to provide specific email verification
+        }
+
+        void verifyKbaConfig() {
+            // Can be overwritten to provide specific kba verification
+        }
+
+        abstract B self();
 
         abstract C internalBuild();
     }

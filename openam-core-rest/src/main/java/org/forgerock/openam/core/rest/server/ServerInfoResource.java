@@ -145,6 +145,8 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"));
             result.put("secureCookie", CookieUtils.isCookieSecure());
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
+            result.put("forgotUsername", String.valueOf(restSecurity.isForgotUsername()));
+            result.put("kbaEnabled", String.valueOf(restSecurity.isKbaEnabled()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
             result.put("lang", getJsLocale(localeContext.getLocale()));
             result.put("successfulUserRegistrationDestination",

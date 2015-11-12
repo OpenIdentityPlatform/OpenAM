@@ -33,6 +33,6 @@ public interface ServiceConfigProviderFactory {
      *
      * @return an instance of a service config provider
      */
-    <C extends ConsoleConfig> ServiceConfigProvider<C> getProvider(C config);
+    <C extends SelfServiceConsoleConfig> ServiceConfigProvider<C> getProvider(C config);
 
 }

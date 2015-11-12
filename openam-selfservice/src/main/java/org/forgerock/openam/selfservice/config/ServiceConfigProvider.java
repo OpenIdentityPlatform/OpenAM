@@ -27,7 +27,7 @@ import org.forgerock.services.context.Context;
  *
  * @since 13.0.0
  */
-public interface ServiceConfigProvider<C extends ConsoleConfig> {
+public interface ServiceConfigProvider<C extends SelfServiceConsoleConfig> {
 
 
     /**

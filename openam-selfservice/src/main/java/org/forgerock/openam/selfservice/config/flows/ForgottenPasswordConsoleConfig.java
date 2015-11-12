@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice.config.flows;
 
 import org.forgerock.util.Reject;
 
@@ -28,11 +28,22 @@ import java.util.Set;
  */
 public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
 
+    private final String emailVerificationUrl;
     private final int minQuestionsToAnswer;
 
     private ForgottenPasswordConsoleConfig(ForgottenPasswordBuilder builder) {
         super(builder);
+        emailVerificationUrl = builder.emailVerificationUrl;
         minQuestionsToAnswer = builder.minQuestionsToAnswer;
+    }
+
+    /**
+     * Gets the verification Url to be sent with the email body.
+     *
+     * @return email verification Url
+     */
+    public String getEmailVerificationUrl() {
+        return emailVerificationUrl;
     }
 
     /**
@@ -47,10 +58,16 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
     static final class ForgottenPasswordBuilder
             extends Builder<ForgottenPasswordConsoleConfig, ForgottenPasswordBuilder> {
 
+        private String emailVerificationUrl;
         private int minQuestionsToAnswer;
 
         private ForgottenPasswordBuilder(Map<String, Set<String>> consoleAttributes) {
             super(consoleAttributes);
+        }
+
+        ForgottenPasswordBuilder setEmailVerificationUrl(String emailVerificationUrl) {
+            this.emailVerificationUrl = emailVerificationUrl;
+            return this;
         }
 
         ForgottenPasswordBuilder setMinQuestionsToAnswer(int minQuestionsToAnswer) {
@@ -59,15 +76,25 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
         }
 
         @Override
-        ForgottenPasswordBuilder getThis() {
+        ForgottenPasswordBuilder self() {
             return this;
         }
 
         @Override
+        void verifyEmailConfig() {
+            Reject.ifNull(emailVerificationUrl, "Email verification Url is required");
+        }
+
+        @Override
+        void verifyKbaConfig() {
+            Reject.ifFalse(minQuestionsToAnswer > 0, "Minimum questions to be answered must be greater than 0");
+        }
+
+        @Override
         ForgottenPasswordConsoleConfig internalBuild() {
-            Reject.ifFalse(minQuestionsToAnswer > 0);
             return new ForgottenPasswordConsoleConfig(this);
         }
+
     }
 
     static ForgottenPasswordBuilder newBuilder(Map<String, Set<String>> consoleAttributes) {

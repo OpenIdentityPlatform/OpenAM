@@ -36,10 +36,66 @@
                 i18nKey="forgerock-restSecurity-service-description">
 
             <Organization>
+
+                <!-- General configuration -->
+
+                <AttributeSchema name="forgerockRESTSecurityCaptchaSiteKey"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="captchaSiteKey"
+                                 i18nKey="a001">
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityCaptchaSecretKey"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="captchaSecretKey"
+                                 i18nKey="a002">
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityCaptchaVerificationUrl"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="captchaVerificationUrl"
+                                 i18nKey="a003">
+                    <DefaultValues>
+                        <Value>https://www.google.com/recaptcha/api/siteverify</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityKBAQuestions"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="kbaQuestions"
+                                 i18nKey="a011">
+                    <DefaultValues>
+                        <Value>1|en|What is the name of your favourite restaurant?</Value>
+                        <Value>2|en|What was the model of your first car?</Value>
+                        <Value>3|en|What was the name of your childhood pet?</Value>
+                        <Value>4|en|What is your mother's maiden name?</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityAnswersUserMustProvide"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="30"
+                                 resourceName="kbaAnswersUserMustProvide"
+                                 i18nKey="a012">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityQuestionsUserMustAnswer"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="50"
+                                 resourceName="kbaQuestionsUserMustAnswer"
+                                 i18nKey="a013">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- User registration -->
+
                 <AttributeSchema name="forgerockRESTSecuritySelfRegistrationEnabled"
                                  type="single"
                                  syntax="boolean"
-                                 validator="RequiredValueValidator"
                                  resourceName="selfRegistrationEnabled"
                                  i18nKey="a101">
                     <BooleanValues>
@@ -50,34 +106,11 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecuritySelfRegTokenTTL"
-                                 type="single"
-                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 validator="RequiredValueValidator"
-                                 resourceName="selfRegistrationTokenLifetime"
-                                 i18nKey="a102">
-                    <DefaultValues>
-                        <Value>900</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecuritySelfRegConfirmationUrl"
-                                 type="single"
-                                 syntax="url"
-                                 resourceName="selfRegistrationConfirmationUrl"
-                                 i18nKey="a103">
-                    <DefaultValues>
-                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#register/</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityForgotPasswordEnabled"
+                <AttributeSchema name="forgerockRESTSecuritySelfRegCaptchaEnabled"
                                  type="single"
                                  syntax="boolean"
-                                 validator="RequiredValueValidator"
-                                 resourceName="forgotPasswordEnabled"
-                                 i18nKey="a104">
+                                 resourceName="selfRegCaptchaEnabled"
+                                 i18nKey="a202">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -86,28 +119,75 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityForgotPassTokenTTL"
+                <AttributeSchema name="forgerockRESTSecuritySelfRegEmailVerificationEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="selfRegEmailVerificationEnabled"
+                                 i18nKey="a203">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySelfRegKbaEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="selfRegKbaEnabled"
+                                 i18nKey="a204">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySelfRegTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 validator="RequiredValueValidator"
-                                 resourceName="forgotPasswordTokenLifetime"
-                                 i18nKey="a105">
+                                 resourceName="selfRegistrationTokenLifetime"
+                                 i18nKey="a102">
                     <DefaultValues>
                         <Value>900</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityForgotPassConfirmationUrl"
-                                 type="single"
-                                 syntax="url"
-                                 resourceName="forgotPasswordConfirmationUrl"
-                                 i18nKey="a106">
+                <AttributeSchema name="forgerockRESTSecuritySelfRegEmailSubject"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="registrationEmailSubject"
+                                 i18nKey="a221">
                     <DefaultValues>
-                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#passwordReset/</Value>
+                        <Value>en|Registration email</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
+                <AttributeSchema name="forgerockRESTSecuritySelfRegEmailBody"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="registrationEmailBody"
+                                 i18nKey="a222">
+                    <DefaultValues>
+                        <Value>en|Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to register</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySelfRegistrationValidUserAttributes"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="selfRegistrationValidAttributes"
+                                 i18nKey="a231">
+                    <DefaultValues>
+                        <Value>mail</Value>
+                        <Value>inetUserStatus</Value>
+                        <Value>sn</Value>
+                        <Value>username</Value>
+                        <Value>userPassword</Value>
+                        <Value>kbaInfo</Value>
+                        <Value>kbaInformation</Value>
+                        <Value>givenName</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecuritySuccessfulUserRegistrationDestination"
                                  type="single_choice"
                                  syntax="string"
@@ -123,6 +203,187 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <!-- Forgotten password -->
+
+                <AttributeSchema name="forgerockRESTSecurityForgotPasswordEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotPasswordEnabled"
+                                 i18nKey="a104">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassCaptchaEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotPassCaptchaEnabled"
+                                 i18nKey="a302">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassEmailVerificationEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgetPassEmailVerificationEnabled"
+                                 i18nKey="a303">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassKbaEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotPassKbaEnabled"
+                                 i18nKey="a304">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassTokenTTL"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 resourceName="forgotPasswordTokenLifetime"
+                                 i18nKey="a105">
+                    <DefaultValues>
+                        <Value>900</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassEmailSubject"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="forgottenPasswordEmailSubject"
+                                 i18nKey="a321">
+                    <DefaultValues>
+                        <Value>en|Forgotten password email</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassEmailBody"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="forgottenPasswordEmailBody"
+                                 i18nKey="a322">
+                    <DefaultValues>
+                        <Value>en|Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to reset your password
+                        </Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- Forgotten username -->
+
+                <AttributeSchema name="forgerockRESTSecurityForgotUsernameEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotUsernameEnabled"
+                                 i18nKey="a401">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotUsernameCaptchaEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotUsernameCaptchaEnabled"
+                                 i18nKey="a402">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotUsernameKbaEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotUsernameKbaEnabled"
+                                 i18nKey="a403">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotUsernameEmailUsernameEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotUsernameEmailUsernameEnabled"
+                                 i18nKey="a404">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotUsernameShowUsernameEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="forgotUsernameShowUsernameEnabled"
+                                 i18nKey="a405">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotUsernameTokenTTL"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 resourceName="forgotUsernameTokenLifetime"
+                                 i18nKey="a411">
+                    <DefaultValues>
+                        <Value>900</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotUsernameEmailSubject"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="forgottenUsernameEmailSubject"
+                                 i18nKey="a421">
+                    <DefaultValues>
+                        <Value>en|Forgotten username email</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerockRESTSecurityForgotUsernameEmailBody"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="forgottenUsernameEmailBody"
+                                 i18nKey="a422">
+                    <DefaultValues>
+                        <Value>en|Your username is %username%.</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- Profile management -->
+
                 <AttributeSchema name="forgerockRESTSecurityProtectedUserAttributes"
                                  type="list"
                                  syntax="string"
@@ -130,223 +391,51 @@
                                  i18nKey="a108">
                 </AttributeSchema>
 
-                <AttributeSchema name="forgerockRESTSecuritySelfRegEmailVerificationEnabled"
+                <!-- Advanced configuration -->
+
+                <AttributeSchema name="forgerockRESTSecuritySelfRegConfirmationUrl"
                                  type="single"
-                                 syntax="boolean"
-                                 resourceName="selfRegEmailVerificationEnabled"
-                                 i18nKey="a120">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
+                                 syntax="url"
+                                 resourceName="selfRegistrationConfirmationUrl"
+                                 i18nKey="a103">
                     <DefaultValues>
-                        <Value>true</Value>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#register/</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityForgotPassEmailVerificationEnabled"
+                <AttributeSchema name="forgerockRESTSecurityForgotPassConfirmationUrl"
                                  type="single"
-                                 syntax="boolean"
-                                 resourceName="forgetPassEmailVerificationEnabled"
-                                 i18nKey="a121">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
+                                 syntax="url"
+                                 resourceName="forgotPasswordConfirmationUrl"
+                                 i18nKey="a106">
                     <DefaultValues>
-                        <Value>true</Value>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#passwordReset/</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecuritySelfRegCaptchaEnabled"
-                                 type="single"
-                                 syntax="boolean"
-                                 resourceName="selfRegCaptchaEnabled"
-                                 i18nKey="a150">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityForgotPassCaptchaEnabled"
-                                 type="single"
-                                 syntax="boolean"
-                                 resourceName="forgotPassCaptchaEnabled"
-                                 i18nKey="a151">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityCaptchaSiteKey"
-                                 type="single"
-                                 syntax="string"
-                                 resourceName="captchaSiteKey"
-                                 i18nKey="a152">
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityCaptchaSecretKey"
-                                 type="single"
-                                 syntax="string"
-                                 resourceName="captchaSecretKey"
-                                 i18nKey="a153">
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityCaptchaVerificationUrl"
-                                 type="single"
-                                 syntax="string"
-                                 resourceName="captchaVerificationUrl"
-                                 i18nKey="a154">
-                    <DefaultValues>
-                        <Value>https://www.google.com/recaptcha/api/siteverify</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecuritySelfRegKbaEnabled"
-                                 type="single"
-                                 syntax="boolean"
-                                 resourceName="selfRegKbaEnabled"
-                                 i18nKey="a200">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityForgotPassKbaEnabled"
-                                 type="single"
-                                 syntax="boolean"
-                                 resourceName="forgotPassKbaEnabled"
-                                 i18nKey="a201">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityKBAQuestions"
-                                 type="list"
-                                 syntax="string"
-                                 resourceName="kbaQuestions"
-                                 i18nKey="a202">
-                    <DefaultValues>
-                        <Value>1|en|What is the name of your favourite restaurant?</Value>
-                        <Value>2|en|What was the model of your first car?</Value>
-                        <Value>3|en|What was the name of your childhood pet?</Value>
-                        <Value>4|en|What is your mother's maiden name?</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityQuestionsUserMustAnswer"
-                                 type="single"
-                                 syntax="number_range" rangeStart="0" rangeEnd="50"
-                                 validator="RequiredValueValidator"
-                                 resourceName="kbaQuestionsUserMustAnswer"
-                                 i18nKey="a203">
-                    <DefaultValues>
-                        <Value>1</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityAnswersUserMustProvide"
-                                 type="single"
-                                 syntax="number_range" rangeStart="0" rangeEnd="30"
-                                 validator="RequiredValueValidator"
-                                 resourceName="kbaAnswersUserMustProvide"
-                                 i18nKey="a204">
-                    <DefaultValues>
-                        <Value>1</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
                 <AttributeSchema name="forgerockRESTSecuritySelfRegServiceConfigClass"
                                  type="single"
                                  syntax="string"
                                  resourceName="selfRegistrationServiceConfigClass"
-                                 i18nKey="a300">
+                                 i18nKey="a603">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.selfservice.config.DefaultUserRegistrationConfigProvider</Value>
+                        <Value>org.forgerock.openam.selfservice.config.flows.UserRegistrationConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
                 <AttributeSchema name="forgerockRESTSecurityForgotPassServiceConfigClass"
                                  type="single"
                                  syntax="string"
                                  resourceName="forgotPasswordServiceConfigClass"
-                                 i18nKey="a301">
+                                 i18nKey="a604">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.selfservice.config.DefaultForgottenPasswordConfigProvider</Value>
+                        <Value>org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecuritySelfRegSubjectText"
-                                 type="list"
+                <AttributeSchema name="forgerockRESTSecurityForgotUsernameServiceConfigClass"
+                                 type="single"
                                  syntax="string"
-                                 resourceName="registrationSubjectText"
-                                 i18nKey="a400">
+                                 resourceName="forgotUsernameServiceConfigClass"
+                                 i18nKey="a605">
                     <DefaultValues>
-                        <Value>en|Registration email</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecuritySelfRegEmailText"
-                                 type="list"
-                                 syntax="string"
-                                 resourceName="registrationEmailText"
-                                 i18nKey="a410">
-                    <DefaultValues>
-                        <Value>en|Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to register</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityForgotPassSubjectText"
-                                 type="list"
-                                 syntax="string"
-                                 resourceName="forgottenPasswordSubjectText"
-                                 i18nKey="a420">
-                    <DefaultValues>
-                        <Value>en|Forgotten password email</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecurityForgotPassEmailText"
-                                 type="list"
-                                 syntax="string"
-                                 resourceName="forgottenPasswordEmailText"
-                                 i18nKey="a430">
-                    <DefaultValues>
-                        <Value>en|Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to reset your password</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerockRESTSecuritySelfRegistrationValidUserAttributes"
-                                 type="list"
-                                 syntax="string"
-                                 resourceName="selfRegistrationValidAttributes"
-                                 i18nKey="a500">
-                    <DefaultValues>
-                        <Value>mail</Value>
-                        <Value>inetUserStatus</Value>
-                        <Value>sn</Value>
-                        <Value>username</Value>
-                        <Value>userPassword</Value>
-                        <Value>kbaInfo</Value>
-                        <Value>kbaInformation</Value>
-                        <Value>givenName</Value>
+                        <Value>org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConsoleConfig</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

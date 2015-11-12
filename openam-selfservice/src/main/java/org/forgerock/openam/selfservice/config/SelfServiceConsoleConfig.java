@@ -17,14 +17,14 @@
 package org.forgerock.openam.selfservice.config;
 
 /**
- * Represents console configuration for a given self service.
+ * Defines the bases for which all self service console configuration should be built on.
  *
  * @since 13.0.0
  */
-public interface ConsoleConfig {
+public interface SelfServiceConsoleConfig {
 
     /**
-     * Gets the class name for the service configuration provider.
+     * Gets the class name for the self service configuration provider.
      *
      * @return the config provider class name
      */

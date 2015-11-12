@@ -23,8 +23,9 @@ import com.google.inject.TypeLiteral;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
-import org.forgerock.openam.selfservice.config.ForgottenPasswordConsoleConfig;
-import org.forgerock.openam.selfservice.config.UserRegistrationConsoleConfig;
+import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConsoleConfig;
+import org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConsoleConfig;
+import org.forgerock.openam.selfservice.config.flows.UserRegistrationConsoleConfig;
 
 /**
  * Provides routes for the user self service services.
@@ -36,6 +37,15 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
     @Override
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter
+                .route("/userRegistration")
+                .authenticateWith(
+                        ssoToken()
+                                .exceptRead()
+                                .exceptActions("submitRequirements"))
+                .toRequestHandler(RoutingMode.STARTS_WITH, Key
+                        .get(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>(){}));
+
+        realmRouter
                 .route("/forgottenPassword")
                 .authenticateWith(
                         ssoToken()
@@ -45,13 +55,13 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                         .get(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>(){}));
 
         realmRouter
-                .route("/userRegistration")
+                .route("/forgottenUsername")
                 .authenticateWith(
                         ssoToken()
                                 .exceptRead()
                                 .exceptActions("submitRequirements"))
                 .toRequestHandler(RoutingMode.STARTS_WITH, Key
-                        .get(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>(){}));
+                        .get(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>(){}));
     }
 
 }

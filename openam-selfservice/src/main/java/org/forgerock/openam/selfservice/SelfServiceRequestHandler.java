@@ -25,12 +25,12 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.selfservice.config.ConsoleConfig;
 import org.forgerock.openam.selfservice.config.ConsoleConfigChangeListener;
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
+import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @since 13.0.0
  */
-final class SelfServiceRequestHandler<C extends ConsoleConfig>
+final class SelfServiceRequestHandler<C extends SelfServiceConsoleConfig>
         extends AbstractRequestHandler implements ConsoleConfigChangeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(SelfServiceRequestHandler.class);

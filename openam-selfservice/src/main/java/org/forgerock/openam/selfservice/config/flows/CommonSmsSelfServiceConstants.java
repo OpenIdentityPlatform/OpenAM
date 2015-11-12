@@ -14,29 +14,22 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
-
-import java.util.Map;
-import java.util.Set;
+package org.forgerock.openam.selfservice.config.flows;
 
 /**
- * Responsible for extracting console configuration instance from the collection of passed console attribute values.
- *
- * @param <C>
- *         the console configuration type
+ * Self service SMS related constants shared by all flows.
  *
  * @since 13.0.0
  */
-public interface ConsoleConfigExtractor<C> {
+final class CommonSmsSelfServiceConstants {
 
-    /**
-     * Given the console attribute values, extract out the configuration instance.
-     *
-     * @param consoleAttributes
-     *         console attribute values
-     *
-     * @return a console configuration instance
-     */
-    C extract(Map<String, Set<String>> consoleAttributes);
+    final static String SECURITY_QUESTIONS_KEY = "forgerockRESTSecurityKBAQuestions";
+    final static String CAPTCHA_SITE_KEY = "forgerockRESTSecurityCaptchaSiteKey";
+    final static String CAPTCHA_SECRET_KEY = "forgerockRESTSecurityCaptchaSecretKey";
+    final static String CAPTCHA_VERIFICATION_URL = "forgerockRESTSecurityCaptchaVerificationUrl";
+
+    private CommonSmsSelfServiceConstants() {
+        throw new UnsupportedOperationException();
+    }
 
 }

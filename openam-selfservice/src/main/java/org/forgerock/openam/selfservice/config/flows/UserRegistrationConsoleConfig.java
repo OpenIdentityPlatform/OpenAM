@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice.config.flows;
 
 import org.forgerock.util.Reject;
 
@@ -28,11 +28,22 @@ import java.util.Set;
  */
 public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
 
+    private final String emailVerificationUrl;
     private final int minAnswersToProvide;
 
     private UserRegistrationConsoleConfig(UserRegistrationBuilder builder) {
         super(builder);
+        emailVerificationUrl = builder.emailVerificationUrl;
         minAnswersToProvide = builder.minAnswersToProvide;
+    }
+
+    /**
+     * Gets the verification Url to be sent with the email body.
+     *
+     * @return email verification Url
+     */
+    public String getEmailVerificationUrl() {
+        return emailVerificationUrl;
     }
 
     /**
@@ -47,10 +58,16 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
     static final class UserRegistrationBuilder
             extends Builder<UserRegistrationConsoleConfig, UserRegistrationBuilder> {
 
+        private String emailVerificationUrl;
         private int minAnswersToProvide;
 
         private UserRegistrationBuilder(Map<String, Set<String>> consoleAttributes) {
             super(consoleAttributes);
+        }
+
+        UserRegistrationBuilder setEmailVerificationUrl(String emailVerificationUrl) {
+            this.emailVerificationUrl = emailVerificationUrl;
+            return this;
         }
 
         UserRegistrationBuilder setMinAnswersToProvide(int minAnswersToProvide) {
@@ -59,8 +76,18 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
         }
 
         @Override
-        UserRegistrationBuilder getThis() {
+        UserRegistrationBuilder self() {
             return this;
+        }
+
+        @Override
+        void verifyEmailConfig() {
+            Reject.ifNull(emailVerificationUrl, "Email verification Url is required");
+        }
+
+        @Override
+        void verifyKbaConfig() {
+            Reject.ifFalse(minAnswersToProvide > 0, "Minimum answers to be provided must be greater than 0");
         }
 
         @Override
@@ -68,6 +95,7 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
             Reject.ifFalse(minAnswersToProvide > 0);
             return new UserRegistrationConsoleConfig(this);
         }
+
     }
 
     static UserRegistrationBuilder newBuilder(Map<String, Set<String>> consoleAttributes) {

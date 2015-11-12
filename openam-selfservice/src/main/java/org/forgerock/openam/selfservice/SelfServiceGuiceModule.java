@@ -33,12 +33,14 @@ import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.ConsoleConfigHandlerImpl;
-import org.forgerock.openam.selfservice.config.ForgottenPasswordConsoleConfig;
-import org.forgerock.openam.selfservice.config.ForgottenPasswordExtractor;
+import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConsoleConfig;
+import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordExtractor;
+import org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConsoleConfig;
+import org.forgerock.openam.selfservice.config.flows.ForgottenUsernameExtractor;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactoryImpl;
-import org.forgerock.openam.selfservice.config.UserRegistrationConsoleConfig;
-import org.forgerock.openam.selfservice.config.UserRegistrationExtractor;
+import org.forgerock.openam.selfservice.config.flows.UserRegistrationConsoleConfig;
+import org.forgerock.openam.selfservice.config.flows.UserRegistrationExtractor;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStage;
 import org.forgerock.selfservice.core.ProgressStageProvider;
@@ -69,6 +71,8 @@ public final class SelfServiceGuiceModule extends PrivateModule {
                 .to(UserRegistrationExtractor.class);
         bind(new TypeLiteral<ConsoleConfigExtractor<ForgottenPasswordConsoleConfig>>() {})
                 .to(ForgottenPasswordExtractor.class);
+        bind(new TypeLiteral<ConsoleConfigExtractor<ForgottenUsernameConsoleConfig>>() {})
+                .to(ForgottenUsernameExtractor.class);
 
         try {
             bind(Client.class)
@@ -81,6 +85,7 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         // Registration CREST services
         expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() {});
         expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() {});
+        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() {});
         // Exposed to be accessible to custom progress stages
         expose(ConnectionFactory.class).annotatedWith(SelfService.class);
         expose(Client.class).annotatedWith(SelfService.class);
@@ -101,6 +106,16 @@ public final class SelfServiceGuiceModule extends PrivateModule {
     SelfServiceRequestHandler<ForgottenPasswordConsoleConfig> getForgottenPasswordService(
             SelfServiceFactory serviceFactory, ConsoleConfigHandler configHandler,
             ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> configExtractor,
+            ServiceConfigProviderFactory configProviderFactory) {
+
+        return new SelfServiceRequestHandler<>(serviceFactory, configHandler, configExtractor, configProviderFactory);
+    }
+
+    @Provides
+    @Singleton
+    SelfServiceRequestHandler<ForgottenUsernameConsoleConfig> getForgottenUsernameService(
+            SelfServiceFactory serviceFactory, ConsoleConfigHandler configHandler,
+            ConsoleConfigExtractor<ForgottenUsernameConsoleConfig> configExtractor,
             ServiceConfigProviderFactory configProviderFactory) {
 
         return new SelfServiceRequestHandler<>(serviceFactory, configHandler, configExtractor, configProviderFactory);

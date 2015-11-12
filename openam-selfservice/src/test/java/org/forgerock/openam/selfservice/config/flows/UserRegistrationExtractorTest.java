@@ -14,16 +14,17 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice.config.flows;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
+import org.forgerock.openam.selfservice.config.flows.UserRegistrationConsoleConfig;
+import org.forgerock.openam.selfservice.config.flows.UserRegistrationExtractor;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -40,14 +41,6 @@ public final class UserRegistrationExtractorTest {
         // Given
         Map<String, Set<String>> consoleAttributes = new HashMap<>();
 
-        Set<String> subjectTranslations = new HashSet<>();
-        subjectTranslations.add("it|Italian");
-        subjectTranslations.add("fr|French");
-
-        Set<String> messageTranslations = new HashSet<>();
-        messageTranslations.add("da|Danish");
-        messageTranslations.add("es|Spanish");
-
         consoleAttributes.put("forgerockRESTSecuritySelfRegistrationEnabled", Collections.singleton("true"));
         consoleAttributes.put("forgerockRESTSecuritySelfRegEmailVerificationEnabled", Collections.singleton("true"));
         consoleAttributes.put("forgerockRESTSecuritySelfRegConfirmationUrl", Collections.singleton("someurl"));
@@ -60,8 +53,8 @@ public final class UserRegistrationExtractorTest {
         consoleAttributes.put("forgerockRESTSecurityCaptchaSiteKey", Collections.singleton("someKey"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaSecretKey", Collections.singleton("someSecret"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaVerificationUrl", Collections.singleton("someUrl"));
-        consoleAttributes.put("forgerockRESTSecuritySelfRegSubjectText", subjectTranslations);
-        consoleAttributes.put("forgerockRESTSecuritySelfRegEmailText", messageTranslations);
+        consoleAttributes.put("forgerockRESTSecuritySelfRegEmailSubject", Collections.singleton("en|The Subject!"));
+        consoleAttributes.put("forgerockRESTSecuritySelfRegEmailBody", Collections.singleton("de|Hallo Welt!"));
 
         // When
         ConsoleConfigExtractor<UserRegistrationConsoleConfig> extractor = new UserRegistrationExtractor();
@@ -69,8 +62,7 @@ public final class UserRegistrationExtractorTest {
 
         // Then
         assertThat(config.isEnabled()).isTrue();
-        assertThat(config.isEmailVerificationEnabled()).isTrue();
-        assertThat(config.getEmailUrl()).isEqualTo("someurl");
+        assertThat(config.isEmailEnabled()).isTrue();
         assertThat(config.getTokenExpiry()).isEqualTo(1234L);
         assertThat(config.getConfigProviderClass()).isEqualTo("someclass");
         assertThat(config.isKbaEnabled()).isTrue();
@@ -80,11 +72,9 @@ public final class UserRegistrationExtractorTest {
         assertThat(config.getCaptchaSiteKey()).isEqualTo("someKey");
         assertThat(config.getCaptchaSecretKey()).isEqualTo("someSecret");
         assertThat(config.getCaptchaVerificationUrl()).isEqualTo("someUrl");
-        assertThat(config.getSubjectTranslations()).hasSize(2);
-        assertThat(config.getSubjectTranslations()).containsKey(Locale.ITALIAN);
-        assertThat(config.getSubjectTranslations()).containsKey(Locale.FRENCH);
-        assertThat(config.getMessageTranslations()).hasSize(2);
-        assertThat(config.getMessageTranslations()).containsKey(Locale.forLanguageTag("da"));
-        assertThat(config.getMessageTranslations()).containsKey(Locale.forLanguageTag("es"));
+        assertThat(config.getSubjectTranslations()).containsOnlyKeys(Locale.ENGLISH);
+        assertThat(config.getSubjectTranslations()).containsValues("The Subject!");
+        assertThat(config.getMessageTranslations()).containsOnlyKeys(Locale.GERMAN);
+        assertThat(config.getMessageTranslations()).containsValues("Hallo Welt!");
     }
 }

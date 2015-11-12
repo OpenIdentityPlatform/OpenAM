@@ -14,22 +14,22 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice.config.flows;
 
 import static com.sun.identity.shared.datastruct.CollectionHelper.getBooleanMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getIntMapAttrThrows;
+import static com.sun.identity.shared.datastruct.CollectionHelper.getLocaleMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getLongMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapSetThrows;
-import static com.sun.identity.shared.datastruct.CollectionHelper.getLocaleMapAttrThrows;
-import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.CAPTCHA_SECRET_KEY;
-import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.CAPTCHA_SITE_KEY;
-import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.CAPTCHA_VERIFICATION_URL;
-import static org.forgerock.openam.selfservice.config.CommonSmsSelfServiceConstants.SECURITY_QUESTIONS_KEY;
-import static org.forgerock.openam.selfservice.config.SecurityQuestionsHelper.parseQuestions;
+import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.CAPTCHA_SECRET_KEY;
+import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.CAPTCHA_SITE_KEY;
+import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.CAPTCHA_VERIFICATION_URL;
+import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.SECURITY_QUESTIONS_KEY;
 
 import com.sun.identity.shared.datastruct.ValueNotFoundException;
+import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 
 import java.util.Map;
 import java.util.Set;
@@ -42,15 +42,15 @@ import java.util.Set;
 public final class UserRegistrationExtractor implements ConsoleConfigExtractor<UserRegistrationConsoleConfig> {
 
     private final static String ENABLED_KEY = "forgerockRESTSecuritySelfRegistrationEnabled";
-    private final static String EMAIL_VERIFICATION_ENABLED = "forgerockRESTSecuritySelfRegEmailVerificationEnabled";
+    private final static String CAPTCHA_ENABLED_KEY = "forgerockRESTSecuritySelfRegCaptchaEnabled";
+    private final static String EMAIL_VERIFICATION_ENABLED_KEY = "forgerockRESTSecuritySelfRegEmailVerificationEnabled";
     private final static String EMAIL_URL_KEY = "forgerockRESTSecuritySelfRegConfirmationUrl";
-    private final static String TOKEN_EXPIRY_KEY = "forgerockRESTSecuritySelfRegTokenTTL";
-    private final static String SERVICE_CONFIG_CLASS_KEY = "forgerockRESTSecuritySelfRegServiceConfigClass";
+    private final static String SUBJECT_TRANSLATION_KEY = "forgerockRESTSecuritySelfRegEmailSubject";
+    private final static String BODY_TRANSLATION_KEY = "forgerockRESTSecuritySelfRegEmailBody";
     private final static String KBA_ENABLED_KEY = "forgerockRESTSecuritySelfRegKbaEnabled";
     private final static String MIN_ANSWERS_TO_PROVIDE_KEY = "forgerockRESTSecurityAnswersUserMustProvide";
-    private final static String CAPTCHA_ENABLED_KEY = "forgerockRESTSecuritySelfRegCaptchaEnabled";
-    private final static String SUBJECT_MAP = "forgerockRESTSecuritySelfRegSubjectText";
-    private final static String BODY_TEXT_MAP = "forgerockRESTSecuritySelfRegEmailText";
+    private final static String TOKEN_EXPIRY_KEY = "forgerockRESTSecuritySelfRegTokenTTL";
+    private final static String SERVICE_CONFIG_CLASS_KEY = "forgerockRESTSecuritySelfRegServiceConfigClass";
 
     @Override
     public UserRegistrationConsoleConfig extract(Map<String, Set<String>> consoleAttributes) {
@@ -58,16 +58,16 @@ public final class UserRegistrationExtractor implements ConsoleConfigExtractor<U
             return UserRegistrationConsoleConfig
                     .newBuilder(consoleAttributes)
                     .setEnabled(getBooleanMapAttrThrows(consoleAttributes, ENABLED_KEY))
-                    .setEmailVerificationEnabled(getBooleanMapAttrThrows(consoleAttributes, EMAIL_VERIFICATION_ENABLED))
-                    .setEmailUrl(getMapAttrThrows(consoleAttributes, EMAIL_URL_KEY))
-                    .setSubjectTranslations(getLocaleMapAttrThrows(consoleAttributes, SUBJECT_MAP))
-                    .setMessageTranslations(getLocaleMapAttrThrows(consoleAttributes, BODY_TEXT_MAP))
                     .setCaptchaEnabled(getBooleanMapAttrThrows(consoleAttributes, CAPTCHA_ENABLED_KEY))
                     .setSiteKey(getMapAttr(consoleAttributes, CAPTCHA_SITE_KEY))
                     .setSecretKey(getMapAttr(consoleAttributes, CAPTCHA_SECRET_KEY))
                     .setVerificationUrl(getMapAttr(consoleAttributes, CAPTCHA_VERIFICATION_URL))
+                    .setEmailEnabled(getBooleanMapAttrThrows(consoleAttributes, EMAIL_VERIFICATION_ENABLED_KEY))
+                    .setEmailVerificationUrl(getMapAttrThrows(consoleAttributes, EMAIL_URL_KEY))
+                    .setSubjectTranslations(getLocaleMapAttrThrows(consoleAttributes, SUBJECT_TRANSLATION_KEY))
+                    .setMessageTranslations(getLocaleMapAttrThrows(consoleAttributes, BODY_TRANSLATION_KEY))
                     .setKbaEnabled(getBooleanMapAttrThrows(consoleAttributes, KBA_ENABLED_KEY))
-                    .setSecurityQuestions(parseQuestions(getMapSetThrows(consoleAttributes, SECURITY_QUESTIONS_KEY)))
+                    .setSecurityQuestions(SecurityQuestionsHelper.parseQuestions(getMapSetThrows(consoleAttributes, SECURITY_QUESTIONS_KEY)))
                     .setMinAnswersToProvide(getIntMapAttrThrows(consoleAttributes, MIN_ANSWERS_TO_PROVIDE_KEY))
                     .setTokenExpiry(getLongMapAttrThrows(consoleAttributes, TOKEN_EXPIRY_KEY))
                     .setConfigProviderClass(getMapAttrThrows(consoleAttributes, SERVICE_CONFIG_CLASS_KEY))

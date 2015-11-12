@@ -14,10 +14,11 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice.config.flows;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.forgerock.openam.selfservice.config.flows.SecurityQuestionsHelper;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;

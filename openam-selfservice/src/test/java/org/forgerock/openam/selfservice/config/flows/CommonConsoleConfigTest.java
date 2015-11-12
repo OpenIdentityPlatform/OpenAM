@@ -14,10 +14,11 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice.config.flows;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.forgerock.openam.selfservice.config.flows.CommonConsoleConfig;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -70,7 +71,6 @@ public final class CommonConsoleConfigTest {
         // When
         new MockConfigBuilder(properties)
                 .setEnabled(true)
-                .setEmailUrl("someurl")
                 .setTokenExpiry(123L)
                 .build();
     }
@@ -81,20 +81,6 @@ public final class CommonConsoleConfigTest {
         new MockConfigBuilder(properties)
                 .setEnabled(true)
                 .setConfigProviderClass("abc")
-                .setEmailUrl("someurl")
-                .build();
-    }
-
-    @Test(expectedExceptions = NullPointerException.class)
-    public void failsWithNullEmailUrl() {
-        // When
-        new MockConfigBuilder(properties)
-                .setEnabled(true)
-                .setConfigProviderClass("abc")
-                .setTokenExpiry(123L)
-                .setEmailVerificationEnabled(true)
-                .setMessageTranslations(translations)
-                .setSubjectTranslations(translations)
                 .build();
     }
 
@@ -130,10 +116,9 @@ public final class CommonConsoleConfigTest {
         new MockConfigBuilder(properties)
                 .setEnabled(true)
                 .setConfigProviderClass("abc")
-                .setEmailUrl("someurl")
                 .setTokenExpiry(123L)
                 .setMessageTranslations(translations)
-                .setEmailVerificationEnabled(true)
+                .setEmailEnabled(true)
                 .build();
     }
 
@@ -145,9 +130,8 @@ public final class CommonConsoleConfigTest {
         new MockConfigBuilder(properties)
                 .setEnabled(true)
                 .setConfigProviderClass("abc")
-                .setEmailUrl("someurl")
                 .setTokenExpiry(123L)
-                .setEmailVerificationEnabled(true)
+                .setEmailEnabled(true)
                 .setMessageTranslations(translations)
                 .setSubjectTranslations(emptyMap)
                 .build();
@@ -159,9 +143,8 @@ public final class CommonConsoleConfigTest {
         new MockConfigBuilder(properties)
                 .setEnabled(true)
                 .setConfigProviderClass("abc")
-                .setEmailUrl("someurl")
                 .setTokenExpiry(123L)
-                .setEmailVerificationEnabled(true)
+                .setEmailEnabled(true)
                 .setSubjectTranslations(translations)
                 .build();
     }
@@ -174,9 +157,8 @@ public final class CommonConsoleConfigTest {
         new MockConfigBuilder(properties)
                 .setEnabled(true)
                 .setConfigProviderClass("abc")
-                .setEmailUrl("someurl")
                 .setTokenExpiry(123L)
-                .setEmailVerificationEnabled(true)
+                .setEmailEnabled(true)
                 .setSubjectTranslations(translations)
                 .setMessageTranslations(emptyMap)
                 .build();
@@ -211,7 +193,7 @@ public final class CommonConsoleConfigTest {
         }
 
         @Override
-        MockConfigBuilder getThis() {
+        MockConfigBuilder self() {
             return this;
         }
 

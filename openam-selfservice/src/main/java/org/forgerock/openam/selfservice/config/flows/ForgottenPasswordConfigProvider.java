@@ -14,13 +14,14 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.selfservice.config.flows;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import org.forgerock.json.jose.jwe.EncryptionMethod;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.config.StageConfig;
@@ -43,7 +44,7 @@ import java.util.List;
  *
  * @since 13.0.0
  */
-public final class DefaultForgottenPasswordConfigProvider
+public final class ForgottenPasswordConfigProvider
         implements ServiceConfigProvider<ForgottenPasswordConsoleConfig> {
 
     @Override
@@ -71,8 +72,8 @@ public final class DefaultForgottenPasswordConfigProvider
                 .setIdentityEmailField("/mail/0")
                 .setIdentityServiceUrl("/users"));
 
-        if (config.isEmailVerificationEnabled()) {
-            String serverUrl = config.getEmailUrl() + "&realm=" + realm;
+        if (config.isEmailEnabled()) {
+            String serverUrl = config.getEmailVerificationUrl() + "&realm=" + realm;
             stages.add(new VerifyEmailAccountConfig()
                     .setEmailServiceUrl("/email")
                     .setIdentityEmailField("mail")

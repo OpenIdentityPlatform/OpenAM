@@ -65,7 +65,7 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
     }
 
     @Override
-    public <C extends ConsoleConfig> C getConfig(String realm, ConsoleConfigExtractor<C> extractor) {
+    public <C> C getConfig(String realm, ConsoleConfigExtractor<C> extractor) {
         // Mapping from legacy API
         @SuppressWarnings("unchecked")
         Map<String, Set<String>> attributes = getServiceConfig(realm).getAttributes();
