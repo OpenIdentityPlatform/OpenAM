@@ -18,7 +18,6 @@ package org.forgerock.openam.oauth2.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.in;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
@@ -54,6 +53,7 @@ import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.extensions.ResourceRegistrationFilter;
+import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.util.query.BaseQueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
@@ -118,8 +118,10 @@ public class ResourceSetRegistrationEndpointTest {
 
         ExceptionHandler exceptionHandler = mock(ExceptionHandler.class);
 
+        UmaLabelsStore umaLabelsStore = mock(UmaLabelsStore.class);
+
         endpoint = spy(new ResourceSetRegistrationEndpoint(providerSettingsFactory, validator, requestFactory,
-                listeners, labelRegistration, extensionFilterManager, exceptionHandler));
+                listeners, labelRegistration, extensionFilterManager, exceptionHandler, umaLabelsStore));
 
         Request request = mock(Request.class);
         ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC);

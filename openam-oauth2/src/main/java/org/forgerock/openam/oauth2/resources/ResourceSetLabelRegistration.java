@@ -77,7 +77,7 @@ public class ResourceSetLabelRegistration {
         if (newLabels.isNull()) {
             newLabels = json(array());
         }
-        Collection<String> addedLabels = newLabels.asSet(String.class);
+        Collection<String> addedLabels = new HashSet<>(newLabels.asSet(String.class));
         try {
             Set<ResourceSetLabel> labels = labelsStore.forResourceSet(resourceSet.getRealm(),
                     resourceSet.getResourceOwnerId(), resourceSet.getId(), true);

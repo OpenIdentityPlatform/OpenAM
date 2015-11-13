@@ -17,9 +17,12 @@
 package org.forgerock.openam.oauth2.resources;
 
 import javax.inject.Inject;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,6 +44,8 @@ import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.extensions.ResourceRegistrationFilter;
+import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
+import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
@@ -77,10 +82,10 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
     private final ResourceSetLabelRegistration labelRegistration;
     private final ExtensionFilterManager extensionFilterManager;
     private final ExceptionHandler exceptionHandler;
+    private final UmaLabelsStore umaLabelsStore;
 
     /**
      * Construct a new ResourceSetRegistrationEndpoint instance.
-     *
      * @param providerSettingsFactory An instance of the {@link OAuth2ProviderSettingsFactory}.
      * @param validator An instance of the {@link ResourceSetDescriptionValidator}.
      * @param requestFactory An instance of the OAuth2RequestFactory.
@@ -88,12 +93,13 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
      * @param labelRegistration An instance of the {@code ResourceSetLabelRegistration}.
      * @param extensionFilterManager An instance of the {@code ExtensionFilterManager}.
      * @param exceptionHandler An instance of the {@code ExceptionHandler}.
+     * @param umaLabelsStore An instance of the Uma Label Store
      */
     @Inject
     public ResourceSetRegistrationEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
             ResourceSetDescriptionValidator validator, OAuth2RequestFactory<Request> requestFactory,
             Set<ResourceSetRegistrationListener> listeners, ResourceSetLabelRegistration labelRegistration,
-            ExtensionFilterManager extensionFilterManager, ExceptionHandler exceptionHandler) {
+            ExtensionFilterManager extensionFilterManager, ExceptionHandler exceptionHandler, UmaLabelsStore umaLabelsStore) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.validator = validator;
         this.requestFactory = requestFactory;
@@ -101,6 +107,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         this.labelRegistration = labelRegistration;
         this.extensionFilterManager = extensionFilterManager;
         this.exceptionHandler = exceptionHandler;
+        this.umaLabelsStore = umaLabelsStore;
     }
 
     /**
@@ -146,7 +153,9 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
             filter.beforeResourceRegistration(resourceSetDescription);
         }
         store.create(oAuth2Request, resourceSetDescription);
-        resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels);
+        if(labels.isNotNull()) {
+            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels.asSet());
+        }
         labelRegistration.updateLabelsForNewResourceSet(resourceSetDescription);
         for (ResourceRegistrationFilter filter : extensionFilterManager.getFilters(ResourceRegistrationFilter.class)) {
             filter.afterResourceRegistration(resourceSetDescription);
@@ -178,9 +187,13 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         JsonValue labels = resourceSetDescription.getDescription().get(OAuth2Constants.ResourceSets.LABELS);
         resourceSetDescription.getDescription().remove(OAuth2Constants.ResourceSets.LABELS);
         store.update(resourceSetDescription);
-        resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels);
-
+        if(labels.isNotNull()) {
+            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels.asSet());
+        } else {
+            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, new HashSet<String>());
+        }
         labelRegistration.updateLabelsForExistingResourceSet(resourceSetDescription);
+
         return createJsonResponse(resourceSetDescription, false, true);
     }
 
@@ -204,7 +217,19 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
 
     private Representation readResourceSet(String resourceSetId) throws NotFoundException, ServerException {
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        return createJsonResponse(store.read(resourceSetId), true, true);
+        ResourceSetDescription resourceSetDescription = store.read(resourceSetId);
+        Set<String> labels = new HashSet<String>();
+        try {
+            Set<ResourceSetLabel> labelSet = umaLabelsStore.forResourceSet(resourceSetDescription.getRealm(),
+                    resourceSetDescription.getResourceOwnerId(), resourceSetDescription.getId(), false);
+            for (ResourceSetLabel label : labelSet) {
+                labels.add(label.getName());
+            }
+        } catch (org.forgerock.json.resource.ResourceException e) {
+            throw new ServerException(e);
+        }
+        resourceSetDescription.getDescription().put("labels", labels);
+        return createJsonResponse(resourceSetDescription, true, true);
     }
 
     private Representation listResourceSets() throws ServerException, NotFoundException {
@@ -290,7 +315,14 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
     }
 
     private Tag generateETag(ResourceSetDescription resourceSetDescription) {
-        return new Tag(Integer.toString(resourceSetDescription.hashCode()), true);
+        int hashCode = resourceSetDescription.hashCode();
+        JsonValue description = resourceSetDescription.getDescription();
+        if(!description.isDefined(OAuth2Constants.ResourceSets.LABELS)) {
+            description.put(OAuth2Constants.ResourceSets.LABELS, null);
+            hashCode = resourceSetDescription.hashCode();
+            description.remove(OAuth2Constants.ResourceSets.LABELS);
+        }
+        return new Tag(Integer.toString(hashCode), true);
     }
 
     private Map<String, Object> toMap(JsonRepresentation entity) throws BadRequestException {
