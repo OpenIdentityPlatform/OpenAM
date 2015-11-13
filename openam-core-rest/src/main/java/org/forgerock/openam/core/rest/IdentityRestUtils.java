@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.core.rest;
 
+import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.*;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -22,27 +24,30 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
+import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.forgerock.services.context.Context;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.selfservice.core.SelfServiceContext;
+import org.forgerock.services.context.Context;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asMap;
 
 public final class IdentityRestUtils {
 
@@ -52,6 +57,7 @@ public final class IdentityRestUtils {
 
     public static final String UNIVERSAL_ID = "universalid";
     public static final String FIELD_MAIL = "mail";
+    public static final String REALM = "realm";
 
     public static final String USER_KBA_ATTRIBUTE = "kbaInformation";
 
@@ -131,4 +137,101 @@ public final class IdentityRestUtils {
         }
     }
 
+    /**
+     * When an instance of a user is created via self service, we impose additional rules for security purposes.
+     * Namely, we strictly apply a whitelist of valid attribute names to each attribute in the incoming JSON
+     * representation of the user object.  This ensures a hacker can't manipulate the request and thereby pretend
+     * to be a manager, demigod or individual they are not.
+     *
+     * There is no return value.  If you survive calling this function without an exception being thrown, there
+     * are no illegal values in the incoming JSON
+     *
+     * @param context The context
+     * @param request The request
+     * @param objectType The type of object we're creating, user, group, etc.
+     * @param validUserAttributes The set of valid user attributes
+     * @throws BadRequestException If any attribute is found in the JSON representation of the user object containing
+     * an attribute that is not in our whitelist
+     */
+    public static void enforceWhiteList(final Context context, final JsonValue jsonValue,
+                                        final String objectType, final Set<String> validUserAttributes)
+            throws BadRequestException {
+
+        if (!context.containsContext(SelfServiceContext.class) || !objectType.equals(USER_TYPE)) {
+            return;
+        }
+
+        final String realm = RealmContext.getRealm(context);
+
+        if (validUserAttributes == null || validUserAttributes.isEmpty()) {
+            throw new BadRequestException("Null/empty whitelist of valid attributes for self service user creation");
+        }
+
+        IdentityDetails identityDetails = jsonValueToIdentityDetails(objectType, jsonValue, realm);
+        Attribute[] attributes = identityDetails.getAttributes();
+        for (Attribute attribute : attributes) {
+            if (!validUserAttributes.contains(attribute.getName())) {
+                throw new BadRequestException("User attribute "
+                        + attribute.getName()
+                        + " is not valid for self service creation");
+            }
+        }
+    }
+
+    /**
+     * Returns an IdentityDetails from a JsonValue.
+     *
+     * @param objectType the object type, eg. user, group, etc.
+     * @param jVal The JsonValue Object to be converted
+     * @param realm The realm
+     * @return The IdentityDetails object
+     */
+    public static IdentityDetails jsonValueToIdentityDetails(final String objectType,
+                                                             final JsonValue jVal,
+                                                             final String realm) {
+
+        IdentityDetails identity = new IdentityDetails();
+        Map<String, Set<String>> identityAttrList = new HashMap<>();
+
+        try {
+            identity.setType(objectType); //set type ex. user
+            identity.setRealm(realm); //set realm
+            identity.setName(jVal.get(USERNAME).asString());//set name from JsonValue object
+
+            if (AGENT_TYPE.equals(objectType)) {
+                jVal.remove(USERNAME);
+                jVal.remove(REALM);
+                jVal.remove(UNIVERSAL_ID);
+            }
+
+            try {
+                for (String s : jVal.keys()) {
+                    JsonValue childValue = jVal.get(s);
+                    if (childValue.isString()) {
+                        identityAttrList.put(s, Collections.singleton(childValue.asString()));
+                    } else if (childValue.isList()) {
+                        List<String> list = new ArrayList<>();
+                        for (Object item : childValue.asList()) {
+                            if (item instanceof Map) {
+                                JsonValue json = new JsonValue(item);
+                                list.add(json.toString());
+                            } else {
+                                list.add(item.toString());
+                            }
+                        }
+                        identityAttrList.put(s, new HashSet<>(list));
+                    }
+                }
+            } catch (Exception e) {
+                debug.error("IdentityResource.jsonValueToIdentityDetails() :: Cannot Traverse JsonValue. ", e);
+            }
+            identity.setAttributes(asAttributeArray(identityAttrList));
+
+        } catch (final Exception e) {
+            debug.error("IdentityResource.jsonValueToIdentityDetails() :: Cannot convert JsonValue to IdentityDetails" +
+                    ".", e);
+            //deal with better exceptions
+        }
+        return identity;
+    }
 }

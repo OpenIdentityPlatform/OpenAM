@@ -23,8 +23,10 @@ import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.rest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.rest.RestUtils.isAdmin;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.enforceWhiteList;
 import static org.forgerock.openam.core.rest.IdentityRestUtils.getSSOToken;
 import static org.forgerock.openam.core.rest.IdentityRestUtils.identityDetailsToJsonValue;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.jsonValueToIdentityDetails;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
@@ -48,6 +50,7 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
+import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.NeedMoreCredentials;
@@ -63,9 +66,9 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.selfservice.core.SelfServiceContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -105,7 +108,6 @@ import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.AsyncFunction;
-import org.forgerock.util.Pair;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 
@@ -125,7 +127,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     // TODO: filters, sorting, paged results.
 
-    private final String userType;
+    private final String objectType;
 
     private ServiceConfigManager mailmgr;
     private ServiceConfig mailscm;
@@ -154,9 +156,9 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     /**
      * Creates a backend
      */
-    public IdentityResourceV1(String userType, MailServerLoader mailServerLoader,
+    public IdentityResourceV1(String objectType, MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
-        this(userType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider);
+        this(objectType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider);
     }
 
     /**
@@ -177,10 +179,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     }
 
     // Constructor used for testing...
-    IdentityResourceV1(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
+    IdentityResourceV1(String objectType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
             MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
             RestSecurityProvider restSecurityProvider) {
-        this.userType = userType;
+        this.objectType = objectType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
@@ -639,7 +641,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         final JsonValue jsonBody = request.getContent();
 
         try {
-
             // Check to make sure forgotPassword enabled
             if (restSecurity == null) {
                 if (debug.warningEnabled()) {
@@ -871,7 +872,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         String resourceId = jVal.get(USERNAME).asString();
 
         try {
-            newDtls = jsonValueToIdentityDetails(jVal, realm);
+            newDtls = jsonValueToIdentityDetails(objectType, jVal, realm);
 
             if (newDtls.getAttributes() == null || newDtls.getAttributes().length < 1) {
                 throw new BadRequestException("Illegal arguments: One or more required arguments is null or empty");
@@ -911,6 +912,9 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             if (!restSecurity.isSelfRegistration()) {
                 throw new BadRequestException("Self-registration disabled");
             }
+
+            enforceWhiteList(context, request.getContent(),
+                    objectType, restSecurity.getSelfRegistrationValidUserAttributes());
 
             final String tokenID = jVal.get(TOKEN_ID).asString();
             jVal.remove(TOKEN_ID);
@@ -994,7 +998,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final String realm) {
 
         JsonValue jVal = details;
-        IdentityDetails identity = jsonValueToIdentityDetails(jVal, realm);
+        IdentityDetails identity = jsonValueToIdentityDetails(objectType, jVal, realm);
         final String resourceId = identity.getName();
 
         return attemptResourceCreation(realm, admin, identity, resourceId)
@@ -1031,7 +1035,11 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final JsonValue jVal = request.getContent();
             String resourceId = request.getNewResourceId();
 
-            IdentityDetails identity = jsonValueToIdentityDetails(jVal, realm);
+            RestSecurity restSecurity = restSecurityProvider.get(realm);
+            enforceWhiteList(context, request.getContent(),
+                                            objectType, restSecurity.getSelfRegistrationValidUserAttributes());
+
+            IdentityDetails identity = jsonValueToIdentityDetails(objectType, jVal, realm);
             // check to see if request has included resource ID
             if (resourceId != null) {
                 if (identity.getName() != null) {
@@ -1066,6 +1074,8 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         } catch (SSOException e) {
             debug.error("IdentityResource.createInstance() :: failed.", e);
             return new NotFoundException(e.getMessage(), e).asPromise();
+        } catch (BadRequestException bre) {
+            return bre.asPromise();
         }
     }
 
@@ -1172,47 +1182,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             resource = newResourceResponse(resourceId, "0", result);
             return newResultPromise(resource);
         }
-    }
-
-    /**
-     * Returns an IdentityDetails from a JsonValue
-     *
-     * @param jVal The JsonValue Object to be converted
-     * @return The IdentityDetails object
-     */
-    private IdentityDetails jsonValueToIdentityDetails(final JsonValue jVal, final String realm) {
-
-        IdentityDetails identity = new IdentityDetails();
-        Map<String, Set<String>> identityAttrList = new HashMap<>();
-
-        try {
-            identity.setType(userType); //set type ex. user
-            identity.setRealm(realm); //set realm
-            identity.setName(jVal.get(USERNAME).asString());//set name from JsonValue object
-
-            try {
-                for (String s : jVal.keys()) {
-                    JsonValue childValue = jVal.get(s);
-                    if (childValue.isString()) {
-                        identityAttrList.put(s, Collections.singleton(childValue.asString()));
-                    } else if (childValue.isList()) {
-                        ArrayList<String> tList = (ArrayList<String>) childValue.getObject();
-                        identityAttrList.put(s, new HashSet<>(tList));
-                    }
-                }
-            } catch (Exception e) {
-                debug.error("IdentityResource.jsonValueToIdentityDetails() :: Cannot Traverse JsonValue." +
-                                " realm={}, jVal={}",
-                        realm, jVal, e);
-            }
-            identity.setAttributes(asAttributeArray(identityAttrList));
-
-        } catch (final Exception e) {
-            debug.error("IdentityResource.jsonValueToIdentityDetails() :: Cannot convert JsonValue to IdentityDetails. " +
-                    "realm={}, jVal={}", realm, jVal, e);
-            //deal with better exceptions
-        }
-        return identity;
     }
 
     /**
@@ -1367,7 +1336,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                     }
                 }
             }
-            newDtls = jsonValueToIdentityDetails(jsonValue, realm);
+            newDtls = jsonValueToIdentityDetails(objectType, jsonValue, realm);
             if (newDtls.getName() != null && !resourceId.equalsIgnoreCase(newDtls.getName())) {
                 throw new BadRequestException("id in path does not match id in request body");
             }
@@ -1377,7 +1346,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             identityServices.update(newDtls, admin);
             // read updated identity back to client
             IdentityDetails checkIdent = identityServices.read(dtls.getName(),
-                    getIdentityServicesAttributes(realm), admin);
+                                                                    getIdentityServicesAttributes(realm), admin);
             // handle updated resource
             resource = newResourceResponse(resourceId, "0", identityDetailsToJsonValue(checkIdent));
             return newResultPromise(resource);
@@ -1412,14 +1381,14 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE resourceId={}", resourceId, ssoe);
             return new ForbiddenException(ssoe).asPromise();
         }catch (final Exception e) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATEresourceId={}", resourceId, e);
+            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE resourceId={}", resourceId, e);
             return new NotFoundException(e).asPromise();
         }
     }
 
     private Map<String, Set<String>> getIdentityServicesAttributes(String realm) {
         Map<String, Set<String>> identityServicesAttributes = new HashMap<>();
-        identityServicesAttributes.put("objecttype", Collections.singleton(userType));
+        identityServicesAttributes.put("objecttype", Collections.singleton(objectType));
         identityServicesAttributes.put("realm", Collections.singleton(realm));
         return identityServicesAttributes;
     }
@@ -1431,4 +1400,9 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             return toEncode;
         }
     }
+
+
+
+
+
 }

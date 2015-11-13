@@ -98,15 +98,6 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                               IdentityServicesImpl identityServices,
                               CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
                               BaseURLProviderFactory baseURLProviderFactory) {
-        this(objectType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
-                                                                                        baseURLProviderFactory);
-    }
-
-    // Constructor used for testing...
-    IdentityResourceV3(String objectType, ServiceConfigManager serviceConfigManager, ServiceConfig serviceConfig,
-                       MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-                       RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
-
         this.identityResourceV2 = new IdentityResourceV2(objectType, mailServerLoader, identityServices, coreWrapper,
                 restSecurityProvider, baseURLProviderFactory);
         this.objectType = objectType;
@@ -139,10 +130,6 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(final Context context,
             final CreateRequest request) {
-
-        if (isSelfService(context)) {
-            return createInstanceViaSelfService(context, request);
-        }
 
         return identityResourceV2.createInstance(context, request);
     }
@@ -403,49 +390,5 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
      */
     private IdentityServicesImpl getIdentityServices() {
         return identityServices;
-    }
-
-    private boolean isSelfService(Context context) {
-        return context.asContext(SelfServiceContext.class) != null;
-    }
-
-    /**
-     * When an instance of a user is created via self service, we impose additional rules for security purposes.
-     * Namely, we strictly apply a whitelist of valid attribute names to ensure a hacker can't manipulate the incoming
-     * JSON and pretend to be a manager, demigod or other individual.
-     *
-     * @param context The context
-     * @param request The request
-     * @return A {@code Promise} containing the result of the operation.
-     */
-    private Promise<ResourceResponse, ResourceException> createInstanceViaSelfService(final Context context,
-                                                                                      final CreateRequest request) {
-
-        if (!objectType.equals(IdentityRestUtils.USER_TYPE)) {
-            return new BadRequestException("Cannot create object type " + objectType + " via self service").asPromise();
-        }
-
-        RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
-        RestSecurity restSecurity = restSecurityProvider.get(realm);
-
-        Set<String> validUserAttributes = restSecurity.getSelfRegistrationValidUserAttributes();
-        final JsonValue jsonValue = request.getContent();
-
-        if (validUserAttributes == null || validUserAttributes.isEmpty()) {
-            return new BadRequestException("Could not determine whitelist of valid attributes for self service user creation").asPromise();
-        }
-
-        IdentityDetails identityDetails = identityResourceV2.jsonValueToIdentityDetails(jsonValue, realm);
-        Attribute[] attributes = identityDetails.getAttributes();
-        for (Attribute attribute : attributes) {
-            if (!validUserAttributes.contains(attribute.getName())) {
-                return new BadRequestException("User attribute "
-                                + attribute.getName()
-                                + " is not valid for self service creation").asPromise();
-            }
-        }
-
-        return identityResourceV2.createInstance(context, request);
     }
 }

@@ -125,13 +125,11 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     private static final String AM_ENCRYPTION_PWD = "am.encryption.pwd";
 
     private static final String SEND_NOTIF_TAG = "IdentityResource.sendNotification() :: ";
-    static final String REALM = "realm";
     private static Debug debug = Debug.getInstance("frRest");
 
     public static final String USER_TYPE = "user";
     public static final String GROUP_TYPE = "group";
     public static final String AGENT_TYPE = "agent";
-
 
     private final static RedirectUrlValidator<String> URL_VALIDATOR =
             new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
@@ -969,7 +967,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         String resourceId = jVal.get(USERNAME).asString();
 
         try {
-            newDtls = jsonValueToIdentityDetails(jVal, realm);
+            newDtls = jsonValueToIdentityDetails(objectType, jVal, realm);
 
             if (newDtls.getAttributes() == null || newDtls.getAttributes().length < 1) {
                 throw new BadRequestException("Illegal arguments: One or more required arguments is null or empty");
@@ -1033,6 +1031,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             // create an Identity
             SSOToken admin = RestUtils.getToken();
             final String finalTokenID = tokenID;
+
+            enforceWhiteList(context, request.getContent(), objectType, restSecurity.getSelfRegistrationValidUserAttributes());
+
             return createInstance(admin, jVal, realm)
                     .thenAsync(new AsyncFunction<ActionResponse, ActionResponse, ResourceException>() {
                         @Override
@@ -1124,7 +1125,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     private Promise<ActionResponse, ResourceException> createInstance(SSOToken admin, JsonValue details, final String realm) {
 
         JsonValue jVal = details;
-        IdentityDetails identity = jsonValueToIdentityDetails(jVal, realm);
+        IdentityDetails identity = jsonValueToIdentityDetails(objectType, jVal, realm);
         final String resourceId = identity.getName();
 
         return attemptResourceCreation(realm, admin, identity, resourceId)
@@ -1160,7 +1161,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             final JsonValue jVal = request.getContent();
             String resourceId = request.getNewResourceId();
 
-            IdentityDetails identity = jsonValueToIdentityDetails(jVal, realm);
+            IdentityDetails identity = jsonValueToIdentityDetails(objectType, jVal, realm);
             // check to see if request has included resource ID
             if (resourceId != null) {
                 if (identity.getName() != null) {
@@ -1174,6 +1175,10 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             } else {
                 resourceId = identity.getName();
             }
+
+            RestSecurity restSecurity = restSecurityProvider.get(realm);
+            enforceWhiteList(context, request.getContent(), objectType,
+                                                            restSecurity.getSelfRegistrationValidUserAttributes());
 
             final String id = resourceId;
             return attemptResourceCreation(realm, admin, identity, resourceId)
@@ -1197,6 +1202,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
         } catch (SSOException e) {
             return new ForbiddenException(e).asPromise();
+        } catch (BadRequestException bre) {
+            return bre.asPromise();
         }
     }
 
@@ -1255,60 +1262,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> deleteInstance(final Context context, final String resourceId, final DeleteRequest request) {
         return identityResourceV1.deleteInstance(context, resourceId, request);
-    }
-
-    /**
-     * Returns an IdentityDetails from a JsonValue.  Package private - may be invoked by IdentityResourceV3, for
-     * instance.
-     *
-     * @param jVal The JsonValue Object to be converted
-     * @return The IdentityDetails object
-     */
-     IdentityDetails jsonValueToIdentityDetails(final JsonValue jVal, final String realm) {
-
-        IdentityDetails identity = new IdentityDetails();
-        Map<String, Set<String>> identityAttrList = new HashMap<>();
-
-        try {
-            identity.setType(objectType); //set type ex. user
-            identity.setRealm(realm); //set realm
-            identity.setName(jVal.get(USERNAME).asString());//set name from JsonValue object
-
-            if (AGENT_TYPE.equals(objectType)) {
-                jVal.remove(USERNAME);
-                jVal.remove(REALM);
-                jVal.remove(UNIVERSAL_ID);
-            }
-
-            try {
-                for (String s : jVal.keys()) {
-                    JsonValue childValue = jVal.get(s);
-                    if (childValue.isString()) {
-                        identityAttrList.put(s, Collections.singleton(childValue.asString()));
-                    } else if (childValue.isList()) {
-                        List<String> list = new ArrayList<>();
-                        for (Object item : childValue.asList()) {
-                            if (item instanceof Map) {
-                                JsonValue json = new JsonValue(item);
-                                list.add(json.toString());
-                            } else {
-                                list.add(item.toString());
-                            }
-                        }
-                        identityAttrList.put(s, new HashSet<>(list));
-                    }
-                }
-            } catch (Exception e) {
-                debug.error("IdentityResource.jsonValueToIdentityDetails() :: Cannot Traverse JsonValue. ", e);
-            }
-            identity.setAttributes(asAttributeArray(identityAttrList));
-
-        } catch (final Exception e) {
-            debug.error("IdentityResource.jsonValueToIdentityDetails() :: Cannot convert JsonValue to IdentityDetails" +
-                    ".", e);
-            //deal with better exceptions
-        }
-        return identity;
     }
 
     /**
@@ -1395,7 +1348,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 }
             }
 
-            newDtls = jsonValueToIdentityDetails(jVal, realm);
+            newDtls = jsonValueToIdentityDetails(objectType, jVal, realm);
 
             if (newDtls.getAttributes() == null || newDtls.getAttributes().length < 1) {
                 throw new BadRequestException("Illegal arguments: One or more required arguments is null or empty");
