@@ -103,15 +103,17 @@ public class PooledTaskExecutorTest {
         // Then
         verifyZeroInteractions(task3.task);
 
+        // When
         debug("Unblocking task 2");
         longTask2.unblock();
         debug("Unblocking task 1");
         longTask1.unblock();
 
+        // Then
         debug("Waiting for tasks to complete");
         task1.join(TimeUnit.SECONDS.toMillis(10));
-        task2.join(1);
-        task3.join(1);
+        task2.join(TimeUnit.SECONDS.toMillis(10));
+        task3.join(TimeUnit.SECONDS.toMillis(10));
 
         assertThat(task1.isAlive()).as("Task 1 thread running").isFalse();
         assertThat(task2.isAlive()).as("Task 2 thread running").isFalse();
@@ -119,6 +121,7 @@ public class PooledTaskExecutorTest {
 
         verify(task3.task).execute(null, null);
         verify(simpleTaskExecutorProvider, times(2)).get();
+        assertThat(semaphore.availablePermits()).isEqualTo(2);
     }
 
     private static class TaskThread extends Thread {
