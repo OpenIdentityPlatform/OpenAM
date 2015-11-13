@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock, AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.iplanet.am.util;
 
@@ -38,8 +38,6 @@ import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.SMSEntry;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.utils.CollectionUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -58,6 +56,9 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * This class provides functionality that allows single-point-of-access to all
@@ -697,9 +698,7 @@ public class SystemProperties {
      * @return <code>true</code> if instance is running in server mode.
      */
     public static boolean isServerMode() {
-        // use getProp and not get method to avoid infinite loop
-        return Boolean.valueOf(getProp(
-            Constants.SERVER_MODE, "false")).booleanValue();
+        return IsServerModeHolder.isServerMode;
     }
     
     /**
@@ -714,5 +713,13 @@ public class SystemProperties {
         } finally {
             rwLock.readLock().unlock();
         }
+    }
+
+    /**
+     * Lazy initialisation holder idiom for server mode flag as this is read frequently but never changes.
+     */
+    private static final class IsServerModeHolder {
+        // use getProp and not get method to avoid infinite loop
+        private static final boolean isServerMode = Boolean.parseBoolean(getProp(Constants.SERVER_MODE, "false"));
     }
 }
