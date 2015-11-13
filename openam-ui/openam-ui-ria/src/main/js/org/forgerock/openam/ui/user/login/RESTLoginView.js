@@ -329,7 +329,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             } else {
                 // Attempt to load a stage-specific template to render this form.  If not found, use the generic one.
                 template = "templates/openam/authn/" + reqs.stage + ".html";
-                UIUtils.compileTemplate(template, _.extend(Configuration.globalData, this.data))
+                UIUtils.compileTemplate(template, _.extend({}, Configuration.globalData, this.data))
                     .always(function (compiledTemplate) {
                         // A rendered template will be a string; an error will be an object
                         self.template = typeof compiledTemplate === "string"
