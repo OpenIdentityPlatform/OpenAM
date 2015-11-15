@@ -20,6 +20,7 @@ import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.getTokenFromContext;
 
@@ -166,5 +167,6 @@ class CrestAuditor {
     private void addSessionDetailsFromSSOTokenContext(AMAccessAuditEventBuilder builder, Context context) {
         SSOToken callerToken = getTokenFromContext(context, debug);
         builder.trackingIdFromSSOToken(callerToken);
+        builder.userId(getUserId(callerToken));
     }
 }
