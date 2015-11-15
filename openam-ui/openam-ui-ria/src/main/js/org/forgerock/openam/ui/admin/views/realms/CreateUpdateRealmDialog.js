@@ -81,7 +81,8 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
 
                 data.schema.properties.parentPath["enum"] = options.allRealmPaths;
                 data.schema.properties.parentPath.options = { "enum_titles": options.allRealmPaths };
-                if (data.values.name === "/") {
+                // Once created, it should not be possible to edit a realm's name or who it's parent is.
+                if (!newRealm) {
                     data.schema.properties.name.readonly = true;
                     data.schema.properties.parentPath.readonly = true;
                 }
