@@ -128,7 +128,7 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeQuery(Context context, QueryRequest queryRequest) {
-        return null;
+        return new ForbiddenException().asPromise();
     }
 
     private boolean isTokenOwner(Context context, ActionRequest request)
