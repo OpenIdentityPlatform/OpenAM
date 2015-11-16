@@ -54,18 +54,15 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         },
         selfServiceClick: function(e) {
             e.preventDefault();
-            //save the login params in a cookie for use with the cancel button on forgotPassword/register page 
+            //save the login params in a cookie for use with the cancel button on forgotPassword/register page
             //and also the "proceed to login" link once password has been successfully changed or registration is complete
             var expire = new Date(),
-                cookieVal = '/' + RealmHelper.getRealm(),
-                href = e.target.href + "/";
+                cookieVal = '/' + RealmHelper.getRealm();
             if (conf.globalData.auth.urlParams) {
                 cookieVal += restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
             }
             expire.setDate(expire.getDate() + 1);
             cookieHelper.setCookie("loginUrlParams",cookieVal,expire);
-
-            location.href = RealmHelper.decorateURLWithOverrideRealm(href) + RealmHelper.getSubRealm();
         },
         autoLogin: function() {
             var index,
@@ -407,6 +404,15 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         }
 
         return new Handlebars.SafeString(result);
+    });
+
+    Handlebars.registerHelper("decorateWithRealm", function(uri) {
+        uri = RealmHelper.decorateURLWithOverrideRealm(uri);
+        if (uri.slice(-1) !== '/') {
+            uri += '/';
+        }
+
+        return uri + RealmHelper.getSubRealm();
     });
 
     return new LoginView();
