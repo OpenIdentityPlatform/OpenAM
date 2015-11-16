@@ -31,9 +31,14 @@ import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
@@ -131,5 +136,75 @@ public class TokenOwnerAuthzModuleTest {
         given(mockTokenManager.createSSOToken(eq("token"))).willReturn(mockToken);
         given(mockToken.getPrincipal()).willReturn(mockPrincipal);
         given(mockPrincipal.getName()).willReturn(finalId);
+    }
+
+    @Test
+    public void testCreateIsForbidden() {
+        //given
+
+        //when
+        Promise<AuthorizationResult, ResourceException> promise = testModule.authorizeCreate(mockContext, mock(CreateRequest.class));
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void testQueryIsForbidden() {
+        //given
+
+        //when
+        Promise<AuthorizationResult, ResourceException> promise = testModule.authorizeQuery(mockContext, mock(QueryRequest.class));
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void testReadIsForbidden() {
+        //given
+
+        //when
+        Promise<AuthorizationResult, ResourceException> promise = testModule.authorizeQuery(mockContext, mock(QueryRequest.class));
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
+
+    }
+
+    @Test
+    public void testUpdateIsForbidden() {
+        //given
+
+        //when
+        Promise<AuthorizationResult, ResourceException> promise = testModule.authorizeUpdate(mockContext, mock(UpdateRequest.class));
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
+
+    }
+
+    @Test
+    public void testPatchIsForbidden() {
+        //given
+
+        //when
+        Promise<AuthorizationResult, ResourceException> promise = testModule.authorizePatch(mockContext, mock(PatchRequest.class));
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
+
+    }
+
+    @Test
+    public void testDeleteIsForbidden() {
+        //given
+
+        //when
+        Promise<AuthorizationResult, ResourceException> promise = testModule.authorizeDelete(mockContext, mock(DeleteRequest.class));
+
+        //then
+        assertThat(promise).failedWithException().isExactlyInstanceOf(ForbiddenException.class);
+
     }
 }
