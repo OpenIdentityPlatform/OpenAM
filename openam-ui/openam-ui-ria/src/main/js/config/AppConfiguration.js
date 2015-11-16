@@ -113,14 +113,15 @@ define("config/AppConfiguration", [
         }, {
             moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
             configuration: {
+                username: {
+                    "label" : "config.AppConfiguration.Navigation.username.label"
+                },
                 userBar: [{
-                    "id": "selfServiceLink",
                     "href": "#profile/details",
                     "i18nKey": "common.user.selfService",
                     "navGroup": "admin",
                     "visibleToRoles": ["ui-self-service-user"]
                 }, {
-                    "id": "administratorLink",
                     "href": "#realms",
                     "i18nKey": "common.user.administration",
                     "navGroup": "admin",
@@ -137,7 +138,6 @@ define("config/AppConfiguration", [
                     "navGroup": "user",
                     "visibleToRoles": ["ui-realm-admin"]
                 }, {
-                    "id": "logoutLink",
                     "href": "#logout/",
                     "i18nKey": "common.form.logout"
                 }],

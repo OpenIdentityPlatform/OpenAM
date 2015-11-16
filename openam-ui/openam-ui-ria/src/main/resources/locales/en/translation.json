@@ -120,6 +120,9 @@
                         "requests" : "Requests"
                     },
                     "console": "Console"
+                },
+                "username" : {
+                    "label" : "Signed in as"
                 }
             }
         }
