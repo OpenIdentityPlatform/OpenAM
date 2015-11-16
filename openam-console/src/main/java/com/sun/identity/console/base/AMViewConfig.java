@@ -24,11 +24,11 @@
  *
  * $Id: AMViewConfig.java,v 1.9 2008/06/25 05:42:48 qcheng Exp $
  *
- */
-/**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.console.base;
+
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
 
 import com.iplanet.jato.view.html.OptionList;
 import com.sun.identity.common.DisplayUtils;
@@ -70,6 +70,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class AMViewConfig {
     private static final AMViewConfig instance = new AMViewConfig();
     private static final String CONFIG_FILENAME = "amConsoleConfig.xml";
+    private static final int COMMON_TASKS_ID = 0;
 
     private List tabs = new ArrayList();
     private Map profileTabs = new HashMap();
@@ -705,7 +706,9 @@ public void setTabViews(int parentID, List items) {
                 if (child.getNodeName().equalsIgnoreCase(TAB_ENTRY)) {
                     try {
                         AMTabEntry entry = new AMTabEntry(child);
-                        tabs.add(entry);
+                        if (entry.getID() != COMMON_TASKS_ID || !isXuiAdminConsoleEnabled()) {
+                            tabs.add(entry);
+                        }
                     } catch (AMConsoleException e) {
                         AMModelBase.debug.error("AMViewConfig.configTabs", e);
                     }
