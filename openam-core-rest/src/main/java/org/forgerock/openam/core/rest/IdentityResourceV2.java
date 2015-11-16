@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.core.rest;
 
-import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asAttributeArray;
 import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asMap;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -34,10 +33,8 @@ import javax.security.auth.callback.PasswordCallback;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -113,7 +110,6 @@ import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.AsyncFunction;
-import org.forgerock.util.Pair;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 
@@ -1442,7 +1438,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             debug.warning("IdentityResource.updateInstance() :: Cannot UPDATE resourceId={} ", resourceId, re);
             return re.asPromise();
         } catch (final Exception e) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATEresourceId={}", resourceId, e);
+            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE resourceId={}", resourceId, e);
             return new NotFoundException(e.getMessage(), e).asPromise();
         }
     }

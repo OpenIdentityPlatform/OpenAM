@@ -27,13 +27,16 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.console.idm.model;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
+import com.sun.identity.common.BackwardCompSupport;
+import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -42,33 +45,30 @@ import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.delegation.model.DelegationConfig;
 import com.sun.identity.console.property.PropertyTemplate;
 import com.sun.identity.console.property.PropertyXMLBuilder;
-import com.sun.identity.common.BackwardCompSupport;
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoFatalException;
-import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchOpModifier;
+import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.RequiredValueValidator;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.SMSException;
-import java.text.MessageFormat;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,6 +79,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
+import org.forgerock.openam.ldap.LDAPConstants;
 
 /* - LOG COMPLETE - */
 
@@ -703,6 +704,11 @@ public class EntitiesModelImpl
                 String[] paramsEx = {universalId, attrNames, getErrorString(e)};
                 logEvent("IDM_EXCEPTION_MODIFY_IDENTITY_ATTRIBUTE_VALUE",
                     paramsEx);
+
+                if (e.getErrorCode().equals(LDAPConstants.CONSTRAINT_VIOLATED_ERROR)) {
+                    throw new AMConsoleException(e.getConstraintViolationDetails());
+                }
+
                 throw new AMConsoleException(getErrorString(e));
             } catch (SSOException e) {
                 String[] paramsEx = {universalId, attrNames, getErrorString(e)};

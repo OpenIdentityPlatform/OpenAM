@@ -95,6 +95,7 @@ public class LDAPConstants {
     public static final String LDAP_ROLE_SEARCH_SCOPE = "sun-idrepo-ldapv3-config-role-search-scope";
     public static final String LDAP_AD_TYPE = "sun-idrepo-ldapv3-ldapv3AD";
     public static final String LDAP_ADAM_TYPE = "sun-idrepo-ldapv3-ldapv3ADAM";
+    public static final String CONSTRAINT_VIOLATED_ERROR = "313";
 
     private LDAPConstants() {
     }
