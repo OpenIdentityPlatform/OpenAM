@@ -188,7 +188,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 if (reqs.hasOwnProperty("tokenId")) {
                     // Set a variable for the realm passed into the browser so there can be a
                     // check to make sure it is the same as the current user's realm
-                    auth.passedInRealm = auth.subRealm;
+                    auth.passedInRealm = RealmHelper.getRealm();
                     // If we have a token, let's see who we are logged in as....
                     SessionManager.getLoggedUser(function (user) {
 
