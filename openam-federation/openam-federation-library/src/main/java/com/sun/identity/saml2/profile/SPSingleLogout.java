@@ -578,14 +578,15 @@ public class SPSingleLogout {
         String inResponseTo = logoutRes.getInResponseTo();
         LogoutRequest logoutReq =  (LogoutRequest) SPCache.logoutRequestIDHash.remove(inResponseTo);
 
+        if (logoutReq == null) {
+            logoutReq = (LogoutRequest) SAML2Store.getTokenFromStore(inResponseTo);
+        }
         if (logoutReq == null && SAML2FailoverUtils.isSAML2FailoverEnabled()) { //check the samlFailover cache instead
             try {
                 logoutReq = (LogoutRequest) SAML2FailoverUtils.retrieveSAML2Token(inResponseTo);
             } catch (SAML2TokenRepositoryException e) {
                 throw new SAML2Exception(SAML2Utils.bundle.getString("LogoutRequestIDandInResponseToDoNotMatch"));
             }
-        } else {
-            logoutReq = (LogoutRequest) SAML2Store.getTokenFromStore(inResponseTo);
         }
 
         // invoke SPAdapter preSingleLogoutProcess
