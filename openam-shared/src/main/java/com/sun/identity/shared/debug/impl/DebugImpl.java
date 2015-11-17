@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -26,11 +26,12 @@
  *
  */
 
-/**
+/*
  * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.impl;
 
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.DebugLevel;
@@ -38,14 +39,15 @@ import com.sun.identity.shared.debug.IDebug;
 import com.sun.identity.shared.debug.file.DebugFile;
 import com.sun.identity.shared.debug.file.DebugFileProvider;
 import com.sun.identity.shared.debug.file.impl.StdDebugFile;
-import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.openam.utils.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
+
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.utils.IOUtils;
 
 /**
  * Debug implementation class.
@@ -59,6 +61,7 @@ public class DebugImpl implements IDebug {
     }
 
     private final static int DIR_ISSUE_ERROR_INTERVAL_IN_MS = 60 * 1000;
+    private static final boolean SERVER_MODE = SystemPropertiesManager.getAsBoolean(Constants.SERVER_MODE);
     private static volatile long lastDirectoryIssue = 0l;
 
     private final String debugName;
@@ -242,9 +245,22 @@ public class DebugImpl implements IDebug {
         prefix.append(debugName)
                 .append(":").append(dateFormatted)
                 .append(": ").append(Thread.currentThread().toString())
-                .append(": TransactionId[").append(AuditRequestContext.getTransactionIdValue()).append("]");
+                .append(": TransactionId[").append(getAuditTransactionId()).append("]");
 
         writeIt(prefix.toString(), msg, th);
+    }
+
+    /**
+     * Determine the current audit transaction id. If we are not running in server mode then return nothing to avoid
+     * breaking Fedlet and other client applications that do not include the audit classes.
+     *
+     * @return the current audit transaction id, or the string "unknown" if not present.
+     */
+    private String getAuditTransactionId() {
+        if (SERVER_MODE) {
+            return AuditRequestContext.getTransactionIdValue();
+        }
+        return "unknown";
     }
 
     /**

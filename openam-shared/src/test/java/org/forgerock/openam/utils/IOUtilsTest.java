@@ -15,15 +15,17 @@
  */
 package org.forgerock.openam.utils;
 
-import com.sun.identity.shared.datastruct.OrderedSet;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sun.identity.shared.datastruct.OrderedSet;
+
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.DeflaterOutputStream;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 
 public class IOUtilsTest {
@@ -108,5 +113,51 @@ public class IOUtilsTest {
         objectOutputStream.close();
 
         return byteArrayOutputStream.toByteArray();
+    }
+
+    @Test
+    public void shouldCopyStreamsFully() throws Exception {
+        // Given
+        final byte[] input = new byte[8 * 1024 + 1]; // Slightly larger than a typical buffer size
+        for (int i = 0; i < input.length; ++i) {
+            input[i] = (byte) i;
+        }
+
+        // Take a defensive copy in case the implementation modifies it in any way
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Arrays.copyOf(input, input.length));
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            // When
+            long bytesCopied = IOUtils.copyStream(inputStream, outputStream);
+
+            // Then
+            assertThat(outputStream.toByteArray()).isEqualTo(input);
+            assertThat(bytesCopied).isEqualTo((long) input.length);
+        }
+    }
+
+    @Test
+    public void shouldCopyEmptyStreams() throws Exception {
+        // Given
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[0]);
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            // When
+            long bytesCopied = IOUtils.copyStream(inputStream, outputStream);
+
+            // Then
+            assertThat(bytesCopied).isEqualTo(0L);
+            assertThat(outputStream.toByteArray()).isEqualTo(new byte[0]);
+        }
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
+    public void shouldRejectNullInputStreamForCopy() throws Exception {
+        IOUtils.copyStream(null, new ByteArrayOutputStream());
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
+    public void shouldRejectNullOutputStreamForCopy() throws Exception {
+        IOUtils.copyStream(new ByteArrayInputStream(new byte[0]), null);
     }
 }

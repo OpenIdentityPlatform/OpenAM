@@ -117,7 +117,7 @@
         <opendj.sdk.version>2.6.10</opendj.sdk.version>
 
         <!-- Required for setting classpaths on tools and fedlet -->
-        <forgerock.util.version>2.0.0</forgerock.util.version>
+        <forgerock.util.version>3.0.0</forgerock.util.version>
 
         <forgerock.bloomfilter.version>1.0.0</forgerock.bloomfilter.version>
         <forgerock.ui.version>8.5.0</forgerock.ui.version>

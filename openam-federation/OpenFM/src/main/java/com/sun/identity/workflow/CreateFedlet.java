@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2015 ForgeRock AS.
+ */
+
 package com.sun.identity.workflow;
 
 import com.iplanet.am.util.SystemProperties;
@@ -33,49 +37,58 @@ import com.sun.identity.cot.COTException;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.shared.encode.Base64;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.utils.collections.PrefixSet;
+import org.forgerock.openam.utils.collections.SimplePrefixSet;
+import org.forgerock.openam.utils.file.ZipUtils;
+
 /**
- *  * Creates Fedlet.
- *   */
-public class CreateFedlet
-    extends Task
-{
-    private static Map fedletBits = new HashMap();
-    private static Map FedConfigTagSwap = new HashMap();
-    private static List FedConfigTagSwapOrder = new ArrayList();
-    private static Map jarExtracts = new HashMap();
-    private static String FEDLET_DEFAULT_SHARED_KEY =
-        "JKEK7DosAgR3Aw3Ece20F8qZdXtiMYJ+";
+ * Creates Fedlet.
+ */
+public class CreateFedlet extends Task {
+
+    private static final Map<String, String> fedletBits = new HashMap<>();
+    private static final Map<String, String> FedConfigTagSwap = new LinkedHashMap<>();
+    private static final Map<String, PrefixSet> jarExtracts = new HashMap<>();
+    private static final String FEDLET_DEFAULT_SHARED_KEY = "JKEK7DosAgR3Aw3Ece20F8qZdXtiMYJ+";
+
+    private static final Pattern SPLIT_PATTERN = Pattern.compile("\\s*,\\s*");
  
     static {
         FedConfigTagSwap.put("@AM_ENC_PWD@", getRandomString());
@@ -109,42 +122,16 @@ public class CreateFedlet
         FedConfigTagSwap.put("@SERVER_HOST@", "example.identity.sun.com");
         FedConfigTagSwap.put("@SERVER_PORT@", "80");
         FedConfigTagSwap.put("/@SERVER_URI@", "/fedlet");
-        
-        FedConfigTagSwapOrder.add("@AM_ENC_PWD@");
-        FedConfigTagSwapOrder.add("@CONFIGURATION_PROVIDER_CLASS@"); 
-        FedConfigTagSwapOrder.add("@DATASTORE_PROVIDER_CLASS@");
-        FedConfigTagSwapOrder.add("@LOG_PROVIDER_CLASS@");
-        FedConfigTagSwapOrder.add("@SESSION_PROVIDER_CLASS@"); 
-        FedConfigTagSwapOrder.add("@MONAGENT_PROVIDER_CLASS@");
-        FedConfigTagSwapOrder.add("@MONSAML1_PROVIDER_CLASS@");
-        FedConfigTagSwapOrder.add("@MONSAML2_PROVIDER_CLASS@");
-        FedConfigTagSwapOrder.add("@MONIDFF_PROVIDER_CLASS@");
-        FedConfigTagSwapOrder.add("@XML_SIGNATURE_PROVIDER@");
-        FedConfigTagSwapOrder.add("@XMLSIG_KEY_PROVIDER@");
-        FedConfigTagSwapOrder.add("@PASSWORD_DECODER_CLASS@");
-        FedConfigTagSwapOrder.add("%BASE_DIR%%SERVER_URI%");
-        FedConfigTagSwapOrder.add("%BASE_DIR%");
-        FedConfigTagSwapOrder.add("com.sun.identity.common.serverMode=true");
-        FedConfigTagSwapOrder.add("@SERVER_PROTO@");
-        FedConfigTagSwapOrder.add("@SERVER_HOST@");
-        FedConfigTagSwapOrder.add("@SERVER_PORT@");
-        FedConfigTagSwapOrder.add("/@SERVER_URI@");
-        
+
         ResourceBundle rb = ResourceBundle.getBundle("fedletBits");
-        for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
-            String k = (String)e.nextElement();
-            fedletBits.put(k, rb.getObject(k));
+        for (String key : rb.keySet()) {
+            fedletBits.put(key, rb.getString(key));
         }
         
         rb = ResourceBundle.getBundle("fedletJarExtract");
-        for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
-            String jarName = (String)e.nextElement();
+        for (String jarName : rb.keySet()) {
             String pkgNames = rb.getString(jarName);
-            StringTokenizer st = new StringTokenizer(pkgNames, ",");
-            Set set = new HashSet();
-            while (st.hasMoreElements()) {
-                set.add(st.nextToken().trim());
-            }
+            PrefixSet set = SimplePrefixSet.of(SPLIT_PATTERN.split(pkgNames));
             jarExtracts.put(jarName, set);
         }
         
@@ -162,29 +149,22 @@ public class CreateFedlet
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
             random.nextBytes(bytes);
             randomStr = Base64.encode(bytes).trim();
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
             randomStr = null;
         }
-        return (randomStr != null) ? randomStr :
-            FEDLET_DEFAULT_SHARED_KEY;
+        return (randomStr != null) ? randomStr : FEDLET_DEFAULT_SHARED_KEY;
     }
 
-    public CreateFedlet() {
-    }
-
-    public String execute(Locale locale, Map params)
-        throws WorkflowException {
+    public String execute(Locale locale, Map params) throws WorkflowException {
         validateParameters(params);
         String entityId = getString(params, ParameterKeys.P_ENTITY_ID);
         Pattern patern = Pattern.compile("[/:\\.?|*]");
         Matcher match = patern.matcher(entityId);
         String folderName = match.replaceAll("");
-        String workDir = SystemProperties.get(SystemProperties.CONFIG_PATH) +
-            "/myfedlets/" + folderName;
+        String workDir = SystemProperties.get(SystemProperties.CONFIG_PATH) + "/myfedlets/" + folderName;
         File dir = new File(workDir);
         if (dir.exists()) {
-            Object[] param = {workDir};
-            throw new WorkflowException("directory.already.exist", param);
+            throw new WorkflowException("directory.already.exist", workDir);
         }
         
         if (!dir.getParentFile().exists())  {
@@ -202,30 +182,27 @@ public class CreateFedlet
         exportIDPMetaData(params, confDir);
         createCOTProperties(params, confDir);
         
-        ServletContext servletCtx = (ServletContext)params.get(
-            ParameterKeys.P_SERVLET_CONTEXT);
+        ServletContext servletCtx = (ServletContext) params.get(ParameterKeys.P_SERVLET_CONTEXT);
         copyBits(servletCtx, workDir);
         extractJars(servletCtx, warDir);
         createFederationConfigProperties(servletCtx, confDir);
         createWar(workDir);
+
         String zipFileName = createZip(workDir);
         
-        Object[] param = {zipFileName};
-        return MessageFormat.format(
-            getMessage("Fedlet.created", locale), param);
+        return MessageFormat.format(getMessage("Fedlet.created", locale), zipFileName);
     }
     
-    private void copyBits(ServletContext servletCtx, String workDir)
-        throws WorkflowException {
+    private void copyBits(ServletContext servletCtx, String workDir) throws WorkflowException {
         String dir = workDir + "/war";
-        (new File(dir)).mkdir();
+        new File(dir).mkdir();
         
         copyFile(servletCtx, "/WEB-INF/fedlet/README", workDir + "/README");
 
-        for (Iterator i = fedletBits.keySet().iterator(); i.hasNext(); ) {
-            String file = (String)i.next();
-            String target = (String)fedletBits.get(file);
-            if ((target == null) || (target.trim().length() == 0)) {
+        for (Map.Entry<String, String> entry : fedletBits.entrySet()) {
+            String file = entry.getKey();
+            String target = entry.getValue();
+            if (StringUtils.isBlank(target)) {
                 target = file;
             }
 
@@ -233,65 +210,33 @@ public class CreateFedlet
         }
     }
     
-    private void extractJars(ServletContext servletCtx, String workDir)
-        throws WorkflowException {
-        for (Iterator i = jarExtracts.keySet().iterator(); i.hasNext(); ) {
-            JarInputStream jis = null;
-            JarOutputStream zipOutputStream = null;
-            
-            try {
-                String fileName = (String) i.next();
-                if (fileName == null || fileName.isEmpty()) {
-                    continue;
-                }
-                Set pkgNames = (Set) jarExtracts.get(fileName);
-                InputStream is = servletCtx.getResourceAsStream(fileName);
-                jis = new JarInputStream(is);
-                FileOutputStream fileOutputStream = new FileOutputStream(
-                    workDir + fileName);
-                zipOutputStream = new JarOutputStream(fileOutputStream);
-                JarEntry entry = jis.getNextJarEntry();
+    private void extractJars(ServletContext servletCtx, String workDir) throws WorkflowException {
+        for (final Map.Entry<String, PrefixSet> jarFilter : jarExtracts.entrySet()) {
+            final String fileName = jarFilter.getKey();
+            final PrefixSet pkgNames = jarFilter.getValue();
+
+            if (StringUtils.isEmpty(fileName)) {
+                continue;
+            }
+
+
+            try (JarInputStream jarInputStream = new JarInputStream(servletCtx.getResourceAsStream(fileName));
+                JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(workDir + fileName))) {
+
+                JarEntry entry = jarInputStream.getNextJarEntry();
 
                 while (entry != null) {
-                    int size = (new Long(entry.getSize())).intValue();
-                    if (size > 0) {
+                    if (entry.getSize() != 0) {
                         String name = entry.getName();
-                        boolean bExtract = false;
-                        for (Iterator j = pkgNames.iterator(); 
-                            (j.hasNext() && !bExtract); 
-                        ) {
-                            bExtract = name.startsWith((String)j.next());
-                        }
-                        if (bExtract) {
-                            zipOutputStream.putNextEntry(entry);
-                            byte[] b = new byte[size];
-                            int tobeRead = size;
-                            while (true) {
-                                int readSize = jis.read(b, size - tobeRead, tobeRead);
-                                if (readSize == tobeRead) {
-                                    break;
-                                } else {
-                                    tobeRead -= readSize;
-                                }
-                            }
-                            zipOutputStream.write(b);
+                        if (pkgNames.containsPrefixOf(name)) {
+                            jarOutputStream.putNextEntry(entry);
+                            IOUtils.copyStream(jarInputStream, jarOutputStream);
                         }
                     }
-                    entry = jis.getNextJarEntry();
+                    entry = jarInputStream.getNextJarEntry();
                 }
             } catch (IOException ex) {
                 throw new WorkflowException(ex.getMessage());
-            } finally {
-                try {
-                    if (jis != null) {
-                        jis.close();
-                    }
-                    if (zipOutputStream != null) {
-                        zipOutputStream.close();
-                    }
-                } catch (IOException ex) {
-                    //ignore
-                }
             }
         }
     }
@@ -304,85 +249,62 @@ public class CreateFedlet
             parent.mkdirs();
         }
         
-        FileOutputStream fos = null;
-        InputStream src = null;
-        try {
-            src = servletCtx.getResourceAsStream(source);
-            if (src != null) {
-                fos = new FileOutputStream(dest);
-                int length = 0;
-                byte[] bytes = new byte[1024];
-                while ((length = src.read(bytes)) != -1) {
-                    fos.write(bytes, 0, length);
-                }
-            } else {
-                Object[] param = {source};
-                throw new WorkflowException("file-not-found", param);
+        try (InputStream src = servletCtx.getResourceAsStream(source);
+             FileOutputStream fos = new FileOutputStream(dest)) {
+
+            if (src == null) {
+                throw new WorkflowException("file-not-found", source);
             }
+
+            IOUtils.copyStream(src, fos);
         } catch (IOException e) {
             throw new WorkflowException(e.getMessage());
-        } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-                if (src != null) {
-                    src.close();
-                }
-            } catch (IOException ex) {
-                //ignore
-            }
         }
     }
     
-    private void createCOTProperties(Map params, String workDir)
-        throws WorkflowException {
+    private void createCOTProperties(Map params, String workDir) throws WorkflowException {
         String sp = getString(params, ParameterKeys.P_ENTITY_ID);
         String idp = getString(params, ParameterKeys.P_IDP);
         String cot = getString(params, ParameterKeys.P_COT);
 
-        String content =
-            "cot-name=" + cot + "\n" +
-            "sun-fm-cot-status=Active\n" +
-            "sun-fm-trusted-providers=" + encodeVal(idp) + "," +
-            encodeVal(sp) + "\n" +
-            "sun-fm-saml2-readerservice-url=\n" +
-            "sun-fm-saml2-writerservice-url=\n";
-        writeToFile(workDir + "/fedlet.cot", content);
+        Properties content = new Properties();
+        content.setProperty("cot-name", cot);
+        content.setProperty("sun-fm-cot-status", "Active");
+        content.setProperty("sun-fm-trusted-providers", encodeVal(idp) + "," + encodeVal(sp));
+        content.setProperty("sun-fm-saml2-readerservice-url", "");
+        content.setProperty("sun-fm-saml2-writerservice-url", "");
+        try (OutputStream out = new FileOutputStream(workDir + "/fedlet.cot")) {
+            content.store(out, null);
+        } catch (IOException e) {
+            throw new WorkflowException(e.getMessage());
+        }
     }
     
-    private void exportIDPMetaData(Map params, String workDir)
-        throws WorkflowException {
+    private void exportIDPMetaData(Map params, String workDir) throws WorkflowException {
         String realm = getString(params, ParameterKeys.P_REALM);
         String idp = getString(params, ParameterKeys.P_IDP);
         String metadata = null;
         try {
-            metadata = SAML2MetaUtils.exportStandardMeta(
-                realm, idp, false);
+            metadata = SAML2MetaUtils.exportStandardMeta(realm, idp, false);
         } catch (SAML2MetaException se) {
             throw new WorkflowException(se.getMessage());
         }
-        String extended = ExportSAML2MetaData.exportExtendedMeta(
-            realm, idp);
+        String extended = ExportSAML2MetaData.exportExtendedMeta(realm, idp);
         
         String extendedModified = flipHostedParameter(extended, false);
         writeToFile(workDir + "/idp-extended.xml", extendedModified);
         writeToFile(workDir + "/idp.xml", metadata);
     }
     
-    private void loadMetaData(Map params, String workDir)
-        throws WorkflowException {
+    private void loadMetaData(Map params, String workDir) throws WorkflowException {
         String realm = getString(params, ParameterKeys.P_REALM);
         String entityId = getString(params, ParameterKeys.P_ENTITY_ID);
         String cot = getString(params, ParameterKeys.P_COT);
-        String assertConsumer = getString(params, 
-            ParameterKeys.P_ASSERT_CONSUMER);
+        String assertConsumer = getString(params, ParameterKeys.P_ASSERT_CONSUMER);
         List attrMapping = getAttributeMapping(params);
 
-        String metadata = FedletMetaData.createStandardMetaData(entityId, 
-            assertConsumer);
-        String extended = FedletMetaData.createExtendedMetaData(realm,
-            entityId, attrMapping, assertConsumer);
+        String metadata = FedletMetaData.createStandardMetaData(entityId, assertConsumer);
+        String extended = FedletMetaData.createExtendedMetaData(realm, entityId, attrMapping, assertConsumer);
         
         // Add the AttributeQueryConfig to SP extended meta data
         extended = addAttributeQueryTemplate(extended, cot);
@@ -391,7 +313,7 @@ public class CreateFedlet
         extended = addXACMLAuthzQueryTemplate(extended, cot);
           
         ImportSAML2MetaData.importData(realm, metadata, extended);
-        if ((cot != null) && (cot.length() > 0)) {
+        if (!StringUtils.isBlank(cot)) {
             try {
                 AddProviderToCOT.addToCOT(realm, cot, entityId);
             } catch (COTException e) {
@@ -399,9 +321,7 @@ public class CreateFedlet
             }
             int idx = extended.indexOf("<Attribute name=\"cotlist\">");
             idx = extended.indexOf("</Attribute>", idx);
-            extended = extended.substring(0, idx) +
-                "<Value>" + cot + "</Value>" +
-                extended.substring(idx);
+            extended = extended.substring(0, idx) + "<Value>" + cot + "</Value>" + extended.substring(idx);
         }
         
         String extendedModified = flipHostedParameter(extended, true);
@@ -409,15 +329,13 @@ public class CreateFedlet
         writeToFile(workDir + "/sp.xml", metadata);
     }
 
-    private void validateParameters(Map params)
-        throws WorkflowException {
+    private void validateParameters(Map params) throws WorkflowException {
         String entityId = getString(params, ParameterKeys.P_ENTITY_ID);
-        if ((entityId == null) || (entityId.trim().length() == 0)) {
+        if (StringUtils.isBlank(entityId)) {
             throw new WorkflowException("entityId-required", null);
         }
-        String assertConsumer = getString(params, 
-            ParameterKeys.P_ASSERT_CONSUMER);
-        if ((assertConsumer == null) || (assertConsumer.trim().length() == 0)) {
+        String assertConsumer = getString(params, ParameterKeys.P_ASSERT_CONSUMER);
+        if (StringUtils.isBlank(assertConsumer)) {
             throw new WorkflowException("assertion.consumer-required", null);
         }
         
@@ -428,76 +346,38 @@ public class CreateFedlet
         }
 
         String cot = getString(params, ParameterKeys.P_COT);
-        if ((cot == null) || (cot.trim().length() == 0)) {
+        if (StringUtils.isBlank(cot)) {
             throw new WorkflowException("missing-cot", null);
         }
         
         String realm = getString(params, ParameterKeys.P_REALM);
-        if ((realm == null) || (realm.trim().length() == 0)) {
+        if (StringUtils.isBlank(realm)) {
             throw new WorkflowException("missing-realm", null);
         }
     }
     
-    private void createFederationConfigProperties(
-        ServletContext servletCtx,
-        String workDir
-    ) throws WorkflowException {
+    private void createFederationConfigProperties(ServletContext servletCtx, String workDir) throws WorkflowException {
         
-        String prop = getBitAsString(servletCtx,
-            "/WEB-INF/fedlet/FederationConfig.properties");
-        for (Iterator i = FedConfigTagSwapOrder.iterator(); i.hasNext();) {
-            String k = (String) i.next();
-            String v = (String) FedConfigTagSwap.get(k);
-            prop = prop.replaceAll(k, v);
+        String prop = getBitAsString(servletCtx, "/WEB-INF/fedlet/FederationConfig.properties");
+        for (Map.Entry<String, String> replacement : FedConfigTagSwap.entrySet()) {
+            prop = prop.replace(replacement.getKey(), replacement.getValue());
         }
         writeToFile(workDir + "/FederationConfig.properties", prop);
     }
     
-    private String getBitAsString(ServletContext servletCtx, String bitName)
-        throws WorkflowException {
-        InputStream in = null;
-        ByteArrayOutputStream out = null;
+    private String getBitAsString(ServletContext servletCtx, String bitName) throws WorkflowException {
         try {
-            in = servletCtx.getResourceAsStream(bitName);
-            out = new ByteArrayOutputStream();
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            return out.toString();
+            return IOUtils.readStream(servletCtx.getResourceAsStream(bitName));
         } catch (IOException ex) {
             throw new WorkflowException(ex.getMessage());
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                //ignore
-            }
         }
     }
     
-    private static void writeToFile(String fileName, String content)
-        throws WorkflowException {
-        FileWriter fout = null;
+    private static void writeToFile(String fileName, String content) throws WorkflowException {
         try {
-            fout = new FileWriter(fileName);
-            fout.write(content);
+            IOUtils.writeToFile(fileName, content);
         } catch (IOException e) {
             throw new WorkflowException(e.getMessage());
-        } finally {
-            if (fout != null) {
-                try {
-                    fout.close();
-                } catch (Exception ex) {
-                    //No handling requried
-                }
-            }
         }
     }
 
@@ -507,7 +387,7 @@ public class CreateFedlet
             idx = xml.indexOf("hosted=\"", idx);
          
             if (idx != -1) {
-                int idx2 = xml.indexOf("\"", idx+9);
+                int idx2 = xml.indexOf('"', idx+9);
                 if (bHosted) {
                     xml = xml.substring(0, idx+8) + "1" + xml.substring(idx2);
                 } else {
@@ -518,99 +398,53 @@ public class CreateFedlet
         return xml;
     }
     
-    private void createWar(String workDir) 
-        throws WorkflowException {
-        JarOutputStream out = null;
+    private void createWar(String workDir) throws WorkflowException {
         String warDir = workDir + "/war";
-        int lenWorkDir = warDir.length() +1;
-        List files = getAllFiles(warDir, true);
+        int lenWorkDir = warDir.length() + 1;
         String jarName = workDir + "/fedlet.war";
 
-        try {
-            out = new JarOutputStream(new FileOutputStream(jarName));
-            byte[] buf = new byte[1024];
+        try (JarOutputStream out = new JarOutputStream(new FileOutputStream(jarName))) {
+            List<String> files = getAllFiles(warDir, true);
 
-            for (Iterator i = files.iterator(); i.hasNext();) {
-                String fname = (String) i.next();
-                FileInputStream in = new FileInputStream(fname);
-                String jarEntryName = fname.substring(lenWorkDir);
-                // use forward slash in jar path to avoid windows issue
-                if (File.separatorChar == '\\') {
-                    jarEntryName = jarEntryName.replace('\\', '/');
+            for (final String fname : files) {
+                try (FileInputStream in = new FileInputStream(fname)) {
+                    String jarEntryName = fname.substring(lenWorkDir);
+                    // use forward slash in jar path to avoid windows issue
+                    if (File.separatorChar == '\\') {
+                        jarEntryName = jarEntryName.replace('\\', '/');
+                    }
+                    out.putNextEntry(new JarEntry(jarEntryName));
+                    IOUtils.copyStream(in, out);
+                    out.closeEntry();
                 }
-                out.putNextEntry(new JarEntry(jarEntryName));
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-                out.closeEntry();
-                in.close();
             }
 
             deleteAllFiles(warDir, files);
             (new File(warDir)).delete();
         } catch (IOException e) {
             throw new WorkflowException(e.getMessage());
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-            // ignore
-            }
         }
     }
     
-    private String createZip(String workDir)
-        throws WorkflowException {
-        int lenWorkDir = workDir.length() +1;
-
-        ZipOutputStream out = null;
+    private String createZip(String workDir) throws WorkflowException {
+        final String zipName = workDir + "/Fedlet.zip";
         try {
-            List files = getAllFiles(workDir, true);
-            String zipName = workDir + "/Fedlet.zip";
-            out = new ZipOutputStream(new FileOutputStream(zipName));
-            byte[] buf = new byte[1024];
-
-            for (Iterator i = files.iterator(); i.hasNext(); )  {
-                String fname = (String) i.next();
-                FileInputStream in = new FileInputStream(fname);
-                out.putNextEntry(new ZipEntry(fname.substring(lenWorkDir)));
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-
-                // Complete the entry
-                out.closeEntry();
-                in.close();
-            }
-
+            final List<String> files = ZipUtils.generateZip(workDir, zipName);
             deleteAllFiles(workDir, files);
-            return zipName;
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new WorkflowException(e.getMessage());
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-                // ignore
-            }
         }
+        return zipName;
     }
     
-    private void deleteAllFiles(String workDir, List files) {
-        for (Iterator i = files.iterator(); i.hasNext(); ) {
-            String fname = (String)i.next();
-            (new File(fname)).delete();
+    private void deleteAllFiles(String workDir, List<String> files) throws IOException {
+        for (String fname : files) {
+            new File(fname).delete();
         }
         
-        List dirs = getAllFiles(workDir, false);
-        for (int i = dirs.size() -1; i >= 0; --i) {
-            String dirName = (String)dirs.get(i);
+        List<String> dirs = getAllFiles(workDir, false);
+        Collections.reverse(dirs);
+        for (String dirName : dirs) {
             File test = new File(dirName);
             if (test.isDirectory()) {
                 test.delete();
@@ -618,25 +452,27 @@ public class CreateFedlet
         }
     }
     
-    private List getAllFiles(String dir, boolean bFileOnly) {
-        List list = new ArrayList();
-        File directory = new File(dir);
-        String[] children = directory.list();
-        
-        for (int i = 0; i < children.length; i++) {
-            String child = dir + "/" + children[i];
-            File f = new File(child);
-            if (f.isDirectory()) {
-                if (!bFileOnly) {
-                    list.add(f.getAbsolutePath());
-                }
-                list.addAll(getAllFiles(f.getAbsolutePath(), bFileOnly));
-            } else {
-                list.add(f.getAbsolutePath());
+    private List<String> getAllFiles(String dir, final boolean bFileOnly) throws IOException {
+        final List<String> files = new ArrayList<>();
+
+        Files.walkFileTree(Paths.get(dir), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+                files.add(file.toAbsolutePath().toString());
+                return FileVisitResult.CONTINUE;
             }
-        }
-        
-        return list;
+
+            @Override
+            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+                    throws IOException {
+                if (!bFileOnly) {
+                    files.add(dir.toAbsolutePath().toString());
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        return files;
     }
     
     /**
@@ -645,7 +481,7 @@ public class CreateFedlet
      */
     private String encodeVal(String v) {
         char[] chars = v.toCharArray();
-        StringBuffer sb = new StringBuffer(chars.length + 20);
+        StringBuilder sb = new StringBuilder(chars.length + 20);
         int i = 0, lastIdx = 0;
         for (i = 0; i < chars.length; i++) {
             if (chars[i] == '%') {
@@ -673,8 +509,7 @@ public class CreateFedlet
      * meta data
      */
     private String addAttributeQueryTemplate(String extended, String cot) {
-        StringBuffer buff = new StringBuffer(1024);
-        buff.append(
+        String buff =
             "    <AttributeQueryConfig metaAlias=\"/attrQuery\">\n" +
             "        <Attribute name=\"signingCertAlias\">\n" +
             "            <Value>" + "</Value>\n" +
@@ -688,15 +523,12 @@ public class CreateFedlet
             "        <Attribute name=\"cotlist\">\n" +
             "            <Value>" + cot + "</Value>\n" +
             "        </Attribute>\n" +
-            "    </AttributeQueryConfig>\n"
-        );
+            "    </AttributeQueryConfig>\n";
         int idx = extended.indexOf("</EntityConfig>");
         if (idx != -1) {
-            extended = extended.substring(0, idx) +
-                       buff.toString() +
-                       "</EntityConfig>";
+            extended = extended.substring(0, idx) + buff + "</EntityConfig>";
         }
-	return extended;
+	    return extended;
     }
 
     /**
@@ -704,8 +536,7 @@ public class CreateFedlet
      * meta data
      */
     private String addXACMLAuthzQueryTemplate(String extended, String cot) {
-        StringBuffer buff = new StringBuffer(1024);
-        buff.append(
+        String buff =
             "    <XACMLAuthzDecisionQueryConfig metaAlias=\"/pep\">\n" +
             "        <Attribute name=\"signingCertAlias\">\n" +
             "            <Value>" + "</Value>\n" +
@@ -731,13 +562,10 @@ public class CreateFedlet
             "        <Attribute name=\"cotlist\">\n" +
             "            <Value>" + cot + "</Value>\n" +
             "        </Attribute>\n" +
-            "    </XACMLAuthzDecisionQueryConfig>\n"
-        );
+            "    </XACMLAuthzDecisionQueryConfig>\n";
         int idx = extended.indexOf("</EntityConfig>");
         if (idx != -1) {
-            extended = extended.substring(0, idx) +
-                       buff.toString() +
-                       "</EntityConfig>";
+            extended = extended.substring(0, idx) + buff + "</EntityConfig>";
         }
         return extended;
     }

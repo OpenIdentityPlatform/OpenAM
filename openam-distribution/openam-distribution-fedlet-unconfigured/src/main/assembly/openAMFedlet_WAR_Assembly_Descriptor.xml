@@ -37,6 +37,8 @@
                 <include>org.forgerock.openam:openam-mib-schema</include>
                 <include>org.forgerock.openam:openam-wsfederation-schema</include>
                 <include>org.forgerock.openam:openam-xacml3-schema</include>
+                <include>org.forgerock.openam:openam-certs</include>
+                <include>org.forgerock.openam:openam-slf4j</include>
                 <include>external:esapiport</include>
                 <include>javax.mail:mail</include>
                 <include>relaxngDatatype:relaxngDatatype</include>
@@ -51,6 +53,7 @@
                 <include>xerces-J:xml-serializer</include>
                 <include>org.apache.santuario:xmlsec</include>
                 <include>commons-logging:commons-logging-api</include>
+                <include>org.slf4j:slf4j-api</include>
             </includes>
         </dependencySet>
     </dependencySets>

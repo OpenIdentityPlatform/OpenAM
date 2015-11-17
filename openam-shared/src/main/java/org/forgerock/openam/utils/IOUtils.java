@@ -40,9 +40,12 @@ import java.io.InputStreamReader;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.InflaterInputStream;
+
+import org.forgerock.util.Reject;
 
 /**
  * Utility class for handling I/O streams
@@ -52,6 +55,7 @@ import java.util.zip.InflaterInputStream;
 public final class IOUtils {
 
     private static final String DEFAULT_ENCODING = "UTF-8";
+    private static final int BUFFER_SIZE = 8 * 1024; // 8kB
 
     private IOUtils() {
     }
@@ -203,6 +207,27 @@ public final class IOUtils {
         for (Closeable c : o) {
             closeIfNotNull(c);
         }
+    }
+
+    /**
+     * Copies the whole input stream to the given output stream. Neither stream is closed after the copy.
+     *
+     * @param in the stream to copy from.
+     * @param out the stream to copy to.
+     * @return the number of bytes copied.
+     * @throws IOException if an error occurs while copying the data.
+     */
+    public static long copyStream(InputStream in, OutputStream out) throws IOException {
+        Reject.ifNull(in, out);
+        final byte[] buffer = new byte[BUFFER_SIZE];
+        long bytesCopied = 0L;
+
+        for (int bytesRead = in.read(buffer); bytesRead != -1; bytesRead = in.read(buffer)) {
+            out.write(buffer, 0, bytesRead);
+            bytesCopied += bytesRead;
+        }
+
+        return bytesCopied;
     }
 
     /**

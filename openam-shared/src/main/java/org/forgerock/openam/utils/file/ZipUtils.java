@@ -29,6 +29,8 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 
 import static java.util.Collections.singletonMap;
@@ -46,28 +48,36 @@ public class ZipUtils {
      *
      * @param srcFolder source folder
      * @param outputZip zip folder
-     * @throws IOException
+     * @return the list of files that were included in the archive.
+     * @throws IOException if an error occurs creating the zip archive.
      */
-    public static void generateZip(String srcFolder, String outputZip) throws IOException, URISyntaxException {
-
+    public static List<String> generateZip(String srcFolder, String outputZip) throws IOException, URISyntaxException {
 
         final Path targetZip = Paths.get(outputZip);
         final Path sourceDir = Paths.get(srcFolder);
         final URI uri = new URI("jar", "file:" + targetZip, null);
+        final List<String> files = new ArrayList<>();
 
         try (FileSystem zipfs = FileSystems.newFileSystem(uri, singletonMap("create", "true"))) {
             Files.walkFileTree(sourceDir, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    // In case the target zip is being created in the folder being zipped (e.g. Fedlet), ignore it.
+                    if (targetZip.equals(file)) {
+                        return FileVisitResult.CONTINUE;
+                    }
                     Path target = zipfs.getPath(sourceDir.relativize(file).toString());
 
                     if (target.getParent() != null) {
                         Files.createDirectories(target.getParent());
                     }
                     Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
+                    files.add(file.toString());
                     return FileVisitResult.CONTINUE;
                 }
             });
         }
+
+        return files;
     }
 }
