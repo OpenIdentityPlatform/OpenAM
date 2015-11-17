@@ -25,6 +25,7 @@ import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,7 +46,7 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.services.context.Context;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -62,11 +63,13 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.ServiceConfigUtils;
-import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -130,9 +133,9 @@ public class ServerInfoResource extends RealmAwareResource {
         RestSecurity restSecurity = restSecurityProvider.get(realm);
 
         //added for the XUI to be able to understand its locale to request the appropriate translations to cache
-        ISLocaleContext locale = new ISLocaleContext();
+        ISLocaleContext localeContext = new ISLocaleContext();
         HttpContext httpContext = context.asContext(HttpContext.class);
-        locale.setLocale(httpContext); //we have nothing else to go on at this point other than their request
+        localeContext.setLocale(httpContext); //we have nothing else to go on at this point other than their request
 
         try {
             cookieDomains = AuthClientUtils.getCookieDomains();
@@ -143,7 +146,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("secureCookie", CookieUtils.isCookieSecure());
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
-            result.put("lang", locale.getLocale().getLanguage());
+            result.put("lang", getJsLocale(localeContext.getLocale()));
             result.put("successfulUserRegistrationDestination",
                     restSecurity.getSuccessfulUserRegistrationDestination());
             result.put("socialImplementations", getSocialAuthnImplementations(realm));
@@ -171,6 +174,15 @@ public class ServerInfoResource extends RealmAwareResource {
             debug.error("ServerInfoResource.getAllServerInfo : Cannot retrieve all server info domains.", e);
             return new NotFoundException(e.getMessage()).asPromise();
         }
+    }
+
+
+    private String getJsLocale(Locale locale) {
+        String jsLocale = locale.getLanguage();
+        if (StringUtils.isNotEmpty(locale.getCountry())) {
+            jsLocale += "-" + locale.getCountry();
+        }
+        return jsLocale;
     }
 
     /**
