@@ -72,6 +72,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
@@ -251,9 +252,9 @@ public class OAuth extends AMLoginModule {
                 final String csrfState;
 
                 if (request.getParameter("jsonContent") != null) {
-                    csrfState =
-                            JsonValueBuilder.toJsonValue(request.getParameter("jsonContent")).get("state").asString();
-                    code = JsonValueBuilder.toJsonValue(request.getParameter("jsonContent")).get(PARAM_CODE).asString();
+                    final JsonValue jval = JsonValueBuilder.toJsonValue(request.getParameter("jsonContent"));
+                    csrfState = jval.get("state").asString();
+                    code =jval.get(PARAM_CODE).asString();
                 } else {
                     csrfState = request.getParameter("state");
                     code = request.getParameter(PARAM_CODE);
