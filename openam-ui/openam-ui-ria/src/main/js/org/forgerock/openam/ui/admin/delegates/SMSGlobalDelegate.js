@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
             } else if (realm.parentPath) {
                 return realm.parentPath + "/" + realm.name;
             } else {
-                return realm.name;
+                return "/";
             }
         };
 
