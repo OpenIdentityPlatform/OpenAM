@@ -84,6 +84,50 @@
                             <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="rotationEnabled" type="single" syntax="boolean" i18nKey="rotationEnabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="rotationMaxFileSize" type="single" i18nKey="rotationMaxFileSize">
+                        <DefaultValues>
+                            <Value>100000000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="rotationFilePrefix" type="single" i18nKey="rotationFilePrefix" />
+                    <AttributeSchema name="rotationFileSuffix" type="single" i18nKey="rotationFileSuffix">
+                        <DefaultValues>
+                            <Value>-MM.dd.yy-kk.mm</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="rotationInterval" type="single" i18nKey="rotationInterval">
+                        <DefaultValues>
+                            <Value>-1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="rotationTimes" type="list" syntax="string" i18nKey="rotationTimes"/>
+                    <AttributeSchema name="retentionMaxNumberOfHistoryFiles" type="single"
+                                     i18nKey="retentionMaxNumberOfHistoryFiles">
+                        <DefaultValues>
+                            <Value>-1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="retentionMaxDiskSpaceToUse" type="single"
+                                     i18nKey="retentionMaxDiskSpaceToUse">
+                        <DefaultValues>
+                            <Value>-1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="retentionMinFreeSpaceRequired" type="single"
+                                     i18nKey="retentionMinFreeSpaceRequired">
+                        <DefaultValues>
+                            <Value>-1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
             </Global>
 
@@ -144,6 +188,50 @@
                     <AttributeSchema name="handlerFactory" type="single" i18nKey="z900">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="rotationEnabled" type="single" syntax="boolean" i18nKey="rotationEnabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="rotationMaxFileSize" type="single" i18nKey="rotationMaxFileSize">
+                        <DefaultValues>
+                            <Value>100000000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="rotationFilePrefix" type="single" i18nKey="rotationFilePrefix" />
+                    <AttributeSchema name="rotationFileSuffix" type="single" i18nKey="rotationFileSuffix">
+                        <DefaultValues>
+                            <Value>-MM.dd.yy-kk.mm</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="rotationInterval" type="single" i18nKey="rotationInterval">
+                        <DefaultValues>
+                            <Value>-1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="rotationTimes" type="list" syntax="string" i18nKey="rotationTimes"/>
+                    <AttributeSchema name="retentionMaxNumberOfHistoryFiles" type="single"
+                                     i18nKey="retentionMaxNumberOfHistoryFiles">
+                        <DefaultValues>
+                            <Value>-1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="retentionMaxDiskSpaceToUse" type="single"
+                                     i18nKey="retentionMaxDiskSpaceToUse">
+                        <DefaultValues>
+                            <Value>-1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="retentionMinFreeSpaceRequired" type="single"
+                                     i18nKey="retentionMinFreeSpaceRequired">
+                        <DefaultValues>
+                            <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
