@@ -251,7 +251,7 @@ public class IdRepoException extends Exception implements L10NMessage {
      * @return a user-facing representation of this exception.
      */
     public String getConstraintViolationDetails() {
-        if (!getErrorCode().equals(LDAPConstants.CONSTRAINT_VIOLATED_ERROR)) {
+        if (!LDAPConstants.CONSTRAINT_VIOLATED_ERROR.equals(getErrorCode()) || args == null || args.length < 3) {
             return getMessage();
         }
 

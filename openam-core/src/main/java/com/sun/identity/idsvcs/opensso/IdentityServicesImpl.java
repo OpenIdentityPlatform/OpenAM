@@ -331,7 +331,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
         } catch (IdRepoException ex) {
             debug.error("IdentityServicesImpl:update", ex);
 
-            if (ex.getErrorCode().equals(LDAPConstants.CONSTRAINT_VIOLATED_ERROR)) {
+            if (LDAPConstants.CONSTRAINT_VIOLATED_ERROR.equals(ex.getErrorCode())) {
                 throw new InternalServerErrorException(ex.getConstraintViolationDetails());
             }
 
