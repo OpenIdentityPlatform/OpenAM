@@ -26,6 +26,8 @@
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
@@ -40,7 +42,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,13 +84,12 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.xui.XUIState;
 import org.forgerock.util.encode.Base64url;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owasp.esapi.ESAPI;
-
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 public class OAuth extends AMLoginModule {
 
@@ -102,7 +102,7 @@ public class OAuth extends AMLoginModule {
     private JwtHandlerConfig jwtHandlerConfig;
     String serverName = "";
     private ResourceBundle bundle = null;
-    private static final SecureRandom random = new SecureRandom();    
+    private static final SecureRandom random = new SecureRandom();
     String data = "";
     String userPassword = "";
     String proxyURL = "";
@@ -247,7 +247,18 @@ public class OAuth extends AMLoginModule {
             }
 
             case GET_OAUTH_TOKEN_STATE: {
-                final String csrfState = request.getParameter("state");
+
+                final String csrfState;
+
+                if (request.getParameter("jsonContent") != null) {
+                    csrfState =
+                            JsonValueBuilder.toJsonValue(request.getParameter("jsonContent")).get("state").asString();
+                    code = JsonValueBuilder.toJsonValue(request.getParameter("jsonContent")).get(PARAM_CODE).asString();
+                } else {
+                    csrfState = request.getParameter("state");
+                    code = request.getParameter(PARAM_CODE);
+                }
+
                 if (csrfState == null) {
                     OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because there was no state "
                             + "parameter");
@@ -265,10 +276,9 @@ public class OAuth extends AMLoginModule {
                     }
 
                     // We are being redirected back from an OAuth 2 Identity Provider
-                    code = request.getParameter(PARAM_CODE);
                     if (code == null || code.isEmpty()) {
-                            OAuthUtil.debugMessage("OAuth.process(): LOGIN_IGNORE");
-                            return ISAuthConstants.LOGIN_START;
+                        OAuthUtil.debugMessage("OAuth.process(): LOGIN_IGNORE");
+                        return ISAuthConstants.LOGIN_START;
                     }
 
                     validateInput("code", code, "HTTPParameterValue", 512, false);
@@ -288,10 +298,7 @@ public class OAuth extends AMLoginModule {
                         JwtHandler jwtHandler = new JwtHandler(jwtHandlerConfig);
                         try {
                             jwtClaims = jwtHandler.validateJwt(idToken);
-                        } catch (RuntimeException e) {
-                            debug.warning("Cannot validate JWT", e);
-                            throw e;
-                        } catch (AuthLoginException e) {
+                        } catch (RuntimeException | AuthLoginException e) {
                             debug.warning("Cannot validate JWT", e);
                             throw e;
                         }
