@@ -20,20 +20,32 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2015 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-log-messages'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+         http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Log Files and Messages</title>
 
- <para>This chapter gives information about the different log files and messages for
-  OpenAM.</para>
+ <para>
+  This chapter gives information about the different log files and messages
+  for OpenAM's classic Logging Service, which is based on the Java SDK.
+ </para>
+
+ <note>
+  <para>
+   OpenAM 13.0.0 introduces a new Audit Logging Service, which is an
+   audit logging framework common across all ForgeRock products. Both
+   logging services are available in OpenAM ${serverDocTargetVersion}, but
+   the classic Logging Service will be deprecated in a future release.
+  </para>
+ </note>
 
  <section xml:id="log-files">
   <title>Log Files</title>
@@ -44,7 +56,7 @@
    <title>Audit Log Files</title>
 
    <para>
-    This chapter describes OpenAM audit log files.
+    This chapter describes OpenAM audit log files:
    </para>
 
    <variablelist>
