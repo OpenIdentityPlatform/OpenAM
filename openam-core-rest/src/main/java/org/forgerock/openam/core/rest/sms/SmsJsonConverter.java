@@ -530,7 +530,9 @@ public class SmsJsonConverter {
 
         @Override
         public String fromJson(Object json) {
-            return Base64.decodeAsUTF8String((String)json);
+            String decodedValue = Base64.decodeAsUTF8String((String)json);
+            return decodedValue == null ? "" : decodedValue;
+
         }
     }
 }

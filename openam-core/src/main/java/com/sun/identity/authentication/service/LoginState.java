@@ -3229,7 +3229,11 @@ public class LoginState {
                 (!currentGoto.equalsIgnoreCase("null"))) {
             String encoded = servletRequest.getParameter("encoded");
             if (encoded != null && encoded.equals("true")) {
-                currentGoto = Base64.decodeAsUTF8String(currentGoto);
+                String decodedGoTo = Base64.decodeAsUTF8String(currentGoto);
+                if (decodedGoTo == null && DEBUG.warningEnabled()) {
+                    DEBUG.warning("As parameter 'encoded' is true, goto '{}' should be base64 encoded", currentGoto);
+                }
+                currentGoto = decodedGoTo;
             }
             if (!LazyConfig.AUTHD.isGotoUrlValid(currentGoto, getOrgDN())) {
                 if (DEBUG.messageEnabled()) {

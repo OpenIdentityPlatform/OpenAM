@@ -141,7 +141,13 @@ public class RedirectUrlValidator<T> {
 
         String encoded = request.getParameter("encoded");
         if (Boolean.parseBoolean(encoded)) {
-            return Base64.decodeAsUTF8String(value);
+            String decodedParameterValue = Base64.decodeAsUTF8String(value);
+            if (decodedParameterValue == null && DEBUG.warningEnabled()) {
+                DEBUG.warning("As parameter 'encoded' is true, parameter ['{}']='{}' should be base64 encoded",
+                            paramName, value);
+            }
+            return decodedParameterValue;
+
         } else {
             return value;
         }

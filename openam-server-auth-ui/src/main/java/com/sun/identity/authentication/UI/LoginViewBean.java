@@ -1531,6 +1531,10 @@ public class LoginViewBean extends AuthViewBeanBase {
             if ((new_org != null && new_org.equals("true")) &&
                 (encoded != null && encoded.equals("true"))){
                 indexName = Base64.decodeAsUTF8String(reqModule);
+                if (indexName == null && loginDebug.warningEnabled()) {
+                    loginDebug.warning("As parameter 'encoded' is true, module name '{}' should be base64 encoded",
+                            reqModule);
+                }
             } else {
                 indexName = reqModule;
             }

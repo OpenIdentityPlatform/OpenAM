@@ -382,7 +382,11 @@ public class AuthClientUtils {
                 // used and the form is posted again with the base64 encoded 
                 // parameters            	
                 if (!value.isEmpty()){
-                    value = Base64.decodeAsUTF8String(value);
+                    String decodedValue = Base64.decodeAsUTF8String(value);
+                    if (decodedValue == null && utilDebug.warningEnabled()) {
+                        utilDebug.warning("Parameter ['{}']='{}' should be base64 encoded", name, value);
+                    }
+                    value = decodedValue;
                     if (utilDebug.messageEnabled()) {
                         utilDebug.message("AuthUtils::decodeHash base 64 decoded '{}'='{}'", name, value);
                     }
@@ -406,7 +410,12 @@ public class AuthClientUtils {
                 }
 
                 if (base64Encoded) {
-                    value = Base64.decodeAsUTF8String(value);
+                    String decodedValue = Base64.decodeAsUTF8String(value);
+                    if (decodedValue == null && utilDebug.warningEnabled()) {
+                        utilDebug.warning("As parameter 'encoded' is true, parameter ['{}']='{}' should be base64" +
+                                        " encoded", name, value);
+                    }
+                    value = decodedValue;
                     if (utilDebug.messageEnabled()) {
                         utilDebug.message("AuthUtils::decodeHash base 64 decoded '{}'='{}'", name, value);
                     }
@@ -1699,7 +1708,11 @@ public class AuthClientUtils {
                 if (parameter.equalsIgnoreCase("SunQueryParamsString")) {
                     String queryParams = request.getParameter(parameter);
                     if ((queryParams != null) && (queryParams.length()>0)){
-                        queryParams = Base64.decodeAsUTF8String(queryParams);
+                        String decodedQueryParams = Base64.decodeAsUTF8String(queryParams);
+                        if (decodedQueryParams == null && utilDebug.warningEnabled()) {
+                            utilDebug.warning("Parameter ['{}']='{}' should be base64 encoded", parameter, queryParams);
+                        }
+                        queryParams = decodedQueryParams;
                     }
                     if ((queryParams != null) &&
                          (queryParams.length()>0)) {
@@ -1719,7 +1732,12 @@ public class AuthClientUtils {
                     	   // Again this will be the case when browser back
                     	   // button is used and the form is posted with the
                     	   // base64 encoded parameters including goto
-                           value = Base64.decodeAsUTF8String(value);
+                           String decodedValue = Base64.decodeAsUTF8String(value);
+                           if (decodedValue == null && utilDebug.warningEnabled()) {
+                               utilDebug.warning("As parameter 'encoded' is true, parameter ['{}']='{}' should be base64" +
+                                       " encoded", parameter, value);
+                           }
+                           value = decodedValue;
                            if(utilDebug.messageEnabled()) {
                                utilDebug.message("constructLoginURL: Base64 decoded "+parameter+"='{}'", value);
                            }
