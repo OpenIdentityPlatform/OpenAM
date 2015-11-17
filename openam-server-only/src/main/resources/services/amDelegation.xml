@@ -26,7 +26,7 @@
   
    $Id: amDelegation.xml,v 1.15 2009/12/21 22:02:42 veiming Exp $
 
-   Portions copyright 2014 ForgeRock AS.
+   Portions copyright 2014-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -475,17 +475,6 @@
                             <Value>READ</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="GlobalConfigRead" id="Permission">
-                        <AttributeValuePair>
-                            <Attribute name="resource"/>
-                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/global-config*</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="actions"/>
-                            <Value>READ</Value>
-                            <Value>MODIFY</Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
                     <SubConfiguration name="SessionPropertiesGetProperty" id="Permission">
                         <AttributeValuePair>
                             <Attribute name="resource" />
@@ -536,7 +525,6 @@
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
                             <Value>RealmAdmin</Value>
-                            <Value>GlobalConfigRead</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="defaultSubjectInLegacyMode" />
