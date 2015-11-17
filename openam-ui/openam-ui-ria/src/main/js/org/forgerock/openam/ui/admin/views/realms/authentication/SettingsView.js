@@ -16,6 +16,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView", [
     "jquery",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -26,7 +27,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSRealmDelegate) {
+], function ($, _, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSRealmDelegate) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
@@ -73,8 +74,16 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             this.data.form.reset();
         },
         save: function (event) {
-            var promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, this.data.form.data());
+            var data = this.data.form.data(),
+                promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, data),
+                self = this;
 
+            promise.then(function () {
+                // update formData for correct re-render tab after saving
+                _.extend(self.data.formData.values, data);
+
+            });
+            // animate save button
             FormHelper.bindSavePromiseToElement(promise, event.currentTarget);
         }
     });
