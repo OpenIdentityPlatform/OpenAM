@@ -27,7 +27,9 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.handler.HttpClientHandler;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
@@ -44,6 +46,7 @@ import org.forgerock.openam.selfservice.config.flows.UserRegistrationExtractor;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStage;
 import org.forgerock.selfservice.core.ProgressStageProvider;
+import org.forgerock.selfservice.core.UserUpdateService;
 import org.forgerock.selfservice.core.annotations.SelfService;
 import org.forgerock.selfservice.core.config.StageConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
@@ -86,6 +89,7 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() {});
         expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() {});
         expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() {});
+        expose(UserUpdateService.class);
         // Exposed to be accessible to custom progress stages
         expose(ConnectionFactory.class).annotatedWith(SelfService.class);
         expose(Client.class).annotatedWith(SelfService.class);
@@ -119,6 +123,12 @@ public final class SelfServiceGuiceModule extends PrivateModule {
             ServiceConfigProviderFactory configProviderFactory) {
 
         return new SelfServiceRequestHandler<>(serviceFactory, configHandler, configExtractor, configProviderFactory);
+    }
+
+    @Provides
+    @Singleton
+    UserUpdateService getUserUpdateService(@SelfService ConnectionFactory connectionFactory) {
+        return new UserUpdateService(connectionFactory, ResourcePath.resourcePath("/users"), new JsonPointer("/kbaInformation"));
     }
 
     @Provides

@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.selfservice;
 
+import static org.forgerock.openam.audit.AuditConstants.Component.USERS;
 import static org.forgerock.openam.rest.Routers.ssoToken;
 
 import com.google.inject.Key;
@@ -26,6 +27,7 @@ import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConsoleConfig;
 import org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConsoleConfig;
 import org.forgerock.openam.selfservice.config.flows.UserRegistrationConsoleConfig;
+import org.forgerock.selfservice.core.UserUpdateService;
 
 /**
  * Provides routes for the user self service services.
@@ -37,7 +39,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
     @Override
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter
-                .route("/userRegistration")
+                .route("/selfservice/userRegistration")
                 .authenticateWith(
                         ssoToken()
                                 .exceptRead()
@@ -46,7 +48,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                         .get(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>(){}));
 
         realmRouter
-                .route("/forgottenPassword")
+                .route("/selfservice/forgottenPassword")
                 .authenticateWith(
                         ssoToken()
                                 .exceptRead()
@@ -55,13 +57,19 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                         .get(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>(){}));
 
         realmRouter
-                .route("/forgottenUsername")
+                .route("/selfservice/forgottenUsername")
                 .authenticateWith(
                         ssoToken()
                                 .exceptRead()
                                 .exceptActions("submitRequirements"))
                 .toRequestHandler(RoutingMode.STARTS_WITH, Key
                         .get(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>(){}));
+
+        realmRouter
+                .route("/selfservice/user")
+                .auditAs(USERS)
+                .authenticateWith(ssoToken())
+                .toCollection(UserUpdateService.class);
     }
 
 }

@@ -16,6 +16,16 @@
 
 package org.forgerock.openam.core.rest;
 
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.getIdentityServicesAttributes;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.getSSOToken;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.identityAttributeJsonToSet;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.identityDetailsToJsonValue;
+import static org.forgerock.openam.rest.RestUtils.isAdmin;
+import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.Attribute;
@@ -25,8 +35,6 @@ import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -53,29 +61,19 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
-import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.CrestQuery;
-import org.forgerock.selfservice.core.SelfServiceContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
-import static org.forgerock.openam.rest.RestUtils.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.util.promise.Promises.*;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -85,24 +83,38 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
     private final String objectType;
     private final IdentityServicesImpl identityServices;
     private final IdentityResourceV2 identityResourceV2;
-    private final RestSecurityProvider restSecurityProvider;
+    private final Set<String> patchableAttributes;
 
     private static Debug logger = Debug.getInstance("frRest");
 
-    private static final String FIELD_PASSWORD = "userPassword";
 
     /**
-     * Creates a backend
+     * Constructs a new identity resource.
+     *
+     * @param objectType
+     *         the object type (whether user, group or agent)
+     * @param mailServerLoader
+     *         the mail service provider
+     * @param identityServices
+     *         the identity service
+     * @param coreWrapper
+     *         core utility API
+     * @param restSecurityProvider
+     *         self service config provider
+     * @param baseURLProviderFactory
+     *         URL provider factory
+     * @param patchableAttributes
+     *         set of acceptable patchable attributes
      */
     public IdentityResourceV3(String objectType, MailServerLoader mailServerLoader,
                               IdentityServicesImpl identityServices,
                               CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-                              BaseURLProviderFactory baseURLProviderFactory) {
+                              BaseURLProviderFactory baseURLProviderFactory, Set<String> patchableAttributes) {
         this.identityResourceV2 = new IdentityResourceV2(objectType, mailServerLoader, identityServices, coreWrapper,
                 restSecurityProvider, baseURLProviderFactory);
         this.objectType = objectType;
         this.identityServices = identityServices;
-        this.restSecurityProvider = restSecurityProvider;
+        this.patchableAttributes = patchableAttributes;
     }
 
     /**
@@ -251,8 +263,6 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                 return new ForbiddenException("Only admin can patch user values").asPromise();
             }
 
-            final Set<String> patchableFieldNames = new HashSet<>(Collections.singletonList(FIELD_PASSWORD));
-
             SSOToken ssoToken = getSSOToken(RestUtils.getToken().getTokenID().toString());
             IdentityServicesImpl identityServices = getIdentityServices();
 
@@ -278,9 +288,8 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                 switch (patchOperation.getOperation()) {
                     case PatchOperation.OPERATION_REPLACE: {
                         String name = getFieldName(patchOperation.getField());
-                        String value = patchOperation.getValue().asString();
 
-                        if (!patchableFieldNames.contains(name)) {
+                        if (!patchableAttributes.contains(name)) {
                             return new BadRequestException("For the object type "
                                     + identityResourceV2.USER_TYPE
                                     + ", field \""
@@ -288,9 +297,8 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                                     + "\" cannot be altered by PATCH").asPromise();
                         }
 
-                        Set<String> newSet = new HashSet<>();
-                        newSet.add(value);
-                        newAttributeMap.put(name, newSet);
+                        JsonValue value = patchOperation.getValue();
+                        newAttributeMap.put(name, identityAttributeJsonToSet(value));
                         updateNeeded = true;
                         break;
                     }

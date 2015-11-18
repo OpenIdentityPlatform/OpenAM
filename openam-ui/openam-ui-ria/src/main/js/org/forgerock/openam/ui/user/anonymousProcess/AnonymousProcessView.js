@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
             realmPath = realmPath.substring(0, 1) === "/" ? realmPath : "/" + realmPath;
 
             if (!this.delegate || Router.currentRoute !== continueRoute) {
-                this.setDelegate("json/" + endpoint, params.token);
+                this.setDelegate("json/selfservice/" + endpoint, params.token);
             }
 
             if (params.token) {
