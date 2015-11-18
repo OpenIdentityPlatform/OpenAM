@@ -557,7 +557,6 @@
       <textobject><para>The OpenAM administrator sees all capabilities of the console.</para></textobject>
      </mediaobject>
     </figure>
-
     <para>
      For more information, see
      <link
@@ -567,7 +566,37 @@
     </para>
    </listitem>
 
+   <!-- OPENAM-1462, OPENAM-6892 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">New Configuration Options for the OATH Authentication Module.</emphasis>
+     Three new configuration properties are available for the OATH
+     authentication module:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       The Shared Secret Provider Class. The class that processes the user
+       profile attribute where the user's secret key is stored. The default class is
+       <literal>org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider</literal>.
+      </para>
+     </listitem>
+      <listitem>
+       <para>
+        Clock Drift Attribute Name. The user profile attribute that stores the
+        clock drift. If unspecified, then OpenAM does not check for clock drift.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Maximum Allowed Clock Drift. The maximum acceptable clock drift before
+        authentication fails.
+       </para>
+      </listitem>
+    </itemizedlist>
+   </listitem>
   </itemizedlist>
+
  </section>
 
 </chapter>
