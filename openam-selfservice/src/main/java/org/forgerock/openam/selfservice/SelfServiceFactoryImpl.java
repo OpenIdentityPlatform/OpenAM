@@ -22,7 +22,6 @@ import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStageProvider;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
-import sun.reflect.Reflection;
 
 import javax.inject.Inject;
 
@@ -57,8 +56,7 @@ class SelfServiceFactoryImpl implements SelfServiceFactory {
 
     @Override
     public RequestHandler getService(ProcessInstanceConfig serviceConfig) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        return new AnonymousProcessService(serviceConfig, stageProvider, tokenHandlerFactory, processStore, classLoader);
+        return new AnonymousProcessService(serviceConfig, stageProvider, tokenHandlerFactory, processStore);
     }
 
 }
