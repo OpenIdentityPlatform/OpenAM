@@ -86,7 +86,7 @@
                 <AttributeSchema name="assignedDashboard"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="Available Dashboard Apps">
+                                 i18nKey="A107">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -96,7 +96,7 @@
                 <AttributeSchema name="assignedDashboard"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="Assigned Dashboard">
+                                 i18nKey="A108">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
