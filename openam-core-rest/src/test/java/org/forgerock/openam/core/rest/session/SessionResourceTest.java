@@ -61,8 +61,13 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.context.SecurityContext;
+import org.forgerock.services.context.RootContext;
+import org.forgerock.http.session.Session;
+import org.forgerock.http.session.SessionContext;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -231,8 +236,10 @@ public class SessionResourceTest {
     public void actionCollectionShouldLogoutSessionAndReturnEmptyJsonObjectWhenSSOTokenValid() throws SSOException {
         //Given
         cookieResponse = "SSO_TOKEN_ID";
-        final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
-        final Context context = ClientContext.newInternalClientContext(new AdviceContext(tokenContext, Collections.<String>emptySet()));
+        final AttributesContext attrContext = new AttributesContext(new SessionContext(new RootContext(), mock(Session.class)));
+        final AdviceContext adviceContext = new AdviceContext(attrContext, Collections.<String>emptySet());
+        final SecurityContext securityContext = new SecurityContext(adviceContext, null, null);
+        final Context context = ClientContext.newInternalClientContext(new SSOTokenContext(securityContext));
         final ActionRequest request = mock(ActionRequest.class);
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
 

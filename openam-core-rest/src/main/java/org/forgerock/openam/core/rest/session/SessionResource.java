@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import org.forgerock.http.header.CookieHeader;
@@ -76,6 +77,7 @@ import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.context.AttributesContext;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -551,6 +553,9 @@ public class SessionResource implements CollectionResourceProvider {
             } else {
                 httpServletResponse = new HeaderCollectingHttpServletResponse(new UnsupportedResponse(), adviceContext);
             }
+            AttributesContext requestContext = context.asContext(AttributesContext.class);
+            Map<String, Object> requestAttributes = requestContext.getAttributes();
+            final HttpServletRequest httpServletRequest = (HttpServletRequest) requestAttributes.get(HttpServletRequest.class.getName());
 
             String sessionId;
             Map<String, Object> map = new HashMap<>();
@@ -559,7 +564,7 @@ public class SessionResource implements CollectionResourceProvider {
                 sessionId = ssoToken.getTokenID().toString();
 
                 try {
-                    authUtilsWrapper.logout(sessionId, null, httpServletResponse);
+                    authUtilsWrapper.logout(sessionId, httpServletRequest, httpServletResponse);
                 } catch (SSOException e) {
                     if (LOGGER.errorEnabled()) {
                         LOGGER.error("SessionResource.logout() :: Token ID, " + tokenId +
