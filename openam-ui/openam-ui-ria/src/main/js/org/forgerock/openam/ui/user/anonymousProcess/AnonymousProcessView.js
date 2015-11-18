@@ -18,7 +18,7 @@
 define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessDelegate",
+    "org/forgerock/commons/ui/user/delegates/AnonymousProcessDelegate",
     "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/util/RealmHelper"
