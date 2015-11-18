@@ -84,7 +84,6 @@
    <item name="Java EE Reference" href="./doc/bootstrap/jee-reference/index.html" />
    <item name="Web Release Notes" href="./doc/bootstrap/web-release-notes/index.html" />
    <item name="Web User's Guide" href="./doc/bootstrap/web-users-guide/index.html" />
-   <item name="Web Reference" href="./doc/bootstrap/web-reference/index.html" />
   </menu>
 
   <menu name="Project Information">
