@@ -29,22 +29,22 @@ import java.util.Set;
  */
 public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
 
-    private final int minQuestionsToAnswer;
+    private final int minimumAnswersToVerify;
     private final boolean showUsernameEnabled;
 
     private ForgottenUsernameConsoleConfig(ForgottenUsernameBuilder builder) {
         super(builder);
-        minQuestionsToAnswer = builder.minQuestionsToAnswer;
+        minimumAnswersToVerify = builder.minimumAnswersToVerify;
         showUsernameEnabled = builder.showUsernameEnabled;
     }
 
     /**
-     * Get the minimum count of questions to answer.
+     * Get the minimum count of questions to verify.
      *
      * @return minimum count
      */
-    public int getMinQuestionsToAnswer() {
-        return minQuestionsToAnswer;
+    public int getMinimumAnswersToVerify() {
+        return minimumAnswersToVerify;
     }
 
     /**
@@ -59,15 +59,15 @@ public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
     static final class ForgottenUsernameBuilder
             extends Builder<ForgottenUsernameConsoleConfig, ForgottenUsernameBuilder> {
 
-        private int minQuestionsToAnswer;
+        private int minimumAnswersToVerify;
         private boolean showUsernameEnabled;
 
         private ForgottenUsernameBuilder(Map<String, Set<String>> consoleAttributes) {
             super(consoleAttributes);
         }
 
-        ForgottenUsernameBuilder setMinQuestionsToAnswer(int minQuestionsToAnswer) {
-            this.minQuestionsToAnswer = minQuestionsToAnswer;
+        ForgottenUsernameBuilder setMinimumAnswersToVerify(int minimumAnswersToVerify) {
+            this.minimumAnswersToVerify = minimumAnswersToVerify;
             return this;
         }
 
@@ -83,7 +83,7 @@ public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
 
         @Override
         void verifyKbaConfig() {
-            Reject.ifFalse(minQuestionsToAnswer > 0, "Minimum questions to be answered must be greater than 0");
+            Reject.ifFalse(minimumAnswersToVerify > 0, "Minimum questions to be verified must be greater than 0");
         }
 
         @Override

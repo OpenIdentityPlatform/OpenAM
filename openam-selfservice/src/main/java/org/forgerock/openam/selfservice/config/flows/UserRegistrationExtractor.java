@@ -17,20 +17,18 @@
 package org.forgerock.openam.selfservice.config.flows;
 
 import static com.sun.identity.shared.datastruct.CollectionHelper.getBooleanMapAttrThrows;
-import static com.sun.identity.shared.datastruct.CollectionHelper.getIntMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getLocaleMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getLongMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttrThrows;
-import static com.sun.identity.shared.datastruct.CollectionHelper.getMapSetThrows;
 import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.CAPTCHA_SECRET_KEY;
 import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.CAPTCHA_SITE_KEY;
 import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.CAPTCHA_VERIFICATION_URL;
-import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.SECURITY_QUESTIONS_KEY;
 
 import com.sun.identity.shared.datastruct.ValueNotFoundException;
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,13 +46,21 @@ public final class UserRegistrationExtractor implements ConsoleConfigExtractor<U
     private final static String SUBJECT_TRANSLATION_KEY = "forgerockRESTSecuritySelfRegEmailSubject";
     private final static String BODY_TRANSLATION_KEY = "forgerockRESTSecuritySelfRegEmailBody";
     private final static String KBA_ENABLED_KEY = "forgerockRESTSecuritySelfRegKbaEnabled";
-    private final static String MIN_ANSWERS_TO_PROVIDE_KEY = "forgerockRESTSecurityAnswersUserMustProvide";
     private final static String TOKEN_EXPIRY_KEY = "forgerockRESTSecuritySelfRegTokenTTL";
     private final static String SERVICE_CONFIG_CLASS_KEY = "forgerockRESTSecuritySelfRegServiceConfigClass";
+
+    private final ConsoleConfigExtractor<KbaConsoleConfig> kbaExtractor;
+
+    @Inject
+    public UserRegistrationExtractor(ConsoleConfigExtractor<KbaConsoleConfig> kbaExtractor) {
+        this.kbaExtractor = kbaExtractor;
+    }
 
     @Override
     public UserRegistrationConsoleConfig extract(Map<String, Set<String>> consoleAttributes) {
         try {
+            KbaConsoleConfig kbaConsoleConfig = kbaExtractor.extract(consoleAttributes);
+
             return UserRegistrationConsoleConfig
                     .newBuilder(consoleAttributes)
                     .setEnabled(getBooleanMapAttrThrows(consoleAttributes, ENABLED_KEY))
@@ -67,8 +73,8 @@ public final class UserRegistrationExtractor implements ConsoleConfigExtractor<U
                     .setSubjectTranslations(getLocaleMapAttrThrows(consoleAttributes, SUBJECT_TRANSLATION_KEY))
                     .setMessageTranslations(getLocaleMapAttrThrows(consoleAttributes, BODY_TRANSLATION_KEY))
                     .setKbaEnabled(getBooleanMapAttrThrows(consoleAttributes, KBA_ENABLED_KEY))
-                    .setSecurityQuestions(SecurityQuestionsHelper.parseQuestions(getMapSetThrows(consoleAttributes, SECURITY_QUESTIONS_KEY)))
-                    .setMinAnswersToProvide(getIntMapAttrThrows(consoleAttributes, MIN_ANSWERS_TO_PROVIDE_KEY))
+                    .setSecurityQuestions(kbaConsoleConfig.getSecurityQuestions())
+                    .setMinimumAnswersToDefine(kbaConsoleConfig.getMinimumAnswersToDefine())
                     .setTokenExpiry(getLongMapAttrThrows(consoleAttributes, TOKEN_EXPIRY_KEY))
                     .setConfigProviderClass(getMapAttrThrows(consoleAttributes, SERVICE_CONFIG_CLASS_KEY))
                     .build();

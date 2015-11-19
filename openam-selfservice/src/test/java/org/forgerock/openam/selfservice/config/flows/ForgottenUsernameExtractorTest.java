@@ -16,9 +16,14 @@
 
 package org.forgerock.openam.selfservice.config.flows;
 
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
@@ -34,6 +39,14 @@ import java.util.Set;
  */
 public final class ForgottenUsernameExtractorTest {
 
+    @Mock
+    private ConsoleConfigExtractor<KbaConsoleConfig> kbaExtractor;
+
+    @BeforeMethod
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
     public void createsValidConfigInstance() {
         // Given
@@ -46,8 +59,6 @@ public final class ForgottenUsernameExtractorTest {
         consoleAttributes.put("forgerockRESTSecurityForgotUsernameTokenTTL", Collections.singleton("1234"));
         consoleAttributes.put("forgerockRESTSecurityForgotUsernameServiceConfigClass", Collections.singleton("someclass"));
         consoleAttributes.put("forgerockRESTSecurityForgotUsernameKbaEnabled", Collections.singleton("true"));
-        consoleAttributes.put("forgerockRESTSecurityKBAQuestions", Collections.singleton("123|en|abc"));
-        consoleAttributes.put("forgerockRESTSecurityQuestionsUserMustAnswer", Collections.singleton("3"));
         consoleAttributes.put("forgerockRESTSecurityForgotUsernameCaptchaEnabled", Collections.singleton("true"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaSiteKey", Collections.singleton("someKey"));
         consoleAttributes.put("forgerockRESTSecurityCaptchaSecretKey", Collections.singleton("someSecret"));
@@ -55,8 +66,17 @@ public final class ForgottenUsernameExtractorTest {
         consoleAttributes.put("forgerockRESTSecurityForgotUsernameEmailSubject", Collections.singleton("en|The Subject!"));
         consoleAttributes.put("forgerockRESTSecurityForgotUsernameEmailBody", Collections.singleton("de|Hallo Welt!"));
 
+        KbaConsoleConfig kbaConsoleConfig = KbaConsoleConfig
+                .newBuilder()
+                .setSecurityQuestions(singletonMap("123", singletonMap("en", "abc")))
+                .setMinimumAnswersToDefine(5)
+                .setMinimumAnswersToVerify(3)
+                .build();
+
+        given(kbaExtractor.extract(consoleAttributes)).willReturn(kbaConsoleConfig);
+
         // When
-        ConsoleConfigExtractor<ForgottenUsernameConsoleConfig> extractor = new ForgottenUsernameExtractor();
+        ConsoleConfigExtractor<ForgottenUsernameConsoleConfig> extractor = new ForgottenUsernameExtractor(kbaExtractor);
         ForgottenUsernameConsoleConfig config = extractor.extract(consoleAttributes);
 
         // Then
@@ -67,7 +87,7 @@ public final class ForgottenUsernameExtractorTest {
         assertThat(config.getConfigProviderClass()).isEqualTo("someclass");
         assertThat(config.isKbaEnabled()).isTrue();
         assertThat(config.getSecurityQuestions()).containsEntry("123", Collections.singletonMap("en", "abc"));
-        assertThat(config.getMinQuestionsToAnswer()).isEqualTo(3);
+        assertThat(config.getMinimumAnswersToVerify()).isEqualTo(3);
         assertThat(config.isCaptchaEnabled()).isTrue();
         assertThat(config.getCaptchaSiteKey()).isEqualTo("someKey");
         assertThat(config.getCaptchaSecretKey()).isEqualTo("someSecret");

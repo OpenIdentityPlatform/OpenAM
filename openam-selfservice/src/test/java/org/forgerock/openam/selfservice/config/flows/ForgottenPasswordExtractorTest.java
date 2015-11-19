@@ -16,14 +16,17 @@
 
 package org.forgerock.openam.selfservice.config.flows;
 
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
-import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConsoleConfig;
-import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordExtractor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -36,28 +39,43 @@ import java.util.Set;
  */
 public final class ForgottenPasswordExtractorTest {
 
+    @Mock
+    private ConsoleConfigExtractor<KbaConsoleConfig> kbaExtractor;
+
+    @BeforeMethod
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
     public void createsValidConfigInstance() {
         // Given
         Map<String, Set<String>> consoleAttributes = new HashMap<>();
 
-        consoleAttributes.put("forgerockRESTSecurityForgotPasswordEnabled", Collections.singleton("true"));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailVerificationEnabled", Collections.singleton("true"));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassConfirmationUrl", Collections.singleton("someurl"));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassTokenTTL", Collections.singleton("1234"));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassServiceConfigClass", Collections.singleton("someclass"));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassKbaEnabled", Collections.singleton("true"));
-        consoleAttributes.put("forgerockRESTSecurityKBAQuestions", Collections.singleton("123|en|abc"));
-        consoleAttributes.put("forgerockRESTSecurityQuestionsUserMustAnswer", Collections.singleton("3"));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassCaptchaEnabled", Collections.singleton("true"));
-        consoleAttributes.put("forgerockRESTSecurityCaptchaSiteKey", Collections.singleton("someKey"));
-        consoleAttributes.put("forgerockRESTSecurityCaptchaSecretKey", Collections.singleton("someSecret"));
-        consoleAttributes.put("forgerockRESTSecurityCaptchaVerificationUrl", Collections.singleton("someUrl"));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailSubject", Collections.singleton("en|The Subject!"));
-        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailBody", Collections.singleton("de|Hallo Welt!"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPasswordEnabled", singleton("true"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailVerificationEnabled", singleton("true"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassConfirmationUrl", singleton("someurl"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassTokenTTL", singleton("1234"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassServiceConfigClass", singleton("someclass"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassKbaEnabled", singleton("true"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassCaptchaEnabled", singleton("true"));
+        consoleAttributes.put("forgerockRESTSecurityCaptchaSiteKey", singleton("someKey"));
+        consoleAttributes.put("forgerockRESTSecurityCaptchaSecretKey", singleton("someSecret"));
+        consoleAttributes.put("forgerockRESTSecurityCaptchaVerificationUrl", singleton("someUrl"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailSubject", singleton("en|The Subject!"));
+        consoleAttributes.put("forgerockRESTSecurityForgotPassEmailBody", singleton("de|Hallo Welt!"));
+
+        KbaConsoleConfig kbaConsoleConfig = KbaConsoleConfig
+                .newBuilder()
+                .setSecurityQuestions(singletonMap("123", singletonMap("en", "abc")))
+                .setMinimumAnswersToDefine(5)
+                .setMinimumAnswersToVerify(3)
+                .build();
+
+        given(kbaExtractor.extract(consoleAttributes)).willReturn(kbaConsoleConfig);
 
         // When
-        ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> extractor = new ForgottenPasswordExtractor();
+        ConsoleConfigExtractor<ForgottenPasswordConsoleConfig> extractor = new ForgottenPasswordExtractor(kbaExtractor);
         ForgottenPasswordConsoleConfig config = extractor.extract(consoleAttributes);
 
         // Then
@@ -67,8 +85,8 @@ public final class ForgottenPasswordExtractorTest {
         assertThat(config.getTokenExpiry()).isEqualTo(1234L);
         assertThat(config.getConfigProviderClass()).isEqualTo("someclass");
         assertThat(config.isKbaEnabled()).isTrue();
-        assertThat(config.getSecurityQuestions()).containsEntry("123", Collections.singletonMap("en", "abc"));
-        assertThat(config.getMinQuestionsToAnswer()).isEqualTo(3);
+        assertThat(config.getSecurityQuestions()).containsEntry("123", singletonMap("en", "abc"));
+        assertThat(config.getMinimumAnswersToVerify()).isEqualTo(3);
         assertThat(config.isCaptchaEnabled()).isTrue();
         assertThat(config.getCaptchaSiteKey()).isEqualTo("someKey");
         assertThat(config.getCaptchaSecretKey()).isEqualTo("someSecret");

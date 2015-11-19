@@ -70,6 +70,11 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                 .auditAs(USERS)
                 .authenticateWith(ssoToken())
                 .toCollection(UserUpdateService.class);
+
+        realmRouter
+                .route("selfservice/kba")
+                .authenticateWith(ssoToken())
+                .toSingleton(KbaResource.class);
     }
 
 }

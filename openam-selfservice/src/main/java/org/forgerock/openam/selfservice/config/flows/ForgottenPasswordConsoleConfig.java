@@ -30,12 +30,12 @@ import java.util.Set;
 public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
 
     private final String emailVerificationUrl;
-    private final int minQuestionsToAnswer;
+    private final int minimumAnswersToVerify;
 
     private ForgottenPasswordConsoleConfig(ForgottenPasswordBuilder builder) {
         super(builder);
         emailVerificationUrl = builder.emailVerificationUrl;
-        minQuestionsToAnswer = builder.minQuestionsToAnswer;
+        minimumAnswersToVerify = builder.minimumAnswersToVerify;
     }
 
     /**
@@ -48,19 +48,19 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
     }
 
     /**
-     * Get the minimum count of questions to answer.
+     * Get the minimum count of questions to verify.
      *
      * @return minimum count
      */
-    public int getMinQuestionsToAnswer() {
-        return minQuestionsToAnswer;
+    public int getMinimumAnswersToVerify() {
+        return minimumAnswersToVerify;
     }
 
     static final class ForgottenPasswordBuilder
             extends Builder<ForgottenPasswordConsoleConfig, ForgottenPasswordBuilder> {
 
         private String emailVerificationUrl;
-        private int minQuestionsToAnswer;
+        private int minimumAnswersToVerify;
 
         private ForgottenPasswordBuilder(Map<String, Set<String>> consoleAttributes) {
             super(consoleAttributes);
@@ -71,8 +71,8 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
             return this;
         }
 
-        ForgottenPasswordBuilder setMinQuestionsToAnswer(int minQuestionsToAnswer) {
-            this.minQuestionsToAnswer = minQuestionsToAnswer;
+        ForgottenPasswordBuilder setMinimumAnswersToVerify(int minimumAnswersToVerify) {
+            this.minimumAnswersToVerify = minimumAnswersToVerify;
             return this;
         }
 
@@ -88,7 +88,7 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
 
         @Override
         void verifyKbaConfig() {
-            Reject.ifFalse(minQuestionsToAnswer > 0, "Minimum questions to be answered must be greater than 0");
+            Reject.ifFalse(minimumAnswersToVerify > 0, "Minimum questions to be verified must be greater than 0");
         }
 
         @Override

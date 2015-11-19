@@ -23,7 +23,6 @@ package org.forgerock.openam.selfservice.config.flows;
  */
 final class CommonSmsSelfServiceConstants {
 
-    final static String SECURITY_QUESTIONS_KEY = "forgerockRESTSecurityKBAQuestions";
     final static String CAPTCHA_SITE_KEY = "forgerockRESTSecurityCaptchaSiteKey";
     final static String CAPTCHA_SECRET_KEY = "forgerockRESTSecurityCaptchaSecretKey";
     final static String CAPTCHA_VERIFICATION_URL = "forgerockRESTSecurityCaptchaVerificationUrl";

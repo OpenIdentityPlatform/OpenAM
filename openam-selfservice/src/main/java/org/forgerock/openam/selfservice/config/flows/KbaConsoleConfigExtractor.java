@@ -16,38 +16,48 @@
 
 package org.forgerock.openam.selfservice.config.flows;
 
+import static com.sun.identity.shared.datastruct.CollectionHelper.getIntMapAttrThrows;
+import static com.sun.identity.shared.datastruct.CollectionHelper.getMapSetThrows;
+
+import com.sun.identity.shared.datastruct.ValueNotFoundException;
+import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Assists with the parsing of security questions. The expected format is:
- * <pre>id|locale|question</pre>
+ * Extracts out the KBA console configuration.
  *
  * @since 13.0.0
  */
-final class SecurityQuestionsHelper {
+public final class KbaConsoleConfigExtractor implements ConsoleConfigExtractor<KbaConsoleConfig> {
+
+    private final static String SECURITY_QUESTIONS_KEY = "forgerockRESTSecurityKBAQuestions";
+    private final static String MIN_QUESTIONS_TO_ANSWERED_KEY = "forgerockRESTSecurityQuestionsUserMustAnswer";
+    private final static String MIN_ANSWERS_TO_PROVIDE_KEY = "forgerockRESTSecurityAnswersUserMustProvide";
 
     private final static Pattern questionPattern = Pattern.compile("^(\\w+)\\|(\\w+)\\|(.+)$");
 
-    private SecurityQuestionsHelper() {
-        throw new UnsupportedOperationException();
+    @Override
+    public KbaConsoleConfig extract(Map<String, Set<String>> consoleAttributes) {
+        try {
+            return KbaConsoleConfig
+                    .newBuilder()
+                    .setSecurityQuestions(parseQuestions(getMapSetThrows(consoleAttributes, SECURITY_QUESTIONS_KEY)))
+                    .setMinimumAnswersToDefine(getIntMapAttrThrows(consoleAttributes, MIN_ANSWERS_TO_PROVIDE_KEY))
+                    .setMinimumAnswersToVerify(getIntMapAttrThrows(consoleAttributes, MIN_QUESTIONS_TO_ANSWERED_KEY))
+                    .build();
+
+        } catch (ValueNotFoundException e) {
+            throw new IllegalArgumentException("Invalid console values", e);
+        }
     }
 
-    /**
-     * Given a list of question strings, parse them into there various parts such that
-     * <pre>id|locale|question</pre>
-     * becomes
-     * <pre>Map&lt;id,Map&lt;locale,question&gt;&gt;</pre>
-     *
-     * @param questions
-     *         question list
-     *
-     * @return parsed question map
-     */
-    static Map<String, Map<String, String>> parseQuestions(Collection<String> questions) {
+    private Map<String, Map<String, String>> parseQuestions(Collection<String> questions) {
         Map<String, Map<String, String>> localisedQuestions = new HashMap<>();
 
         for (String question : questions) {

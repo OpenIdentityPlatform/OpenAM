@@ -30,12 +30,12 @@ import java.util.Set;
 public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
 
     private final String emailVerificationUrl;
-    private final int minAnswersToProvide;
+    private final int minimumAnswersToDefine;
 
     private UserRegistrationConsoleConfig(UserRegistrationBuilder builder) {
         super(builder);
         emailVerificationUrl = builder.emailVerificationUrl;
-        minAnswersToProvide = builder.minAnswersToProvide;
+        minimumAnswersToDefine = builder.minimumAnswersToDefine;
     }
 
     /**
@@ -48,19 +48,19 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
     }
 
     /**
-     * Get the minimum count of answers to provide.
+     * Get the minimum count of answers to define.
      *
      * @return minimum count
      */
-    public int getMinAnswersToProvide() {
-        return minAnswersToProvide;
+    public int getMinimumAnswersToDefine() {
+        return minimumAnswersToDefine;
     }
 
     static final class UserRegistrationBuilder
             extends Builder<UserRegistrationConsoleConfig, UserRegistrationBuilder> {
 
         private String emailVerificationUrl;
-        private int minAnswersToProvide;
+        private int minimumAnswersToDefine;
 
         private UserRegistrationBuilder(Map<String, Set<String>> consoleAttributes) {
             super(consoleAttributes);
@@ -71,8 +71,8 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
             return this;
         }
 
-        UserRegistrationBuilder setMinAnswersToProvide(int minAnswersToProvide) {
-            this.minAnswersToProvide = minAnswersToProvide;
+        UserRegistrationBuilder setMinimumAnswersToDefine(int minimumAnswersToDefine) {
+            this.minimumAnswersToDefine = minimumAnswersToDefine;
             return this;
         }
 
@@ -88,12 +88,12 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
 
         @Override
         void verifyKbaConfig() {
-            Reject.ifFalse(minAnswersToProvide > 0, "Minimum answers to be provided must be greater than 0");
+            Reject.ifFalse(minimumAnswersToDefine > 0, "Minimum answers to be defined must be greater than 0");
         }
 
         @Override
         UserRegistrationConsoleConfig internalBuild() {
-            Reject.ifFalse(minAnswersToProvide > 0);
+            Reject.ifFalse(minimumAnswersToDefine > 0);
             return new UserRegistrationConsoleConfig(this);
         }
 

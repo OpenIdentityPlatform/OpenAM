@@ -17,20 +17,18 @@
 package org.forgerock.openam.selfservice.config.flows;
 
 import static com.sun.identity.shared.datastruct.CollectionHelper.getBooleanMapAttrThrows;
-import static com.sun.identity.shared.datastruct.CollectionHelper.getIntMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getLocaleMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getLongMapAttrThrows;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttrThrows;
-import static com.sun.identity.shared.datastruct.CollectionHelper.getMapSetThrows;
 import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.CAPTCHA_SECRET_KEY;
 import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.CAPTCHA_SITE_KEY;
 import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.CAPTCHA_VERIFICATION_URL;
-import static org.forgerock.openam.selfservice.config.flows.CommonSmsSelfServiceConstants.SECURITY_QUESTIONS_KEY;
 
 import com.sun.identity.shared.datastruct.ValueNotFoundException;
 import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,13 +46,21 @@ public final class ForgottenPasswordExtractor implements ConsoleConfigExtractor<
     private final static String SUBJECT_TRANSLATIONS_KEY = "forgerockRESTSecurityForgotPassEmailSubject";
     private final static String BODY_TRANSLATIONS_KEY = "forgerockRESTSecurityForgotPassEmailBody";
     private final static String KBA_ENABLED_KEY = "forgerockRESTSecurityForgotPassKbaEnabled";
-    private final static String MIN_QUESTIONS_TO_ANSWERED_KEY = "forgerockRESTSecurityQuestionsUserMustAnswer";
     private final static String TOKEN_EXPIRY_KEY = "forgerockRESTSecurityForgotPassTokenTTL";
     private final static String SERVICE_CONFIG_CLASS_KEY = "forgerockRESTSecurityForgotPassServiceConfigClass";
+
+    private final ConsoleConfigExtractor<KbaConsoleConfig> kbaExtractor;
+
+    @Inject
+    public ForgottenPasswordExtractor(ConsoleConfigExtractor<KbaConsoleConfig> kbaExtractor) {
+        this.kbaExtractor = kbaExtractor;
+    }
 
     @Override
     public ForgottenPasswordConsoleConfig extract(Map<String, Set<String>> consoleAttributes) {
         try {
+            KbaConsoleConfig kbaConsoleConfig = kbaExtractor.extract(consoleAttributes);
+
             return ForgottenPasswordConsoleConfig
                     .newBuilder(consoleAttributes)
                     .setEnabled(getBooleanMapAttrThrows(consoleAttributes, ENABLED_KEY))
@@ -67,8 +73,8 @@ public final class ForgottenPasswordExtractor implements ConsoleConfigExtractor<
                     .setSubjectTranslations(getLocaleMapAttrThrows(consoleAttributes, SUBJECT_TRANSLATIONS_KEY))
                     .setMessageTranslations(getLocaleMapAttrThrows(consoleAttributes, BODY_TRANSLATIONS_KEY))
                     .setKbaEnabled(getBooleanMapAttrThrows(consoleAttributes, KBA_ENABLED_KEY))
-                    .setSecurityQuestions(SecurityQuestionsHelper.parseQuestions(getMapSetThrows(consoleAttributes, SECURITY_QUESTIONS_KEY)))
-                    .setMinQuestionsToAnswer(getIntMapAttrThrows(consoleAttributes, MIN_QUESTIONS_TO_ANSWERED_KEY))
+                    .setSecurityQuestions(kbaConsoleConfig.getSecurityQuestions())
+                    .setMinimumAnswersToVerify(kbaConsoleConfig.getMinimumAnswersToVerify())
                     .setTokenExpiry(getLongMapAttrThrows(consoleAttributes, TOKEN_EXPIRY_KEY))
                     .setConfigProviderClass(getMapAttrThrows(consoleAttributes, SERVICE_CONFIG_CLASS_KEY))
                     .build();

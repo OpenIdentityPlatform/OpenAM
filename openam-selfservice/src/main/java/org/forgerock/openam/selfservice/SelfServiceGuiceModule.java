@@ -41,6 +41,8 @@ import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConsoleCon
 import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordExtractor;
 import org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConsoleConfig;
 import org.forgerock.openam.selfservice.config.flows.ForgottenUsernameExtractor;
+import org.forgerock.openam.selfservice.config.flows.KbaConsoleConfig;
+import org.forgerock.openam.selfservice.config.flows.KbaConsoleConfigExtractor;
 import org.forgerock.openam.selfservice.config.flows.UserRegistrationConsoleConfig;
 import org.forgerock.openam.selfservice.config.flows.UserRegistrationExtractor;
 import org.forgerock.selfservice.core.ProcessStore;
@@ -69,6 +71,7 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         bind(SnapshotTokenHandlerFactory.class).to(SnapshotTokenHandlerFactoryImpl.class);
         bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
         bind(SelfServiceFactory.class).to(SelfServiceFactoryImpl.class);
+        bind(KbaResource.class);
 
         bind(new TypeLiteral<ConsoleConfigExtractor<UserRegistrationConsoleConfig>>() {})
                 .to(UserRegistrationExtractor.class);
@@ -76,6 +79,8 @@ public final class SelfServiceGuiceModule extends PrivateModule {
                 .to(ForgottenPasswordExtractor.class);
         bind(new TypeLiteral<ConsoleConfigExtractor<ForgottenUsernameConsoleConfig>>() {})
                 .to(ForgottenUsernameExtractor.class);
+        bind(new TypeLiteral<ConsoleConfigExtractor<KbaConsoleConfig>>() {})
+                .to(KbaConsoleConfigExtractor.class);
 
         try {
             bind(Client.class)
@@ -90,6 +95,7 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() {});
         expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() {});
         expose(UserUpdateService.class);
+        expose(KbaResource.class);
         // Exposed to be accessible to custom progress stages
         expose(ConnectionFactory.class).annotatedWith(SelfService.class);
         expose(Client.class).annotatedWith(SelfService.class);

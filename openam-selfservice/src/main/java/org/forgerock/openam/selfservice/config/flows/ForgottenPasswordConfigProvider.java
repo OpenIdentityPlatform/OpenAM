@@ -88,7 +88,7 @@ public final class ForgottenPasswordConfigProvider
             stages.add(new SecurityAnswerVerificationConfig(new KbaConfig())
                     .setQuestions(config.getSecurityQuestions())
                     .setKbaPropertyName("kbaInfo")
-                    .setNumberOfQuestionsUserMustAnswer(config.getMinQuestionsToAnswer())
+                    .setNumberOfQuestionsUserMustAnswer(config.getMinimumAnswersToVerify())
                     .setIdentityServiceUrl("/users"));
         }
 
