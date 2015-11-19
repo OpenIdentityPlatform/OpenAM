@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -29,6 +29,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.AdviceContext;
@@ -51,12 +52,15 @@ import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
+import org.forgerock.openam.rest.RestEndpointServlet;
 import org.forgerock.openam.utils.StringUtils;
 
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -524,6 +528,7 @@ public class SessionResource implements CollectionResourceProvider {
                 }
                 return new JsonValue(map);
             }
+            HttpServletRequest httpServletRequest = RestEndpointServlet.getCurrentRequest();
             HttpServletResponse httpServletResponse = null;
             final AdviceContext adviceContext = context.asContext(AdviceContext.class);
             if (adviceContext == null) {
@@ -535,7 +540,7 @@ public class SessionResource implements CollectionResourceProvider {
             }
             if (ssoToken != null) {
                 try {
-                    authUtilsWrapper.logout(ssoToken.getTokenID().toString(), null, httpServletResponse);
+                    authUtilsWrapper.logout(ssoToken.getTokenID().toString(), httpServletRequest, httpServletResponse);
                 } catch (SSOException e) {
                     if (LOGGER.errorEnabled()) {
                         LOGGER.error("SessionResource.logout() :: Token ID, " + tokenId +

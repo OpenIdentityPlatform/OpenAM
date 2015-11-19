@@ -43,6 +43,7 @@ import java.io.IOException;
 public class RestEndpointServlet extends HttpServlet {
 
     public static final String CREST_CONNECTION_FACTORY_NAME = "CrestConnectionFactory";
+    private static ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<HttpServletRequest>();
 
     private final org.forgerock.json.resource.servlet.HttpServlet crestServlet;
     private final RestletServiceServlet restletJSONServiceServlet;
@@ -109,32 +110,37 @@ public class RestEndpointServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
-        if ("/json".equals(request.getServletPath())) {
-            final String restRequest = getResourceName(request);
+        try {
+            currentRequest.set(request);
+            if ("/json".equals(request.getServletPath())) {
+                final String restRequest = getResourceName(request);
 
-            final String endpoint = endpointManager.findEndpoint(restRequest);
+                final String endpoint = endpointManager.findEndpoint(restRequest);
 
-            final RestEndpointManager.EndpointType endpointType = endpointManager.getEndpointType(endpoint);
+                final RestEndpointManager.EndpointType endpointType = endpointManager.getEndpointType(endpoint);
 
-            if (endpointType == null) {
-                throw new ServletException("Endpoint Type could not be determined");
-            }
-
-            switch (endpointType) {
-                case RESOURCE: {
-                    crestServlet.service(request, response);
-                    break;
+                if (endpointType == null) {
+                    throw new ServletException("Endpoint Type could not be determined");
                 }
-                case SERVICE: {
-                    restletJSONServiceServlet.service(new HttpServletRequestWrapper(request), response);
-                    break;
+
+                switch (endpointType) {
+                    case RESOURCE: {
+                        crestServlet.service(request, response);
+                        break;
+                    }
+                    case SERVICE: {
+                        restletJSONServiceServlet.service(new HttpServletRequestWrapper(request), response);
+                        break;
+                    }
                 }
-            }
-        } else if ("/xacml".equals(request.getServletPath())) {
-            restletXACMLServiceServlet.service(new HttpServletRequestWrapper(request), response);
-        } else if ("/oauth2".equals(request.getServletPath())) {
-            restletOAuth2ServiceServlet.service(new HttpServletRequestWrapper(request), response);
-        }
+            } else if ("/xacml".equals(request.getServletPath())) {
+                restletXACMLServiceServlet.service(new HttpServletRequestWrapper(request), response);
+            } else if ("/oauth2".equals(request.getServletPath())) {
+                restletOAuth2ServiceServlet.service(new HttpServletRequestWrapper(request), response);
+            } 
+        } finally {
+            currentRequest.remove();
+        } 
     }
 
     /**
@@ -164,5 +170,15 @@ public class RestEndpointServlet extends HttpServlet {
         restletXACMLServiceServlet.destroy();
         restletOAuth2ServiceServlet.destroy();
         restletJSONServiceServlet.destroy();
+    }
+
+    /**
+     * Gets the HttpServletRequest object since it's not available in CREST
+     * but it is required for session's logout.
+     *
+     * @return The current HttpServletRequest object.
+     */
+    public static HttpServletRequest getCurrentRequest() {
+        return currentRequest.get();
     }
 }
