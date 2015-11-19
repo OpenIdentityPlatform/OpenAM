@@ -123,7 +123,7 @@
         <forgerock.ui.version>8.5.0</forgerock.ui.version>
         <forgerock.audit.version>1.0.0</forgerock.audit.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
-        <forgerock.selfservice.version>0.9.0</forgerock.selfservice.version>
+        <forgerock.selfservice.version>0.10.0</forgerock.selfservice.version>
 
         <guice.version>3.0</guice.version>
         <restlet.version>2.3.4</restlet.version>

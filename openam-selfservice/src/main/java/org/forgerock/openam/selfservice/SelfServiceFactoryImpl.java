@@ -56,7 +56,8 @@ class SelfServiceFactoryImpl implements SelfServiceFactory {
 
     @Override
     public RequestHandler getService(ProcessInstanceConfig serviceConfig) {
-        return new AnonymousProcessService(serviceConfig, stageProvider, tokenHandlerFactory, processStore);
+        ClassLoader classLoader = getClass().getClassLoader();
+        return new AnonymousProcessService(serviceConfig, stageProvider, tokenHandlerFactory, processStore, classLoader);
     }
 
 }
