@@ -18,7 +18,6 @@ package org.forgerock.openam.selfservice.config;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
@@ -31,6 +30,7 @@ import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -46,6 +46,7 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
     private final static String SERVICE_NAME = "RestSecurity";
     private final static String SERVICE_VERSION = "1.0";
 
+    private final ConcurrentHashMap<String, Map<String, Set<String>>> attributeCache;
     private final ServiceConfigManager configManager;
     private final List<ConsoleConfigChangeListener> changeListeners;
 
@@ -55,6 +56,7 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
     public ConsoleConfigHandlerImpl(DNWrapper dnUtils, PrivilegedAction<SSOToken> ssoTokenPrivilegedAction) {
         this.dnUtils = dnUtils;
         changeListeners = new CopyOnWriteArrayList<>();
+        attributeCache = new ConcurrentHashMap<>();
 
         try {
             configManager = new ServiceConfigManager(ssoTokenPrivilegedAction.run(), SERVICE_NAME, SERVICE_VERSION);
@@ -66,16 +68,25 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
 
     @Override
     public <C> C getConfig(String realm, ConsoleConfigExtractor<C> extractor) {
-        // Mapping from legacy API
-        @SuppressWarnings("unchecked")
-        Map<String, Set<String>> attributes = getServiceConfig(realm).getAttributes();
+        Map<String, Set<String>> attributes = attributeCache.get(realm);
+
+        if (attributes == null) {
+            attributes = getConfiguredAttributes(realm);
+
+            Map<String, Set<String>> existingAttributes = attributeCache.putIfAbsent(realm, attributes);
+
+            if (existingAttributes != null) {
+                attributes = existingAttributes;
+            }
+        }
 
         return extractor.extract(attributes);
     }
 
-    private ServiceConfig getServiceConfig(String realm) {
+    @SuppressWarnings("unchecked")
+    private Map<String, Set<String>> getConfiguredAttributes(String realm) {
         try {
-            return configManager.getOrganizationConfig(realm, null);
+            return configManager.getOrganizationConfig(realm, null).getAttributes();
         } catch (SMSException | SSOException e) {
             throw new ConfigRetrievalException("Unable to retrieve organisation config", e);
         }
@@ -88,6 +99,7 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
 
     private void notifyListeners(String orgName) {
         String realm = dnUtils.orgNameToRealmName(orgName);
+        attributeCache.remove(realm);
 
         for (ConsoleConfigChangeListener listener : changeListeners) {
             try {
