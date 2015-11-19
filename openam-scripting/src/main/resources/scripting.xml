@@ -298,7 +298,7 @@
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="defaultScript"/>
-                        <Value>@GlobalEntitlementConditionScriptId@</Value>
+                        <Value>@GlobalOidcClaimsScriptId@</Value>
                     </AttributeValuePair>
                     <SubConfiguration name="engineConfiguration" id="engineConfiguration">
                         <AttributeValuePair>
