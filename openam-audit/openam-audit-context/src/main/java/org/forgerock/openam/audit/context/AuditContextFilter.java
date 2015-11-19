@@ -17,6 +17,7 @@
 package org.forgerock.openam.audit.context;
 
 import org.forgerock.audit.events.TransactionId;
+import org.forgerock.guice.core.InjectorHolder;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -60,10 +61,13 @@ public class AuditContextFilter implements Filter {
 
     private void setRequestContext(ServletRequest request) {
         if (request instanceof HttpServletRequest) {
-            String transactionIdHeader = ((HttpServletRequest) request).getHeader(TransactionId.HTTP_HEADER);
-            if (transactionIdHeader != null && !transactionIdHeader.trim().isEmpty()) {
-                AuditRequestContext.set(
-                        new AuditRequestContext(new TransactionId(transactionIdHeader)));
+            TransactionIdConfiguration configuration = InjectorHolder.getInstance(TransactionIdConfiguration.class);
+            if (configuration.trustHttpTransactionHeader()) {
+                String transactionIdHeader = ((HttpServletRequest) request).getHeader(TransactionId.HTTP_HEADER);
+                if (transactionIdHeader != null && !transactionIdHeader.trim().isEmpty()) {
+                    AuditRequestContext.set(
+                            new AuditRequestContext(new TransactionId(transactionIdHeader)));
+                }
             }
         }
     }

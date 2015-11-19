@@ -13,22 +13,23 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.audit.configuration;
-
-import com.google.inject.AbstractModule;
-import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.audit.context.TransactionIdConfiguration;
+package org.forgerock.openam.audit.context;
 
 /**
- * Guice Module for configuring bindings for the OpenAM Audit Configuration classes.
+ * Responsible for deciding whether or not transaction ID received as HTTP header should be accepted.
+ * <p/>
+ * The decision should be made based on the value of the System Property "org.forgerock.http.TrustTransactionHeader";
+ * unfortunately, due to cyclic dependency issues, it's not possible to access the com.iplanet.am.util.SystemProperties
+ * from this module.
+ *
+ * @since 13.0.0
  */
-@GuiceModule
-public class AuditConfigurationGuiceModule extends AbstractModule {
+public interface TransactionIdConfiguration {
 
-    @Override
-    protected void configure() {
-        bind(AuditServiceConfigurationProvider.class).to(AuditServiceConfigurationProviderImpl.class);
-        bind(TransactionIdConfiguration.class).to(TransactionIdConfigurationImpl.class);
-    }
-
+    /**
+     * Establishes whether or not HTTP header "X-ForgeRock-TransactionId" should be trusted.
+     *
+     * @return true if the System Property "org.forgerock.http.TrustTransactionHeader" is true; false otherwise.
+     */
+    boolean trustHttpTransactionHeader();
 }
