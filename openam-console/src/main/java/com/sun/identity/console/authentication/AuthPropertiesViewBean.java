@@ -38,7 +38,6 @@ import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,6 +75,8 @@ import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCDropDownMenu;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
+
+import org.forgerock.http.util.Uris;
 
 /**
  * This is the main authentication properties view page which displays the
@@ -195,13 +196,9 @@ public  class AuthPropertiesViewBean
 
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (isXuiAdminConsoleEnabled()) {
-            try {
-                String redirectRealm = getRedirectRealm(this);
-                redirectToXui(getRequestContext().getRequest(), redirectRealm,
-                        MessageFormat.format("realms/{0}/authentication/settings", URLEncoder.encode(redirectRealm, "UTF-8")));
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException("UTF-8 encoding not supported", e);
-            }
+            String redirectRealm = getRedirectRealm(this);
+            redirectToXui(getRequestContext().getRequest(), redirectRealm,
+                MessageFormat.format("realms/{0}/authentication/settings", Uris.urlEncodePathElement(redirectRealm)));
         }
     }
 

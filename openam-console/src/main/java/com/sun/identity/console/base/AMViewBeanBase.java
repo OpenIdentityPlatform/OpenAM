@@ -77,7 +77,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.rmi.server.UID;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -94,6 +93,7 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.forgerock.http.util.Uris;
 import org.forgerock.openam.console.base.ConsoleViewBeanBase;
 import org.forgerock.openam.utils.IOUtils;
 import org.owasp.esapi.ESAPI;
@@ -104,7 +104,7 @@ import org.owasp.esapi.ESAPI;
 public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
     public static Debug debug = Debug.getInstance(
         AMAdminConstants.CONSOLE_DEBUG_FILENAME);
-        
+
     private static final int MAX_PG_SESSION_SIZE = 1024-32;
     private static final String TXT_LOCATION = "txtLocation";
     private static final String TXT_RANDOM_STR = "txtRandomStr";
@@ -139,11 +139,11 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
             SystemProperties.get(Constants.AM_SERVER_PORT);
         System.setProperty("com.sun.web.console.secureport", port);
         System.setProperty("com.sun.web.console.unsecureport", port);
-        
+
         String protocol = (remote) ?
             SystemProperties.get(Constants.AM_CONSOLE_PROTOCOL) :
             SystemProperties.get(Constants.AM_SERVER_PROTOCOL);
-        CCPrivateConfiguration.setSecureHelp(protocol.equals("https")); 
+        CCPrivateConfiguration.setSecureHelp(protocol.equals("https"));
     }
 
     /**
@@ -166,7 +166,7 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
         handlePageSessionThruURL(context);
         setRequestContentInitialize(context);
     }
-    
+
     protected void setRequestContentInitialize(RequestContext context) {
         initialize();
     }
@@ -452,19 +452,19 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
     }
 
     /**
-     * Returns an option list object that contains options for a given 
+     * Returns an option list object that contains options for a given
      * collection of string.
      *
      * @param collection Collection of strings to be included in option list.
      * @param locale Locale defining how the entries should be sorted.
-     * @return a option list object that contains options for a given 
+     * @return a option list object that contains options for a given
      *        collection of string.
      */
     public static OptionList createOptionList(
         Collection collection,
         Locale locale
     ) {
-        return createOptionList(collection, locale, true); 
+        return createOptionList(collection, locale, true);
     }
 
     /**
@@ -477,7 +477,7 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
      */
     public OptionList createOptionList(Collection collection) {
         OptionList optionList = new OptionList();
-        
+
         if ((collection != null) && !collection.isEmpty()) {
             // first sort the entries in the collection
             collection = AMFormatUtils.sortItems(
@@ -488,7 +488,7 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
                 optionList.add(value, value);
             }
         }
-        
+
         return optionList;
     }
 
@@ -506,7 +506,7 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
         Collection collection,
         Locale locale,
         boolean bSort
-    ) {        
+    ) {
         OptionList optionList = new OptionList();
 
         if ((collection != null) && !collection.isEmpty()) {
@@ -515,12 +515,12 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
             }
             for (Iterator iter = collection.iterator(); iter.hasNext(); ) {
                   String value = (String)iter.next();
-                  optionList.add(value, value); 
+                  optionList.add(value, value);
             }
         }
-        return optionList; 
+        return optionList;
     }
-    
+
     /**
      * Returns a set of string from a option list items.
      *
@@ -580,7 +580,7 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
 
     private String encodePageSessionMap() {
         String encoded = "";
-                                                                                
+
         try {
             HashMap map = new HashMap(getPageSessionAttributes());
             encoded = Encoder.encodeHttp64(Encoder.serialize(map, false), 800);
@@ -810,18 +810,18 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
                 Map attributes = getPageSessionAttributes();
                 store.put(vbUID, attributes);
 
-                /* 
-                 * We are storing the SSOToken ID because it is needed to 
+                /*
+                 * We are storing the SSOToken ID because it is needed to
                  * retrieve the page session map later on. We cannot call
                  * getModel().getUserSSOToken() because the model may depend on
-                 * the page session map for initialization. This avoids getting 
+                 * the page session map for initialization. This avoids getting
                  * into a chicken or the egg problem.
-                 */                
+                 */
                 Map tmp = new HashMap(4);
                 tmp.put(PG_SESSION_ATTR_ID, vbUID);
                 tmp.put(PG_SESSION_SSO_ID, ssoTokenID);
                 super.setPageSessionAttributes(tmp);
-                
+
                 strAttr = super.getPageSessionAttributeString();
                 pageSessionInSessionStore = true;
             }
@@ -948,18 +948,13 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
     }
 
     /**
-     * Get the current realm, UTF-8 encoded.
+     * Get the current realm, encoded as a path element.
      *
-     * @return The current realm encoded in UTF-8.
+     * @return The current realm encoded as a path element.
      */
     protected String getCurrentRealmEncoded() {
         String currentRealm = getCurrentRealm();
-        try {
-            return URLEncoder.encode(currentRealm, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            debug.warning("Encoding not supported", e);
-            return currentRealm;
-        }
+        return Uris.urlEncodePathElement(currentRealm);
     }
 
     // this builds a display string only
@@ -998,7 +993,7 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
         return req.getScheme() + "://" + req.getServerName() +
             ":" + req.getServerPort() + uri;
     }
-    
+
     public static String stringToHex(String str) {
         StringBuilder buff = new StringBuilder();
         str = str.replaceAll("\\\\u", "\\\\\\\\u");
@@ -1008,7 +1003,7 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
         }
         return buff.toString();
     }
-    
+
     public static String charToHex(char c) {
         StringBuilder buffer = new StringBuilder();
         if (c <= 0x7E) {
@@ -1023,7 +1018,7 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
         }
         return buffer.toString();
     }
-    
+
     public static String hexToString(String str) {
         StringBuilder buff = new StringBuilder();
         int idx = str.indexOf("\\u");
