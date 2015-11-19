@@ -17,12 +17,14 @@
 
 define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, AbstractView, BootstrapDialog, DeviceManagementDelegate, UIUtils) {
+    "org/forgerock/openam/ui/dashboard/views/DeviceDetailsDialog",
+    "org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog"
+], function ($, _, AbstractView, BootstrapDialog, DeviceManagementDelegate, DeviceDetailsDialog,
+             DevicesSettingsDialog) {
     var DeviceManagementView = AbstractView.extend({
         template: "templates/openam/dashboard/DeviceManagementTemplate.html",
         noBaseTemplate: true,
@@ -30,7 +32,8 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
         events: {
             "click .delete-device-btn":  "deleteDevice",
             "click .recovery-codes-btn": "showDeviceDetails",
-            "click .device-details": "showDeviceDetails"
+            "click .device-details": "showDeviceDetails",
+            "click .devices-settings-btn" : "showDevicesSettings"
         },
 
         deleteDevice: function (event) {
@@ -40,7 +43,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                 card = $(target).closest("div[data-device-uuid]"),
                 uuid = card.attr("data-device-uuid");
 
-            DeviceManagementDelegate.deleteDevice(uuid).done(function () {
+            DeviceManagementDelegate.deleteDevice(uuid).then(function () {
                 card.parent().remove();
             });
         },
@@ -48,63 +51,26 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
         showDeviceDetails: function (event) {
             event.preventDefault();
 
-            var self = this,
-                statusDevice,
-                uuid = $(event.currentTarget).closest("div[data-device-uuid]").attr("data-device-uuid"),
+            var uuid = $(event.currentTarget).closest("div[data-device-uuid]").attr("data-device-uuid"),
                 device = _.find(this.data.devices, { uuid: uuid });
 
-            UIUtils.fillTemplateWithData("templates/openam/dashboard/EditDeviceDialogTemplate.html", device,
-                function (html) {
-                    BootstrapDialog.show({
-                        title: device.deviceName,
-                        message: $(html),
-                        cssClass: "device-details",
-                        closable: false,
-                        buttons: [{
-                            label: $.t("common.form.cancel"),
-                            action: function (dialog) {
-                                dialog.close();
-                            }
-                        }, {
-                            label: $.t("common.form.save"),
-                            cssClass: "btn-primary",
-                            action: function (dialog) {
-                                statusDevice = dialog.$modalBody.find("[name=\"deviceSkip\"]").is(":checked");
-                                DeviceManagementDelegate.setDeviceSkippable(statusDevice).done(function () {
-                                    self.render();
-                                    dialog.close();
-                                });
-                            }
-                        }],
-                        onshown: function (dialog) {
-                            dialog.$modalBody.find(".recovery-codes-download").click(function () {
-                                location.href = "data:text/plain," +
-                                    encodeURIComponent(device.recoveryCodes.join("\r\n"));
-                            });
+            DeviceDetailsDialog(uuid, device);
+        },
 
-                            dialog.$modalBody.find("[data-toggle=\"popover\"]").popover({
-                                content: $.t("openam.deviceManagement.deviceDetailsDialog.help"),
-                                placement: "bottom",
-                                title: $.t("openam.deviceManagement.deviceDetailsDialog.skip"),
-                                trigger: "focus"
-                            });
-                        }
-                    });
-
-                });
+        showDevicesSettings: function (event) {
+            event.preventDefault();
+            DevicesSettingsDialog();
         },
 
         render: function (callback) {
             var self = this;
-            DeviceManagementDelegate.getDevices().done(function (devicesData) {
+            DeviceManagementDelegate.getDevices().then(function (devicesData) {
                 self.data.devices = devicesData.result;
                 self.parentRender(function () {
                     if (callback) {
                         callback();
                     }
                 });
-            }).fail(function () {
-                // TODO: add failure condition
             });
         }
     });

@@ -1,26 +1,15 @@
 <form class="form-horizontal">
-
     <div class="form-group">
-        <label class="control-label col-sm-4">{{t 'openam.deviceManagement.deviceDetailsDialog.deviceName'}}</label>
+        <label class="control-label col-sm-4" for="deviceName">{{t 'openam.deviceManagement.deviceDetailsDialog.deviceName'}}</label>
         <div class="col-sm-7">
-            <input type="text" class="form-control input-btn" value="{{deviceName}}" readonly>
+            <input type="text" id="deviceName" class="form-control input-btn" value="{{deviceName}}" readonly>
         </div>
     </div>
-
     <div class="form-group">
-        <label class="control-label col-sm-4">{{t 'openam.deviceManagement.deviceDetailsDialog.skip'}}</label>
-        <div class="col-sm-7 skip-checkbox">
-            <input class="checkbox" type="checkbox" name="deviceSkip" {{#if skipped}} checked {{/if}}>
-            <a data-toggle="popover" role="button" aria-dropeffect="popup" tabindex="0" class="pull-left"><i class="fa fa-question-circle"></i></a>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="control-label col-sm-4">{{t 'openam.deviceManagement.deviceDetailsDialog.recoveryCodes'}}</label>
+        <label class="control-label col-sm-4" for="recoveryCodes">{{t 'openam.deviceManagement.deviceDetailsDialog.recoveryCodes'}}</label>
         <div class="col-sm-7">
-            <pre class="text-center">{{#each recoveryCodes}}{{this}}<br>{{/each}}</pre>
+            <pre id="recoveryCodes" class="text-center">{{#each recoveryCodes}}{{this}}<br>{{/each}}</pre>
             <button class="btn btn-default recovery-codes-download"><span class="bootstrap-dialog-button-icon fa fa-download"></span>{{t 'common.form.download'}}</button>
         </div>
     </div>
-
 </form>

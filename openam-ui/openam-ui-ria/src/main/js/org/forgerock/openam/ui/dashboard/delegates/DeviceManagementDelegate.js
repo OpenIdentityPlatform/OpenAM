@@ -14,7 +14,9 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-
+/**
+ * @module org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate
+ */
 define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
     "jquery",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -22,47 +24,61 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function ($, Configuration, Constants, AbstractDelegate, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/"),
+        getPath = function () {
+            return "__subrealm__/users/" + Configuration.loggedUser.get("uid") + "/devices/2fa/oath/";
+        };
 
+    /**
+     * Delete oath device by uuid
+     * @param {String} uuid The unique device id
+     * @returns {Promise} promise that will contain the response
+     */
     obj.deleteDevice = function (uuid) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" +
-                                                     Configuration.loggedUser.get("uid") +
-                                                     "/devices/2fa/oath/" +
-                                                     uuid),
+            url: RealmHelper.decorateURIWithSubRealm(getPath() + uuid),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             method: "DELETE"
         });
     };
 
-    obj.setDeviceSkippable = function (statusDevice) {
-        var skipOption = {};
-        skipOption.value = statusDevice;
+    /**
+     * Set status of the oath skip flag for devices
+     * @param {Boolean} skip The flag value
+     * @returns {Promise} promise that will contain the response
+     */
+    obj.setDevicesOathSkippable = function (skip) {
+        var skipOption = { value: skip };
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                                                  Configuration.loggedUser.get("uid") +
-                                                  "/devices/2fa/oath/?_action=skip"),
+            url: RealmHelper.decorateURIWithRealm(getPath() + "?_action=skip"),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             data: JSON.stringify(skipOption),
             method: "POST"
         });
     };
 
+    /**
+     * Check status of the oath skip flag for devices
+     * @returns {Promise} promise that will contain the response
+     */
+    obj.checkDevicesOathSkippable = function () {
+        return obj.serviceCall({
+            url: RealmHelper.decorateURIWithRealm(getPath() + "?_action=check"),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            method: "POST"
+        }).then(function (statusData) {
+            return statusData.result;
+        });
+    };
+
+    /**
+     * Get array of oath devices
+     * @returns {Promise} promise that will contain the response
+     */
     obj.getDevices = function () {
-        var path = "__subrealm__/users/" + Configuration.loggedUser.get("uid") + "/devices/2fa/oath/";
-        return $.when(
-            obj.serviceCall({
-                url: RealmHelper.decorateURIWithSubRealm(path + "?_queryFilter=true"),
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            }),
-            obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm(path + "?_action=check"),
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                method: "POST"
-            })
-        ).then(function (devicesData, statusData) {
-            devicesData[0].result.skipped = statusData[0].result;
-            return devicesData[0];
+        return obj.serviceCall({
+            url: RealmHelper.decorateURIWithSubRealm(getPath() + "?_queryFilter=true"),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
