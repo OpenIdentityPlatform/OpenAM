@@ -24,7 +24,7 @@
 dn: CN=schema
 changetype: modify
 add: attributeTypes
-attributeTypes: ( 1.3.6.1.4.1.36733.2.2.1.5 NAME 'kbaInformation' DESC 'Knowledge Based Authentication information is stored in this attribute' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.2.1.5 NAME 'kbaInfo' DESC 'Knowledge Based Authentication information is stored in this attribute' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
 
 add: attributeTypes
 attributeTypes: ( 1.3.6.1.4.1.36733.2.2.1.6 NAME 'kbaActiveIndex' DESC 'Knowledge Based Authentication Active Index' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
@@ -32,4 +32,4 @@ attributeTypes: ( 1.3.6.1.4.1.36733.2.2.1.6 NAME 'kbaActiveIndex' DESC 'Knowledg
 dn: CN=schema
 changetype: modify
 add: objectClasses
-objectClasses: ( 1.3.6.1.4.1.36733.2.2.2.5 NAME 'kbaInformationContainer' DESC 'Class containing KBA information' SUP top AUXILIARY MAY ( kbaInformation $ kbaActiveIndex ) )
+objectClasses: ( 1.3.6.1.4.1.36733.2.2.2.5 NAME 'kbaInfoContainer' DESC 'Class containing KBA information' SUP top AUXILIARY MAY ( kbaInfo $ kbaActiveIndex ) )

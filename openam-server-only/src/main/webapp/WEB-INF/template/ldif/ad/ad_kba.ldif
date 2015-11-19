@@ -21,16 +21,16 @@
 # your own identifying information:
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
-dn: CN=kbaInformation,CN=Schema,CN=Configuration,@userStoreRootSuffix@
+dn: CN=kbaInfo,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 changetype: add
-adminDisplayName: kbaInformation
+adminDisplayName: kbaInfo
 adminDescription: Knowledge Based Authentication information for a particular user
 attributeID: 1.3.6.1.4.1.36733.2.2.1.5
 attributeSyntax: 2.5.5.3
-cn: kbaInformation
+cn: kbaInfo
 instanceType: 4
 isSingleValued: FALSE
-lDAPDisplayName: kbaInformation
+lDAPDisplayName: kbaInfo
 objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 objectClass: attributeSchema
 schemaIDGUID: +s1kNSVv1RKxuWjIr5Ymah==
@@ -67,15 +67,15 @@ add: schemaUpdateNow
 schemaUpdateNow: 1
 -
 
-dn: CN=kbaInformationContainer,CN=Schema,CN=Configuration,@userStoreRootSuffix@
+dn: CN=kbaInfoContainer,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 changetype: add
-adminDisplayName: kbaInformationContainer
+adminDisplayName: kbaInfoContainer
 adminDescription: Class containing KBA information
-cn: kbaInformationContainer
+cn: kbaInfoContainer
 governsID: 1.3.6.1.4.1.36733.2.2.2.5
 instanceType: 4
-lDAPDisplayName: kbaInformationContainer
-mayContain: kbaInformation
+lDAPDisplayName: kbaInfoContainer
+mayContain: kbaInfo
 objectCategory: CN=Class-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 objectClass: classSchema
 objectClassCategory: 3
@@ -93,7 +93,7 @@ schemaUpdateNow: 1
 dn: CN=User,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 changetype: modify
 add: auxiliaryClass
-auxiliaryClass: kbaInformationContainer
+auxiliaryClass: kbaInfoContainer
 -
 
 dn:

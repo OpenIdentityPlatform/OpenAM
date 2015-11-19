@@ -184,7 +184,6 @@
                         <Value>username</Value>
                         <Value>userPassword</Value>
                         <Value>kbaInfo</Value>
-                        <Value>kbaInformation</Value>
                         <Value>givenName</Value>
                     </DefaultValues>
                 </AttributeSchema>

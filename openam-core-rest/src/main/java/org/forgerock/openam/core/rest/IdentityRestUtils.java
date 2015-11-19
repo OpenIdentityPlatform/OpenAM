@@ -60,7 +60,7 @@ public final class IdentityRestUtils {
     public static final String FIELD_MAIL = "mail";
     public static final String REALM = "realm";
 
-    public static final String USER_KBA_ATTRIBUTE = "kbaInformation";
+    public static final String USER_KBA_ATTRIBUTE = "kbaInfo";
 
     public static final String USERNAME = "username";
 

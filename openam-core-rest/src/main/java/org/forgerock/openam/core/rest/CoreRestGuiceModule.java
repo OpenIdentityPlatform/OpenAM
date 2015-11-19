@@ -310,7 +310,7 @@ public class CoreRestGuiceModule extends AbstractModule {
     public Set<String> getPatchableUserAttributes() {
         Set<String> patchableAttributes = new HashSet<>();
         patchableAttributes.add("userPassword");
-        patchableAttributes.add("kbaInformation");
+        patchableAttributes.add("kbaInfo");
         return patchableAttributes;
     }
 

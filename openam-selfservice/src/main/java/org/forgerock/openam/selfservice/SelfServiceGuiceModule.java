@@ -128,7 +128,7 @@ public final class SelfServiceGuiceModule extends PrivateModule {
     @Provides
     @Singleton
     UserUpdateService getUserUpdateService(@SelfService ConnectionFactory connectionFactory) {
-        return new UserUpdateService(connectionFactory, ResourcePath.resourcePath("/users"), new JsonPointer("/kbaInformation"));
+        return new UserUpdateService(connectionFactory, ResourcePath.resourcePath("/users"), new JsonPointer("/kbaInfo"));
     }
 
     @Provides

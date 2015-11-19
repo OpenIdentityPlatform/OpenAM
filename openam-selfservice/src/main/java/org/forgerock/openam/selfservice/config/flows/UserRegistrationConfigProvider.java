@@ -82,7 +82,7 @@ public final class UserRegistrationConfigProvider
             stages.add(new SecurityAnswerDefinitionConfig(new KbaConfig())
                     .setQuestions(config.getSecurityQuestions())
                     .setNumberOfAnswersUserMustSet(config.getMinAnswersToProvide())
-                    .setKbaPropertyName("kbaInformation"));
+                    .setKbaPropertyName("kbaInfo"));
         }
 
         stages.add(new UserRegistrationConfig()
