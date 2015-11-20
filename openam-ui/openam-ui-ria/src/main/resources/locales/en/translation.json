@@ -317,6 +317,7 @@
             "deleteSelected" : "Delete Selected",
             "startTypingToSearch": "Start typing to search",
             "passwordPlaceholder": "••••••••••••",
+            "redirecting": "Redirecting...",
             "validation" : {
                 "VALID_PHONE_FORMAT": "Contains invalid characters",
                 "VALID_NAME_FORMAT": "Contains invalid characters",
@@ -530,7 +531,7 @@
             "unavailable": "Unable to login to OpenAM"
         },
         "deviceManagement": {
-            "header": "Device Management",
+            "header": "Authentication Devices",
             "noneFound": "You have not registered any devices",
             "menu": {
                 "recoveryCodes": "Recovery Codes",

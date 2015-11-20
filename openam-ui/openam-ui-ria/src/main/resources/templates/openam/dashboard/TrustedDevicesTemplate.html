@@ -22,7 +22,10 @@
                         <td>{{this.lastSelectedDate}}</td>
                         <td>
                             <div class="pull-right">
-                                <a class="deleteDevice" href="#" id="{{this.uuid}}" data-toggle="tooltip" title="{{t 'openam.trusted.devices.deleteDevice'}}"><i class="fa fa-times"></i></a>
+                                <a  href="#" class="deleteDevice" id="{{this.uuid}}" role="button"
+                                    data-toggle="tooltip" title="{{t 'openam.trusted.devices.deleteDevice'}}">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    <span class="sr-only">{{t 'openam.trusted.devices.deleteDevice'}}</span>
                             </div>
                         </td>
                     </tr>

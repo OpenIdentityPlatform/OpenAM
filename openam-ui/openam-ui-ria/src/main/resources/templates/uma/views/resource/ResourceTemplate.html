@@ -1,5 +1,5 @@
 <header class="page-header page-header-no-border clearfix">
-    <span id="umaShareImage" class="header-icon pull-left fa">
+    <span id="umaShareImage" class="header-icon pull-left fa" aria-hidden="true">
         {{#if icon}}
             <img title="{{name}}" src="{{icon}}" />
         {{else}}
@@ -22,7 +22,7 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    <li class="disabled" id="unshare"><a href="#"><i class="fa fa-ban"></i> {{t "uma.resources.show.revoke"}}</a></li>
+                    <li class="disabled" id="unshare"><a href="#" aria-disabled="true" role="button"><i class="fa fa-ban"></i> {{t "uma.resources.show.revoke"}}</a></li>
                 </ul>
             </div>
         </div>

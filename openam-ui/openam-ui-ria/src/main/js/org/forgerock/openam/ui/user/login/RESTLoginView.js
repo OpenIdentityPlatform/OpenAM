@@ -279,7 +279,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     if (redirectCallback.redirectMethod === "POST") {
 
                         _.each(redirectCallback.redirectData, function (v, k) {
-                            redirectForm.append("<input type='hidden' name='" + k + "' value='" + v + "' />");
+                            redirectForm.append(
+                                "<input type='hidden' name='" + k + "' value='" + v + "' aria-hidden='true' />");
                         });
 
                         redirectForm.appendTo("body").submit();

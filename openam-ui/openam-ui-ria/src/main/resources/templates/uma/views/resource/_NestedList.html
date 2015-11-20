@@ -13,7 +13,7 @@
     <a class="text-primary" href="{{routeTo 'umaResourcesMyLabels' title}}">{{title}}</a>
     {{/if}}
 
-    <ol class="collapse list-unstyled sidenav-submenu" id="view{{#if _id}}{{_id}}{{else}}{{viewId}}{{/if}}">
+    <ol class="collapse list-unstyled sidenav-submenu" id="view{{#if _id}}{{_id}}{{else}}{{viewId}}{{/if}}" role="navigation">
     {{#each children}}
         {{> templates/uma/views/resource/_NestedList }}
     {{/each}}

@@ -35,7 +35,7 @@
                            data-target="#labels">
                             <i class="fa fa-tags"></i>{{t "uma.resources.myLabels.title"}}
                         </a>
-                        <ol class="collapse in list-unstyled sidenav-submenu" id="labels">
+                        <ol class="collapse in list-unstyled sidenav-submenu" id="labels" role="navigation">
                         {{#each nestedLabels}}
                             {{> templates/uma/views/resource/_NestedList }}
                         {{/each}}

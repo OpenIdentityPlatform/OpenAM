@@ -362,7 +362,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     self.renderLabelsOptions();
 
                     if (self.model.has("policy") && self.model.get("policy").get("permissions").length > 0) {
-                        self.$el.find("li#unshare").removeClass("disabled");
+                        self.$el.find("li#unshare").removeClass("disabled").find("a").attr("aria-disabled", false);
                     }
 
                     self.$el.find(".table-container").append(grid.render().el);

@@ -1,4 +1,6 @@
+<label class="sr-only" for="callback_{{index}}" >{{prompt}}</label>
 <input type="text"
+       id="callback_{{index}}"
        name="callback_{{index}}"
        value="{{value}}"
        data-validator="required"
@@ -6,4 +8,4 @@
        data-validator-event="keyup"
        class="form-control input-lg"
        placeholder="{{prompt}}"
-       {{#equals index 0}}autofocus{{/equals}}>
+       {{#equals index 0}}autofocus{{/equals}} />

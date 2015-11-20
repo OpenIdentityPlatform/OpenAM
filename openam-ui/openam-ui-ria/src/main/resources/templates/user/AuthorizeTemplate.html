@@ -26,13 +26,20 @@
 
         <fieldset>
             <p>{{t 'form.description'}}</p>
-            <div class="panel-group form-horizontal"  aria-multiselectable="true">
+            <div class="panel-group form-horizontal" aria-multiselectable="true">
 
                 {{#each oauth2Data.displayScopes}}
                 {{#if this.values}}
                 <div class="panel panel-info">
-                    <div class="panel-heading am-panel-heading-hover" data-toggle="collapse" aria-expanded="false"
-                         data-target="#oauth2Scope{{@index}}" aria-controls="oauth2Scope{{@index}}">
+                    <div
+                        class="panel-heading am-panel-heading-hover clearfix"
+                        data-toggle="collapse"
+                        aria-expanded="false"
+                        data-target="#oauth2Scope{{@index}}"
+                        aria-controls="oauth2Scope{{@index}}"
+                        role="tab"
+                        tabindex="0"
+                    >
                         {{this.name}}
                         <div class="pull-right"><i class="fa fa-angle-down"></i></div>
                     </div>
@@ -59,8 +66,15 @@
                 {{#each oauth2Data.displayClaims}}
                 {{#if this.values}}
                 <div class="panel panel-info">
-                    <div class="panel-heading am-panel-heading-hover" data-toggle="collapse" aria-expanded="false"
-                         data-target="#oauth2Claims{{@index}}" role="tab" aria-controls="oauth2Claims{{@index}}">
+                    <div
+                        class="panel-heading am-panel-heading-hover clearfix"
+                        data-toggle="collapse"
+                        aria-expanded="false"
+                        data-target="#oauth2Claims{{@index}}"
+                        aria-controls="oauth2Claims{{@index}}"
+                        role="tab"
+                        tabindex="0"
+                    >
                         {{this.name}}
                         <div class="pull-right"><i class="fa fa-angle-down"></i></div>
                     </div>
@@ -90,30 +104,30 @@
 
             <!-- Optional parameters -->
             {{#if oauth2Data.realm}}
-            <input type="hidden" name="realm" value="{{oauth2Data.realm}}"/>
+            <input type="hidden" name="realm" aria-hidden="true" value="{{oauth2Data.realm}}"/>
             {{/if}}
             {{#if oauth2Data.redirectUri}}
-            <input type="hidden" name="redirect_uri" value="{{oauth2Data.redirectUri}}"/>
+            <input type="hidden" name="redirect_uri" aria-hidden="true" value="{{oauth2Data.redirectUri}}"/>
             {{/if}}
             {{#if oauth2Data.scope}}
-            <input type="hidden" name="scope" value="{{oauth2Data.scope}}"/>
+            <input type="hidden" name="scope" aria-hidden="true" value="{{oauth2Data.scope}}"/>
             {{/if}}
             {{#if oauth2Data.state}}
-            <input type="hidden" name="state" value="{{oauth2Data.state}}"/>
+            <input type="hidden" name="state" aria-hidden="true" value="{{oauth2Data.state}}"/>
             {{/if}}
             {{#if oauth2Data.nonce}}
-            <input type="hidden" name="nonce" value="{{oauth2Data.nonce}}"/>
+            <input type="hidden" name="nonce" aria-hidden="true" value="{{oauth2Data.nonce}}"/>
             {{/if}}
             {{#if oauth2Data.acr}}
-            <input type="hidden" name="acr" value="{{oauth2Data.acr}}"/>
+            <input type="hidden" name="acr" aria-hidden="true" value="{{oauth2Data.acr}}"/>
             {{/if}}
             {{#if oauth2Data.userCode}}
-            <input type="hidden" name="user_code" value="{{oauth2Data.userCode}}"/>
+            <input type="hidden" name="user_code" aria-hidden="true" value="{{oauth2Data.userCode}}"/>
             {{/if}}
 
             <!-- Required parameters -->
-            <input type="hidden" name="response_type" value="{{oauth2Data.responseType}}"/>
-            <input type="hidden" name="client_id" value="{{oauth2Data.clientId}}"/>
+            <input type="hidden" name="response_type" aria-hidden="true" value="{{oauth2Data.responseType}}"/>
+            <input type="hidden" name="client_id" aria-hidden="true" value="{{oauth2Data.clientId}}"/>
 
             <div class="form-group clearfix">
                 <div class="pull-right">
@@ -122,7 +136,7 @@
                 </div>
 
                 <div class="pull-left checkbox">
-                    <label><input type="checkbox" name="save_consent"/>{{t 'form.save'}}</label>
+                    <label for="saveConsent"><input type="checkbox" name="save_consent" id="saveConsent"/>{{t 'form.save'}}</label>
                 </div>
             </div>
 

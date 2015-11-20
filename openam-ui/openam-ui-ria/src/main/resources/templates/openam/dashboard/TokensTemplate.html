@@ -26,7 +26,12 @@
                         <td>{{this.expireTime}} </td>
                         <td>
                             <div class="pull-right">
-                                <a class="deleteToken" href="#" id="{{this.id}}" data-toggle="tooltip" title="{{t 'openam.oAuth2.tokens.deleteToken'}}"><i class="fa fa-times"></i></a>
+                                <a  href="#" id="{{this.id}}" role="button"
+                                    class="deleteToken" data-toggle="tooltip"
+                                    title="{{t 'openam.oAuth2.tokens.deleteToken'}}">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    <span class="sr-only">{{t 'openam.oAuth2.tokens.deleteToken'}}</span>
+                                </a>
                             </div>
                         </td>
                     </tr>
