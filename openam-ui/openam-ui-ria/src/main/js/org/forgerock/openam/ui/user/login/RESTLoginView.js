@@ -447,16 +447,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             case "ChoiceCallback":
                 options = _.find(this.output, { name: "choices" });
 
-                // FIXME: If more than two then maybe a vertical radio list.
                 if (options && options.value !== undefined) {
                     result += renderPartial("Choice", {
                         values: _.map(options.value, function (option, key) {
-                            var checked = (self.input.value === key) ? "checked" : "", // Default option
-                                active = checked ? "active" : "";
-
                             return {
-                                active: active,
-                                checked: checked,
+                                active: self.input.value === key,
                                 key: key,
                                 value: option
                             };
