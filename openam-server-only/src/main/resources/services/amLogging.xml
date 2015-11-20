@@ -128,7 +128,7 @@
                         <ChoiceValue i18nKey="choiceINACTIVE">INACTIVE</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>ACTIVE</Value>
+                        <Value>INACTIVE</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="resolveHostName"

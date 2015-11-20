@@ -32,7 +32,7 @@
                         <BooleanFalseValue>false</BooleanFalseValue>
                     </BooleanValues>
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="suppressAuditFailure" type="single" syntax="boolean" i18nKey="a002">
@@ -94,7 +94,7 @@
                         <BooleanFalseValue>false</BooleanFalseValue>
                     </BooleanValues>
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="suppressAuditFailure" type="single" syntax="boolean" i18nKey="a002">
