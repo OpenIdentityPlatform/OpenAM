@@ -334,8 +334,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 UIUtils.compileTemplate(template, _.extend({}, Configuration.globalData, this.data))
                     .always(function (compiledTemplate) {
                         // A rendered template will be a string; an error will be an object
-                        self.template = typeof compiledTemplate === "string"
-                            ? template : self.genericTemplate;
+                        self.template = typeof compiledTemplate === "string" ? template : self.genericTemplate;
 
                         populateTemplate.call(self);
                         self.parentRender(function () {
