@@ -45,6 +45,7 @@ import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.Advice;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
+import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.assertion.AttributeStatement;
 import com.sun.identity.saml2.assertion.EncryptedAttribute;
 import com.sun.identity.saml2.assertion.EncryptedID;
@@ -1039,35 +1040,13 @@ public class SPACSUtils {
         // get mappers
         SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, hostEntityId);
         SPAttributeMapper attrMapper = SAML2Utils.getSPAttributeMapper(realm, hostEntityId);
-        
-        boolean needAttributeEncrypted = false;
-        boolean needNameIDEncrypted = false;
+
         String assertionEncryptedAttr =
-            SAML2Utils.getAttributeValueFromSPSSOConfig(
-                spssoconfig,
-                SAML2Constants.WANT_ASSERTION_ENCRYPTED);
-        if (assertionEncryptedAttr == null ||
-            !assertionEncryptedAttr.equals("true"))
-        {
-            String attrEncryptedStr =
-                SAML2Utils.getAttributeValueFromSPSSOConfig(
-                    spssoconfig,
-                    SAML2Constants.WANT_ATTRIBUTE_ENCRYPTED);
-            if (attrEncryptedStr != null &&
-                attrEncryptedStr.equals("true"))
-            {
-                needAttributeEncrypted = true;
-            }
-            String idEncryptedStr =
-                SAML2Utils.getAttributeValueFromSPSSOConfig(
-                    spssoconfig,
-                    SAML2Constants.WANT_NAMEID_ENCRYPTED);
-            if (idEncryptedStr != null &&
-                idEncryptedStr.equals("true"))
-            {
-                needNameIDEncrypted = true;
-            }
-        }
+                SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
+
+        boolean needAttributeEncrypted = getNeedAttributeEncrypted(assertionEncryptedAttr, spssoconfig);
+        boolean needNameIDEncrypted = getNeedNameIDEncrypted(assertionEncryptedAttr, spssoconfig);
+
         Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
         if (needNameIDEncrypted && encId == null) {
             SAML2Utils.debug.error(classMethod +
@@ -1428,6 +1407,29 @@ public class SPACSUtils {
         return session;
     }
 
+    private static boolean getNeedNameIDEncrypted(String assertionEncryptedAttr, SPSSOConfigElement spssoconfig) {
+        if (Boolean.parseBoolean(assertionEncryptedAttr)) {
+            String idEncryptedStr = SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
+                    SAML2Constants.WANT_NAMEID_ENCRYPTED);
+            if (Boolean.parseBoolean(idEncryptedStr)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean getNeedAttributeEncrypted(String assertionEncryptedAttr, SPSSOConfigElement spssoconfig) {
+        if (Boolean.parseBoolean(assertionEncryptedAttr)) {
+            String attrEncryptedStr =
+                    SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ATTRIBUTE_ENCRYPTED);
+            if (Boolean.parseBoolean(attrEncryptedStr)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private static void invokeSPAdapterForSSOFailure(String hostEntityId,
         String realm, HttpServletRequest request, HttpServletResponse response,
@@ -1848,39 +1850,40 @@ public class SPACSUtils {
         return result;
     }
 
-    // gets the attributes from AttibuteStates in the assertions.
-    private static List getSAMLAttributes(Assertion assertion, boolean needAttributeEncrypted,
-            Set<PrivateKey> privateKeys) {
-        List attrList = null;
+    /**
+     * Gets the attributes from an assert's AttributeStates.
+     *
+     * @param assertion The assertion from which to pull the AttributeStates.
+     * @param needAttributeEncrypted Whether attributes must be encrypted (or else rejected).
+     * @param privateKeys Private keys used to decrypt those encrypted attributes.
+     * @return a list of attributes pulled from the provided assertion.
+     */
+    public static List<Attribute> getSAMLAttributes(Assertion assertion, boolean needAttributeEncrypted,
+                                                     Set<PrivateKey> privateKeys) {
+        List<Attribute> attrList = null;
         if (assertion != null) {
-            List statements = assertion.getAttributeStatements();
-            if (statements != null && statements.size() > 0 ) {
-                for (Iterator it = statements.iterator(); it.hasNext(); ) {
-                    AttributeStatement statement =
-                        (AttributeStatement)it.next();
-                    List attributes = statement.getAttribute();
-                    if (needAttributeEncrypted &&
-                        attributes != null && !attributes.isEmpty())
-                    {
+            List<AttributeStatement> statements = assertion.getAttributeStatements();
+            if (CollectionUtils.isNotEmpty(statements)) {
+                for (AttributeStatement statement : statements) {
+                    List<Attribute> attributes = statement.getAttribute();
+                    if (needAttributeEncrypted && attributes != null && !attributes.isEmpty()) {
                         SAML2Utils.debug.error("Attribute not encrypted.");
                         return null;
                     }
                     if (attributes != null) {
                         if (attrList == null) {
-                            attrList = new ArrayList();
+                            attrList = new ArrayList<>();
                         }
                         attrList.addAll(attributes);
                     }
-                    List encAttrs = statement.getEncryptedAttribute();
+                    List<EncryptedAttribute> encAttrs = statement.getEncryptedAttribute();
                     if (encAttrs != null) {
-                        for (Iterator encIter = encAttrs.iterator();
-                                encIter.hasNext(); )
-                        {
+                        for (EncryptedAttribute encAttr : encAttrs) {
                             if (attrList == null) {
-                                attrList = new ArrayList();
+                                attrList = new ArrayList<>();
                             }
                             try {
-                                attrList.add(((EncryptedAttribute) encIter.next()).decrypt(privateKeys));
+                                attrList.add((encAttr).decrypt(privateKeys));
                             } catch (SAML2Exception se) {
                                 SAML2Utils.debug.error("Decryption error:", se);
                                 return null;
@@ -2071,37 +2074,35 @@ public class SPACSUtils {
         return map;
     }
 
-
-
-
     /**
      * Returns the username if there was one from the Assertion we were able to map into a local user account. Returns
-     * null if not.
+     * null if not. Should only be used from the SP side. Should only be called in conjuncture with the Auth Module.
+     * In addition, it performs what attribute federation it can.
+     *
+     * This method is a picked apart version of the "processResponse" function.
      */
     public static String getPrincipalWithoutLogin(Subject assertionSubject, Assertion authnAssertion, String realm,
-                                                  String spName, SAML2MetaManager metaManager, String idpEntityName)
+                                                  String spEntityId, SAML2MetaManager metaManager, String idpEntityId)
             throws SAML2Exception {
 
-        NameID nameId = assertionSubject.getNameID();
-        EncryptedID encId = assertionSubject.getEncryptedID();
-        SPSSOConfigElement spssoconfig = metaManager.getSPSSOConfig(realm, spName);
-
-        // get mappers
-        SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, spName);
+        final EncryptedID encId = assertionSubject.getEncryptedID();
+        final SPSSOConfigElement spssoconfig = metaManager.getSPSSOConfig(realm, spEntityId);
+        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+        final SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, spEntityId);
 
         boolean needNameIDEncrypted = false;
+        NameID nameId = assertionSubject.getNameID();
+
         String assertionEncryptedAttr =
                 SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
-        if (assertionEncryptedAttr == null || !Boolean.parseBoolean(assertionEncryptedAttr))
-        {
+        if (assertionEncryptedAttr == null || !Boolean.parseBoolean(assertionEncryptedAttr)) {
             String idEncryptedStr =
                     SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_NAMEID_ENCRYPTED);
-            if (idEncryptedStr != null && Boolean.parseBoolean(idEncryptedStr))
-            {
+            if (idEncryptedStr != null && Boolean.parseBoolean(idEncryptedStr)) {
                 needNameIDEncrypted = true;
             }
         }
-        Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+
         if (needNameIDEncrypted && encId == null) {
             throw new SAML2Exception(SAML2Utils.bundle.getString("nameIDNotEncrypted"));
         }
@@ -2111,7 +2112,7 @@ public class SPACSUtils {
 
         SPSSODescriptorElement spDesc = null;
         try {
-            spDesc = metaManager.getSPSSODescriptor(realm, spName);
+            spDesc = metaManager.getSPSSODescriptor(realm, spEntityId);
         } catch (SAML2MetaException ex) {
             SAML2Utils.debug.error("Unable to read SPSSODescription", ex);
         }
@@ -2119,43 +2120,110 @@ public class SPACSUtils {
         if (spDesc == null) {
             throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
         }
-        String nameIDFormat = nameId.getFormat();
+
+        final String nameIDFormat = nameId.getFormat();
+
         if (nameIDFormat != null) {
             List spNameIDFormatList = spDesc.getNameIDFormat();
 
             if (CollectionUtils.isNotEmpty(spNameIDFormatList) && !spNameIDFormatList.contains(nameIDFormat)) {
-                Object[] args = { nameIDFormat };
+                Object[] args = {nameIDFormat};
                 throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "unsupportedNameIDFormatSP", args);
             }
         }
 
-        boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
-        boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
+        final boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
+        final boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
+        final boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
 
-        String remoteHostId = authnAssertion.getIssuer().getValue();
+        final boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
+                && acctMapper.shouldPersistNameIDFormat(realm, spEntityId, idpEntityId, nameIDFormat));
+
         String userName = null;
+        boolean isNewAccountLink = false;
 
-        boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
-                && acctMapper.shouldPersistNameIDFormat(realm, spName, remoteHostId, nameIDFormat));
         try {
             if (shouldPersistNameID) {
                 try {
                     userName = SAML2Utils.getDataStoreProvider().getUserID(realm, SAML2Utils.getNameIDKeyMap(
-                            nameId, spName, remoteHostId, realm, SAML2Constants.SP_ROLE));
+                            nameId, spEntityId, idpEntityId, realm, SAML2Constants.SP_ROLE));
                 } catch (DataStoreProviderException dse) {
                     throw new SAML2Exception(dse.getMessage());
                 }
             }
+
+            //if we can't get an already linked account, see if we'll be generating a new one based on federated data
             if (userName == null) {
-                userName = acctMapper.getIdentity(authnAssertion, spName, realm);
+                userName = acctMapper.getIdentity(authnAssertion, spEntityId, realm);
+                isNewAccountLink = true; //we'll use this later to inform us
             }
         } catch (SAML2Exception se) {
             return null;
         }
 
-        return userName;
+        //if we're new and we're persistent, store the federation data in the user pref
+        if (isNewAccountLink && isPersistent) {
+            try {
+                writeFedData(nameId, spEntityId, realm, metaManager, idpEntityId, userName);
+            } catch (SAML2Exception se) {
+                return userName;
+            }
+        }
 
+        return userName;
+    }
+
+    private static void writeFedData(NameID nameId, String spEntityId, String realm, SAML2MetaManager metaManager,
+                                     String idpEntityId, String userName) throws SAML2Exception {
+        final NameIDInfo info;
+        final String affiID = nameId.getSPNameQualifier();
+        boolean isDualRole = SAML2Utils.isDualRole(spEntityId, realm);
+        AffiliationDescriptorType affiDesc = null;
+
+        if (affiID != null && !affiID.isEmpty()) {
+            affiDesc = metaManager.getAffiliationDescriptor(realm, affiID);
+        }
+
+        if (affiDesc != null) {
+            if (!affiDesc.getAffiliateMember().contains(spEntityId)) {
+                throw new SAML2Exception("Unable to locate SP Entity ID in the affiliate descriptor.");
+            }
+            if (isDualRole) {
+                info = new NameIDInfo(affiID, idpEntityId, nameId, SAML2Constants.DUAL_ROLE, true);
+            } else {
+                info = new NameIDInfo(affiID, idpEntityId, nameId, SAML2Constants.SP_ROLE, true);
+            }
+        } else {
+            if (isDualRole) {
+                info = new NameIDInfo(spEntityId, idpEntityId, nameId, SAML2Constants.DUAL_ROLE, false);
+            } else {
+                info = new NameIDInfo(spEntityId, idpEntityId, nameId, SAML2Constants.SP_ROLE, false);
+            }
+        }
+
+        // write fed info into data store
+        AccountUtils.setAccountFederation(info, userName);
+
+    }
+
+    /**
+     * Gets the attributes for this assertion in a new List.
+     * @param authnAssertion Assertion from which to reead the attributes.
+     * @param needAttributeEncrypted Whether the attributes must be encrypted.
+     * @param decryptionKeys The keys used to decrypt the attributes, if they're encrypted.
+     * @return a List of the attributes in this assertion.
+     */
+    public static List<Attribute> getAttrs(Assertion authnAssertion, boolean needAttributeEncrypted,
+                                           Set<PrivateKey> decryptionKeys) {
+        final List<Attribute> origAttrs = getSAMLAttributes(authnAssertion, needAttributeEncrypted, decryptionKeys);
+
+        List<Attribute> attrs = null;
+        if (origAttrs != null && !origAttrs.isEmpty()) {
+            attrs = new ArrayList<>();
+            attrs.addAll(origAttrs);
+        }
+
+        return attrs;
     }
 
 }

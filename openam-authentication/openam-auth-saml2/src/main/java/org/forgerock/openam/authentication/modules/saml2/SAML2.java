@@ -29,6 +29,7 @@ import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.saml2.assertion.Assertion;
+import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.Subject;
@@ -46,6 +47,7 @@ import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.plugins.DefaultLibrarySPAccountMapper;
 import com.sun.identity.saml2.plugins.SAML2PluginsUtils;
+import com.sun.identity.saml2.plugins.SPAttributeMapper;
 import com.sun.identity.saml2.profile.AuthnRequestInfo;
 import com.sun.identity.saml2.profile.AuthnRequestInfoCopy;
 import com.sun.identity.saml2.profile.SPACSUtils;
@@ -62,6 +64,7 @@ import java.security.PrivateKey;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -85,6 +88,7 @@ public class SAML2 extends AMLoginModule {
 
     private static final Debug DEBUG = Debug.getInstance(AM_AUTH_SAML2);
     private static final String BUNDLE_NAME = "amAuthSAML2";
+    private static final String PROPERTY_VALUES_SEPARATOR = "|";
 
     //From config
     private String entityName;
@@ -96,6 +100,7 @@ public class SAML2 extends AMLoginModule {
     private String nameIDFormat;
 
     //Internal state
+    private Assertion authnAssertion;
     private Subject assertionSubject;
     private Map<String, List<String>> params = new HashMap<>();
     private Principal principal;
@@ -286,7 +291,6 @@ public class SAML2 extends AMLoginModule {
         }
 
         final String username;
-        final Assertion authnAssertion;
         final SAML2ResponseData data;
 
         if (SAML2FailoverUtils.isSAML2FailoverEnabled() && !StringUtils.isBlank(key)) {
@@ -312,7 +316,7 @@ public class SAML2 extends AMLoginModule {
                     realm, spName, metaManager, entityName);
             if (username != null) {
                 principal = new SAML2Principal(username);
-                return success(getNameId());
+                return success(authnAssertion, getNameId(), username);
             }
         } catch (SAML2Exception e) {
             return processError(e, null, "SAML2.handleReturnFromRedirect : Unable to perform user lookup.");
@@ -442,8 +446,9 @@ public class SAML2 extends AMLoginModule {
         } else if (authenticationContext.getStatus().equals(AuthContext.Status.SUCCESS)) {
             try {
                 final NameID nameId = getNameId();
-                linkAccount(authenticationContext.getSSOToken().getProperty(UNIVERSAL_IDENTIFIER), nameId);
-                return success(nameId);
+                final String userName = authenticationContext.getSSOToken().getProperty(UNIVERSAL_IDENTIFIER);
+                linkAccount(userName, nameId);
+                return success(authnAssertion, nameId, userName);
             } catch (L10NMessageImpl l10NMessage) {
                 return processError(l10NMessage, null,
                         "SAML2 :: process() : failed to perform local authentication - {} ",
@@ -460,8 +465,8 @@ public class SAML2 extends AMLoginModule {
      * Sets the auth module's logged-in username via storeUsernamePasswd, triggers call
      * to add information necessary for SLO (if configured) and returns success.
      */
-    private int success(NameID nameId) throws AuthLoginException, SAML2Exception {
-        setSessionPropertiesForSLO(nameId);
+    private int success(Assertion assertion, NameID nameId, String userName) throws AuthLoginException, SAML2Exception {
+        setSessionProperties(assertion, nameId, userName);
         DEBUG.message("SAML2 :: User Authenticated via SAML2 - {}", getPrincipal().getName());
         storeUsernamePasswd(DNUtils.DNtoName(getPrincipal().getName()), null);
         return ISAuthConstants.LOGIN_SUCCEED;
@@ -528,8 +533,8 @@ public class SAML2 extends AMLoginModule {
      * Reads the authenticating user's SAML2 NameId from the stored map. Decrypts if necessary.
      */
     private NameID getNameId() throws SAML2Exception, AuthLoginException {
-        final String spName = metaManager.getEntityByMetaAlias(metaAlias);
         final EncryptedID encId = assertionSubject.getEncryptedID();
+        final String spName = metaManager.getEntityByMetaAlias(metaAlias);
         final SPSSOConfigElement spssoconfig = metaManager.getSPSSOConfig(realm, spName);
         final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
 
@@ -542,9 +547,11 @@ public class SAML2 extends AMLoginModule {
     }
 
     /**
-     * Adds information necessary for the SLO to be able to be run into the user's session.
+     * Adds information necessary for the session to be federated completely (if attributes are being
+     * drawn in, and to configure ready for SLO).
      */
-    private void setSessionPropertiesForSLO(NameID nameId) throws AuthLoginException, SAML2Exception {
+    private void setSessionProperties(Assertion assertion, NameID nameId, String userName)
+            throws AuthLoginException, SAML2Exception {
         setUserSessionProperty(SAML2Constants.SINGLE_LOGOUT, String.valueOf(singleLogoutEnabled));
         if (singleLogoutEnabled) {
             setUserSessionProperty(SAML2Constants.SESSION_INDEX, sessionIndex);
@@ -554,6 +561,55 @@ public class SAML2 extends AMLoginModule {
             setUserSessionProperty(SAML2Constants.METAALIAS, metaAlias);
             setUserSessionProperty(SAML2Constants.REQ_BINDING, reqBinding);
             setUserSessionProperty(SAML2Constants.NAMEID, nameId.toXMLString(true, true));
+        }
+        setAttributeProperties(assertion, userName);
+    }
+
+    /**
+     * Performs the functions of linking attribute values that have been received from the assertion
+     * by building them into appropriate strings and asking the auth service to migrate them into session
+     * properties once authentication is completed.
+     */
+    private void setAttributeProperties(Assertion assertion, String userName)
+            throws AuthLoginException, SAML2Exception {
+
+        final String spName = metaManager.getEntityByMetaAlias(metaAlias);
+        final SPSSOConfigElement spssoconfig = metaManager.getSPSSOConfig(realm, spName);
+        final String assertionEncryptedAttr =
+                SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
+        final boolean needAttributeEncrypted = SPACSUtils.getNeedAttributeEncrypted(assertionEncryptedAttr,
+                spssoconfig);
+        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+        final List<Attribute> attrs = SPACSUtils.getAttrs(assertion, needAttributeEncrypted, decryptionKeys);
+
+        final SPAttributeMapper attrMapper = SAML2Utils.getSPAttributeMapper(realm, spName);
+
+        final Map<String, Set<String>> attrMap;
+
+        try {
+            attrMap = attrMapper.getAttributes(attrs, userName, spName, entityName, realm);
+        }  catch (SAML2Exception se) {
+            return; //no attributes
+        }
+
+        setUserAttributes(attrMap);
+
+        if (assertion.getAdvice() != null) {
+            List<String> creds = assertion.getAdvice().getAdditionalInfo();
+            attrMap.put(SAML2Constants.DISCOVERY_BOOTSTRAP_CREDENTIALS, new HashSet<>(creds));
+        }
+
+        for (String name : attrMap.keySet()) {
+            Set<String> value = attrMap.get(name);
+            StringBuilder toStore = new StringBuilder();
+
+            // | is defined as the property value delimiter, cf FMSessionProvider#setProperty
+            for (String toAdd : value) {
+                toStore.append(com.sun.identity.shared.StringUtils.getEscapedValue(toAdd))
+                        .append(PROPERTY_VALUES_SEPARATOR);
+            }
+            toStore.deleteCharAt(toStore.length() - 1);
+            setUserSessionProperty(name, toStore.toString());
         }
     }
 
