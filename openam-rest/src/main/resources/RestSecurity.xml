@@ -434,7 +434,7 @@
                                  resourceName="forgotUsernameServiceConfigClass"
                                  i18nKey="a605">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConsoleConfig</Value>
+                        <Value>org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
