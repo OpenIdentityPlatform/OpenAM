@@ -119,6 +119,8 @@ import org.forgerock.openam.session.blacklist.NoOpSessionBlacklist;
 import org.forgerock.openam.session.blacklist.SessionBlacklist;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.openam.sm.config.ConsoleConfigHandlerImpl;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
@@ -276,6 +278,8 @@ public class CoreGuiceModule extends AbstractModule {
         bind(SessionCookies.class).toInstance(SessionCookies.getInstance());
         bind(SessionURL.class).toInstance(SessionURL.getInstance());
         bind(SessionServiceURLService.class).toInstance(SessionServiceURLService.getInstance());
+
+        bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
     }
 
     @Provides

@@ -19,6 +19,7 @@ package org.forgerock.openam.selfservice;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.selfservice.config.beans.KbaConsoleConfig.KbaBuilder;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -32,9 +33,8 @@ import org.forgerock.json.resource.Responses;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
-import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
-import org.forgerock.openam.selfservice.config.flows.KbaConsoleConfig;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.openam.selfservice.config.beans.KbaConsoleConfig;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -49,18 +49,16 @@ import javax.inject.Inject;
 final class KbaResource implements SingletonResourceProvider {
 
     private final ConsoleConfigHandler configHandler;
-    private final ConsoleConfigExtractor<KbaConsoleConfig> extractor;
 
     @Inject
-    KbaResource(ConsoleConfigHandler configHandler, ConsoleConfigExtractor<KbaConsoleConfig> extractor) {
+    KbaResource(ConsoleConfigHandler configHandler) {
         this.configHandler = configHandler;
-        this.extractor = extractor;
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest readRequest) {
         String realm = RealmContext.getRealm(context);
-        KbaConsoleConfig kbaConsoleConfig = configHandler.getConfig(realm, extractor);
+        KbaConsoleConfig kbaConsoleConfig = configHandler.getConfig(realm, KbaBuilder.class);
 
         JsonValue jsonQuestions = json(
                 object(

@@ -15,8 +15,6 @@
  */
 
 /**
- * Contains classes for handling self service console configuration.
- *
- * @supported.api
+ * Contains classes used to help construct config beans from SMS configuration.
  */
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.sm.config;

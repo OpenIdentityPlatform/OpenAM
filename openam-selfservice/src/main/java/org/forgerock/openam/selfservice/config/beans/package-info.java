@@ -13,25 +13,10 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.selfservice.config;
 
 /**
- * Represents an unexpected failure in retrieving SMS console configuration.
+ * Contains self service configuration beans.
  *
- * @since 13.0.0
+ * @supported.api
  */
-public class ConfigRetrievalException extends RuntimeException {
-
-    /**
-     * Constructs a new config retrieval exception.
-     *
-     * @param message
-     *         exception message
-     * @param cause
-     *         exception cause
-     */
-    public ConfigRetrievalException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-}
+package org.forgerock.openam.selfservice.config.beans;

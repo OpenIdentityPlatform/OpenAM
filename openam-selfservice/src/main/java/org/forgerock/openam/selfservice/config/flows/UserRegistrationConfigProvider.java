@@ -22,6 +22,7 @@ import org.forgerock.json.jose.jwe.EncryptionMethod;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
+import org.forgerock.openam.selfservice.config.beans.UserRegistrationConsoleConfig;
 import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.config.StageConfig;

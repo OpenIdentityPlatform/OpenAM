@@ -13,22 +13,25 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-
-package org.forgerock.openam.selfservice.config.flows;
+package org.forgerock.openam.sm.config;
 
 /**
- * Self service SMS related constants shared by all flows.
+ * Represents an unexpected failure in retrieving SMS console configuration.
  *
  * @since 13.0.0
  */
-final class CommonSmsSelfServiceConstants {
+public class ConfigRetrievalException extends RuntimeException {
 
-    final static String CAPTCHA_SITE_KEY = "forgerockRESTSecurityCaptchaSiteKey";
-    final static String CAPTCHA_SECRET_KEY = "forgerockRESTSecurityCaptchaSecretKey";
-    final static String CAPTCHA_VERIFICATION_URL = "forgerockRESTSecurityCaptchaVerificationUrl";
-
-    private CommonSmsSelfServiceConstants() {
-        throw new UnsupportedOperationException();
+    /**
+     * Constructs a new config retrieval exception.
+     *
+     * @param message
+     *         exception message
+     * @param cause
+     *         exception cause
+     */
+    public ConfigRetrievalException(String message, Throwable cause) {
+        super(message, cause);
     }
 
 }

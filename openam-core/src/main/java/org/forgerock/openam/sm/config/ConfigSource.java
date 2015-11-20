@@ -14,29 +14,31 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.sm.config;
 
-import java.util.Map;
-import java.util.Set;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Responsible for extracting console configuration instance from the collection of passed console attribute values.
- *
- * @param <C>
- *         the console configuration type
+ * Annotation represents console configuration sources.
  *
  * @since 13.0.0
  */
-public interface ConsoleConfigExtractor<C> {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Inherited
+@Documented
+public @interface ConfigSource {
 
     /**
-     * Given the console attribute values, extract out the configuration instance.
+     * Gets value array that represent the config service sources.
      *
-     * @param consoleAttributes
-     *         console attribute values
-     *
-     * @return a console configuration instance
+     * @return config sources
      */
-    C extract(Map<String, Set<String>> consoleAttributes);
+    String[] value();
 
 }

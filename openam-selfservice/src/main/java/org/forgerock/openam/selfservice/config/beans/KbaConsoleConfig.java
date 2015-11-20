@@ -14,11 +14,16 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice.config.flows;
+package org.forgerock.openam.selfservice.config.beans;
 
+import org.forgerock.openam.sm.config.ConfigAttribute;
+import org.forgerock.openam.sm.config.ConfigSource;
+import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
 import org.forgerock.util.Reject;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Console configuration for knowledge based answers (KBA).
@@ -31,7 +36,7 @@ public final class KbaConsoleConfig {
     private final int minimumAnswersToDefine;
     private final int minimumAnswersToVerify;
 
-    private KbaConsoleConfig(Builder builder) {
+    private KbaConsoleConfig(KbaBuilder builder) {
         securityQuestions = builder.securityQuestions;
         minimumAnswersToDefine = builder.minimumAnswersToDefine;
         minimumAnswersToVerify = builder.minimumAnswersToVerify;
@@ -64,37 +69,39 @@ public final class KbaConsoleConfig {
         return minimumAnswersToVerify;
     }
 
-    static final class Builder {
+    @ConfigSource("RestSecurity")
+    public static final class KbaBuilder implements ConsoleConfigBuilder<KbaConsoleConfig> {
 
-        private Map<String, Map<String, String>> securityQuestions;
+        private final Map<String, Map<String, String>> securityQuestions;
         private int minimumAnswersToDefine;
         private int minimumAnswersToVerify;
 
-        Builder setSecurityQuestions(Map<String, Map<String, String>> securityQuestions) {
-            this.securityQuestions = securityQuestions;
-            return this;
+        public KbaBuilder() {
+            securityQuestions = new HashMap<>();
         }
 
-        Builder setMinimumAnswersToDefine(int minimumAnswersToDefine) {
+        @ConfigAttribute(value = "forgerockRESTSecurityKBAQuestions", transformer = SecurityQuestionTransformer.class)
+        public void setSecurityQuestions(Map<String, Map<String, String>> securityQuestions) {
+            this.securityQuestions.putAll(securityQuestions);
+        }
+
+        @ConfigAttribute("forgerockRESTSecurityAnswersUserMustProvide")
+        public void setMinimumAnswersToDefine(int minimumAnswersToDefine) {
             this.minimumAnswersToDefine = minimumAnswersToDefine;
-            return this;
         }
 
-        Builder setMinimumAnswersToVerify(int minimumAnswersToVerify) {
+        @ConfigAttribute("forgerockRESTSecurityQuestionsUserMustAnswer")
+        public void setMinimumAnswersToVerify(int minimumAnswersToVerify) {
             this.minimumAnswersToVerify = minimumAnswersToVerify;
-            return this;
         }
 
-        KbaConsoleConfig build() {
+        @Override
+        public KbaConsoleConfig build(Map<String, Set<String>> attributes) {
             Reject.ifTrue(minimumAnswersToVerify > minimumAnswersToDefine,
                     "Number of answers to verify must be equal or less that those defined");
             return new KbaConsoleConfig(this);
         }
 
-    }
-
-    static Builder newBuilder() {
-        return new Builder();
     }
 
 }

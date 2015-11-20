@@ -24,9 +24,9 @@ import com.google.inject.TypeLiteral;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
-import org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConsoleConfig;
-import org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConsoleConfig;
-import org.forgerock.openam.selfservice.config.flows.UserRegistrationConsoleConfig;
+import org.forgerock.openam.selfservice.config.beans.ForgottenPasswordConsoleConfig;
+import org.forgerock.openam.selfservice.config.beans.ForgottenUsernameConsoleConfig;
+import org.forgerock.openam.selfservice.config.beans.UserRegistrationConsoleConfig;
 import org.forgerock.selfservice.core.UserUpdateService;
 
 /**

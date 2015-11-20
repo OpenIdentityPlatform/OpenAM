@@ -13,22 +13,28 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.selfservice.config;
+
+package org.forgerock.openam.sm.config;
+
+import java.util.Set;
 
 /**
- * An implementor of this interface is interested in being
- * notified of self service console config changes.
+ * Provides a custom transformation to the attribute values.
+ * <p/>
+ * The transformed type should be the same type as that of parameter being passed via the setter.
  *
  * @since 13.0.0
  */
-public interface ConsoleConfigChangeListener {
+public interface ConfigTransformer<T> {
 
     /**
-     * Notifies the listener that the config has changed for the passed realm.
+     * Transforms the set of strings into the parameter type required by the setter.
      *
-     * @param realm
-     *         the realm
+     * @param values
+     *         attribute values
+     *
+     * @return expected parameter type
      */
-    void configUpdate(String realm);
+    T transform(Set<String> values, Class<?> parameterType);
 
 }

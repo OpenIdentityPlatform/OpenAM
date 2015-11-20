@@ -14,9 +14,33 @@
  * Copyright 2015 ForgeRock AS.
  */
 
+package org.forgerock.openam.sm.config;
+
+import java.util.Map;
+import java.util.Set;
+
 /**
- * Contains classes for handling self service console configuration.
+ * Builder to construct the config object represented by {@link C}.
+ * <p/>
+ * The builder needs to declare which service configuration sources to pull on using
+ * {@link ConfigSource} and each setter needs to declare which attribute to be
+ * populated with using {@link ConfigAttribute}.
  *
- * @supported.api
+ * @param <C>
+ *         Config object type
+ *
+ * @since 13.0.0
  */
-package org.forgerock.openam.selfservice.config;
+public interface ConsoleConfigBuilder<C> {
+
+    /**
+     * Builds a new instance of {@link C}.
+     *
+     * @param attributes
+     *         all retrieved attributes
+     *
+     * @return new instance of {@link C}
+     */
+    C build(Map<String, Set<String>> attributes);
+
+}

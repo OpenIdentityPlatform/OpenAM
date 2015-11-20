@@ -25,12 +25,13 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.selfservice.config.ConsoleConfigChangeListener;
-import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
-import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
+import org.forgerock.openam.sm.config.ConfigSource;
+import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
+import org.forgerock.openam.sm.config.ConsoleConfigListener;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
-import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.slf4j.Logger;
@@ -46,37 +47,39 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 13.0.0
  */
 final class SelfServiceRequestHandler<C extends SelfServiceConsoleConfig>
-        extends AbstractRequestHandler implements ConsoleConfigChangeListener {
+        extends AbstractRequestHandler implements ConsoleConfigListener {
 
     private static final Logger logger = LoggerFactory.getLogger(SelfServiceRequestHandler.class);
 
-    private final Map<String, RequestHandler> serviceCache;
-    private final SelfServiceFactory serviceFactory;
+    private final Class<? extends ConsoleConfigBuilder<C>> consoleConfigBuilderType;
     private final ConsoleConfigHandler consoleConfigHandler;
-    private final ConsoleConfigExtractor<C> configExtractor;
     private final ServiceConfigProviderFactory providerFactory;
+    private final SelfServiceFactory serviceFactory;
+
+    private final Map<String, RequestHandler> serviceCache;
 
     /**
      * Constructs a new self service.
      *
+     * @param consoleConfigBuilderType
+     *         configuration extractor
      * @param consoleConfigHandler
      *         console configuration handler
-     * @param configExtractor
-     *         configuration extractor
      * @param providerFactory
      *         service provider factory
      */
     @Inject
-    public SelfServiceRequestHandler(SelfServiceFactory serviceFactory, ConsoleConfigHandler consoleConfigHandler,
-            ConsoleConfigExtractor<C> configExtractor, ServiceConfigProviderFactory providerFactory) {
+    public SelfServiceRequestHandler(Class<? extends ConsoleConfigBuilder<C>> consoleConfigBuilderType,
+            ConsoleConfigHandler consoleConfigHandler, ServiceConfigProviderFactory providerFactory,
+            SelfServiceFactory serviceFactory) {
 
         serviceCache = new ConcurrentHashMap<>();
-        this.serviceFactory = serviceFactory;
+        this.consoleConfigBuilderType = consoleConfigBuilderType;
         this.consoleConfigHandler = consoleConfigHandler;
-        this.configExtractor = configExtractor;
         this.providerFactory = providerFactory;
+        this.serviceFactory = serviceFactory;
 
-        consoleConfigHandler.registerListener(this);
+        consoleConfigHandler.registerListener(this, consoleConfigBuilderType);
     }
 
     @Override
@@ -122,7 +125,7 @@ final class SelfServiceRequestHandler<C extends SelfServiceConsoleConfig>
     }
 
     private RequestHandler createNewService(Context context, String realm) throws NotSupportedException {
-        C consoleConfig = consoleConfigHandler.getConfig(realm, configExtractor);
+        C consoleConfig = consoleConfigHandler.getConfig(realm, consoleConfigBuilderType);
         ServiceConfigProvider<C> serviceConfigProvider = providerFactory.getProvider(consoleConfig);
 
         if (!serviceConfigProvider.isServiceEnabled(consoleConfig)) {
@@ -133,7 +136,7 @@ final class SelfServiceRequestHandler<C extends SelfServiceConsoleConfig>
     }
 
     @Override
-    public final void configUpdate(String realm) {
+    public final void configUpdate(String source, String realm) {
         synchronized (serviceCache) {
             serviceCache.remove(realm);
         }

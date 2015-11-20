@@ -28,8 +28,8 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.openam.selfservice.config.ConsoleConfigExtractor;
-import org.forgerock.openam.selfservice.config.ConsoleConfigHandler;
+import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
@@ -40,6 +40,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Unit test for {@link SelfServiceRequestHandler}.
@@ -52,8 +54,6 @@ public final class SelfServiceRequestHandlerTest {
     private SelfServiceFactory serviceFactory;
     @Mock
     private ConsoleConfigHandler consoleConfigHandler;
-    @Mock
-    private ConsoleConfigExtractor<SelfServiceConsoleConfig> configExtractor;
     @Mock
     private ServiceConfigProviderFactory providerFactory;
     @Mock
@@ -74,8 +74,8 @@ public final class SelfServiceRequestHandlerTest {
         context = new HttpContext(json(object(field("headers", Collections.emptyMap()),
                 field("parameters", Collections.emptyMap()))), null);
 
-        selfServiceHandler = new SelfServiceRequestHandler<>(
-                serviceFactory, consoleConfigHandler, configExtractor, providerFactory);
+        selfServiceHandler = new SelfServiceRequestHandler<>(MockBuilder.class,
+                consoleConfigHandler, providerFactory, serviceFactory);
     }
 
     @Test
@@ -83,7 +83,7 @@ public final class SelfServiceRequestHandlerTest {
         // When
         ReadRequest request = Requests.newReadRequest("/someEndpoint");
 
-        given(consoleConfigHandler.getConfig("/", configExtractor)).willReturn(consoleConfig);
+        given(consoleConfigHandler.getConfig("/", MockBuilder.class)).willReturn(consoleConfig);
         given(providerFactory.getProvider(consoleConfig)).willReturn(configProvider);
         given(configProvider.isServiceEnabled(consoleConfig)).willReturn(true);
         ProcessInstanceConfig config = new ProcessInstanceConfig();
@@ -102,7 +102,7 @@ public final class SelfServiceRequestHandlerTest {
         // When
         ActionRequest request = Requests.newActionRequest("/someEndpoint", "submitRequirements");
 
-        given(consoleConfigHandler.getConfig("/", configExtractor)).willReturn(consoleConfig);
+        given(consoleConfigHandler.getConfig("/", MockBuilder.class)).willReturn(consoleConfig);
         given(providerFactory.getProvider(consoleConfig)).willReturn(configProvider);
         given(configProvider.isServiceEnabled(consoleConfig)).willReturn(true);
         ProcessInstanceConfig config = new ProcessInstanceConfig();
@@ -114,6 +114,15 @@ public final class SelfServiceRequestHandlerTest {
 
         // Then
         verify(underlyingService).handleAction(context, request);
+    }
+
+    private static final class MockBuilder implements ConsoleConfigBuilder<SelfServiceConsoleConfig> {
+
+        @Override
+        public SelfServiceConsoleConfig build(Map<String, Set<String>> attributes) {
+            return null;
+        }
+
     }
 
 }

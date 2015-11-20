@@ -13,31 +13,25 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.selfservice.config;
+package org.forgerock.openam.sm.config;
 
 /**
- * Responsible for handling the retrieval and notification of self service console configuration.
+ * Listener interface to be notified of SMS configuration changes.
+ * Implementors should use the {@link ConfigSource} annotation
+ * to detail which sources to listen on.
  *
  * @since 13.0.0
  */
-public interface ConsoleConfigHandler {
+public interface ConsoleConfigListener {
 
     /**
-     * Retrieves the config for the requested realm.
+     * Notifies the listener that the config has changed for the passed source and realm.
      *
+     * @param source
+     *         the source
      * @param realm
      *         the realm
-     *
-     * @return associated config
      */
-    <C> C getConfig(String realm, ConsoleConfigExtractor<C> extractor);
-
-    /**
-     * Registers the passed listener for config changes.
-     *
-     * @param listener
-     *         the listener
-     */
-    void registerListener(ConsoleConfigChangeListener listener);
+    void configUpdate(String source, String realm);
 
 }
