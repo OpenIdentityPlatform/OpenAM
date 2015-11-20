@@ -106,7 +106,7 @@
                     </AttributeSchema>
                     <AttributeSchema name="rotationInterval" type="single" i18nKey="rotationInterval">
                         <DefaultValues>
-                            <Value>-1</Value>
+                            <Value>disabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationTimes" type="list" syntax="string" i18nKey="rotationTimes"/>
@@ -212,7 +212,7 @@
                     </AttributeSchema>
                     <AttributeSchema name="rotationInterval" type="single" i18nKey="rotationInterval">
                         <DefaultValues>
-                            <Value>-1</Value>
+                            <Value>disabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationTimes" type="list" syntax="string" i18nKey="rotationTimes"/>
