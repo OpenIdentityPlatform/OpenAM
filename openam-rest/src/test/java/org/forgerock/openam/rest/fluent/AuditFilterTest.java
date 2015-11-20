@@ -16,7 +16,7 @@
 package org.forgerock.openam.rest.fluent;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.*;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
@@ -24,13 +24,18 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.Responses;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -41,11 +46,15 @@ import org.testng.annotations.Test;
 public class AuditFilterTest extends AbstractAuditFilterTest {
 
     private AuditFilter auditFilter;
+    private Debug debug;
+    private CrestAuditorFactory auditorFactory;
 
     @BeforeMethod
     protected void setUp() throws Exception {
         super.setUp();
-        auditFilter = new AuditFilter(mock(Debug.class), auditEventPublisher, auditEventFactory);
+        debug = mock(Debug.class);
+        auditorFactory = mock(CrestAuditorFactory.class);
+        auditFilter = new AuditFilter(debug, auditEventPublisher, auditEventFactory);
     }
 
     @SuppressWarnings("unchecked")
@@ -171,5 +180,51 @@ public class AuditFilterTest extends AbstractAuditFilterTest {
         JsonValue filterResponse = auditFilter.getQuerySuccessDetail(queryRequest, queryResponse);
 
         assertThat(filterResponse).isEqualTo(null);
+    }
+
+    @Test
+    public void shouldAuditSuccessForResults() throws Exception {
+        ResourceResponse response = mock(ResourceResponse.class);
+        Promise<ResourceResponse, ResourceException> myPromise = Promises.newResultPromise(response);
+        given(filterChain.handleUpdate(any(Context.class), any(UpdateRequest.class))).willReturn(myPromise);
+        CrestAuditor auditor = mock(CrestAuditor.class);
+        given(auditorFactory.create(context, updateRequest)).willReturn(auditor);
+        AuditFilter auditFilter = new AuditFilter(debug, auditorFactory);
+
+        auditFilter.filterUpdate(context, updateRequest, filterChain);
+
+        verify(auditor).auditAccessSuccess(null);
+    }
+    @Test
+    public void shouldAuditFailureForExceptions() throws Exception {
+        Promise<ResourceResponse, ResourceException> myPromise = new NotFoundException("message").asPromise();
+        given(filterChain.handleUpdate(any(Context.class), any(UpdateRequest.class))).willReturn(myPromise);
+        CrestAuditor auditor = mock(CrestAuditor.class);
+        given(auditorFactory.create(context, updateRequest)).willReturn(auditor);
+        AuditFilter auditFilter = new AuditFilter(debug, auditorFactory);
+
+        auditFilter.filterUpdate(context, updateRequest, filterChain);
+
+        verify(auditor).auditAccessFailure(404, "message");
+    }
+
+    @Test
+    public void shouldAuditFailureForRuntimeExceptions() throws Exception {
+        Promise<ResourceResponse, ResourceException> myPromise = Promises.newResultPromise(null);
+        myPromise = myPromise.thenAsync(new AsyncFunction<ResourceResponse, ResourceResponse, ResourceException>() {
+            @Override
+            public Promise<? extends ResourceResponse, ? extends ResourceException> apply(ResourceResponse value)
+                    throws ResourceException {
+                throw new NullPointerException("foo");
+            }
+        });
+        given(filterChain.handleUpdate(any(Context.class), any(UpdateRequest.class))).willReturn(myPromise);
+        CrestAuditor auditor = mock(CrestAuditor.class);
+        given(auditorFactory.create(context, updateRequest)).willReturn(auditor);
+        AuditFilter auditFilter = new AuditFilter(debug, auditorFactory);
+
+        auditFilter.filterUpdate(context, updateRequest, filterChain);
+
+        verify(auditor).auditAccessFailure(500, "foo");
     }
 }

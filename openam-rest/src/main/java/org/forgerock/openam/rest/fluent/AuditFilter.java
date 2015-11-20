@@ -43,6 +43,7 @@ import org.forgerock.util.Reject;
 import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.ResultHandler;
+import org.forgerock.util.promise.RuntimeExceptionHandler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,22 +56,23 @@ import javax.inject.Named;
 public class AuditFilter implements Filter {
 
     private final Debug debug;
-    private final AuditEventPublisher auditEventPublisher;
-    private final AuditEventFactory auditEventFactory;
+    private final CrestAuditorFactory crestAuditorFactory;
+
+    AuditFilter(@Named("frRest") Debug debug, AuditEventPublisher auditEventPublisher,
+            AuditEventFactory auditEventFactory) {
+        this(debug, new CrestAuditorFactory(debug, auditEventPublisher, auditEventFactory));
+    }
 
     /**
      * Guiced constructor.
      *
      * @param debug Debug instance.
-     * @param auditEventPublisher AuditEventPublisher to which publishing of events can be delegated.
-     * @param auditEventFactory AuditEventFactory for audit event builders.
+     * @param crestAuditorFactory CrestAuditorFactory for CrestAuditor instances.
      */
     @Inject
-    public AuditFilter(@Named("frRest") Debug debug, AuditEventPublisher auditEventPublisher,
-                       AuditEventFactory auditEventFactory) {
+    public AuditFilter(@Named("frRest") Debug debug, CrestAuditorFactory crestAuditorFactory) {
         this.debug = debug;
-        this.auditEventPublisher = auditEventPublisher;
-        this.auditEventFactory = auditEventFactory;
+        this.crestAuditorFactory = crestAuditorFactory;
     }
 
     /**
@@ -263,11 +265,17 @@ public class AuditFilter implements Filter {
                     public void handleException(ResourceException exception) {
                         auditingHandler.auditAccessFailure(exception.getCode(), exception.getMessage());
                     }
+                })
+                .thenOnRuntimeException(new RuntimeExceptionHandler() {
+                    @Override
+                    public void handleRuntimeException(RuntimeException exception) {
+                        auditingHandler.auditAccessFailure(ResourceException.INTERNAL_ERROR, exception.getMessage());
+                    }
                 });
     }
 
     private CrestAuditor newAuditor(Context context, Request request) {
-        return new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
+        return crestAuditorFactory.create(context, request);
     }
 
     /**
