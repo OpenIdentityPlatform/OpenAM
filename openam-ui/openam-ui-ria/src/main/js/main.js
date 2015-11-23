@@ -17,15 +17,16 @@
 require.config({
     map: {
         "*" : {
-            "Footer"           : "org/forgerock/openam/ui/common/components/Footer",
-            "ThemeManager"     : "org/forgerock/openam/ui/common/util/ThemeManager",
-            "LoginView"        : "org/forgerock/openam/ui/user/login/RESTLoginView",
-            "PasswordResetView": "org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView",
-            "UserProfileView"  : "org/forgerock/commons/ui/user/profile/UserProfileView",
-            "LoginDialog"      : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
-            "RegisterView"     : "org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView",
+            "Footer"            : "org/forgerock/openam/ui/common/components/Footer",
+            "ThemeManager"      : "org/forgerock/openam/ui/common/util/ThemeManager",
+            "LoginView"         : "org/forgerock/openam/ui/user/login/RESTLoginView",
+            "ForgotUsernameView": "org/forgerock/openam/ui/user/anonymousProcess/ForgotUsernameView",
+            "PasswordResetView" : "org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView",
+            "UserProfileView"   : "org/forgerock/commons/ui/user/profile/UserProfileView",
+            "LoginDialog"       : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
+            "RegisterView"      : "org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView",
             // TODO: Remove this when there are no longer any references to the "underscore" dependency
-            "underscore"       : "lodash"
+            "underscore"        : "lodash"
         }
     },
     paths: {

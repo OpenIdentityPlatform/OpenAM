@@ -134,9 +134,9 @@
                 "noAccountQuestion" : "Don't have an account?",
                 "registerAccount" : "Register your account",
                 "problemLoggingQuestion" : "Having trouble logging in?",
-                "resetPassword" : "Reset your password",
                 "socialAuthentication" : "Or login with:",
-                "resetPassword" : "Reset your Password"
+                "resetPassword" : "Forgot Password?",
+                "forgotUsername" : "Forgot Username?"
             },
             "404" : {
                 "pageNotFound" : "Page not found",
@@ -380,14 +380,23 @@
                 "tryAgain": "Try Registering Again",
                 "return": "Return to Login Page"
             },
+            "forgotUsername" : {
+                "title" : "Retrieve Your Username",
+                "checkEmail" : "An email containing your username has been sent to your account.",
+                "failed": "Unable to retrieve your username",
+                "found": "Username found:",
+                "tryAgain": "Try Finding Your Username Again",
+                "return": "Return to Login Page"
+            },
             "kba" : {
                 "answerQuestions": "Answer security questions below to reset your password.",
-                "description": "The Security Question selected and corresponding answer provided by you will be used to help identify you in the event that you forget your password.",
+                "description": "Select security question(s) below. These questions will help us verify your identity if you forget your password.",
                 "provideAnother": "Add another question",
                 "selectQuestion": "Select a security question",
                 "provideYourOwn": "Provide your own",
                 "customQuestion": "Custom Security Question",
-                "answer": "Security Answer"
+                "answer": "Security Answer",
+                "securityQuestions": "Security Questions"
             },
             "emailVerification" : {
                 "description" : "Enter the email address associated with your account to reset your password. We will send you an email that will allow you to reset your password.",

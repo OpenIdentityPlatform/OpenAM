@@ -1,0 +1,18 @@
+<div class="text-center clearfix remember-forgot">
+    <ul role="navigation">
+        {{#if showForgotUserName}}
+            <li><a href="{{url 'forgotUsername'}}">{{t "templates.user.LoginTemplate.forgotUsername"}}</a></li>
+        {{/if}}
+
+        {{#if showForgotPassword}}
+            <li><a href="{{url 'passwordReset'}}">{{t "templates.user.LoginTemplate.resetPassword"}}</a></li>
+        {{/if}}
+    </ul>
+</div>
+
+{{#if showSelfRegistration}}
+    <div class="toggle-login-register">
+        <hr>
+        {{t "templates.login.newHere" }} <a href="{{url 'selfRegistration'}}">{{t "templates.login.createAccount" }}</a>
+    </div>
+{{/if}}

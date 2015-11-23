@@ -1,40 +1,30 @@
 <div class="container">
 
     {{#if reqs.header}}
-    <div class="page-header">
-        <h1 class="text-center">{{reqs.header}}</h1>
-    </div>
+        <div class="page-header">
+            <h1 class="text-center">{{reqs.header}}</h1>
+        </div>
     {{/if}}
 
-    <form action="" method="post" class="form col-sm-6 col-sm-offset-3" autocomplete="off">
-        <fieldset>
+    <form action="" method="post" class="form login col-sm-6 col-sm-offset-3" autocomplete="off">
+        <fieldset class="row">
             {{#each reqs.callbacks}}
-            {{#if isSubmit}}
-            <div class="remember-forgot clearfix">
-                {{#if ../../showForgotPassword}}
-                <div class="pull-right">
-                    <a href="#passwordReset/" id="passwordReset">{{t "common.user.forgotPassword" }}</a>
-                </div>
+                {{#if isSubmit}}
+                    {{#if ../../showRememberLogin}}
+                        {{> login/_RememberLogin }}
+                    {{/if}}
                 {{/if}}
 
-                {{#if ../../showRememberLogin}}
-                <div class="checkbox pull-left">
-                    <label><input type="checkbox" type="checkbox" name="loginRemember" id="remember"> {{t "templates.user.LoginTemplate.loginRemember"}}</label>
+                <div class="form-group">
+                    {{callbackRender}}
                 </div>
-                {{/if}}
-            </div>
-            {{/if}}
-
-            <div class="form-group">
-                {{callbackRender}}
-            </div>
-
-            {{#if isSubmit}}
-            <div class="text-center">
-                {{#if ../../showRegister}}{{t "templates.login.newHere" }} <a href="#register/" id="register">{{t "templates.login.createAccount" }}</a>{{/if}}
-            </div>
-            {{/if}}
             {{/each}}
+
+            {{> login/_SelfService }}
+
+            {{#if socialImplementations}}
+                {{> login/selfservice/_SocialAuthn }}
+            {{/if}}
         </fieldset>
     </form>
 </div>

@@ -14,7 +14,6 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-
 define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
     "jquery",
     "underscore",

@@ -40,13 +40,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
     function populateTemplate () {
         var self = this,
-            firstAuthStage = Configuration.globalData.auth.currentStage === 1,
-            firstUsernamePassStage = firstAuthStage && this.isUsernamePasswordStages;
+            showSelfService = Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
 
-        // self-service links should be shown only on the first stage of the UsernamePassword Stages
-        this.data.showForgotPassword = firstUsernamePassStage && Configuration.globalData.forgotPassword === "true";
-        this.data.showRegister = firstUsernamePassStage && Configuration.globalData.selfRegistration === "true";
-        this.data.showRememberLogin = firstUsernamePassStage;
+        // self-service links should be shown only on the first stage of the username/password stages
+        this.data.showForgotPassword = showSelfService && Configuration.globalData.forgotPassword === "true";
+        this.data.showForgotUserName = showSelfService && Configuration.globalData.forgotUsername === "true";
+        this.data.showSelfRegistration = showSelfService && Configuration.globalData.selfRegistration === "true";
+        this.data.showRememberLogin = showSelfService;
 
         if (Configuration.backgroundLogin) {
             this.prefillLoginData();
@@ -260,7 +260,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 template,
                 self = this;
 
-            this.isUsernamePasswordStages = _.contains(usernamePasswordStages, reqs.stage);
+            this.userNamePasswordStage = _.contains(usernamePasswordStages, reqs.stage);
+
             cleaned.callbacks = [];
             _.each(reqs.callbacks, function (element) {
 

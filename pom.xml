@@ -120,7 +120,7 @@
         <forgerock.util.version>3.0.0</forgerock.util.version>
 
         <forgerock.bloomfilter.version>1.0.0</forgerock.bloomfilter.version>
-        <forgerock.ui.version>8.5.0</forgerock.ui.version>
+        <forgerock.ui.version>8.6.1</forgerock.ui.version>
         <forgerock.audit.version>1.0.0</forgerock.audit.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
         <forgerock.selfservice.version>0.10.0</forgerock.selfservice.version>
