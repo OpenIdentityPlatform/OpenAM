@@ -16,15 +16,18 @@
 package org.forgerock.openam.rest.audit;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILED;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableTrackingIds;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.rest.service.RestletRealmRouter.REALM;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 import static org.restlet.ext.servlet.ServletUtils.getRequest;
+
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.json.JsonValue;
@@ -39,9 +42,6 @@ import org.restlet.data.Status;
 import org.restlet.representation.BufferingRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.routing.Filter;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Set;
 
 import com.sun.identity.shared.debug.Debug;
 
@@ -84,7 +84,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
     protected int beforeHandle(Request request, Response response) {
         try {
             Representation representation = request.getEntity();
-            // If the representation is transient we can only read it's entity once, so we have to wrap it in a
+            // If the representation is transient we can only read its entity once, so we have to wrap it in a
             // buffer in order to read from it during the event logging and later during authentication
             if (representation.isTransient()) {
                 request.setEntity(new BufferingRepresentation(request.getEntity()));

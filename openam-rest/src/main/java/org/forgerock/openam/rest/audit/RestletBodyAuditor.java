@@ -71,8 +71,8 @@ public abstract class RestletBodyAuditor<T> implements Function<Representation, 
             @Override
             public JsonValue apply(Representation representation) throws AuditException {
                 try {
-                    return extractValues(((JsonRepresentation) representation).getJsonObject());
-                } catch (JSONException e) {
+                    return extractValues(new JsonRepresentation(representation).getJsonObject());
+                } catch (IOException | JSONException e) {
                     throw new AuditException("Could not parse body as JSON - wrong body auditor?", e);
                 }
             }
@@ -94,7 +94,7 @@ public abstract class RestletBodyAuditor<T> implements Function<Representation, 
             @Override
             public JsonValue apply(Representation representation) throws AuditException {
                 try {
-                    return extractValues((Map<String, Object>) ((JacksonRepresentation) representation).getObject());
+                    return extractValues((Map<String, Object>) (new JacksonRepresentation(representation).getObject()));
                 } catch (IOException e) {
                     throw new AuditException("Could not parse body as JSON - wrong body auditor?", e);
                 }
