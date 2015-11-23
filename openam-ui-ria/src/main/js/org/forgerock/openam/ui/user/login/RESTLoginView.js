@@ -311,15 +311,18 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             //rest does not accept the params listed in the array below as is
             //they must be transformed into the 'authIndexType' and 'authIndexValue' params
-            _.each(["authlevel", "module", "service", "user", "resource", "resourceURL"], function (param) {
-                if (urlParams[param]) {
-                    urlParams.authIndexType = ((param === "authlevel") ? "level" : param);
-                    urlParams.authIndexValue = urlParams[param];
-                    //*** Note special case for authLevel
-                    conf.globalData.auth.additional += "&authIndexType=" +
-                    ((param === "authlevel") ? "level" : param) + "&authIndexValue=" + urlParams[param];
-                }
-            });
+            // but if composite_advice set that must be adhered to
+            if (!urlParams.authIndexType || urlParams.authIndexType !== "composite_advice") {
+                _.each(["authlevel", "module", "service", "user", "resource"], function (param) {
+                    if (urlParams[param]) {
+                        urlParams.authIndexType = ((param === "authlevel") ? "level" : param);
+                        urlParams.authIndexValue = urlParams[param];
+                        //*** Note special case for authLevel
+                        conf.globalData.auth.additional += "&authIndexType=" +
+                        ((param === "authlevel") ? "level" : param) + "&authIndexValue=" + urlParams[param];
+                    }
+                });
+            }
 
             //special case for SSORedirect
             if(urlParams.goto && urlParams.goto.indexOf('/SSORedirect') === 0){
