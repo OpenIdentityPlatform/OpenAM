@@ -101,7 +101,7 @@
                                     <include>org.forgerock.commons:forgerock-util</include>
                                     <include>org.forgerock.openam:openam-shared</include>
                                     <include>com.google.inject:guice:no_aop</include>
-                                    <include>javax.inject:javax.inject</include>
+                                    <include>org.apache.servicemix.bundles:org.apache.servicemix.bundles.javax-inject</include>
                                     <include>org.slf4j:slf4j-api</include>
                                     <include>org.slf4j:slf4j-nop</include>
                                 </includes>

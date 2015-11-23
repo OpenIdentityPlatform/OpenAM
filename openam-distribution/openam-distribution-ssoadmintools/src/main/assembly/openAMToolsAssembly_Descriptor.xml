@@ -61,7 +61,7 @@
                 <include>org.forgerock.openam:openam-ldap-utils</include>
                 <include>org.forgerock.openam:openam-audit-context</include>
                 <include>org.forgerock.commons:json-resource</include>
-                <include>javax.inject:javax.inject</include>
+                <include>org.apache.servicemix.bundles:org.apache.servicemix.bundles.javax-inject</include>
                 <include>com.google.inject:guice:jar:no_aop</include>
                 <include>com.google.inject.extensions:guice-assistedinject</include>
                 <include>commons-lang:commons-lang</include>

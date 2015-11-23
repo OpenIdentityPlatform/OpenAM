@@ -184,9 +184,9 @@
         <freemarker.version>2.3.19</freemarker.version>
         <java-ipv6.version>0.14</java-ipv6.version>
         <json.version>20090211</json.version>
-        <javax.inject.version>1</javax.inject.version>
         <hikaricp.version>2.4.1</hikaricp.version>
         <h2database.version>1.4.188</h2database.version>
+        <javax.inject.version>1_2</javax.inject.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -1769,6 +1769,11 @@
                         <groupId>aopalliance</groupId>
                         <artifactId>aopalliance</artifactId>
                     </exclusion>
+                    <!-- Exclude javax.inject in favour of servicemix OSGi-compatible version -->
+                    <exclusion>
+                        <groupId>javax.inject</groupId>
+                        <artifactId>javax.inject</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -1811,8 +1816,9 @@
             </dependency>
 
             <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
+                <!-- Use OSGi-compatible javax.inject to satisfy commons dependencies -->
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
                 <version>${javax.inject.version}</version>
             </dependency>
 

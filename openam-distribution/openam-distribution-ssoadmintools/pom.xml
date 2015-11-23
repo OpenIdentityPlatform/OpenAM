@@ -41,7 +41,7 @@
     <packaging>pom</packaging>
     <properties>
         <setupArtifactIDs>opendj-server,forgerock-util,json,xalan,xercesImpl,xml-apis,xmlsec,openam-core,
-            openam-entitlements,openam-shared,openam-dtd-schema,openam-rest,openam-license-manager-cli,openam-license-core,openam-audit-context,forgerock-guice-core,guice,guice-assistedinject,commons-lang,commons-collections,javax.inject,slf4j-api,slf4j-nop,opendj-ldap-sdk,i18n-core,openam-ldap-utils,grizzly-framework,forgerock-audit-core</setupArtifactIDs>
+            openam-entitlements,openam-shared,openam-dtd-schema,openam-rest,openam-license-manager-cli,openam-license-core,openam-audit-context,forgerock-guice-core,guice,guice-assistedinject,commons-lang,commons-collections,org.apache.servicemix.bundles.javax-inject,slf4j-api,slf4j-nop,opendj-ldap-sdk,i18n-core,openam-ldap-utils,grizzly-framework,forgerock-audit-core</setupArtifactIDs>
     </properties>
 
 
