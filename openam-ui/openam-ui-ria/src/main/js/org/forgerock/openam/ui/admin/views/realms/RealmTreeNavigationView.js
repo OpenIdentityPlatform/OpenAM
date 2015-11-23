@@ -24,6 +24,13 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
     "org/forgerock/openam/ui/common/components/TreeNavigation"
 ], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, TreeNavigation) {
     var RealmTreeNavigationView = TreeNavigation.extend({
+        events: {
+            "click [data-event]": "sendEvent"
+        },
+        sendEvent: function (e) {
+            e.preventDefault();
+            EventManager.sendEvent($(e.currentTarget).data().event, this.data.realmPath);
+        },
         template: "templates/admin/views/realms/RealmTreeNavigationTemplate.html",
         realmExists: function (path) {
             return SMSGlobalDelegate.realms.get(path);

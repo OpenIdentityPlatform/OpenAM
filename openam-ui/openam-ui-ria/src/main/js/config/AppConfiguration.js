@@ -31,7 +31,6 @@ define("config/AppConfiguration", [
                     { "routes": "config/routes/AMRoutesConfig" },
                     { "routes": "config/routes/CommonRoutesConfig" },
                     { "routes": "config/routes/UserRoutesConfig" },
-                    { "routes": "config/routes/admin/AdminRoutes" },
                     { "routes": "config/routes/admin/RealmsRoutes" },
                     { "routes": "config/routes/user/UMARoutes" }
                 ]
@@ -157,19 +156,19 @@ define("config/AppConfiguration", [
                                 "visibleToRoles": ["ui-realm-admin"]
                             },
                             "federation": {
-                                "url": "#federation",
+                                "event": Constants.EVENT_REDIRECT_TO_JATO_FEDERATION,
                                 "name": "config.AppConfiguration.Navigation.links.federation",
                                 "icon": "fa fa-building-o",
                                 "visibleToRoles": ["ui-global-admin"]
                             },
                             "configuration": {
-                                "url": "#configuration",
+                                "event": Constants.EVENT_REDIRECT_TO_JATO_CONFIGURATION,
                                 "name": "config.AppConfiguration.Navigation.links.configuration",
                                 "icon": "fa fa-cog",
                                 "visibleToRoles": ["ui-global-admin"]
                             },
                             "sessions": {
-                                "url": "#sessions",
+                                "event": Constants.EVENT_REDIRECT_TO_JATO_SESSIONS,
                                 "name": "config.AppConfiguration.Navigation.links.sessions",
                                 "icon": "fa fa-users",
                                 "visibleToRoles": ["ui-global-admin"]

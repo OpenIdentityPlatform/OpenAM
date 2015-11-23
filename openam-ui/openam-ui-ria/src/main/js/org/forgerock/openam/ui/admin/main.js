@@ -27,12 +27,6 @@ define([
     "./utils/JSONEditorTheme",
     "./utils/RedirectToLegacyConsole",
 
-    "./views/commonTasks/CommonTasksView",
-
-    "./views/configuration/ConfigurationView",
-
-    "./views/federation/FederationView",
-
     "./views/realms/agents/AgentsView",
 
     "./views/realms/authentication/chains/CriteriaView",
@@ -64,15 +58,12 @@ define([
     "./views/realms/scripts/EditScriptView",
     "./views/realms/scripts/ScriptsView",
 
-    "./views/realms/services/ServicesView",
-
     "./views/realms/sts/STSView",
 
     "./views/realms/subjects/SubjectsView",
 
     "./views/realms/RealmsListView",
     "./views/realms/RealmTreeNavigationView",
-    "./views/realms/CreateUpdateRealmDialog",
+    "./views/realms/CreateUpdateRealmDialog"
 
-    "./views/sessions/SessionsView"
 ]);

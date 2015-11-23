@@ -51,16 +51,12 @@ define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
     };
 
     obj.realm = {
-        general       : redirector(11),
-        authentication: redirector(12),
         services      : redirector(13),
         dataStores    : redirector(14),
         privileges    : redirector(15),
-        policies      : redirector(16),
         subjects      : redirector(17),
         agents        : redirector(18),
         sts           : redirector(19),
-        scripts       : redirector(20),
         redirectToTab : function (tabIndex, realm) {
             obj.getJATOPageSession(realm).done(function (session) {
                 if (session) {

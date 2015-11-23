@@ -81,30 +81,6 @@ define("config/routes/admin/RealmsRoutes", function () {
                 role: "ui-realm-admin",
                 navGroup: "admin"
             },
-            "realmsServices": {
-                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-                page: "org/forgerock/openam/ui/admin/views/realms/services/ServicesView",
-                url: scopedByRealm("services\/?"),
-                pattern: "realms/?/services",
-                role: "ui-realm-admin",
-                navGroup: "admin"
-            },
-            "realmsDataStores": {
-                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-                page: "org/forgerock/openam/ui/admin/views/realms/dataStores/DataStoresView",
-                url: scopedByRealm("dataStores\/?"),
-                pattern: "realms/?/dataStores",
-                role: "ui-realm-admin",
-                navGroup: "admin"
-            },
-            "realmsPrivileges": {
-                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-                page: "org/forgerock/openam/ui/admin/views/realms/privileges/PrivilegesView",
-                url: scopedByRealm("privileges\/?"),
-                pattern: "realms/?/privileges",
-                role: "ui-realm-admin",
-                navGroup: "admin"
-            },
             "realmsPolicySets": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/PolicySetsView",
@@ -176,30 +152,6 @@ define("config/routes/admin/RealmsRoutes", function () {
                 role: "ui-realm-admin",
                 navGroup: "admin",
                 forceUpdate: true
-            },
-            "realmsSubjects": {
-                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-                page: "org/forgerock/openam/ui/admin/views/realms/subjects/SubjectsView",
-                url: scopedByRealm("subjects\/?"),
-                pattern: "realms/?/subjects",
-                role: "ui-realm-admin",
-                navGroup: "admin"
-            },
-            "realmsAgents": {
-                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-                page: "org/forgerock/openam/ui/admin/views/realms/agents/AgentsView",
-                url: scopedByRealm("agents\/?"),
-                pattern: "realms/?/agents",
-                role: "ui-realm-admin",
-                navGroup: "admin"
-            },
-            "realmsSTS": {
-                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-                page: "org/forgerock/openam/ui/admin/views/realms/sts/STSView",
-                url: scopedByRealm("sts\/?"),
-                pattern: "realms/?/sts",
-                role: "ui-realm-admin",
-                navGroup: "admin"
             },
             "realmsScripts": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",

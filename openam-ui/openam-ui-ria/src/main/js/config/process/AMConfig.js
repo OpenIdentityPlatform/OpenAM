@@ -123,6 +123,87 @@ define("config/process/AMConfig", [
                                    encodeURIComponent(subRealm);
         }
     }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_CONFIGURATION,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.global.configuration();
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_FEDERATION,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.global.federation();
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_SESSIONS,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.global.sessions();
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_SERVICES,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.realm.services(event);
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_DATASTORE,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.realm.dataStores(event);
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_PRIVILEGES,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.realm.privileges(event);
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_SUBJECTS,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.realm.subjects(event);
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_AGENTS,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.realm.agents(event);
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_STS,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.realm.sts(event);
+        }
+    }, {
         startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,
         description: "",
         dependencies: [
