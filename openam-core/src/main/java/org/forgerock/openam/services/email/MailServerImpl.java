@@ -37,6 +37,9 @@ import java.security.AccessController;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Default {@link MailServer} implementation that sends email via the configured SMTP server.
+ */
 public class MailServerImpl implements MailServer {
 
     private static final String DEBUG_TAG = "MailServerImpl.sendEmail() : ";
@@ -112,7 +115,7 @@ public class MailServerImpl implements MailServer {
      * Sets the SMTP options
      * @param options SMTP Options
      */
-    private void setOptions(Map options) {
+    private void setOptions(Map<String, Set<String>> options) {
         // Tries to set Options passed in, otherwise uses default options from service
         smtpHostName = CollectionHelper.getMapAttr(options, SMTP_HOSTNAME);
         if(smtpHostName == null || smtpHostName.isEmpty()){
@@ -168,7 +171,7 @@ public class MailServerImpl implements MailServer {
     }
 
     @Override
-    public void sendHtmlEmail(String from, String to, String subject, String message, Map options)
+    public void sendHtmlEmail(String from, String to, String subject, String message, Map<String, Set<String>> options)
             throws MessagingException {
         sendEmail(from, to, subject, message, HTML_MIME_TYPE, options);
     }
@@ -184,7 +187,7 @@ public class MailServerImpl implements MailServer {
     }
 
     @Override
-    public void sendEmail(String from, String to, String subject, String message, Map options)
+    public void sendEmail(String from, String to, String subject, String message, Map<String, Set<String>> options)
             throws MessagingException {
         sendEmail(from, to, subject, message, PLAIN_MIME_TYPE, options);
     }
