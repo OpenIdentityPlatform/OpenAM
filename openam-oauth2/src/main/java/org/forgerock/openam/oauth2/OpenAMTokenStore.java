@@ -601,59 +601,44 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * {@inheritDoc}
      */
     public void updateAuthorizationCode(AuthorizationCode authorizationCode) {
-        deleteAuthorizationCode(authorizationCode.getTokenId());
-
-        // Store in CTS
         try {
-            tokenStore.create(authorizationCode);
+            tokenStore.update(authorizationCode);
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"UPDATED_AUTHORIZATION_CODE", authorizationCode.toString()};
-                auditLogger.logAccessMessage("CREATED_AUTHORIZATION_CODE", obs, null);
+                auditLogger.logAccessMessage("UPDATED_AUTHORIZATION_CODE", obs, null);
             }
         } catch (CoreTokenException e) {
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_UPDATE_AUTHORIZATION_CODE", authorizationCode.toString()};
                 auditLogger.logErrorMessage("FAILED_UPDATE_AUTHORIZATION_CODE", obs, null);
             }
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
+            logger.error("DefaultOAuthTokenStoreImpl::Unable to update authorization code "
                     + authorizationCode.getTokenInfo(), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not create token in CTS", null);
+                    "Internal error", "Could not update token in CTS", null);
         }
     }
 
     public void updateAccessToken(AccessToken accessToken) {
         try {
-            deleteAccessToken(accessToken.getTokenId());
-            tokenStore.create(accessToken);
-        } catch (ServerException e) {
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to delete access token "
-                    + accessToken.getTokenId(), e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not delete token in CTS", null);
+            tokenStore.update(accessToken);
         } catch (CoreTokenException e) {
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to create access token "
+            logger.error("DefaultOAuthTokenStoreImpl::Unable to update access token "
                     + accessToken.getTokenId(), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not create token in CTS", null);
+                    "Internal error", "Could not update token in CTS", null);
         }
     }
 
     @Override
     public void updateRefreshToken(RefreshToken refreshToken) {
         try {
-            deleteRefreshToken(refreshToken.getTokenId());
-            tokenStore.create(refreshToken);
+            tokenStore.update(refreshToken);
         } catch (CoreTokenException e) {
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token "
+            logger.error("DefaultOAuthTokenStoreImpl::Unable to update refresh token "
                     + refreshToken.getTokenId(), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not create token in CTS", null);
-        } catch (InvalidRequestException e) {
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to delete refresh token "
-                    + refreshToken.getTokenId(), e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not delete token in CTS", null);
+                    "Internal error", "Could not update token in CTS", null);
         }
     }
 
