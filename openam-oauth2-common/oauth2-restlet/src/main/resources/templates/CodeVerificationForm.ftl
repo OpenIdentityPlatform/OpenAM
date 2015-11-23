@@ -30,7 +30,7 @@
   pageData = {
       <#if locale??>locale: "${locale?js_string}",</#if>
       <#if errorCode??>errorCode: "${errorCode?js_string}",</#if>
-      realm : "${realm?js_string}/XUI",
+      realm : "${realm?js_string}",
       baseUrl : "${baseUrl?js_string}/XUI"
   };
 </script>
