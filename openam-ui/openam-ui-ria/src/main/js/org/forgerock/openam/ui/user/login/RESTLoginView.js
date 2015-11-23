@@ -157,7 +157,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
         render: function (args) {
             var urlParams = {}, // Deserialized querystring params
-                promise = $.Deferred(),
                 auth = Configuration.globalData.auth;
 
             if (args && args.length) {
@@ -229,7 +228,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
                 } else { // We aren't logged in yet, so render a form...
                     this.renderForm(reqs, urlParams);
-                    promise.resolve();
+                    if (CookieHelper.getCookie("invalidRealm")) {
+                        CookieHelper.deleteCookie("invalidRealm");
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
+                    }
                 }
             }, this), _.bind(function (error) {
                 // If we can't render a login form, then the user must not be able to login
@@ -243,13 +245,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     }
                 });
             }, this));
-
-            promise.done(function () {
-                if (CookieHelper.getCookie("invalidRealm")) {
-                    CookieHelper.deleteCookie("invalidRealm");
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
-                }
-            });
         },
 
         renderForm: function (reqs, urlParams) {
