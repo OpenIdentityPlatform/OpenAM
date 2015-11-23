@@ -362,7 +362,6 @@ public class LoginState {
     Set userSessionMapping = Collections.EMPTY_SET;
     Hashtable idRepoHash = new Hashtable();
     AMIdentityRepository amIdRepo = null;
-    private static boolean messageEnabled;
     private static String serverURL = null;
     private static long agentSessionIdleTime;
     private static long minAgentSessionIdleTime = 30;
@@ -417,8 +416,6 @@ public class LoginState {
         userAttributes.add(ISAuthConstants.USER_FAILURE_URL);
         userAttributes.add(ISAuthConstants.POST_LOGIN_PROCESS);
         
-        messageEnabled = debug.messageEnabled();
-
         String proto = SystemProperties.get(Constants.DISTAUTH_SERVER_PROTOCOL);
         String host = null;
         String port = null;
@@ -505,7 +502,7 @@ public class LoginState {
     public InternalSession getSession() {
         if (session == null || session.getState() == Session.INACTIVE ||
             session.getState() == Session.DESTROYED) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message(
                     "Session is null OR INACTIVE OR DESTROYED :" + session);
             }
@@ -919,7 +916,7 @@ public class LoginState {
                 attrs, ISAuthConstants.INVALID_ATTEMPTS_DATA_ATTR_NAME);
 
             pCookieAuthLevel = CollectionHelper.getMapAttr(attrs, ISAuthConstants.PCOOKIE_AUTH_LEVEL);
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Getting Org Profile: " + orgDN
                         + "\nlocale->" + localeContext.getLocale()
                         + "\ncharset->" + localeContext.getMIMECharset()
@@ -970,7 +967,7 @@ public class LoginState {
         String tmpModules = (String)Misc.getMapAttr(attrs,
          ISAuthConstants.KEEP_MODULES_IN_SESSION);
         modulesInSession = Boolean.parseBoolean(tmpModules); 
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("LoginState.populateGlobalProfile: "
                 + "Getting Global Profile: " +
                 "\npostProcessInSession ->" + postProcessInSession +
@@ -1029,7 +1026,7 @@ public class LoginState {
      * @return user DN.
      */
     public String getUserDN() {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("getUserDN: " + userDN);
         }
         return userDN;
@@ -1075,7 +1072,7 @@ public class LoginState {
             if (requestHash != null) {
                 cli = (String) requestHash.get("client");
             }
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("getClient : servletRequest is : " + servletRequest);
                 debug.message("getClient : cli is : " + cli);
             }
@@ -1088,12 +1085,12 @@ public class LoginState {
                 }
             }
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error getting client Type " , e);
             }
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Client is : " + clientHost);
         }
         client = clientHost;
@@ -1142,7 +1139,7 @@ public class LoginState {
             // set flag, indicate user DN is constructed from userContainerDN
             dnByUserContainer = true;
             String userDN = s.toString();
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("token=" + token0 + ", id=" + id +
                 ", DN=" + userDN);
             }
@@ -1190,7 +1187,7 @@ public class LoginState {
     public boolean activateSession(Subject subject, AuthContextLocal ac, Object
         loginContext) throws AuthException {
         try {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("activateSession - Token is : "+ token);
                 debug.message("activateSession - userDN is : "+ userDN);
             }
@@ -1229,7 +1226,7 @@ public class LoginState {
                 session.setObject(ISAuthConstants.LOGIN_CONTEXT,
                 loginContext);
             }
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
 		        debug.message("Activating session: " + session);
             }
 
@@ -1256,7 +1253,7 @@ public class LoginState {
      */
     public void setSessionProperties(InternalSession session)
         throws AuthException {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("LoginState getSession = " +
             session +" \nrequest token = " + token);
         }
@@ -1285,7 +1282,7 @@ public class LoginState {
                     ad.getIdentity(IdType.USER,userDN,getOrgDN());          
                 oldAMIdentity = 
                     ad.getIdentity(IdType.USER,oldUserDN,getOrgDN());
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     debug.message("LoginState.setSessionProperties()" + 
                               " newAMIdentity is: " + newAMIdentity);
                     debug.message("LoginState.setSessionProperties()" + 
@@ -1294,7 +1291,7 @@ public class LoginState {
             }
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("LoginState.setSessionProperties()" + 
             		      " userDN is: " + userDN);
             debug.message("LoginState.setSessionProperties()" +
@@ -1319,7 +1316,7 @@ public class LoginState {
                     oldAuthenticationModuleClassName = 
                         authInstance.getType();
                 }catch (AMConfigurationException ace) {
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("LoginState.setSessionProperties()" 
                         + ":Unable to create AMAuthenticationManager"
                         + "Instance:"
@@ -1336,7 +1333,7 @@ public class LoginState {
                         oldAMIdentity.equals(newAMIdentity)){
                     sessionUpgrade();
                 }else {
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("LoginState.setSessionProperties()" +
                         "Resetting session upgrade to false " +
                         "since oldAMIdentity and newAMIdentity doesn't match");
@@ -1350,7 +1347,7 @@ public class LoginState {
                             DNUtils.normalizeDN(oldUserDN))){
                     sessionUpgrade();
                 } else {
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("LoginState.setSessionProperties()" +
                         "Resetting session upgrade to false " +
                         "since Old UserDN and New UserDN doesn't match");
@@ -1446,7 +1443,7 @@ public class LoginState {
         }
         
         String userId = DNUtils.DNtoName(userDN);
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message(
                 "setSessionProperties Principal = " + userDN + "\n" +
                 "UserId = " + token + "\n" +
@@ -1631,7 +1628,7 @@ public class LoginState {
                         String attrName = (String)entry.getKey();
                         String attrValue = (String)entry.getValue();
                         session.putProperty(attrName, attrValue);
-                        if (messageEnabled) {
+                        if (debug.messageEnabled()) {
                             debug.message("AttrMap for SAML : " +
                             attrName + " , " + attrValue);
                         }
@@ -1823,7 +1820,7 @@ public class LoginState {
             }
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("returning from getUserDomain : " + userOrg);
         }
         return userOrg;
@@ -1856,12 +1853,12 @@ public class LoginState {
         // set the locale
         setRequestLocale(request);
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("locale : " + localeContext.getLocale());
         }
 
         this.userOrg = getUserDomain(request,sid,requestHash);
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("createAuthContext: userOrg is : " + userOrg);
         }
 
@@ -1871,7 +1868,7 @@ public class LoginState {
             throw new AuthException(AMAuthErrorCode.AUTH_INVALID_DOMAIN, null);
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("AuthUtil:getAuthContext:" +
                 "Creating new AuthContextLocal & LoginState");
         }
@@ -1882,7 +1879,7 @@ public class LoginState {
         setParamHash(requestHash);
         client = getClient();
         this.sid = sid;
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("requestType : " + requestType);
             debug.message("client : " + client);
             debug.message("sid : " + sid);
@@ -1899,7 +1896,7 @@ public class LoginState {
         if ((cookieSupport != null) && cookieSupport.equals("false")){
             cookieSupported = false;
         }
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("cookieSupport is : " + cookieSupport);
             debug.message("cookieDetect is .. : "+ cookieDetect);
             debug.message("cookieSupported is .. : "+ cookieSupported);
@@ -1986,7 +1983,7 @@ public class LoginState {
         HttpServletResponse response,
         boolean useAMCookie) {
 
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("in encodeURL");
         }
         boolean appendSessCookieInURL = Boolean.valueOf(SystemProperties.get(
@@ -1995,7 +1992,7 @@ public class LoginState {
             return url;
         }
 
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("cookieDetect : " + cookieDetect);
             debug.message("cookieSupported : " + cookieSupported);
         }
@@ -2021,7 +2018,7 @@ public class LoginState {
                 url, SessionUtils.QUERY, false, cookieName);
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("AuthRequest encodeURL : URL=" + url +
             ", Rewritten URL=" + encodedURL);
         }
@@ -2145,7 +2142,7 @@ public class LoginState {
                 debug.message("No profile created for Application module");
                 return false;
             }
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Creating user entry: " + token);
                 debug.message("aliasList : " + aliasList);
             }
@@ -2167,7 +2164,7 @@ public class LoginState {
             if (!aliasMap.isEmpty()) {
                 userCreationAttributes.putAll(aliasMap);
             }
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("userCreationAttributes is : "
                 + userCreationAttributes);
             }
@@ -2197,7 +2194,7 @@ public class LoginState {
             return true;
         } catch (Exception ex) {
             debug.error("Cannot create user profile for: " + token);
-            if (messageEnabled){
+            if (debug.messageEnabled()){
                 debug.message("Stack trace: ", ex);
             }
         }
@@ -2241,7 +2238,7 @@ public class LoginState {
     ) throws AMException {
         String[] sessionAttrs = getDefaultSessionAttributes(getOrgDN());
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("default max session time: " + sessionAttrs[0]
             + "\ndefault max idle time: " + sessionAttrs[1]
             + "\ndefault max caching time: " + sessionAttrs[2]);
@@ -2284,7 +2281,7 @@ public class LoginState {
                 p, ISAuthConstants.LOGIN_STATUS, "active");
             String tmp2 = CollectionHelper.getMapAttr(
                 p, ISAuthConstants.NSACCOUNT_LOCK, ISAuthConstants.FALSE_VALUE);
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("entity status is : " + tmp);
                 debug.message("user-login-status is : " + tmp1);
                 debug.message("nsaccountlock is : " + tmp2);
@@ -2327,7 +2324,7 @@ public class LoginState {
             clientSuccessRoleURL = getRedirectUrl(successRoleURLSet);
             defaultSuccessRoleURL = tempDefaultURL;
             
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Populate User attributes"+
                 "\n  idle->" + idleTime +
                 "\n  cache->" + cacheTime+
@@ -2350,7 +2347,7 @@ public class LoginState {
                 "\n  accountLife->" + accountLife);
             }
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Eception in populateUserAttributes : ", e);
             }
             throw new AMException(e.getMessage(), e.toString());
@@ -2370,7 +2367,7 @@ public class LoginState {
         try {
             return getUserProfile(token,populate,true);
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("getUserProfile(string,boolean)", e);
             }
             throw new AuthException(e);
@@ -2400,7 +2397,7 @@ public class LoginState {
         
         IdType idt = null;
         try {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("In getUserProfile : Search for user " + user);
             }
             
@@ -2419,7 +2416,7 @@ public class LoginState {
                 // Try getting the AMIdentity object assuming AMSDK
                 // is present i.e., using IdUtils
                 try {
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("LoginState: gettingIdentity " +
                         "using IdUtil.getIdentity: " + user +
                         " Org: " + getOrgDN());
@@ -2431,20 +2428,20 @@ public class LoginState {
                         amIdentitySet = new HashSet();
                         amIdentitySet.add(amIdentity);
                         idt = amIdentity.getType();
-                        if (messageEnabled) {
+                        if (debug.messageEnabled()) {
                             debug.message("LoginState: getIdentity " +
                             "using IdUtil.getIdentity: " + amIdentity);
                         }
                     }
                 } catch (IdRepoException e) {
                     // Ignore the exception and continue
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("LoginState: getting identity " +
                         "Got IdRepException in IdUtils.getIdentity", e);
                     }
                 } catch (SSOException se) {
                     // Ignore the exception and continue
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("LoginState: getting identity " +
                         "Got SSOException in IdUtils.getIdentity", se);
                     }
@@ -2454,13 +2451,13 @@ public class LoginState {
                 // search for all configured Identity Types
                 if (amIdentitySet == Collections.EMPTY_SET ||
                 !identityTypes.contains(idt.getName())) {
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("LoginState: getIdentity " +
                         "performing IdRepo search to obtain AMIdentity");
                     }
                         String userTokenID = DNUtils.DNtoName(user);
             
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("Search for Identity " + userTokenID);
                     }
 
@@ -2490,7 +2487,7 @@ public class LoginState {
                 }
             }
             
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("result is :" + amIdentitySet);
             }
             if (amIdentitySet.isEmpty()) {
@@ -2509,7 +2506,7 @@ public class LoginState {
             amIdentityUser= (AMIdentity) amIdentitySet.iterator().next();
             userDN = getUserDN(amIdentityUser);
             idt = amIdentityUser.getType();
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("userDN is : "+ userDN);
                 debug.message("userID(token) is : " + token);
                 debug.message("idType is : " + idt);
@@ -2553,16 +2550,16 @@ public class LoginState {
             return true;
         } catch(SSOException ex) {
             debug.error("SSOException");
-            if (messageEnabled){
+            if (debug.messageEnabled()){
                 debug.message("Stack trace: " , ex);
             }
         } catch(AMException ex) {
             debug.error("No aliases for: " + aliasAttrNames + "=" + token);
-            if (messageEnabled){
+            if (debug.messageEnabled()){
                 debug.message("Stack trace: " , ex);
             }
         } catch (IdRepoException ee) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.error("IdReporException ", ee);
             }
         }
@@ -2593,7 +2590,7 @@ public class LoginState {
         }
         userEnabled = true;
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Populate Default User attributes"+
             "\n  idle->" + idleTime +
             "\n  cache->" + cacheTime+
@@ -2647,7 +2644,7 @@ public class LoginState {
     ) throws AuthException {
         tokenSet = getTokenFromPrincipal(subject); 
         // check for all users user authenticated as
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("in searchUserProfile");
             debug.message("indexType is.. :" + indexType);
             debug.message("indexName is.. :" + indexName);
@@ -2726,7 +2723,7 @@ public class LoginState {
                         if (indexType == AuthContext.IndexType.ROLE) {
                             boolean userRoleFound = getUserForRole(
                                 getIdentityRole(indexName,getOrgDN()));
-                            if (messageEnabled) {
+                            if (debug.messageEnabled()) {
                                 debug.message("userRoleFound: "
                                 + userRoleFound);
                             }
@@ -2758,14 +2755,14 @@ public class LoginState {
                     Iterator tokenIterator = tokenSet.iterator();
                     while (tokenIterator.hasNext()) {
                         token = (String) tokenIterator.next();
-                        if (messageEnabled) {
+                        if (debug.messageEnabled()) {
                             debug.message("BEGIN WHILE: Token is.. : "
                             + token);
                         }
                         gotUserProfile = getUserProfile(token,true);
                         gotUserProfileMap.put(token,
                             Boolean.valueOf(gotUserProfile));
-                        if (messageEnabled) {
+                        if (debug.messageEnabled()) {
                             debug.message("gotUserProfile : " + gotUserProfile);
                         }
                         if (gotUserProfile) {
@@ -2785,7 +2782,7 @@ public class LoginState {
                             if (foundUserAlias=
                                 getFoundUserAlias(foundAliasMap)) {
                                 aliasToken =token;
-                                if (messageEnabled) {
+                                if (debug.messageEnabled()) {
                                     debug.message(
                                         "found aliases exiting while:"
                                         + foundAliasMap);
@@ -2794,7 +2791,7 @@ public class LoginState {
                             }
                         }
                     } // end while
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("Alias Token is : " + aliasToken);
                         debug.message("Profile Token :" + validToken);
                         debug.message("Token is : " + token);
@@ -2819,7 +2816,7 @@ public class LoginState {
                                 throw new AuthException(
                                 AMAuthErrorCode.AUTH_USER_NOT_FOUND, null);
                             }
-                            if (messageEnabled) {
+                            if (debug.messageEnabled()) {
                                 debug.message("userRoleFound:"
                                 +userRoleFound);
                             }
@@ -2827,7 +2824,7 @@ public class LoginState {
                         
                         gotUserProfile = getGotUserProfile(gotUserProfileMap);
                         
-                        if (messageEnabled) {
+                        if (debug.messageEnabled()) {
                             debug.message("userEnabled : " + userEnabled);
                         }
                         
@@ -2840,7 +2837,7 @@ public class LoginState {
                         
                         if ((gotUserProfile) && (!foundUserAlias)) {
                             if (createWithAlias) {
-                                if (messageEnabled) {
+                                if (debug.messageEnabled()) {
                                     debug.message("dynamicProfileCreation : "
                                     + dynamicProfileCreation);
                                     debug.message("foundUserAliasMap : "
@@ -2862,7 +2859,7 @@ public class LoginState {
                     }
                 }
             }
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("LoginState:searchUserProfile:returning: "
                 + gotUserProfile);
             }
@@ -2925,14 +2922,14 @@ public class LoginState {
             }
             while(tokenIterator.hasNext()) {
                 Object alias = tokenIterator.next();
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     debug.message("alias list add token:" + (String) alias);
                 }
                 tokensList.add(alias);
             }
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Tokens List is.. :" + tokensList);
         }
         
@@ -2941,7 +2938,7 @@ public class LoginState {
             return profileCreated;
         } catch (Exception e) {
             debug.error("Cannot create user profile for: " + token);
-            if (messageEnabled){
+            if (debug.messageEnabled()){
                 debug.message("Stack trace: ", e);
             }
             return false;
@@ -2953,7 +2950,7 @@ public class LoginState {
     Map searchUserAliases(String userToken,Set tokenSet) {
         Map foundUserAliasMap = new HashMap();
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("userAliastList is.. :" + userAliasList);
             debug.message("userToken is.. :" + userToken);
             debug.message("tokenSet is.. :" + tokenSet);
@@ -2969,7 +2966,7 @@ public class LoginState {
             while (tokenIterator.hasNext()) {
                 String authToken = (String)tokenIterator.next();
                 if ((userAliasList != null) && !userAliasList.isEmpty()) {
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("AuthToken is : " + authToken);
                         debug.message("userToken is : " + userToken);
                     }
@@ -2991,7 +2988,7 @@ public class LoginState {
                     }
                 }
             }
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("searchUserAliases: foundUserAliasMap : "
                 + foundUserAliasMap);
             }
@@ -3030,7 +3027,7 @@ public class LoginState {
                 tokenSet.add(this.token);
             }
 
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("principal name is... :" + this.token);
             }
         }
@@ -3041,7 +3038,7 @@ public class LoginState {
                 principalList.length() - 1); // remove the last "|"
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Principal List is :" + principalList);
         }
         
@@ -3086,7 +3083,7 @@ public class LoginState {
             this.authLevel = moduleAuthLevel;
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("AuthLevel is set to : " + this.authLevel);
         }
     }
@@ -3114,7 +3111,7 @@ public class LoginState {
      * @return Identity Role.
      */
     AMIdentity searchIdentityRole(String role,String orgDN) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("rolename : " + role);
         }
         if (role == null) {
@@ -3139,7 +3136,7 @@ public class LoginState {
      * @param authMethName Module Name.
      */
     public void setAuthModuleName(String authMethName) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("authethName" + authMethName);
             debug.message("pAuthMethName " + pAuthMethName);
         }
@@ -3157,7 +3154,7 @@ public class LoginState {
         if (sb != null) {
             this.authMethName = sb.toString();
         }
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("setAuthModuleName: " + this.authMethName);
         }
     }
@@ -3177,7 +3174,7 @@ public class LoginState {
                 foundUser = true;
             }
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error getRoleName : " , e);
             }
         }
@@ -3263,7 +3260,7 @@ public class LoginState {
     
     /* check if the users map to the same user */
     boolean getFoundUserAlias(Map foundAliasMap) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("foundAliasMap :" + foundAliasMap);
         }
         boolean foundUserAlias= true;
@@ -3273,7 +3270,7 @@ public class LoginState {
         foundAliasMap.containsValue(boolValFalse)) {
             foundUserAlias = false;
         }
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("foundUserAlias : " + foundUserAlias);
         }
         return foundUserAlias;
@@ -3281,7 +3278,7 @@ public class LoginState {
     
     /* check if profile for the user was retrieve */
     boolean getGotUserProfile(Map gotUserProfileMap) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("GotUserProfileMAP is: " + gotUserProfileMap);
         }
         boolean gotUserProfile = false;
@@ -3289,7 +3286,7 @@ public class LoginState {
         if (gotUserProfileMap.containsValue(boolValTrue)) {
             gotUserProfile=true;
         }
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("gotUserProfile :" + gotUserProfile);
         }
         return gotUserProfile;
@@ -3300,7 +3297,7 @@ public class LoginState {
      */
     void addAliasToUserProfile(String token,Map foundUserAliasMap)
             throws AuthException {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Token : " + token);
         }
         
@@ -3315,7 +3312,7 @@ public class LoginState {
      */
     void addAliasToUserProfile(AMIdentity amIdentity,Map foundUserAliasMap) {
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("foundUserAliasMap : " + foundUserAliasMap);
         }
         
@@ -3352,7 +3349,7 @@ public class LoginState {
      */
     boolean checkAliasList(Map userAliasList) {
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("UserAliasList is.. : "+ userAliasList);
         }
         boolean aliasFound=true;
@@ -3360,7 +3357,7 @@ public class LoginState {
         Iterator aliasIterator = aliasKeySet.iterator();
         while (aliasIterator.hasNext()) {
             Object token1 =  aliasIterator.next();
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Token is.. : "+ (String)token1);
             }
             String newToken = tokenToDN((String)token1);
@@ -3393,7 +3390,7 @@ public class LoginState {
             
             return username;
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("ERROR searchPersistentCookie ",e);
             }
             return null;
@@ -3501,7 +3498,7 @@ public class LoginState {
             
             // get the time the pCookie was created
             pCookieTimeCreated = Long.parseLong(tmpstr2.substring(tmpIndex+1));
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("pCookieTimeCreated : " + pCookieTimeCreated);
             }
             // clean up auth internal tables
@@ -3544,7 +3541,7 @@ public class LoginState {
             }
 
             pAuthMethName = ISAuthConstants.PCOOKIE_AUTH_TYPE;
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Found valid PC : username=" + usernameStr +
                     "\ndomainname=" + domainStr + "\nauthMethod=" +
                     authMethStr + "\nmaxSession=" + maxSession +
@@ -3555,7 +3552,7 @@ public class LoginState {
             foundPCookie=Boolean.TRUE;
             return usernameStr;
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("ERROR:parsePersistentCookie : " , e);
             }
             return null;
@@ -3595,7 +3592,7 @@ public class LoginState {
             } catch (Exception Ex2) {
                 maxAge = 0;
             }
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Add Cookie: maxage=" + maxAge);
                 debug.message("Add Cookie: maxage_str=" + maxage_str);
             }
@@ -3614,11 +3611,11 @@ public class LoginState {
                     AuthUtils.getPersistentCookieName(),
                     pCookieValue, maxAge, cookieDomain);
 
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     debug.message("Add PCookie = " + cookiestr);
                 }
             } else {
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     debug.message("Persistent Cookie Mode"+
                         " configured for domain " + orgName +
                         ", but no persistentCookieTime = " + maxage_str);
@@ -3650,7 +3647,7 @@ public class LoginState {
             } catch (Exception Ex2) {
                 maxAge = 0;
             }
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Add Load Balance Cookie: maxage=" + maxAge);
             }
             
@@ -3728,7 +3725,7 @@ public class LoginState {
         }
         String currentGoto = (servletRequest == null)?
         null: servletRequest.getParameter("goto");
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             ad.debug.message("currentGoto : " + currentGoto);
         }
         String fqdnURL = null;
@@ -3736,10 +3733,14 @@ public class LoginState {
         (!currentGoto.equalsIgnoreCase("null"))) {
             String encoded = servletRequest.getParameter("encoded");
             if (encoded != null && encoded.equals("true")) {
-                currentGoto = Base64.decodeAsUTF8String(currentGoto);
+                String decodedGoTo = Base64.decodeAsUTF8String(currentGoto);
+                if (decodedGoTo == null && debug.warningEnabled()) {
+                    debug.warning("As parameter 'encoded' is true, goto '{}' should be base64 encoded", currentGoto);
+                }
+                currentGoto = decodedGoTo;
             }
             if (!ad.isGotoUrlValid(currentGoto, getOrgDN())) {
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     ad.debug.message("LoginState.getSuccessLoginURL():Original goto URL is " + currentGoto
                             + " which is invalid");
                 }
@@ -3755,7 +3756,7 @@ public class LoginState {
         }        
         
         String encodedSuccessURL = encodeURL(fqdnURL,servletResponse,true);
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             ad.debug.message("get fqdnURL : " + fqdnURL);
             ad.debug.message("get successLoginURL : " 
                              + successLoginURL);
@@ -3775,7 +3776,7 @@ public class LoginState {
         String encodedSuccessURL =
         encodeURL(ad.processURL(
             successLoginURL,servletRequest),servletResponse,true);
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("getSuccessLoginURL : " + successLoginURL);
             debug.message(
                 "getSuccessLoginURL (encoded) : " + encodedSuccessURL);
@@ -3790,7 +3791,7 @@ public class LoginState {
                 roleURL =getRoleURLFromAttribute(roleAttrMap,
                 ISAuthConstants.LOGIN_SUCCESS_URL);
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Execption:getSuccessURLForRole : " , e);
             }
         }
@@ -3806,7 +3807,7 @@ public class LoginState {
                 roleFailureURL = getRoleURLFromAttribute(roleAttrMap,
                 ISAuthConstants.LOGIN_FAILURE_URL);
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error retrieving url " );
                 debug.message("Exception : " , e);
             }
@@ -3842,7 +3843,7 @@ public class LoginState {
             if (roleAttributeMap == null) {
                 roleAttributeMap = Collections.EMPTY_MAP;
             }
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Returning Service Attributes: " +
                 roleAttributeMap);
                 debug.message("for Role : " + amIdentityRole.getName());
@@ -3870,18 +3871,18 @@ public class LoginState {
                 serviceAttributesMap= getServiceAttributes(indexName);
             }
             
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("AttributeMAP is.. :" + serviceAttributesMap);
             }
             
             successServiceURL= getServiceURLFromAttribute(
             serviceAttributesMap, ISAuthConstants.LOGIN_SUCCESS_URL);
             
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("service successURL : " + successServiceURL);
             }
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error retrieving url ");
                 debug.message("Exception : ",e);
             }
@@ -3904,11 +3905,11 @@ public class LoginState {
             serviceFailureURL = getServiceURLFromAttribute(
             serviceAttributesMap, ISAuthConstants.LOGIN_FAILURE_URL);
             
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Service failureURL: " + serviceFailureURL);
             }
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error retrieving url ");
                 debug.message("Exception : ",e);
             }
@@ -3940,7 +3941,7 @@ public class LoginState {
                 attributeDataMap);
             return attributeDataMap;
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error getting service attribute: ");
                 debug.message(" Exception : " + e.getMessage());
             }
@@ -3950,7 +3951,7 @@ public class LoginState {
     
     /* create an instance of PostLoginProcessInterface Class */
     AMPostAuthProcessInterface getPostLoginProcessInstance(String className) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("postLoginProcess Class Name is : " + className);
         }
         if ((className == null) || (className.length() == 0)) {
@@ -3962,12 +3963,12 @@ public class LoginState {
                     (Class.forName(className).newInstance());
             return loginPostProcessInstance;
         } catch (ClassNotFoundException ce) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Class not Found :" , ce);
             }
             return null;
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error: " , e);
             }
             return null;
@@ -3981,7 +3982,7 @@ public class LoginState {
      */
     public void setSuccessLoginURL(String url) {
         /* this is for AMLoginModule to set the success url */
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("URL : from modle  : " + url);
         }
         moduleSuccessLoginURL = url;
@@ -4068,7 +4069,7 @@ public class LoginState {
         AuthContext.IndexType indexType,
         String indexName) {
         /* if module sets  the url then return the URL module set */
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("moduleSucessLoginURL : " + moduleSuccessLoginURL);
         }
         if ((moduleSuccessLoginURL != null) &&
@@ -4161,7 +4162,7 @@ public class LoginState {
         
         // now assign back to the success url
         successLoginURL = defSuccessURL;
-        if(messageEnabled) {
+        if(debug.messageEnabled()) {
             debug.message("SUCCESS Login url : " + successLoginURL);
         }
         
@@ -4188,7 +4189,7 @@ public class LoginState {
             return;
         }
 
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("failureTokenId in setFailureLoginURL = "
             + failureTokenId);
         }
@@ -4207,7 +4208,7 @@ public class LoginState {
                 }
                 defFailureURL = defaultUserFailureURL;
             } catch (Exception e){
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     debug.message("Error retreiving profile for : " +
                     failureTokenId, e);
                 }
@@ -4275,7 +4276,7 @@ public class LoginState {
         }
         // now assign back to the Failure url
         failureLoginURL = defFailureURL;
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("defaultFailureURL : " + failureLoginURL);
         }
         
@@ -4329,7 +4330,7 @@ public class LoginState {
             Set roleURLSet = (Set) roleAttrMap.get(attrName);
             return getRedirectUrl(roleURLSet);
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error getting role attribute " ,e );
             }
             return null;
@@ -4347,7 +4348,7 @@ public class LoginState {
         (Set) attributeMap.get(attrName);
         
         String serviceURL = getRedirectUrl(serviceURLSet);
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("attr map: " + attributeMap +
             "\nserviceURL : " + serviceURL);
         }
@@ -4558,7 +4559,7 @@ public class LoginState {
      * @param lockoutMsg the lockout message.
      */
     public void setLockoutMsg(String lockoutMsg) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("setLockoutMsg :" + lockoutMsg);
         }
         this.lockoutMsg = lockoutMsg;
@@ -4606,7 +4607,7 @@ public class LoginState {
     ) throws AuthException {
         this.userOrg = getDomainNameByOrg(orgName);
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("createAuthContext: userOrg is : " + userOrg);
         }
         
@@ -4616,14 +4617,14 @@ public class LoginState {
             throw new AuthException(AMAuthErrorCode.AUTH_INVALID_DOMAIN, null);
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("AuthUtil::getAuthContext::Creating new " + 
                 "AuthContextLocal & LoginState");
         }
         AuthContextLocal authContext = new AuthContextLocal(this.userOrg);
         requestType = true;
         this.sid = sid;
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("requestType : " + requestType);
             debug.message("sid : " + sid);
             debug.message("orgName passed: " + orgName);
@@ -4657,7 +4658,7 @@ public class LoginState {
             this.authLevel = moduleAuthLevel;
             levelSet=true;
         }
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("spi authLevel :" + authLevel);
             debug.message(
                 "module configuration authLevel :" + this.authLevel);
@@ -4687,7 +4688,7 @@ public class LoginState {
             orgDN = AuthUtils.getOrganizationDN(orgName,false,null);
             
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Incorrect orgName passed:" + orgName,e);
             }
         }
@@ -4708,11 +4709,11 @@ public class LoginState {
             
             moduleInstances = domainAuthenticators;
             
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("moduleInstances are : " + moduleInstances);
             }
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error getting moduleInstances " , e);
             }
         }
@@ -5117,7 +5118,7 @@ public class LoginState {
             debug.error("AuthLevel from session property bad format");
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("prevAuthLevel : " + prevAuthLevel);
         }
         
@@ -5183,7 +5184,7 @@ public class LoginState {
             newModuleList = getRealmQualifiedModulesList(
                 DNMapper.orgNameToRealmName(qualifiedOrgDN), authMethName);            
         }
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("newModuleList : " + newModuleList);
             debug.message("prevModuleList : " + prevModuleList);
         }
@@ -5196,7 +5197,7 @@ public class LoginState {
             upgradeModuleList = sb.toString();
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("oldAuthLevel : " + prevAuthLevel);
             debug.message("newAuthLevel : " + authLevel);
             debug.message("upgradeAuthLevel : " + upgradeAuthLevel);
@@ -5232,7 +5233,7 @@ public class LoginState {
 
     /* Get realm qualified modules list */
     String getRealmQualifiedModulesList(String realm,String oldModulesList) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("getRealmQualifiedModulesList:realm : " 
                 + realm);
             debug.message("getRealmQualifiedModulesList:oldModulesList : " 
@@ -5254,7 +5255,7 @@ public class LoginState {
                 realmQualifiedModulesList.substring(0,i);
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("RealmQualifiedModulesList is : " 
                 + realmQualifiedModulesList);
         }
@@ -5263,7 +5264,7 @@ public class LoginState {
     
     /* compare old session property and new session property */
     String parsePropertyList(String oldProperty,String newProperty) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("oldProperty : " + oldProperty);
             debug.message("newProperty : " + newProperty);
         }
@@ -5280,7 +5281,7 @@ public class LoginState {
         
         String propertyList = sb.toString();
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("propertyList is : " + propertyList);
         }
         return propertyList;
@@ -5357,7 +5358,7 @@ public class LoginState {
         setPostLoginInstances(indexType,indexName);
         if ((postProcessInSession) && ((postLoginInstanceSet != null) &&
             (!postLoginInstanceSet.isEmpty()))) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("LoginState.setPostLoginInstances : " 
                     + "Setting post process class in session "
                     + postLoginInstanceSet);
@@ -5414,17 +5415,17 @@ public class LoginState {
                         getSSOToken());
                 break;
             default:
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     ad.debug.message("executePostProcessSPI: " +
                         "invalid input type: "+type);
                 }
             }
         } catch (AuthenticationException ae) {
-            if (messageEnabled){
+            if (debug.messageEnabled()){
                 ad.debug.message("Error " , ae);
             }
         } catch (Exception e) {
-            if (messageEnabled){
+            if (debug.messageEnabled()){
                 ad.debug.message("Error " , e);
             }
         }
@@ -5502,7 +5503,7 @@ public class LoginState {
             }
         }
 
-        if (messageEnabled){
+        if (debug.messageEnabled()){
               debug.message("postLoginClassSet = "+postLoginClassSet);
         }
 
@@ -5514,7 +5515,7 @@ public class LoginState {
                 if (sb.length() > 0) {
                     sb.append("|");
                 }
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     debug.message("setPostLoginInstances : " 
                     + postLoginClassName);
                     debug.message("setPostLoginInstances : " 
@@ -5547,13 +5548,13 @@ public class LoginState {
              postLoginClassSet = Collections.EMPTY_SET;
             }
             
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Role Post Login Class Set : " + 
                 postLoginClassSet);
             }
             
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error get role class set " , e);
             }
         }
@@ -5574,7 +5575,7 @@ public class LoginState {
                 serviceAttributesMap = getServiceAttributes(indexName);
             }
             
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Service Attributes are . :" + 
                 serviceAttributesMap);
             }
@@ -5585,12 +5586,12 @@ public class LoginState {
              postLoginClassSet = Collections.EMPTY_SET;
             }
             
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("postLoginClassName: " + postLoginClassSet);
             }
             
         } catch (Exception e) {
-            if (messageEnabled){
+            if (debug.messageEnabled()){
                 debug.message("Error get service post login class name " 
                 + e.getMessage());
             }
@@ -5637,7 +5638,7 @@ public class LoginState {
      * @param pageTimeOut Page timeout.
      */
     public synchronized void setPageTimeOut(long pageTimeOut) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Setting page timeout :" + pageTimeOut);
         }
         this.pageTimeOut = pageTimeOut;
@@ -5649,7 +5650,7 @@ public class LoginState {
      * @return Page timeout.
      */
     public long getPageTimeOut() {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Returning page timeout :" + pageTimeOut);
         }
         return pageTimeOut;
@@ -5661,7 +5662,7 @@ public class LoginState {
      * @param lastCallbackSent Last callback sent.
      */
     public void setLastCallbackSent(long lastCallbackSent) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("setting Last Callback Sent :" + lastCallbackSent);
         }
         this.lastCallbackSent = lastCallbackSent;
@@ -5673,7 +5674,7 @@ public class LoginState {
      * @return Last callback sent.
      */
     public long getLastCallbackSent() {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message(
                 "Returning Last Callback Sent :" + lastCallbackSent);
         }
@@ -5700,7 +5701,7 @@ public class LoginState {
             Iterator iter = urls.iterator();
             while (iter.hasNext()) {
                 String url = (String)iter.next();
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     debug.message("URL is : " + url);
                 }
                 if ((url != null) && (url.length() > 0)) {
@@ -5721,7 +5722,7 @@ public class LoginState {
                 }
             } //end while
             tempDefaultURL = defaultURL;
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("defaultURL : " + defaultURL);
                 debug.message("tempDefaultURL : " + tempDefaultURL);
             }
@@ -5796,7 +5797,7 @@ public class LoginState {
      * @param userID User ID.
      */
     public void setFailedUserId(String userID) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("setting userID : " + userID);
         }
         failureTokenId  = userID;
@@ -5841,7 +5842,7 @@ public class LoginState {
      */
     public void setPCookieUserName(String indexName) {
         this.pCookieUserName = indexName;
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Setting Pcookie user name : " + pCookieUserName);
         }
     }
@@ -5871,12 +5872,12 @@ public class LoginState {
             subject = new Subject();
         }
         String sidStr = sid.toString();
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("sid string is.. " + sidStr);
         }
         Principal ssoTokenPrincipal = new SSOTokenPrincipal(sidStr);
         subject.getPrincipals().add(ssoTokenPrincipal);
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Subject is.. :" + subject);
         }
         
@@ -5890,7 +5891,7 @@ public class LoginState {
      * @param attributeValuePairs Map of attribute name to a set of values.
      */
     public void setUserCreationAttributes(Map attributeValuePairs) {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("attributeValuePairs : " + attributeValuePairs);
         }
         if ((attributeValuePairs != null) && (!attributeValuePairs.isEmpty())) {
@@ -5903,7 +5904,7 @@ public class LoginState {
             ) {
                 externalAliasList = (HashSet)attributeValuePairs.get(
                 ISAuthConstants.USER_ALIAS_ATTR);
-                if (messageEnabled){
+                if (debug.messageEnabled()){
                     debug.message("externalAliasList:" +externalAliasList);
                 }
                 attributeValuePairs.remove(ISAuthConstants.USER_ALIAS_ATTR);
@@ -5922,7 +5923,7 @@ public class LoginState {
      */
     public void setSuccessModuleName(String moduleName) {
         successModuleSet.add(moduleName);
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Module name is .. " + moduleName);
             debug.message("successModuleSet is : " + successModuleSet);
         }
@@ -5935,7 +5936,7 @@ public class LoginState {
      * successfully authenticated.
      */
     protected Set getSuccessModuleSet() {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("getSuccessModuleSet : " + successModuleSet);
         }
         return successModuleSet;
@@ -5965,7 +5966,7 @@ public class LoginState {
      */
     public void setFailureModuleName(String moduleName) {
         failureModuleSet.add(moduleName);
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Module name is .. " + moduleName);
             debug.message("failureModuleSet is : " + failureModuleSet);
         }
@@ -5988,7 +5989,7 @@ public class LoginState {
      */
     public void setFailureModuleList(String failureModuleList) {
         this.failureModuleList = failureModuleList;
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("failureModulelist :" + failureModuleList);
         }
     }
@@ -6008,7 +6009,7 @@ public class LoginState {
                 debug.message("user is of type 'Agent'");
             }
         } catch (Exception e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error isAgent : " + e.toString());
             }
         }
@@ -6189,7 +6190,7 @@ public class LoginState {
             AMIdentity amIdentity = getRole(roleName);
             roleUnivId = IdUtils.getUniversalId(amIdentity);
         } catch (Exception ae) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Error getting role : " +ae.getMessage());
             }
         }
@@ -6258,7 +6259,7 @@ public class LoginState {
                     if (Misc.isDescendantOf(containerName, getOrgDN())) {
                         int containerType =
                         ad.getSDK().getAMObjectType(containerName);
-                        if (messageEnabled) {
+                        if (debug.messageEnabled()) {
                             debug.message("Container Type = "
                             + containerType);
                             debug.message("Container Name = "
@@ -6308,7 +6309,7 @@ public class LoginState {
             throw new AuthException(AMAuthErrorCode.AUTH_ERROR, null);
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("agentContainerDN = " + agentContainerDN);
             debug.message("userContainerDN = " + userContainerDN);
             debug.message("userOrgDN set in PC atrr = " + userOrgDN);
@@ -6328,7 +6329,7 @@ public class LoginState {
      */
     IdSearchResults searchIdentity(IdType idType, String userTokenID, boolean populate)
             throws IdRepoException,SSOException  {
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("In searchAutehnticatedUser: idType " + idType);
             debug.message("In getUserProfile : Search for user " +
             userTokenID);
@@ -6350,12 +6351,12 @@ public class LoginState {
             idsc.setReturnAttributes(returnSet);
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("alias attr=" + aliasAttrNames +
             ", attr=" + userAttributes + ",merge=" + returnSet);
         }
         
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("Search for Identity " + userTokenID);
         }
         // search for the identity
@@ -6368,12 +6369,12 @@ public class LoginState {
                 result = searchResults.getSearchResults();
             }
         } catch (SSOException sso) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("SSOException Error searching Identity " +
                 " with username " + sso.getMessage());
             }
         } catch (IdRepoException e) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("IdRepoException : Error searching "
                 + " Identities with username : "
                 + e.getMessage());
@@ -6382,12 +6383,12 @@ public class LoginState {
         
         if ( result.isEmpty() && (aliasAttrNames != null) &&
         (!aliasAttrNames.isEmpty())) {
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("No identity found, try Alias attrname.");
             }
             pattern="*";
             avPairs= CollectionUtils.toAvPairMap(aliasAttrNames, userTokenID);
-            if (messageEnabled) {
+            if (debug.messageEnabled()) {
                 debug.message("Search for Filter (avPairs) :" + avPairs);
                 debug.message("userTokenID : " + userTokenID);
                 debug.message("userDN : " + userDN);
@@ -6409,7 +6410,7 @@ public class LoginState {
                 if ((resultAlias.isEmpty()) && (userDN != null) &&
                     (!userDN.equalsIgnoreCase(userTokenID))) {
                     avPairs= CollectionUtils.toAvPairMap(aliasAttrNames, userDN);
-                    if (messageEnabled) {
+                    if (debug.messageEnabled()) {
                         debug.message("Search for Filter (avPairs) " + 
                         "with userDN : " + avPairs);
                     }
@@ -6419,13 +6420,13 @@ public class LoginState {
                         amIdRepo.searchIdentities(idType,pattern,idsc);
                 }
             } catch (SSOException sso) {
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     debug.message("SSOException : Error searching "
                     + "Identities with aliasattrname : "
                     + sso.getMessage());
                 }
             } catch (IdRepoException e) {
-                if (messageEnabled) {
+                if (debug.messageEnabled()) {
                     debug.message("IdRepoException : Error searching "
                     + "Identities : "+e.getMessage());
                 }
@@ -6489,7 +6490,7 @@ public class LoginState {
             debug.message(
                 "Error getting Identity for user :" + e.getMessage());
         }
-        if (messageEnabled) {
+        if (debug.messageEnabled()) {
             debug.message("getUserUniversalId:universalId : " + universalId);
         }
         return universalId;
@@ -6585,7 +6586,7 @@ public class LoginState {
             }
         }
 
-        if (messageEnabled){
+        if (debug.messageEnabled()){
             debug.message("getAuthConfigName:finalAuthConfigName = " 
                 + finalAuthConfigName);
         }
