@@ -39,6 +39,7 @@
     <script type="text/javascript">
         <#if error??>
             pageData = {
+                realm : "${realm?js_string}",
                 baseUrl: "${baseUrl?js_string}/XUI",
                 error: {
                 <#if error_uri??>
