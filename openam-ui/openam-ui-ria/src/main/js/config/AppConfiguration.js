@@ -122,14 +122,8 @@ define("config/AppConfiguration", [
                     "navGroup": "admin",
                     "visibleToRoles": ["ui-self-service-user"]
                 }, {
-                    "href": "#realms",
-                    "i18nKey": "common.user.administration",
-                    "navGroup": "admin",
-                    "visibleToRoles": ["ui-realm-admin"]
-                }, { // TODO: The next two items are duplicated from the ones above because of a limitation in commons.
-                     // We should be able to have visibleToRoles without a navGroup, but that is currently not possible.
                     "href": "#profile/details",
-                    "i18nKey": "common.user.selfService",
+                    "i18nKey": "common.user.profile",
                     "navGroup": "user",
                     "visibleToRoles": ["ui-self-service-user"]
                 }, {
