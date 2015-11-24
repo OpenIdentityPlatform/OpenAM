@@ -41,6 +41,8 @@ import java.util.List;
  * Responsible for managing the presentation detail around a CREST query and its
  * response to the caller.
  *
+ * Resource fields MUST be {@link Comparable} for them to be used as sorting keys.
+ *
  * This class supports CREST query operations by providing paging and sorting of
  * results. Sorting is always performed before paging.
  *
@@ -212,8 +214,8 @@ public class QueryResponsePresentation {
             public int compare(ResourceResponse o1, ResourceResponse o2) {
                 int compare = 0;
                 for (SortKey key : sortKeys) {
-                    String v1 = getField(o1, key.getField());
-                    String v2 = getField(o2, key.getField());
+                    Comparable<Object> v1 = getField(o1, key.getField());
+                    Comparable<Object> v2 = getField(o2, key.getField());
 
                     compare = compare(v1, v2, key.isAscendingOrder());
                     if (compare != 0) {
@@ -223,7 +225,7 @@ public class QueryResponsePresentation {
                 return compare;
             }
 
-            private int compare(String first, String second, boolean ascending) {
+            private int compare(Comparable<Object> first, Comparable<Object> second, boolean ascending) {
                 int result;
                 if (first == null && second == null) {
                     result = 0;
@@ -241,12 +243,34 @@ public class QueryResponsePresentation {
                 return result;
             }
 
-            private String getField(ResourceResponse resource, JsonPointer field) {
+            /**
+             * Gets the comparable field value from a resource.
+             *
+             * @param resource The resource.
+             * @param field The field.
+             * @return The comparable field value or {@code null} if the field is empty or the
+             * field value is not comparable.
+             */
+            private Comparable<Object> getField(ResourceResponse resource, JsonPointer field) {
                 JsonValue value = resource.getContent();
                 if (value.get(field).isNull()) {
                     return null;
                 }
-                return value.get(field).asString();
+                Object object = value.get(field).getObject();
+                if (isComparable(object)) {
+                    return asComparable(object);
+                } else {
+                    return null;
+                }
+            }
+
+            private boolean isComparable(Object o) {
+                return o instanceof Comparable;
+            }
+
+            @SuppressWarnings("unchecked")
+            private Comparable<Object> asComparable(Object o) {
+                return (Comparable<Object>) o;
             }
         };
 

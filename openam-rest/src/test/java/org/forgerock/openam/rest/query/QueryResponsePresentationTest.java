@@ -13,14 +13,22 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.rest.query;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CountPolicy;
@@ -35,9 +43,6 @@ import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class QueryResponsePresentationTest {
 
@@ -170,6 +175,13 @@ public class QueryResponsePresentationTest {
         QueryRequest sortedRequest = makeSortedQueryRequest("^name");
         QueryResponsePresentation.perform(mockHandler, sortedRequest, makeJsonValues("ghj,def,abc"), NAME_POINTER);
         assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("abc");
+    }
+
+    @Test
+    public void shouldNotSortResultsOnUncomparableObjects()  {
+        QueryRequest sortedRequest = makeSortedQueryRequest("^name");
+        QueryResponsePresentation.perform(mockHandler, sortedRequest, asList(json(object(field("name", Collections.singletonMap("key2", "value2")), field("place", "a"))), json(object(field("name", Collections.singletonMap("key1", "value1")), field("place", "z")))), new JsonPointer("place"));
+        assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("a");
     }
 
     @Test
