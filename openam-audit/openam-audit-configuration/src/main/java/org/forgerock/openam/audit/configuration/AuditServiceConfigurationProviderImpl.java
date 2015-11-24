@@ -86,6 +86,20 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
     @Override
     public void addConfigurationListener(AuditServiceConfigurationListener listener) {
         listeners.add(listener);
+
+        // If setup has already completed, let the listener know of the current state
+        if (initialised) {
+            listener.globalConfigurationChanged();
+
+            for (String realm : getRealmNames()) {
+                ServiceConfig config = getAuditRealmConfiguration(realm);
+                if (serviceExists(config)) {
+                    listener.realmConfigurationChanged(realm);
+                } else {
+                    listener.realmConfigurationRemoved(realm);
+                }
+            }
+        }
     }
 
     @Override
