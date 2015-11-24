@@ -47,7 +47,7 @@
                                  i18nKey="a102"
                                  resourceName="permissionTicketLifetime">
                     <DefaultValues>
-                        <Value>60</Value>
+                        <Value>120</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

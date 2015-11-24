@@ -36,7 +36,7 @@
                                  validator="RequiredValueValidator"
                                  i18nKey="a100" resourceName="codeLifetime">
                     <DefaultValues>
-                        <Value>10</Value>
+                        <Value>120</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -46,7 +46,7 @@
                                  validator="RequiredValueValidator"
                                  i18nKey="a101" resourceName="refreshTokenLifetime">
                     <DefaultValues>
-                        <Value>600</Value>
+                        <Value>604800</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -56,7 +56,7 @@
                                  validator="RequiredValueValidator"
                                  i18nKey="a102" resourceName="accessTokenLifetime">
                     <DefaultValues>
-                        <Value>60</Value>
+                        <Value>3600</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -221,7 +221,7 @@
                                  resourceName="jwtTokenLifetime"
                                  i18nKey="a113">
                     <DefaultValues>
-                        <Value>600</Value>
+                        <Value>3600</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
