@@ -135,6 +135,10 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-installer-utils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
