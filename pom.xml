@@ -121,7 +121,6 @@
 
         <forgerock.bloomfilter.version>1.0.0</forgerock.bloomfilter.version>
         <forgerock.ui.version>9.0.1</forgerock.ui.version>
-        <forgerock.audit.version>1.0.0</forgerock.audit.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
         <forgerock.selfservice.version>0.10.0</forgerock.selfservice.version>
 
@@ -494,7 +493,7 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-bom</artifactId>
-                <version>2.0.0</version>
+                <version>2.1.1</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -1678,20 +1677,12 @@
                 <artifactId>forgerock-bloomfilter-monitoring</artifactId>
                 <version>${forgerock.bloomfilter.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-audit-core</artifactId>
-                <version>${forgerock.audit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-audit-handler-csv</artifactId>
-                <version>${forgerock.audit.version}</version>
-            </dependency>
+
+            <!-- TODO the BOM has a typo in this dependency artifact id! remove once the next version of the BOM is released -->
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-audit-handler-jdbc</artifactId>
-                <version>${forgerock.audit.version}</version>
+                <version>2.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
