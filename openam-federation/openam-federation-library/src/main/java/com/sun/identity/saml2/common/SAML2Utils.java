@@ -3954,7 +3954,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 StringTokenizer st = new StringTokenizer(entry, "="); 
                 map.put(st.nextToken(), st.nextToken());
             }
-            return map;
+            return getMappedAttributes(mappedAttributes);
 
         } catch(SAML2MetaException sme) {
             debug.error("SAML2Utils.getConfigAttributeMap: ", sme);
@@ -3963,6 +3963,34 @@ public class SAML2Utils extends SAML2SDKUtils {
         }
     }
     
+    /**
+     * For the list of Strings containing mappings, return a map of name value pairs that match the mapping string
+     * @param mappedAttributes a non-null list of strings in the form of name=value or name="static value"
+     * @return a Map of name value pairs keyed off of the mapping name from the mappedAttributes list
+     */
+    public static Map<String, String> getMappedAttributes(List<String> mappedAttributes) {
+
+        if (mappedAttributes == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, String> attributeMap = new HashMap<String, String>(mappedAttributes.size());
+
+        for (String entry : mappedAttributes) {
+            int equalsLoc = entry.indexOf("=");
+            if (equalsLoc == -1) {
+                if (debug.messageEnabled()) {
+                    debug.message("SAML2Utils.getMappedAttributes: Invalid entry: " + entry);
+                }
+                continue;
+            }
+
+            attributeMap.put(entry.substring(0, equalsLoc), entry.substring(equalsLoc + 1));
+        }
+
+        return attributeMap;
+    }
+
     /**
      * Returns the SAML <code>Attribute</code> object.
      * @param name attribute name.
