@@ -55,8 +55,12 @@ define("org/forgerock/openam/ui/user/UserModel", [
                             {
                                 "type": "PUT",
                                 "data": JSON.stringify(
-                                    _.pick(this.toJSON(),
-                                        ["givenName", "sn", "mail", "postalAddress", "telephoneNumber"])
+                                    _.chain(this.toJSON())
+                                        .pick(["givenName", "sn", "mail", "postalAddress", "telephoneNumber"])
+                                        .mapValues(function (val) {
+                                            return val || [];
+                                        })
+                                        .value()
                                 ),
                                 "url": RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
                                 "headers": {
@@ -100,7 +104,8 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     }
                 });
 
-                user.id = user.uid;
+                // When we parse response the first time, amadmin don't have uid
+                user.id = user.uid || user.username;
                 if (!_.has(user, "roles")) {
                     this.uiroles = [];
                 } else if (_.isString(user.roles)) {
