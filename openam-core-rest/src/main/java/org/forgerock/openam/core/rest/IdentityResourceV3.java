@@ -18,10 +18,7 @@ package org.forgerock.openam.core.rest;
 
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.getIdentityServicesAttributes;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.getSSOToken;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.identityAttributeJsonToSet;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.identityDetailsToJsonValue;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
 import static org.forgerock.openam.rest.RestUtils.isAdmin;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -87,7 +84,6 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
 
     private static Debug logger = Debug.getInstance("frRest");
 
-
     /**
      * Constructs a new identity resource.
      *
@@ -118,12 +114,30 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Version 3 of this endpoint cannot remove these actions as this version is invoked by default.
+     * Instead we log messages to remind the user that these actions will disappear from here, although they
+     * will be retained by Version 2.
      */
     @Override
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
 
+        final String action = request.getAction();
+        if ("register".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        } else if ("confirm".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        } else if ("anonymousCreate".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        } else if ("forgotPassword".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        } else if ("forgotPasswordReset".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        }
         return identityResourceV2.actionCollection(context, request);
+    }
+
+    private void logAsDeprecated(String action) {
+        logger.warning("The action '" + action + "' in the 'users' endpoint is deprecated in version 3.0");
     }
 
     /**
@@ -211,7 +225,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
             }
 
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-            logger.message("UserIdentityResourceV3.queryCollection :: QUERY performed on realm "
+            logger.message("IdentityResourceV3.queryCollection :: QUERY performed on realm "
                     + realm
                     + " by "
                     + principalName);
@@ -227,10 +241,10 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
             }
 
         } catch (ResourceException resourceException) {
-            logger.warning("UserIdentityResourceV3.queryCollection caught ResourceException", resourceException);
+            logger.warning("IdentityResourceV3.queryCollection caught ResourceException", resourceException);
             return resourceException.asPromise();
         } catch (Exception exception) {
-            logger.error("UserIdentityResourceV3.queryCollection caught exception", exception);
+            logger.error("IdentityResourceV3.queryCollection caught exception", exception);
             return new InternalServerErrorException(exception.getMessage(), exception).asPromise();
         }
 
@@ -276,7 +290,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
 
             if (existingAttributeMap.containsKey(IdentityRestUtils.UNIVERSAL_ID)) {
                 Set<String> values = existingAttributeMap.get(IdentityRestUtils.UNIVERSAL_ID);
-                if (isNotEmpty(values) && !identityResourceV2.isUserActive(values.iterator().next())) {
+                if (isNotEmpty(values) && !isUserActive(values.iterator().next())) {
                     return new ForbiddenException("User "
                             + resourceId
                             + " is not active: Request is forbidden").asPromise();
@@ -291,7 +305,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
 
                         if (!patchableAttributes.contains(name)) {
                             return new BadRequestException("For the object type "
-                                    + identityResourceV2.USER_TYPE
+                                    + IdentityRestUtils.USER_TYPE
                                     + ", field \""
                                     + name
                                     + "\" cannot be altered by PATCH").asPromise();
@@ -323,28 +337,28 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                     identityDetailsToJsonValue(identityDetails)));
 
         } catch (final ObjectNotFound notFound) {
-            logger.error("UserIdentityResourceV3.patchInstance cannot find resource " + resourceId, notFound);
+            logger.error("IdentityResourceV3.patchInstance cannot find resource " + resourceId, notFound);
             return new NotFoundException("Resource cannot be found.", notFound).asPromise();
         } catch (final TokenExpired tokenExpired) {
-            logger.error("UserIdentityResourceV3.patchInstance, token expired", tokenExpired);
+            logger.error("IdentityResourceV3.patchInstance, token expired", tokenExpired);
             return new PermanentException(401, "Unauthorized", null).asPromise();
         } catch (final AccessDenied accessDenied) {
-            logger.error("UserIdentityResourceV3.patchInstance, access denied", accessDenied);
+            logger.error("IdentityResourceV3.patchInstance, access denied", accessDenied);
             return new ForbiddenException(accessDenied.getMessage(), accessDenied).asPromise();
         } catch (final GeneralFailure generalFailure) {
-            logger.error("UserIdentityResourceV3.patchInstance, general failure " + generalFailure.getMessage());
+            logger.error("IdentityResourceV3.patchInstance, general failure " + generalFailure.getMessage());
             return new BadRequestException(generalFailure.getMessage(), generalFailure).asPromise();
         } catch (ForbiddenException fex) {
-            logger.warning("UserIdentityResourceV3.patchInstance, insufficient privileges.", fex);
+            logger.warning("IdentityResourceV3.patchInstance, insufficient privileges.", fex);
             return fex.asPromise();
         } catch (NotFoundException notFound) {
-            logger.warning("UserIdentityResourceV3.patchInstance " + resourceId + " not found", notFound);
+            logger.warning("IdentityResourceV3.patchInstance " + resourceId + " not found", notFound);
             return new NotFoundException("Resource " + resourceId + " cannot be found.", notFound).asPromise();
         } catch (ResourceException resourceException) {
-            logger.warning("UserIdentityResourceV3.patchInstance caught ResourceException", resourceException);
+            logger.warning("IdentityResourceV3.patchInstance caught ResourceException", resourceException);
             return resourceException.asPromise();
         } catch (Exception exception) {
-            logger.error("UserIdentityResourceV3.patchInstance caught exception", exception);
+            logger.error("IdentityResourceV3.patchInstance caught exception", exception);
             return new InternalServerErrorException(exception.getMessage(), exception).asPromise();
         }
     }

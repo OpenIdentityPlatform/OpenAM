@@ -33,9 +33,11 @@ import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.selfservice.core.SelfServiceContext;
@@ -254,6 +256,34 @@ public final class IdentityRestUtils {
         }
 
         return Collections.singleton(identityAttributeJson.toString());
+    }
+
+    /**
+     * Uses an amAdmin SSOtoken to create an AMIdentity from the UID provided and checks
+     * whether the AMIdentity in context is active/inactive
+     *
+     * @param uid the universal identifier of the user
+     * @return true is the user is active, false otherwise
+     * @throws NotFoundException invalid SSOToken, invalid UID
+     */
+    public static boolean isUserActive(String uid) throws NotFoundException {
+        try {
+            AMIdentity userIdentity = new AMIdentity(RestUtils.getToken(), uid);
+            if (debug.messageEnabled()) {
+                debug.message("IdentityResource.isUserActive() : UID={} isActive={}", uid, userIdentity.isActive());
+            }
+            return userIdentity.isActive();
+        } catch (IdRepoException idre) {
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.isUserActive() : Invalid UID={}", uid , idre);
+            }
+            throw new NotFoundException("Invalid UID, could not retrieved " + uid, idre);
+        } catch (SSOException ssoe) {
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.isUserActive() : Invalid SSOToken", ssoe);
+            }
+            throw new NotFoundException("Invalid SSOToken " + ssoe.getMessage(), ssoe);
+        }
     }
 
 }

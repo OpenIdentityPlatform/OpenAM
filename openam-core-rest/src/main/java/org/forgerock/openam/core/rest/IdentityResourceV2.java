@@ -686,36 +686,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     }
 
     /**
-     * Uses an amAdmin SSOtoken to create an AMIdentity from the UID provided and checks
-     * whether the AMIdentity in context is active/inactive
-     * @param uid the universal identifier of the user
-     * @return true is the user is active;false otherwise
-     * @throws NotFoundException invalid SSOToken, invalid UID
-     */
-    /*
-     * package private scope to allow invocation from IdentityResourceV3
-     */
-    boolean isUserActive(String uid) throws NotFoundException {
-        try {
-            AMIdentity userIdentity = new AMIdentity(RestUtils.getToken(), uid);
-            if (debug.messageEnabled()) {
-                debug.message("IdentityResource.isUserActive() : UID={} isActive={}", uid, userIdentity.isActive());
-            }
-            return userIdentity.isActive();
-        } catch (IdRepoException idre) {
-            if (debug.errorEnabled()) {
-                debug.error("IdentityResource.isUserActive() : Invalid UID={}", uid , idre);
-            }
-            throw new NotFoundException("Invalid UID, could not retrieved " + uid, idre);
-        } catch (SSOException ssoe){
-            if (debug.errorEnabled()) {
-                debug.error("IdentityResource.isUserActive() : Invalid SSOToken", ssoe);
-            }
-            throw new NotFoundException("Invalid SSOToken " + ssoe.getMessage(), ssoe);
-        }
-    }
-
-    /**
      * Generates the e-mail contents based on the incoming request.
      *
      * Will only send the e-mail if all the following conditions are true:
