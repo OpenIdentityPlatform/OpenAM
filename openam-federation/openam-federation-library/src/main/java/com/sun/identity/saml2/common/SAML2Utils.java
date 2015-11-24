@@ -3555,26 +3555,41 @@ public class SAML2Utils extends SAML2SDKUtils {
                 return Collections.EMPTY_MAP;
             }
 
-            Map<String, String> attributeMap = new HashMap<>();
-
-            for (String entry : mappedAttributes) {
-                if (!entry.contains("=")) {
-                    if (debug.messageEnabled()) {
-                        debug.message("SAML2Utils.getConfigAttributeMap: Invalid entry." + entry);
-                    }
-                    continue;
-                }
-
-                StringTokenizer st = new StringTokenizer(entry, "=");
-                attributeMap.put(st.nextToken(), st.nextToken());
-            }
-            return attributeMap;
+            return getMappedAttributes(mappedAttributes);
 
         } catch (SAML2MetaException sme) {
             debug.error("SAML2Utils.getConfigAttributeMap: ", sme);
             throw new SAML2Exception(sme.getMessage());
 
         }
+    }
+
+    /**
+     * For the list of Strings containing mappings, return a map of name value pairs that match the mapping string
+     * @param mappedAttributes a non-null list of strings in the form of name=value or name="static value"
+     * @return a Map of name value pairs keyed off of the mapping name from the mappedAttributes list
+     */
+    public static Map<String, String> getMappedAttributes(List<String> mappedAttributes) {
+
+        if (mappedAttributes == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, String> attributeMap = new HashMap<>(mappedAttributes.size());
+
+        for (String entry : mappedAttributes) {
+            int equalsLoc = entry.indexOf("=");
+            if (equalsLoc == -1) {
+                if (debug.messageEnabled()) {
+                    debug.message("SAML2Utils.getMappedAttributes: Invalid entry: " + entry);
+                }
+                continue;
+            }
+
+            attributeMap.put(entry.substring(0, equalsLoc), entry.substring(equalsLoc + 1));
+        }
+
+        return attributeMap;
     }
 
     /**
