@@ -21,6 +21,8 @@ import org.forgerock.openam.audit.context.TransactionIdConfiguration;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Audit Configuration classes.
+ *
+ * @since 13.0.0
  */
 @GuiceModule
 public class AuditConfigurationGuiceModule extends AbstractModule {

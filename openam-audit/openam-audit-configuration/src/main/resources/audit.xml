@@ -142,6 +142,90 @@
                     </AttributeSchema>
                 </SubSchema>
 
+                <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
+                           i18nFileName="commonAudit">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.SyslogAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host" />
+                    <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port" />
+                    <AttributeSchema name="transportProtocol" i18nKey="audit.handlers.syslog.transportProtocol"
+                                     type="single_choice">
+                        <ChoiceValues>
+                            <ChoiceValue>TCP</ChoiceValue>
+                            <ChoiceValue>UDP</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TCP</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="connectTimeout" type="single"
+                                     i18nKey="audit.handlers.syslog.connectTimeout" />
+                    <AttributeSchema name="buffering" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.syslog.buffering.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility"
+                                     type="single_choice">
+                        <ChoiceValues>
+                            <ChoiceValue>KERN</ChoiceValue>
+                            <ChoiceValue>USER</ChoiceValue>
+                            <ChoiceValue>MAIL</ChoiceValue>
+                            <ChoiceValue>DAEMON</ChoiceValue>
+                            <ChoiceValue>AUTH</ChoiceValue>
+                            <ChoiceValue>SYSLOG</ChoiceValue>
+                            <ChoiceValue>LPR</ChoiceValue>
+                            <ChoiceValue>NEWS</ChoiceValue>
+                            <ChoiceValue>UUCP</ChoiceValue>
+                            <ChoiceValue>CRON</ChoiceValue>
+                            <ChoiceValue>AUTHPRIV</ChoiceValue>
+                            <ChoiceValue>FTP</ChoiceValue>
+                            <ChoiceValue>NTP</ChoiceValue>
+                            <ChoiceValue>LOGAUDIT</ChoiceValue>
+                            <ChoiceValue>LOGALERT</ChoiceValue>
+                            <ChoiceValue>CLOCKD</ChoiceValue>
+                            <ChoiceValue>LOCAL0</ChoiceValue>
+                            <ChoiceValue>LOCAL1</ChoiceValue>
+                            <ChoiceValue>LOCAL2</ChoiceValue>
+                            <ChoiceValue>LOCAL3</ChoiceValue>
+                            <ChoiceValue>LOCAL4</ChoiceValue>
+                            <ChoiceValue>LOCAL5</ChoiceValue>
+                            <ChoiceValue>LOCAL6</ChoiceValue>
+                            <ChoiceValue>LOCAL7</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>USER</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
                 <SubSchema name="JDBC" inheritance="multiple" i18nKey="handler.name.jdbc" i18nFileName="commonAudit">
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
                         <BooleanValues>
@@ -402,6 +486,90 @@
                                      i18nKey="audit.handlers.file.minFreeSpaceRequired">
                         <DefaultValues>
                             <Value>-1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
+                <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
+                           i18nFileName="commonAudit">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.SyslogAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host" />
+                    <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port" />
+                    <AttributeSchema name="transportProtocol" i18nKey="audit.handlers.syslog.transportProtocol"
+                                     type="single_choice">
+                        <ChoiceValues>
+                            <ChoiceValue>TCP</ChoiceValue>
+                            <ChoiceValue>UDP</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TCP</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="connectTimeout" type="single"
+                                     i18nKey="audit.handlers.syslog.connectTimeout" />
+                    <AttributeSchema name="buffering" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.syslog.buffering.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility"
+                                     type="single_choice">
+                        <ChoiceValues>
+                            <ChoiceValue>KERN</ChoiceValue>
+                            <ChoiceValue>USER</ChoiceValue>
+                            <ChoiceValue>MAIL</ChoiceValue>
+                            <ChoiceValue>DAEMON</ChoiceValue>
+                            <ChoiceValue>AUTH</ChoiceValue>
+                            <ChoiceValue>SYSLOG</ChoiceValue>
+                            <ChoiceValue>LPR</ChoiceValue>
+                            <ChoiceValue>NEWS</ChoiceValue>
+                            <ChoiceValue>UUCP</ChoiceValue>
+                            <ChoiceValue>CRON</ChoiceValue>
+                            <ChoiceValue>AUTHPRIV</ChoiceValue>
+                            <ChoiceValue>FTP</ChoiceValue>
+                            <ChoiceValue>NTP</ChoiceValue>
+                            <ChoiceValue>LOGAUDIT</ChoiceValue>
+                            <ChoiceValue>LOGALERT</ChoiceValue>
+                            <ChoiceValue>CLOCKD</ChoiceValue>
+                            <ChoiceValue>LOCAL0</ChoiceValue>
+                            <ChoiceValue>LOCAL1</ChoiceValue>
+                            <ChoiceValue>LOCAL2</ChoiceValue>
+                            <ChoiceValue>LOCAL3</ChoiceValue>
+                            <ChoiceValue>LOCAL4</ChoiceValue>
+                            <ChoiceValue>LOCAL5</ChoiceValue>
+                            <ChoiceValue>LOCAL6</ChoiceValue>
+                            <ChoiceValue>LOCAL7</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>USER</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

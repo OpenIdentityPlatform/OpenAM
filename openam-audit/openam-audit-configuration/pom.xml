@@ -47,6 +47,10 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-audit-handler-syslog</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-audit-handler-jdbc</artifactId>
         </dependency>
         <dependency>
