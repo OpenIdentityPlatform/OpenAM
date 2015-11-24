@@ -119,6 +119,9 @@ Copyright: Copyright 2009 Google Inc
 Version: guice-multibindings-3.0.jar
 Copyright: Copyright 2009 Google Inc
 
+Version: HikariCP-2.4.1.jar
+Copyright: Copyright (C) 2013-2015 Brett Wooldridge
+
 Version: httpclient-4.0.1.jar
 Copyright: Copyright 1999-2014 The Apache Software Foundation
 
