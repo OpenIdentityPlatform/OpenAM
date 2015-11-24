@@ -31,7 +31,7 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.Status;
-import org.restlet.ext.json.JsonRepresentation;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -90,7 +90,7 @@ public class ConnectClientRegistration extends ServerResource {
             final JsonValue registration = clientRegistrationService.createRegistration(accessToken,
                     deploymentUrl, request);
             setStatus(Status.SUCCESS_CREATED);
-            return new JsonRepresentation(registration.asMap());
+            return new JacksonRepresentation(registration.asMap());
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
         }
@@ -113,7 +113,7 @@ public class ConnectClientRegistration extends ServerResource {
         try {
             final JsonValue registration = clientRegistrationService.getRegistration(clientId, accessToken, request);
 
-            return new JsonRepresentation(registration.asMap());
+            return new JacksonRepresentation(registration.asMap());
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
         }

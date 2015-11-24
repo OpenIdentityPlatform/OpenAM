@@ -31,6 +31,7 @@ import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
+import org.restlet.representation.BufferingRepresentation;
 import org.restlet.representation.Representation;
 
 /**
@@ -71,6 +72,12 @@ public abstract class RestletBodyAuditor<T> implements Function<Representation, 
             @Override
             public JsonValue apply(Representation representation) throws AuditException {
                 try {
+                    boolean isBufferingRepresentation = (representation instanceof BufferingRepresentation);
+                    boolean isEmptyBufferingRepresentation = isBufferingRepresentation
+                            && ((BufferingRepresentation) representation).getWrappedRepresentation().isEmpty();
+                    if(isEmptyBufferingRepresentation || (!isBufferingRepresentation && representation.isEmpty())) {
+                        return json(object());
+                    }
                     return extractValues(new JsonRepresentation(representation).getJsonObject());
                 } catch (IOException | JSONException e) {
                     throw new AuditException("Could not parse body as JSON - wrong body auditor?", e);
@@ -94,7 +101,10 @@ public abstract class RestletBodyAuditor<T> implements Function<Representation, 
             @Override
             public JsonValue apply(Representation representation) throws AuditException {
                 try {
-                    return extractValues((Map<String, Object>) (new JacksonRepresentation(representation).getObject()));
+                    if(((JacksonRepresentation) representation).getObject() instanceof Map) {
+                        return extractValues((Map<String, Object>) ((JacksonRepresentation) representation).getObject());
+                    }
+                    return json(object());
                 } catch (IOException e) {
                     throw new AuditException("Could not parse body as JSON - wrong body auditor?", e);
                 }
