@@ -389,7 +389,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             }
         });
 
+        function generateId (name) {
+            return _.isEmpty(name) ? "" : _.camelCase(name);
+        }
+
         renderContext = {
+            id: generateId(this.input.name),
             index: this.input.index,
             value: this.input.value,
             prompt: prompt
