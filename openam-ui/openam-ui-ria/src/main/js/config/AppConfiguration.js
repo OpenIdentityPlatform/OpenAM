@@ -194,7 +194,6 @@ define("config/AppConfiguration", [
                                 "icon": "fa fa-user",
                                 "name": "config.AppConfiguration.Navigation.links.uma",
                                 "dropdown" : true,
-                                "cssClass": "hidden",
                                 "urls": {
                                     "listResource": {
                                         "url": "#uma/resources/",
@@ -209,7 +208,7 @@ define("config/AppConfiguration", [
                                         "name": "config.AppConfiguration.Navigation.links.umaLinks.requests"
                                     }
                                 },
-                                "visibleToRoles": ["ui-self-service-user"]
+                                "visibleToRoles": ["ui-uma-user"]
                             }
                         }
                     }
