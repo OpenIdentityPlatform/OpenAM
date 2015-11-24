@@ -20,8 +20,9 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
     "org/forgerock/commons/ui/user/delegates/AnonymousProcessDelegate",
     "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, RealmHelper) {
+], function ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, Constants, RealmHelper) {
 
     return AnonymousProcessView.extend({
         initialize: function () {
@@ -58,7 +59,7 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
             realmPath = realmPath.substring(0, 1) === "/" ? realmPath : "/" + realmPath;
 
             if (!this.delegate || Router.currentRoute !== continueRoute) {
-                this.setDelegate("json/selfservice/" + endpoint, params.token);
+                this.setDelegate(Constants.SELF_SERVICE_CONTEXT + endpoint, params.token);
             }
 
             if (params.token) {

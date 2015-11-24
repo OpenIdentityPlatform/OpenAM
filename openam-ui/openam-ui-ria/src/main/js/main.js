@@ -22,7 +22,6 @@ require.config({
             "LoginView"         : "org/forgerock/openam/ui/user/login/RESTLoginView",
             "ForgotUsernameView": "org/forgerock/openam/ui/user/anonymousProcess/ForgotUsernameView",
             "PasswordResetView" : "org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView",
-            "UserProfileView"   : "org/forgerock/commons/ui/user/profile/UserProfileView",
             "LoginDialog"       : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
             "NavigationFilter"  : "org/forgerock/openam/ui/common/components/navigation/filters/RouteNavGroupFilter",
             "Router"            : "org/forgerock/commons/ui/common/main/Router",

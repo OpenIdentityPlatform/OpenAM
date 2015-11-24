@@ -96,8 +96,10 @@ define("org/forgerock/openam/ui/user/UserModel", [
 
                 // many keys in response have single-element arrays for each property;
                 // translate these into a simpler map object, when possible
+                // kbaInfo property though needs to stay as an array
                 _.each(_.keys(response), function (property) {
-                    if (_.isArray(response[property]) && response[property].length === 1) {
+                    if (_.isArray(response[property]) && response[property].length === 1 &&
+                        property !== "kbaInfo") {
                         user[property] = response[property][0];
                     } else {
                         user[property] = response[property];

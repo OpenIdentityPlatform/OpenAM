@@ -68,6 +68,12 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
                     // Redirect browser back to the server using the FQDN to ensure cookies are set correctly
                     location.href = URIUtils.getCurrentUrl().replace(hostname, fqdn);
                 } else {
+                    require.config({ "map": { "*": {
+                        "UserProfileView" : (response.kbaEnabled === "true"
+                            ? "org/forgerock/commons/ui/user/profile/UserProfileKBAView"
+                            : "org/forgerock/commons/ui/user/profile/UserProfileView")
+                    } } });
+
                     successCallback(response);
                 }
             },
