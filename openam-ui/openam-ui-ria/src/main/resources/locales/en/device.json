@@ -2,7 +2,8 @@
     "common": {
         "form": {
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
-            "thankYou": "Done!"
+            "thankYou": "Done!",
+            "build": "Build"
         }
     },
     "form": {

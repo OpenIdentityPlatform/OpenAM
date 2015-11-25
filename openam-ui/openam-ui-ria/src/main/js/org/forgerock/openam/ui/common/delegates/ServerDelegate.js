@@ -15,9 +15,10 @@
  */
 
 define("org/forgerock/openam/ui/common/delegates/ServerDelegate", [
+    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants"
-], function (AbstractDelegate, Constants) {
+], function ($, AbstractDelegate, Constants) {
     /**
      * @exports org/forgerock/openam/ui/common/delegates/ServerDelegate
      */
@@ -27,7 +28,7 @@ define("org/forgerock/openam/ui/common/delegates/ServerDelegate", [
         return obj.serviceCall({
             url: "/version"
         }).then(function (data) {
-            return data.version;
+            return data.version + " " + $.t("common.form.build") + " " + data.revision + "(" + data.date + ")";
         });
     };
 

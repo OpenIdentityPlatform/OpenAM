@@ -315,6 +315,7 @@
             "active": "Active",
             "inactive": "Inactive",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
+            "build": "Build",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
             "deleteSelected" : "Delete Selected",

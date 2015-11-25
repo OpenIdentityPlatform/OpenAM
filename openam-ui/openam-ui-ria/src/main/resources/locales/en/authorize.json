@@ -1,7 +1,8 @@
 {
     "common": {
         "form": {
-            "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved."
+            "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
+            "build": "Build"
         }
     },
     "form": {
