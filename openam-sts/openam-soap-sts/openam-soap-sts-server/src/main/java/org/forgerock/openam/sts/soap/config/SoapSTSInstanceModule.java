@@ -177,19 +177,21 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Inject
     STSPropertiesMBean getSTSProperties(Logger logger) {
         StaticSTSProperties stsProperties = new StaticSTSProperties();
-        stsProperties.setCallbackHandler(new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
-        Crypto crypto;
-        try {
-            crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        } catch (WSSecurityException e) {
-            String message = "Exception caught initializing the CryptoFactory: " + e;
-            logger.error(message, e);
-            throw new IllegalStateException(message);
+        // KeystoreConfig may be null for a TLS-based SecurityPolicy binding, or for the AM-bare binding.
+        if (stsInstanceConfig.getKeystoreConfig() != null) {
+            stsProperties.setCallbackHandler(new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
+            Crypto crypto;
+            try {
+                crypto = CryptoFactory.getInstance(getEncryptionProperties());
+            } catch (WSSecurityException e) {
+                String message = "Exception caught initializing the CryptoFactory: " + e;
+                logger.error(message, e);
+                throw new IllegalStateException(message);
+            }
+            stsProperties.setSignatureCrypto(crypto);
+            stsProperties.setEncryptionCrypto(crypto);
+            stsProperties.setSignatureUsername(stsInstanceConfig.getKeystoreConfig().getSignatureKeyAlias());
         }
-        stsProperties.setSignatureCrypto(crypto);
-        stsProperties.setEncryptionCrypto(crypto);
-        stsProperties.setSignatureUsername(stsInstanceConfig.getKeystoreConfig().getSignatureKeyAlias());
-
         return stsProperties;
     }
     /*
@@ -210,11 +212,14 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Inject
     Map<String, Object> getProperties(WSSValidatorFactory wssValidatorFactory, Logger logger) throws WSSecurityException {
         Map<String, Object> properties = new HashMap<>();
-        properties.put(SecurityConstants.CALLBACK_HANDLER, new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        properties.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
-        properties.put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
-        properties.put(SecurityConstants.SIGNATURE_USERNAME, stsInstanceConfig.getKeystoreConfig().getSignatureKeyAlias());
+        // KeystoreConfig may be null for a TLS-based SecurityPolicy binding, or for the AM-bare binding.
+        if (stsInstanceConfig.getKeystoreConfig() != null) {
+            properties.put(SecurityConstants.CALLBACK_HANDLER, new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
+            Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+            properties.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
+            properties.put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
+            properties.put(SecurityConstants.SIGNATURE_USERNAME, stsInstanceConfig.getKeystoreConfig().getSignatureKeyAlias());
+        }
         properties.put("faultStackTraceEnabled", "true");
         properties.put("exceptionMessageCauseEnabled", "true");
         processSecurityPolicyTokenValidatorConfiguration(properties, wssValidatorFactory, logger);
@@ -278,14 +283,16 @@ public class SoapSTSInstanceModule extends AbstractModule {
                 "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
         );
         String keystorePassword;
-        try {
-            keystorePassword = new String(stsInstanceConfig.getKeystoreConfig().getKeystorePassword(), AMSTSConstants.UTF_8_CHARSET_ID);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Unsupported string encoding for keystore password: " + e);
+        if (stsInstanceConfig.getKeystoreConfig() != null) {
+            try {
+                keystorePassword = new String(stsInstanceConfig.getKeystoreConfig().getKeystorePassword(), AMSTSConstants.UTF_8_CHARSET_ID);
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException("Unsupported string encoding for keystore password: " + e);
+            }
+            properties.put("org.apache.ws.security.crypto.merlin.keystore.password", keystorePassword);
+            properties.put("org.apache.ws.security.crypto.merlin.keystore.file", stsInstanceConfig.getKeystoreConfig().getKeystoreFileName());
+            properties.put("org.apache.ws.security.crypto.merlin.keystore.type", "jks");
         }
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", keystorePassword);
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", stsInstanceConfig.getKeystoreConfig().getKeystoreFileName());
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.type", "jks");
         return properties;
     }
 
