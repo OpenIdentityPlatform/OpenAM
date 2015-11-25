@@ -6,7 +6,7 @@
 
     <div class="row">
         <div class="col-sm-3 col-md-2">
-            <nav class="sidenav">
+            <nav class="sidenav" role="navigation">
                 <ol class="list-unstyled">
                     <li>
                         <a class="text-primary"
@@ -35,7 +35,7 @@
                            data-target="#labels">
                             <i class="fa fa-tags"></i>{{t "uma.resources.myLabels.title"}}
                         </a>
-                        <ol class="collapse in list-unstyled sidenav-submenu" id="labels" role="navigation">
+                        <ol class="collapse in list-unstyled sidenav-submenu" id="labels">
                         {{#each nestedLabels}}
                             {{> templates/uma/views/resource/_NestedList }}
                         {{/each}}

@@ -1,5 +1,5 @@
-<div class="text-center clearfix remember-forgot">
-    <ul role="navigation">
+<nav class="text-center clearfix remember-forgot" role="navigation">
+    <ul>
         {{#if showForgotUserName}}
             <li><a href="{{url 'forgotUsername'}}">{{t "templates.user.LoginTemplate.forgotUsername"}}</a></li>
         {{/if}}
@@ -8,7 +8,7 @@
             <li><a href="{{url 'passwordReset'}}">{{t "templates.user.LoginTemplate.resetPassword"}}</a></li>
         {{/if}}
     </ul>
-</div>
+</nav>
 
 {{#if showSelfRegistration}}
     <div class="toggle-login-register">

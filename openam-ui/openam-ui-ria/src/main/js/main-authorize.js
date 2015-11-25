@@ -79,7 +79,9 @@ require([
         baseTemplate,
         footerTemplate,
         loginHeaderTemplate,
-        data = window.pageData;
+        data = window.pageData,
+        KEY_CODE_ENTER = 13,
+        KEY_CODE_SPACE = 32;
 
     i18nManager.init({
         paramLang: {
@@ -104,8 +106,12 @@ require([
         $("#wrapper").html(baseTemplate(data));
         $("#footer").html(footerTemplate(data));
         $("#loginBaseLogo").html(loginHeaderTemplate(data));
-        $("#content").html(formTemplate(data)).find(".panel-heading")
-        .click(function () {
+        $("#content").html(formTemplate(data)).find(".panel-heading").bind("click keyup", function (e) {
+            // keyup is required so that the collasped panel can be opened with the keyboard alone,
+            // and without relying on a mouse click event.
+            if (e.type === "keyup" && e.keyCode !== KEY_CODE_ENTER && e.keyCode !== KEY_CODE_SPACE) {
+                return;
+            }
             $(this).toggleClass("expanded").next(".panel-collapse").slideToggle();
         });
 
