@@ -40,7 +40,7 @@ define("config/routes/AMRoutesConfig", [], function () {
         },
         dashboard: {
             view: "org/forgerock/openam/ui/dashboard/views/DashboardView",
-            role: "ui-user",
+            role: "ui-self-service-user",
             url: "dashboard/",
             forceUpdate: true,
             navGroup: "user"
