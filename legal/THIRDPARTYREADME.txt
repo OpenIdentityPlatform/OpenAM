@@ -4,10 +4,16 @@ DO NOT TRANSLATE OR LOCALIZE
 Apache Software License, Version 2.0
 ***************************************************************************
 
-Version: less-1.5.1-min.js
-Copyright: Copyright (c) 2009-2013, Alexis Sellier <self@cloudhead.net>
+Version: bootstrap-tabdrop-1.0.js
+Copyright: Copyright 2012 Stefan Petre
 
-Version: selectize-0.11.2-min.js
+Version: microplugin-0.0.3.js
+Copyright: Copyright © 2013 Brian Reavis & Contributors
+
+Version: selectize-0.12.1-min.js
+Copyright: Copyright © 2013 Brian Reavis & Contributors
+
+Version: sifter-0.4.1-min.js
 Copyright: Copyright © 2013 Brian Reavis & Contributors
 
 Version: Click toolkit (installer)
@@ -53,47 +59,114 @@ Copyright: Copyright 2002-2012 The Apache Software Foundation
 Version: commons-lang-2.6.jar
 Copyright: Copyright 2001-2008 The Apache Software Foundation
 
+Version: commons-lang3-3.4.jar
+Copyright: Copyright 2001-2015 The Apache Software Foundation
+
 Version: commons-logging-1.1.3.jar
 Copyright: Copyright 2001-2007 The Apache Software Foundation
 
 Version: commons-logging-api-1.1.jar
 Copyright: Copyright 2001-2007 The Apache Software Foundation
 
-Version: cxf-api-2.7.8.jar
-Copyright: Copyright 2006-2013 The Apache Software Foundation
+Version: cxf-api-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-bindings-soap-2.7.8.jar
-Copyright: Copyright 2006-2013 The Apache Software Foundation
+Version: cxf-rt-bindings-soap-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-core-2.7.8.jar
-Copyright: Copyright 2006-2013 The Apache Software Foundation
+Version: cxf-rt-bindings-xml-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-databinding-jaxb-2.7.8.jar
-Copyright: Copyright 2006-2013 The Apache Software Foundation
+Version: cxf-rt-core-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-transports-http-2.7.8.jar
-Copyright: Copyright 2006-2013 The Apache Software Foundation
+Version: cxf-rt-databinding-jaxb-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-addr-2.7.8.jar
-Copyright: Copyright 2006-2013 The Apache Software Foundation
+Version: cxf-rt-frontend-jaxws-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-policy-2.7.8.jar
-Copyright: Copyright 2006-2013 The Apache Software Foundation
+Version: cxf-rt-frontend-simple-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-security-2.7.8.jar
-Copyright: Copyright 2006-2013 The Apache Software Foundation
+Version: cxf-rt-transports-http-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-services-sts-core-2.7.8.jar
-Copyright: Copyright 2006-2013 The Apache Software Foundation
+Version: cxf-rt-transports-http-jetty-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
+
+Version: cxf-rt-ws-addr-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
+
+Version: cxf-rt-ws-policy-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
+
+Version: cxf-rt-ws-security-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
+
+Version: cxf-services-sts-core-2.7.17.jar
+Copyright: Copyright 2006-2015 The Apache Software Foundation
 
 Version: ehcache-core-2.5.1.jar
 Copyright: Copyright 2003-2010 Terracotta, Inc.
+
+Version: forgerock-guava-annotations-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-base-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-cache-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-collect-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-concurrent-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-escape-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-eventbus-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-hash-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-io-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-math-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-net-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-primitives-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guava-reflect-18.0.3.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guice-core-1.1.0.jar
+Copyright: Copyright 2010 The Guava Authors
+
+Version: forgerock-guice-servlet-1.1.0.jar
+Copyright: Copyright 2010 The Guava Authors
 
 Version: geoip2-2.0.0.jar
 Copyright: Copyright https://www.maxmind.com
 
 Version: geronimo-javamail_1.4_spec-1.7.1.jar
 Copyright: Copyright (C) 2003-2006 The Apache Software Foundation
+
+Version: geronimo-servlet_3.0_spec-1.0.jar
+Copyright: Copyright 2003-2010 The Apache Software Foundation
+           Copyright © 1994-2002 World Wide Web Consortium,
+           (Massachusetts Institute of Technology, Institut National
+           de Recherche en Informatique et en Automatique, Keio
+           University). All Rights Reserved.
 
 Version: google-http-client-1.19.0.jar
 Copyright: Copyright (c) 2011 Google Inc.
@@ -105,9 +178,6 @@ Version: groovy-json-2.3.3.jar
 Copyright: Copyright 2001-2009 The Apache Software Foundation
 
 Version: groovy-jsr223-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
-
-Version: groovy-sandbox-1.6.jar
 Copyright: Copyright 2001-2009 The Apache Software Foundation
 
 Version: guice-3.0-no_aop.jar
@@ -140,8 +210,23 @@ Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 Version: jackson-databind-2.4.2.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-mapper-asl-1.9.7.jar
-Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
+Version: jackson-dataformat-csv-2.5.3.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
+
+Version: jackson-dataformat-smile-2.4.4.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
+
+Version: jackson-dataformat-xml-2.4.2.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
+
+Version: jackson-dataformat-yaml-2.4.4.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
+
+Version: jackson-module-jaxb-annotations-2.5.3.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
+
+Version: jackson-module-jsonSchema-2.5.3.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: java-ipv6-0.14.jar
 Copyright: Copyright 2013 Jan Van Besien
@@ -149,11 +234,30 @@ Copyright: Copyright 2013 Jan Van Besien
 Version: javax.inject-1.jar
 Copyright: Copyright (C) 2009 The JSR-330 Expert Group
 
-Version: joda-time-1.6.2.jar
-Copyright: Copyright 2001-2006 Stephen Colebourne
+Version: jetty-continuation-8.1.15.v20140411.jar
+Copyright: Copyright (c) 1995-2015 Mort Bay Consulting Pty. Ltd.
 
-Version: jsr305-1.3.9.jar
+Version: jetty-http-8.1.15.v20140411.jar
+Copyright: Copyright (c) 1995-2015 Mort Bay Consulting Pty. Ltd.
+
+Version: jetty-io-8.1.15.v20140411.jar
+Copyright: Copyright (c) 1995-2015 Mort Bay Consulting Pty. Ltd.
+
+Version: jetty-security-8.1.15.v20140411.jar
+Copyright: Copyright (c) 1995-2015 Mort Bay Consulting Pty. Ltd.
+
+Version: jetty-server-8.1.15.v20140411.jar
+Copyright: Copyright (c) 1995-2015 Mort Bay Consulting Pty. Ltd.
+
+Version: jetty-util-8.1.15.v20140411.jar
+Copyright: Copyright (c) 1995-2015 Mort Bay Consulting Pty. Ltd.
+
+Version: joda-time-2.1.jar
+Copyright: Copyright 2001-2011 Stephen Colebourne
+
+Version: jsr305-3.0.0.jar
 Copyright: Copyright (C) 2005, University of Maryland
+           Copyright (c) 2005 Brian Goetz
 
 Version: jstl-1.1.2.jar
 Copyright: Copyright 1999-2004 The Apache Software Foundation.
@@ -167,11 +271,15 @@ Copyright: Copyright (c) 2014 by MaxMind, Inc.
 Version: neethi-3.0.2.jar
 Copyright: Copyright © 2004-2014 The Apache Software Foundation. All Rights Reserved.
 
-Version: opensaml-2.5.1-1.jar
+Version: opensaml-2.6.1.jar
 Copyright: Copyright (c) University Corporation for Advanced Internet Development, Inc.
 
-Version: openws-1.4.2-1.jar
+Version: openws-1.5.1.jar
 Copyright: Copyright 2007 University Corporation for Advanced Internet Development, Inc.
+
+Version: org.apache.servicemix.bundles.javax-inject-1_2.jar
+Copyright: Copyright (C) 2009 The JSR-330 Expert Group
+           Copyright 2005-2012 The Apache Software Foundation
 
 Version: org.restlet.ext.freemarker-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
@@ -179,29 +287,29 @@ Copyright: Copyright 2005-2012 Restlet S.A.S.
 Version: org.restlet.ext.jackson-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.ext.net-2.3.4.jar
+Version: org.restlet.ext.json-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
 Version: org.restlet.ext.servlet-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.ext.ssl-2.3.4.jar
+Version: org.restlet.ext.slf4j-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
 Version: org.restlet.ext.xml-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.jee-org.restlet-2.3.4.jar
-Copyright: Copyright 2005-2012 Restlet S.A.S.
-
-Version: org.restlet.jee-org.restlet.ext.json-2.3.4.jar
-Copyright: Copyright 2005-2012 Restlet S.A.S.
-
-Version: org.restlet.jee-org.restlet.lib.org.json-2.0.jar
+Version: org.restlet-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
 Version: serializer-2.7.1.jar
 Copyright: Copyright 2001, 2002,2004 The Apache Software Foundation.
+
+Version: snakeyaml-1.6.jar
+Copyright: Copyright (c) 2008-2010 Andrey Somov
+
+Version: super-csv-2.4.0.jar
+Copyright: Copyright 2007 Kasper B. Graversen
 
 Version: velocity-1.7.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
@@ -221,21 +329,27 @@ Copyright: Copyright 1999-2006- Apache 1999-2002 - Lotus 2001-2002 - Sun, 2003 -
 Version: xml-serializer-2.11.0.jar
 Copyright: Copyright 1999-2006- Apache 1999-2002 - Lotus 2001-2002 - Sun, 2003 - IBM
 
-Version: xmlschema-core-2.0.3.jar
-Copyright: Copyright 2004-2011 The Apache Software Foundation
+Version: xmlschema-core-2.1.0.jar
+Copyright: Copyright 2004-2014 The Apache Software Foundation
+           Portions Copyright 2006 International Business Machines Corp.
+           Portions Copyright (C) World Wide Web Consortium 2006, 2007 and licensed under the
+           three-part BSD license.
 
 Version: xmlsec-1.5.6.jar
 Copyright: Copyright 2000-2013 The Apache Software Foundation
 
-Version: xmltooling-1.3.2-1.jar
+Version: xmltooling-1.4.1.jar
 Copyright: Copyright 2008 Members of the EGEE Collaboration.
            Copyright 2008 University Corporation for Advanced Internet Development, Inc.
 
-Version: woodstox-core-asl-4.2.0.jar
-Copyright: © 2006 Codehaus Foundation. Original design by Andreas Viklund
+Version: validation-api-1.1.0.Final.jar
+Copyright: Copyright 2009-2012, Red Hat, Inc. and/or its affiliates, and individual contributors
 
-Version: wss4j-1.6.13.jar
-Copyright: Copyright 2004-2013 The Apache Software Foundation
+Version: woodstox-core-asl-4.3.0.jar
+Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
+
+Version: wss4j-1.6.18.jar
+Copyright: Copyright 2004-2015 The Apache Software Foundation
 
 ==================
 Full license text:
@@ -317,6 +431,9 @@ limitations under the License.
 The BSD 3-Clause License
 ***************************************************************************
 
+Version: asm-3.3.1.jar
+Copyright: Copyright (c) 2000-2011 INRIA, France Telecom
+
 Version: sinon-1.10.3.js
 Copyright: Copyright (c) 2010-2014, Christian Johansen
 
@@ -331,9 +448,6 @@ Copyright: Copyright (c) 2003 The Visigoth Software Society. All rights reserved
 
 Version: ognl-2.6.9.jar
 Copyright: Copyright (c) 1998-2004, Drew Davidson and Luke Blanshard
-
-Version: stax2-api-3.1.1.jar
-Copyright: Copyright 2003-2013 The Codehaus. All rights reserved.
 
 Version: relaxngDatatype-20020414.jar
 Copyright: Copyright (c) 2001, Thai Open Source Software Center Ltd, James Clark, Kohsuke KAWAGUCHI
@@ -369,11 +483,34 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 
 ***************************************************************************
+The BSD 2-Clause License
+***************************************************************************
+
+Version: stax2-api-3.1.4.jar
+Copyright: Copyright (c) 2010-, FasterXML.com
+
+==================
+Full license text:
+==================
+
+Copyright (c) <YEAR>, <OWNER>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+***************************************************************************
 Common Public License Version 1.0 (CPL)
 ***************************************************************************
 
 Version: wsdl4j-1.6.3.jar
-Copyright: Copyright IBM Corp 2001, 2006
+Copyright: Copyright IBM Corp 2001-2013
 
 ==================
 Full license text:
@@ -599,23 +736,71 @@ The MIT License (MIT)
 Version: backbone-1.1.2-min.js
 Copyright: Copyright (c) 2010-2014 Jeremy Ashkenas, DocumentCloud
 
+Version: backbone-relational-0.9.0-min.js
+Copyright: Copyright (c) 2011-2014 Paul Uithol
+
+Version: backbone.paginator.min-2.0.2-min.js
+Copyright: Copyright (c) 2012-2014 Jimmy Yuen Ho Wong and contributors
+
+Version: backgrid-filter.min-0.3.5-min.js
+Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
+
+Version: backgrid-paginator-0.3.5-custom.min.js
+Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
+
+Version: backgrid-paginator.min-0.3.5-min.js
+Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
+
+Version: backgrid-select-all-0.3.5-min.js
+Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
+
+Version: backgrid.min-0.3.5-min.js
+Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
+
+Version: bootstrap-3.3.5-custom.js
+Copyright: Copyright (c) 2011-2015 Twitter, Inc
+
+Version: bootstrap-clockpicker-0.0.7-min.js
+CopyrightL Copyright (c) 2014 Wang Shenwei
+
 Version: bootstrap-datetimepicker-4.14.30-min.js
 Copyright: Copyright (c) 2015 Jonathan Peterson
+
+Version: bootstrap-dialog-1.34.4-min.js
+Copyright:
+
+Version: codemirror/addon/display/fullscreen.js
+Copyright: Copyright (C) 2014 by Marijn Haverbeke
+
+Version: codemirror/lib/codemirror.js
+Copyright: Copyright (C) 2014 by Marijn Haverbeke
+
+Version: codemirror/mode/groovy/groovy.js
+Copyright: Copyright (C) 2014 by Marijn Haverbeke
+
+Version: codemirror/mode/javascript/javascript.js
+Copyright: Copyright (C) 2014 by Marijn Haverbeke
 
 Version: form2js-2.0.js
 Copyright: Copyright (c) 2010 Maxim Vasiliev
 
-Version: handlebars-1.3.0-min.js
-Copyright: Copyright (C) 2011 by Yehuda Katz
+Version: handlebars-3.0.3-min.js
+Copyright: Copyright (C) 2011-2015 by Yehuda Katz
 
 Version: grid.locale-en.js
 Copyright: Copyright (c) Tony Tomov tony@trirand.com
+
+Version: groovy-sandbox-1.6.jar
+Copyright: Copyright (c) 2012-2014 Kohsuke Kawaguchi, CloudBees, Inc., other contributors
 
 Version: i18next-1.7.3-min.js
 Copyright: Copyright (c)2014 Jan Mühlemann (jamuhl).
 
 Version: jquery-1.11.1-min.js
 Copyright: Copyright (c) 2005, 2014 jQuery Foundation, Inc.
+
+Version: jquery-2.1.1-min.js
+Copyright: Copyright 2005, 2014 jQuery Foundation, Inc. and other contributors
 
 Version: bootstrap-clockpicker-0.0.7-min.js
 Copyright: Copyright 2014 Wang Shenwei.
@@ -632,15 +817,21 @@ Copyright: Copyright (c) 2010 "Cowboy" Ben Alma
 Version: jquery.jqGrid-4.5.4-min.js
 Copyright: Copyright (c) 2010 Shawn Chin
 
+Version: jquery.placeholder-2.0.8.js
+Copyright: Copyright Mathias Bynens <http://mathiasbynens.be/>
+
 Version: js2form-2.0.js
 Copyright: Copyright (c) 2010 Maxim Vasiliev
 
-Version: lodash-2.4.1-min.js
-Copyright: Copyright 2012-2014 The Dojo Foundation
+Version: lodash-3.10.1-min.js
+Copyright: Copyright 2012-2015 The Dojo Foundation
            Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative (from Underscore.js 1.5.2)
 
 Version: moment-2.8.1-min.js
 Copyright: Copyright Tim Wood, Iskren Chernev, Moment.js
+
+Version: qrcode-1.0.0-min.js
+Copyright: Copyright (c) 2009 Kazuhiko Arase
 
 Version: qunit-1.15.0.js
 Copyright: Copyright 2012-2014 The Dojo Foundation
@@ -666,7 +857,7 @@ Copyright: Copyright (C) 2008-2010 James Coglan
 Version: bluff-src.js 3.6.2
 Copyright: Copyright (C) 2008-2010 James Coglan
 
-Version: query-amd-min.js
+Version: jquery-amd-min.js
 Copyright: Copyright 2011, John Resig
 
 Version: jquery-ui.js
@@ -687,8 +878,14 @@ Copyright:
 Version: calendar_date_select.js (1.16.1)
 Copyright: Copyright 2009 Tim Harper
 
-Version: json2-1.0.js
-Copyright:
+Version: jsoneditor-0.7.22-custom.js
+Copyright: Copyright (c) 2013 Jeremy Dorn
+
+Version: jsoneditor-0.7.9-min.js
+Copyright: Copyright (c) 2013 Jeremy Dorn
+
+Version: js2form-2.0.js
+Copyright: Copyright (c) 2010 Maxim Vasiliev
 
 Version: require-jquery.js
 Copyright: Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
@@ -705,8 +902,11 @@ Copyright: Copyright 2004-2013 QOS.ch
 Version: slf4j-nop-1.7.5.jar
 Copyright: Copyright 2004-2013 QOS.ch
 
-Version: json-20090211.jar
-Copyright: Copyright (c) 2002 JSON.org
+Version: slf4j-jdk14-1.7.5.jar
+Copyright: Copyright 2004-2007 QOS.ch
+
+Version: text.js
+Copyright: Copyright (c) 2010-2014, The Dojo Foundation
 
 ==================
 Full license text:
@@ -1020,7 +1220,7 @@ Version: jsr311-api-1.1.1.jar
 Copyright: Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
 
 Version: mail-1.4.5.jar
-Copyright: Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+Copyright: Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
 
 Version: oauth-client-1.1.5.2.jar
 Copyright: Copyright 2009 Sun Microsystems, Inc. All rights reserved.
@@ -1471,3 +1671,70 @@ Everyone is permitted to copy and distribute copies of this Agreement, but in or
 
 This Agreement is governed by the laws of the State of New York and the intellectual property laws of the United States of America. No party to this Agreement will bring a legal action under this Agreement more than one year after the cause of action arose. Each party waives its rights to a jury trial in any resulting litigation.
 
+
+***************************************************************************
+CC0 - Public Domain Dedication
+***************************************************************************
+
+Version: HdrHistogram-2.1.4.jar
+Copyright disclaimer: Written by Gil Tene of Azul Systems, and released to the public domain,
+
+Version: json2-1.0.js
+Copyright:     Public Domain.
+               NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+
+==================
+Full license text:
+==================
+
+Statement of Purpose
+
+The laws of most jurisdictions throughout the world automatically confer exclusive Copyright and Related Rights (defined below) upon the creator and subsequent owner(s) (each and all, an "owner") of an original work of authorship and/or a database (each, a "Work").
+
+Certain owners wish to permanently relinquish those rights to a Work for the purpose of contributing to a commons of creative, cultural and scientific works ("Commons") that the public can reliably and without fear of later claims of infringement build upon, modify, incorporate in other works, reuse and redistribute as freely as possible in any form whatsoever and for any purposes, including without limitation commercial purposes. These owners may contribute to the Commons to promote the ideal of a free culture and the further production of creative, cultural and scientific works, or to gain reputation or greater distribution for their Work in part through the use and efforts of others.
+
+For these and/or other purposes and motivations, and without any expectation of additional consideration or compensation, the person associating CC0 with a Work (the "Affirmer"), to the extent that he or she is an owner of Copyright and Related Rights in the Work, voluntarily elects to apply CC0 to the Work and publicly distribute the Work under its terms, with knowledge of his or her Copyright and Related Rights in the Work and the meaning and intended legal effect of CC0 on those rights.
+
+1. Copyright and Related Rights. A Work made available under CC0 may be protected by copyright and related or neighboring rights ("Copyright and Related Rights"). Copyright and Related Rights include, but are not limited to, the following:
+
+the right to reproduce, adapt, distribute, perform, display, communicate, and translate a Work;
+moral rights retained by the original author(s) and/or performer(s);
+publicity and privacy rights pertaining to a person's image or likeness depicted in a Work;
+rights protecting against unfair competition in regards to a Work, subject to the limitations in paragraph 4(a), below;
+rights protecting the extraction, dissemination, use and reuse of data in a Work;
+database rights (such as those arising under Directive 96/9/EC of the European Parliament and of the Council of 11 March 1996 on the legal protection of databases, and under any national implementation thereof, including any amended or successor version of such directive); and
+other similar, equivalent or corresponding rights throughout the world based on applicable law or treaty, and any national implementations thereof.
+2. Waiver. To the greatest extent permitted by, but not in contravention of, applicable law, Affirmer hereby overtly, fully, permanently, irrevocably and unconditionally waives, abandons, and surrenders all of Affirmer's Copyright and Related Rights and associated claims and causes of action, whether now known or unknown (including existing as well as future claims and causes of action), in the Work (i) in all territories worldwide, (ii) for the maximum duration provided by applicable law or treaty (including future time extensions), (iii) in any current or future medium and for any number of copies, and (iv) for any purpose whatsoever, including without limitation commercial, advertising or promotional purposes (the "Waiver"). Affirmer makes the Waiver for the benefit of each member of the public at large and to the detriment of Affirmer's heirs and successors, fully intending that such Waiver shall not be subject to revocation, rescission, cancellation, termination, or any other legal or equitable action to disrupt the quiet enjoyment of the Work by the public as contemplated by Affirmer's express Statement of Purpose.
+
+3. Public License Fallback. Should any part of the Waiver for any reason be judged legally invalid or ineffective under applicable law, then the Waiver shall be preserved to the maximum extent permitted taking into account Affirmer's express Statement of Purpose. In addition, to the extent the Waiver is so judged Affirmer hereby grants to each affected person a royalty-free, non transferable, non sublicensable, non exclusive, irrevocable and unconditional license to exercise Affirmer's Copyright and Related Rights in the Work (i) in all territories worldwide, (ii) for the maximum duration provided by applicable law or treaty (including future time extensions), (iii) in any current or future medium and for any number of copies, and (iv) for any purpose whatsoever, including without limitation commercial, advertising or promotional purposes (the "License"). The License shall be deemed effective as of the date CC0 was applied by Affirmer to the Work. Should any part of the License for any reason be judged legally invalid or ineffective under applicable law, such partial invalidity or ineffectiveness shall not invalidate the remainder of the License, and in such case Affirmer hereby affirms that he or she will not (i) exercise any of his or her remaining Copyright and Related Rights in the Work or (ii) assert any associated claims and causes of action with respect to the Work, in either case contrary to Affirmer's express Statement of Purpose.
+
+4. Limitations and Disclaimers.
+
+No trademark or patent rights held by Affirmer are waived, abandoned, surrendered, licensed or otherwise affected by this document.
+Affirmer offers the Work as-is and makes no representations or warranties of any kind concerning the Work, express, implied, statutory or otherwise, including without limitation warranties of title, merchantability, fitness for a particular purpose, non infringement, or the absence of latent or other defects, accuracy, or the present or absence of errors, whether or not discoverable, all to the greatest extent permissible under applicable law.
+Affirmer disclaims responsibility for clearing rights of other persons that may apply to the Work or any use thereof, including without limitation any person's Copyright and Related Rights in the Work. Further, Affirmer disclaims responsibility for obtaining any necessary consents, permissions or other rights required for any use of the Work.
+Affirmer understands and acknowledges that Creative Commons is not a party to this document and has no duty or obligation with respect to this CC0 or use of the Work.
+
+***************************************************************************
+The JSON License
+***************************************************************************
+
+Version: org.restlet.lib.org.json-2.0.jar
+Copyright: Copyright (c) 2002 JSON.org
+
+Version: json-20090211.jar
+Copyright: Copyright (c) 2002 JSON.org
+
+==================
+Full license text:
+==================
+
+Copyright (c) 2002 JSON.org
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+The Software shall be used for Good, not Evil.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
