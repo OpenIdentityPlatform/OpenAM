@@ -25,6 +25,7 @@ import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ApplicationServiceImpl;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.service.ResourceTypeServiceImpl;
+import org.forgerock.openam.session.SessionCache;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -46,5 +47,7 @@ public class CliGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(ApplicationService.class, ApplicationServiceImpl.class)
                 .build(ApplicationServiceFactory.class));
+
+        bind(SessionCache.class).toInstance(SessionCache.getInstance());
     }
 }
