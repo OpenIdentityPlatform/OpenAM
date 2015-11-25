@@ -41,6 +41,7 @@ import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.ServiceRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.services.MailService;
 
@@ -66,6 +67,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
         realmRouter.route("serverinfo/version")
                 .authenticateWith(ssoToken().exceptRead())
                 .auditAs(SERVER_INFO)
+                .authorizeWith(PrivilegeAuthzModule.class)
                 .toSingleton(ServerVersionResource.class);
 
         realmRouter.route("users")
