@@ -24,16 +24,14 @@
  *
  * $Id: RequestContext.java,v 1.11 2009/04/02 01:16:07 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.cli;
 
 import com.sun.identity.shared.locale.Locale;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +47,9 @@ public class RequestContext {
     private CLIRequest request;
     private ResourceBundle rb;
     private SubCommand subCommand;
+
+    private List<String> parentArgList;
+    private List<String> childArgList;
 
     /**
      * Creates a request context object.
@@ -86,6 +87,11 @@ public class RequestContext {
         if (!subcmd.validateOptions(mapOptions, request.getSSOToken())) {
             throw createIncorrectOptionException(commandMgr.getCommandName(),
                 argv);
+        } else {
+            request.setOptions(childArgList.toArray(new String[childArgList.size()]));
+            if (parentArgv != null) {
+                parentRequest.setOptions(parentArgList.toArray(new String[parentArgList.size()]));
+            }
         }
     }
 
@@ -164,6 +170,7 @@ public class RequestContext {
     ) throws CLIException {
         //skip the first index because it is the sub command name.
         List values = null;
+        parentArgList = new ArrayList<String>(Arrays.asList(argv));
         for (int i = 1; i < argv.length; i++) {
             String arg = argv[i];
             if (arg.startsWith(CLIConstants.PREFIX_ARGUMENT_LONG)) {
@@ -189,6 +196,7 @@ public class RequestContext {
                     if (longOption != null) {
                         values = new ArrayList();
                         mapOptions.put(longOption, values);
+                        parentArgList.set(i, CLIConstants.PREFIX_ARGUMENT_LONG + longOption);
                     } else {
                         values = null;
                     }
@@ -211,6 +219,7 @@ public class RequestContext {
     ) throws CLIException {
         //skip the first index because it is the sub command name.
         List values = null;
+        childArgList = new ArrayList<String>(Arrays.asList(argv));
         for (int i = 1; i < argv.length; i++) {
             String arg = argv[i];
             if (arg.startsWith(CLIConstants.PREFIX_ARGUMENT_LONG)) {
@@ -238,6 +247,7 @@ public class RequestContext {
                     } else {
                         values = new ArrayList();
                         mapOptions.put(longOption, values);
+                        childArgList.set(i, CLIConstants.PREFIX_ARGUMENT_LONG + longOption);
                     }
                 }
             } else if (values == null) {
