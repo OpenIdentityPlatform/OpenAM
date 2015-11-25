@@ -19,18 +19,21 @@ package org.forgerock.openam.rest.authz;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.services.context.Context;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.utils.Config;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
+
+import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  *
@@ -58,39 +61,20 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
         return NAME;
     }
 
-    /**
-     * Authorizes caller if they are either a super user or they are making a request to a resource they "own",
-     * i.e. demo making a call to /json/users/demo/uma/resourceset.
-     *
-     * @param context The request context.
-     * @return The authorization result.
-     */
     @Override
-    protected Promise<AuthorizationResult, ResourceException> authorize(Context context) {
-
-        try {
-            String loggedInUserId = getUserId(context);
-            if (isSuperUser(loggedInUserId)) {
-                if (debug.messageEnabled()) {
-                    debug.message("ResourceOwnerOrSuperUserAuthzModule :: User, " + loggedInUserId
-                            + " accepted as Super user.");
-                }
-                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
-            } else if (loggedInUserId.equalsIgnoreCase(getUserIdFromUri(context))) {
-                if (debug.messageEnabled()) {
-                    debug.message("ResourceOwnerOrSuperUserAuthzModule :: User, " + loggedInUserId
-                            + " accepted as Resource Owner.");
-                }
-                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
-            } else {
-                if (debug.warningEnabled()) {
-                    debug.warning("ResourceOwnerOrSuperUserAuthzModule :: Denied access to " + loggedInUserId);
-                }
-                return Promises.newResultPromise(AuthorizationResult.accessDenied("User, " + loggedInUserId
-                        + ", not authorized."));
-            }
-        } catch (ResourceException e) {
-            return e.asPromise();
+    protected Promise<AuthorizationResult, ResourceException> validateToken(Context context, SSOToken token)
+            throws SSOException, ResourceException {
+        String loggedInUserId = getUserId(token);
+        if (isSuperUser(loggedInUserId)) {
+            debug.message("{} :: User, {} accepted as Super user", moduleName, loggedInUserId);
+            return Promises.newResultPromise(AuthorizationResult.accessPermitted());
+        } else if (loggedInUserId.equalsIgnoreCase(getUserIdFromUri(context))) {
+            debug.message("{} :: User, {} accepted as Resource Owner", moduleName, loggedInUserId);
+            return Promises.newResultPromise(AuthorizationResult.accessPermitted());
+        } else {
+            debug.warning("{} :: Denied access to {}", moduleName, loggedInUserId);
+            return Promises.newResultPromise(AuthorizationResult.accessDenied("User, " + loggedInUserId
+                    + ", not authorized."));
         }
     }
 

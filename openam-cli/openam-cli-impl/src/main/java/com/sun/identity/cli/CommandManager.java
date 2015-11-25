@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,6 @@
  *
  * $Id: CommandManager.java,v 1.37 2010/01/28 00:47:10 bigfatrat Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
@@ -50,6 +47,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.forgerock.audit.events.TransactionId;
 import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -72,6 +70,7 @@ import com.sun.identity.tools.bundles.VersionCheck;
 public class CommandManager {
     private final static String IMPORT_SVC_CMD = "import-svc-cfg";
     private final static String RESOURCE_BUNDLE_NAME = "cliBase";
+    public static final TransactionId TRANSACTION_ID = new TransactionId();
     public static ResourceBundle resourceBundle;
     private static Debug debugger;        
     private ResourceBundle rbMessages;

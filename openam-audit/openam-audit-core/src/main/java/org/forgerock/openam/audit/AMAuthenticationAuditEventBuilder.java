@@ -26,20 +26,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.iplanet.sso.SSOToken;
+
 /**
  * Builder for OpenAM audit authentication events.
  *
  * @since 13.0.0
  */
-public final class AMAuthenticationAuditEventBuilder extends
-        AuthenticationAuditEventBuilder<AMAuthenticationAuditEventBuilder> {
+public final class AMAuthenticationAuditEventBuilder
+        extends AuthenticationAuditEventBuilder<AMAuthenticationAuditEventBuilder>
+        implements AMAuditEventBuilder<AMAuthenticationAuditEventBuilder> {
 
-    /**
-     * Provide value for "realm" audit log field.
-     *
-     * @param value Value that should be stored in the 'realm' audit log field.
-     * @return this builder for method chaining.
-     */
+    @Override
     public AMAuthenticationAuditEventBuilder realm(String value) {
         putRealm(jsonValue, value);
         return this;
@@ -74,25 +72,13 @@ public final class AMAuthenticationAuditEventBuilder extends
         return this;
     }
 
-    /**
-     * Provide value for "component" audit log field.
-     *
-     * @param value one of the predefined names from {@link AuditConstants.Component}
-     * @return this builder for method chaining.
-     */
+    @Override
     public AMAuthenticationAuditEventBuilder component(AuditConstants.Component value) {
         putComponent(jsonValue, value.toString());
         return this;
     }
 
-    /**
-     * Sets the provided name for the event. This method is preferred over
-     * {@link org.forgerock.audit.events.AuditEventBuilder#eventName(String)} as it allows OpenAM to manage event
-     * names better and documentation to be automatically generated for new events.
-     *
-     * @param name one of the predefined names from {@link AuditConstants.EventName}
-     * @return this builder
-     */
+    @Override
     public AMAuthenticationAuditEventBuilder eventName(AuditConstants.EventName name) {
         return eventName(name.toString());
     }
@@ -109,4 +95,11 @@ public final class AMAuthenticationAuditEventBuilder extends
         }
         return this;
     }
+
+    @Override
+    public AMAuthenticationAuditEventBuilder trackingIdFromSSOToken(SSOToken ssoToken) {
+        trackingId(getTrackingIdFromSSOToken(ssoToken));
+        return this;
+    }
+
 }

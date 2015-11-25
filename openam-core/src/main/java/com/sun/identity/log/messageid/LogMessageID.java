@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,15 +24,17 @@
  *
  * $Id: LogMessageID.java,v 1.6 2008/08/27 22:08:38 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.log.messageid;
 
+import static com.sun.identity.log.messageid.LogMessageConstants.XML_DATAINFO_TAG_NAME;
+
 import com.sun.identity.log.spi.Debug;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import org.w3c.dom.Element;
@@ -43,12 +45,13 @@ import org.w3c.dom.NodeList;
  * Log Message ID is a unique identifier for each log message.
  */
 public class LogMessageID {
+    private final List<String> dataInfoColumns;
     private Level logLevel;
     private String prefix;
     private int id;
     private String name;
     private String description;
-    private int dataInfo;
+    private int dataInfoSize;
 
     private static Map mapLogLevel = new HashMap();
 
@@ -64,13 +67,12 @@ public class LogMessageID {
 
     /**
      * Constructs a log message ID instance.
-     *
-     * @param logLevel Log level.
+     *  @param logLevel Log level.
      * @param prefix Prefix of this log.
      * @param id Unique Identification number.
      * @param name Unique name.
      * @param description Description of this log.
-     * @param dataInfo Information on the data logged.
+     * @param dataInfoColumns Information on the data logged.
      */
     public LogMessageID(
         Level logLevel,
@@ -78,14 +80,15 @@ public class LogMessageID {
         int id,
         String name,
         String description,
-        int dataInfo
+        List<String> dataInfoColumns
     ) {
         this.logLevel = logLevel;
         this.prefix = prefix;
         this.id = id;
         this.name = name;
         this.description = description;
-        this.dataInfo = dataInfo;
+        this.dataInfoSize = dataInfoColumns.size();
+        this.dataInfoColumns = dataInfoColumns;
     }
 
     /**
@@ -139,7 +142,15 @@ public class LogMessageID {
      * @return number of entries in the data column.
      */
     public int getNumberOfEntriesInDataColumn() {
-        return dataInfo;
+        return dataInfoSize;
+    }
+
+    /**
+     * Get the names of the data columns for the log message.
+     * @return The column names.
+     */
+    public List<String> getDataColumns() {
+        return dataInfoColumns;
     }
 
     static LogMessageID createInstance(String prefix, Node node) {
@@ -160,11 +171,18 @@ public class LogMessageID {
 
                 if ((name.length() > 0) && (id.length() > 0)) {
                     try {
+                        Node datainfo = getNodeOfName(node, XML_DATAINFO_TAG_NAME);
+                        List<String> dataColumns = new ArrayList<>();
+                        if (datainfo != null) {
+                            NodeList dataInfoItems = ((Element)datainfo).getElementsByTagName("item");
+                            for (int i = 0; i < dataInfoItems.getLength(); i++) {
+                                dataColumns.add(dataInfoItems.item(i).getTextContent().trim());
+                            }
+                        }
                         messageID = new LogMessageID(
                             (Level)mapLogLevel.get(logLevel), prefix,
                             Integer.parseInt(id), name, description,
-                            getArrayCount(node,
-                                LogMessageConstants.XML_DATAINFO_TAG_NAME));
+                            dataColumns);
                     } catch (NumberFormatException e) {
                         Debug.error("LogMessageID.createInstance", e);        
                     }

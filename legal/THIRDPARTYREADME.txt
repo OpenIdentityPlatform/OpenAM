@@ -192,6 +192,9 @@ Copyright: Copyright 2009 Google Inc
 Version: HikariCP-2.4.1.jar
 Copyright: Copyright (C) 2013-2015 Brett Wooldridge
 
+Version: httpasyncclient-4.1.jar
+Copyright: Copyright 2010-2015 The Apache Software Foundation
+
 Version: httpclient-4.0.1.jar
 Copyright: Copyright 1999-2014 The Apache Software Foundation
 
@@ -205,6 +208,9 @@ Version: httpcore-4.4.1.jar
 Copyright: Copyright 2005-2015 The Apache Software Foundation
            This project contains annotations derived from JCIP-ANNOTATIONS
            Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
+
+Version: httpcore-nio-4.4.1.jar
+Copyright: 2005-2015 The Apache Software Foundation
 
 Version: jackson-annotations-2.4.2.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SessionID.java,v 1.10 2009/10/02 23:45:42 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2015 ForgeRock, AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
@@ -203,9 +200,9 @@ public class SessionID implements Serializable {
     }
 
     /**
-     * Returns the session server URI in this object.
-     * 
-     * @return The session server URI in this object.
+     * Returns the session server path in this object.
+     *
+     * @return The session server path in this object.
      */
     public String getSessionServerURI() {
         if (isNull(sessionServerURI)) {
@@ -213,7 +210,17 @@ public class SessionID implements Serializable {
         }
         return sessionServerURI;
     }
-    
+
+    /**
+     * Returns the session server URL in this object.
+     *
+     * @return The session server URL in this object.
+     */
+    public String getSessionServerURL() {
+        parseSessionString();
+        return sessionServerProtocol + "://" + sessionServer + ":" + sessionServerPort + sessionServerURI;
+    }
+
     /**
       * This method returns the boolean representing if this session id
       * is a regular auth token, generated via AuthContext API

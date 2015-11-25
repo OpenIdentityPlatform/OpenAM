@@ -15,16 +15,19 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.putRealm;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 
 import org.forgerock.audit.events.ConfigAuditEventBuilder;
+
+import com.iplanet.sso.SSOToken;
 
 /**
  * Builder for OpenAM audit config events.
  *
  * @since 13.0.0
  */
-public final class AMConfigAuditEventBuilder extends ConfigAuditEventBuilder<AMConfigAuditEventBuilder> {
+public final class AMConfigAuditEventBuilder extends ConfigAuditEventBuilder<AMConfigAuditEventBuilder>
+        implements AMAuditEventBuilder<AMConfigAuditEventBuilder> {
     /**
      * Sets the provided name for the event. This method is preferred over
      * {@link org.forgerock.audit.events.AuditEventBuilder#eventName(String)} as it allows OpenAM to manage event
@@ -58,5 +61,17 @@ public final class AMConfigAuditEventBuilder extends ConfigAuditEventBuilder<AMC
     public final AMConfigAuditEventBuilder realm(String realm) {
         putRealm(jsonValue, realm);
         return self();
+    }
+
+    @Override
+    public AMConfigAuditEventBuilder component(AuditConstants.Component value) {
+        putComponent(jsonValue, value.toString());
+        return this;
+    }
+
+    @Override
+    public AMConfigAuditEventBuilder trackingIdFromSSOToken(SSOToken ssoToken) {
+        trackingId(getTrackingIdFromSSOToken(ssoToken));
+        return this;
     }
 }

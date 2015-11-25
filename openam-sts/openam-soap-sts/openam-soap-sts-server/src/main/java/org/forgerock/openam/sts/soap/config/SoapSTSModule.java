@@ -242,7 +242,7 @@ public class SoapSTSModule extends PrivateModule {
     @Named (AMSTSConstants.REST_CREATE_ACCESS_AUDIT_EVENT_URI_ELEMENT)
     @Exposed
     String restAMAuditUriElement() {
-        return "/audit/access/?_action=create";
+        return "/global-audit/access/?_action=create";
     }
 
     @Inject

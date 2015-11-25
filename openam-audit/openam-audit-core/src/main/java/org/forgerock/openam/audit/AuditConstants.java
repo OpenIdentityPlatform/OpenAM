@@ -116,7 +116,9 @@ public final class AuditConstants {
         /** Audit audit event component. */
         AUDIT("Audit"),
         /** RADIUS server component. */
-        RADIUS("Radius");
+        RADIUS("Radius"),
+        /** SSOADM CLI component. */
+        SSOADM("ssoadm");
         private final String name;
 
         Component(String name) {

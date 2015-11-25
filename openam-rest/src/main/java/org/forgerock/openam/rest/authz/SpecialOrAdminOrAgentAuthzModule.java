@@ -13,6 +13,7 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.rest.authz;
 
 import javax.inject.Inject;
@@ -21,10 +22,13 @@ import javax.inject.Named;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
+import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
+import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
@@ -34,16 +38,21 @@ import com.sun.identity.shared.debug.Debug;
  *
  * @since 13.0.0
  */
-public class AgentOnlyAuthzModule extends SSOTokenAuthzModule {
+public class SpecialOrAdminOrAgentAuthzModule extends AgentOnlyAuthzModule {
 
-    public static final String NAME = "AgentOnlyFilter";
+    public static final String NAME = "AdminOrAgentOnlyFilter";
 
     protected final AgentIdentity agentIdentity;
+    private final Config<SessionService> sessionService;
+    private final SpecialUserIdentity specialUserIdentity;
 
     @Inject
-    public AgentOnlyAuthzModule(AgentIdentity agentIdentity, @Named("frRest") Debug debug) {
-        super(debug);
+    public SpecialOrAdminOrAgentAuthzModule(SpecialUserIdentity specialUserIdentity, AgentIdentity agentIdentity,
+            Config<SessionService> sessionService, @Named("frRest") Debug debug) {
+        super(agentIdentity, debug);
         this.agentIdentity = agentIdentity;
+        this.specialUserIdentity = specialUserIdentity;
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -54,12 +63,14 @@ public class AgentOnlyAuthzModule extends SSOTokenAuthzModule {
     @Override
     protected Promise<AuthorizationResult, ResourceException> validateToken(Context context, SSOToken token) throws SSOException {
         String userId = token.getPrincipal().getName();
-        if (agentIdentity.isAgent(token)) {
-            debug.message("AgentOnlyAuthzModule :: User, {} accepted as Agent user", userId);
+        if (specialUserIdentity.isSpecialUser(token)) {
+            debug.message("{} :: User, {} accepted as special user", moduleName, userId);
+            return Promises.newResultPromise(AuthorizationResult.accessPermitted());
+        } else if (sessionService.get().isSuperUser(AdminOnlyAuthzModule.getUserId(token))) {
+            debug.message("{} :: User, {} accepted as admin user", moduleName, userId);
             return Promises.newResultPromise(AuthorizationResult.accessPermitted());
         } else {
-            debug.warning("AgentUserOnlyAuthzModule :: Denied access to {}", userId);
-            return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not an Agent."));
+            return super.validateToken(context, token);
         }
     }
 }

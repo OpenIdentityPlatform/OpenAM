@@ -40,6 +40,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
+import org.forgerock.util.Reject;
 
 import com.iplanet.sso.SSOToken;
 
@@ -48,7 +49,8 @@ import com.iplanet.sso.SSOToken;
  *
  * @since 13.0.0
  */
-public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessAuditEventBuilder> {
+public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessAuditEventBuilder>
+        implements AMAuditEventBuilder<AMAccessAuditEventBuilder> {
 
     /**
      * Provide value for "component" audit log field.
@@ -61,13 +63,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         return this;
     }
 
-    /**
-     * Adds trackingId from property of {@link SSOToken}, if the provided
-     * <code>SSOToken</code> is not <code>null</code>.
-     *
-     * @param ssoToken The SSOToken from which the trackingId value will be retrieved.
-     * @return this builder
-     */
+    @Override
     public AMAccessAuditEventBuilder trackingIdFromSSOToken(SSOToken ssoToken) {
         trackingId(getTrackingIdFromSSOToken(ssoToken));
         return this;
@@ -148,10 +144,10 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
 
     private AMAccessAuditEventBuilder addDetail(JsonValue detail, String field) {
         if (detail != null) {
-            if (jsonValue.contains(field)) {
+            if (jsonValue.isDefined(field)) {
                 jsonValue.get(field).put(DETAIL, detail.getObject());
             } else {
-                jsonValue.put(field, object(field(DETAIL, detail.getObject())));
+                this.jsonValue.put(field, object(field(DETAIL, detail.getObject())));
             }
         }
         return this;
@@ -165,6 +161,38 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      */
     public final AMAccessAuditEventBuilder realm(String realm) {
         putRealm(jsonValue, realm);
+        return this;
+    }
+
+    /**
+     * Set response without elapsed time.
+     * @param status The status of the response.
+     * @param statusCode The status code, if applicable.
+     * @return The builder.
+     */
+    public final AMAccessAuditEventBuilder response(AccessAuditEventBuilder.ResponseStatus status, String statusCode) {
+        JsonValue object = json(object(
+                field("status", status == null ? null : status.toString()),
+                field("statusCode", statusCode)));
+        this.jsonValue.put("response", object);
+        return this;
+    }
+
+    /**
+     * Set response with detail without elapsed time.
+     * @param status The status of the response.
+     * @param statusCode The status code, if applicable.
+     * @param detail The detail of the response.
+     * @return The builder.
+     */
+    public final AMAccessAuditEventBuilder responseWithDetail(AccessAuditEventBuilder.ResponseStatus status,
+            String statusCode, JsonValue detail) {
+        Reject.ifNull(detail);
+        JsonValue object = json(object(
+                field("status", status == null ? null : status.toString()),
+                field("statusCode", statusCode),
+                field("detail", detail.getObject())));
+        this.jsonValue.put("response", object);
         return this;
     }
 

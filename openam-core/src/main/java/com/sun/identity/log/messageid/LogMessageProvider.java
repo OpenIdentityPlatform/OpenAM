@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,15 +24,13 @@
  *
  * $Id: LogMessageProvider.java,v 1.4 2008/06/25 05:43:37 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.log.messageid;
 
 import com.sun.identity.log.LogRecord;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This interface defines a methods for a log message provider.
@@ -46,6 +44,11 @@ public interface LogMessageProvider {
     List getAllMessageIDs();
 
     /**
+     * Returns a map of message names to IDs
+     */
+    Map<String, LogMessageID> getAllHashMessageIDs();
+
+    /**
      * Creates Log Record.
      *
      * @param messageIDName Name of Message ID.
@@ -53,8 +56,5 @@ public interface LogMessageProvider {
      * @param ssoToken Single sign on token which will be used to fill in
      *        details like client IP address into the log record.
      */
-    LogRecord createLogRecord(
-        String messageIDName,
-        String[] dataInfo,
-        Object ssoToken);
+    LogRecord createLogRecord(String messageIDName, String[] dataInfo, Object ssoToken);
 }
