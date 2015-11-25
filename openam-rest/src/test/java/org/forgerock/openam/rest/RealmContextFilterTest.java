@@ -28,23 +28,43 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdRepoException;
-import org.forgerock.services.context.Context;
 import org.forgerock.http.Handler;
-import org.forgerock.services.context.RootContext;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.http.CrestHttp;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.rest.query.QueryResponseHandler;
 import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.services.context.AttributesContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RootContext;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.IdRepoException;
 
 public class RealmContextFilterTest {
 
@@ -191,6 +211,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
+        verifyRealmContext(contextCaptor.getValue(), "", "/", null);
         verifyUriRouterContextForInvalidRealm(contextCaptor.getValue());
     }
 
@@ -395,12 +416,97 @@ public class RealmContextFilterTest {
                 new InternalServerErrorException("EXCEPTION_MESSAGE").toJsonValue().getObject());
     }
 
+    @Test(dataProvider = "CRUDPAQ")
+    public void filterShouldConsumeRealmFromCRUDPAQRequest(Request request, String postURIString) throws Exception {
+
+        //Given
+        RequestHandler requestHandler = mock(RequestHandler.class);
+        String path = ENDPOINT_PATH_ELEMENT;
+        Context context = mockContext(path);
+        request.setUri(createRequestURI(HOSTNAME, path, postURIString));
+
+        mockDnsAlias(HOSTNAME, "/");
+
+        //When
+        Handler httpHandler = getHttpHandler(requestHandler);
+        httpHandler.handle(context, request).getOrThrowUninterruptibly();
+
+        //Then
+        ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
+        ArgumentCaptor<org.forgerock.json.resource.Request> requestCaptor = ArgumentCaptor.forClass(org.forgerock.json.resource.Request.class);
+
+        collectCRUDPAQArguments(requestHandler, contextCaptor, requestCaptor);
+
+        verifyRealmContext(contextCaptor.getValue(), "", "/", null);
+        verifyUriRouterContext(contextCaptor.getValue(), "");
+        verifyResolvedResourcePath(requestCaptor.getValue(), ENDPOINT_PATH_ELEMENT);
+    }
+
+    @Test(dataProvider = "CRUDPAQ")
+    public void filterShouldConsumeRealmFromCRUDPAQRequestWithSubrealm(Request request, String postURIString) throws Exception {
+
+        //Given
+        RequestHandler requestHandler = mock(RequestHandler.class);
+        String path = SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT;
+        Context context = mockContext(path);
+        request.setUri(createRequestURI(HOSTNAME, path, postURIString));
+
+        mockDnsAlias(HOSTNAME, "/");
+        mockRealmAlias("/" + SUB_REALM, "/" + SUB_REALM);
+
+        //When
+        Handler httpHandler = getHttpHandler(requestHandler);
+        httpHandler.handle(context, request).getOrThrowUninterruptibly();
+
+        //Then
+        ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
+        ArgumentCaptor<org.forgerock.json.resource.Request> requestCaptor = ArgumentCaptor.forClass(org.forgerock.json.resource.Request.class);
+
+        collectCRUDPAQArguments(requestHandler, contextCaptor, requestCaptor);
+
+        verifyRealmContext(contextCaptor.getValue(), "", "/" + SUB_REALM, null);
+        verifyUriRouterContext(contextCaptor.getValue(), SUB_REALM);
+        verifyResolvedResourcePath(requestCaptor.getValue(), ENDPOINT_PATH_ELEMENT);
+    }
+
+
+    @Test(dataProvider = "CRUDPAQ")
+    public void filterShouldConsumeRealmFromCRUDPAQRequestWithInvalidSubrealm(Request request, String postURIString) throws Exception {
+
+        //Given
+        RequestHandler requestHandler = mock(RequestHandler.class);
+        String path = INVALID_SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT;
+        Context context = mockContext(path);
+        request.setUri(createRequestURI(HOSTNAME, path, postURIString));
+
+        mockDnsAlias(HOSTNAME, "/");
+        mockInvalidRealmAlias(INVALID_SUB_REALM);
+
+        //When
+        Handler httpHandler = getHttpHandler(requestHandler);
+        httpHandler.handle(context, request).getOrThrowUninterruptibly();
+
+        //Then
+        ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
+        ArgumentCaptor<org.forgerock.json.resource.Request> requestCaptor = ArgumentCaptor.forClass(org.forgerock.json.resource.Request.class);
+
+        collectCRUDPAQArguments(requestHandler, contextCaptor, requestCaptor);
+
+        verifyRealmContext(contextCaptor.getValue(), "", "/", null);
+        verifyUriRouterContextForInvalidRealm(contextCaptor.getValue());
+        verifyResolvedResourcePath(requestCaptor.getValue(), INVALID_SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
+    }
+
     private Context mockContext(String remainingUri) {
-        return new UriRouterContext(new RootContext(), JSON_PATH_ELEMENT, remainingUri, EMPTY_VARIABLE_MAP);
+        return new UriRouterContext(new AttributesContext(new RootContext()), JSON_PATH_ELEMENT, remainingUri, EMPTY_VARIABLE_MAP);
     }
 
     private Request createRequest(String hostname, String path) {
-        return new Request().setUri(URI.create("http://" + hostname + "/json/" + path));
+        return new Request().setUri(createRequestURI(hostname, path, ""));
+    }
+
+    private URI createRequestURI(String hostname, String path, String postString) {
+        return URI.create("http://" + hostname + "/json/" + path + postString);
     }
 
     private void mockDnsAlias(String alias, String realm) throws Exception {
@@ -459,5 +565,59 @@ public class RealmContextFilterTest {
         assertThat(response.getStatus()).isSameAs(Status.BAD_REQUEST);
         assertThat(response.getEntity().getJson()).isEqualTo(
                 new BadRequestException("Invalid realm, " + expectedInvalidRealm).toJsonValue().getObject());
+    }
+
+    private void collectCRUDPAQArguments(RequestHandler requestHandler, ArgumentCaptor<Context> contextCaptor, ArgumentCaptor<org.forgerock.json.resource.Request> requestCaptor) {
+        //The cast on each line is safe, as that function can only be called with that type of request
+        //The atLeast(0) call results in each line being optional (they don't all need to be called)
+        verify(requestHandler, atLeast(0)).handleCreate(contextCaptor.capture(), (CreateRequest) requestCaptor.capture());
+        verify(requestHandler, atLeast(0)).handleRead(contextCaptor.capture(), (ReadRequest) requestCaptor.capture());
+        verify(requestHandler, atLeast(0)).handleUpdate(contextCaptor.capture(), (UpdateRequest) requestCaptor.capture());
+        verify(requestHandler, atLeast(0)).handleDelete(contextCaptor.capture(), (DeleteRequest) requestCaptor.capture());
+        verify(requestHandler, atLeast(0)).handlePatch(contextCaptor.capture(), (PatchRequest) requestCaptor.capture());
+        verify(requestHandler, atLeast(0)).handleAction(contextCaptor.capture(), (ActionRequest) requestCaptor.capture());
+        verify(requestHandler, atLeast(0)).handleQuery(contextCaptor.capture(), (QueryRequest) requestCaptor.capture(), any(QueryResponseHandler.class));
+    }
+
+    private Handler getHttpHandler(RequestHandler requestHandler) {
+        ResourceResponse response = mock(ResourceResponse.class);
+        Promise<ResourceResponse, ResourceException> result = Promises.newResultPromise(response);
+
+        given(requestHandler.handleCreate(any(Context.class), any(CreateRequest.class))).willReturn(result);
+        given(requestHandler.handleRead(any(Context.class), any(ReadRequest.class))).willReturn(result);
+        given(requestHandler.handleUpdate(any(Context.class), any(UpdateRequest.class))).willReturn(result);
+        given(requestHandler.handleDelete(any(Context.class), any(DeleteRequest.class))).willReturn(result);
+        given(requestHandler.handlePatch(any(Context.class), any(PatchRequest.class))).willReturn(result);
+        given(requestHandler.handleAction(any(Context.class), any(ActionRequest.class)))
+                .willReturn(Promises.<ActionResponse, ResourceException>newResultPromise(mock(ActionResponse.class)));
+        given(requestHandler.handleQuery(any(Context.class), any(QueryRequest.class), any(QueryResponseHandler.class)))
+                .willReturn(Promises.<QueryResponse, ResourceException>newResultPromise(mock(QueryResponse.class)));
+        FilterChain filterChain = new FilterChain(requestHandler, filter);
+        return CrestHttp.newHttpHandler(filterChain);
+
+    }
+
+    @DataProvider(name = "CRUDPAQ")
+    public Object[][] createCRUDPAQRequests() {
+        return new Object[][] {
+            { new Request().setMethod("POST").setEntity(new String("{}")), "?_action=create"}, //create
+            { new Request().setMethod("GET"), "" }, //read
+            { getUpdateRequest(), "" }, //update
+            { new Request().setMethod("DELETE"), "" }, //delete
+            {new Request().setMethod("PATCH").setEntity(new String("[]")), "" }, //patch
+            { new Request().setMethod("POST"), "?_action=other" }, //action
+            { new Request().setMethod("GET"), "?_queryFilter=true"} //query
+        };
+    }
+
+    private Request getUpdateRequest() {
+        Request request = new Request().setMethod("PUT");
+        request.getHeaders().put("If-Match", "*");
+        request.setEntity(new String("{}"));
+        return request;
+    }
+
+    private void verifyResolvedResourcePath(org.forgerock.json.resource.Request request, String matchedResourcePath) {
+        assertThat(request.getResourcePath()).isEqualTo(matchedResourcePath);
     }
 }

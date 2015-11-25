@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest;
 
+import static org.forgerock.json.resource.Requests.*;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -28,8 +29,8 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
 
-import org.forgerock.guava.common.collect.Iterables;
 import org.forgerock.guava.common.collect.Lists;
+import org.forgerock.openam.utils.RealmUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
@@ -52,7 +53,6 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
@@ -93,7 +93,12 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
     public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
         try {
-            return next.handleAction(evaluate(context, request), request);
+            Context newContext = evaluate(context, request);
+            ActionRequest evaluatedRequest = wasEvaluated(context, newContext)
+                    ? copyOfActionRequest(request)
+                            .setResourcePath(newContext.asContext(UriRouterContext.class).getRemainingUri())
+                    : request;
+            return next.handleAction(evaluate(context, request), evaluatedRequest);
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }
@@ -103,7 +108,12 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
     public Promise<ResourceResponse, ResourceException> filterCreate(Context context, CreateRequest request,
             RequestHandler next) {
         try {
-            return next.handleCreate(evaluate(context, request), request);
+            Context newContext = evaluate(context, request);
+            CreateRequest evaluatedRequest = wasEvaluated(context, newContext)
+                    ? copyOfCreateRequest(request)
+                            .setResourcePath(newContext.asContext(UriRouterContext.class).getRemainingUri())
+                    : request;
+            return next.handleCreate(evaluate(context, request), evaluatedRequest);
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }
@@ -113,7 +123,12 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
     public Promise<ResourceResponse, ResourceException> filterDelete(Context context, DeleteRequest request,
             RequestHandler next) {
         try {
-            return next.handleDelete(evaluate(context, request), request);
+            Context newContext = evaluate(context, request);
+            DeleteRequest evaluatedRequest = wasEvaluated(context, newContext)
+                    ? copyOfDeleteRequest(request)
+                            .setResourcePath(newContext.asContext(UriRouterContext.class).getRemainingUri())
+                    : request;
+            return next.handleDelete(evaluate(context, request), evaluatedRequest);
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }
@@ -123,7 +138,12 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
     public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
         try {
-            return next.handlePatch(evaluate(context, request), request);
+            Context newContext = evaluate(context, request);
+            PatchRequest evaluatedRequest = wasEvaluated(context, newContext)
+                    ? copyOfPatchRequest(request)
+                            .setResourcePath(newContext.asContext(UriRouterContext.class).getRemainingUri())
+                    : request;
+            return next.handlePatch(evaluate(context, request), evaluatedRequest);
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }
@@ -133,7 +153,12 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
     public Promise<QueryResponse, ResourceException> filterQuery(Context context, QueryRequest request,
             QueryResourceHandler handler, RequestHandler next) {
         try {
-            return next.handleQuery(evaluate(context, request), request, handler);
+            Context newContext = evaluate(context, request);
+            QueryRequest evaluatedRequest = wasEvaluated(context, newContext)
+                    ? copyOfQueryRequest(request)
+                            .setResourcePath(newContext.asContext(UriRouterContext.class).getRemainingUri())
+                    : request;
+            return next.handleQuery(evaluate(context, request), evaluatedRequest, handler);
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }
@@ -143,7 +168,12 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
     public Promise<ResourceResponse, ResourceException> filterRead(Context context, ReadRequest request,
             RequestHandler next) {
         try {
-            return next.handleRead(evaluate(context, request), request);
+            Context newContext = evaluate(context, request);
+            ReadRequest evaluatedRequest = wasEvaluated(context, newContext)
+                    ? copyOfReadRequest(request)
+                            .setResourcePath(newContext.asContext(UriRouterContext.class).getRemainingUri())
+                    : request;
+            return next.handleRead(newContext, evaluatedRequest);
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }
@@ -153,10 +183,23 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
     public Promise<ResourceResponse, ResourceException> filterUpdate(Context context, UpdateRequest request,
             RequestHandler next) {
         try {
-            return next.handleUpdate(evaluate(context, request), request);
+            Context newContext = evaluate(context, request);
+            UpdateRequest evaluatedRequest = wasEvaluated(context, newContext)
+                    ? copyOfUpdateRequest(request)
+                    .setResourcePath(newContext.asContext(UriRouterContext.class).getRemainingUri())
+                    : request;
+            return next.handleUpdate(newContext, evaluatedRequest);
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }
+    }
+
+    private boolean wasEvaluated(Context originalContext, Context newContext) {
+        RealmContext newRealmContext = newContext.asContext(RealmContext.class);
+        return newRealmContext != null
+                && (!originalContext.containsContext(RealmContext.class)
+                || !newRealmContext.getResolvedRealm()
+                        .equals(originalContext.asContext(RealmContext.class).getResolvedRealm()));
     }
 
     private Context evaluate(Context context, Request request) throws ResourceException {
@@ -178,13 +221,13 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
 
         SSOToken adminToken = coreWrapper.getAdminToken();
 
-        String dnsAliasRealm = cleanRealm(getRealmFromAlias(adminToken, hostname));
+        String dnsAliasRealm = RealmUtils.cleanRealm(getRealmFromAlias(adminToken, hostname));
         StringBuilder matchedUriBuilder = new StringBuilder();
         String currentRealm = dnsAliasRealm;
         int consumedElementsCount = 0;
         for (String element : requestUri) {
             try {
-                String subrealm = cleanRealm(element);
+                String subrealm = RealmUtils.cleanRealm(element);
                 currentRealm = resolveRealm(adminToken, currentRealm, subrealm);
                 matchedUriBuilder.append(subrealm);
                 consumedElementsCount++;
@@ -196,7 +239,7 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
         String overrideRealm = null;
         try {
             if (overrideRealmParameter != null && !overrideRealmParameter.isEmpty()) {
-                overrideRealm = resolveRealm(adminToken, "/", cleanRealm(overrideRealmParameter.get(0)));
+                overrideRealm = resolveRealm(adminToken, "/", RealmUtils.cleanRealm(overrideRealmParameter.get(0)));
             }
         } catch (InternalServerErrorException e) {
             throw new BadRequestException("Invalid realm, " + overrideRealmParameter.get(0), e);
@@ -209,34 +252,20 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
         RealmContext realmContext = new RealmContext(new UriRouterContext(context, matchedUri,
                 Paths.joinPath(remainingUri), Collections.<String, String>emptyMap()));
         realmContext.setDnsAlias(hostname, dnsAliasRealm);
-        realmContext.setSubRealm(matchedUri, cleanRealm(currentRealm.substring(dnsAliasRealm.length())));
+        realmContext.setSubRealm(matchedUri, RealmUtils.cleanRealm(currentRealm.substring(dnsAliasRealm.length())));
         realmContext.setOverrideRealm(overrideRealm);
         return realmContext;
 
     }
 
-    private String cleanRealm(String realm) {
-        if (!realm.startsWith("/")) {
-            realm = "/" + realm;
-        }
-        if (realm.length() > 1 && realm.endsWith("/")) {
-            realm = realm.substring(0, realm.length() - 1);
-        }
-        return realm;
-    }
-
     private String resolveRealm(SSOToken adminToken, String parentRealm, String subrealm)
             throws InternalServerErrorException {
-        String realm = concatenateRealmPath(parentRealm, subrealm);
+        String realm = RealmUtils.concatenateRealmPath(parentRealm, subrealm);
         if (!realmValidator.isRealm(realm)) {
             // Ignoring parentRealm here as a realm alias is only applicable if it is from the root realm
             return getRealmFromAlias(adminToken, subrealm.substring(1));
         }
         return realm;
-    }
-
-    private String concatenateRealmPath(String parentRealm, String subrealm) {
-        return parentRealm.equals("/") ? subrealm : parentRealm + subrealm;
     }
 
     private String getRealmFromAlias(SSOToken adminToken, String realmAlias) throws InternalServerErrorException {

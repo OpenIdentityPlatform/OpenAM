@@ -332,7 +332,8 @@ public class SmsRealmProvider implements RequestHandler {
 
         try {
             final SessionID sessionID = new SessionID(getUserSsoToken(context).getTokenID().toString());
-            final String realmPath = coreWrapper.convertOrgNameToRealmName(sessionCache.getSession(sessionID).getClientDomain());
+            final String realmPath =
+                    coreWrapper.convertOrgNameToRealmName(sessionCache.getSession(sessionID).getClientDomain());
 
             final OrganizationConfigManager ocm = new OrganizationConfigManager(getUserSsoToken(context), realmPath);
 
@@ -372,6 +373,12 @@ public class SmsRealmProvider implements RequestHandler {
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         RealmContext realmContext = context.asContext(RealmContext.class);
         String realmPath = realmContext.getResolvedRealm();
+
+        if(!request.getResourcePath().isEmpty()) {
+            //if the resource path is not empty, the realm has not resolved correctly
+            return new NotFoundException("Realm \"" + RealmUtils.concatenateRealmPath(RealmUtils.cleanRealm(realmPath),
+                    RealmUtils.cleanRealm(request.getResourcePath())) + "\" is not a valid realm.").asPromise();
+        }
 
         try {
             JsonValue jsonResponse = getJsonValue(realmPath);

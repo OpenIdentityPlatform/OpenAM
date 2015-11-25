@@ -98,6 +98,31 @@ public final class RealmUtils {
     }
 
     /**
+     * Converts a realm to a valid form
+     * @param realm Raw realm
+     * @return Cleaned realm
+     */
+    public static String cleanRealm(String realm) {
+        if (!realm.startsWith("/")) {
+            realm = "/" + realm;
+        }
+        if (realm.length() > 1 && realm.endsWith("/")) {
+            realm = realm.substring(0, realm.length() - 1);
+        }
+        return realm;
+    }
+
+    /**
+     * Takes two realm and concatenates them together
+     * @param parentRealm The base realm
+     * @param subrealm The subrealm to concatenate
+     * @return The concatenated realm
+     */
+    public static String concatenateRealmPath(String parentRealm, String subrealm) {
+        return parentRealm.equals("/") ? subrealm : parentRealm + subrealm;
+    }
+
+    /**
      * Retrieve the names of all the realms starting with '/' and including '/'.
      *
      * @param adminToken The admin token.
