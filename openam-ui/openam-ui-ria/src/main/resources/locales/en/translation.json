@@ -375,14 +375,13 @@
                 "completed": "Your password has been successfully reset.",
                 "failed": "Unable to reset your password",
                 "tryAgain": "Try Resetting Your Password Again",
-                "return": "Return to Login Page"
+                "answerQuestions": "Answer the security questions below to reset your password."
             },
             "selfRegistration" : {
                 "title": "Register Your Account",
                 "completed": "Your account has been successfully registered.",
                 "failed": "Unable to register your account",
-                "tryAgain": "Try Registering Again",
-                "return": "Return to Login Page"
+                "tryAgain": "Try Registering Again"
             },
             "forgotUsername" : {
                 "title" : "Retrieve Your Username",
@@ -390,10 +389,9 @@
                 "failed": "Unable to retrieve your username",
                 "found": "Username found:",
                 "tryAgain": "Try Finding Your Username Again",
-                "return": "Return to Login Page"
+                "answerQuestions": "Answer the security questions below to retrieve your username."
             },
             "kba" : {
-                "answerQuestions": "Answer security questions below to reset your password.",
                 "description": "Select security question(s) below. These questions will help us verify your identity if you forget your password.",
                 "provideAnother": "Add another question",
                 "selectQuestion": "Select a security question",
@@ -402,10 +400,7 @@
                 "answer": "Security Answer",
                 "securityQuestions": "Security Questions"
             },
-            "emailVerification" : {
-                "description" : "Enter the email address associated with your account to reset your password. We will send you an email that will allow you to reset your password.",
-                "send": "Send"
-            },
+            "returnToLoginPage": "Return to Login Page",
             "userIdValidation" : "Enter the username or email address associated with your account. We will send you an email with a link that will allow you to reset your password.",
             "emailValidation" : "Enter your email address to proceed. We will send you an email with a link that will allow you to continue registering.",
             "send": "Send",
