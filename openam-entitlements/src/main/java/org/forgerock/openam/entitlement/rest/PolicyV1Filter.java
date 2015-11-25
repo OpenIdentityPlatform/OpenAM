@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.entitlement.rest;
 
@@ -30,6 +31,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -190,7 +192,7 @@ public class PolicyV1Filter implements Filter {
         final Application application = applicationService.getApplication(applicationName);
 
         if (application == null) {
-            throw new BadRequestException("Unable to find application " + applicationName);
+            throw new NotFoundException("Unable to find application " + applicationName);
         }
 
         if (application.getResourceTypeUuids().size() != 1) {

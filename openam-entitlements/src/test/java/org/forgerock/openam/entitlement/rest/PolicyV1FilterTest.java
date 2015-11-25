@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.entitlement.rest;
 
@@ -208,7 +209,7 @@ public class PolicyV1FilterTest {
         // Then
         verify(applicationServiceFactory).create(subject, "/abc");
         verify(applicationService).getApplication("testApp");
-        assertThat(promise).failedWithResourceException().withCode(ResourceException.BAD_REQUEST);
+        assertThat(promise).failedWithResourceException().withCode(ResourceException.NOT_FOUND);
         // Request should not be forwarded.
         verifyNoMoreInteractions(requestHandler);
     }
