@@ -50,6 +50,7 @@ import com.sun.identity.saml2.plugins.SAML2PluginsUtils;
 import com.sun.identity.saml2.plugins.SPAttributeMapper;
 import com.sun.identity.saml2.profile.AuthnRequestInfo;
 import com.sun.identity.saml2.profile.AuthnRequestInfoCopy;
+import com.sun.identity.saml2.profile.ResponseInfo;
 import com.sun.identity.saml2.profile.SPACSUtils;
 import com.sun.identity.saml2.profile.SPCache;
 import com.sun.identity.saml2.profile.SPSSOFederate;
@@ -109,6 +110,8 @@ public class SAML2 extends AMLoginModule {
     private int previousLength = 0;
     private ResourceBundle bundle = null;
     private String sessionIndex;
+    private boolean isTransient;
+    private ResponseInfo respInfo;
 
     private SAML2MetaManager metaManager;
 
@@ -310,6 +313,7 @@ public class SAML2 extends AMLoginModule {
         assertionSubject = data.getSubject();
         authnAssertion = data.getAssertion();
         sessionIndex = data.getSessionIndex();
+        respInfo = data.getResponseInfo();
 
         try { //you're already linked or we auto looked up user
             username = SPACSUtils.getPrincipalWithoutLogin(assertionSubject, authnAssertion,
@@ -552,16 +556,23 @@ public class SAML2 extends AMLoginModule {
      */
     private void setSessionProperties(Assertion assertion, NameID nameId, String userName)
             throws AuthLoginException, SAML2Exception {
+        //if we support single logout sp inititated from the auth module's resulting session
         setUserSessionProperty(SAML2Constants.SINGLE_LOGOUT, String.valueOf(singleLogoutEnabled));
-        if (singleLogoutEnabled) {
-            setUserSessionProperty(SAML2Constants.SESSION_INDEX, sessionIndex);
-            setUserSessionProperty(SAML2Constants.IDPENTITYID, entityName);
+
+        if (singleLogoutEnabled) { //we also need to store the relay state
             setUserSessionProperty(SAML2Constants.RELAY_STATE, sloRelayState);
-            setUserSessionProperty(SAML2Constants.SPENTITYID, SPSSOFederate.getSPEntityId(metaAlias));
-            setUserSessionProperty(SAML2Constants.METAALIAS, metaAlias);
-            setUserSessionProperty(SAML2Constants.REQ_BINDING, reqBinding);
-            setUserSessionProperty(SAML2Constants.NAMEID, nameId.toXMLString(true, true));
         }
+
+        //we need the following for idp initiated slo as well as sp, so always include it
+        setUserSessionProperty(SAML2Constants.SESSION_INDEX, sessionIndex);
+        setUserSessionProperty(SAML2Constants.IDPENTITYID, entityName);
+        setUserSessionProperty(SAML2Constants.SPENTITYID, SPSSOFederate.getSPEntityId(metaAlias));
+        setUserSessionProperty(SAML2Constants.METAALIAS, metaAlias);
+        setUserSessionProperty(SAML2Constants.REQ_BINDING, reqBinding);
+        setUserSessionProperty(SAML2Constants.NAMEID, nameId.toXMLString(true, true));
+        setUserSessionProperty(Constants.IS_TRANSIENT, Boolean.toString(isTransient));
+        setUserSessionProperty(Constants.REQUEST_ID, respInfo.getResponse().getInResponseTo());
+
         setAttributeProperties(assertion, userName);
     }
 
@@ -632,7 +643,7 @@ public class SAML2 extends AMLoginModule {
             final SPSSODescriptorElement spsso = SPSSOFederate.getSPSSOForAuthnReq(realm, spEntityID);
 
             nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso, idpsso);
-            boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
+            isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
             boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
             boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
 

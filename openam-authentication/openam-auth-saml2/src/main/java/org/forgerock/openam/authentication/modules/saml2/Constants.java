@@ -43,6 +43,16 @@ final class Constants {
      */
     static final int MAX_CALLBACKS_INJECTED = 10;
 
+    /**
+     * Used for IdP-initiated SLO - whether the NameIdFormat was transient.
+     */
+    public static final String IS_TRANSIENT = "isTransient";
+
+    /**
+     * Used for determining if the request went through an IdP Proxy.
+     */
+    public static final String REQUEST_ID = "requestId";
+
     /*
      * Auth Module States.
      */

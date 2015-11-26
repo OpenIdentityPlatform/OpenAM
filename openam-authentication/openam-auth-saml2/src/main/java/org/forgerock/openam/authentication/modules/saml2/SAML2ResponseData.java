@@ -17,6 +17,7 @@ package org.forgerock.openam.authentication.modules.saml2;
 
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.Subject;
+import com.sun.identity.saml2.profile.ResponseInfo;
 import org.forgerock.util.Reject;
 
 /**
@@ -27,6 +28,7 @@ public class SAML2ResponseData {
     private Subject subject;
     private Assertion assertion;
     private String sessionIndex;
+    private ResponseInfo responseInfo;
 
     /**
      * Dummy creator, used by databinder to generate this POJO.
@@ -41,13 +43,15 @@ public class SAML2ResponseData {
      * @param sessionIndex Session index used for this authentication.
      * @param subject Subject about whom this authentication provides information.
      * @param assertion Assertion for this subject's authentication.
+     * @param responseInfo Response Information pertaining to the authentication.
      */
-    public SAML2ResponseData(String sessionIndex, Subject subject, Assertion assertion) {
-        Reject.ifNull(sessionIndex, subject, assertion);
+    public SAML2ResponseData(String sessionIndex, Subject subject, Assertion assertion, ResponseInfo responseInfo) {
+        Reject.ifNull(sessionIndex, subject, assertion, responseInfo);
 
         this.subject = subject;
         this.assertion = assertion;
         this.sessionIndex = sessionIndex;
+        this.responseInfo = responseInfo;
     }
 
     /**
@@ -78,6 +82,15 @@ public class SAML2ResponseData {
     }
 
     /**
+     * Sets the responseInfo value.
+     *
+     * @param responseInfo value of the responseInfo.
+     */
+    public void setResponseInfo(ResponseInfo responseInfo) {
+        this.responseInfo = responseInfo;
+    }
+
+    /**
      * Get the subject. Will not be null.
      * @return the subject.
      */
@@ -99,5 +112,13 @@ public class SAML2ResponseData {
      */
     public String getSessionIndex() {
         return sessionIndex;
+    }
+
+    /**
+     * Get the response info. Will not be null.
+     * @return the response info.
+     */
+    public ResponseInfo getResponseInfo() {
+        return responseInfo;
     }
 }

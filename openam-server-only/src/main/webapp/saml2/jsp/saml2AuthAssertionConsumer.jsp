@@ -135,12 +135,13 @@
 
         SAML2ResponseData data = new SAML2ResponseData((String) smap.get(SAML2Constants.SESSION_INDEX),
                 (Subject) smap.get(SAML2Constants.SUBJECT),
-                (Assertion) smap.get(SAML2Constants.POST_ASSERTION));
+                (Assertion) smap.get(SAML2Constants.POST_ASSERTION),
+                respInfo);
 
         if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
             try {
                 long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval; //counted in seconds
-                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(key, data ,sessionExpireTime);
+                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(key, data, sessionExpireTime);
             } catch (SAML2TokenRepositoryException e) {
                 //logging?
                 return SAML2Proxy.toPostWithErrorForm(request, SAML2Proxy.SAML_FAILOVER_DISABLED_ERROR);
