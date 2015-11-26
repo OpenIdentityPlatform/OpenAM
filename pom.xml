@@ -195,6 +195,7 @@
         <forgerock.license.groupId>org.forgerock</forgerock.license.groupId>
         <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
         <forgerock.license.version>1.0.0</forgerock.license.version>
+        <checkstyleFailOnError>false</checkstyleFailOnError>
     </properties>
 
     <!-- Profiles -->

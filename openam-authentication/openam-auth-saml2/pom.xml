@@ -15,6 +15,9 @@
     <artifactId>openam-auth-saml2</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <checkstyleFailOnError>true</checkstyleFailOnError>
+    </properties>
 
     <!-- Build -->
     <build>
@@ -69,41 +72,5 @@
             <artifactId>forgerock-guava-cache</artifactId>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>module-precommit</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                        <version>${checkstylePluginVersion}</version>
-                        <executions>
-                            <execution>
-                                <id>check-src-and-tests</id>
-                                <configuration>
-                                    <configLocation>${checkstyleSourceConfigLocation}</configLocation>
-                                    <headerLocation>${checkstyleHeaderLocation}</headerLocation>
-                                    <suppressionsLocation>${checkstyleUnitTestSuppressionsLocation}</suppressionsLocation>
-                                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                                    <!-- Only output errors if we're not expecting any -->
-                                    <consoleOutput>${checkstyleFailOnError}</consoleOutput>
-                                    <failsOnError>${checkstyleFailOnError}</failsOnError>
-                                </configuration>
-                                <phase>process-test-classes</phase>
-                                <goals>
-                                    <goal>checkstyle</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>
