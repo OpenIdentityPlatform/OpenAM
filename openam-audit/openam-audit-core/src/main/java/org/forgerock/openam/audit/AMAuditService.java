@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.forgerock.openam.audit.AuditConstants.EventName;
+
 import org.forgerock.audit.AuditService;
 import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
@@ -39,12 +41,14 @@ public interface AMAuditService extends AuditService {
             throws ServiceUnavailableException;
 
     /**
-     * Determines if the audit service is auditing the specified {@literal topic}.
+     * Determines if the audit service is auditing the specified {@literal topic} and {@literal eventName}.  If you
+     * do not know the eventName (i.e. any event names is valid) you may pass in {@literal null}.
      *
      * @param topic The auditing topic.
-     * @return {@code true} if Auditing is switched on and if the topic should be audited.
+     * @param eventName The auditing event name, may be null for all event names
+     * @return {@code true} if Auditing is switched on and if the topic and eventName should be audited.
      */
-    boolean isAuditEnabled(String topic);
+    boolean isAuditEnabled(String topic, EventName eventName);
 
     /**
      * Stop failure to log an audit message from also failing the operation that is audited.

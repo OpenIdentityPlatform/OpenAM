@@ -69,7 +69,7 @@ public final class SessionAuditor {
         String realm = session.getClientDomain();
         realm = isEmpty(realm) ? NO_REALM : DNMapper.orgNameToRealmName(realm);
 
-        if (auditEventPublisher.isAuditing(realm, ACTIVITY_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACTIVITY_TOPIC, eventName)) {
 
             String contextId = session.getProperty(Constants.AM_CTX_ID);
 

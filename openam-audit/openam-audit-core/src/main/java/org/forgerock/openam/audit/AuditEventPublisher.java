@@ -18,6 +18,7 @@ package org.forgerock.openam.audit;
 import static org.forgerock.audit.events.AuditEventBuilder.EVENT_NAME;
 import static org.forgerock.json.resource.Requests.newCreateRequest;
 import static org.forgerock.json.resource.Resources.newInternalConnection;
+import static org.forgerock.openam.audit.AuditConstants.EventName;
 import static org.forgerock.openam.audit.AuditConstants.EVENT_REALM;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 
@@ -83,6 +84,7 @@ public class AuditEventPublisher {
     }
 
     private void publishToDefault(String topic, AuditEvent auditEvent) throws AuditException {
+
         AMAuditService auditService = auditServiceProvider.getDefaultAuditService();
         Connection connection = newInternalConnection(auditService);
         CreateRequest request = newCreateRequest(topic, auditEvent.getValue());
@@ -150,13 +152,14 @@ public class AuditEventPublisher {
      *
      * @param realm The realm in which the audit event occurred, or null if realm is not applicable.
      * @param topic The auditing topic.
+     * @param eventName The event name, may be {@literal null} if not known.
      * @return {@code true} if the topic should be audited.
      */
-    public boolean isAuditing(String realm, String topic) {
+    public boolean isAuditing(String realm, String topic, EventName eventName) {
         if (isBlank(realm)) {
-            return auditServiceProvider.getDefaultAuditService().isAuditEnabled(topic);
+            return auditServiceProvider.getDefaultAuditService().isAuditEnabled(topic, eventName);
         } else {
-            return auditServiceProvider.getAuditService(realm).isAuditEnabled(topic);
+            return auditServiceProvider.getAuditService(realm).isAuditEnabled(topic, eventName);
         }
     }
 }

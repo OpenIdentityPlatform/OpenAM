@@ -15,12 +15,22 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.audit.AuditConstants.*;
+
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditService;
 import org.forgerock.audit.AuditServiceProxy;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Extension of the commons {@link AuditServiceProxy} that allows for OpenAM specific configuration to be exposed
@@ -49,6 +59,14 @@ public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAud
     }
 
     @Override
+    public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
+        if (!isAuditEnabled(request)) {
+            return newResourceResponse(null, null, json(object())).asPromise();
+        }
+        return super.handleCreate(context, request);
+    }
+
+    @Override
     public void setDelegate(AuditService delegate, AMAuditServiceConfiguration configuration) throws
             ServiceUnavailableException {
 
@@ -63,13 +81,19 @@ public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAud
     }
 
     @Override
-    public boolean isAuditEnabled(String topic) {
+    public boolean isAuditEnabled(String topic, EventName eventName) {
         obtainReadLock();
         try {
             try {
-                return auditServiceConfiguration.isAuditEnabled() && isAuditing(topic);
+                String eventNameString = null;
+                if (eventName != null) {
+                    eventNameString = eventName.toString();
+                }
+                return auditServiceConfiguration.isAuditEnabled()
+                        && isAuditing(topic)
+                        && !auditServiceConfiguration.isBlacklisted(eventNameString);
             } catch (ServiceUnavailableException e) {
-                DEBUG.warning("Default Audit Service is unavailable. Event for topic, {}, will not be logged.", e);
+                DEBUG.warning("Default Audit Service is unavailable.", e);
             }
         } finally {
             releaseReadLock();
@@ -95,5 +119,15 @@ public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAud
         } finally {
             releaseReadLock();
         }
+    }
+
+    private boolean isAuditEnabled(CreateRequest createRequest) {
+        JsonValue auditEventValue = createRequest.getContent();
+        JsonValue eventNameJson = auditEventValue.get("eventName");
+
+        if (eventNameJson == null) {
+            return true;
+        }
+        return !auditServiceConfiguration.isBlacklisted(eventNameJson.asString());
     }
 }

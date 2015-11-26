@@ -23,6 +23,7 @@ import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.audit.AuditConstants.EventName;
 import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
 import static org.forgerock.openam.audit.AuditConstants.Component.CONFIG;
@@ -363,7 +364,7 @@ public class RestRouterIT extends GuiceTestCase {
     }
 
     private void auditingOff() {
-        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)).willReturn(false);
+        given(auditEventPublisher.isAuditing(eq(NO_REALM), eq(ACCESS_TOPIC), any(EventName.class))).willReturn(false);
     }
 
     private void mockDnsAlias(String alias, String realm) throws Exception {

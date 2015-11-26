@@ -18,6 +18,9 @@ package org.forgerock.openam.audit.configuration;
 import org.forgerock.audit.AuditServiceConfiguration;
 import org.forgerock.openam.audit.AMAuditService;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Audit service configuration specific to OpenAM. An instance of the current state can be retrieved from
  * {@link AuditServiceConfigurationProvider}. The instance retrieved from {@link AuditServiceConfigurationProvider}
@@ -31,6 +34,7 @@ import org.forgerock.openam.audit.AMAuditService;
  */
 public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
 
+    private final Set<String> blacklistedEventNames;
     private final boolean auditEnabled;
     private final boolean auditFailureSuppressed;
     private final boolean resolveHostNameEnabled;
@@ -48,6 +52,24 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
         this.auditEnabled = auditEnabled;
         this.auditFailureSuppressed = auditFailureSuppressed;
         this.resolveHostNameEnabled = resolveHostNameEnabled;
+        this.blacklistedEventNames = new HashSet<>();
+    }
+
+    /**
+     * Create an instance of {@code AMAuditServiceConfiguration} with the specified values.
+     *
+     * @param auditEnabled Is audit logging enabled.
+     * @param auditFailureSuppressed Is audit failure suppressed.
+     * @param resolveHostNameEnabled Is resolve host name enabled.
+     * @param blacklistedEventNames A set of event names which we DO NOT want to audit.
+     */
+    public AMAuditServiceConfiguration(boolean auditEnabled, boolean auditFailureSuppressed,
+                                       boolean resolveHostNameEnabled, Set<String> blacklistedEventNames) {
+
+        this.auditEnabled = auditEnabled;
+        this.auditFailureSuppressed = auditFailureSuppressed;
+        this.resolveHostNameEnabled = resolveHostNameEnabled;
+        this.blacklistedEventNames = blacklistedEventNames;
     }
 
     /**
@@ -72,5 +94,19 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
      */
     public boolean isResolveHostNameEnabled() {
         return resolveHostNameEnabled;
+    }
+
+    /**
+     * Is the specified event name blacklisted, i.e. one which we do NOT want to audit.  Passing in {@literal null}
+     * turns the checking off, returning {@literal false}, such that no event name is blacklisted.
+     *
+     * @param eventName the specified event name as a string, or {@literal null}
+     * @return true if blacklisted, i.e. we do NOT want to audit
+     */
+    public boolean isBlacklisted(String eventName) {
+        if (eventName == null) {
+            return false;
+        }
+        return blacklistedEventNames.contains(eventName.toString());
     }
 }

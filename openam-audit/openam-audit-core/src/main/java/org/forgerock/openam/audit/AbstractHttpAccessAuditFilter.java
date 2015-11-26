@@ -92,7 +92,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
 
     private void auditAccessAttempt(Request request, Context context) throws AuditException {
         String realm = getRealm(context);
-        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(context.asContext(RequestAuditContext.class).getRequestReceivedTime())
@@ -109,7 +109,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
 
     private void auditAccessSuccess(Request request, Context context, Response response) {
         String realm = getRealm(context);
-        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime();
@@ -130,7 +130,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
 
     private void auditAccessFailure(Request request, Context context, Response response) {
         String realm = getRealm(context);
-        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());

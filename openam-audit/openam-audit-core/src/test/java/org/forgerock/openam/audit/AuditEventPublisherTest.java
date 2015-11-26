@@ -176,7 +176,7 @@ public class AuditEventPublisherTest {
 
     private AuditEvent getAuditEvent(String realm) {
         return new AMAccessAuditEventBuilder()
-                .eventName(EventName.AM_ACCESS_ATTEMPT)
+                .eventName(EventName.AM_ACCESS_OUTCOME)
                 .transactionId(UUID.randomUUID().toString())
                 .userId("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
                 .client("172.16.101.7", 62375)

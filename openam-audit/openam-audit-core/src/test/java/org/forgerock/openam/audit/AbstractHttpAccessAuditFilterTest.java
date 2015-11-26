@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
 import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.SESSION;
+import static org.forgerock.openam.audit.AuditConstants.EventName;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_ATTEMPT;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_OUTCOME;
 import static org.forgerock.openam.audit.AuditConstants.USER_ID;
@@ -201,13 +202,21 @@ public class AbstractHttpAccessAuditFilterTest {
     }
 
     private void disableAccessTopicAuditing() {
-        given(eventPublisher.isAuditing(eq(realm), anyString())).willReturn(true);
-        given(eventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)).willReturn(false);
+        given(eventPublisher
+                .isAuditing(eq(realm), anyString(), any(EventName.class)))
+                .willReturn(true);
+        given(eventPublisher
+                .isAuditing(eq(realm), eq(AuditConstants.ACCESS_TOPIC), any(EventName.class)))
+                .willReturn(false);
     }
 
     private void enableAccessTopicAuditing() {
-        given(eventPublisher.isAuditing(eq(realm), anyString())).willReturn(false);
-        given(eventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)).willReturn(true);
+        given(eventPublisher
+                .isAuditing(eq(realm), anyString(), any(EventName.class)))
+                .willReturn(false);
+        given(eventPublisher
+                .isAuditing(eq(realm), eq(AuditConstants.ACCESS_TOPIC), any(EventName.class)))
+                .willReturn(true);
     }
 
     private Handler mockHandler(Context context, Request request, Status status) {

@@ -73,7 +73,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
     public void auditLoginSuccess(LoginState loginState) {
         String realm = getRealmFromState(loginState);
 
-        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC)) {
+        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC, AM_LOGIN_COMPLETED)) {
             String moduleName = null;
             String userDN = null;
             if (loginState != null) {
@@ -116,7 +116,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
     public void auditLoginFailure(LoginState loginState, AuthenticationFailureReason failureReason) {
         String realm = getRealmFromState(loginState);
 
-        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC)) {
+        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC, AM_LOGIN_COMPLETED)) {
             String principal = getFailedPrincipal(loginState);
             String moduleName = loginState == null ? null : loginState.getFailureModuleNames();
             AuthenticationAuditEntry entryDetail = getAuditEntryDetail(moduleName, loginState);
@@ -148,7 +148,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
     public void auditLogout(SSOToken token) {
         String realm = getRealmFromToken(token);
 
-        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC)) {
+        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC, AM_LOGOUT)) {
             String principalName;
             try {
                 Principal principal = token == null ? null : token.getPrincipal();

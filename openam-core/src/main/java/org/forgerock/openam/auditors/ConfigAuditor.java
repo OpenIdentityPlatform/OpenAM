@@ -15,37 +15,23 @@
  */
 package org.forgerock.openam.auditors;
 
+import static org.forgerock.openam.audit.AuditConstants.*;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.ModificationItem;
-
 import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
 import org.forgerock.openam.audit.AMConfigAuditEventBuilder;
 import org.forgerock.openam.audit.AuditConstants;
-import org.forgerock.openam.audit.AuditConstants.ConfigOperations;
-import org.forgerock.openam.audit.AuditConstants.EventName;
+import org.forgerock.openam.audit.AuditConstants.*;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 
-import static org.forgerock.openam.audit.AuditConstants.CONFIG_TOPIC;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Responsible for publishing audit config events for a configuration operation.
@@ -202,14 +188,14 @@ public abstract class ConfigAuditor {
         return initialState;
     }
 
-
     /**
      * Determines if a given event should be audited
      * @param operation The operation that is being applied to the object
      * @return True if auditing is enabled for configuration, and the specific operation is audited for the object.
      */
     protected boolean shouldAudit(ConfigOperations operation) {
-        return auditEventPublisher.isAuditing(realm, CONFIG_TOPIC) && isAudited(operation);
+        return auditEventPublisher.isAuditing(realm, CONFIG_TOPIC, EventName.AM_CONFIG_CHANGE)
+                    && isAudited(operation);
     }
 
     private boolean isAudited(ConfigOperations operation) {
@@ -218,7 +204,6 @@ public abstract class ConfigAuditor {
                 return false;
             }
         }
-
         return true;
     }
 }

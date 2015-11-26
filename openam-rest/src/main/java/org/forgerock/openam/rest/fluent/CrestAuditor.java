@@ -90,7 +90,7 @@ class CrestAuditor {
      * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     void auditAccessAttempt() throws AuditException {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpCrestRequest(context, request)
@@ -115,7 +115,7 @@ class CrestAuditor {
      *                       of the payload). Can be null if there are no additional details.
      */
     void auditAccessSuccess(JsonValue responseDetail) {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
@@ -146,7 +146,7 @@ class CrestAuditor {
      * @param message    A human-readable description of the error that occurred.
      */
     void auditAccessFailure(int resultCode, String message) {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;

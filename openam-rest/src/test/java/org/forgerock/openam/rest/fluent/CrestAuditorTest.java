@@ -68,6 +68,7 @@ public class CrestAuditorTest {
 
     @Test(dataProvider = "CRESTRequests")
     public void auditAccessShouldPublishEvents(Request request) throws Exception {
+        given(auditEventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).willReturn(true);
         auditor = new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
         givenAccessAuditingEnabled(auditEventPublisher);
 
@@ -80,6 +81,7 @@ public class CrestAuditorTest {
 
     @Test(dataProvider = "CRESTRequests")
     public void auditSuccessShouldPublishEvents(Request request) throws Exception {
+        given(auditEventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).willReturn(true);
         auditor = new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
         givenAccessAuditingEnabled(auditEventPublisher);
 
@@ -94,6 +96,7 @@ public class CrestAuditorTest {
 
     @Test(dataProvider = "CRESTRequests")
     public void auditFailureShouldPublishEvents(Request request) throws Exception {
+        given(auditEventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).willReturn(true);
         auditor = new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
         givenAccessAuditingEnabled(auditEventPublisher);
 
@@ -120,11 +123,11 @@ public class CrestAuditorTest {
     }
 
     private void givenAccessAuditingEnabled(AuditEventPublisher auditEventPublisher) {
-        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)).willReturn(true);
+        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC, null)).willReturn(true);
     }
 
     private void givenAccessAuditingDisabled(AuditEventPublisher auditEventPublisher) {
-        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)).willReturn(false);
+        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC, null)).willReturn(false);
     }
 
     private JsonValue getField(ArgumentCaptor<AuditEvent> captor, String pointer) {

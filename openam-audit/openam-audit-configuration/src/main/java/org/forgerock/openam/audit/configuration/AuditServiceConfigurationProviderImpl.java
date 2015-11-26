@@ -16,13 +16,15 @@
 package org.forgerock.openam.audit.configuration;
 
 import static com.sun.identity.shared.datastruct.CollectionHelper.*;
-import static com.sun.identity.sm.SMSUtils.serviceExists;
+import static com.sun.identity.sm.SMSUtils.*;
 import static java.util.Collections.*;
-import static org.forgerock.openam.audit.AuditConstants.SERVICE_NAME;
+import static org.forgerock.openam.audit.AuditConstants.*;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
@@ -203,10 +205,21 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
         } else {
             attributes = config.getAttributes();
         }
+
+        // We have a system property which says whether to audit AM_ACCESS_ATTEMPT.  If false (i.e. we do NOT
+        // want to audit this event name, we blacklist the event name.  This is so in the future we will be able
+        // to blacklist any or all event names to get better control over the amount of stuff that is audited.
+        //
+        Set<String> blacklistedEventNames = new HashSet<>();
+        if (!SystemProperties.getAsBoolean(Constants.AUDIT_AM_ACCESS_ATTEMPT_ENABLED)) {
+            blacklistedEventNames.add(EventName.AM_ACCESS_ATTEMPT.toString());
+        }
+
         return new AMAuditServiceConfiguration(
                 getBooleanMapAttr(attributes, "auditEnabled", false),
                 getBooleanMapAttr(attributes, "suppressAuditFailure", true),
-                getBooleanMapAttr(attributes, "resolveHostNameEnabled", false));
+                getBooleanMapAttr(attributes, "resolveHostNameEnabled", false),
+                blacklistedEventNames);
     }
 
     private Set<AuditEventHandlerConfiguration> getEventHandlerConfigurations(ServiceConfig serviceConfig) {

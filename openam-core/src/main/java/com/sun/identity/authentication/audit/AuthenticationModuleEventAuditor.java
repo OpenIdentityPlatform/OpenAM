@@ -69,7 +69,7 @@ public class AuthenticationModuleEventAuditor extends AbstractAuthenticationEven
 
         String realm = getRealmFromState(loginState);
 
-        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC)) {
+        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC, AM_LOGIN_MODULE_COMPLETED)) {
             String principalName = principal == null ? null : principal.getName();
             String authId = getUserId(principalName, realm);
             auditModuleEvent(loginState, realm, principalName, authId, SUCCESSFUL, auditEntryDetail);
@@ -88,7 +88,7 @@ public class AuthenticationModuleEventAuditor extends AbstractAuthenticationEven
 
         String realm = getRealmFromState(loginState);
 
-        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC)) {
+        if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC, AM_LOGIN_MODULE_COMPLETED)) {
             String principalName = principal == null ? null : principal.getName();
             Map sharedState = loginState == null ? emptyMap() : loginState.getSharedState();
             String authId = getUserId(principalName, realm);

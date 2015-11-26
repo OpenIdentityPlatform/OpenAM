@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.forgerock.openam.audit.AuditConstants.EventName;
+
 import org.forgerock.audit.AuditService;
 import org.forgerock.audit.AuditServiceProxy;
 import org.forgerock.json.resource.ServiceUnavailableException;
@@ -67,12 +69,18 @@ public class RealmAuditServiceProxy extends AuditServiceProxy implements AMAudit
     }
 
     @Override
-    public boolean isAuditEnabled(String topic) {
+    public boolean isAuditEnabled(String topic, EventName eventName) {
         obtainReadLock();
         try {
-            return auditServiceConfiguration.isAuditEnabled() && isAuditing(topic);
+            String eventNameString = null;
+            if (eventName != null) {
+                eventNameString = eventName.toString();
+            }
+            return auditServiceConfiguration.isAuditEnabled()
+                    && isAuditing(topic)
+                    && !auditServiceConfiguration.isBlacklisted(eventNameString);
         } catch (ServiceUnavailableException e) {
-            return defaultDelegate.isAuditEnabled(topic);
+            return defaultDelegate.isAuditEnabled(topic, eventName);
         } finally {
             releaseReadLock();
         }

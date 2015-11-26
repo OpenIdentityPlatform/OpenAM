@@ -110,7 +110,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
     private void auditAccessAttempt(Request request) throws AuditException {
         String realm = getRealmFromRequest(request);
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(request.getDate().getTime())
@@ -132,7 +132,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
     private void auditAccessSuccess(Request request, Response response) {
         String realm = getRealmFromRequest(request);
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - request.getDate().getTime();
@@ -165,7 +165,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
     private void auditAccessFailure(Request request, Response response) {
         String realm = getRealmFromRequest(request);
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());
