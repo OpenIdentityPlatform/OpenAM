@@ -20,12 +20,12 @@ import static com.sun.identity.entitlement.EntitlementException.REMOVE_RESOURCE_
 import static com.sun.identity.entitlement.EntitlementException.RESOURCE_TYPE_RETRIEVAL_ERROR;
 import static com.sun.identity.entitlement.opensso.OpenSSOLogger.LogLevel.ERROR;
 import static com.sun.identity.entitlement.opensso.OpenSSOLogger.LogLevel.MESSAGE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_ATTEMPT_REMOVE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_ATTEMPT_SAVE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_FAILED_REMOVE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_FAILED_SAVE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_SUCCEEDED_REMOVE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_SUCCEEDED_SAVE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.ATTEMPT_REMOVE_RESOURCE_TYPE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.ATTEMPT_SAVE_RESOURCE_TYPE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.FAILED_REMOVE_RESOURCE_TYPE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.FAILED_SAVE_RESOURCE_TYPE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.SUCCEEDED_REMOVE_RESOURCE_TYPE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.SUCCEEDED_SAVE_RESOURCE_TYPE;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_ACTIONS;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_CREATED_BY;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_CREATION_DATE;
@@ -168,7 +168,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
     public void removeResourceType(Subject subject, String realm, String uuid) throws EntitlementException {
         try {
             final String[] logParams = {realm, uuid};
-            OpenSSOLogger.log(MESSAGE, Level.INFO, RESOURCE_TYPE_ATTEMPT_REMOVE, logParams, subject);
+            OpenSSOLogger.log(MESSAGE, Level.INFO, ATTEMPT_REMOVE_RESOURCE_TYPE, logParams, subject);
 
             if (isResourceTypeUsed(subject, realm, uuid)) {
                 throw new EntitlementException(EntitlementException.RESOURCE_TYPE_REFERENCED, uuid);
@@ -176,7 +176,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
 
             getSubOrgConfig(subject, realm, CONFIG_RESOURCE_TYPES).removeSubConfig(uuid);
 
-            OpenSSOLogger.log(MESSAGE, Level.INFO, RESOURCE_TYPE_SUCCEEDED_REMOVE, logParams, subject);
+            OpenSSOLogger.log(MESSAGE, Level.INFO, SUCCEEDED_REMOVE_RESOURCE_TYPE, logParams, subject);
         } catch (SMSException e) {
             handleRemoveException(subject, realm, uuid, e);
         } catch (SSOException e) {
@@ -237,9 +237,9 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
             final String[] logParams = {realm, uuid};
 
             entry.setAttributes(getResourceTypeData(resourceType));
-            OpenSSOLogger.log(MESSAGE, Level.INFO, RESOURCE_TYPE_ATTEMPT_SAVE, logParams, subject);
+            OpenSSOLogger.log(MESSAGE, Level.INFO, ATTEMPT_SAVE_RESOURCE_TYPE, logParams, subject);
             entry.save();
-            OpenSSOLogger.log(MESSAGE, Level.INFO, RESOURCE_TYPE_SUCCEEDED_SAVE, logParams, subject);
+            OpenSSOLogger.log(MESSAGE, Level.INFO, SUCCEEDED_SAVE_RESOURCE_TYPE, logParams, subject);
         } catch (SMSException ex) {
             handleSaveException(subject, realm, uuid, ex);
         } catch (SSOException ex) {
@@ -426,7 +426,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
     private void handleSaveException(Subject subject, String realm, String uuid, Exception e)
             throws EntitlementException {
 
-        OpenSSOLogger.log(ERROR, Level.INFO, RESOURCE_TYPE_FAILED_SAVE, new String[]{realm, uuid, e.getMessage()},
+        OpenSSOLogger.log(ERROR, Level.INFO, FAILED_SAVE_RESOURCE_TYPE, new String[]{realm, uuid, e.getMessage()},
                 subject);
         throw new EntitlementException(MODIFY_RESOURCE_TYPE_FAIL, e, uuid);
     }
@@ -441,7 +441,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
     private void handleRemoveException(Subject subject, String realm, String uuid, Exception e)
             throws EntitlementException {
 
-        OpenSSOLogger.log(ERROR, Level.INFO, RESOURCE_TYPE_FAILED_REMOVE, new String[]{realm, uuid, e.getMessage()},
+        OpenSSOLogger.log(ERROR, Level.INFO, FAILED_REMOVE_RESOURCE_TYPE, new String[]{realm, uuid, e.getMessage()},
                 subject);
         throw new EntitlementException(REMOVE_RESOURCE_TYPE_FAIL, e, uuid);
     }
