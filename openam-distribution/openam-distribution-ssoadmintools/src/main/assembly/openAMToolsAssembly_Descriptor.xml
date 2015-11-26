@@ -94,9 +94,6 @@
                 <include>org.forgerock.commons:i18n-core</include>
                 <include>org.forgerock.commons:forgerock-audit-core</include>
                 <include>org.glassfish.grizzly:grizzly-framework</include>
-                <include>com.fasterxml.jackson.core:jackson-core</include>
-                <include>com.fasterxml.jackson.core:jackson-databind</include>
-                <include>com.fasterxml.jackson.core:jackson-annotations</include>
             </includes>
         </dependencySet>
         <dependencySet>
