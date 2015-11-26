@@ -50,7 +50,8 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
 
             $.when(realmPromise, tasksPromise).then(function (realmData, tasksData) {
                 self.data.realm = {
-                    status: realmData.values.active ? $.t("common.form.enabled") : $.t("common.form.disabled"),
+                    status: realmData.values.active ? $.t("common.form.active") : $.t("common.form.inactive"),
+                    active: realmData.values.active,
                     aliases: realmData.values.aliases
                 };
 

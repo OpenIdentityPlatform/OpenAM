@@ -8,7 +8,7 @@
 <div class="page-description">
     <ul class="list-inline fr-list-inline-piped">
         <li>
-            {{#equals realm.status 'Enabled'}}
+            {{#if realm.active}}
             <span class="text-success">
                 <i class="fa fa-check-circle"></i> {{realm.status}}
             </span>
@@ -16,7 +16,7 @@
             <span class="text-warning">
                 <i class="fa fa-ban"></i> {{realm.status}}
             </span>
-            {{/equals}}
+            {{/if}}
         </li>
         {{#if realm.aliases}}
         <li class="text-muted">
