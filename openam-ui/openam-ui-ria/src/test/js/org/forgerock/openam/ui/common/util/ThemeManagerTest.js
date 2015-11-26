@@ -16,7 +16,7 @@
 
 define([
     "jquery",
-    "underscore",
+    "lodash",
     "squire",
     "sinon",
     "org/forgerock/openam/ui/common/util/Constants"

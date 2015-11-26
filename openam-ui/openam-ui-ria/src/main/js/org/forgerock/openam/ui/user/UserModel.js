@@ -18,13 +18,15 @@ define("org/forgerock/openam/ui/user/UserModel", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractModel",
+    "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/ServiceInvoker"
-], function ($, _, AbstractModel, Configuration, Constants, EventManager, RealmHelper, Router, ServiceInvoker) {
+], function ($, _, AbstractModel, arrayify, Configuration, Constants, EventManager, RealmHelper, Router,
+             ServiceInvoker) {
     var baseUrl = Constants.host + "/" + Constants.context + "/json/__subrealm__/users",
         UserModel = AbstractModel.extend({
             idAttribute: "id",
@@ -158,6 +160,14 @@ define("org/forgerock/openam/ui/user/UserModel", [
             },
             setCurrentPassword: function (currentPassword) {
                 this.currentPassword = currentPassword;
+            },
+            /**
+             * Determines whether the user has the specified role(s).
+             * @param   {string|array} roles Roles as either a string or array of roles
+             * @returns {Boolean}      Whether this model has any of the roles specified
+             */
+            hasRole: function (roles) {
+                return _.spread(_.partial(_.contains, this.uiroles))(arrayify(roles));
             }
         });
     return new UserModel();

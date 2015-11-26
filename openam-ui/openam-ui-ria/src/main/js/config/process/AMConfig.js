@@ -29,12 +29,15 @@ define("config/process/AMConfig", [
         dependencies: [
             "org/forgerock/commons/ui/common/main/Router",
             "org/forgerock/commons/ui/common/main/Configuration",
-            "org/forgerock/commons/ui/common/main/SessionManager"
+            "org/forgerock/commons/ui/common/main/SessionManager",
+            "org/forgerock/openam/ui/common/sessions/SessionValidator"
         ],
-        processDescription: function (event, router, conf, sessionManager) {
+        processDescription: function (event, router, conf, sessionManager, SessionValidator) {
             var argsURLFragment = event ? (event.args ? event.args[0] : "") : "",
                 urlParams = URIUtils.parseQueryString(argsURLFragment),
                 gotoURL = urlParams.goto;
+
+            SessionValidator.stop();
 
             sessionManager.logout(function (response) {
                 conf.setProperty("loggedUser", null);
@@ -237,62 +240,35 @@ define("config/process/AMConfig", [
         startEvent: Constants.EVENT_AUTHENTICATED,
         description: "",
         dependencies: [
-            "underscore",
             "org/forgerock/commons/ui/common/main/Configuration",
+            "org/forgerock/commons/ui/common/util/CookieHelper",
+            "org/forgerock/openam/ui/common/sessions/SessionValidator",
+            "org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy",
             "org/forgerock/openam/ui/common/util/NavigationHelper"
         ],
-        processDescription: function (event, _, Configuration, NavigationHelper) {
-            if (_.contains(Configuration.loggedUser.uiroles, "ui-realm-admin")) {
+        processDescription: function (event, Configuration, CookieHelper, SessionValidator, MaxIdleTimeLeftStrategy,
+                                      NavigationHelper) {
+            if (Configuration.loggedUser.hasRole("ui-realm-admin")) {
                 NavigationHelper.populateRealmsDropdown();
             }
+
+            if (Configuration.globalData.xuiUserSessionValidationEnabled &&
+                !Configuration.loggedUser.hasRole(["ui-realm-admin", "ui-global-admin"])) {
+                var token = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
+
+                SessionValidator.start(token, MaxIdleTimeLeftStrategy);
+            }
         }
-    },
-    {
+    }, {
         startEvent: Constants.EVENT_UNAUTHORIZED,
         description: "",
         override: true,
         dependencies: [
-            "org/forgerock/commons/ui/common/main/Router",
             "org/forgerock/commons/ui/common/main/Configuration",
-            "org/forgerock/commons/ui/common/main/SessionManager"
+            "org/forgerock/openam/ui/common/RouteTo"
         ],
-        processDescription: function (event, Router, Configuration, SessionManager) {
-            var loggedIn = Configuration.loggedUser,
-                setGoToUrlProperty = function () {
-                    var hash = Router.getCurrentHash();
-                    if (!Configuration.gotoURL && !hash.match(Router.configuration.routes.login.url)) {
-                        Configuration.setProperty("gotoURL", "#" + hash);
-                    }
-                },
-                forbiddenPage = function () {
-                    delete Configuration.globalData.authorizationFailurePending;
-                    return EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                        route: {
-                            view: "org/forgerock/openam/ui/common/views/error/ForbiddenView",
-                            url: /.*/
-                        },
-                        fromRouter: true
-                    });
-                },
-                forbiddenError = function () {
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
-                },
-                logout = function () {
-                    setGoToUrlProperty();
-
-                    return SessionManager.logout().then(function () {
-                        EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
-                            anonymousMode: true
-                        });
-                        return EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                            route: Router.configuration.routes.login
-                        });
-                    });
-
-                },
-                loginDialog = function () {
-                    return EventManager.sendEvent(Constants.EVENT_SHOW_LOGIN_DIALOG);
-                };
+        processDescription: function (event, Configuration, RouteTo) {
+            var loggedIn = Configuration.loggedUser;
 
             // Multiple rest calls that all return authz failures will cause this event to be called multiple times
             if (Configuration.globalData.authorizationFailurePending !== undefined) {
@@ -300,19 +276,22 @@ define("config/process/AMConfig", [
             }
             Configuration.globalData.authorizationFailurePending = true;
 
-
             if (!loggedIn) {
                 // 401 no session
-                return logout();
+                return RouteTo.logout();
             } else if (_.get(event, "error.status") === 401) {
-                // 401 session timeout
-                return loginDialog();
-            } else if (event.fromRouter) {
+                if (Configuration.loggedUser.hasRole("ui-self-service-user")) {
+                    return RouteTo.sessionExpired();
+                } else {
+                    // 401 session timeout
+                    return RouteTo.loginDialog();
+                }
+            } else if (_.get(event, "fromRouter")) {
                 // 403 route change
-                return forbiddenPage();
+                return RouteTo.forbiddenPage();
             } else {
                 // 403 rest call
-                return forbiddenError();
+                return RouteTo.forbiddenError();
             }
         }
     }];

@@ -192,6 +192,9 @@
             "RestLogoutTemplate" : {
                 "loggedOut" : "You have been logged out."
             },
+            "SessionExpiredTemplate" : {
+                "sessionExpired" : "Your session expired."
+            },
             "ChangesPendingTemplate": {
                 "undo": "Undo Changes",
                 "changesPending": "Changes Pending"

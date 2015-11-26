@@ -64,6 +64,13 @@ define("config/routes/AMRoutesConfig", [], function () {
             pattern: "failedLogin??",
             defaults: ["/", ""],
             argumentNames: ["realm", "additionalParameters"]
+        },
+        sessionExpired: {
+            view: "org/forgerock/openam/ui/user/login/SessionExpiredView",
+            url: /sessionExpired([^\&]+)?(&.+)?/,
+            pattern: "sessionExpired??",
+            defaults: ["/", ""],
+            argumentNames: ["realm", "additionalParameters"]
         }
     };
 });

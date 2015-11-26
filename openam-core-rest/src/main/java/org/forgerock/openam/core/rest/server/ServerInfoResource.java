@@ -162,6 +162,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("referralsEnabled", String.valueOf(PolicyConfig.isReferralsEnabled()));
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
             result.put("realm", realm);
+            result.put("xuiUserSessionValidationEnabled", SystemProperties.getAsBoolean(Constants.XUI_USER_SESSION_VALIDATION_ENABLED, true));
 
             String hostName = URI.create(httpContext.getPath()).getHost();
 

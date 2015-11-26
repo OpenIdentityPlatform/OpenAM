@@ -1280,6 +1280,13 @@ public interface Constants {
     static final String OBJECTCLASS = "objectClass";
 
     /**
+     * When a non-admin is logged into the XUI, enabling this will ensure the XUI calls the server periodically to check
+     * the user still has a valid session. This ensures sensative user information will not remain on-screen and instead
+     * they will directed to the login screen.
+     */
+    static final String XUI_USER_SESSION_VALIDATION_ENABLED = "org.forgerock.openam.xui.user.session.validation.enabled";
+
+    /**
      * AMSetupFilter will redirect to this external URL in case the configuration store
      * is not available but the bootstrap file exists
      */

@@ -37,7 +37,8 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
     public SessionResourceAuthzModule(SSOTokenManager ssoTokenManager) {
         super("tokenId", ssoTokenManager,
                 SessionResource.DELETE_PROPERTY_ACTION_ID, SessionResource.GET_PROPERTY_ACTION_ID,
-                SessionResource.GET_PROPERTY_NAMES_ACTION_ID, SessionResource.SET_PROPERTY_ACTION_ID);
+                SessionResource.GET_PROPERTY_NAMES_ACTION_ID, SessionResource.SET_PROPERTY_ACTION_ID,
+                SessionResource.GET_TIME_LEFT_ACTION_ID, SessionResource.GET_MAX_IDLE_ACTION_ID);
     }
 
     @Override

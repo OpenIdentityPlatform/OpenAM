@@ -22,31 +22,45 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-
 define("org/forgerock/openam/ui/user/delegates/SessionDelegate", [
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/AbstractDelegate"
-], function (constants, AbstractDelegate) {
+    "lodash",
+    "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/commons/ui/common/util/Constants"
+], function (_, AbstractDelegate, Constants) {
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/sessions");
 
-    var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json/sessions");
-
-    obj.isSessionValid = function (tokenCookie) {
-        return obj.serviceCall({
+    function performServiceCall (options) {
+        return obj.serviceCall(_.merge({
             type: "POST",
-            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
             data: {},
-            url: "/" + tokenCookie + "?_action=validate",
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
             errorsHandlers: { "Bad Request": { status: 400 } }
+        }, options));
+    }
+
+    obj.getMaxIdle = function (token) {
+        return performServiceCall({
+            url: "?_action=getMaxIdle&tokenId=" + token,
+            suppressSpinner: true
         });
     };
 
-    obj.logout = function (tokenCookie) {
-        return obj.serviceCall({
-            type: "POST",
-            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-            data: "{}",
-            url: "/" + tokenCookie + "?_action=logout",
-            errorsHandlers: { "Bad Request": { status: 400 } }
+    obj.getTimeLeft = function (token) {
+        return performServiceCall({
+            url: "?_action=getTimeLeft&tokenId=" + token,
+            suppressSpinner: true
+        });
+    };
+
+    obj.isSessionValid = function (token) {
+        return performServiceCall({
+            url: "/" + token + "?_action=validate"
+        });
+    };
+
+    obj.logout = function (token) {
+        return performServiceCall({
+            url: "/" + token + "?_action=logout"
         });
     };
 
