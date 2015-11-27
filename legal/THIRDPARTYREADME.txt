@@ -195,8 +195,16 @@ Copyright: Copyright (C) 2013-2015 Brett Wooldridge
 Version: httpclient-4.0.1.jar
 Copyright: Copyright 1999-2014 The Apache Software Foundation
 
+Version: httpclient-4.4.1.jar
+Copyright: Copyright 1999-2015 The Apache Software Foundation
+
 Version: httpcore-4.0.1.jar
 Copyright: Copyright 1999-2014 The Apache Software Foundation
+
+Version: httpcore-4.4.1.jar
+Copyright: Copyright 2005-2015 The Apache Software Foundation
+           This project contains annotations derived from JCIP-ANNOTATIONS
+           Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
 
 Version: jackson-annotations-2.4.2.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
@@ -268,7 +276,7 @@ Copyright: Copyright 2007 The Apache Software Foundation
 Version: maxmind-db-1.0.0.jar
 Copyright: Copyright (c) 2014 by MaxMind, Inc.
 
-Version: neethi-3.0.2.jar
+Version: neethi-3.0.3.jar
 Copyright: Copyright © 2004-2014 The Apache Software Foundation. All Rights Reserved.
 
 Version: opensaml-2.6.1.jar
@@ -326,6 +334,9 @@ Copyright: Copyright 1999-2006- Apache 1999-2002 - Lotus 2001-2002 - Sun, 2003 -
 Version: xml-resolver-2.11.0.jar
 Copyright: Copyright 1999-2006- Apache 1999-2002 - Lotus 2001-2002 - Sun, 2003 - IBM
 
+Version: xml-resolver-1.2.jar
+Copyright:
+
 Version: xml-serializer-2.11.0.jar
 Copyright: Copyright 1999-2006- Apache 1999-2002 - Lotus 2001-2002 - Sun, 2003 - IBM
 
@@ -346,6 +357,9 @@ Version: validation-api-1.1.0.Final.jar
 Copyright: Copyright 2009-2012, Red Hat, Inc. and/or its affiliates, and individual contributors
 
 Version: woodstox-core-asl-4.3.0.jar
+Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
+
+Version: woodstox-core-asl-4.4.1.jar
 Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: wss4j-1.6.18.jar
@@ -1162,6 +1176,54 @@ Copyright: Copyright (c) 2009-2013 Oracle and/or its affiliates. All rights rese
 Version: jato-2005-05-04.jar
 Copyright: Copyright 2003-2009 Sun Microsystems, Inc. All rights reserved
 
+Version: cc-2008-08-08.jar
+Copyright:
+
+Version: cc_de-2008-08-08.jar
+Copyright:
+
+Version: cc_es-2008-08-08.jar
+Copyright:
+
+Version: cc_fr-2008-08-08.jar
+Copyright:
+
+Version: cc_it-2008-08-08.jar
+Copyright:
+
+Version: cc_ja-2008-08-08.jar
+Copyright:
+
+Version: cc_ko-2008-08-08.jar
+Copyright:
+
+Version: cc_sv-2008-08-08.jar
+Copyright:
+
+Version: cc_zh-2008-08-08.jar
+Copyright:
+
+Version: cc_zh_CN-2008-08-08.jar
+Copyright:
+
+Version: cc_zh_HK-2008-08-08.jar
+Copyright:
+
+Version: cc_zh_TW-2008-08-08.jar
+Copyright:
+
+Version: jaxb-impl-1.0.6.jar
+Copyright:
+
+Version: jaxb-xjc-1.0.6.jar
+Copyright:
+
+Version: jsp-api-2.1.jar
+Copyright: Copyright 2005 Sun Microsystems, Inc. All rights reserved.
+
+Version: jaxb-api-1.0.6.jar
+Copyright: Copyright (c) 2001-2011 Oracle and/or its affiliates. All rights reserved.
+
 Version: javax.security.auth.message-3.1.jar
 Copyright: Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
 
@@ -1191,6 +1253,9 @@ Copyright: Copyright (c) 2001-2011 Oracle and/or its affiliates. All rights rese
 
 Version: jersey-client-1.1.5.2.jar
 Copyright: Copyright 1997-2007 Sun Microsystems
+
+Version: jersey-core-1.1.5.2.jar
+Copyright: Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
 
 Version: chf-http-core-1.0.0.jar
 Copyright: Copyright 2015 ForgeRock AS.
