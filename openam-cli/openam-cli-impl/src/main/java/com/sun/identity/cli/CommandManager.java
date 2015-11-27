@@ -27,26 +27,12 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.cli;
 
-
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.services.util.Crypt;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import org.forgerock.util.thread.listener.ShutdownManager;
-import com.sun.identity.log.Logger;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.setup.Bootstrap;
-import com.sun.identity.setup.ConfiguratorException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.tools.bundles.VersionCheck;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -63,6 +49,22 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
+
+import org.forgerock.guice.core.InjectorConfiguration;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.services.util.Crypt;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.log.Logger;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.Bootstrap;
+import com.sun.identity.setup.ConfiguratorException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.tools.bundles.VersionCheck;
 
 /**
  * This is the "engine" that drives the CLI. This is a singleton class.
@@ -111,6 +113,8 @@ public class CommandManager {
             }
         } else {
             try {
+                //Set specific modules for the Guice InjectorHolder to be initialised with.
+                InjectorConfiguration.setGuiceModuleLoader(new CliGuiceModuleLoader());
                 Bootstrap.load();
                 // Initialize AdminTokenAction
                 AdminTokenAction.getInstance().authenticationInitialized();
