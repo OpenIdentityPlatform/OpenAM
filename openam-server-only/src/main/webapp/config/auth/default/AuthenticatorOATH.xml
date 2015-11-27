@@ -24,15 +24,9 @@
     <Callbacks length="0" order="1" timeout="120" header="ForgeRock Authenticator (OATH)">
     </Callbacks>
     <!-- For when we're optional and device isn't registered -->
-    <Callbacks length="2" order="2" timeout="120" header="ForgeRock Authenticator (OATH)">
-        <NameCallback>
-            <Prompt>Enter verification code:</Prompt>
-        </NameCallback>
+    <Callbacks length="1" order="2" timeout="120" header="ForgeRock Authenticator (OATH)">
         <ConfirmationCallback>
             <OptionValues>
-                <OptionValue>
-                    <Value>Submit</Value>
-                </OptionValue>
                 <OptionValue>
                     <Value>Register device</Value>
                 </OptionValue>
@@ -43,15 +37,9 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- For when we're not optional and a device isn't registered -->
-    <Callbacks length="2" order="3" timeout="120" header="ForgeRock Authenticator (OATH)">
-        <NameCallback>
-            <Prompt>Enter verification code:</Prompt>
-        </NameCallback>
+    <Callbacks length="1" order="3" timeout="120" header="ForgeRock Authenticator (OATH)">
         <ConfirmationCallback>
             <OptionValues>
-                <OptionValue>
-                    <Value>Submit</Value>
-                </OptionValue>
                 <OptionValue>
                     <Value>Register device</Value>
                 </OptionValue>
@@ -59,7 +47,7 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- For when we're not optional and a device is registered -->
-    <Callbacks length="2" order="4" timeout="120" header="ForgeRock Authenticator (OATH)">
+    <Callbacks length="2" order="4" timeout="120" header="#REPLACE#">
         <NameCallback>
             <Prompt>Enter verification code:</Prompt>
         </NameCallback>
@@ -101,7 +89,7 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- For when we're optional, but we just generated a device -->
-    <Callbacks length="2" order="7" timeout="120" header="ForgeRock Authenticator (OATH)">
+    <Callbacks length="2" order="7" timeout="120" header="#REPLACE#">
         <NameCallback>
             <Prompt>Enter verification code:</Prompt>
         </NameCallback>

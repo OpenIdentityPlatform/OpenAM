@@ -97,6 +97,9 @@ public class AuthenticatorOATH extends AMLoginModule {
             "iplanet-am-auth-fr-oath-min-secret-key-length";
     private static final String MAXIMUM_CLOCK_DRIFT = "openam-auth-fr-oath-maximum-clock-drift";
     private static final String ISSUER_NAME = "openam-auth-fr-oath-issuer-name";
+    private static final int TOTAL_ATTEMPTS = 3;
+
+    private static final String MODULE_NAME = "ForgeRock Authenticator (OATH)";
 
     //module attribute holders
     private String issuerName;
@@ -112,6 +115,7 @@ public class AuthenticatorOATH extends AMLoginModule {
     private int totpStepsInWindow = 0;
     private long time = 0;
     private int totpMaxClockDrift = 0;
+    private int attempt = 0;
 
     private static final int HOTP = 0;
     private static final int TOTP = 1;
@@ -128,9 +132,9 @@ public class AuthenticatorOATH extends AMLoginModule {
     private static final int RECOVERY_USED = 6;
     private static final int LOGIN_OPT_DEVICE = 7;
 
-    private static final int REGISTER_DEVICE_OPTION_VALUE_INDEX = 1;
-    private static final int SKIP_OATH_INDEX = 2;
+    private static final int REGISTER_DEVICE_OPTION_VALUE_INDEX = 0;
     private static final int OPT_DEVICE_SKIP_INDEX = 1;
+    private static final int SKIP_OATH_INDEX = 1;
 
     private static final int SCRIPT_OUTPUT_CALLBACK_INDEX = 1;
 
@@ -295,21 +299,19 @@ public class AuthenticatorOATH extends AMLoginModule {
                         if (settings == null) {
                             return LOGIN_NO_DEVICE;
                         } else {
+                            replaceHeader(LOGIN_SAVED_DEVICE, MODULE_NAME);
                             return LOGIN_SAVED_DEVICE;
                         }
                     }
 
                 //process callbacks
-                //callback[0] = Name CallBack (OTP)
-                //callback[1] = Confirmation CallBack (Submit OTP/Register device)
-                //callback[2] = Configure account to skip OATH
                 case LOGIN_OPTIONAL:
 
                     if (callbacks == null) {
                         throw new AuthLoginException(amAuthOATH, "authFailed", null);
                     }
 
-                    selectedIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
+                    selectedIndex = ((ConfirmationCallback) callbacks[0]).getSelectedIndex();
                     if (selectedIndex == SKIP_OATH_INDEX) {
                         realmOathService.setUserSkipOath(id, AuthenticatorOathService.SKIPPABLE);
                         return ISAuthConstants.LOGIN_SUCCEED;
@@ -321,7 +323,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                         throw new AuthLoginException(amAuthOATH, "authFailed", null);
                     }
 
-                    selectedIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
+                    selectedIndex = ((ConfirmationCallback) callbacks[0]).getSelectedIndex();
                     if (selectedIndex == REGISTER_DEVICE_OPTION_VALUE_INDEX) {
                         paintRegisterDeviceCallback(id, createBasicDevice(id));
                         return REGISTER_DEVICE;
@@ -348,8 +350,14 @@ public class AuthenticatorOATH extends AMLoginModule {
                     String OTP = ((NameCallback) callbacks[0]).getName();
                     if (OTP.length() == 0) {
                         debug.error("OATH.process() : invalid OTP code");
-                        setFailureID(userName);
-                        throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                        if (++attempt >= TOTAL_ATTEMPTS) {
+                            setFailureID(userName);
+                            throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                        }
+
+                        replaceHeader(state, MODULE_NAME
+                                + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
+                        return state;
                     }
 
                     //get Arrival time of the OTP
@@ -364,14 +372,22 @@ public class AuthenticatorOATH extends AMLoginModule {
                         return ISAuthConstants.LOGIN_SUCCEED;
                     } else {
                         //the OTP is out of the window or incorrect
-                        setFailureID(userName);
-                        throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                        if (++attempt >= TOTAL_ATTEMPTS) {
+                            setFailureID(userName);
+                            throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                        }
+
+                        replaceHeader(state, MODULE_NAME
+                                + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
+                        return state;
                     }
 
                 case REGISTER_DEVICE:
                     if (isOptional) {
+                        replaceHeader(LOGIN_OPT_DEVICE, MODULE_NAME);
                         return LOGIN_OPT_DEVICE;
                     } else {
+                        replaceHeader(LOGIN_SAVED_DEVICE, MODULE_NAME);
                         return LOGIN_SAVED_DEVICE;
                     }
                 case RECOVERY_USED:
