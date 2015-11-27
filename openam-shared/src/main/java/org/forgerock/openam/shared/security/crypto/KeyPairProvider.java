@@ -14,28 +14,30 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice;
+package org.forgerock.openam.shared.security.crypto;
 
-import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
+import java.security.KeyPair;
 
 /**
- * Creates new self service instances.
+ * Key pair provider delivers up key pairs.
  *
  * @since 13.0.0
  */
-public interface SelfServiceFactory {
+public interface KeyPairProvider {
 
     /**
-     * Creates a new service instance based on the passed service config.
+     * Given the algorithm and key size, provides a key pair instance.
      *
-     * @param realm
-     *         the realm
-     * @param serviceConfig
-     *         service config
+     * @param algorithm
+     *         the algorithm
+     * @param keySize
+     *         the key size
      *
-     * @return new self service instance
+     * @return key pair instance
+     *
+     * @throws IllegalArgumentException
+     *         if the algorithm is invalid
      */
-    RequestHandler getService(String realm, ProcessInstanceConfig serviceConfig);
+    KeyPair getKeyPair(String algorithm, int keySize);
 
 }

@@ -68,7 +68,7 @@ public final class UserRegistrationConfigProvider
             String serverUrl = config.getEmailVerificationUrl() + "&realm=" + realm;
             stages.add(new VerifyEmailAccountConfig()
                     .setEmailServiceUrl("/email")
-                    .setIdentityEmailField("mail")
+                    .setIdentityEmailField(config.getEmailAttributeName())
                     .setSubjectTranslations(config.getSubjectTranslations())
                     .setMessageTranslations(config.getMessageTranslations())
                     .setMimeType("text/html")
@@ -77,7 +77,7 @@ public final class UserRegistrationConfigProvider
         }
 
         stages.add(new UserDetailsConfig()
-                .setIdentityEmailField("/mail"));
+                .setIdentityEmailField(config.getEmailAttributeName()));
 
         if (config.isKbaEnabled()) {
             stages.add(new SecurityAnswerDefinitionConfig(new KbaConfig())

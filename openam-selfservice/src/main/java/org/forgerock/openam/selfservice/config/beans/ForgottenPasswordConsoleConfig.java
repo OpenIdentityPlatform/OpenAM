@@ -144,7 +144,7 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
         return messageTranslations;
     }
 
-    @ConfigSource("RestSecurity")
+    @ConfigSource({"MailServer", "RestSecurity"})
     public static final class ForgottenPasswordBuilder
             extends CommonConsoleConfigBuilder<ForgottenPasswordConsoleConfig> {
 

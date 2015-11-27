@@ -15,8 +15,11 @@
  */
 package org.forgerock.openam.selfservice;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
+import org.forgerock.openam.shared.security.crypto.KeyPairProvider;
 import org.forgerock.selfservice.core.config.StageConfigException;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandler;
@@ -24,15 +27,21 @@ import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
 import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandler;
 import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandlerConfig;
 
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
+import java.security.KeyPair;
 
 /**
  * Factory for providing snapshot token handlers.
  *
  * @since 13.0.0
  */
-final class SnapshotTokenHandlerFactoryImpl implements SnapshotTokenHandlerFactory {
+final class JwtSnapshotTokenHandlerFactory implements SnapshotTokenHandlerFactory {
+
+    private final KeyPairProvider provider;
+
+    @AssistedInject
+    JwtSnapshotTokenHandlerFactory(@Assisted KeyPairProvider provider) {
+        this.provider = provider;
+    }
 
     @Override
     public SnapshotTokenHandler get(SnapshotTokenConfig config) {
@@ -44,24 +53,17 @@ final class SnapshotTokenHandlerFactoryImpl implements SnapshotTokenHandlerFacto
     }
 
     private SnapshotTokenHandler configureJwtTokenHandler(JwtTokenHandlerConfig config) {
-        try {
-            SigningManager signingManager = new SigningManager();
-            SigningHandler signingHandler = signingManager.newHmacSigningHandler(config.getSharedKey());
+        SigningManager signingManager = new SigningManager();
+        SigningHandler signingHandler = signingManager.newHmacSigningHandler(config.getSharedKey());
+        KeyPair keyPair = provider.getKeyPair(config.getKeyPairAlgorithm(), config.getKeyPairSize());
 
-            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(config.getKeyPairAlgorithm());
-            keyPairGen.initialize(config.getKeyPairSize());
-
-            return new JwtTokenHandler(
-                    config.getJweAlgorithm(),
-                    config.getEncryptionMethod(),
-                    keyPairGen.generateKeyPair(),
-                    config.getJwsAlgorithm(),
-                    signingHandler,
-                    config.getTokenLifeTimeInSeconds());
-
-        } catch (NoSuchAlgorithmException nsaE) {
-            throw new IllegalArgumentException("Unknown algorithm as defined in the config", nsaE);
-        }
+        return new JwtTokenHandler(
+                config.getJweAlgorithm(),
+                config.getEncryptionMethod(),
+                keyPair,
+                config.getJwsAlgorithm(),
+                signingHandler,
+                config.getTokenLifeTimeInSeconds());
     }
 
 }

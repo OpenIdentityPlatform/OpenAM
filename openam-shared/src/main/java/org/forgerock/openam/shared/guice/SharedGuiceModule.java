@@ -22,6 +22,8 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorServiceFactory;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
+import org.forgerock.openam.shared.security.crypto.KeyPairProviderFactory;
+import org.forgerock.openam.shared.security.crypto.KeyPairProviderFactoryImpl;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -39,6 +41,7 @@ public class SharedGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(DEBUG_THREAD_MANAGER))
                 .toInstance(Debug.getInstance(DEBUG_THREAD_MANAGER));
         bind(ShutdownManager.class).toInstance(com.sun.identity.common.ShutdownManager.getInstance());
+        bind(KeyPairProviderFactory.class).to(KeyPairProviderFactoryImpl.class);
     }
 
     @Provides @Inject

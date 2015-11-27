@@ -25,13 +25,13 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.sm.config.ConfigSource;
-import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
-import org.forgerock.openam.sm.config.ConsoleConfigListener;
-import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
+import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.openam.sm.config.ConsoleConfigListener;
+import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.slf4j.Logger;
@@ -132,7 +132,7 @@ final class SelfServiceRequestHandler<C extends SelfServiceConsoleConfig>
             throw new NotSupportedException("Service not configured");
         }
 
-        return serviceFactory.getService(serviceConfigProvider.getServiceConfig(consoleConfig, context, realm));
+        return serviceFactory.getService(realm, serviceConfigProvider.getServiceConfig(consoleConfig, context, realm));
     }
 
     @Override

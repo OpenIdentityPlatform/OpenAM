@@ -67,17 +67,17 @@ public final class ForgottenPasswordConfigProvider
         }
 
         stages.add(new UserQueryConfig()
-                .setValidQueryFields(new HashSet<>(Arrays.asList("uid", "mail", "sn", "givenName")))
+                .setValidQueryFields(new HashSet<>(Arrays.asList("uid", "sn", "givenName", config.getEmailAttributeName())))
                 .setIdentityIdField("/uid/0")
                 .setIdentityUsernameField("/username")
-                .setIdentityEmailField("/mail/0")
+                .setIdentityEmailField("/" + config.getEmailAttributeName() + "/0")
                 .setIdentityServiceUrl("/users"));
 
         if (config.isEmailEnabled()) {
             String serverUrl = config.getEmailVerificationUrl() + "&realm=" + realm;
             stages.add(new VerifyEmailAccountConfig()
                     .setEmailServiceUrl("/email")
-                    .setIdentityEmailField("mail")
+                    .setIdentityEmailField(config.getEmailAttributeName())
                     .setSubjectTranslations(config.getSubjectTranslations())
                     .setMessageTranslations(config.getMessageTranslations())
                     .setMimeType("text/html")

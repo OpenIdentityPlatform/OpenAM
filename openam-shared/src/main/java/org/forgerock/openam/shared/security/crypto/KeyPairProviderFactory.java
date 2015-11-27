@@ -14,28 +14,23 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.selfservice;
-
-import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
+package org.forgerock.openam.shared.security.crypto;
 
 /**
- * Creates new self service instances.
+ * Factory delivers up {@link KeyPairProvider} instances for the passed realm.
  *
  * @since 13.0.0
  */
-public interface SelfServiceFactory {
+public interface KeyPairProviderFactory {
 
     /**
-     * Creates a new service instance based on the passed service config.
+     * Gets the provider for the given realm.
      *
      * @param realm
      *         the realm
-     * @param serviceConfig
-     *         service config
      *
-     * @return new self service instance
+     * @return key pair provider
      */
-    RequestHandler getService(String realm, ProcessInstanceConfig serviceConfig);
+    KeyPairProvider getProvider(String realm);
 
 }

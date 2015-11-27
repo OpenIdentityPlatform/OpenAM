@@ -172,7 +172,7 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
             if (parent != null) {
                 try {
                     Method superMethod = parent.getMethod(method.getName(), method.getParameterTypes());
-                    getConfigAttributeAnnotation(superMethod);
+                    result = getConfigAttributeAnnotation(superMethod);
                 } catch (NoSuchMethodException e) {
                     // Ignore exception
                 }

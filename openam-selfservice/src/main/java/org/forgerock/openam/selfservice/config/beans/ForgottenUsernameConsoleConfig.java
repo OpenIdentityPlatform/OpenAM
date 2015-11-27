@@ -143,7 +143,7 @@ public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
         return showUsernameEnabled;
     }
 
-    @ConfigSource("RestSecurity")
+    @ConfigSource({"MailServer", "RestSecurity"})
     public static final class ForgottenUsernameBuilder
             extends CommonConsoleConfigBuilder<ForgottenUsernameConsoleConfig> {
 

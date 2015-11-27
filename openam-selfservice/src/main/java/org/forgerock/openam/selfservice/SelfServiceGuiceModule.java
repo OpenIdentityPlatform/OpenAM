@@ -24,6 +24,7 @@ import com.google.inject.Injector;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Named;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.guice.core.GuiceModule;
@@ -35,12 +36,12 @@ import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
-import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactoryImpl;
 import org.forgerock.openam.selfservice.config.beans.ForgottenPasswordConsoleConfig;
 import org.forgerock.openam.selfservice.config.beans.ForgottenUsernameConsoleConfig;
 import org.forgerock.openam.selfservice.config.beans.UserRegistrationConsoleConfig;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStage;
 import org.forgerock.selfservice.core.ProgressStageProvider;
@@ -62,8 +63,11 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Override
     protected void configure() {
+        install(new FactoryModuleBuilder()
+                .implement(SnapshotTokenHandlerFactory.class, JwtSnapshotTokenHandlerFactory.class)
+                .build(new TypeLiteral<KeyPairInjector<SnapshotTokenHandlerFactory>>() {}));
+
         bind(ProcessStore.class).to(ProcessStoreImpl.class);
-        bind(SnapshotTokenHandlerFactory.class).to(SnapshotTokenHandlerFactoryImpl.class);
         bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
         bind(SelfServiceFactory.class).to(SelfServiceFactoryImpl.class);
         bind(KbaResource.class);

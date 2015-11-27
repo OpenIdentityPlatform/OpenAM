@@ -17,9 +17,9 @@ package org.forgerock.openam.selfservice.config.beans;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
+import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.openam.sm.config.ConfigAttribute;
 import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
-import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.util.Reject;
 
 import java.util.HashMap;
@@ -39,6 +39,7 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
     private final String secretKey;
     private final String verificationUrl;
     private final Map<String, Map<String, String>> securityQuestions;
+    private final String emailAttributeName;
 
     protected CommonConsoleConfig(CommonConsoleConfigBuilder builder) {
         attributes = builder.attributes;
@@ -46,6 +47,7 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
         secretKey = builder.secretKey;
         verificationUrl = builder.verificationUrl;
         securityQuestions = builder.securityQuestions;
+        emailAttributeName = builder.emailAttributeName;
     }
 
     /**
@@ -86,6 +88,15 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
     }
 
     /**
+     * Gets the email attribute name.
+     *
+     * @return the email attribute name
+     */
+    public final String getEmailAttributeName() {
+        return emailAttributeName;
+    }
+
+    /**
      * Retrieves the underlying console attribute for the key.
      *
      * @param key
@@ -121,6 +132,7 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
         private String secretKey;
         private String verificationUrl;
         private final Map<String, Map<String, String>> securityQuestions;
+        private String emailAttributeName;
 
         protected CommonConsoleConfigBuilder() {
             securityQuestions = new HashMap<>();
@@ -144,6 +156,11 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
         @ConfigAttribute(value = "forgerockRESTSecurityKBAQuestions", transformer = SecurityQuestionTransformer.class)
         public final void setSecurityQuestions(Map<String, Map<String, String>> securityQuestions) {
             this.securityQuestions.putAll(securityQuestions);
+        }
+
+        @ConfigAttribute("openamEmailAttribute")
+        public final void setEmailAttributeName(String emailAttributeName) {
+            this.emailAttributeName = emailAttributeName;
         }
 
         @Override

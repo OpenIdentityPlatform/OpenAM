@@ -88,7 +88,7 @@ public final class SelfServiceRequestHandlerTest {
         given(configProvider.isServiceEnabled(consoleConfig)).willReturn(true);
         ProcessInstanceConfig config = new ProcessInstanceConfig();
         given(configProvider.getServiceConfig(consoleConfig, context, "/")).willReturn(config);
-        given(serviceFactory.getService(config)).willReturn(underlyingService);
+        given(serviceFactory.getService("/", config)).willReturn(underlyingService);
 
         // Given
         selfServiceHandler.handleRead(context, request);
@@ -107,7 +107,7 @@ public final class SelfServiceRequestHandlerTest {
         given(configProvider.isServiceEnabled(consoleConfig)).willReturn(true);
         ProcessInstanceConfig config = new ProcessInstanceConfig();
         given(configProvider.getServiceConfig(consoleConfig, context, "/")).willReturn(config);
-        given(serviceFactory.getService(config)).willReturn(underlyingService);
+        given(serviceFactory.getService("/", config)).willReturn(underlyingService);
 
         // Given
         selfServiceHandler.handleAction(context, request);

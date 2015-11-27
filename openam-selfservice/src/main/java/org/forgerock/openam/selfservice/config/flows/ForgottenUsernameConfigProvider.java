@@ -67,10 +67,10 @@ public final class ForgottenUsernameConfigProvider
         }
 
         stages.add(new UserQueryConfig()
-                .setValidQueryFields(new HashSet<>(Arrays.asList("uid", "mail", "sn", "givenName")))
+                .setValidQueryFields(new HashSet<>(Arrays.asList("uid", "sn", "givenName", config.getEmailAttributeName())))
                 .setIdentityIdField("/uid/0")
                 .setIdentityUsernameField("/username")
-                .setIdentityEmailField("/mail/0")
+                .setIdentityEmailField("/" + config.getEmailAttributeName() + "/0")
                 .setIdentityServiceUrl("/users"));
 
         if (config.isKbaEnabled()) {

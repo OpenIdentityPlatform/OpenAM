@@ -16,26 +16,23 @@
 
 package org.forgerock.openam.selfservice;
 
-import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
+import org.forgerock.openam.shared.security.crypto.KeyPairProvider;
 
 /**
- * Creates new self service instances.
+ * Provides instances of {@link T} injected with the passed key pair provider.
  *
  * @since 13.0.0
  */
-public interface SelfServiceFactory {
+interface KeyPairInjector<T> {
 
     /**
-     * Creates a new service instance based on the passed service config.
+     * Provides new instances of {@link T}, injecting the passed key pair provider.
      *
-     * @param realm
-     *         the realm
-     * @param serviceConfig
-     *         service config
+     * @param keyPairProvider
+     *         key pair provider
      *
-     * @return new self service instance
+     * @return instance of {@link T}
      */
-    RequestHandler getService(String realm, ProcessInstanceConfig serviceConfig);
+    T getInjectedWith(KeyPairProvider keyPairProvider);
 
 }

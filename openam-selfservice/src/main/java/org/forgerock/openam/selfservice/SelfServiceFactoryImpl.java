@@ -17,6 +17,8 @@
 package org.forgerock.openam.selfservice;
 
 import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.openam.shared.security.crypto.KeyPairProvider;
+import org.forgerock.openam.shared.security.crypto.KeyPairProviderFactory;
 import org.forgerock.selfservice.core.AnonymousProcessService;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStageProvider;
@@ -33,7 +35,8 @@ import javax.inject.Inject;
 class SelfServiceFactoryImpl implements SelfServiceFactory {
 
     private final ProgressStageProvider stageProvider;
-    private final SnapshotTokenHandlerFactory tokenHandlerFactory;
+    private final KeyPairInjector<SnapshotTokenHandlerFactory> keyPairInjector;
+    private final KeyPairProviderFactory keyPairProviderFactory;
     private final ProcessStore processStore;
 
     /**
@@ -41,21 +44,27 @@ class SelfServiceFactoryImpl implements SelfServiceFactory {
      *
      * @param stageProvider
      *         progress stage provider
-     * @param tokenHandlerFactory
-     *         snapshot token handler factory
+     * @param keyPairInjector
+     *         key pair provider injector
+     * @param keyPairProviderFactory
+     *         key pair provider factory
      * @param processStore
      *         local process store
      */
     @Inject
     SelfServiceFactoryImpl(ProgressStageProvider stageProvider,
-            SnapshotTokenHandlerFactory tokenHandlerFactory, ProcessStore processStore) {
+            KeyPairInjector<SnapshotTokenHandlerFactory> keyPairInjector,
+            KeyPairProviderFactory keyPairProviderFactory, ProcessStore processStore) {
         this.stageProvider = stageProvider;
-        this.tokenHandlerFactory = tokenHandlerFactory;
+        this.keyPairInjector = keyPairInjector;
+        this.keyPairProviderFactory = keyPairProviderFactory;
         this.processStore = processStore;
     }
 
     @Override
-    public RequestHandler getService(ProcessInstanceConfig serviceConfig) {
+    public RequestHandler getService(String realm, ProcessInstanceConfig serviceConfig) {
+        KeyPairProvider keyPairProvider = keyPairProviderFactory.getProvider(realm);
+        SnapshotTokenHandlerFactory tokenHandlerFactory = keyPairInjector.getInjectedWith(keyPairProvider);
         ClassLoader classLoader = getClass().getClassLoader();
         return new AnonymousProcessService(serviceConfig, stageProvider, tokenHandlerFactory, processStore, classLoader);
     }

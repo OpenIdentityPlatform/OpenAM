@@ -143,7 +143,7 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
         return minimumAnswersToDefine;
     }
 
-    @ConfigSource("RestSecurity")
+    @ConfigSource({"MailServer", "RestSecurity"})
     public static final class UserRegistrationBuilder
             extends CommonConsoleConfigBuilder<UserRegistrationConsoleConfig> {
 
