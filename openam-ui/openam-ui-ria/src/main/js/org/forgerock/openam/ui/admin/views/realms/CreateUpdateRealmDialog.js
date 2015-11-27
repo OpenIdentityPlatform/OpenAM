@@ -20,18 +20,47 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/admin/models/Form",
+    "handlebars",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, _, AbstractView, BootstrapDialog, Form, SMSGlobalDelegate) {
+], function ($, _, AbstractView, BootstrapDialog, Form, Handlebars, SMSGlobalDelegate) {
+    function validateRealmName (dialog) {
+        var valid = true,
+            alert = "",
+            errors,
+            realmName = _.trim(dialog.$modalBody.find("input[name=\"root[name]\"]").val());
+
+        errors = dialog.form.editor.validate({
+            name: realmName,
+            property: "pattern"
+        });
+
+        if (errors.length) {
+            _.each(errors, function (error) {
+                if (error.property === "pattern") {
+                    valid = false;
+
+                    if (realmName.length > 0) {
+                        alert = Handlebars.compile("{{> alerts/_Alert type='warning' " +
+                            "text='console.realms.realmNameValidationError'}}");
+                    }
+                }
+            });
+        }
+
+        dialog.$modalBody.find("#alertContainer").html(alert);
+        return valid;
+    }
+
     var CreateUpdateRealmDialog = AbstractView.extend({
         /**
          * CreateUpdateRealmDialog.show(options);
          * The options object can contain up to 3 parameters, realmPath, allRealmPaths, callback.
-         * If you are editing an exsisting realm then pass in the option.realmPath. It is used by this
+         * If you are editing an existing realm then pass in the option.realmPath. It is used by this
          * view to determine if the realm is a new one or not.
-         * If option.allRealmPaths are used to populate the parent dropdown. Not all views have this list availiable,
+         * If option.allRealmPaths are used to populate the parent dropdown. Not all views have this list available,
          * so if none are passed in this view will make another call to get this data.
          * If option.callback called after the new changes are saved the the server. The call back fires regardless as
-         * to whether the call was sucessfull or not. This being used to re-render the parent view.
+         * to whether the call was successful or not. This being used to re-render the parent view.
          * @example
          * CreateUpdateRealmDialog.show({
          *    allRealmPaths :  this.data.allRealmPaths,
@@ -83,6 +112,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                     // Only create dropdowns if the field is editable
                     data.schema.properties.parentPath["enum"] = options.allRealmPaths;
                     data.schema.properties.parentPath.options = { "enum_titles": options.allRealmPaths };
+                    data.schema.properties.name.pattern = "^[^$&+,/:;=?@\ #%]+$";
                 } else {
                     // Once created, it should not be possible to edit a realm's name or who it's parent is.
                     data.schema.properties.name.readonly = true;
@@ -94,6 +124,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                     message: function (dialog) {
                         var element = $("<div></div>");
                         dialog.form = new Form(element[0], data.schema, data.values);
+                        dialog.$modalBody.append("<div id=\"alertContainer\"></div>");
                         return element;
                     },
                     buttons: [{
@@ -137,8 +168,11 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                         }
 
                         dialog.$modalBody.on("change keyup", "input[name=\"root[name]\"]", function () {
-                            var realmName = _.trim(dialog.$modalBody.find("input[name=\"root[name]\"]").val());
-                            if (realmName.length > 0) {
+
+                            // Disable standard jsonEditor errors
+                            dialog.form.editor.setOption("show_errors", "never");
+
+                            if (validateRealmName(dialog)) {
                                 dialog.getButton("submitButton").enable();
                             } else {
                                 dialog.getButton("submitButton").disable();

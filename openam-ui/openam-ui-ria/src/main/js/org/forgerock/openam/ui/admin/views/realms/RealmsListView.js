@@ -38,6 +38,9 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             "click .edit-realm"          : "editRealm",
             "click .toggle-realm-active" : "toggleRealmActive"
         },
+        partials: [
+            "partials/alerts/_Alert.html" // CreateUpdateRealmDialog
+        ],
         addRealm: function (event) {
             event.preventDefault();
             var self = this;

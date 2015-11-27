@@ -822,7 +822,8 @@
             "realmAliasesPopover": {
                 "title": "Realm/DNS Aliases",
                 "content": "When a request is received by the authentication user interface, OpenAM searches this attribute in all realms to find the matching realm into which the user should be authenticated. <br> OpenAM must only find one matching realm so therefore do not put duplicate entries into multiple realms. <br> Additionally if OpenAM does not find a matching realm, the user is presented with an error screen."
-            }
+            },
+            "realmNameValidationError" : "Characters $, &, +, comma, /, :, ;, =, ?, @, space, #, %% are not allowed in a realm's name"
         },
         "scripts": {
             "edit": {
