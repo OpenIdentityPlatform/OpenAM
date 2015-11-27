@@ -200,6 +200,8 @@ public interface ISAuthConstants {
 
     public static final String AUTH_ATTR_PREFIX_NEW = "sunAMAuth";
 
+    public static final String AUTH_ATTR_PREFIX_FORGEROCK = "forgerock-am-auth-";
+
     /**
      * LDAP Service Attributes
      */

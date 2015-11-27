@@ -24,10 +24,7 @@
  *
  * $Id: AMAuthConfigUtils.java,v 1.5 2008/06/25 05:41:51 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2015 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.config;
 
@@ -638,11 +635,12 @@ public class AMAuthConfigUtils {
      */
     public static String getAuthLevelAttribute(Map attrs, String module) {
         // auth level attribute must follow this naming convention
-        String attrName =  ISAuthConstants.AUTH_ATTR_PREFIX + 
-            module.toLowerCase() + "-auth-level";
+        String attrName =  ISAuthConstants.AUTH_ATTR_PREFIX + module.toLowerCase() + "-auth-level";
         if (attrs.get(attrName) == null) {
-            attrName = ISAuthConstants.AUTH_ATTR_PREFIX_NEW + module + 
-            "AuthLevel";
+            attrName = ISAuthConstants.AUTH_ATTR_PREFIX_FORGEROCK + module.toLowerCase() + "-auth-level";
+            if (attrs.get(attrName) == null) {
+                attrName = ISAuthConstants.AUTH_ATTR_PREFIX_NEW + module + "AuthLevel";
+            }
         }
         return attrName;
     }

@@ -15,8 +15,10 @@
 */
 package org.forgerock.openam.authentication.modules.saml2;
 
+import static com.sun.identity.authentication.util.ISAuthConstants.AUTH_ATTR_PREFIX_FORGEROCK;
+import static com.sun.identity.authentication.util.ISAuthConstants.LOGIN_START;
+
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
-import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.saml2.common.SAML2Constants;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,7 +59,7 @@ final class Constants {
      * Auth Module States.
      */
     /** Auth Module state - starting state. */
-    static final int START = ISAuthConstants.LOGIN_START;
+    static final int START = LOGIN_START;
     /** Auth Module state - returning from redirect. */
     static final int REDIRECT = 2;
     /** Auth Module state - Performing local login. */
@@ -79,35 +81,35 @@ final class Constants {
      * Auth Module Configuration XML Names.
      */
     /** Auth Level Module Configuration XML Name. */
-    static final String AUTHLEVEL = "forgerock-am-auth-saml2-auth-level";
+    static final String AUTHLEVEL = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-auth-level";
     /** Entity Name Module Configuration XML Name. */
-    static final String ENTITY_NAME = "forgerock-am-auth-saml2-entity-name";
+    static final String ENTITY_NAME = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-entity-name";
     /** Meta Alias Module Configuration XML Name. */
-    static final String META_ALIAS = "forgerock-am-auth-saml2-meta-alias";
+    static final String META_ALIAS = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-meta-alias";
     /** Allow Create Module Configuration XML Name. */
-    static final String ALLOW_CREATE = "forgerock-am-auth-saml2-allow-create";
+    static final String ALLOW_CREATE = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-allow-create";
     /** Auth Comparison Module Configuration XML Name. */
-    static final String AUTH_COMPARISON = "forgerock-am-auth-saml2-auth-comparison";
+    static final String AUTH_COMPARISON = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-auth-comparison";
     /** Authentication Context Class Reference Module Configuration XML Name. */
-    static final String AUTHN_CONTEXT_CLASS_REF = "forgerock-am-auth-saml2-authn-context-class-ref";
+    static final String AUTHN_CONTEXT_CLASS_REF = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-authn-context-class-ref";
     /** Authentication Context Declaration Reference Module Configuration XML Name. */
-    static final String AUTHN_CONTEXT_DECL_REF = "forgerock-am-auth-saml2-authn-context-decl-ref";
+    static final String AUTHN_CONTEXT_DECL_REF = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-authn-context-decl-ref";
     /** SAML2 Binding Module Configuration XML Name. */
-    static final String BINDING = "forgerock-am-auth-saml2-binding";
+    static final String BINDING = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-binding";
     /** Force Authentication Module Configuration XML Name. */
-    static final String FORCE_AUTHN = "forgerock-am-auth-saml2-force-authn";
+    static final String FORCE_AUTHN = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-force-authn";
     /** Is Passive Module Configuration XML Name. */
-    static final String IS_PASSIVE = "forgerock-am-auth-saml2-is-passive";
+    static final String IS_PASSIVE = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-is-passive";
     /** Name ID Format Module Configuration XML Name. */
-    static final String NAME_ID_FORMAT = "forgerock-am-auth-saml2-name-id-format";
+    static final String NAME_ID_FORMAT = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-name-id-format";
     /** Request Binding Module Configuration XML Name. */
-    static final String REQ_BINDING = "forgerock-am-auth-saml2-req-binding";
+    static final String REQ_BINDING = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-req-binding";
     /** Login Chain Module Configuration XML Name. */
-    static final String LOCAL_CHAIN = "forgerock-am-auth-saml2-login-chain";
+    static final String LOCAL_CHAIN = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-login-chain";
     /** Single Log Out Enabled Module Configuration XML Name. */
-    static final String SLO_ENABLED = "forgerock-am-auth-saml2-slo-enabled";
+    static final String SLO_ENABLED = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-slo-enabled";
     /** Single Logout Redirect Location Module Configuration XML Name. */
-    static final String SLO_RELAY_STATE = "forgerock-am-auth-saml2-slo-relay";
+    static final String SLO_RELAY_STATE = AUTH_ATTR_PREFIX_FORGEROCK + "saml2-slo-relay";
 
     /**
      * Default Callback.

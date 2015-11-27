@@ -35,7 +35,7 @@
                 resourceName="authSaml">
 
             <Organization>
-                <AttributeSchema name="iplanet-am-auth-saml2-auth-level"
+                <AttributeSchema name="forgerock-am-auth-saml2-auth-level"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
