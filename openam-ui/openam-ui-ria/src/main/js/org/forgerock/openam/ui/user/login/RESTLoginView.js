@@ -79,26 +79,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
         data: {},
         events: {
-            "click input[type=submit]": "formSubmit",
-            "click #passwordReset": "selfServiceClick",
-            "click #register": "selfServiceClick"
-        },
-
-        selfServiceClick: function (e) {
-            e.preventDefault();
-
-            var overrideRealmParameter = RealmHelper.getOverrideRealm(),
-                realmPath;
-
-            if (overrideRealmParameter) {
-                realmPath = overrideRealmParameter.substring(0, 1) === "/"
-                    ? overrideRealmParameter.slice(1)
-                    : overrideRealmParameter;
-            } else {
-                realmPath = RealmHelper.getSubRealm();
-            }
-
-            location.href = e.target.href + realmPath;
+            "click input[type=submit]": "formSubmit"
         },
 
         autoLogin: function () {
@@ -466,6 +447,15 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         }
 
         return new Handlebars.SafeString(result);
+    });
+
+    Handlebars.registerHelper("decorateWithRealm", function (uri) {
+        uri = RealmHelper.decorateURLWithOverrideRealm(uri);
+        if (uri.slice(-1) !== "/") {
+            uri += "/";
+        }
+
+        return uri + RealmHelper.getSubRealm();
     });
 
     return new LoginView();

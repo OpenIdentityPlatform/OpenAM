@@ -4,7 +4,7 @@
     <nav role="navigation">
         <ul class="list-inline">
             {{#each socialImplementations}}
-                <li><a href="#login/{{../../auth.subRealm}}&service={{authnChain}}" title="{{displayName}}" ><img alt="{{displayName}}" src="{{iconPath}}" width="50px" height="50px" /></a></li>
+                <li><a href="{{decorateWithRealm '#login'}}&service={{authnChain}}" title="{{displayName}}" ><img alt="{{displayName}}" src="{{iconPath}}" width="50px" height="50px" /></a></li>
             {{/each}}
         </ul>
     </nav>

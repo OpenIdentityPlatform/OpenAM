@@ -33,11 +33,24 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
      */
     obj.decorateURLWithOverrideRealm = function (uri) {
         var overrideRealm = obj.getOverrideRealm(),
-            prepend;
+            prepend, idx, fragment;
 
         if (overrideRealm) {
+            if (uri.indexOf("realm=") !== -1) {
+                // URI is already decorated by some other means
+                return uri;
+            }
+            idx = uri.indexOf("#");
+            if (idx !== -1) {
+                fragment = uri.slice(idx);
+                uri = uri.slice(0, idx);
+            }
+
             prepend = uri.indexOf("?") === -1 ? "?" : "&";
             uri = uri + prepend + "realm=" + overrideRealm;
+            if (fragment) {
+                uri = uri + fragment;
+            }
         }
 
         return uri;
