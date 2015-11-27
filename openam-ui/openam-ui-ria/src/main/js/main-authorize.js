@@ -79,19 +79,43 @@ require([
         baseTemplate,
         footerTemplate,
         loginHeaderTemplate,
-        data = window.pageData,
+        data = window.pageData || {},
         KEY_CODE_ENTER = 13,
         KEY_CODE_SPACE = 32;
 
     i18nManager.init({
         paramLang: {
-            locale: data.locale
+            locale: data.locale || Constants.DEFAULT_LANGUAGE
         },
         defaultLang: Constants.DEFAULT_LANGUAGE,
         nameSpace: "authorize"
     });
 
+    if (data.oauth2Data) {
+        _.each(data.oauth2Data.displayScopes, function (obj) {
+            if (_.isEmpty(obj.values)) {
+                delete obj.values;
+            }
+            return obj;
+        });
+
+        _.each(data.oauth2Data.displayClaims, function (obj) {
+            if (_.isEmpty(obj.values)) {
+                delete obj.values;
+            }
+            return obj;
+        });
+
+        if (_.isEmpty(data.oauth2Data.displayScopes) && _.isEmpty(data.oauth2Data.displayClaims)) {
+            data.noScopes = true;
+        }
+
+    } else {
+        data.noScopes = true;
+    }
+
     Configuration.globalData = { realm : data.realm };
+
     Router.currentRoute = {
         navGroup: "user"
     };

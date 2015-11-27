@@ -4,35 +4,40 @@
     <div class="alert alert-warning col-md-6 col-md-offset-3" role="alert">
         <strong>
         {{#if error.uri}}
-            <a href="{{error.uri}}">{{error.message}}</a>
+            <a href="{{{error.uri}}}">{{{error.message}}}</a>
         {{else}}
-            {{error.message}}
+            {{{error.message}}}
         {{/if}}
         </strong>
         {{#if error.description}}
-            {{error.description}}
+            {{{error.description}}}
         {{/if}}
     </div>
     {{else}}
 
     <div class="page-header col-md-6 col-md-offset-3 wordwrap">
-        <h1 class="text-center">{{oauth2Data.displayName}}</h1>
+        <h1 class="text-center">{{{oauth2Data.displayName}}}</h1>
         {{#if oauth2Data.displayDescription}}
-        <p class="text-center"><em>{{oauth2Data.displayDescription}}</em></p>
+        <p class="text-center"><em>{{{oauth2Data.displayDescription}}}</em></p>
         {{/if}}
     </div>
 
     <form action="{{oauth2Data.formTarget}}" method="post" class="form col-md-6 col-md-offset-3" autocomplete="off">
 
         <fieldset>
-            <p>{{t 'form.description'}}</p>
+            {{#if noScopes}}
+                <p>{{t 'form.noScopes'}}</p>
+            {{else}}
+                <p>{{t 'form.description'}}</p>
+            {{/if}}
+
             <div class="panel-group form-horizontal" aria-multiselectable="true">
 
                 {{#each oauth2Data.displayScopes}}
                 {{#if this.values}}
                 <div class="panel panel-info">
                     <div
-                        class="panel-heading am-panel-heading-hover clearfix"
+                        class="panel-heading clearfix am-panel-heading-hover clearfix"
                         data-toggle="collapse"
                         aria-expanded="false"
                         data-target="#oauth2Scope{{@index}}"
@@ -40,17 +45,17 @@
                         role="tab"
                         tabindex="0"
                     >
-                        {{this.name}}
+                        {{{this.name}}}
                         <div class="pull-right"><i class="fa fa-angle-down"></i></div>
                     </div>
 
                     <div id="oauth2Scope{{@index}}" class="panel-collapse collapse" role="tabpanel"  aria-expanded="false">
                         <div class="panel-body">
                             {{#if this.values.length}}
-                                <small>{{this.values}}</small><br/>
+                                <small>{{{this.values}}}</small><br/>
                             {{else}}
                                 {{#each this.values}}
-                                    <small><strong>{{@key}}:</strong> {{this}}</small><br/>
+                                <small><strong>{{{@key}}}:</strong> {{{this}}}</small><br/>
                                 {{/each}}
                             {{/if}}
                         </div>
@@ -58,7 +63,7 @@
                 </div>
                 {{else}}
                 <div class="panel panel-default">
-                    <div class="panel-heading">{{this.name}}</div>
+                    <div class="panel-heading">{{{this.name}}}</div>
                 </div>
                 {{/if}}
                 {{/each}}
@@ -67,7 +72,7 @@
                 {{#if this.values}}
                 <div class="panel panel-info">
                     <div
-                        class="panel-heading am-panel-heading-hover clearfix"
+                        class="panel-heading clearfix am-panel-heading-hover clearfix"
                         data-toggle="collapse"
                         aria-expanded="false"
                         data-target="#oauth2Claims{{@index}}"
@@ -75,16 +80,16 @@
                         role="tab"
                         tabindex="0"
                     >
-                        {{this.name}}
+                        {{{this.name}}}
                         <div class="pull-right"><i class="fa fa-angle-down"></i></div>
                     </div>
                     <div id="oauth2Claims{{@index}}" class="panel-collapse collapse" role="tabpanel"  aria-expanded="false">
                         <div class="panel-body">
                             {{#if this.values.length}}
-                            <small>{{this.values}}</small><br/>
+                            <small>{{{this.values}}}</small><br/>
                             {{else}}
                             {{#each this.values}}
-                            <small><strong>{{@key}}:</strong> {{this}}</small><br/>
+                            <small><strong>{{{@key}}}:</strong> {{{this}}}</small><br/>
                             {{/each}}
                             {{/if}}
                         </div>
@@ -92,14 +97,14 @@
                 </div>
                 {{else}}
                 <div class="panel panel-default">
-                    <div class="panel-heading">{{this.name}}</div>
+                    <div class="panel-heading">{{{this.name}}}</div>
                 </div>
                 {{/if}}
                 {{/each}}
             </div>
 
             {{#if oauth2Data.userName}}
-            <p>{{t 'form.signedInAs'}} <span class="text-primary">{{oauth2Data.userName}}</span></p>
+            <p>{{t 'form.signedInAs'}} <span class="text-primary">{{{oauth2Data.userName}}}</span></p>
             {{/if}}
 
             <!-- Optional parameters -->
