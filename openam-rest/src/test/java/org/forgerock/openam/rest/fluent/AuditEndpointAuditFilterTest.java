@@ -31,7 +31,7 @@ public class AuditEndpointAuditFilterTest extends AbstractAuditFilterTest {
     @BeforeMethod
     protected void setUp() throws Exception {
         super.setUp();
-        AuditFilter auditFilter = new AuditFilter(mock(Debug.class), auditEventPublisher, auditEventFactory);
+        AuditFilter auditFilter = new AuditFilter(mock(Debug.class), auditorFactory);
         auditEndpointAuditFilter = new AuditEndpointAuditFilter(auditFilter);
     }
 

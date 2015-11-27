@@ -47,14 +47,13 @@ public class AuditFilterTest extends AbstractAuditFilterTest {
 
     private AuditFilter auditFilter;
     private Debug debug;
-    private CrestAuditorFactory auditorFactory;
+
 
     @BeforeMethod
     protected void setUp() throws Exception {
         super.setUp();
         debug = mock(Debug.class);
-        auditorFactory = mock(CrestAuditorFactory.class);
-        auditFilter = new AuditFilter(debug, auditEventPublisher, auditEventFactory);
+        auditFilter = new AuditFilter(debug, auditorFactory);
     }
 
     @SuppressWarnings("unchecked")
@@ -187,7 +186,6 @@ public class AuditFilterTest extends AbstractAuditFilterTest {
         ResourceResponse response = mock(ResourceResponse.class);
         Promise<ResourceResponse, ResourceException> myPromise = Promises.newResultPromise(response);
         given(filterChain.handleUpdate(any(Context.class), any(UpdateRequest.class))).willReturn(myPromise);
-        CrestAuditor auditor = mock(CrestAuditor.class);
         given(auditorFactory.create(context, updateRequest)).willReturn(auditor);
         AuditFilter auditFilter = new AuditFilter(debug, auditorFactory);
 
@@ -199,7 +197,6 @@ public class AuditFilterTest extends AbstractAuditFilterTest {
     public void shouldAuditFailureForExceptions() throws Exception {
         Promise<ResourceResponse, ResourceException> myPromise = new NotFoundException("message").asPromise();
         given(filterChain.handleUpdate(any(Context.class), any(UpdateRequest.class))).willReturn(myPromise);
-        CrestAuditor auditor = mock(CrestAuditor.class);
         given(auditorFactory.create(context, updateRequest)).willReturn(auditor);
         AuditFilter auditFilter = new AuditFilter(debug, auditorFactory);
 
@@ -219,7 +216,6 @@ public class AuditFilterTest extends AbstractAuditFilterTest {
             }
         });
         given(filterChain.handleUpdate(any(Context.class), any(UpdateRequest.class))).willReturn(myPromise);
-        CrestAuditor auditor = mock(CrestAuditor.class);
         given(auditorFactory.create(context, updateRequest)).willReturn(auditor);
         AuditFilter auditFilter = new AuditFilter(debug, auditorFactory);
 

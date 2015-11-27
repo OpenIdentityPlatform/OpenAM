@@ -48,7 +48,7 @@ public class PoliciesAuditFilterTest extends AbstractAuditFilterTest {
     @BeforeMethod
     protected void setUp() throws Exception {
         super.setUp();
-        auditFilter = new PoliciesAuditFilter(mock(Debug.class), auditEventPublisher, auditEventFactory);
+        auditFilter = new PoliciesAuditFilter(mock(Debug.class), auditorFactory);
     }
 
     @SuppressWarnings("unchecked")

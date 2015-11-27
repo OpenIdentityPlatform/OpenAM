@@ -36,8 +36,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Response;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.audit.AuditEventFactory;
-import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.ExceptionHandler;
@@ -57,11 +55,6 @@ public class AuditFilter implements Filter {
 
     private final Debug debug;
     private final CrestAuditorFactory crestAuditorFactory;
-
-    AuditFilter(@Named("frRest") Debug debug, AuditEventPublisher auditEventPublisher,
-            AuditEventFactory auditEventFactory) {
-        this(debug, new CrestAuditorFactory(debug, auditEventPublisher, auditEventFactory));
-    }
 
     /**
      * Guiced constructor.

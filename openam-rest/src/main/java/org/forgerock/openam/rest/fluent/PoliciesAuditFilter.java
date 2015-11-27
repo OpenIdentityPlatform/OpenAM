@@ -38,13 +38,11 @@ public class PoliciesAuditFilter extends AuditFilter {
      * Guiced constructor.
      *
      * @param debug Debug instance.
-     * @param auditEventPublisher AuditEventPublisher to which publishing of events can be delegated.
-     * @param auditEventFactory AuditEventFactory for audit event builders.
+     * @param crestAuditorFactory CrestAuditorFactory for CrestAuditor instances.
      */
     @Inject
-    public PoliciesAuditFilter(@Named("frRest") Debug debug, AuditEventPublisher auditEventPublisher,
-                       AuditEventFactory auditEventFactory) {
-        super(debug, auditEventPublisher, auditEventFactory);
+    public PoliciesAuditFilter(@Named("frRest") Debug debug, CrestAuditorFactory crestAuditorFactory) {
+        super(debug, crestAuditorFactory);
     }
 
     /**
