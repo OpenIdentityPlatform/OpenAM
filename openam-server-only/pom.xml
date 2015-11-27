@@ -313,9 +313,9 @@
                             <filtering>false</filtering>
                         </webResource>
                         <webResource>
-                            <directory>${project.basedir}/../openam-rest/src/main/resources</directory>
+                            <directory>${project.basedir}/../openam-selfservice/src/main/resources</directory>
                             <includes>
-                                <include>RestSecurity*.properties</include>
+                                <include>selfService*.properties</include>
                             </includes>
                             <targetPath>WEB-INF/classes</targetPath>
                             <filtering>false</filtering>

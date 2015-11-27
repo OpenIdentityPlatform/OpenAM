@@ -19,7 +19,6 @@ package org.forgerock.openam.selfservice;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.openam.selfservice.config.beans.KbaConsoleConfig.KbaBuilder;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -33,13 +32,20 @@ import org.forgerock.json.resource.Responses;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.selfservice.config.beans.SecurityQuestionTransformer;
+import org.forgerock.openam.sm.config.ConfigAttribute;
+import org.forgerock.openam.sm.config.ConfigSource;
+import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
-import org.forgerock.openam.selfservice.config.beans.KbaConsoleConfig;
 import org.forgerock.services.context.Context;
+import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * KBA resource is responsible for delivering up configured security questions.
@@ -58,15 +64,8 @@ final class KbaResource implements SingletonResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest readRequest) {
         String realm = RealmContext.getRealm(context);
-        KbaConsoleConfig kbaConsoleConfig = configHandler.getConfig(realm, KbaBuilder.class);
-
-        JsonValue jsonQuestions = json(
-                object(
-                        field("questions", kbaConsoleConfig.getSecurityQuestions()),
-                        field("minimumAnswersToDefine", kbaConsoleConfig.getMinimumAnswersToDefine()),
-                        field("minimumAnswersToVerify", kbaConsoleConfig.getMinimumAnswersToVerify())));
-
-        ResourceResponse response = Responses.newResourceResponse("1", "1.0", jsonQuestions);
+        JsonValue kbaJson = configHandler.getConfig(realm, KbaBuilder.class);
+        ResourceResponse response = Responses.newResourceResponse("1", "1.0", kbaJson);
         return Promises.newResultPromise(response);
     }
 
@@ -83,6 +82,49 @@ final class KbaResource implements SingletonResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, UpdateRequest updateRequest) {
         return new NotSupportedException().asPromise();
+    }
+
+    /**
+     * Builder intended for the use by {@link KbaResource} for the purpose of retrieve KBA config.
+     */
+    @ConfigSource("selfService")
+    public static final class KbaBuilder implements ConsoleConfigBuilder<JsonValue> {
+
+        private final Map<String, Map<String, String>> securityQuestions;
+        private int minimumAnswersToDefine;
+        private int minimumAnswersToVerify;
+
+        KbaBuilder() {
+            securityQuestions = new HashMap<>();
+        }
+
+        @ConfigAttribute(value = "selfServiceKBAQuestions", transformer = SecurityQuestionTransformer.class)
+        public void setSecurityQuestions(Map<String, Map<String, String>> securityQuestions) {
+            this.securityQuestions.putAll(securityQuestions);
+        }
+
+        @ConfigAttribute("selfServiceMinimumAnswersToDefine")
+        public void setMinimumAnswersToDefine(int minimumAnswersToDefine) {
+            this.minimumAnswersToDefine = minimumAnswersToDefine;
+        }
+
+        @ConfigAttribute("selfServiceMinimumAnswersToVerify")
+        public void setMinimumAnswersToVerify(int minimumAnswersToVerify) {
+            this.minimumAnswersToVerify = minimumAnswersToVerify;
+        }
+
+        @Override
+        public JsonValue build(Map<String, Set<String>> attributes) {
+            Reject.ifTrue(minimumAnswersToVerify > minimumAnswersToDefine,
+                    "Number of answers to verify must be equal or less than those defined");
+
+            return json(
+                    object(
+                            field("questions", securityQuestions),
+                            field("minimumAnswersToDefine", minimumAnswersToDefine),
+                            field("minimumAnswersToVerify", minimumAnswersToVerify)));
+        }
+
     }
 
 }

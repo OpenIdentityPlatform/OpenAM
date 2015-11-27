@@ -67,8 +67,8 @@ public final class ForgottenUsernameConfigProvider
         }
 
         stages.add(new UserQueryConfig()
-                .setValidQueryFields(new HashSet<>(Arrays.asList("uid", "sn", "givenName", config.getEmailAttributeName())))
-                .setIdentityIdField("/uid/0")
+                .setValidQueryFields(config.getValidQueryAttributes())
+                .setIdentityIdField("/username")
                 .setIdentityUsernameField("/username")
                 .setIdentityEmailField("/" + config.getEmailAttributeName() + "/0")
                 .setIdentityServiceUrl("/users"));

@@ -21,8 +21,10 @@ import org.forgerock.openam.sm.config.ConfigSource;
 import org.forgerock.util.Reject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents forgotten password console configuration.
@@ -42,6 +44,7 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
     private final Map<Locale, String> messageTranslations;
     private final boolean captchaEnabled;
     private final boolean kbaEnabled;
+    private final Set<String> validQueryAttributes;
 
     private ForgottenPasswordConsoleConfig(ForgottenPasswordBuilder builder) {
         super(builder);
@@ -55,6 +58,7 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
         kbaEnabled = builder.kbaEnabled;
         subjectTranslations = builder.subjectTranslations;
         messageTranslations = builder.messageTranslations;
+        validQueryAttributes = builder.validQueryAttributes;
     }
 
     @Override
@@ -144,7 +148,16 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
         return messageTranslations;
     }
 
-    @ConfigSource({"MailServer", "RestSecurity"})
+    /**
+     * Get set of valid query attributes.
+     *
+     * @return valid query attributes
+     */
+    public Set<String> getValidQueryAttributes() {
+        return validQueryAttributes;
+    }
+
+    @ConfigSource({"MailServer", "selfService"})
     public static final class ForgottenPasswordBuilder
             extends CommonConsoleConfigBuilder<ForgottenPasswordConsoleConfig> {
 
@@ -158,62 +171,69 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
         private final Map<Locale, String> messageTranslations;
         private boolean captchaEnabled;
         private boolean kbaEnabled;
+        private final Set<String> validQueryAttributes;
 
         public ForgottenPasswordBuilder() {
             subjectTranslations = new HashMap<>();
             messageTranslations = new HashMap<>();
+            validQueryAttributes = new HashSet<>();
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotPassConfirmationUrl")
+        @ConfigAttribute("selfServiceForgottenPasswordConfirmationUrl")
         public void setEmailVerificationUrl(String emailVerificationUrl) {
             this.emailVerificationUrl = emailVerificationUrl;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotPasswordEnabled")
+        @ConfigAttribute("selfServiceForgottenPasswordEnabled")
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotPassServiceConfigClass")
+        @ConfigAttribute("selfServiceForgottenPasswordServiceConfigClass")
         public void setConfigProviderClass(String configProviderClass) {
             this.configProviderClass = configProviderClass;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotPassTokenTTL")
+        @ConfigAttribute("selfServiceForgottenPasswordTokenTTL")
         public void setTokenExpiry(long tokenExpiry) {
             this.tokenExpiry = tokenExpiry;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotPassEmailVerificationEnabled")
+        @ConfigAttribute("selfServiceForgottenPasswordEmailVerificationEnabled")
         public void setEmailEnabled(boolean emailEnabled) {
             this.emailEnabled = emailEnabled;
         }
 
-        @ConfigAttribute(value = "forgerockRESTSecurityForgotPassEmailSubject",
+        @ConfigAttribute(value = "selfServiceForgottenPasswordEmailSubject",
                 transformer = LocaleMessageTransformer.class)
         public void setSubjectTranslations(Map<Locale, String> subjectTranslations) {
             this.subjectTranslations.putAll(subjectTranslations);
         }
 
-        @ConfigAttribute(value = "forgerockRESTSecurityForgotPassEmailBody",
+        @ConfigAttribute(value = "selfServiceForgottenPasswordEmailBody",
                 transformer = LocaleMessageTransformer.class)
         public void setMessageTranslations(Map<Locale, String> messageTranslations) {
             this.messageTranslations.putAll(messageTranslations);
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotPassCaptchaEnabled")
+        @ConfigAttribute("selfServiceForgottenPasswordCaptchaEnabled")
         public void setCaptchaEnabled(boolean captchaEnabled) {
             this.captchaEnabled = captchaEnabled;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotPassKbaEnabled")
+        @ConfigAttribute("selfServiceForgottenPasswordKbaEnabled")
         public void setKbaEnabled(boolean kbaEnabled) {
             this.kbaEnabled = kbaEnabled;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityQuestionsUserMustAnswer")
+        @ConfigAttribute("selfServiceMinimumAnswersToVerify")
         public void setMinimumAnswersToVerify(int minimumAnswersToVerify) {
             this.minimumAnswersToVerify = minimumAnswersToVerify;
+        }
+
+        @ConfigAttribute("selfServiceValidQueryAttributes")
+        public void setValidQueryAttributes(Set<String> validQueryAttributes) {
+            this.validQueryAttributes.addAll(validQueryAttributes);
         }
 
         @Override

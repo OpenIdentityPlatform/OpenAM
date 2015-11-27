@@ -21,8 +21,10 @@ import org.forgerock.openam.sm.config.ConfigSource;
 import org.forgerock.util.Reject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents forgotten username console configuration.
@@ -42,6 +44,7 @@ public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
     private final Map<Locale, String> messageTranslations;
     private final boolean captchaEnabled;
     private final boolean kbaEnabled;
+    private final Set<String> validQueryAttributes;
 
     private ForgottenUsernameConsoleConfig(ForgottenUsernameBuilder builder) {
         super(builder);
@@ -55,6 +58,7 @@ public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
         kbaEnabled = builder.kbaEnabled;
         subjectTranslations = builder.subjectTranslations;
         messageTranslations = builder.messageTranslations;
+        validQueryAttributes = builder.validQueryAttributes;
     }
 
     @Override
@@ -143,7 +147,16 @@ public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
         return showUsernameEnabled;
     }
 
-    @ConfigSource({"MailServer", "RestSecurity"})
+    /**
+     * Get set of valid query attributes.
+     *
+     * @return valid query attributes
+     */
+    public Set<String> getValidQueryAttributes() {
+        return validQueryAttributes;
+    }
+
+    @ConfigSource({"MailServer", "selfService"})
     public static final class ForgottenUsernameBuilder
             extends CommonConsoleConfigBuilder<ForgottenUsernameConsoleConfig> {
 
@@ -157,62 +170,69 @@ public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
         private final Map<Locale, String> messageTranslations;
         private boolean captchaEnabled;
         private boolean kbaEnabled;
+        private final Set<String> validQueryAttributes;
 
         public ForgottenUsernameBuilder() {
             subjectTranslations = new HashMap<>();
             messageTranslations = new HashMap<>();
+            validQueryAttributes = new HashSet<>();
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotUsernameEnabled")
+        @ConfigAttribute("selfServiceForgottenUsernameEnabled")
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotUsernameServiceConfigClass")
+        @ConfigAttribute("selfServiceForgottenUsernameServiceConfigClass")
         public void setConfigProviderClass(String configProviderClass) {
             this.configProviderClass = configProviderClass;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotUsernameTokenTTL")
+        @ConfigAttribute("selfServiceForgottenUsernameTokenTTL")
         public void setTokenExpiry(long tokenExpiry) {
             this.tokenExpiry = tokenExpiry;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotUsernameEmailUsernameEnabled")
+        @ConfigAttribute("selfServiceForgottenUsernameEmailUsernameEnabled")
         public void setEmailEnabled(boolean emailEnabled) {
             this.emailEnabled = emailEnabled;
         }
 
-        @ConfigAttribute(value = "forgerockRESTSecurityForgotUsernameEmailSubject",
+        @ConfigAttribute(value = "selfServiceForgottenUsernameEmailSubject",
                 transformer = LocaleMessageTransformer.class)
         public void setSubjectTranslations(Map<Locale, String> subjectTranslations) {
             this.subjectTranslations.putAll(subjectTranslations);
         }
 
-        @ConfigAttribute(value = "forgerockRESTSecurityForgotUsernameEmailBody",
+        @ConfigAttribute(value = "selfServiceForgottenUsernameEmailBody",
                 transformer = LocaleMessageTransformer.class)
         public void setMessageTranslations(Map<Locale, String> messageTranslations) {
             this.messageTranslations.putAll(messageTranslations);
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotUsernameCaptchaEnabled")
+        @ConfigAttribute("selfServiceForgottenUsernameCaptchaEnabled")
         public void setCaptchaEnabled(boolean captchaEnabled) {
             this.captchaEnabled = captchaEnabled;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotUsernameKbaEnabled")
+        @ConfigAttribute("selfServiceForgottenUsernameKbaEnabled")
         public void setKbaEnabled(boolean kbaEnabled) {
             this.kbaEnabled = kbaEnabled;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityQuestionsUserMustAnswer")
+        @ConfigAttribute("selfServiceMinimumAnswersToVerify")
         public void setMinimumAnswersToVerify(int minimumAnswersToVerify) {
             this.minimumAnswersToVerify = minimumAnswersToVerify;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityForgotUsernameShowUsernameEnabled")
+        @ConfigAttribute("selfServiceForgottenUsernameShowUsernameEnabled")
         public void setShowUsernameEnabled(boolean showUsernameEnabled) {
             this.showUsernameEnabled = showUsernameEnabled;
+        }
+
+        @ConfigAttribute("selfServiceValidQueryAttributes")
+        public void setValidQueryAttributes(Set<String> validQueryAttributes) {
+            this.validQueryAttributes.addAll(validQueryAttributes);
         }
 
         @Override

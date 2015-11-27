@@ -81,6 +81,7 @@ import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.services.routing.RouteMatcher;
 
@@ -173,9 +174,9 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Singleton
     public IdentityResourceV1 getUsersResourceV1(MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            Set<UiRolePredicate> uiRolePredicates) {
+            ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, uiRolePredicates);
+                restSecurityProvider, configHandler, uiRolePredicates);
     }
 
     @Provides
@@ -184,9 +185,9 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Singleton
     public IdentityResourceV2 getUsersResourceV2(MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory, uiRolePredicates);
+                restSecurityProvider, configHandler, baseURLProviderFactory, uiRolePredicates);
     }
 
     @Provides
@@ -195,10 +196,10 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Singleton
     public IdentityResourceV3 getUsersResource(MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            BaseURLProviderFactory baseURLProviderFactory,
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory,
             @Named("PatchableUserAttributes") Set<String> patchableAttributes, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV3(IdentityResourceV2.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory, patchableAttributes, uiRolePredicates);
+                restSecurityProvider, configHandler, baseURLProviderFactory, patchableAttributes, uiRolePredicates);
     }
 
     @Provides
@@ -207,9 +208,9 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Singleton
     public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            Set<UiRolePredicate> uiRolePredicates) {
+            ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, uiRolePredicates);
+                restSecurityProvider, configHandler, uiRolePredicates);
     }
 
     @Provides
@@ -218,9 +219,9 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Singleton
     public IdentityResourceV2 getGroupsResourceV2(MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory, uiRolePredicates);
+                restSecurityProvider, configHandler, baseURLProviderFactory, uiRolePredicates);
     }
 
     @Provides
@@ -229,9 +230,9 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Singleton
     public IdentityResourceV3 getGroupsResource(MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV3(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityServices,
-                coreWrapper, restSecurityProvider, baseURLProviderFactory, Collections.<String>emptySet(), uiRolePredicates);
+                coreWrapper, restSecurityProvider, configHandler, baseURLProviderFactory, Collections.<String>emptySet(), uiRolePredicates);
     }
 
     @Provides
@@ -240,9 +241,9 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Singleton
     public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            Set<UiRolePredicate> uiRolePredicates) {
+            ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, uiRolePredicates);
+                restSecurityProvider, configHandler, uiRolePredicates);
     }
 
     @Provides
@@ -251,9 +252,9 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Singleton
     public IdentityResourceV2 getAgentsResourceV2(MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory, uiRolePredicates);
+                restSecurityProvider, configHandler, baseURLProviderFactory, uiRolePredicates);
     }
 
     @Provides
@@ -262,9 +263,9 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Singleton
     public IdentityResourceV3 getAgentsResource(MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV3(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityServices,
-                coreWrapper, restSecurityProvider, baseURLProviderFactory, Collections.<String>emptySet(), uiRolePredicates);
+                coreWrapper, restSecurityProvider, configHandler, baseURLProviderFactory, Collections.<String>emptySet(), uiRolePredicates);
     }
 
     @Provides

@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  *
  * @since 13.0.0
  */
-final class SecurityQuestionTransformer implements ConfigTransformer<Map<String, Map<String, String>>> {
+public final class SecurityQuestionTransformer implements ConfigTransformer<Map<String, Map<String, String>>> {
 
     private final static Pattern questionPattern = Pattern.compile("^(\\w+)\\|(\\w+)\\|(.+)$");
 

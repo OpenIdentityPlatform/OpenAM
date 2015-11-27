@@ -143,7 +143,7 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
         return minimumAnswersToDefine;
     }
 
-    @ConfigSource({"MailServer", "RestSecurity"})
+    @ConfigSource({"MailServer", "selfService"})
     public static final class UserRegistrationBuilder
             extends CommonConsoleConfigBuilder<UserRegistrationConsoleConfig> {
 
@@ -163,54 +163,54 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
             messageTranslations = new HashMap<>();
         }
 
-        @ConfigAttribute("forgerockRESTSecuritySelfRegistrationEnabled")
+        @ConfigAttribute("selfServiceUserRegistrationEnabled")
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        @ConfigAttribute("forgerockRESTSecuritySelfRegServiceConfigClass")
+        @ConfigAttribute("selfServiceUserRegistrationServiceConfigClass")
         public void setConfigProviderClass(String configProviderClass) {
             this.configProviderClass = configProviderClass;
         }
 
-        @ConfigAttribute("forgerockRESTSecuritySelfRegTokenTTL")
+        @ConfigAttribute("selfServiceUserRegistrationTokenTTL")
         public void setTokenExpiry(long tokenExpiry) {
             this.tokenExpiry = tokenExpiry;
         }
 
-        @ConfigAttribute("forgerockRESTSecuritySelfRegEmailVerificationEnabled")
+        @ConfigAttribute("selfServiceUserRegistrationEmailVerificationEnabled")
         public void setEmailEnabled(boolean emailEnabled) {
             this.emailEnabled = emailEnabled;
         }
 
-        @ConfigAttribute(value = "forgerockRESTSecuritySelfRegEmailSubject",
+        @ConfigAttribute(value = "selfServiceUserRegistrationEmailSubject",
                 transformer = LocaleMessageTransformer.class)
         public void setSubjectTranslations(Map<Locale, String> subjectTranslations) {
             this.subjectTranslations.putAll(subjectTranslations);
         }
 
-        @ConfigAttribute(value = "forgerockRESTSecuritySelfRegEmailBody",
+        @ConfigAttribute(value = "selfServiceUserRegistrationEmailBody",
                 transformer = LocaleMessageTransformer.class)
         public void setMessageTranslations(Map<Locale, String> messageTranslations) {
             this.messageTranslations.putAll(messageTranslations);
         }
 
-        @ConfigAttribute("forgerockRESTSecuritySelfRegCaptchaEnabled")
+        @ConfigAttribute("selfServiceUserRegistrationCaptchaEnabled")
         public void setCaptchaEnabled(boolean captchaEnabled) {
             this.captchaEnabled = captchaEnabled;
         }
 
-        @ConfigAttribute("forgerockRESTSecuritySelfRegKbaEnabled")
+        @ConfigAttribute("selfServiceUserRegistrationKbaEnabled")
         public void setKbaEnabled(boolean kbaEnabled) {
             this.kbaEnabled = kbaEnabled;
         }
 
-        @ConfigAttribute("forgerockRESTSecuritySelfRegConfirmationUrl")
+        @ConfigAttribute("selfServiceUserRegistrationConfirmationUrl")
         public void setEmailVerificationUrl(String emailVerificationUrl) {
             this.emailVerificationUrl = emailVerificationUrl;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityAnswersUserMustProvide")
+        @ConfigAttribute("selfServiceMinimumAnswersToDefine")
         public void setMinimumAnswersToDefine(int minimumAnswersToDefine) {
             this.minimumAnswersToDefine = minimumAnswersToDefine;
         }

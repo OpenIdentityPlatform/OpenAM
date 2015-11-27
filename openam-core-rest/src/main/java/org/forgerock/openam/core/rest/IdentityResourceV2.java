@@ -23,6 +23,7 @@ import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
+import static org.forgerock.openam.core.rest.UserAttributeInfo.*;
 import static org.forgerock.openam.rest.RestUtils.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -67,6 +68,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
@@ -161,15 +163,16 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
     private final IdentityServicesImpl identityServices;
     private final BaseURLProviderFactory baseURLProviderFactory;
+    private final ConsoleConfigHandler configHandler;
 
     /**
      * Creates a backend
      */
     public IdentityResourceV2(String userType, MailServerLoader mailServerLoader, IdentityServicesImpl identityServices,
-            CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider, ConsoleConfigHandler configHandler,
             BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         this(userType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
-                baseURLProviderFactory, uiRolePredicates);
+                configHandler, baseURLProviderFactory, uiRolePredicates);
     }
 
     /**
@@ -192,15 +195,16 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     // Constructor used for testing...
     IdentityResourceV2(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
             MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-            RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory,
-            Set<UiRolePredicate> uiRolePredicates) {
+            RestSecurityProvider restSecurityProvider, ConsoleConfigHandler configHandler,
+            BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         this.objectType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
         this.restSecurityProvider = restSecurityProvider;
+        this.configHandler = configHandler;
         this.identityResourceV1 = new IdentityResourceV1(userType, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, uiRolePredicates);
+                restSecurityProvider, configHandler, uiRolePredicates);
         this.identityServices = identityServices;
         this.baseURLProviderFactory = baseURLProviderFactory;
     }
@@ -1003,8 +1007,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             SSOToken admin = RestUtils.getToken();
             final String finalTokenID = tokenID;
 
-            enforceWhiteList(context, request.getContent(), objectType, restSecurity.getSelfRegistrationValidUserAttributes());
-
             return createInstance(admin, jVal, realm)
                     .thenAsync(new AsyncFunction<ActionResponse, ActionResponse, ResourceException>() {
                         @Override
@@ -1147,9 +1149,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 resourceId = identity.getName();
             }
 
-            RestSecurity restSecurity = restSecurityProvider.get(realm);
+            UserAttributeInfo userAttributeInfo = configHandler.getConfig(realm, UserAttributeInfoBuilder.class);
             enforceWhiteList(context, request.getContent(), objectType,
-                                                            restSecurity.getSelfRegistrationValidUserAttributes());
+                                                            userAttributeInfo.getValidCreationAttributes());
 
             final String id = resourceId;
             return attemptResourceCreation(realm, admin, identity, resourceId)
@@ -1330,12 +1332,17 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             }
             newDtls.setName(resourceId);
 
+            UserAttributeInfo userAttributeInfo = configHandler.getConfig(realm, UserAttributeInfoBuilder.class);
+
             // Handle attribute change when password is required
             // Get restSecurity for this realm
             RestSecurity restSecurity = restSecurityProvider.get(realm);
             // Make sure user is not admin and check to see if we are requiring a password to change any attributes
-            Set<String> protectedUserAttributes = restSecurity.getProtectedUserAttributes();
-            if (protectedUserAttributes != null && !isAdmin(context)) {
+            Set<String> protectedUserAttributes = new HashSet<>();
+            protectedUserAttributes.addAll(restSecurity.getProtectedUserAttributes());
+            protectedUserAttributes.addAll(userAttributeInfo.getProtectedUpdateAttributes());
+
+            if (!protectedUserAttributes.isEmpty() && !isAdmin(context)) {
                 boolean hasReauthenticated = false;
                 for (String protectedAttr : protectedUserAttributes) {
                     JsonValue jValAttr = jVal.get(protectedAttr);

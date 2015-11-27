@@ -60,6 +60,7 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
@@ -104,10 +105,10 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
      */
     public IdentityResourceV3(String objectType, MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            BaseURLProviderFactory baseURLProviderFactory, Set<String> patchableAttributes,
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<String> patchableAttributes,
             Set<UiRolePredicate> uiRolePredicates) {
         this.identityResourceV2 = new IdentityResourceV2(objectType, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory, uiRolePredicates);
+                restSecurityProvider, configHandler, baseURLProviderFactory, uiRolePredicates);
         this.objectType = objectType;
         this.identityServices = identityServices;
         this.patchableAttributes = patchableAttributes;

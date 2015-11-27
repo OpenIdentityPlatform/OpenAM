@@ -138,22 +138,22 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
             securityQuestions = new HashMap<>();
         }
 
-        @ConfigAttribute(value = "forgerockRESTSecurityCaptchaSiteKey", required = false)
+        @ConfigAttribute(value = "selfServiceCaptchaSiteKey", required = false)
         public final void setSiteKey(String siteKey) {
             this.siteKey = siteKey;
         }
 
-        @ConfigAttribute(value = "forgerockRESTSecurityCaptchaSecretKey", required = false)
+        @ConfigAttribute(value = "selfServiceCaptchaSecretKey", required = false)
         public final void setSecretKey(String secretKey) {
             this.secretKey = secretKey;
         }
 
-        @ConfigAttribute("forgerockRESTSecurityCaptchaVerificationUrl")
+        @ConfigAttribute("selfServiceCaptchaVerificationUrl")
         public final void setVerificationUrl(String verificationUrl) {
             this.verificationUrl = verificationUrl;
         }
 
-        @ConfigAttribute(value = "forgerockRESTSecurityKBAQuestions", transformer = SecurityQuestionTransformer.class)
+        @ConfigAttribute(value = "selfServiceKBAQuestions", transformer = SecurityQuestionTransformer.class)
         public final void setSecurityQuestions(Map<String, Map<String, String>> securityQuestions) {
             this.securityQuestions.putAll(securityQuestions);
         }

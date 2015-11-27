@@ -36,6 +36,12 @@ import org.forgerock.openam.rest.ServiceConfigUtils;
 import java.security.AccessController;
 import java.util.Set;
 
+/**
+ * Provides REST security configuration.
+ * <p>
+ * Given this is deprecated {@link org.forgerock.openam.sm.config.ConsoleConfigHandler} should be used instead.
+ */
+@Deprecated
 public class RestSecurity {
 
     private static Debug debug = Debug.getInstance("frRest");
@@ -47,16 +53,11 @@ public class RestSecurity {
     private final static String SELF_REGISTRATION = "forgerockRESTSecuritySelfRegistrationEnabled";
     private final static String SELF_REG_CONFIRMATION_URL = "forgerockRESTSecuritySelfRegConfirmationUrl";
     private final static String FORGOT_PASSWORD = "forgerockRESTSecurityForgotPasswordEnabled";
-    private final static String FORGOT_USERNAME = "forgerockRESTSecurityForgotUsernameEnabled";
     private final static String SELF_REG_TOKEN_LIFE_TIME = "forgerockRESTSecuritySelfRegTokenTTL";
-    private final static String FORGOT_PASSWORD_TOKEN_LIFE_TIME = "forgerockRESTSecurityForgotPassTokenTTL";
+    private final static String FORGOT_PASSWORD_TOKEN_LIFE_TIME= "forgerockRESTSecurityForgotPassTokenTTL";
     private final static String FORGOT_PASSWORD_CONFIRMATION_URL = "forgerockRESTSecurityForgotPassConfirmationUrl";
     private final static String PROTECTED_USER_ATTRIBUTES = "forgerockRESTSecurityProtectedUserAttributes";
     private final static String SUCCESSFUL_USER_REGISTRATION_DESTINATION = "forgerockRESTSecuritySuccessfulUserRegistrationDestination";
-    private final static String SELF_REG_VALID_ATTRIBUTES = "forgerockRESTSecuritySelfRegistrationValidUserAttributes";
-    private final static String SELF_REG_KBA_ENABLED = "forgerockRESTSecuritySelfRegKbaEnabled";
-    private final static String FORGOT_PASSWORD_KBA_ENABLED = "forgerockRESTSecurityForgotPassKbaEnabled";
-    private final static String FORGOT_USERNAME_KBA_ENABLED = "forgerockRESTSecurityForgotUsernameKbaEnabled";
 
     private final static String SERVICE_NAME = "RestSecurity";
     private final static String SERVICE_VERSION = "1.0";
@@ -79,14 +80,13 @@ public class RestSecurity {
 
         @Override
         public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
-                String serviceComponent, int type) {
+                                              String serviceComponent, int type) {
             if (currentRealmTargetedByOrganizationUpdate(serviceName, version, orgName, type)) {
                 if (debug.messageEnabled()) {
                     debug.message("Updating RestSecurity service configuration state for realm " + realm);
                 }
                 initializeSettings(mgr);
-            }
-            if (currentRealmTargetedByOrganizaionRemoved(serviceName, version, orgName, type)) {
+            } if (currentRealmTargetedByOrganizaionRemoved(serviceName, version, orgName, type)){
                 mgr = null;
             } else {
                 if (debug.messageEnabled()) {
@@ -98,14 +98,13 @@ public class RestSecurity {
             }
         }
 
-        private boolean currentRealmTargetedByOrganizaionRemoved(String serviceName, String version, String orgName, int type) {
+        private boolean currentRealmTargetedByOrganizaionRemoved(String serviceName, String version, String orgName, int type){
             return serviceName.equalsIgnoreCase(SERVICE_NAME) &&
                     version.equalsIgnoreCase(SERVICE_VERSION) &&
                     (ServiceListener.REMOVED == type) &&
                     (orgName != null) &&
                     orgName.equals(DNMapper.orgNameToDN(realm));
         }
-
         private boolean currentRealmTargetedByOrganizationUpdate(String serviceName, String version, String orgName, int type) {
             return serviceName.equalsIgnoreCase(SERVICE_NAME) &&
                     version.equalsIgnoreCase(SERVICE_VERSION) &&
@@ -122,30 +121,23 @@ public class RestSecurity {
         final String forgotPasswordConfirmationUrl;
         final Boolean selfRegistration;
         final Boolean forgotPassword;
-        final Boolean forgotUsername;
-        final Boolean kbaEnabled;
         final Set<String> protectedUserAttributes;
         final String successfulUserRegistrationDestination;
         final Boolean twoFactorAuthEnabled;
-        final Set<String> selfRegistrationValidAttributes;
 
         private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl,
                 Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, Boolean selfRegistration,
-                Boolean forgotPassword, Boolean forgotUsername, Boolean kbaEnabled, Set<String> protectedUserAttributes,
-                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled,
-                Set<String> selfRegistrationValidAttributes) {
+                Boolean forgotPassword, Set<String> protectedUserAttributes,
+                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
             this.selfRegistrationConfirmationUrl = selfRegistrationConfirmationUrl;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
             this.forgotPasswordConfirmationUrl = forgotPasswordConfirmationUrl;
             this.selfRegistration = selfRegistration;
             this.forgotPassword = forgotPassword;
-            this.forgotUsername = forgotUsername;
-            this.kbaEnabled = kbaEnabled;
             this.protectedUserAttributes = protectedUserAttributes;
             this.successfulUserRegistrationDestination = successfulUserRegistrationDestination;
             this.twoFactorAuthEnabled = twoFactorAuthEnabled;
-            this.selfRegistrationValidAttributes = selfRegistrationValidAttributes;
         }
     }
 
@@ -156,22 +148,11 @@ public class RestSecurity {
             String selfRegistrationConfirmationUrl = ServiceConfigUtils.getStringAttribute(serviceConfig, SELF_REG_CONFIRMATION_URL);
             Boolean forgotPassword = ServiceConfigUtils.getBooleanAttribute(serviceConfig, FORGOT_PASSWORD);
             String forgotPasswordConfirmationUrl = ServiceConfigUtils.getStringAttribute(serviceConfig, FORGOT_PASSWORD_CONFIRMATION_URL);
-            Boolean forgotUsername = ServiceConfigUtils.getBooleanAttribute(serviceConfig, FORGOT_USERNAME);
             Long selfRegTokLifeTime = ServiceConfigUtils.getLongAttribute(serviceConfig, SELF_REG_TOKEN_LIFE_TIME);
             Long forgotPassTokLifeTime = ServiceConfigUtils.getLongAttribute(serviceConfig, FORGOT_PASSWORD_TOKEN_LIFE_TIME);
             Set<String> protectedUserAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
             String successfulUserRegistrationDestination = ServiceConfigUtils.getStringAttribute(serviceConfig, SUCCESSFUL_USER_REGISTRATION_DESTINATION);
             Boolean twoFactorAuthEnabled = ServiceConfigUtils.getBooleanAttribute(serviceConfig, TWO_FACTOR_AUTH_ENABLED);
-            Set<String> selfRegistrationValidAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, SELF_REG_VALID_ATTRIBUTES);
-
-            Boolean kbaEnabledSelfRegistration = ServiceConfigUtils.getBooleanAttribute(serviceConfig, SELF_REG_KBA_ENABLED);
-            Boolean kbaEnabledForgottenPassword = ServiceConfigUtils.getBooleanAttribute(serviceConfig, FORGOT_PASSWORD_KBA_ENABLED);
-            Boolean kbaEnabledForgottenUsername = ServiceConfigUtils.getBooleanAttribute(serviceConfig, FORGOT_USERNAME_KBA_ENABLED);
-
-            Boolean kbaEnabled = Boolean.TRUE.equals(kbaEnabledSelfRegistration)
-                    || Boolean.TRUE.equals(kbaEnabledForgottenPassword)
-                    || Boolean.TRUE.equals(kbaEnabledForgottenUsername);
-
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
                     selfRegistrationConfirmationUrl,
@@ -179,12 +160,9 @@ public class RestSecurity {
                     forgotPasswordConfirmationUrl,
                     selfRegistration,
                     forgotPassword,
-                    forgotUsername,
-                    kbaEnabled,
                     protectedUserAttributes,
                     successfulUserRegistrationDestination,
-                    twoFactorAuthEnabled,
-                    selfRegistrationValidAttributes);
+                    twoFactorAuthEnabled);
 
             setProviderConfig(newRestSecuritySettings);
             if (debug.messageEnabled()) {
@@ -200,12 +178,9 @@ public class RestSecurity {
     private synchronized void setProviderConfig(RestSecurityConfiguration newSettings) {
         restSecurityConfiguration = newSettings;
     }
-
     /**
      * Default Constructor
-     *
-     * @param realm
-     *         in which Rest Security service shall be created
+     * @param realm in which Rest Security service shall be created
      */
     RestSecurity(String realm) {
         this.realm = realm;
@@ -236,116 +211,64 @@ public class RestSecurity {
         if ((restSecurityConfiguration != null) && (restSecurityConfiguration.selfRegistration != null)) {
             return restSecurityConfiguration.selfRegistration;
         } else {
-            String message = "RestSecurity::Unable to get provider setting for : " + SELF_REGISTRATION;
+            String message = "RestSecurity::Unable to get provider setting for : "+ SELF_REGISTRATION;
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }
     }
-
+    
     public String getSelfRegistrationConfirmationUrl() {
-        return restSecurityConfiguration.selfRegistrationConfirmationUrl;
+    	return restSecurityConfiguration.selfRegistrationConfirmationUrl;
     }
 
     public boolean isForgotPassword() throws ServiceNotFoundException {
         if ((restSecurityConfiguration != null) && (restSecurityConfiguration.forgotPassword != null)) {
             return restSecurityConfiguration.forgotPassword;
         } else {
-            String message = "RestSecurity::Unable to get provider setting for : " + FORGOT_PASSWORD;
+            String message = "RestSecurity::Unable to get provider setting for : "+ FORGOT_PASSWORD;
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }
     }
-
+    
     public String getForgotPasswordConfirmationUrl() {
-        return restSecurityConfiguration.forgotPasswordConfirmationUrl;
+    	return restSecurityConfiguration.forgotPasswordConfirmationUrl;
     }
-
-    /**
-     * Returns whether or not forgotten username is enabled.
-     *
-     * @return whether forgotten username is enabled
-     *
-     * @throws ServiceNotFoundException
-     *         if the configuration has not been initialised properly
-     */
-    public boolean isForgotUsername() throws ServiceNotFoundException {
-        if ((restSecurityConfiguration != null) && (restSecurityConfiguration.forgotUsername != null)) {
-            return restSecurityConfiguration.forgotUsername;
-        } else {
-            String message = "RestSecurity::Unable to get provider setting for : " + FORGOT_USERNAME;
-            debug.error(message);
-            throw new ServiceNotFoundException(message);
-        }
-    }
-
-
-    /**
-     * Returns whether or not KBA is enabled.
-     *
-     * @return whether KBA is enabled
-     *
-     * @throws ServiceNotFoundException
-     *         if the configuration has not been initialise properly
-     */
-    public boolean isKbaEnabled() throws ServiceNotFoundException {
-        if (restSecurityConfiguration != null) {
-            return restSecurityConfiguration.kbaEnabled;
-        } else {
-            String message = "RestSecurity::Configuration has not be initialised";
-            debug.error(message);
-            throw new ServiceNotFoundException(message);
-        }
-    }
-
     /**
      * Retrieves the Self-Registration CTS Token Life Time
-     *
      * @return Long representing the time that the Token shall be valid
-     *
      * @throws ServiceNotFoundException
      */
     public Long getSelfRegTLT() throws ServiceNotFoundException {
         if ((restSecurityConfiguration != null) && (restSecurityConfiguration.selfRegTokenLifeTime != null)) {
             return restSecurityConfiguration.selfRegTokenLifeTime;
         } else {
-            String message = "RestSecurity::Unable to get provider setting for : " + SELF_REG_TOKEN_LIFE_TIME;
+            String message = "RestSecurity::Unable to get provider setting for : "+ SELF_REG_TOKEN_LIFE_TIME;
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }
     }
-
+    
     public Set<String> getProtectedUserAttributes() {
         return restSecurityConfiguration.protectedUserAttributes;
     }
-
+    
     public String getSuccessfulUserRegistrationDestination() {
-        return restSecurityConfiguration.successfulUserRegistrationDestination;
+    	return restSecurityConfiguration.successfulUserRegistrationDestination;
     }
 
     /**
      * Retrieves the Forgotten Password CTS Token Life Time
-     *
      * @return Long representing the time that the Token shall be valid
-     *
      * @throws ServiceNotFoundException
      */
     public Long getForgotPassTLT() throws ServiceNotFoundException {
         if ((restSecurityConfiguration != null) && (restSecurityConfiguration.forgotPasswordTokenLifeTime != null)) {
             return restSecurityConfiguration.forgotPasswordTokenLifeTime;
         } else {
-            String message = "RestSecurity::Unable to get provider setting for : " + FORGOT_PASSWORD_TOKEN_LIFE_TIME;
+            String message = "RestSecurity::Unable to get provider setting for : "+ FORGOT_PASSWORD_TOKEN_LIFE_TIME;
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }
-    }
-
-    /**
-     * Retrieve the set of attribute names which are valid for self registration (i.e. user creation).
-     *
-     * @return Set of strings representing valid attributes when creating the user - anything not in this list will be
-     * removed when the user is created.
-     */
-    public Set<String> getSelfRegistrationValidUserAttributes() {
-        return restSecurityConfiguration.selfRegistrationValidAttributes;
     }
 }

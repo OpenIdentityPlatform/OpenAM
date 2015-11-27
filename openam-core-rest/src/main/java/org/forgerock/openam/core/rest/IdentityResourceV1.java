@@ -20,6 +20,7 @@ import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asMap;
 import static org.forgerock.json.JsonValue.array;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.core.rest.UserAttributeInfo.*;
 import static org.forgerock.openam.rest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.rest.RestUtils.isAdmin;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -70,6 +71,7 @@ import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.selfservice.core.SelfServiceContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
@@ -155,6 +157,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     private final RestSecurityProvider restSecurityProvider;
     private final Set<UiRolePredicate> uiRolePredicates;
     private final IdentityServicesImpl identityServices;
+    private final ConsoleConfigHandler configHandler;
 
     private final MailServerLoader mailServerLoader;
 
@@ -165,9 +168,9 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      */
     public IdentityResourceV1(String objectType, MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-            Set<UiRolePredicate> uiRolePredicates) {
+            ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
         this(objectType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
-                uiRolePredicates);
+                configHandler, uiRolePredicates);
     }
 
     /**
@@ -190,7 +193,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     // Constructor used for testing...
     IdentityResourceV1(String objectType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
             MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-            RestSecurityProvider restSecurityProvider, Set<UiRolePredicate> uiRolePredicates) {
+            RestSecurityProvider restSecurityProvider, ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
         this.objectType = objectType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
@@ -198,6 +201,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         this.identityServices = identityServices;
         this.coreWrapper = coreWrapper;
         this.restSecurityProvider = restSecurityProvider;
+        this.configHandler = configHandler;
         this.uiRolePredicates = uiRolePredicates;
     }
 
@@ -923,9 +927,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 throw new BadRequestException("Self-registration disabled");
             }
 
-            enforceWhiteList(context, request.getContent(),
-                    objectType, restSecurity.getSelfRegistrationValidUserAttributes());
-
             final String tokenID = jVal.get(TOKEN_ID).asString();
             jVal.remove(TOKEN_ID);
             confirmationId = jVal.get(CONFIRMATION_ID).asString();
@@ -1045,9 +1046,9 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final JsonValue jVal = request.getContent();
             String resourceId = request.getNewResourceId();
 
-            RestSecurity restSecurity = restSecurityProvider.get(realm);
+            UserAttributeInfo userAttributeInfo = configHandler.getConfig(realm, UserAttributeInfoBuilder.class);
             enforceWhiteList(context, request.getContent(),
-                                            objectType, restSecurity.getSelfRegistrationValidUserAttributes());
+                                            objectType, userAttributeInfo.getValidCreationAttributes());
 
             IdentityDetails identity = jsonValueToIdentityDetails(objectType, jVal, realm);
             // check to see if request has included resource ID
