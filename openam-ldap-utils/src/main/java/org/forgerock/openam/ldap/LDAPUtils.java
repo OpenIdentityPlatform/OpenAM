@@ -15,9 +15,6 @@
  */
 package org.forgerock.openam.ldap;
 
-import java.util.Iterator;
-import javax.naming.InvalidNameException;
-import javax.naming.NamingException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
@@ -33,6 +30,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+
+import javax.naming.InvalidNameException;
 
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.opendj.ldap.Attribute;
@@ -69,16 +68,15 @@ import org.forgerock.util.Reject;
  * can prioritize manually (if the logic differs from this implementation) and create the corresponding {@link LDAPURL}
  * objects, or you can pass in the list to the newPrioritized* methods.
  *
- * @author Peter Major
  * @supported.all.api
  */
-public class LDAPUtils {
+public final class LDAPUtils {
 
     private static final char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';'};
     private static final String LDAP_SCOPE_BASE = "SCOPE_BASE";
     private static final String LDAP_SCOPE_ONE = "SCOPE_ONE";
     private static final String LDAP_SCOPE_SUB = "SCOPE_SUB";
-    private static final Map<String, SearchScope> scopes;
+    private static final Map<String, SearchScope> SCOPES;
     private static final Debug DEBUG = Debug.getInstance("LDAPUtils");
     private static final int DEFAULT_HEARTBEAT_TIMEOUT = 3;
 
@@ -87,7 +85,7 @@ public class LDAPUtils {
         mappings.put(LDAP_SCOPE_BASE, SearchScope.BASE_OBJECT);
         mappings.put(LDAP_SCOPE_ONE, SearchScope.SINGLE_LEVEL);
         mappings.put(LDAP_SCOPE_SUB, SearchScope.WHOLE_SUBTREE);
-        scopes = Collections.unmodifiableMap(mappings);
+        SCOPES = Collections.unmodifiableMap(mappings);
     }
 
     private LDAPUtils() {
@@ -224,9 +222,9 @@ public class LDAPUtils {
             String heartBeatTimeUnit,
             LDAPOptions ldapOptions) {
         Boolean ssl = ldapurl.isSSL();
-        int heartBeatTimeout 
-            = SystemPropertiesManager.getAsInt(Constants.LDAP_HEARTBEAT_TIMEOUT, DEFAULT_HEARTBEAT_TIMEOUT);
-        
+        int heartBeatTimeout =
+                SystemPropertiesManager.getAsInt(Constants.LDAP_HEARTBEAT_TIMEOUT, DEFAULT_HEARTBEAT_TIMEOUT);
+
         if (ssl != null && ssl.booleanValue()) {
             try {
                 //Creating a defensive copy of ldapOptions to handle the case when a mixture of SSL/non-SSL connections
@@ -239,10 +237,10 @@ public class LDAPUtils {
         ConnectionFactory cf = new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
         if (heartBeatInterval > 0) {
             TimeUnit unit = TimeUnit.valueOf(heartBeatTimeUnit.toUpperCase());
-            
-            cf = Connections.newHeartBeatConnectionFactory(cf, 
+
+            cf = Connections.newHeartBeatConnectionFactory(cf,
                      unit.toSeconds(heartBeatInterval), //interval
-                     unit.toSeconds(heartBeatTimeout), //timeout 
+                     unit.toSeconds(heartBeatTimeout), //timeout
                      TimeUnit.SECONDS);
         }
         if (username != null) {
@@ -322,7 +320,7 @@ public class LDAPUtils {
      * @return the corresponding {@link SearchScope} object.
      */
     public static SearchScope getSearchScope(String scope, SearchScope defaultScope) {
-        SearchScope searchScope = scopes.get(scope);
+        SearchScope searchScope = SCOPES.get(scope);
         return searchScope == null ? defaultScope : searchScope;
     }
 
@@ -485,10 +483,10 @@ public class LDAPUtils {
 
     /**
      * Returns a set of all the non-root DNs from the collection that are not equal to the {@code compare} parameter.
-     * @param compare
-     * @param dns
-     * @return
-     * @throws NamingException
+     * @param compare The DN to compare against.
+     * @param dns THe DNs to compare.
+     * @return A {@code Set} of non identical DNs.
+     * @throws InvalidNameException If an error occurs.
      */
     public static Set<String> collectNonIdenticalValues(DN compare, Set<String> dns) throws InvalidNameException {
         Set<String> results = new HashSet<>();
@@ -501,6 +499,13 @@ public class LDAPUtils {
         return results;
     }
 
+    /**
+     * Gets the DB name.
+     *
+     * @param suffix The suffix.
+     * @param ld The connection.
+     * @return The name of the DB.
+     */
     public static String getDBName(String suffix, Connection ld) {
         String filter = "cn=" + suffix;
 
@@ -523,21 +528,27 @@ public class LDAPUtils {
 
     /**
      * Tests whether the supplied string is a DN, and is not the root DN.
-     * @param candidateDN
-     * @return
+     * @param candidateDN The possible DN.
+     * @return {@code true} if the string is a DN.
      */
     public static boolean isDN(String candidateDN) {
         return newDN(candidateDN).size() > 0;
     }
 
-    public static String escapeValue( String str ) {
+    /**
+     * Escapes characters that should be escaped.
+     *
+     * @param str The string to escape.
+     * @return The escaped string.
+     */
+    public static String escapeValue(String str) {
         StringBuilder retbuf = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
-            char current_char = str.charAt(i);
-            if (shouldEscapeCharacter(current_char)) {
-                retbuf.append( '\\' );
+            char currentChar = str.charAt(i);
+            if (shouldEscapeCharacter(currentChar)) {
+                retbuf.append('\\');
             }
-            retbuf.append(current_char);
+            retbuf.append(currentChar);
         }
         return retbuf.toString();
     }
@@ -551,10 +562,22 @@ public class LDAPUtils {
         return false;
     }
 
+    /**
+     * Normalizes the DN.
+     *
+     * @param dn The DN to normalize.
+     * @return The normalized DN.
+     */
     public static String normalizeDN(String dn) {
         return newDN(dn).toString().toLowerCase();
     }
 
+    /**
+     * Creates a DN from the specified DN string.
+     *
+     * @param orgName The DN string.
+     * @return A DN.
+     */
     public static DN newDN(String orgName) {
         if (orgName == null || orgName.startsWith("/") || !orgName.contains("=")) {
             return DN.rootDN();
@@ -574,6 +597,13 @@ public class LDAPUtils {
         return DN.valueOf(dn).toString().toLowerCase();
     }
 
+    /**
+     * Determines if the DN's are equal.
+     *
+     * @param dn1 The first DN.
+     * @param dn2 The second DN.
+     * @return {@code true} if the DN's are equal.
+     */
     public static boolean dnEquals(String dn1, String dn2) {
         DN dnObj1 = DN.valueOf(dn1);
         DN dnObj2 = DN.valueOf(dn2);
@@ -615,14 +645,14 @@ public class LDAPUtils {
     public static ConnectionFactory createFailoverConnectionFactory(String host, int defaultPort,
             String authDN, String authPasswd, LDAPOptions options) {
         StringTokenizer st = new StringTokenizer(host);
-        String hostList[] = new String[st.countTokens()];
-        int portList[] = new int[st.countTokens()];
+        String[] hostList = new String[st.countTokens()];
+        int[] portList = new int[st.countTokens()];
         int hostCount = 0;
-        while(st.hasMoreTokens()) {
+        while (st.hasMoreTokens()) {
             String s = st.nextToken();
             int colon = s.indexOf(':');
             if (colon > 0) {
-                hostList[hostCount] = s.substring( 0, colon);
+                hostList[hostCount] = s.substring(0, colon);
                 portList[hostCount] = Integer.parseInt(s.substring(colon + 1));
             } else {
                 hostList[hostCount] = s;

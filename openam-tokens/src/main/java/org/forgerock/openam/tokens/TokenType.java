@@ -25,17 +25,52 @@ package org.forgerock.openam.tokens;
  */
 public enum TokenType {
 
+    /**
+     * Session token type.
+     */
     SESSION,
+    /**
+     * SAML2 token type.
+     */
     SAML2,
+    /**
+     * OAuth token type.
+     */
     OAUTH,
+    /**
+     * REST token type.
+     */
     REST,
+    /**
+     * Generatic token type.
+     */
     GENERIC,
+    /**
+     * OAuth Resource set token type.
+     */
     RESOURCE_SET,
+    /**
+     * UMA Permission ticket token type.
+     */
     PERMISSION_TICKET,
+    /**
+     * UMA Requesting party token type.
+     */
     REQUESTING_PARTY,
+    /**
+     * UMA Audit entry token type.
+     */
     UMA_AUDIT_ENTRY,
+    /**
+     * Session blacklist token type.
+     */
     SESSION_BLACKLIST,
+    /**
+     * UMA Pending request token type.
+     */
     UMA_PENDING_REQUEST,
+    /**
+     * STS token type.
+     */
     STS
-
 }

@@ -25,9 +25,20 @@ import org.forgerock.json.JsonValue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * A custom converter that converted {@code JsonValue}s to {@code byte} arrays.
+ *
+ * @since 13.0.0
+ */
 public class JsonValueToJsonBytesConverter implements Converter<JsonValue, byte[]> {
 
     private final ObjectMapper mapper;
+
+    /**
+     * Constructs a new JsonValueToJsonBytesConverter instance.
+     *
+     * @param mapper A {@code ObjectMapper} instance.
+     */
     @Inject
     public JsonValueToJsonBytesConverter(@Named("cts-json-object-mapper") ObjectMapper mapper) {
         this.mapper = mapper;
@@ -36,7 +47,7 @@ public class JsonValueToJsonBytesConverter implements Converter<JsonValue, byte[
     @Override
     public byte[] convertFrom(JsonValue jsonValue) {
         try {
-        return mapper.writeValueAsBytes(jsonValue.getObject());
+            return mapper.writeValueAsBytes(jsonValue.getObject());
         } catch (IOException e) {
             throw new IllegalArgumentException("Could not convert input to JSON", e);
         }

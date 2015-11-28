@@ -11,18 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.ldap;
 
 /**
- * A simple domain object to represent a simple LDAP URL, the URL can have two main formats:
+ * A simple domain object to represent a simple LDAP URL. The URL can have two main formats:
  * <ul>
  *  <li>scheme://host:port</li>
  *  <li>host:port</li>
  * </ul>
- *
- * @author Peter Major
  */
 public final class LDAPURL implements Comparable<LDAPURL> {
 
@@ -39,10 +38,20 @@ public final class LDAPURL implements Comparable<LDAPURL> {
         this.isSSL = isSSL;
     }
 
+    /**
+     * Gets the port from the LDAP URL.
+     *
+     * @return The port.
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * Gets the host from the LDAP URL.
+     *
+     * @return The host.
+     */
     public String getHost() {
         return host;
     }
@@ -67,7 +76,7 @@ public final class LDAPURL implements Comparable<LDAPURL> {
      * <ul>
      *  <li>scheme://host:port</li>
      *  <li>host:port</li>
-     * </ul
+     * </ul>
      *
      * @param url An LDAP URL that needs to be parsed.
      * @return An LDAPURL instance that represents the passed in URL.

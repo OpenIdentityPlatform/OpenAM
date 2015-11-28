@@ -26,6 +26,11 @@ import javax.inject.Singleton;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * A custom converter that converted {@code Map}s to JSON {@code String}s.
+ *
+ * @since 13.0.0
+ */
 @Singleton
 public class MapToJsonStringConverter implements Converter<Map<String, ?>, String> {
 
@@ -33,6 +38,11 @@ public class MapToJsonStringConverter implements Converter<Map<String, ?>, Strin
     private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<Map<String, Object>>() {
     };
 
+    /**
+     * Constructs a new MapToJsonStringConverter instance.
+     *
+     * @param mapper A {@code ObjectMapper} instance.
+     */
     @Inject
     public MapToJsonStringConverter(@Named("cts-json-object-mapper") ObjectMapper mapper) {
         this.mapper = mapper;

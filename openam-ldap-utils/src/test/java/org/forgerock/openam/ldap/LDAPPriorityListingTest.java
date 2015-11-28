@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.ldap;
 
 import java.util.LinkedHashSet;
@@ -30,32 +31,40 @@ public class LDAPPriorityListingTest {
     }
 
     public void matchingAndNonMatchingServersAreUnique() {
-        Set<LDAPURL> list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:389", "test1.com|03"), "01", "02");
+        Set<LDAPURL> list = LDAPUtils.prioritizeServers(
+                asOrderedSet("test1.com:389", "test1.com|03"), "01", "02");
         assertThat(list).hasSize(1).containsOnly(LDAPURL.valueOf("test1.com:389"));
     }
-    
-    public void nonMatchingServerIsAtTheEndOfTheList(){
-        Set<LDAPURL> list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:389|03", "test2.com|02", "test3.com|01"), "01", "02");
+
+    public void nonMatchingServerIsAtTheEndOfTheList() {
+        Set<LDAPURL> list = LDAPUtils.prioritizeServers(
+                asOrderedSet("test1.com:389|03", "test2.com|02", "test3.com|01"), "01", "02");
         assertThat(list.toArray()).isEqualTo(urls("test3.com", "test1.com", "test2.com").toArray());
     }
 
     public void matchingServersAreFirst() {
-        Set<LDAPURL> list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:1389|03", "test3.com:2389|01", "test2.com:50389|01"), "01", "02");
+        Set<LDAPURL> list = LDAPUtils.prioritizeServers(
+                asOrderedSet("test1.com:1389|03", "test3.com:2389|01", "test2.com:50389|01"), "01", "02");
         assertThat(list.toArray()).isEqualTo(urls("test3.com:2389", "test2.com:50389", "test1.com:1389").toArray());
-        list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:1389|03", "test3.com:2389|02", "test2.com:50389|01"), "03", "01");
+        list = LDAPUtils.prioritizeServers(
+                asOrderedSet("test1.com:1389|03", "test3.com:2389|02", "test2.com:50389|01"), "03", "01");
         assertThat(list.toArray()).isEqualTo(urls("test1.com:1389", "test3.com:2389", "test2.com:50389").toArray());
-        list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:1389|03", "test3.com:2389|02", "test2.com:50389|01"), "02", "04");
+        list = LDAPUtils.prioritizeServers(
+                asOrderedSet("test1.com:1389|03", "test3.com:2389|02", "test2.com:50389|01"), "02", "04");
         assertThat(list.toArray()).isEqualTo(urls("test3.com:2389", "test1.com:1389", "test2.com:50389").toArray());
-        list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:1389|03", "test3.com:2389|04", "test2.com:50389|01|02"), "05", "02");
+        list = LDAPUtils.prioritizeServers(
+                asOrderedSet("test1.com:1389|03", "test3.com:2389|04", "test2.com:50389|01|02"), "05", "02");
         assertThat(list.toArray()).isEqualTo(urls("test2.com:50389", "test1.com:1389", "test3.com:2389").toArray());
     }
 
     public void matchingSitesFirstIfNoServerMatching() {
-        Set<LDAPURL> list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:1389|03", "test3.com:2389|01", "test2.com:50389|01|02"), "04", "02");
+        Set<LDAPURL> list = LDAPUtils.prioritizeServers(
+                asOrderedSet("test1.com:1389|03", "test3.com:2389|01", "test2.com:50389|01|02"), "04", "02");
         assertThat(list.toArray()).isEqualTo(urls("test2.com:50389", "test1.com:1389", "test3.com:2389").toArray());
         list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:1389|03|02", "test2.com:50389|01|05"), "04", "02");
         assertThat(list.toArray()).isEqualTo(urls("test1.com:1389", "test2.com:50389").toArray());
-        list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:1389|03|02", "test2.com:50389|01|05", "test4.com:389"), "01", "05");
+        list = LDAPUtils.prioritizeServers(
+                asOrderedSet("test1.com:1389|03|02", "test2.com:50389|01|05", "test4.com:389"), "01", "05");
         assertThat(list.toArray()).isEqualTo(urls("test2.com:50389", "test1.com:1389", "test4.com:389").toArray());
     }
 

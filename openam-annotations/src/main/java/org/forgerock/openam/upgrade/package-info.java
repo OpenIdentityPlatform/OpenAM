@@ -15,11 +15,6 @@
  */
 
 /**
- * Provides common code for looking up click-through license agreements to display to the user during installation
- * or upgrade of OpenAM. Includes a {@link org.forgerock.openam.license.LicenseLocator} interface for locating a
- * license file within the installation archive/war and basic domain objects for licenses and required license
- * sets.
- *
- * @since 12.0.0
+ * Packagin containing OpenAM annotations.
  */
-package org.forgerock.openam.license;
+package org.forgerock.openam.upgrade;

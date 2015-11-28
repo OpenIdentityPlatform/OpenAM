@@ -1,6 +1,4 @@
 /*
- * Copyright 2014 ForgeRock, AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.license;
@@ -73,7 +73,8 @@ public class ClasspathLicenseLocatorTest {
         String licenseName = "aaa";
         String licenseText = "some\nsample license\ntext";
         testLocator = new ClasspathLicenseLocator(mockClassLoader, UTF8, licenseName);
-        given(mockClassLoader.getResourceAsStream(licenseName)).willReturn(new ByteArrayInputStream(licenseText.getBytes(UTF8)));
+        given(mockClassLoader.getResourceAsStream(licenseName))
+                .willReturn(new ByteArrayInputStream(licenseText.getBytes(UTF8)));
 
         // When
         LicenseSet result = testLocator.getRequiredLicenses();

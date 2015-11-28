@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 
 package org.forgerock.openam.license;
@@ -31,13 +31,15 @@ public interface LicensePresenter {
      * all licenses are accepted.
      *
      * @param preAccept Whether or not to auto-accept the license(s) displayed
+     * @throws LicenseRejectedException If the licence is rejected.
      */
-    public void presentLicenses(boolean preAccept) throws LicenseRejectedException;
+    void presentLicenses(boolean preAccept) throws LicenseRejectedException;
 
     /**
      * Returns a notice to display to the user, indicating
      * that all licenses must be accepted for the user to be able to continue.
+     *
+     * @return The notice to display to the user.
      */
-    public String getNotice();
-
+    String getNotice();
 }

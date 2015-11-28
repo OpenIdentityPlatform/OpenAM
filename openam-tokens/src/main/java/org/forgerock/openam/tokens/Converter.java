@@ -22,10 +22,27 @@ package org.forgerock.openam.tokens;
  * @param <T> The type being converted to.
  */
 public interface Converter<F, T> {
+
+    /**
+     * Converts the object from its original format.
+     *
+     * @param f The object being converted.
+     * @return The converted object.
+     */
     T convertFrom(F f);
+
+    /**
+     * Converts the object back to its original format.
+     *
+     * @param t The object being converted.
+     * @return The converted object.
+     */
     F convertBack(T t);
 
-    public static class IdentityConverter implements Converter<Object, Object> {
+    /**
+     * An identity converter that converts an object to the same object.
+     */
+    class IdentityConverter implements Converter<Object, Object> {
         @Override
         public Object convertFrom(Object o) {
             return o;

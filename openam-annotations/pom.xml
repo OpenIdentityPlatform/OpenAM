@@ -39,6 +39,10 @@
     <artifactId>openam-annotations</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <checkstyleFailOnError>true</checkstyleFailOnError>
+    </properties>
+
     <!-- Build -->
     <build>
         <plugins>

@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 
 package org.forgerock.openam.license;
@@ -47,7 +47,7 @@ public class CLILicensePresenterTest {
         //when
         try {
             manager.presentLicenses(true);
-        } catch(LicenseRejectedException lre) {
+        } catch (LicenseRejectedException lre) {
             error = true;
         }
 
@@ -66,7 +66,7 @@ public class CLILicensePresenterTest {
         //when
         try {
             manager.presentLicenses(false);
-        } catch(LicenseRejectedException lre) {
+        } catch (LicenseRejectedException lre) {
             error = true;
         }
 
@@ -85,7 +85,7 @@ public class CLILicensePresenterTest {
         //when
         try {
             manager.presentLicenses(false);
-        } catch(LicenseRejectedException lre) {
+        } catch (LicenseRejectedException lre) {
             error = true;
         }
 

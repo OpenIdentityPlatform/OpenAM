@@ -27,6 +27,10 @@
 
     <artifactId>openam-tokens</artifactId>
 
+    <properties>
+        <checkstyleFailOnError>true</checkstyleFailOnError>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

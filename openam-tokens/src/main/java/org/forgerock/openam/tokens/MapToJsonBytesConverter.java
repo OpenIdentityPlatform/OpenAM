@@ -26,6 +26,11 @@ import javax.inject.Singleton;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * A custom converter that converted {@code Map}s to {@code byte} arrays.
+ *
+ * @since 13.0.0
+ */
 @Singleton
 public class MapToJsonBytesConverter implements Converter<Map<String, ?>, byte[]> {
 
@@ -33,6 +38,11 @@ public class MapToJsonBytesConverter implements Converter<Map<String, ?>, byte[]
     private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<Map<String, Object>>() {
     };
 
+    /**
+     * Constructs a new MapToJsonBytesConverter instance.
+     *
+     * @param mapper A {@code ObjectMapper} instance.
+     */
     @Inject
     public MapToJsonBytesConverter(@Named("cts-json-object-mapper") ObjectMapper mapper) {
         this.mapper = mapper;

@@ -19,6 +19,11 @@ package org.forgerock.openam.tokens;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+/**
+ * A custom converter that converted {@code Long}s to {@code Calendar}s.
+ *
+ * @since 13.0.0
+ */
 public class LongToCalendarConverter implements Converter<Long, Calendar> {
 
     @Override

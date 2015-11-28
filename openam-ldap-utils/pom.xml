@@ -30,6 +30,10 @@
     <name>OpenAM LDAP Utilities</name>
     <description>OpenAM LDAP Utilites</description>
 
+    <properties>
+        <checkstyleFailOnError>true</checkstyleFailOnError>
+    </properties>
+
     <!-- Build -->
     <build>
         <plugins>
