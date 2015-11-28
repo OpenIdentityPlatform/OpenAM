@@ -33,12 +33,24 @@ import org.forgerock.json.JsonValue;
  */
 public class RedirectUrlValidator<T> {
 
+    /**
+     * Go to url query parameter name.
+     */
     public final static String GOTO = "goto";
+
+    /**
+     * Go to on fail query parameter name.
+     */
     public final static String GOTO_ON_FAIL = "gotoOnFail";
 
     private static final Debug DEBUG = Debug.getInstance("patternMatching");
     private final ValidDomainExtractor<T> domainExtractor;
 
+    /**
+     * Constructs a new RedirectUrlValidator instance.
+     *
+     * @param domainExtractor A ValidDomainExtractor instance.
+     */
     public RedirectUrlValidator(final ValidDomainExtractor<T> domainExtractor) {
         this.domainExtractor = domainExtractor;
     }

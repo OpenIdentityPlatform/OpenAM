@@ -11,21 +11,32 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.federation.saml2;
 
 /**
- *
  * This class is used to wrap Exceptions thrown by implementations of the SAML2TokenRepository.
- *
  */
 public class SAML2TokenRepositoryException extends Exception {
 
+    /**
+     * Constructs a new SAML2TokenRepositoryException with the specified detail message and
+     * cause.
+     *
+     * @param error The detail message.
+     * @param cause The cause.
+     */
     public SAML2TokenRepositoryException(String error, Throwable cause) {
         super(error, cause);
     }
 
+    /**
+     * Constructs a new SAML2TokenRepositoryException with the specified detail message.
+     *
+     * @param error The detail message.
+     */
     public SAML2TokenRepositoryException(String error) {
         super(error);
     }

@@ -57,7 +57,6 @@ public class ServicesDefaultValues {
     private static Set preappendSlash = new HashSet();
     private static Set trimSlash = new HashSet();
     private Map defValues = new HashMap();
-    private static ValidateIPaddress ipValidator = new ValidateIPaddress();
 
     static {
         preappendSlash.add(SetupConstants.CONFIG_VAR_PRODUCT_NAME);
@@ -330,7 +329,7 @@ public class ServicesDefaultValues {
     ) {
         int idx = hostname.lastIndexOf(".");
         if ((idx == -1) || (idx == (hostname.length() -1)) ||
-                ipValidator.isValidIP(hostname)
+                ValidateIPaddress.isValidIP(hostname)
                 ) {
             cookieDomain = "";
         } else if ((cookieDomain == null) || (cookieDomain.length() == 0)) {

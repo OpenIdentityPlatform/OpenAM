@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.utils;
 
 import java.util.Calendar;
@@ -26,7 +27,11 @@ import java.util.TimeZone;
  * 00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970, not
  * counting leap seconds.
  */
-public class TimeUtils {
+public final class TimeUtils {
+
+    private TimeUtils() {
+    }
+
     /**
      * Convert from a Java Calendar instance into a Unix Time stamp.
      *
@@ -38,7 +43,7 @@ public class TimeUtils {
      * @return A long representing the number of seconds from the epoch.
      */
     public static long toUnixTime(Calendar timestamp) {
-        return timestamp.getTimeInMillis()/1000L;
+        return timestamp.getTimeInMillis() / 1000L;
     }
 
     /**

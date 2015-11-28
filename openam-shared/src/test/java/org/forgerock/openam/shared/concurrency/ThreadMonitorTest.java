@@ -11,11 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.shared.concurrency;
 
-import com.sun.identity.shared.debug.Debug;
+import static org.mockito.BDDMockito.*;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 import org.mockito.ArgumentCaptor;
@@ -25,9 +35,7 @@ import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.concurrent.*;
-
-import static org.mockito.BDDMockito.*;
+import com.sun.identity.shared.debug.Debug;
 
 public class ThreadMonitorTest {
 
@@ -217,7 +225,7 @@ public class ThreadMonitorTest {
                 com.sun.identity.common.ShutdownManager.getInstance(),
                 subvertedDebugger);
 
-        threadMonitor.watchThread(workPool, new Runnable(){
+        threadMonitor.watchThread(workPool, new Runnable() {
             public void run() {
                 try {
                     Thread.sleep(1000);

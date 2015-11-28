@@ -46,6 +46,10 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+/**
+ * Implementation of a {@code KeyProvider} interface for retrieving X509 Certificates and private
+ * keys from the user data store.
+ */
 public class AMKeyProvider implements KeyProvider {
 
     private static final String DEFAULT_KEYSTORE_FILE_PROP = "com.sun.identity.saml.xmlsig.keystore";
@@ -64,29 +68,40 @@ public class AMKeyProvider implements KeyProvider {
     HashMap keyTable = new HashMap();
 
     /**
-     * Constructor
+     * Constructor.
      */
     public AMKeyProvider() {
-        this(DEFAULT_KEYSTORE_FILE_PROP,DEFAULT_KEYSTORE_PASS_FILE_PROP,
+        this(DEFAULT_KEYSTORE_FILE_PROP, DEFAULT_KEYSTORE_PASS_FILE_PROP,
                 DEFAULT_KEYSTORE_TYPE_PROP, DEFAULT_PRIVATE_KEY_PASS_FILE_PROP);
     }
 
     /**
-     * Constructor
+     * Constructor.
+     *
+     * @param keyStoreFilePropName The key store file property name.
+     * @param keyStorePassFilePropName The key store password property name.
+     * @param keyStoreTypePropName The key store type property name.
+     * @param privateKeyPassFilePropName The key store private key password property name.
      */
     public AMKeyProvider(
-            String keyStoreFilePropName,String keyStorePassFilePropName,
+            String keyStoreFilePropName, String keyStorePassFilePropName,
             String keyStoreTypePropName, String privateKeyPassFilePropName) {
         initialize(keyStoreFilePropName, keyStorePassFilePropName,
                 keyStoreTypePropName, privateKeyPassFilePropName);
         mapPk2Cert();
     }
     /**
-     * Constructor
+     * Constructor.
      * Already resolved is simply to give a different signature
+     *
+     * @param alreadyResolved {@code true} if already resolved.
+     * @param keyStoreFile The key store file.
+     * @param keyStorePass The key store password.
+     * @param keyStoreType The key store type.
+     * @param privateKeyPass The key store private key password.
      */
-    public AMKeyProvider( boolean alreadyResolved,
-            String keyStoreFile,String keyStorePass,
+    public AMKeyProvider(boolean alreadyResolved,
+            String keyStoreFile, String keyStorePass,
             String keyStoreType, String privateKeyPass) {
         this.keystoreFile = keyStoreFile;
         this.keystoreType = keyStoreType;
@@ -109,9 +124,9 @@ public class AMKeyProvider implements KeyProvider {
 
         String kspfile = SystemPropertiesManager.get(keyStorePassFilePropName);
 
-        String tmp_ksType = SystemPropertiesManager.get(keyStoreTypePropName);
-        if ( null != tmp_ksType ) {
-            keystoreType = tmp_ksType.trim();
+        String tmpKsType = SystemPropertiesManager.get(keyStoreTypePropName);
+        if (null != tmpKsType) {
+            keystoreType = tmpKsType.trim();
         }
 
         if (kspfile != null) {
@@ -157,16 +172,16 @@ public class AMKeyProvider implements KeyProvider {
      * @param password The password that requires decoding.
      * @return The decoded password or the same password parameter if the decoding failed.
      */
-    public static String decodePassword(String password)  {
+    public static String decodePassword(String password) {
         String decodedPassword = AccessController.doPrivileged(new DecodeAction(password));
 
         return decodedPassword == null ? password : decodedPassword;
     }
 
-    private void mapPk2Cert(){
+    private void mapPk2Cert() {
         try {
             ks = KeyStore.getInstance(keystoreType);
-            if ( (keystoreFile == null) || (keystoreFile.isEmpty()) ) {
+            if (keystoreFile == null || keystoreFile.isEmpty()) {
                 logger.error("mapPk2Cert.JKSKeyProvider: KeyStore FileName is null, "
                         + "unable to establish Mapping Public Keys to Certificates!");
                 return;
@@ -174,10 +189,10 @@ public class AMKeyProvider implements KeyProvider {
             FileInputStream fis = new FileInputStream(keystoreFile);
             ks.load(fis, keystorePass.toCharArray());
             // create publickey to Certificate mapping
-            for(Enumeration e=ks.aliases();e.hasMoreElements();) {
-                String alias = (String) e.nextElement ();
+            for (Enumeration e = ks.aliases(); e.hasMoreElements();) {
+                String alias = (String) e.nextElement();
                 // if this is not a Private or public Key,  then continue.
-                if (ks.entryInstanceOf( alias, KeyStore.SecretKeyEntry.class)){
+                if (ks.entryInstanceOf(alias, KeyStore.SecretKeyEntry.class)) {
                     continue;
                 }
                 Certificate cert = getCertificate(alias);
@@ -199,14 +214,18 @@ public class AMKeyProvider implements KeyProvider {
         }
     }
 
+    /**
+     * Sets the debug logger.
+     *
+     * @param logger The debug logger.
+     */
     public void setLogger(Debug logger) {
         this.logger = logger;
     }
 
-
     /**
      * Set the key to access key store database. This method will only need to
-     * be calles once if the key could not be obtained by other means.
+     * be called once if the key could not be obtained by other means.
      * @param storepass  password for the key store
      * @param keypass password for the certificate
      */
@@ -218,10 +237,9 @@ public class AMKeyProvider implements KeyProvider {
     /**
      * Return java.security.cert.X509Certificate for the specified certAlias.
      * @param certAlias Certificate alias name
-     * @return X509Certificate which matches the certAlias, return null if
-    the certificate could not be found.
+     * @return X509Certificate which matches the certAlias, return null if the certificate could not be found.
      */
-    public java.security.cert.X509Certificate getX509Certificate (
+    public java.security.cert.X509Certificate getX509Certificate(
             String certAlias) {
         if (certAlias == null || certAlias.length() == 0) {
             return null;
@@ -236,12 +254,11 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
-     * Return java.security.PublicKey for the specified keyAlias
+     * Return java.security.PublicKey for the specified keyAlias.
      * @param keyAlias Key alias name
-     * @return PublicKey which matches the keyAlias, return null if
-    the PublicKey could not be found.
+     * @return PublicKey which matches the keyAlias, return null if the PublicKey could not be found.
      */
-    public java.security.PublicKey getPublicKey (String keyAlias) {
+    public java.security.PublicKey getPublicKey(String keyAlias) {
         if (keyAlias == null || keyAlias.length() == 0) {
             return null;
         }
@@ -249,8 +266,8 @@ public class AMKeyProvider implements KeyProvider {
         try {
             X509Certificate cert = (X509Certificate) ks.getCertificate(keyAlias);
             if (cert == null) {
-                logger.error("Unable to retrieve certificate with alias '" + keyAlias + "' from keystore " +
-                        "'" + this.keystoreFile + "'");
+                logger.error("Unable to retrieve certificate with alias '" + keyAlias + "' from keystore "
+                        + "'" + this.keystoreFile + "'");
                 return null;
             }
             pkey = cert.getPublicKey();
@@ -263,10 +280,9 @@ public class AMKeyProvider implements KeyProvider {
     /**
      * Return java.security.PrivateKey for the specified certAlias.
      * @param certAlias Certificate alias name
-     * @return PrivateKey which matches the certAlias, return null if
-    the private key could not be found.
+     * @return PrivateKey which matches the certAlias, return null if the private key could not be found.
      */
-    public java.security.PrivateKey getPrivateKey (String certAlias) {
+    public java.security.PrivateKey getPrivateKey(String certAlias) {
         java.security.PrivateKey key = null;
         try {
             key = (PrivateKey) ks.getKey(certAlias,
@@ -287,7 +303,7 @@ public class AMKeyProvider implements KeyProvider {
      * @param encryptedKeyPass The encrypted key password to use when getting the private certificate
      * @return PrivateKey which matches the certAlias, return null if the private key could not be found.
      */
-    public PrivateKey getPrivateKey (String certAlias, String encryptedKeyPass) {
+    public PrivateKey getPrivateKey(String certAlias, String encryptedKeyPass) {
 
         PrivateKey key = null;
 
@@ -303,9 +319,9 @@ public class AMKeyProvider implements KeyProvider {
                 logger.error(e.getMessage());
             }
         } else {
-            logger.error("AMKeyProvider.getPrivateKey: " +
-                    "null key password returned from decryption for certificate alias:" + certAlias +
-                    " The password maybe incorrect.");
+            logger.error("AMKeyProvider.getPrivateKey: "
+                    + "null key password returned from decryption for certificate alias:" + certAlias
+                    + " The password maybe incorrect.");
         }
 
         return key;
@@ -360,7 +376,7 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
-     * Get the private key password
+     * Get the private key password.
      * @return the private key password
      */
     public String getPrivateKeyPass() {
@@ -386,7 +402,7 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
-     * Get the keystore
+     * Get the keystore.
      * @return the keystore
      */
     public KeyStore getKeyStore() {
@@ -394,9 +410,10 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
-     * Set the Certificate with name certAlias in the leystore
+     * Set the Certificate with name certAlias in the keystore.
      * @param certAlias Certificate's name Alias
      * @param cert Certificate
+     * @throws KeyStoreException If an error occurs when setting the certificate entry.
      */
     public void setCertificateEntry(String certAlias, Certificate cert) throws KeyStoreException {
         try {
@@ -423,7 +440,12 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
-     * Store the keystore changes
+     * Store the keystore changes.
+     *
+     * @throws IOException If an error occurs when saving the keystore.
+     * @throws CertificateException If an error occurs when saving the keystore.
+     * @throws NoSuchAlgorithmException If an error occurs when saving the keystore.
+     * @throws KeyStoreException If an error occurs when saving the keystore.
      */
     public void store() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
         try {
@@ -448,9 +470,9 @@ public class AMKeyProvider implements KeyProvider {
      * @return Certificate which matches the PublicKey, return null if
     the Certificate could not be found.
      */
-    public Certificate getCertificate (
+    public Certificate getCertificate(
             java.security.PublicKey publicKey) {
         String key = Base64.encode(publicKey.getEncoded());
-        return (Certificate) keyTable.get (key);
+        return (Certificate) keyTable.get(key);
     }
 }

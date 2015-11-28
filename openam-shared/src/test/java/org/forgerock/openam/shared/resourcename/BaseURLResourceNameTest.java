@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.shared.resourcename;
@@ -49,7 +49,8 @@ public class BaseURLResourceNameTest {
     public void testExactMatchCompare() throws Exception {
         match(EXACT_MATCH, "http://example.com:80/fred/index.html", "http://example.com:80/fred/index.html", true);
         match(EXACT_MATCH, "http://example.com:80/fred/index.html", "http://example.com:80/fred/index.html", false);
-        match(EXACT_MATCH, "http://example.com:80/fred/index.html?a=b", "http://example.com:80/fred/index.html?a=b", true);
+        match(EXACT_MATCH, "http://example.com:80/fred/index.html?a=b", "http://example.com:80/fred/index.html?a=b",
+                true);
     }
 
     @Test
@@ -59,7 +60,8 @@ public class BaseURLResourceNameTest {
         match(SUPER_RESOURCE_MATCH, "http://example.com:8080/foo/index.html", "http://example.com:8080", true);
         match(SUPER_RESOURCE_MATCH, "http://example.com:8080/foo*", "http://example.com:8080/", true);
         match(SUPER_RESOURCE_MATCH, "http://www.google.com:80/blah?boo=bing", "http://www.google.com:80/*", true);
-        match(SUPER_RESOURCE_MATCH, "http://www.google.com:80/index.html?abc=123?456", "http://www.google.com:80/*", true);
+        match(SUPER_RESOURCE_MATCH, "http://www.google.com:80/index.html?abc=123?456", "http://www.google.com:80/*",
+                true);
         match(SUPER_RESOURCE_MATCH, "http://www.google.com:80/index?hello", "http://www.google.com:80/-*-", true);
     }
 
@@ -76,7 +78,8 @@ public class BaseURLResourceNameTest {
         match(NO_MATCH, "http://example.com/private/index.html", "http*://example.com:*/index.html", true);
         match(NO_MATCH, "http://example.com:80/private/index.html", "http*://example.com:*/index.html", true);
         match(NO_MATCH, "http://example.com:80/private/fred/index.html", "http*://*example.com:*/fred/*", true);
-        match(NO_MATCH, "http://hello.world:80/hacked.example.com:80/index.html", "http://*.example.com:80/index.html", true);
+        match(NO_MATCH, "http://hello.world:80/hacked.example.com:80/index.html", "http://*.example.com:80/index.html",
+                true);
         match(NO_MATCH, "https://example.com", "http://ex*mple.com", true);
         match(NO_MATCH, "http://example.com:80/foo/asdf/bar", "http://example.com:80/fred*/asdf/bar", true);
         match(NO_MATCH, "http://example.com/private/index.html", "http*://example.com:*/index.html", true);

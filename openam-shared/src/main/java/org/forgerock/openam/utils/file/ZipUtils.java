@@ -36,9 +36,12 @@ import java.util.List;
 import static java.util.Collections.singletonMap;
 
 /**
- * Generate a zip from a folder
+ * Generate a zip from a folder.
  */
-public class ZipUtils {
+public final class ZipUtils {
+
+    private ZipUtils() {
+    }
 
     /**
      * Generate a zip
@@ -50,6 +53,7 @@ public class ZipUtils {
      * @param outputZip zip folder
      * @return the list of files that were included in the archive.
      * @throws IOException if an error occurs creating the zip archive.
+     * @throws URISyntaxException if an error occurs creating the zip archive.
      */
     public static List<String> generateZip(String srcFolder, String outputZip) throws IOException, URISyntaxException {
 

@@ -26,8 +26,8 @@ public enum KeyStoreType {
      * The Sun proprietary Java Key Store format. May not be supported on non-Oracle JREs.
      *
      * @see <a
-     * href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#KeystoreImplementation">
-     * Keystore Implementation</a>
+     * href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#
+     * KeystoreImplementation">Keystore Implementation</a>
      */
     JKS,
     /**
@@ -35,8 +35,8 @@ public enum KeyStoreType {
      * format. May not be supported on all platforms.
      *
      * @see <a
-     * href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#KeystoreImplementation">
-     * Keystore Implementation</a>
+     * href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#
+     * KeystoreImplementation">Keystore Implementation</a>
      */
     JCEKS,
     /**

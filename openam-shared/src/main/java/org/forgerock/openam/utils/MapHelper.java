@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock Inc.
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.utils;
 
 import com.sun.identity.common.CaseInsensitiveHashMap;
@@ -26,9 +27,15 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Set;
 
-public class MapHelper {
+/**
+ * Utility class for operations on {@code Map}s.
+ */
+public final class MapHelper {
 
     private static final Debug DEBUG = Debug.getInstance("workflow");
+
+    private MapHelper() {
+    }
 
     /**
      * Read a properties file into a map of strings to sets of strings.  Lines whose first non whitespace character
@@ -63,7 +70,7 @@ public class MapHelper {
      * @return A map of strings to sets of strings
      * @throws IOException if there is an IO problem when reading the file (like it doesn't exist, etc.)
      */
-    public static Map<String,Set<String>> readMap(InputStream is) throws IOException {
+    public static Map<String, Set<String>> readMap(InputStream is) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         try {

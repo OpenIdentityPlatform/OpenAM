@@ -1,6 +1,4 @@
 /*
- * Copyright 2013 ForgeRock, Inc.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -103,7 +103,7 @@ public class AMKeyProviderTest {
     @Test
     public void getPrivateKeyUsingDefaultPassword() {
 
-        // Trying to get a private key with its own password will make use of the default password and should return null
+        //Trying to get a private key with its own password will make use of the default password and should return null
         PrivateKey key = amKeyProvider.getPrivateKey(PRIVATE_KEY_ALIAS);
         Assert.assertNull(key);
     }

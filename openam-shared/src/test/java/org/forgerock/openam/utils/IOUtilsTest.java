@@ -82,7 +82,7 @@ public class IOUtilsTest {
         validCollection.put("key16", new float[]{0.0f, 1.0f});
         validCollection.put("key17", new double[]{0.0f, 1.0f});
         validCollection.put("key18", new boolean[]{true, false});
-        validCollection.put("key19", new int[][]{{1,1},{2,2}});
+        validCollection.put("key19", new int[][]{{1, 1}, {2, 2}});
 
         final byte[] bytes = getObjectStreamBytes(validCollection, true);
 

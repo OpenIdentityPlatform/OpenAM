@@ -1,31 +1,20 @@
-/**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
- * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- *
+ * Copyright 2011-2015 ForgeRock AS.
  */
 /*
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -41,17 +30,18 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * Utility class for handling Strings
- *
- * @author Peter Major
+ * Utility class for handling Strings.
  */
 public final class StringUtils {
 
+    private StringUtils() {
+    }
+
     /**
+     * Swaps content with tags with the provided tag values.
      *
      * @param content The String content to be replaced
-     * @param tagSwapMap A map containing the replacable tokens with their new
-     * values
+     * @param tagSwapMap A map containing the replacable tokens with their new values
      * @return the tagswapped String content
      */
     public static String tagSwap(String content, Map<String, String> tagSwapMap) {
@@ -61,6 +51,14 @@ public final class StringUtils {
         return content;
     }
 
+    /**
+     * Inserted content into a string.
+     *
+     * @param original The original string.
+     * @param position The insertion position.
+     * @param content The content to insert.
+     * @return A new string with the inserted content.
+     */
     public static String insertContent(String original, int position, String content) {
         return original.substring(0, position) + content + original.substring(position);
     }
@@ -137,6 +135,8 @@ public final class StringUtils {
     }
 
     /**
+     * Determines if the string is empty.
+     *
      * @param s string to test
      * @return true if the specified string is null or zero length.
      */
@@ -145,6 +145,8 @@ public final class StringUtils {
     }
 
     /**
+     * Determines if the string is blank.
+     *
      * @param s string to test
      * @return true if the specified string is null or when trimmed is empty (i.e. when trimmed it has zero length)
      */
@@ -153,6 +155,8 @@ public final class StringUtils {
     }
 
     /**
+     * Determines if the string is not empty.
+     *
      * @param s string to test
      * @return test if the specified string is not null and not empty (i.e. is greater than zero length).
      */
@@ -161,6 +165,8 @@ public final class StringUtils {
     }
 
     /**
+     * Determines if the string is not blank.
+     *
      * @param s string to test
      * @return true if the specified string is not null and when trimmed has greater than zero length.
      */
@@ -273,7 +279,7 @@ public final class StringUtils {
                 }
             }
 
-            char lastChar = strPattern.charAt(strPattern.length()-1);
+            char lastChar = strPattern.charAt(strPattern.length() - 1);
             if (lastChar == '*') {
                 buff.append(".*");
             } else {

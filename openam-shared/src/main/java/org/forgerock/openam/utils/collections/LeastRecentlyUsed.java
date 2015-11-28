@@ -22,15 +22,23 @@ import java.util.Map;
  * A simple Least Recently Used cache implementation based on the standard
  * Java SDK LinkedHashMap class.
  *
- * Specially maintains a cache up to the size limit specified. After which
- * point will start to discard entries in Least Recently Used order.
+ * <p>Specially maintains a cache up to the size limit specified. After which
+ * point will start to discard entries in Least Recently Used order.</p>
+ *
+ * @param <T> The cache key type.
+ * @param <V> The cache value type.
  */
 public class LeastRecentlyUsed<T, V> extends LinkedHashMap<T, V> {
     private final int maxSize;
 
+    /**
+     * Constructs a new LeastRecentlyUsed cache.
+     *
+     * @param maxSize The maximum size of the cache.
+     */
     public LeastRecentlyUsed(int maxSize) {
         // Values selected based on Java JavaDoc recommendations.
-        super(maxSize*4/3, 0.75f, true);
+        super(maxSize * 4 / 3, 0.75f, true);
         this.maxSize = maxSize;
     }
 
@@ -41,7 +49,7 @@ public class LeastRecentlyUsed<T, V> extends LinkedHashMap<T, V> {
 
     /**
      * Get the maximum size of the cache.
-     * 
+     *
      * @return the maximum size of the cache.
      */
     public int getMaxSize() {

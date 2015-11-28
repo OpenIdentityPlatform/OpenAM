@@ -31,8 +31,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+/**
+ * Guice module for OpenAM shared bindings.
+ */
 @GuiceModule
 public class SharedGuiceModule extends AbstractModule {
+
+    /**
+     * The Debug instance annotation name for the thread manager.
+     */
     public static final String DEBUG_THREAD_MANAGER = "amThreadManager";
 
     @Override
@@ -51,11 +58,7 @@ public class SharedGuiceModule extends AbstractModule {
 
     @Provides @Inject @Singleton
     ThreadMonitor provideThreadMonitor(ExecutorServiceFactory factory,
-                                              ShutdownManager wrapper,
-                                              @Named(DEBUG_THREAD_MANAGER) Debug debug) {
-        return new ThreadMonitor(
-                factory.createCachedThreadPool(DEBUG_THREAD_MANAGER),
-                wrapper,
-                debug);
+            ShutdownManager wrapper, @Named(DEBUG_THREAD_MANAGER) Debug debug) {
+        return new ThreadMonitor(factory.createCachedThreadPool(DEBUG_THREAD_MANAGER), wrapper, debug);
     }
 }

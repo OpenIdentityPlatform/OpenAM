@@ -84,8 +84,8 @@ final class KeyPairProviderImpl implements KeyPairProvider {
                 return false;
             }
             CacheKey cacheKey = (CacheKey) other;
-            return Objects.equals(keySize, cacheKey.keySize) &&
-                    Objects.equals(algorithm, cacheKey.algorithm);
+            return Objects.equals(keySize, cacheKey.keySize)
+                    && Objects.equals(algorithm, cacheKey.algorithm);
         }
 
         @Override

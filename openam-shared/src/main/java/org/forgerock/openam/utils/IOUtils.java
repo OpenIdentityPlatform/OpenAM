@@ -1,25 +1,17 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2015 ForgeRock AS.
- *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
- *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.utils;
@@ -48,9 +40,7 @@ import java.util.zip.InflaterInputStream;
 import org.forgerock.util.Reject;
 
 /**
- * Utility class for handling I/O streams
- *
- * @author Peter Major
+ * Utility class for handling I/O streams.
  */
 public final class IOUtils {
 
@@ -118,7 +108,8 @@ public final class IOUtils {
      * @throws IOException if an error occured while reading
      * @throws IllegalArgumentException if the file does not exists
      */
-    public static String getFileContentFromClassPath(Class classInSameModule, String path, String encoding) throws IOException {
+    public static String getFileContentFromClassPath(Class classInSameModule, String path, String encoding)
+            throws IOException {
         InputStream is = classInSameModule.getResourceAsStream(path);
         if (is == null) {
             throw new IllegalArgumentException("The supplied file: " + path
@@ -130,7 +121,7 @@ public final class IOUtils {
 
     /**
      * Reads the InputStream and tries to interpret its content as String using
-     * UTF-8 encoding
+     * UTF-8 encoding.
      * @param is the inputstream to read
      * @return The string representation of the inputstreams content
      * @throws IOException if there was an error while reading the stream
@@ -141,7 +132,7 @@ public final class IOUtils {
 
     /**
      * Reads the InputStream and tries to interpret its content as String using
-     * the given encoding
+     * the given encoding.
      * @param is the inputstream to read
      * @param encoding the encoding to be used
      * @return The string representation of the inputstreams content
@@ -231,10 +222,12 @@ public final class IOUtils {
     }
 
     /**
+     * Deserialises an object from a byte array to an object of a specified type.
      *
      * @param bytes The bytes that represent the Object to be deserialized. The classes to be loaded must be from the
      *              set specified in the whitelist
      * @param compressed If true, expect that the bytes are compressed.
+     * @param <T> The returned object type.
      * @return The Object T representing the deserialized bytes
      * @throws IOException If there was a problem with the ObjectInputStream process.
      * @throws ClassNotFoundException If there was problem loading a class that makes up the bytes to be deserialized.
@@ -244,11 +237,13 @@ public final class IOUtils {
     }
 
     /**
+     * Deserialises an object from a byte array to an object of a specified type.
      *
      * @param bytes The bytes that represent the Object to be deserialized. The classes to be loaded must be from the
      *              set specified in the whitelist maintained in the <code>WhitelistObjectInputStream</code>
      * @param compressed If true, expect that the bytes are compressed.
      * @param classLoader Used in place of the default ClassLoader, default will be used if null.
+     * @param <T> The returned object type.
      * @return The Object T representing the deserialized bytes
      * @throws IOException If there was a problem with the ObjectInputStream process.
      * @throws ClassNotFoundException If there was problem loading a class that makes up the bytes to be deserialized.
@@ -263,7 +258,7 @@ public final class IOUtils {
 
         final T result;
         try {
-            result = (T)ois.readObject();
+            result = (T) ois.readObject();
         } finally {
             closeIfNotNull(ois);
         }
@@ -333,10 +328,10 @@ public final class IOUtils {
                     ? Class.forName(classToLoad)
                     : Class.forName(classToLoad, true, classLoader);
             } else {
-                DEBUG.warning("WhitelistObjectInputStream.resolveClass:" + classToLoad +
-                        " was not in the whitelist of allowed classes");
-                throw new InvalidClassException(classToLoad, "Requested ObjectStreamClass was not in the " +
-                        "whitelist of allowed classes");
+                DEBUG.warning("WhitelistObjectInputStream.resolveClass:" + classToLoad
+                        + " was not in the whitelist of allowed classes");
+                throw new InvalidClassException(classToLoad, "Requested ObjectStreamClass was not in the "
+                        + "whitelist of allowed classes");
             }
 
             return result;

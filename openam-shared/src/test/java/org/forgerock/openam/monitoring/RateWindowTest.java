@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.monitoring;
@@ -24,7 +24,6 @@ import org.testng.annotations.Test;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 import static org.fest.assertions.Assertions.assertThat;
 
 public class RateWindowTest {
@@ -568,7 +567,7 @@ public class RateWindowTest {
 
         given(timer.now()).willReturn(timestamp3);
         assertThat(rateWindow.getMaxRate()).isEqualTo(1);
-        
+
         given(timer.now()).willReturn(timestamp4);
         assertThat(rateWindow.getMaxRate()).isEqualTo(0);
     }

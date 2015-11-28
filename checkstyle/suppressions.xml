@@ -37,6 +37,18 @@
     <suppress checks=".*"                          files="/src/test/java/com/sun/identity/" />
 
     <!--
+      Suppress all checks on legacy resources in openam-shared.
+    -->
+    <suppress checks=".*"                          files="/src/main/resources/amUtilMsgs.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/de_DE/amUtilMsgs_de.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/es_ES/amUtilMsgs_es.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/fr_FR/amUtilMsgs_fr.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/ja_JP/amUtilMsgs_ja.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/ko_KR/amUtilMsgs_ko.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/zh_CN/amUtilMsgs_zh.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/zh_TW/amUtilMsgs_zh_TW.properties" />
+
+    <!--
       Suppress certain checks on unit tests.
     -->
 

@@ -39,6 +39,10 @@
     <artifactId>openam-shared</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <checkstyleFailOnError>true</checkstyleFailOnError>
+    </properties>
+
     <!-- Build -->
     <build>
         <plugins>
