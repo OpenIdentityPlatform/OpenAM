@@ -314,22 +314,20 @@ public class SmsJsonConverter {
             }
 
             final Object attributeValue = translatedAttributeValuePairs.get(attributeName);
-            HashSet<String> value = new HashSet<>();
-
-            AttributeSchemaConverter attributeSchemaConverter = getAttributeConverter(attributeName);
+            Set<String> value = new HashSet<>();
 
             if (attributeValue instanceof HashMap) {
                 final HashMap<String, Object> attributeMap = (HashMap<String, Object>) attributeValue;
                 for (String name : attributeMap.keySet()) {
-                    value.add("[" + name + "]=" + attributeSchemaConverter.fromJson(attributeMap.get(name)));
+                    value.add("[" + name + "]=" + convertJsonToString(attributeName, attributeMap.get(name)));
                 }
             } else if (attributeValue instanceof List) {
-                ArrayList<Object> attributeArray = (ArrayList<Object>) attributeValue;
+                List<Object> attributeArray = (ArrayList<Object>) attributeValue;
                 for (Object val : attributeArray) {
-                    value.add(attributeSchemaConverter.fromJson(val));
+                    value.add(convertJsonToString(attributeName, val));
                 }
             } else {
-                value.add(attributeSchemaConverter.fromJson(attributeValue));
+                value.add(convertJsonToString(attributeName, attributeValue));
             }
             result.put(attributeName, value);
         }
@@ -451,6 +449,15 @@ public class SmsJsonConverter {
             }
         }
         return result;
+    }
+
+    private String convertJsonToString(String attributeName, Object value) throws BadRequestException {
+        AttributeSchemaConverter converter = getAttributeConverter(attributeName);
+        try {
+            return converter.fromJson(value);
+        } catch (ClassCastException cce) {
+            throw new BadRequestException("Invalid attribute value syntax: '" + value + "'", cce);
+        }
     }
 
     private static interface AttributeSchemaConverter {
