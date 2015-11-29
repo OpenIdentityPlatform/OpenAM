@@ -64,8 +64,10 @@ public final class AMSetupFilter implements Filter {
     private static final String AM_ENCRYPTION_PASSWORD_PROPERTY_KEY = "am.enc.pwd";
     private static final String CONFIG_STORE_DOWN_ERROR_CODE = "configstore.down";
 
-    private static final Collection<String> ALLOWED_RESOURCES = CollectionUtils.asSet(".ico", ".htm", ".css", ".js",
-            ".jpg", ".gif", ".png", ".JPG", "SMSObjectIF", "setSetupProgress", "setUpgradeProgress", "/legal-notices/");
+    private static final Collection<String> ALLOWED_RESOURCES = CollectionUtils.asSet("SMSObjectIF", "setSetupProgress",
+            "setUpgradeProgress", "/legal-notices/", NOWRITE_PERMISSION);
+    private static final Collection<String> ALLOWED_FILE_EXTENSIONS = CollectionUtils.asSet(".ico", ".htm", ".css",
+            ".js", ".jpg", ".gif", ".png");
 
     private AMSetupManager setupManager;
     private volatile boolean isPassthrough;
@@ -112,7 +114,7 @@ public final class AMSetupFilter implements Filter {
                         throw new ConfigurationException(CONFIG_STORE_DOWN_ERROR_CODE, null);
                     }
                 } else {
-                    if (isPassthrough && isRequestForAllowedResource(request.getRequestURI())) {
+                    if (isPassthrough && isRequestForAllowedResource(request.getServletPath())) {
                         filterChain.doFilter(request, response);
                     } else if (isConfiguratorRequest(request.getRequestURI())) {
                         filterChain.doFilter(request, response);
@@ -153,9 +155,14 @@ public final class AMSetupFilter implements Filter {
                 + request.getContextPath();
     }
 
-    private boolean isRequestForAllowedResource(String requestUri) {
+    private boolean isRequestForAllowedResource(String servletPath) {
         for (String allowedResource : ALLOWED_RESOURCES) {
-            if (requestUri.contains(allowedResource)) {
+            if (servletPath.contains(allowedResource)) {
+                return true;
+            }
+        }
+        for (String allowedExtension : ALLOWED_FILE_EXTENSIONS) {
+            if (servletPath.toLowerCase().endsWith(allowedExtension)) {
                 return true;
             }
         }

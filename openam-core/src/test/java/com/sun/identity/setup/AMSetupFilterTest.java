@@ -272,14 +272,14 @@ public class AMSetupFilterTest {
     }
 
     @Test(dataProvider = "allowedRequestsWhilstConfiguring")
-    public void filterShouldAllowCertainRequestsThroughIfNotConfiguredAndInConfigurationMode(String requestUriSuffix)
+    public void filterShouldAllowCertainRequestsThroughIfNotConfiguredAndInConfigurationMode(String suffix)
             throws Exception {
 
         //Previous request must have been redirected to setup page to set the pass-through flag
         filterShouldRedirectRequestsToSetupPageIfNotConfigured();
 
         //Given
-        HttpServletRequest request = mockRequest("REQUEST_URI" + requestUriSuffix);
+        HttpServletRequest request = mockRequest(suffix);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
@@ -331,13 +331,14 @@ public class AMSetupFilterTest {
         given(setupManager.isUpgradeCompleted()).willReturn(false);
     }
 
-    private HttpServletRequest mockRequest(String requestUri) {
+    private HttpServletRequest mockRequest(String suffix) {
         HttpServletRequest request = mock(HttpServletRequest.class);
         given(request.getScheme()).willReturn("SCHEME");
         given(request.getServerName()).willReturn("SERVER_NAME");
         given(request.getServerPort()).willReturn(8080);
         given(request.getContextPath()).willReturn("/CONTEXT_PATH");
-        given(request.getRequestURI()).willReturn(requestUri);
+        given(request.getRequestURI()).willReturn("REQUEST_URI" + suffix);
+        given(request.getServletPath()).willReturn("SERVLET_PATH" + suffix);
         return request;
     }
 
