@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest;
 
+import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -44,48 +45,61 @@ public class ContextFilter implements Filter {
     @Override
     public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
-        return next.handleAction(addSSOTokenContext(context), request);
+        return next.handleAction(addMissingContexts(context), request);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> filterCreate(Context context, CreateRequest request,
             RequestHandler next) {
-        return next.handleCreate(addSSOTokenContext(context), request);
+        return next.handleCreate(addMissingContexts(context), request);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> filterDelete(Context context, DeleteRequest request,
             RequestHandler next) {
-        return next.handleDelete(addSSOTokenContext(context), request);
+        return next.handleDelete(addMissingContexts(context), request);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
-        return next.handlePatch(addSSOTokenContext(context), request);
+        return next.handlePatch(addMissingContexts(context), request);
     }
 
     @Override
     public Promise<QueryResponse, ResourceException> filterQuery(Context context, QueryRequest request,
             QueryResourceHandler handler, RequestHandler next) {
-        return next.handleQuery(addSSOTokenContext(context), request, handler);
+        return next.handleQuery(addMissingContexts(context), request, handler);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> filterRead(Context context, ReadRequest request,
             RequestHandler next) {
-        return next.handleRead(addSSOTokenContext(context), request);
+        return next.handleRead(addMissingContexts(context), request);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> filterUpdate(Context context, UpdateRequest request,
             RequestHandler next) {
-        return next.handleUpdate(addSSOTokenContext(context), request);
+        return next.handleUpdate(addMissingContexts(context), request);
+    }
+
+    private Context addMissingContexts(Context context) {
+        context = addSSOTokenContext(context);
+        return addLocaleContext(context);
     }
 
     private Context addSSOTokenContext(Context context) {
         if (!context.containsContext(SSOTokenContext.class)) {
             return new SSOTokenContext(context);
+        } else {
+            return context;
+        }
+    }
+
+    private Context addLocaleContext(Context context) {
+        if (!context.containsContext(LocaleContext.class)) {
+            return new LocaleContext(context);
         } else {
             return context;
         }

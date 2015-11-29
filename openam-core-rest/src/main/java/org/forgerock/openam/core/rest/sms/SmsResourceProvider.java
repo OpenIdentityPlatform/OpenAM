@@ -33,10 +33,26 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+
+import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.resource.LocaleContext;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.promise.Promise;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -49,19 +65,6 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
-import org.forgerock.services.context.Context;
-import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.json.JsonPointer;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.promise.Promise;
 
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
@@ -229,7 +232,7 @@ abstract class SmsResourceProvider {
         JsonValue result = json(object());
 
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
-        ResourceBundle console = ResourceBundle.getBundle("amConsole");
+        ResourceBundle console = ResourceBundle.getBundle("amConsole", getLocale(context));
         String serviceType = schema.getServiceType().getType();
 
         String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
@@ -248,7 +251,7 @@ abstract class SmsResourceProvider {
             Map<String, String> attributeSectionMap, ResourceBundle consoleI18n, String serviceType,
                                       Context context) {
 
-        ResourceBundle schemaI18n = ResourceBundle.getBundle(schema.getI18NFileName());
+        ResourceBundle schemaI18n = ResourceBundle.getBundle(schema.getI18NFileName(), getLocale(context));
         NumberFormat sectionFormat = new DecimalFormat("00");
 
         for (AttributeSchema attribute : (Set<AttributeSchema>) schema.getAttributeSchemas()) {
@@ -406,4 +409,7 @@ abstract class SmsResourceProvider {
         return result;
     }
 
+    protected Locale getLocale(Context context) {
+        return context.asContext(LocaleContext.class).getLocale();
+    }
 }
