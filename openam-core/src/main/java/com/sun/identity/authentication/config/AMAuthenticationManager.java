@@ -34,6 +34,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.DNUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -90,7 +91,7 @@ public class AMAuthenticationManager {
         try {
             SMSEntry.validateToken(token);
             this.token = token;
-            this.realm = com.sun.identity.sm.DNMapper.orgNameToDN(org);
+            this.realm = DNUtils.normalizeDN(com.sun.identity.sm.DNMapper.orgNameToDN(org));
 
             orgServiceConfig = getOrgServiceConfig();
             if (orgServiceConfig == null) {
@@ -252,10 +253,10 @@ public class AMAuthenticationManager {
                     if (DEBUG.messageEnabled()) {
                         DEBUG.message("AMAuthenticationManager." +
                             "buildModuleInstanceForService: Service="
-                            + serviceName + " not configured in realm="+realm);
+                            + serviceName + " not configured in realm=" + realm);
                     }
                 }
-                realm = com.sun.identity.sm.DNMapper.orgNameToDN(realm);
+                realm = DNUtils.normalizeDN(com.sun.identity.sm.DNMapper.orgNameToDN(realm));
                 synchronized (MODULE_INSTANCE_TABLE) {
                     Map<String, Set<String>> moduleMap = MODULE_INSTANCE_TABLE.remove(realm);
                     if (moduleMap != null) {
