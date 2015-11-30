@@ -16,24 +16,24 @@
 
 package org.forgerock.openam.oauth2;
 
+import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.data.Offset.offset;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.verify;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.assertj.core.data.Offset.offset;
-import static java.util.Collections.singletonMap;
 
-import com.iplanet.services.cdm.Client;
 import com.iplanet.sso.SSOTokenManager;
-
+import com.sun.identity.shared.debug.Debug;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.sun.identity.shared.debug.Debug;
-
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.DeviceCode;
@@ -236,7 +236,7 @@ public class OpenAMTokenStoreTest {
         assertThat(code.getTokenName()).isEqualTo("device_code");
         assertThat(code.getExpiryTime()).isCloseTo(System.currentTimeMillis() + 10000, offset(1000L));
         assertThat(code.getTokenId()).matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
-        assertThat(code.getUserCode()).matches("[a-zA-Z0-9+/]{8}");
+        assertThat(code.getUserCode()).matches("[" + OpenAMTokenStore.ALPHABET + "]{8}");
         assertThat(code.getRealm()).isEqualTo("MY_REALM");
     }
 
