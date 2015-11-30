@@ -17,14 +17,15 @@
 
 define("org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView", [
     "lodash",
+    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/user/anonymousProcess/SelfRegistrationView"
-], function (_, AnonymousProcessView, SelfRegistrationView) {
+], function (_, Constants, AnonymousProcessView, SelfRegistrationView) {
 
     function AMSelfRegistrationView () { }
 
     AMSelfRegistrationView.prototype = SelfRegistrationView;
-    AMSelfRegistrationView.prototype.endpoint = "userRegistration";
+    AMSelfRegistrationView.prototype.endpoint = Constants.SELF_SERVICE_REGISTER;
 
     _.extend(AMSelfRegistrationView.prototype, AnonymousProcessView.prototype);
 

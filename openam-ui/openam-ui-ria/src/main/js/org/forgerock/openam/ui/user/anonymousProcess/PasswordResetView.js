@@ -17,14 +17,15 @@
 
 define("org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView", [
     "lodash",
+    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/user/anonymousProcess/PasswordResetView"
-], function (_, AnonymousProcessView, PasswordResetView) {
+], function (_, Constants, AnonymousProcessView, PasswordResetView) {
 
     function AMPasswordResetView () { }
 
     AMPasswordResetView.prototype = PasswordResetView;
-    AMPasswordResetView.prototype.endpoint = "forgottenPassword";
+    AMPasswordResetView.prototype.endpoint = Constants.SELF_SERVICE_RESET_PASSWORD;
 
     _.extend(AMPasswordResetView.prototype, AnonymousProcessView.prototype);
 

@@ -11,19 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
+define("org/forgerock/openam/ui/user/delegates/KBADelegate", [
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/user/delegates/KBADelegate",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function (Constants, KBADelegate, RealmHelper) {
 
-define("org/forgerock/openam/ui/user/main", [
-    "./profile/ChangeSecurityDataDialog",
-    "./delegates/TokenDelegate",
-    "./delegates/SessionDelegate",
-    "./delegates/AuthNDelegate",
-    "./delegates/KBADelegate",
-    "./login/RESTLoginHelper",
-    "./login/RESTLoginView",
-    "./login/RESTConfirmLoginView",
-    "./login/RESTLoginDialog",
-    "./logout/RESTLogoutView"
-]);
+    KBADelegate.serviceUrl = RealmHelper.decorateURIWithSubRealm("/" + Constants.context + "/json/__subrealm__/" +
+        Constants.SELF_SERVICE_CONTEXT);
+    KBADelegate.baseEntity = RealmHelper.decorateURIWithSubRealm("json/__subrealm__/" + Constants.SELF_SERVICE_CONTEXT);
+
+    return KBADelegate;
+});

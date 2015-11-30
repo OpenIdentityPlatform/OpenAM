@@ -25,14 +25,6 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
 ], function ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, Constants, RealmHelper) {
 
     return AnonymousProcessView.extend({
-        initialize: function () {
-            AnonymousProcessView.prototype.initialize.call(this);
-
-            _.extend(this.events, {
-                "click #anonymousProcessReturn": "returnToLoginPage"
-            });
-        },
-
         render: function () {
             var params = Router.convertCurrentUrlToJSON().params,
                 overrideRealm = RealmHelper.getOverrideRealm(),
@@ -41,9 +33,11 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
                 realmPath = "/",
                 continueRoute;
 
-            if (endpoint === "userRegistration") {
+            this.events["click #anonymousProcessReturn"] = "returnToLoginPage";
+
+            if (endpoint === Constants.SELF_SERVICE_REGISTER) {
                 continueRoute = Router.configuration.routes.continueSelfRegister;
-            } else if (endpoint === "forgottenPassword") {
+            } else if (endpoint === Constants.SELF_SERVICE_RESET_PASSWORD) {
                 continueRoute = Router.configuration.routes.continuePasswordReset;
             }
 
@@ -59,7 +53,7 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
             realmPath = realmPath.substring(0, 1) === "/" ? realmPath : "/" + realmPath;
 
             if (!this.delegate || Router.currentRoute !== continueRoute) {
-                this.setDelegate(Constants.SELF_SERVICE_CONTEXT + endpoint, params.token);
+                this.setDelegate("json/" + endpoint, params.token);
             }
 
             if (params.token) {

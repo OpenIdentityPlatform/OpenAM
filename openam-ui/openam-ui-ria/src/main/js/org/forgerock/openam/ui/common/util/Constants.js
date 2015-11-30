@@ -72,7 +72,9 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     Constants.EVENT_REDIRECT_TO_JATO_AGENTS = "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS";
     Constants.EVENT_REDIRECT_TO_JATO_STS = "main.navigation.EVENT_REDIRECT_TO_JATO_STS";
 
-    Constants.SELF_SERVICE_CONTEXT = "json/selfservice/";
+    Constants.SELF_SERVICE_FORGOTTEN_USERNAME = "selfservice/forgottenUsername";
+    Constants.SELF_SERVICE_RESET_PASSWORD = "selfservice/forgottenPassword";
+    Constants.SELF_SERVICE_REGISTER = "selfservice/userRegistration";
 
     return Constants;
 });

@@ -17,14 +17,15 @@
 
 define("org/forgerock/openam/ui/user/anonymousProcess/ForgotUsernameView", [
     "lodash",
+    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/user/anonymousProcess/ForgotUsernameView"
-], function (_, AnonymousProcessView, ForgotUsernameView) {
+], function (_, Constants, AnonymousProcessView, ForgotUsernameView) {
 
     function AMForgotUsernameView () { }
 
     AMForgotUsernameView.prototype = ForgotUsernameView;
-    AMForgotUsernameView.prototype.endpoint = "forgottenUsername";
+    AMForgotUsernameView.prototype.endpoint = Constants.SELF_SERVICE_FORGOTTEN_USERNAME;
 
     _.extend(AMForgotUsernameView.prototype, AnonymousProcessView.prototype);
 
