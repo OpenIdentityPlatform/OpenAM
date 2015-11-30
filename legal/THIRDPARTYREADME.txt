@@ -218,7 +218,7 @@ Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 Version: jackson-databind-2.4.2.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-dataformat-csv-2.5.3.jar
+Version: jackson-dataformat-csv-2.6.3.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: jackson-dataformat-smile-2.4.4.jar
@@ -230,10 +230,10 @@ Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless othe
 Version: jackson-dataformat-yaml-2.4.4.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-module-jaxb-annotations-2.5.3.jar
+Version: jackson-module-jaxb-annotations-2.6.3.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-module-jsonSchema-2.5.3.jar
+Version: jackson-module-jsonSchema-2.6.3.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: java-ipv6-0.14.jar
