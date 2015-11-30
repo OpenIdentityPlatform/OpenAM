@@ -107,7 +107,7 @@ public class PermissionRequestEndpointTest {
         ResourceSetDescription resourceSetDescription = new ResourceSetDescription("RESOURCE_SET_ID",
                 "CLIENT_ID", "RESOURCE_OWNER_ID", description.asMap());
 
-        given(resourceSetStore.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
+        given(resourceSetStore.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID")).willReturn(resourceSetDescription);
     }
 
     @Test(expectedExceptions = UmaException.class)
@@ -182,7 +182,7 @@ public class PermissionRequestEndpointTest {
 
         given(entity.getJsonObject()).willReturn(requestBody);
         given(requestBody.toString()).willReturn("{\"resource_set_id\":\"RESOURCE_SET_ID\"}");
-        given(resourceSetStore.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
+        given(resourceSetStore.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID")).willReturn(resourceSetDescription);
 
         //When
         try {
@@ -207,7 +207,7 @@ public class PermissionRequestEndpointTest {
 
         given(entity.getJsonObject()).willReturn(requestBody);
         given(requestBody.toString()).willReturn("{\"resource_set_id\":\"RESOURCE_SET_ID\", \"scopes\":\"SCOPE\"}");
-        given(resourceSetStore.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
+        given(resourceSetStore.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID")).willReturn(resourceSetDescription);
 
         //When
         try {
@@ -232,7 +232,7 @@ public class PermissionRequestEndpointTest {
         given(requestBody.toString()).willReturn("{\"resource_set_id\":\"RESOURCE_SET_ID\", "
                 + "\"scopes\":[\"SCOPE_A\", \"SCOPE_C\"]}");
 
-        doThrow(NotFoundException.class).when(resourceSetStore).read("RESOURCE_SET_ID");
+        doThrow(NotFoundException.class).when(resourceSetStore).read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID");
 
         //When
         try {
@@ -256,7 +256,7 @@ public class PermissionRequestEndpointTest {
         given(requestBody.toString()).willReturn("{\"resource_set_id\":\"RESOURCE_SET_ID\", "
                 + "\"scopes\":[\"SCOPE_A\", \"SCOPE_C\"]}");
 
-        doThrow(ServerException.class).when(resourceSetStore).read("RESOURCE_SET_ID");
+        doThrow(ServerException.class).when(resourceSetStore).read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID");
 
         //When
         try {

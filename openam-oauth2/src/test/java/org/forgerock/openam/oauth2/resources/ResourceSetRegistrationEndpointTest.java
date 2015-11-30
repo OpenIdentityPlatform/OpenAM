@@ -277,7 +277,7 @@ public class ResourceSetRegistrationEndpointTest {
                 "RESOURCE_OWNER_ID", RESOURCE_SET_DESCRIPTION_CONTENT.asMap());
 
         setUriResourceSetId();
-        given(store.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
+        given(store.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID")).willReturn(resourceSetDescription);
 
         //When
         Representation responseRep = endpoint.readOrListResourceSet();
@@ -301,7 +301,7 @@ public class ResourceSetRegistrationEndpointTest {
 
         setUriResourceSetId();
         addCondition();
-        given(store.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
+        given(store.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID")).willReturn(resourceSetDescription);
 
         //When
         Representation responseRep = endpoint.updateResourceSet(entity);

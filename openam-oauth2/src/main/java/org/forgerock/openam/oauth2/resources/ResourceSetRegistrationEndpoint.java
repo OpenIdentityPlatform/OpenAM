@@ -181,7 +181,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         final String resourceSetId = getResourceSetId();
 
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        ResourceSetDescription resourceSetDescription = store.read(resourceSetId)
+        ResourceSetDescription resourceSetDescription = store.read(resourceSetId, getResourceOwnerId())
                 .update(resourceSetDescriptionAttributes);
 
         JsonValue labels = resourceSetDescription.getDescription().get(OAuth2Constants.ResourceSets.LABELS);
@@ -217,7 +217,8 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
 
     private Representation readResourceSet(String resourceSetId) throws NotFoundException, ServerException {
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        ResourceSetDescription resourceSetDescription = store.read(resourceSetId);
+        ResourceSetDescription resourceSetDescription = store.read(resourceSetId, getResourceOwnerId());
+
         Set<String> labels = new HashSet<String>();
         try {
             Set<ResourceSetLabel> labelSet = umaLabelsStore.forResourceSet(resourceSetDescription.getRealm(),
@@ -267,7 +268,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         }
 
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        labelRegistration.updateLabelsForDeletedResourceSet(store.read(getResourceSetId()));
+        labelRegistration.updateLabelsForDeletedResourceSet(store.read(getResourceSetId(), getResourceOwnerId()));
         store.delete(getResourceSetId(), getResourceOwnerId());
         return createEmptyResponse();
     }

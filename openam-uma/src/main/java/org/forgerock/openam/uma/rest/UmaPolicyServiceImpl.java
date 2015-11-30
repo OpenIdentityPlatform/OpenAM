@@ -867,7 +867,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             Context context) throws ResourceException {
         try {
             String realm = getRealm(context);
-            return resourceSetStoreFactory.create(realm).read(resourceSetId);
+            return resourceSetStoreFactory.create(realm).read(resourceSetId, resourceOwnerId);
         } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new BadRequestException("Invalid ResourceSet UID");
         } catch (ServerException e) {
