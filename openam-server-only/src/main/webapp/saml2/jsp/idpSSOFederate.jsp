@@ -34,12 +34,28 @@
 <%@ page import="com.sun.identity.saml2.profile.IDPSSOUtil" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPSSOFederate" %>
 <%@ page import="java.io.PrintWriter" %>
+<%@ page import="org.forgerock.guice.core.InjectorHolder" %>
+<%@ page import="org.forgerock.openam.audit.AuditEventPublisher" %>
+<%@ page import="org.forgerock.openam.saml2.audit.SAML2Auditor" %>
+<%@ page import="org.forgerock.openam.audit.AuditEventFactory" %>
 <%
+
+    AuditEventPublisher aep = InjectorHolder.getInstance(AuditEventPublisher.class);
+    AuditEventFactory aef = InjectorHolder.getInstance(AuditEventFactory.class);
+    SAML2Auditor saml2Auditor = new SAML2Auditor(aep, aef, request);
+
+    saml2Auditor.setMethod("idpSSOFederate");
+    saml2Auditor.setRealm(SAML2Utils.getRealm(request.getParameterMap()));
+    saml2Auditor.setSessionTrackingId(session.getId());
+    saml2Auditor.auditAccessAttempt();
+
     // check request, response
     if ((request == null) || (response == null)) {
-	SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
-	    "nullInput", SAML2Utils.bundle.getString("nullInput"));
-	return;
+	    SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST, "nullInput",
+                SAML2Utils.bundle.getString("nullInput"));
+        saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                SAML2Utils.bundle.getString("nullInput"));
+        return;
     }
 
     try {
@@ -48,15 +64,16 @@
         // cookie writer. There is already an assertion response
         // cached in this provider. Send it back directly.
         if ((cachedResID != null) && (cachedResID.length() != 0)) {
+            saml2Auditor.auditAccessSuccess();
             IDPSSOUtil.sendResponse(request, response, new PrintWriter(out, true), cachedResID);
             return;
         }
     } catch (SAML2Exception sse) {
         SAML2Utils.debug.error("Error processing request " , sse);
-        SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
-            "requestProcessingError",
-            SAML2Utils.bundle.getString("requestProcessingError") + " " +
-            sse.getMessage());
+        SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,  "requestProcessingError",
+                SAML2Utils.bundle.getString("requestProcessingError") + " " + sse.getMessage());
+        saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                SAML2Utils.bundle.getString("requestProcessingError"));
         return;
     }
 
@@ -73,5 +90,5 @@
      * It sends back a response containing error status if
      * something is wrong during the request processing.
      */
-    IDPSSOFederate.doSSOFederate(request, response, new PrintWriter(out, true), reqBinding );
+    IDPSSOFederate.doSSOFederate(request, response, new PrintWriter(out, true), reqBinding, saml2Auditor);
 %>

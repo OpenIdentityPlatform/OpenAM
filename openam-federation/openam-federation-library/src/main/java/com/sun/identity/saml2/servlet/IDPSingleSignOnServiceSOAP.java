@@ -59,7 +59,7 @@ public class IDPSingleSignOnServiceSOAP extends HttpServlet {
         // handle DOS attack
         SAMLUtils.checkHTTPContentLength(req);
         try {
-            IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
+            IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP, null);
         } catch (FederatedSSOException e) {
             sendError(resp, e.getFaultCode(), e.getMessageCode(), e.getDetail());
         }
@@ -71,7 +71,7 @@ public class IDPSingleSignOnServiceSOAP extends HttpServlet {
         // handle DOS attack
         SAMLUtils.checkHTTPContentLength(req);
         try {
-            IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
+            IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP, null);
         } catch (FederatedSSOException e) {
             sendError(resp, e.getFaultCode(), e.getMessageCode(), e.getDetail());
         }

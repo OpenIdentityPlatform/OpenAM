@@ -33,6 +33,10 @@
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPSSOUtil" %>
 <%@ page import="java.io.PrintWriter" %>
+<%@ page import="org.forgerock.guice.core.InjectorHolder" %>
+<%@ page import="org.forgerock.openam.audit.AuditEventPublisher" %>
+<%@ page import="org.forgerock.openam.saml2.audit.SAML2Auditor" %>
+<%@ page import="org.forgerock.openam.audit.AuditEventFactory" %>
 
 <%--
     idpssoinit.jsp initiates Unsolicited SSO at the Identity Provider.
@@ -78,10 +82,18 @@
     7. affiliationID	    affiliation entity ID
 --%>
 <%
+    AuditEventPublisher aep = InjectorHolder.getInstance(AuditEventPublisher.class);
+    AuditEventFactory aef = InjectorHolder.getInstance(AuditEventFactory.class);
+    SAML2Auditor saml2Auditor = new SAML2Auditor(aep, aef, request);
+    saml2Auditor.setMethod("idpSSOInit");
+    saml2Auditor.setRealm(SAML2Utils.getRealm(request.getParameterMap()));
+    saml2Auditor.setSessionTrackingId(session.getId());
+    saml2Auditor.auditAccessAttempt();
     // Retrieve the Request Query Parameters
     // metaAlias and spEntiyID are the required query parameters
     // metaAlias - Identity Provider Entity Id
     // spEntityID - Service Provider Identifier
+
     try {
         String cachedResID = request.getParameter(SAML2Constants.RES_INFO_ID);
         // if this id is set, then this is a redirect from the COT
@@ -92,33 +104,40 @@
             return;
         }
 
-	String metaAlias = request.getParameter("metaAlias");
+	    String metaAlias = request.getParameter("metaAlias");
         if ((metaAlias ==  null) || (metaAlias.length() == 0)) {
-            SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
-                "nullIDPEntityID",
-		SAML2Utils.bundle.getString("nullIDPEntityID"));
-	    return;
-         }
+            SAMLUtils.sendError(
+                    request, response, response.SC_BAD_REQUEST, "nullIDPEntityID",
+		            SAML2Utils.bundle.getString("nullIDPEntityID"));
+            saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                    SAML2Utils.bundle.getString("nullSPEntityID"));
+	        return;
+        }
         String spEntityID = request.getParameter("spEntityID");
 
         if ((spEntityID == null) || (spEntityID.length() == 0)) {
-            SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
-                "nullSPEntityID",
-		SAML2Utils.bundle.getString("nullSPEntityID"));
-	    return;
+            SAMLUtils.sendError(
+                    request, response, response.SC_BAD_REQUEST, "nullSPEntityID",
+		            SAML2Utils.bundle.getString("nullSPEntityID"));
+            saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                    SAML2Utils.bundle.getString("nullSPEntityID"));
+	        return;
         }
-	// get the nameIDPolicy
-	String nameIDFormat =
-		request.getParameter(SAML2Constants.NAMEID_POLICY_FORMAT);
-	String relayState = SAML2Utils.getRelayState(request);
-	IDPSSOUtil.doSSOFederate(request, response, new PrintWriter(out, true), null, spEntityID,
-				 metaAlias, nameIDFormat,relayState);
+
+	    // get the nameIDPolicy
+	    String nameIDFormat = request.getParameter(SAML2Constants.NAMEID_POLICY_FORMAT);
+	    String relayState = SAML2Utils.getRelayState(request);
+	    IDPSSOUtil.doSSOFederate(request, response, new PrintWriter(out, true), null, spEntityID, metaAlias,
+                nameIDFormat, relayState, saml2Auditor);
+        saml2Auditor.auditAccessSuccess();
     } catch (SAML2Exception sse) {
 	    SAML2Utils.debug.error("Error processing request " , sse);
 	    SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
             "requestProcessingError", 
 	        SAML2Utils.bundle.getString("requestProcessingError") + " " +
             sse.getMessage());
+        saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                SAML2Utils.bundle.getString("requestProcessingError"));
         return;
     } catch (Exception e) {
         SAML2Utils.debug.error("Error processing request ",e);
@@ -126,6 +145,8 @@
             "requestProcessingError",
 	        SAML2Utils.bundle.getString("requestProcessingError") + " " +
             e.getMessage());
+        saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                SAML2Utils.bundle.getString("requestProcessingError"));
         return;
     }
 %>

@@ -114,7 +114,9 @@ public final class AuditConstants {
         /** SSOADM CLI component. */
         SSOADM("ssoadm"),
         /** Jato audit event component. */
-        JATO("jato");
+        JATO("jato"),
+        /** SAML2 audit event component. */
+        SAML2("SAML2");
 
         private final String name;
 

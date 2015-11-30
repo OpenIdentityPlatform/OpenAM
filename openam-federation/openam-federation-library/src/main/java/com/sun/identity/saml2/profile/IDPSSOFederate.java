@@ -40,12 +40,12 @@ import org.forgerock.openam.saml2.SAML2ActorFactory;
 import org.forgerock.openam.saml2.SAMLAuthenticator;
 import org.forgerock.openam.saml2.SAMLAuthenticatorLookup;
 import org.forgerock.openam.saml2.UtilProxyCookieRedirector;
+import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
@@ -65,6 +65,7 @@ public class IDPSSOFederate {
     private final boolean isFromECP;
     private final FederateCookieRedirector cookieRedirector;
     private final SAML2ActorFactory saml2ActorFactory;
+    private SAML2EventLogger auditor;
 
     private IDPSSOFederate(final boolean isFromECP) throws ServerFaultException, ClientFaultException {
         this.isFromECP = isFromECP;
@@ -89,14 +90,19 @@ public class IDPSSOFederate {
      * @param request the <code>HttpServletRequest</code> object
      * @param response the <code>HttpServletResponse</code> object
      * @param out the print writer for writing out presentation
+     * @param auditor the auditor for logging SAML2 Events - may be null
      */
     public static void doSSOFederate(HttpServletRequest request,
                                      HttpServletResponse response,
                                      PrintWriter out,
-                                     String reqBinding) {
+                                     String reqBinding,
+                                     SAML2EventLogger auditor) {
+
         try {
-            doSSOFederate(request, response, out, false, reqBinding);
+            doSSOFederate(request, response, out, false, reqBinding, auditor);
+            auditor.auditAccessSuccess();
         } catch (FederatedSSOException ex) {
+            auditor.auditAccessFailure(ex.getFaultCode(), ex.getLocalizedMessage());
             // Invoke the IDP Adapter after the user has been authenticated
             try {
                 SAML2Utils.debug.message("Invoking IDP adapter preSendFailureResponse hook");
@@ -122,21 +128,28 @@ public class IDPSSOFederate {
      * @param response the <code>HttpServletResponse</code> object
      * @param out the print writer for writing out presentation
      * @param isFromECP true if the request comes from ECP
+     * @param auditor the auditor for logging SAML2 Events - may be null
      *
      */
     public static void doSSOFederate(HttpServletRequest request, HttpServletResponse response, PrintWriter out,
-                                     boolean isFromECP, String reqBinding)
+                                     boolean isFromECP, String reqBinding, SAML2EventLogger auditor)
             throws FederatedSSOException {
         String classMethod = "IDPSSOFederate.doSSOFederate: ";
 
         try {
             final IDPSSOFederate idpSsoFederateRequest = new IDPSSOFederate(isFromECP);
+            idpSsoFederateRequest.withEventAuditor(auditor);
             idpSsoFederateRequest.process(request, response, out, reqBinding);
         } catch (IOException ioe) {
             SAML2Utils.debug.error(classMethod + "I/O error", ioe);
         } catch (SessionException sso) {
             SAML2Utils.debug.error("SSOException : ", sso);
         }
+    }
+
+    private IDPSSOFederate withEventAuditor(SAML2EventLogger auditor) {
+        this.auditor = auditor;
+        return this;
     }
 
     /**
@@ -205,18 +218,22 @@ public class IDPSSOFederate {
         String idpEntityID = validator.getIDPEntity(idpMetaAlias, realm);
         SAML2IdentityProviderAdapter idpAdapter = validator.getIDPAdapter(realm, idpEntityID);
         String reqID = request.getParameter(REQ_ID);
-
+        if (null != auditor && StringUtils.isNotEmpty(reqID)) {
+            auditor.setRequestId(reqID);
+        }
         IDPSSOFederateRequest reqData = new IDPSSOFederateRequest(reqID, realm, idpAdapter, idpMetaAlias, idpEntityID);
-
+        reqData.setEventAuditor(auditor);
         // get the request id query parameter from the request. If this
         // is the first visit then the request id is not set; if it is
         // coming back from a successful authentication, then request
         // id should be there.
         if (StringUtils.isEmpty(reqData.getRequestID())) {
-            SAMLAuthenticator samlAuthenticator = saml2ActorFactory.getSAMLAuthenticator(reqData, request, response, out, isFromECP);
+            SAMLAuthenticator samlAuthenticator = saml2ActorFactory.getSAMLAuthenticator(reqData, request, response,
+                    out, isFromECP);
             samlAuthenticator.authenticate();
         } else {
-            SAMLAuthenticatorLookup samlLookup = saml2ActorFactory.getSAMLAuthenticatorLookup(reqData, request, response, out);
+            SAMLAuthenticatorLookup samlLookup = saml2ActorFactory.getSAMLAuthenticatorLookup(reqData, request,
+                    response, out);
             samlLookup.retrieveAuthenticationFromCache();
         }
     }

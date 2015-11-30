@@ -88,6 +88,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 
 /**
  * This class reads the query parameters and performs the required
@@ -126,14 +127,15 @@ public class SPSSOFederate {
      *              AuthnContextDeclRef, AuthnContextClassRef,
      *              AuthComparison, Consent (currently not supported),
      *              AuthLevel, and sunamcompositeadvice.
+     * @param auditor the SAML2EventLogger to use to log the saml request - may be null
      * @throws SAML2Exception if error initiating request to IDP.
      */
-    public static void initiateAuthnRequest(HttpServletRequest request,
-                                 HttpServletResponse response,
-                                 String metaAlias,
-                                 String idpEntityID,
-                                 Map paramsMap)
-                                 throws SAML2Exception {
+    public static void initiateAuthnRequest(final HttpServletRequest request,
+                                            final HttpServletResponse response,
+                                            final String metaAlias,
+                                            final String idpEntityID,
+                                            final Map paramsMap,
+                                            final SAML2EventLogger auditor) throws SAML2Exception {
 
         try {
             // get the sp entity ID from the metaAlias
@@ -145,7 +147,7 @@ public class SPSSOFederate {
                 SAML2Utils.debug.message("SPSSOFederate realm is :" + realm);
             }
 
-            initiateAuthnRequest(request, response, spEntityID,  idpEntityID, realm, paramsMap);
+            initiateAuthnRequest(request, response, spEntityID,  idpEntityID, realm, paramsMap, auditor);
         } catch (SAML2MetaException sme) {
             SAML2Utils.debug.error("SPSSOFederate: Error retreiving spEntityID from MetaAlias",sme);
             throw new SAML2Exception(SAML2Utils.bundle.getString("metaAliasError"));
@@ -181,10 +183,12 @@ public class SPSSOFederate {
      *              AuthnContextDeclRef, AuthnContextClassRef,
      *              AuthComparison, Consent (currently not supported),
      *              AuthLevel, and sunamcompositeadvice.
+     * @param auditor the auditor for logging SAML2 Events - may be null
      * @throws SAML2Exception if error initiating request to IDP.
      */
-    private static void initiateAuthnRequest(HttpServletRequest request, HttpServletResponse response, String spEntityID,
-                                 String idpEntityID, String realmName, Map paramsMap)
+    private static void initiateAuthnRequest(
+            final HttpServletRequest request, final HttpServletResponse response, final String spEntityID,
+            final String idpEntityID, final String realmName, final Map paramsMap, final SAML2EventLogger auditor)
             throws SAML2Exception {
 
         if (FSUtils.needSetLBCookieAndRedirect(request, response, false)) {
@@ -257,7 +261,10 @@ public class SPSSOFederate {
             // create AuthnRequest 
             AuthnRequest authnRequest = createAuthnRequest(realm, spEntityID, paramsMap, spConfigAttrsMap,
                     extensionsList, spsso, idpsso, ssoURL, false);
-               
+            if (null != auditor && null != authnRequest) {
+                auditor.setRequestId(authnRequest.getID());
+            }
+
             // invoke SP Adapter class if registered
             SAML2ServiceProviderAdapter spAdapter = SAML2Utils.getSPAdapterClass(spEntityID, realmName);
             if (spAdapter != null) {

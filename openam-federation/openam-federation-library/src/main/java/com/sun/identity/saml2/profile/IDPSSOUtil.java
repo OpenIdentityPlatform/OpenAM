@@ -102,6 +102,7 @@ import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.ClientUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -178,6 +179,7 @@ public class IDPSSOUtil {
      * @param idpMetaAlias the meta alias of the identity provider
      * @param nameIDFormat the <code>NameIDFormat</code>
      * @param relayState   the relay state
+     * @param auditor      the auditor for logging SAML2 Events - may be null
      * @throws SAML2Exception if the operation is not successful
      */
     public static void doSSOFederate(HttpServletRequest request,
@@ -187,11 +189,12 @@ public class IDPSSOUtil {
                                      String spEntityID,
                                      String idpMetaAlias,
                                      String nameIDFormat,
-                                     String relayState)
+                                     String relayState,
+                                     SAML2EventLogger auditor)
             throws SAML2Exception {
         doSSOFederate(request, response, out, authnReq,
                 spEntityID, idpMetaAlias, nameIDFormat,
-                relayState, null);
+                relayState, null, auditor);
     }
 
     /**
@@ -206,6 +209,7 @@ public class IDPSSOUtil {
      * @param nameIDFormat the <code>NameIDFormat</code>
      * @param relayState   the relay state
      * @param newSession   Session used in IDP Proxy Case
+     * @param auditor      the auditor for logging SAML2 Events - may be null
      * @throws SAML2Exception if the operation is not successful
      */
     public static void doSSOFederate(HttpServletRequest request,
@@ -216,7 +220,8 @@ public class IDPSSOUtil {
                                      String idpMetaAlias,
                                      String nameIDFormat,
                                      String relayState,
-                                     Object newSession)
+                                     Object newSession,
+                                     SAML2EventLogger auditor)
             throws SAML2Exception {
 
         String classMethod = "IDPSSOUtil.doSSOFederate: ";
@@ -224,9 +229,13 @@ public class IDPSSOUtil {
         Object session = null;
         if (newSession != null) {
             session = newSession;
+            auditor.setSSOTokenId(session);
         } else {
             try {
                 session = sessionProvider.getSession(request);
+                if (null != auditor) {
+                    auditor.setAuthTokenId(session);
+                }
             } catch (SessionException se) {
                 if (SAML2Utils.debug.warningEnabled()) {
                     SAML2Utils.debug.warning(
@@ -239,6 +248,7 @@ public class IDPSSOUtil {
         String authnRequestStr = null;
         if (authnReq != null) {
             authnRequestStr = authnReq.toXMLString();
+            auditor.setRequestId(authnReq.getID());
         }
         String[] logdata = {spEntityID, idpMetaAlias, authnRequestStr};
         LogUtil.access(Level.INFO,

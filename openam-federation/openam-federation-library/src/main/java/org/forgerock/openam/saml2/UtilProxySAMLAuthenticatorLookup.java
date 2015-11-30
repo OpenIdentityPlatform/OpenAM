@@ -37,6 +37,7 @@ import com.sun.identity.saml2.profile.ServerFaultException;
 import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.NameIDPolicy;
 import com.sun.identity.saml2.protocol.Response;
+import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
@@ -86,6 +87,7 @@ public class UtilProxySAMLAuthenticatorLookup extends SAMLBase implements SAMLAu
         SessionProvider sessionProvider = SessionManager.getProvider();
         try {
             data.setSession(sessionProvider.getSession(request));
+            data.getEventAuditor().setSSOTokenId(data.getSession());
         } catch (SessionException se) {
             SAML2Utils.debug.error("An error occurred while retrieving the session: " + se.getMessage());
             data.setSession(null);

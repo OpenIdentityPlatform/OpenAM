@@ -165,7 +165,7 @@ public class PLLAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .responseWithDetail(FAILED, errorCode == null ? "" : errorCode, elapsedTime, MILLISECONDS, detail)
+                    .responseWithDetail(FAILED, errorCode, elapsedTime, MILLISECONDS, detail)
                     .userId(userId)
                     .request(PLL, method)
                     .trackingId(trackingId)

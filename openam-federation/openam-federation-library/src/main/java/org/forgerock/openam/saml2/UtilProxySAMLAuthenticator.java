@@ -52,6 +52,8 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
+import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -123,6 +125,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
         if (data.getAuthnRequest() == null) {
             throw new ClientFaultException(data.getIdpAdapter(), INVALID_SAML_REQUEST);
         }
+        data.getEventAuditor().setRequestId(data.getRequestID());
 
         data.setSpEntityID(data.getAuthnRequest().getIssuer().getValue());
 
@@ -226,6 +229,9 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
             } catch (SessionException se) {
                 SAML2Utils.debug.message("{} Unable to retrieve user session.", classMethod);
             }
+        }
+        if (null != data.getSession()) {
+            data.getEventAuditor().setAuthTokenId(data.getSession());
         }
 
         // preSingleSignOn adapter hook
@@ -807,6 +813,4 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
         IDPCache.idpAuthnContextCache.remove(reqID);
         IDPCache.isSessionUpgradeCache.remove(reqID);
     }
-
-
 }

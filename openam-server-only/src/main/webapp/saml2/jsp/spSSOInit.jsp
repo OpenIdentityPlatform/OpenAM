@@ -27,12 +27,16 @@
    Portions Copyright 2013-2015 ForgeRock AS.
 --%>
 
-<%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
+<%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
 <%@ page import="com.sun.identity.saml2.profile.SPCache" %>
 <%@ page import="com.sun.identity.saml2.profile.SPSSOFederate" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.forgerock.guice.core.InjectorHolder" %>
+<%@ page import="org.forgerock.openam.audit.AuditEventPublisher" %>
+<%@ page import="org.forgerock.openam.saml2.audit.SAML2Auditor" %>
+<%@ page import="org.forgerock.openam.audit.AuditEventFactory" %>
 
 <%--
     spssoinit.jsp initiates the Single Sign-On at the Service Provider.
@@ -155,6 +159,15 @@
                             Requested Authentication Context element. True by default.
 --%>
 <%
+    AuditEventPublisher aep = InjectorHolder.getInstance(AuditEventPublisher.class);
+    AuditEventFactory aef = InjectorHolder.getInstance(AuditEventFactory.class);
+    SAML2Auditor saml2Auditor = new SAML2Auditor(aep, aef, request);
+
+    saml2Auditor.setMethod("spSSOInit");
+    saml2Auditor.setRealm(SAML2Utils.getRealm(request.getParameterMap()));
+    saml2Auditor.setSessionTrackingId(session.getId());
+    saml2Auditor.auditAccessAttempt();
+
     // Retrieve the Request Query Parameters
     // metaAlias and idpEntiyID are the required query parameters
     // metaAlias - Service Provider Entity Id
@@ -164,68 +177,70 @@
     String metaAlias= null;
     Map paramsMap = null;
     try {
-	String reqID = request.getParameter("requestID");
-	if (reqID != null) {
-	   //get the preferred idp
-	   idpEntityID = SAML2Utils.getPreferredIDP(request);
-	   paramsMap = (Map)SPCache.reqParamHash.get(reqID);
-	   metaAlias = (String) paramsMap.get("metaAlias");
-	   SPCache.reqParamHash.remove(reqID);
-	} else {
-	    // this is an original request check
-	    // get the metaAlias ,idpEntityID
-	    // if idpEntityID is null redirect to IDP Discovery
-	    // Service to retrieve.
-	    metaAlias = request.getParameter("metaAlias");
+    	String reqID = request.getParameter("requestID");
+    	if (reqID != null) {
+    	   //get the preferred idp
+    	   idpEntityID = SAML2Utils.getPreferredIDP(request);
+    	   paramsMap = (Map)SPCache.reqParamHash.get(reqID);
+    	   metaAlias = (String) paramsMap.get("metaAlias");
+    	   SPCache.reqParamHash.remove(reqID);
+    	} else {
+    	    // this is an original request check
+    	    // get the metaAlias ,idpEntityID
+    	    // if idpEntityID is null redirect to IDP Discovery
+    	    // Service to retrieve.
+    	    metaAlias = request.getParameter("metaAlias");
             if ((metaAlias ==  null) || (metaAlias.length() == 0)) {
-                SAMLUtils.sendError(request, response, 
-                    response.SC_BAD_REQUEST, "nullSPEntityID", 
-		    SAML2Utils.bundle.getString("nullSPEntityID"));
-	        return;
+                SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST, "nullSPEntityID",
+    		    SAML2Utils.bundle.getString("nullSPEntityID"));
+                saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                        SAML2Utils.bundle.getString("nullSPEntityID"));
+    	        return;
             }
             idpEntityID = request.getParameter("idpEntityID");
-	    paramsMap = SAML2Utils.getParamsMap(request);
+    	    paramsMap = SAML2Utils.getParamsMap(request);
 
             if ((idpEntityID == null) || (idpEntityID.length() == 0)) {
-		// get reader url
-		String readerURL = SAML2Utils.getReaderURL(metaAlias);
-	        if (readerURL != null) {
-		    String rID = SAML2Utils.generateID();
- 	            String redirectURL =
-			SAML2Utils.getRedirectURL(readerURL,rID,request);
-		    if (redirectURL != null) {
-			paramsMap.put("metaAlias",metaAlias);
-			SPCache.reqParamHash.put(rID,paramsMap);
-			response.sendRedirect(redirectURL);
-			return;
-		    }
-		}
-	   }
-	}
+		        // get reader url
+		        String readerURL = SAML2Utils.getReaderURL(metaAlias);
+    	        if (readerURL != null) {
+                    String rID = SAML2Utils.generateID();
+                    String redirectURL = SAML2Utils.getRedirectURL(readerURL, rID, request);
+                    if (redirectURL != null) {
+                        paramsMap.put("metaAlias", metaAlias);
+                        SPCache.reqParamHash.put(rID, paramsMap);
+                        response.sendRedirect(redirectURL);
+                        return;
+                    }
+                }
+	        }
+	    }
 
-	if ((idpEntityID == null) || (idpEntityID.length() == 0)) {
-            SAMLUtils.sendError(request, response, 
-                response.SC_BAD_REQUEST, "nullIDPEntityID",
-	        SAML2Utils.bundle.getString("nullIDPEntityID"));
-	    return;
-	}
-	// get the parameters and put it in a map.
-	SPSSOFederate.initiateAuthnRequest( request,response,metaAlias,
-				          idpEntityID,
-                                          paramsMap);
+    	if ((idpEntityID == null) || (idpEntityID.length() == 0)) {
+            SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST, "nullIDPEntityID",
+                    SAML2Utils.bundle.getString("nullIDPEntityID"));
+            saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                    SAML2Utils.bundle.getString("nullIDPEntityID"));
+	        return;
+	    }
+	    // get the parameters and put it in a map.
+	    SPSSOFederate.initiateAuthnRequest(request, response, metaAlias, idpEntityID, paramsMap, saml2Auditor);
+        saml2Auditor.auditAccessSuccess();
+
     } catch (SAML2Exception sse) {
 	    SAML2Utils.debug.error("Error sending AuthnRequest " , sse);
-	    SAMLUtils.sendError(request, response,
-            response.SC_BAD_REQUEST, "requestProcessingError",
-	        SAML2Utils.bundle.getString("requestProcessingError") + " " +
-            sse.getMessage());
+	    SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST, "requestProcessingError",
+	    SAML2Utils.bundle.getString("requestProcessingError") + " " + sse.getMessage());
+        saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                SAML2Utils.bundle.getString("requestProcessingError"));
         return;
     } catch (Exception e) {
         SAML2Utils.debug.error("Error processing Request ",e);
-	    SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
-            "requestProcessingError",
+	    SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST, "requestProcessingError",
 	        SAML2Utils.bundle.getString("requestProcessingError") + " " +
             e.getMessage());
+        saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+                SAML2Utils.bundle.getString("requestProcessingError"));
         return;
     }
 %>

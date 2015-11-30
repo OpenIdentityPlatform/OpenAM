@@ -109,6 +109,8 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.saml2.audit.SAML2Auditor;
+import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -985,15 +987,16 @@ public class SPACSUtils {
      * @param respInfo <code>ResponseInfo</code> to be verified.
      * @param realm realm or organization name of the service provider.
      * @param hostEntityId hosted service provider Entity ID.
-     * @param metaManager <code>SAML2MetaManager</code> instance for meta
-     *                operation.
+     * @param metaManager <code>SAML2MetaManager</code> instance for meta operation.
+     * @param auditor a <code>SAML2EventLogger</code> auditor object to hook into
+     *                tracking information for the saml request
      * @return <code>Object</code> which holds result of the session.
      * @throws SAML2Exception if the processing failed.
      */
     public static Object processResponse(
         HttpServletRequest request, HttpServletResponse response, PrintWriter out,
         String metaAlias, Object session, ResponseInfo respInfo,
-        String realm, String hostEntityId, SAML2MetaManager metaManager
+        String realm, String hostEntityId, SAML2MetaManager metaManager, SAML2EventLogger auditor
     ) throws SAML2Exception {
 
         String classMethod = "SPACSUtils.processResponse: ";
@@ -1167,6 +1170,9 @@ public class SPACSUtils {
             // In case we just got authenticated locally, we should accept the freshly authenticated session's principal
             // as the username corresponding to the received assertion.
             userName = existUserName;
+        }
+        if (null != auditor) {
+            auditor.setUserId(userName);
         }
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message(
@@ -2002,7 +2008,7 @@ public class SPACSUtils {
         // the SPAdapter issued a HTTP redirect.
         newSession = SPACSUtils.processResponse(
                     request, response, out, metaAlias, null, respInfo,
-                    orgName, hostEntityId, metaManager);
+                    orgName, hostEntityId, metaManager, null);
         
         SAML2SDKUtils.debug.message("SSO SUCCESS");
         String[] redirected = sessionProvider.getProperty(newSession,

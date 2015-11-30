@@ -76,8 +76,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPMessage;
+
+import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.SAML2Store;
+import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 
 /**
  * This class reads the required data from HttpServletRequest and
@@ -136,6 +139,7 @@ public class SPSingleLogout {
      *                   known as Consent Identifiers.
      *       "Extension" - Specifies a list of Extensions as list of
      *                   String objects.
+     * @param auditor the auditor for logging SAML2 Events - may be null
      * @throws SAML2Exception if error initiating request to IDP.
      */
     public static void initiateLogoutRequest(
@@ -143,10 +147,11 @@ public class SPSingleLogout {
         HttpServletResponse response,
         PrintWriter out,
         String binding,
-        Map paramsMap) 
+        Map paramsMap,
+        SAML2EventLogger auditor)
     throws SAML2Exception {
         initiateLogoutRequest(request, response, out, binding,
-            paramsMap, null, null, null);
+            paramsMap, null, null, null, auditor);
     }
 
     /**
@@ -169,7 +174,8 @@ public class SPSingleLogout {
      *                   String objects.
      * @param origLogoutRequest original LogoutRequest
      * @param msg SOAPMessage 
-     * @param  newSession Session object for IDP Proxy
+     * @param newSession Session object for IDP Proxy
+     * @param audit the auditor for logging SAML2 Events - may be null
      * @throws SAML2Exception if error initiating request to IDP.
      */
     public static void initiateLogoutRequest(
@@ -180,7 +186,8 @@ public class SPSingleLogout {
         Map paramsMap, 
         LogoutRequest origLogoutRequest, 
         SOAPMessage msg, 
-        Object newSession)
+        Object newSession,
+        SAML2EventLogger audit)
         throws SAML2Exception {
 
         if (debug.messageEnabled()) {
@@ -196,6 +203,9 @@ public class SPSingleLogout {
                session = newSession; 
             } else {
                 session = sessionProvider.getSession(request);
+            }
+            if (null != audit) {
+                audit.setSSOTokenId(session);
             }
             if (!SPCache.isFedlet) {
                 if (session == null) {
@@ -243,7 +253,7 @@ public class SPSingleLogout {
 
             // clean up session index
             String tokenID = sessionProvider.getSessionID(session);
-            String infoKeyString = null;            
+            String infoKeyString = null;
             if (SPCache.isFedlet) {
                 infoKeyString = SAML2Utils.getParameter(paramsMap,
                     SAML2Constants.INFO_KEY);

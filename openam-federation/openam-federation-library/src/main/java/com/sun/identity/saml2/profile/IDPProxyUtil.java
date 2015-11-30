@@ -557,7 +557,8 @@ public class IDPProxyUtil {
                                   idpMetaAlias, 
                                   nameIDFormat, 
                                   relayState,
-                                  newSession);
+                                  newSession,
+                                  null);
     }
 
     /**
@@ -695,7 +696,7 @@ public class IDPProxyUtil {
             } 
             idpSession.removeSessionPartner(partner);
             SPSingleLogout.initiateLogoutRequest(request,response, out,
-                binding, paramsMap, logoutReq, msg, ssoToken);
+                binding, paramsMap, logoutReq, msg, ssoToken, null);
         } catch (SAML2Exception sse) {
             SAML2Utils.debug.error("Error sending Logout Request " , sse);
             try {

@@ -18,12 +18,15 @@ package org.forgerock.openam.saml2;
 import com.sun.identity.saml2.assertion.AuthnContext;
 import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import com.sun.identity.saml2.protocol.AuthnRequest;
+import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 
 /**
  * Represents the data necessary for a request to be handled by the IdP SSO Federate's authenticate
  * and authentication lookup systems, as well as all related utility functions.
  */
 public class IDPSSOFederateRequest {
+
+    private static final SAML2EventLogger DEFAULT_SMAL2_EVENT_AUDITOR = new DoNothingSAML2EventLogger();
 
     private final String reqID;
     private final String realm;
@@ -37,6 +40,8 @@ public class IDPSSOFederateRequest {
 
     private AuthnRequest authnReq;
     private AuthnContext matchingAuthnContext;
+
+    private SAML2EventLogger eventAuditor;
 
     private Object session;
 
@@ -196,4 +201,86 @@ public class IDPSSOFederateRequest {
         return idpAdapter;
     }
 
+    /**
+     * @return the Audit Event Logger for this request
+     */
+    public SAML2EventLogger getEventAuditor() {
+        if (null == this.eventAuditor) {
+            return DEFAULT_SMAL2_EVENT_AUDITOR;
+        }
+        return this.eventAuditor;
+
+    }
+
+    /**
+     * @param eventAuditor the Audit Event Logger for this request. The Default SAML2EventLogger will not perform
+     *                     any actions.
+     */
+    public void setEventAuditor(SAML2EventLogger eventAuditor) {
+        this.eventAuditor = eventAuditor;
+    }
+
+    // this inner class saves the caller of getEventAuditor from having to perform null checks
+    private static class DoNothingSAML2EventLogger implements SAML2EventLogger {
+
+        @Override
+        public void auditAccessAttempt() {
+            // Do Nothing
+        }
+
+        @Override
+        public void auditAccessSuccess() {
+            // Do Nothing
+        }
+
+        @Override
+        public void auditAccessFailure(String errorCode, String message) {
+            // Do Nothing
+        }
+
+        @Override
+        public void setSessionTrackingId(String trackingId) {
+            // Do Nothing
+        }
+
+        @Override
+        public void setUserId(String userId) {
+            // Do Nothing
+        }
+
+        @Override
+        public void setRealm(String realm) {
+            // Do Nothing
+        }
+
+        @Override
+        public void setMethod(String method) {
+            // Do Nothing
+        }
+
+        @Override
+        public void auditForwardToProxy() {
+            // Do Nothing
+        }
+
+        @Override
+        public void auditForwardToLocalUserLogin() {
+            // Do Nothing
+        }
+
+        @Override
+        public void setRequestId(String authnRequestId) {
+            // Do Nothing
+        }
+
+        @Override
+        public void setSSOTokenId(Object ssoTokenId) {
+            // Do Nothing
+        }
+
+        @Override
+        public void setAuthTokenId(Object session) {
+            // Do Nothing
+        }
+    }
 }

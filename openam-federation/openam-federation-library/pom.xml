@@ -277,6 +277,11 @@
             <groupId>org.forgerock.commons.guava</groupId>
             <artifactId>forgerock-guava-cache</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>openam-audit-core</artifactId>
+        </dependency>
     </dependencies>
 </project>
 
