@@ -9,28 +9,14 @@
  * When distributing Covered Software, include this CDDL Header Notice in each file and include
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [year] [name of copyright owner]".
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.soap.audit;
-
-import javax.servlet.http.HttpServletRequest;
-
 /**
- * Factory interface for Guice assisted injection of {@link Auditor}.
+ * HTTP servlet filter for auditing access attempts.
  *
  * @since 13.0.0
  */
-public interface AuditorFactory {
-
-    /**
-     * Construct a new Auditor instance with other dependencies provided by Guice.
-     *
-     * @param request HttpServletRequest.
-     * @param response Queryable decorator over the HttpServletResponse.
-     * @return new Auditor instance.
-     */
-    Auditor create(HttpServletRequest request, AuditableHttpServletResponse response);
-}
+package org.forgerock.openam.audit.servlet;

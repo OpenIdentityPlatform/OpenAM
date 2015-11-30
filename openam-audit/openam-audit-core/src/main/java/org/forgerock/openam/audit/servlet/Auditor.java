@@ -14,27 +14,27 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.soap.audit;
+package org.forgerock.openam.audit.servlet;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILED;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AuditConstants.ACCESS_RESPONSE_DETAIL_REASON;
-import static org.forgerock.openam.audit.AuditConstants.Component.STS;
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-
-import com.google.inject.assistedinject.Assisted;
-import org.forgerock.audit.events.AuditEvent;
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
-import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.util.time.TimeService;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_ATTEMPT;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_OUTCOME;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.util.time.TimeService;
+
+import com.google.inject.assistedinject.Assisted;
 
 /**
  * Creates access audit events from information collected from HTTP request and response objects.
@@ -48,10 +48,16 @@ public class Auditor {
     private final AuditableHttpServletResponse response;
     private final long startTime;
 
+    /**
+     * Constructs a new Auditor instance.
+     *
+     * @param timeService A {@code TimeService} instance.
+     * @param request The {@code HttpServletRequest}.
+     * @param response The {@code HttpServletResponse}.
+     */
     @Inject
-    public Auditor(TimeService timeService,
-                   @Assisted HttpServletRequest request,
-                   @Assisted AuditableHttpServletResponse response) {
+    public Auditor(TimeService timeService, @Assisted HttpServletRequest request,
+            @Assisted AuditableHttpServletResponse response) {
         this.timeService = timeService;
         this.request = request;
         this.response = response;
@@ -59,60 +65,72 @@ public class Auditor {
     }
 
     /**
-     * Creates an audit event that captures details of an attempted HTTP call to the SOAP STS.
+     * Creates an audit event that captures details of an attempted HTTP call.
+     *
+     * @param component The component.
+     * @return An AuditEvent.
      */
-    AuditEvent auditAccessAttempt() {
+    public AuditEvent auditAccessAttempt(AuditConstants.Component component) {
         return accessEvent()
                 .forHttpServletRequest(request)
                 .timestamp(startTime)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_ATTEMPT)
-                .component(STS)
+                .component(component)
                 .toEvent();
     }
 
     /**
-     * Creates an audit event that captures details of the outcome from a HTTP call to the SOAP STS.
+     * Creates an audit event that captures details of the outcome from a HTTP call.
+     *
+     * @param component The component.
+     * @return An AuditEvent.
      */
-    AuditEvent auditAccessOutcome() {
+    public AuditEvent auditAccessOutcome(AuditConstants.Component component) {
         if (response.hasSuccessStatusCode()) {
-            return auditAccessSuccess();
+            return auditAccessSuccess(component);
         } else {
-            return auditAccessFailure();
+            return auditAccessFailure(component);
         }
     }
 
     /**
-     * Creates an audit event that captures details of a successfully completed HTTP call to the SOAP STS.
+     * Creates an audit event that captures details of a successfully completed HTTP call.
+     *
+     * @param component The component.
+     * @return An AuditEvent.
      */
-    AuditEvent auditAccessSuccess() {
-        final long endTime = timeService.now();
-        final long elapsedTime = endTime - startTime;
+    public AuditEvent auditAccessSuccess(AuditConstants.Component component) {
+        long endTime = timeService.now();
+        long elapsedTime = endTime - startTime;
         return accessEvent()
                 .forHttpServletRequest(request)
                 .timestamp(endTime)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_OUTCOME)
-                .component(STS)
+                .component(component)
                 .response(SUCCESSFUL, "", elapsedTime, MILLISECONDS)
                 .toEvent();
     }
 
     /**
-     * Creates an audit event that captures details of an unsuccessfully completed HTTP call to the SOAP STS.
+     * Creates an audit event that captures details of an unsuccessfully completed HTTP call.
+     *
+     * @param component The component.
+     * @return An AuditEvent.
      */
-    AuditEvent auditAccessFailure() {
-        final long endTime = timeService.now();
-        final long elapsedTime = endTime - startTime;
-        final String statusCode = Integer.toString(response.getStatusCode());
-        final JsonValue responseDetail = json(object(
+    public AuditEvent auditAccessFailure(AuditConstants.Component component) {
+        long endTime = timeService.now();
+        long elapsedTime = endTime - startTime;
+        String statusCode = Integer.toString(response.getStatusCode());
+        JsonValue responseDetail = json(object(
                 field(ACCESS_RESPONSE_DETAIL_REASON, response.getMessage())));
         return accessEvent()
                 .forHttpServletRequest(request)
                 .timestamp(endTime)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_OUTCOME)
-                .component(STS)
+                .component(component)
                 .responseWithDetail(FAILED, statusCode, elapsedTime, MILLISECONDS, responseDetail)
                 .toEvent();
     }

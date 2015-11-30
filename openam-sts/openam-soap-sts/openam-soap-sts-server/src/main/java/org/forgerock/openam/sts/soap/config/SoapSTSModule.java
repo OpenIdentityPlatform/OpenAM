@@ -16,21 +16,29 @@
 
 package org.forgerock.openam.sts.soap.config;
 
-import com.google.inject.Exposed;
-import com.google.inject.Key;
-import com.google.inject.PrivateModule;
-import com.google.inject.Provides;
-import com.google.inject.Scopes;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.name.Names;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
-import org.forgerock.openam.sts.soap.audit.AuditableHttpServletResponse;
-import org.forgerock.openam.sts.soap.audit.Auditor;
-import org.forgerock.openam.sts.soap.audit.AuditorFactory;
+import org.forgerock.openam.sts.soap.audit.SoapAuditEventPublisher;
+import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
+import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProviderImpl;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentConfigAccess;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentConfigAccessImpl;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentCredentialsAccess;
@@ -40,12 +48,10 @@ import org.forgerock.openam.sts.soap.bootstrap.SoapSTSLifecycleImpl;
 import org.forgerock.openam.sts.soap.policy.am.OpenAMSessionTokenServerInterceptorProvider;
 import org.forgerock.openam.sts.soap.publish.PublishServiceConsumer;
 import org.forgerock.openam.sts.soap.publish.PublishServiceConsumerImpl;
-import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
-import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProviderImpl;
-import org.forgerock.openam.sts.soap.publish.SoapSTSInstancePublisher;
-import org.forgerock.openam.sts.soap.publish.SoapSTSInstancePublisherImpl;
 import org.forgerock.openam.sts.soap.publish.SoapSTSInstanceLifecycleManager;
 import org.forgerock.openam.sts.soap.publish.SoapSTSInstanceLifecycleManagerImpl;
+import org.forgerock.openam.sts.soap.publish.SoapSTSInstancePublisher;
+import org.forgerock.openam.sts.soap.publish.SoapSTSInstancePublisherImpl;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -58,19 +64,12 @@ import org.forgerock.util.time.TimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import com.google.inject.Exposed;
+import com.google.inject.Key;
+import com.google.inject.PrivateModule;
+import com.google.inject.Provides;
+import com.google.inject.Scopes;
+import com.google.inject.name.Names;
 
 /**
  * Defines the guice bindings needed by the soap-sts 'framework' - i.e. the elements need to exposed published soap-sts
@@ -149,8 +148,7 @@ public class SoapSTSModule extends PrivateModule {
         bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class).in(Scopes.SINGLETON);
         expose(PrincipalFromSession.class);
 
-        install(new FactoryModuleBuilder().implement(Auditor.class, Auditor.class).build(AuditorFactory.class));
-        expose(AuditorFactory.class);
+        bind(AuditEventPublisher.class).to(SoapAuditEventPublisher.class);
 
         bind(TimeService.class).toInstance(TimeService.SYSTEM);
         expose(TimeService.class);

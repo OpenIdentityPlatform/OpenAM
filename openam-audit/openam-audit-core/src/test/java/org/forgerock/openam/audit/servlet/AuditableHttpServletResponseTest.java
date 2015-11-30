@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.soap.audit;
+package org.forgerock.openam.audit.servlet;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -18,28 +18,28 @@ package org.forgerock.openam.sts.soap.audit;
 
 import static java.net.HttpURLConnection.HTTP_CREATED;
 
-import org.forgerock.audit.events.AuditEvent;
-import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.HttpURLConnectionWrapper;
-import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
-import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
-import org.forgerock.openam.sts.soap.config.SoapSTSModule;
-import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.slf4j.Logger;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
+import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
+import org.slf4j.Logger;
 
 /**
  * Responsible for sending locally created audit events to the OpenAM AuditService.
  *
  * @since 13.0.0
  */
-final class AuditEventPublisher {
+public final class SoapAuditEventPublisher implements AuditEventPublisher {
 
     private final String openamAuditServiceVersion;
     private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
@@ -49,7 +49,7 @@ final class AuditEventPublisher {
     private final Logger logger;
 
     @Inject
-    AuditEventPublisher(
+    SoapAuditEventPublisher(
             HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
             @Named(AMSTSConstants.REST_CREATE_ACCESS_AUDIT_EVENT_URL) String openamAuditServiceUrl,
             @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,
@@ -67,9 +67,11 @@ final class AuditEventPublisher {
     /**
      * Send create request to OpenAM server's CREST AuditService with audit event JSON as payload.
      *
+     * @param topic Coarse-grained categorization of the AuditEvent's type.
      * @param auditEvent AuditEvent to be published.
      */
-    public void publish(AuditEvent auditEvent) {
+    @Override
+    public void publish(String topic, AuditEvent auditEvent) {
         try {
 
             String sessionId = null;
@@ -102,6 +104,16 @@ final class AuditEventPublisher {
         } catch (Exception e) {
             logger.error("Failed to publish audit event: {}", e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void tryPublish(String topic, AuditEvent auditEvent) {
+        publish(topic, auditEvent);
+    }
+
+    @Override
+    public boolean isAuditing(String realm, String topic) {
+        return true;
     }
 
     private URL buildAuditAccessUrl() throws MalformedURLException {

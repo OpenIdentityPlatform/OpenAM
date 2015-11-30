@@ -27,6 +27,8 @@ import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AMAuditService;
+import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.AuditEventPublisherImpl;
 import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
@@ -186,6 +188,7 @@ public class JSONSerialisationTest extends GuiceTestCase {
         protected void configure() {
             bind(AuditServiceConfigurationProvider.class).to(DummyAuditServiceConfigurationProvider.class);
             bind(AuditServiceProvider.class).to(DummyAuditServiceProvider.class);
+            bind(AuditEventPublisher.class).to(AuditEventPublisherImpl.class);
         }
     }
 

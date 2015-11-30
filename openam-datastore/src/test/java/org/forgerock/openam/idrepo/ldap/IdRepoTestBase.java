@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -34,6 +34,7 @@ import org.forgerock.audit.events.AuditEventBuilder;
 import org.forgerock.guice.core.GuiceModuleLoader;
 import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.AuditEventPublisherImpl;
 import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.opendj.ldap.Connection;
@@ -95,7 +96,7 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
                     return mock(SMSAuditor.class);
                 }
             });
-            bind(AuditEventPublisher.class).toInstance(mock(AuditEventPublisher.class));
+            bind(AuditEventPublisher.class).toInstance(mock(AuditEventPublisherImpl.class));
             bind(AuditEventBuilder.class).toInstance(mock(AuditEventBuilder.class));
             bind(AuditServiceProvider.class).toInstance(mock(AuditServiceProvider.class));
         }

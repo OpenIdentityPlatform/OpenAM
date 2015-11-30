@@ -14,11 +14,12 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.soap.audit;
+package org.forgerock.openam.audit.servlet;
+
+import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-import java.io.IOException;
 
 /**
  * {@link HttpServletResponse} decorator used for capturing response status and message.
@@ -30,18 +31,38 @@ public class AuditableHttpServletResponse extends HttpServletResponseWrapper {
     private int statusCode = SC_OK;
     private String message = "";
 
+    /**
+     * Constructs a new AuditableHttpServletResponse.
+     *
+     * @param response The {@code HttpServletResponse} to audit.
+     */
     public AuditableHttpServletResponse(HttpServletResponse response) {
         super(response);
     }
 
+    /**
+     * Determines if the response is successful.
+     *
+     * @return {@code true} if the response is successful, {@code false} otherwise.
+     */
     public boolean hasSuccessStatusCode() {
         return statusCode < SC_BAD_REQUEST;
     }
 
+    /**
+     * Gets the HTTP response status code.
+     *
+     * @return The response HTTP status code.
+     */
     public int getStatusCode() {
         return statusCode;
     }
 
+    /**
+     * Gets the HTTP response message.
+     *
+     * @return The response message.
+     */
     public String getMessage() {
         return message;
     }

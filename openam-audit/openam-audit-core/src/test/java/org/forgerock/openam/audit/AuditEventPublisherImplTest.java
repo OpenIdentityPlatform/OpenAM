@@ -53,7 +53,7 @@ import java.util.UUID;
  * @since 13.0.0
  */
 @SuppressWarnings("unchecked")
-public class AuditEventPublisherTest {
+public class AuditEventPublisherImplTest {
 
     private static final String FAILURE_SUPPRESSED_REALM = "realm1";
     private static final String FAILURE_NOT_SUPPRESSED_REALM = "realm2";
@@ -70,7 +70,7 @@ public class AuditEventPublisherTest {
         when(mockHandler.getHandledTopics()).thenReturn(asSet("access"));
         when(mockHandler.isEnabled()).thenReturn(true);
         auditServiceProvider = mock(AuditServiceProvider.class);
-        auditEventPublisher = new AuditEventPublisher(auditServiceProvider);
+        auditEventPublisher = new AuditEventPublisherImpl(auditServiceProvider);
         auditEventCaptor = ArgumentCaptor.forClass(JsonValue.class);
         dummyPromise = newResultPromise(newResourceResponse("", "", json(object())));
     }
