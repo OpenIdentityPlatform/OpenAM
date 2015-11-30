@@ -179,7 +179,11 @@ public class AuthServiceListener implements ServiceListener{
             + orgName + "Service = "+serviceName+ " Change type = "+ type);
         }
         if (type != ADDED) {
-            serviceAttributeCache.remove(serviceName + "," + orgName);
+            int componentSlash = serviceComponent.lastIndexOf('/');
+            if (componentSlash != -1) {
+                String componentName = serviceComponent.substring(componentSlash + 1);
+                serviceAttributeCache.remove(componentName + "," + orgName);
+            }
         }
     }
 }
