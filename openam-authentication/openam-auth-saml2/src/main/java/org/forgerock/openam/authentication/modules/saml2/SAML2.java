@@ -20,7 +20,6 @@ import static org.forgerock.openam.authentication.modules.saml2.Constants.*;
 
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.client.AuthClientUtils;
-import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.AuthenticationException;
@@ -58,6 +57,7 @@ import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import com.sun.identity.sm.DNMapper;
 import java.security.Principal;
@@ -75,10 +75,12 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.SAML2Store;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.xui.XUIState;
 
 /**
  * SAML2 Authentication Module, acting from the SP's POV. Will redirect to a SAML2 IdP for authentication, then
@@ -397,27 +399,29 @@ public class SAML2 extends AMLoginModule {
      */
     private void setCookiesForRedirects(final HttpServletRequest request, final HttpServletResponse response) {
         final Set<String> domains = AuthClientUtils.getCookieDomains();
-        final String authCookieName = AuthUtils.getAuthCookieName();
+        final StringBuilder originalUrl = new StringBuilder();
+        final XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
+        final String requestedQuery = request.getQueryString();
 
-        String requestedQuery = request.getQueryString();
-        String requestedURI = request.getRequestURI();
-
-        if (requestedQuery != null) {
-            if (requestedQuery.endsWith(authCookieName + "=")) {
-                requestedQuery = requestedQuery.substring(0, requestedQuery.length() - authCookieName.length() - 1);
-            }
-            requestedURI += "?" + requestedQuery;
+        if (xuiState.isXUIEnabled()) {
+            originalUrl.append(request.getContextPath());
+        } else {
+            originalUrl.append(request.getRequestURI());
         }
 
-        // forces us back to XUI, not directly to endpoint
-        if (requestedURI.contains("/json/authenticate")) {
-            requestedURI = requestedURI.replace("/json/authenticate", "");
+        if (StringUtils.isNotEmpty(realm)) {
+            originalUrl.append("?realm=").append(URLEncDec.encode(realm));
+        }
+
+        if (requestedQuery != null) {
+            originalUrl.append(originalUrl.indexOf("?") == -1 ? '?' : '&');
+            originalUrl.append(requestedQuery);
         }
 
         // Set the return URL Cookie
         for (String domain : domains) {
             CookieUtils.addCookieToResponse(response,
-                    CookieUtils.newCookie(Constants.AM_LOCATION_COOKIE, requestedURI, "/", domain));
+                    CookieUtils.newCookie(Constants.AM_LOCATION_COOKIE, originalUrl.toString(), "/", domain));
         }
     }
 
