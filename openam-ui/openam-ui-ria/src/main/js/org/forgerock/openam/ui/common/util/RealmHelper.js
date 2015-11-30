@@ -143,5 +143,23 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
         return subRealm;
     };
 
+    /**
+     * Encode a realm's path.
+     * @param  {String} path - realm path
+     * @returns {String} Encoded realm path e.g. /myRealm/Realm%232
+     */
+    obj.encodeRealm = function (path) {
+        var encodedPath = [],
+            realmPath = path.split("/");
+
+        _.each(realmPath, function (pathFragment) {
+            if (pathFragment !== "") {
+                encodedPath.push(encodeURIComponent(pathFragment));
+            }
+        });
+
+        return "/" + encodedPath.join("/");
+    };
+
     return obj;
 });

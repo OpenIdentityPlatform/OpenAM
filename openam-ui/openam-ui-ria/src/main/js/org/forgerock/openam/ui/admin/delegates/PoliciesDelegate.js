@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json"),
         getCurrentAdministeredRealm = function () {
             var realm = AdministeredRealmsHelper.getCurrentRealm();
-            return realm === "/" ? "" : realm;
+            return realm === "/" ? "" : RealmHelper.encodeRealm(realm);
         };
 
     obj.getApplicationType = function (type) {

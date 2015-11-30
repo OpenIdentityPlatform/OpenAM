@@ -19,16 +19,21 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils"
-], function ($, _, AbstractDelegate, Constants, SMSDelegateUtils) {
+    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function ($, _, AbstractDelegate, Constants, SMSDelegateUtils, RealmHelper) {
     /**
      * @exports org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate
      */
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json"),
         scopedByRealm = function (realm, path) {
-            if (realm === "/") { realm = ""; }
+            var encodedRealm = "";
 
-            return realm + "/realm-config/" + path;
+            if (realm !== "/") {
+                encodedRealm = RealmHelper.encodeRealm(realm);
+            }
+
+            return encodedRealm + "/realm-config/" + path;
         };
 
     obj.authentication = {

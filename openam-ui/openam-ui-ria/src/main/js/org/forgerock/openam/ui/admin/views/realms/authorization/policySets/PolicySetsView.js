@@ -31,10 +31,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate"
+    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Configuration,
              EventManager, Router, Constants, BackgridUtils, URLHelper, PolicySetModel, AbstractListView,
-             PoliciesDelegate) {
+             PoliciesDelegate, RealmHelper) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/authorization/policySets/PolicySetsTemplate.html",
         // Used in AbstractListView
@@ -194,7 +195,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         },
 
         exportPolicies: function () {
-            var realm = this.realmPath === "/" ? "" : this.realmPath;
+            var realm = this.realmPath === "/" ? "" : RealmHelper.encodeRealm(this.realmPath);
             this.$el.find("#exportPolicies").attr("href",
                 Constants.host + "/" + Constants.context + "/xacml" + realm + "/policies");
         },

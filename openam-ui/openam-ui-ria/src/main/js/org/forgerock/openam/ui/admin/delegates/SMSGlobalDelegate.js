@@ -107,11 +107,11 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
 
         /**
          * Gets a realm's schema together with it's values.
-         * @param  {String} path Unescaped realm path (must have leading slash). e.g. "/myrealm"
+         * @param  {String} path Encoded realm path (must have leading slash). e.g. "/myrealm"
          * @returns {Promise.<Object>} Service promise
          */
         get: function (path) {
-            return schemaWithValues("realms" + path);
+            return schemaWithValues("realms" + RealmHelper.encodeRealm(path));
         },
 
         /**
@@ -124,12 +124,12 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
 
         /**
          * Removes a realm.
-         * @param  {String} path Unescaped realm path (must have leading slash). e.g. "/myrealm"
+         * @param  {String} path Encoded realm path (must have leading slash). e.g. "/myrealm"
          * @returns {Promise} Service promise
          */
         remove: function (path) {
             return obj.serviceCall({
-                url: "realms" + path,
+                url: "realms" + RealmHelper.encodeRealm(path),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE",
                 suppressEvents: true
@@ -143,7 +143,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
          */
         update: function (data) {
             return obj.serviceCall({
-                url: "realms" + getRealmPath(data),
+                url: "realms" + RealmHelper.encodeRealm(getRealmPath(data)),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data)

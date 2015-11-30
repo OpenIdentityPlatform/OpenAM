@@ -17,13 +17,15 @@
 define("org/forgerock/openam/ui/common/util/URLHelper", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function (Configuration, AdministeredRealmsHelper, Constants) {
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function (Configuration, AdministeredRealmsHelper, Constants, RealmHelper) {
     return {
         substitute: function (url) {
             return function () {
                 var realm = AdministeredRealmsHelper.getCurrentRealm(),
-                    apiUrlBase = Constants.host + "/" + Constants.context + "/json" + (realm !== "/" ? realm : "");
+                    apiUrlBase = Constants.host + "/" + Constants.context + "/json" +
+                        (realm !== "/" ? RealmHelper.encodeRealm(realm) : "");
 
                 return url.replace("__api__", apiUrlBase)
                     .replace("__host__", Constants.host)
