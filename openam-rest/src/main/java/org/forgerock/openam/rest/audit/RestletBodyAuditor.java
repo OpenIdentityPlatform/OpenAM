@@ -101,7 +101,8 @@ public abstract class RestletBodyAuditor<T> implements Function<Representation, 
             @Override
             public JsonValue apply(Representation representation) throws AuditException {
                 try {
-                    if(((JacksonRepresentation) representation).getObject() instanceof Map) {
+                    if(!representation.isEmpty()
+                            && ((JacksonRepresentation) representation).getObject() instanceof Map) {
                         return extractValues((Map<String, Object>) ((JacksonRepresentation) representation).getObject());
                     }
                     return json(object());
