@@ -15,10 +15,14 @@
  */
 package org.forgerock.openam.audit.configuration;
 
+import static com.sun.identity.shared.Constants.AM_AUTH_COOKIE_NAME;
+import static com.sun.identity.shared.Constants.AM_COOKIE_NAME;
 import static com.sun.identity.shared.datastruct.CollectionHelper.*;
 import static com.sun.identity.sm.SMSUtils.*;
 import static java.util.Collections.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.audit.AuditConstants.SERVICE_NAME;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -33,6 +37,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.audit.events.EventTopicsMetaData;
 import org.forgerock.audit.events.EventTopicsMetaDataBuilder;
+import org.forgerock.audit.filter.FilterPolicy;
 import org.forgerock.openam.audit.AMAuditService;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -42,6 +47,7 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -215,11 +221,27 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
             blacklistedEventNames.add(EventName.AM_ACCESS_ATTEMPT.toString());
         }
 
-        return new AMAuditServiceConfiguration(
+        AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration(
                 getBooleanMapAttr(attributes, "auditEnabled", false),
                 getBooleanMapAttr(attributes, "suppressAuditFailure", true),
                 getBooleanMapAttr(attributes, "resolveHostNameEnabled", false),
                 blacklistedEventNames);
+
+        Set<String> filterPolicies = new HashSet<>();
+        for (String policy : attributes.get("fieldFilterPolicy")) {
+            if (isNotEmpty(policy)) {
+                policy = policy.replaceAll("%AM_COOKIE_NAME%", SystemProperties.get(AM_COOKIE_NAME));
+                policy = policy.replaceAll("%AM_AUTH_COOKIE_NAME%", SystemProperties.get(AM_AUTH_COOKIE_NAME));
+                filterPolicies.add(policy);
+            }
+        }
+        Map<String, FilterPolicy> filterPolicyMap = new HashMap<>();
+        FilterPolicy fieldFP = new FilterPolicy();
+        fieldFP.setExcludeIf(filterPolicies);
+        filterPolicyMap.put("field", fieldFP);
+        configuration.setFilterPolicies(filterPolicyMap);
+
+        return configuration;
     }
 
     private Set<AuditEventHandlerConfiguration> getEventHandlerConfigurations(ServiceConfig serviceConfig) {

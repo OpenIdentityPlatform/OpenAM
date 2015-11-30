@@ -23,10 +23,10 @@ import static org.forgerock.openam.utils.ClientUtils.*;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -170,7 +170,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
 
     @SuppressWarnings("unchecked")
     private Map<String, List<String>> getHeadersAsMap(HttpServletRequest request) {
-        Map<String, List<String>> headers = new HashMap<>();
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         for (Enumeration<String> e = request.getHeaderNames(); e.hasMoreElements();) {
             String name = e.nextElement();
             headers.put(name, list(request.getHeaders(name)));
@@ -179,7 +179,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
     }
 
     private Map<String, List<String>> getHeadersAsMap(Headers requestHeaders) {
-        Map<String, List<String>> headers = new HashMap<>();
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         for (Map.Entry<String, Header> header : requestHeaders.asMapOfHeaders().entrySet()) {
             headers.put(header.getKey(), new ArrayList<>(header.getValue().getValues()));
         }

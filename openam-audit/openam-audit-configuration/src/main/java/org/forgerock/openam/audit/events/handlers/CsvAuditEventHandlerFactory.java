@@ -93,7 +93,7 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
         csvHandlerConfiguration.getFileRetention().setMaxNumberOfHistoryFiles(maxNumberOfHistoryFiles);
         long maxDiskSpaceToUse = getLongMapAttr(attributes, "retentionMaxDiskSpaceToUse", -1L, debug);
         csvHandlerConfiguration.getFileRetention().setMaxDiskSpaceToUse(maxDiskSpaceToUse);
-        int minFreeSpaceRequired = getIntMapAttr(attributes, "retentionMinFreeSpaceRequired", -1, debug);
+        long minFreeSpaceRequired = getLongMapAttr(attributes, "retentionMinFreeSpaceRequired", -1L, debug);
         csvHandlerConfiguration.getFileRetention().setMinFreeSpaceRequired(minFreeSpaceRequired);
     }
 }

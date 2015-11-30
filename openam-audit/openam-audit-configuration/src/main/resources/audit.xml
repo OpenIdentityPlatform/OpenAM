@@ -53,6 +53,13 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="fieldFilterPolicy" i18nKey="a004">
+                    <DefaultValues>
+                        <DefaultValuesClassName
+                                className="org.forgerock.openam.audit.configuration.EventFilterDefaultValues">
+                        </DefaultValuesClassName>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="commonAudit">
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
@@ -308,6 +315,13 @@
                     </BooleanValues>
                     <DefaultValues>
                         <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="fieldFilterPolicy" i18nKey="a004">
+                    <DefaultValues>
+                        <DefaultValuesClassName
+                                className="org.forgerock.openam.audit.configuration.EventFilterDefaultValues">
+                        </DefaultValuesClassName>
                     </DefaultValues>
                 </AttributeSchema>
 
