@@ -19,9 +19,15 @@ import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
+import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.Header;
+import org.restlet.engine.adapter.HttpRequest;
+import org.restlet.engine.adapter.ServerCall;
+import org.restlet.engine.header.HeaderConstants;
+import org.restlet.util.Series;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -51,6 +57,26 @@ public class RestletHeaderAccessTokenVerifierTest {
 
         // Then
         assertThat(result.isValid()).isFalse();
+    }
+
+    @Test
+    public void shouldCheckHttpHeader() throws Exception {
+        // Given
+        ServerCall serverCall = mock(ServerCall.class);
+        HttpRequest request = mock(HttpRequest.class);
+        OAuth2Request req = new RestletOAuth2Request(request);
+        when(request.getHttpCall()).thenReturn(serverCall);
+
+        Series<Header> requestHeaders = new Series<Header>(Header.class);
+        requestHeaders.add(new Header(HeaderConstants.HEADER_AUTHORIZATION, "Bearer freddy"));
+        when(request.getHttpCall().getRequestHeaders()).thenReturn(requestHeaders);
+
+        // When
+        AccessTokenVerifier.TokenState result = verifier.verify(req);
+
+        // Then
+        assertThat(result.isValid()).isFalse();
+        verify(tokenStore).readAccessToken(req, "freddy");
     }
 
     @Test
