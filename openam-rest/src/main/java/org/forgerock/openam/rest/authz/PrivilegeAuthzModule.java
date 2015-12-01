@@ -18,19 +18,14 @@ package org.forgerock.openam.rest.authz;
 
 import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.sso.SSOException;
-import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationException;
-import com.sun.identity.delegation.DelegationPermission;
-import com.sun.identity.delegation.DelegationPermissionFactory;
+import javax.inject.Inject;
+
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.services.context.Context;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -41,12 +36,24 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.utils.RealmUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
+
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.delegation.DelegationPermission;
+import com.sun.identity.delegation.DelegationPermissionFactory;
 
 /**
  * This authorisation module ties the calling subject back into the delegation privilege framework to
@@ -71,14 +78,19 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
     private final DelegationEvaluator evaluator;
     private final Map<String, PrivilegeDefinition> actionToDefinition;
     private final DelegationPermissionFactory permissionFactory;
+    private final SessionCache sessionCache;
+    private final CoreWrapper coreWrapper;
 
     @Inject
     public PrivilegeAuthzModule(final DelegationEvaluator evaluator,
-                                final Map<String, PrivilegeDefinition> actionToDefinition,
-                                final DelegationPermissionFactory permissionFactory) {
+            final Map<String, PrivilegeDefinition> actionToDefinition,
+            final DelegationPermissionFactory permissionFactory,
+            SessionCache sessionCache, CoreWrapper coreWrapper) {
         this.evaluator = evaluator;
         this.actionToDefinition = actionToDefinition;
         this.permissionFactory = permissionFactory;
+        this.sessionCache = sessionCache;
+        this.coreWrapper = coreWrapper;
     }
 
     @Override
@@ -161,19 +173,26 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
         final Set<String> actions = transformSet(definition.getActions(), ACTION_TO_STRING_MAPPER);
 
         try {
+            final SessionID sessionID = new SessionID(subjectContext.getCallerSSOToken().getTokenID().toString());
+            final String loggedInRealm =
+                    coreWrapper.convertOrgNameToRealmName(sessionCache.getSession(sessionID).getClientDomain());
+
             final DelegationPermission permissionRequest = permissionFactory.newInstance(
-                    realm, REST, VERSION, routerContext.getMatchedUri(),
+                    loggedInRealm, REST, VERSION, routerContext.getMatchedUri(),
                     definition.getCommonVerb(), actions, Collections.<String, String>emptyMap());
 
+            boolean isLoggedIntoRealmOrParentRealm = (realm.equalsIgnoreCase(loggedInRealm)
+                    || RealmUtils.isParentRealm(loggedInRealm, realm));
+
             if (evaluator.isAllowed(subjectContext.getCallerSSOToken(), permissionRequest,
-                    Collections.<String, Set<String>>emptyMap())) {
+                    Collections.<String, Set<String>>emptyMap()) && isLoggedIntoRealmOrParentRealm) {
 
                 // Authorisation has been approved.
                 return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             }
         } catch (DelegationException dE) {
             return new InternalServerErrorException("Attempt to authorise the user has failed", dE).asPromise();
-        } catch (SSOException ssoE) {
+        } catch (SSOException | SessionException e) {
             //you don't have a user so return access denied
             return Promises.newResultPromise(AuthorizationResult.accessDenied("No user supplied in request."));
         }

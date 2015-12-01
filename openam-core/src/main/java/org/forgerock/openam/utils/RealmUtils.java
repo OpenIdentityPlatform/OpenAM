@@ -64,6 +64,23 @@ public final class RealmUtils {
     }
 
     /**
+     * Returns parent realm from a given fully qualified realm.
+     *
+     * @param path Fully qualified realm.
+     * @return parent realm.
+     */
+    public static boolean isParentRealm(String parentPath, String path) {
+        parentPath = normalizeRealm(parentPath).toLowerCase();
+        path = normalizeRealm(path).toLowerCase();
+
+        if (path.startsWith(parentPath)) {
+            path = path.substring(parentPath.length());
+            return path.startsWith("/");
+        }
+        return false;
+    }
+
+    /**
      * Returns child realm from a given fully qualified realm.
      *
      * @param path Fully qualified realm.
