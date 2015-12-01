@@ -136,9 +136,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                 logger.debug("Couldn't get user info - continuing to display consent page without claims.", e);
             }
 
-            final String clientName = clientRegistration.getDisplayName(locale);
+            String clientName = clientRegistration.getDisplayName(locale);
             if (clientName == null) {
-                throw failureFactory.getException(request, "Display name has not been set.");
+                clientName = clientRegistration.getClientId();
+                logger.warn("Client does not have a display name or client name set. using client ID {} for display",
+                        clientName);
             }
             final String displayDescription = clientRegistration.getDisplayDescription(locale);
             final String clientDescription = displayDescription == null ? "" : displayDescription;
