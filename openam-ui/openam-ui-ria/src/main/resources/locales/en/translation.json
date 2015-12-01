@@ -338,7 +338,7 @@
                 "atLeastOneNumber" : "At least one number",
                 "atLeast8Characters" : "At least 8 characters",
                 "cannotMatchLogin" : "Cannot match login",
-                "confirmationMatchesPassword" : "Confirmation matches password",
+                "confirmationMatchesPassword" : "Confirmation must match password",
                 "usernameExists" : "Username already exists",
                 "emailAddressAlreadyExists" : "Email address already exists",
                 "onlyAlphabeticCharacters" : "Only alphabetic characters",
