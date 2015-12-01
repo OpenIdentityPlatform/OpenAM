@@ -30,8 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import javax.inject.Inject;
+import java.util.TreeSet;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -42,10 +41,10 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 
+import org.forgerock.guava.common.base.Joiner;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.RealmNormaliser;
@@ -97,6 +96,8 @@ public class SmsRealmProvider implements RequestHandler {
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
     private RealmNormaliser realmNormaliser;
+    private final static Set<String> BLACKLIST_CHARACTERS = CollectionUtils.asSet("$", "&", "+", ",", "/", ":", ";",
+            "=", "?", "@", " ", "#", "%");
 
     public SmsRealmProvider(SessionCache sessionCache,
                             CoreWrapper coreWrapper,
@@ -190,6 +191,15 @@ public class SmsRealmProvider implements RequestHandler {
         ))));
     }
 
+    private boolean containsBlacklistedCharacters(String realmName) {
+        for (String blacklistCharacter : BLACKLIST_CHARACTERS) {
+            if (realmName.contains(blacklistCharacter)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,
             CreateRequest createRequest) {
@@ -202,8 +212,8 @@ public class SmsRealmProvider implements RequestHandler {
                 throw new BadRequestException("No realm name provided");
             }
 
-            if (realmName.contains("/")) {
-                throw new BadRequestException("Realm names cannot contain '/'");
+            if (containsBlacklistedCharacters(realmName)) {
+                throw new BadRequestException("Realm names cannot contain: " + BLACKLIST_CHARACTERS.toString());
             }
 
             RealmContext realmContext = serverContext.asContext(RealmContext.class);
