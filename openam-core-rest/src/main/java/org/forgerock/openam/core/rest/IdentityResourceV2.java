@@ -1386,7 +1386,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             IdentityDetails checkIdent = identityServices.read(dtls.getName(),
                     getIdentityServicesAttributes(realm, objectType), token);
             // handle updated resource
-            resource = newResourceResponse(resourceId, "0", identityDetailsToJsonValue(checkIdent));
+            resource = newResourceResponse(resourceId, "0", this.addRoleInformation(context, resourceId, identityDetailsToJsonValue(checkIdent)));
             return newResultPromise(resource);
         } catch (final ObjectNotFound onf) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE resourceId={} : Could not find the " +
