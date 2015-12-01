@@ -104,6 +104,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
         return obj.serviceCall({
             serviceUrl: Constants.host + "/" + Constants.context,
             url: RealmHelper.decorateURLWithOverrideRealm("/xacml" + getCurrentAdministeredRealm() + "/policies"),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: data
         });

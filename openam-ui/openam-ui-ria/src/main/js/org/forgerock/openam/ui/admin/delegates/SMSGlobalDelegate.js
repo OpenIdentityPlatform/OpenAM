@@ -30,10 +30,12 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
             return $.when(
                 obj.serviceCall({
                     url: url + "?_action=schema",
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
                 }),
                 obj.serviceCall({
-                    url: url
+                    url: url,
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 })
             ).then(function (schemaData, valuesData) {
                 return {
@@ -44,8 +46,16 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
         },
         schemaWithDefaults = function (url) {
             return $.when(
-                obj.serviceCall({ url: url + "?_action=schema", type: "POST" }),
-                obj.serviceCall({ url: url + "?_action=template", type: "POST" })
+                obj.serviceCall({
+                    url: url + "?_action=schema",
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "POST"
+                }),
+                obj.serviceCall({
+                    url: url + "?_action=template",
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "POST"
+                })
             ).then(function (schemaData, templateData) {
                 return {
                     schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
@@ -70,7 +80,8 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
          */
         all: function () {
             return obj.serviceCall({
-                url: "realms?_queryFilter=true"
+                url: "realms?_queryFilter=true",
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).done(function (data) {
                 data.result = _.each(data.result, function (realm) {
                     realm.path = getRealmPath(realm);
@@ -88,6 +99,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
         create: function (data) {
             return obj.serviceCall({
                 url: "realms?_action=create",
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify(data)
             });
@@ -116,7 +128,12 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
          * @returns {Promise} Service promise
          */
         remove: function (path) {
-            return obj.serviceCall({ url: "realms" + path, type: "DELETE", suppressEvents: true });
+            return obj.serviceCall({
+                url: "realms" + path,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "DELETE",
+                suppressEvents: true
+            });
         },
 
         /**
@@ -127,6 +144,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
         update: function (data) {
             return obj.serviceCall({
                 url: "realms" + getRealmPath(data),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data)
             });
@@ -142,7 +160,9 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
              */
             schema: function (type) {
                 return obj.serviceCall({
-                    url: "authentication/modules/" + type + "?_action=schema", type: "POST"
+                    url: "authentication/modules/" + type + "?_action=schema",
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "POST"
                 }).then(function (data) {
                     return SMSDelegateUtils.sanitizeSchema(data);
                 });
@@ -157,7 +177,8 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
          */
         getAllContexts: function () {
             return obj.serviceCall({
-                url: RealmHelper.decorateURLWithOverrideRealm("services/scripting/contexts?_queryFilter=true")
+                url: RealmHelper.decorateURLWithOverrideRealm("services/scripting/contexts?_queryFilter=true"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             });
         },
 
@@ -167,7 +188,8 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
          */
         getDefaultGlobalContext: function () {
             return obj.serviceCall({
-                url: RealmHelper.decorateURLWithOverrideRealm("services/scripting")
+                url: RealmHelper.decorateURLWithOverrideRealm("services/scripting"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             });
         },
 
@@ -178,6 +200,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
         getSchema: function () {
             return obj.serviceCall({
                 url: RealmHelper.decorateURLWithOverrideRealm("services/scripting?_action=schema"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             });
         },
@@ -189,6 +212,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
         getContextSchema: function () {
             return obj.serviceCall({
                 url: RealmHelper.decorateURLWithOverrideRealm("services/scripting/contexts?_action=schema"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             });
         }

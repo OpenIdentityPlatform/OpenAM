@@ -41,6 +41,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                         // password changes have to occur via a special rest call
                         return ServiceInvoker.restCall({
                             url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id + "?_action=changePassword"),
+                            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             type: "POST",
                             data: JSON.stringify({
                                 username: this.get("id"),
@@ -64,7 +65,8 @@ define("org/forgerock/openam/ui/user/UserModel", [
                                 ),
                                 "url": RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
                                 "headers": {
-                                    "If-Match": this.getMVCCRev()
+                                    "If-Match": this.getMVCCRev(),
+                                    "Accept-API-Version": "protocol=1.0,resource=2.0"
                                 }
                             },
                             options
@@ -75,6 +77,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     return ServiceInvoker.restCall(_.extend(
                         {
                             "url" : RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                            "headers": { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             "type": "GET"
                         },
                         options
@@ -125,6 +128,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
             getProfile: function () {
                 return ServiceInvoker.restCall({
                     url: RealmHelper.decorateURIWithRealm(baseUrl + "?_action=idFromSession"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                     type: "POST",
                     errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
                 }).then(

@@ -26,7 +26,8 @@ define("org/forgerock/openam/ui/common/delegates/ServerDelegate", [
 
     obj.version = function () {
         return obj.serviceCall({
-            url: "/version"
+            url: "/version",
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then(function (data) {
             return data.version + " " + $.t("common.form.build") + " " + data.revision + "(" + data.date + ")";
         });

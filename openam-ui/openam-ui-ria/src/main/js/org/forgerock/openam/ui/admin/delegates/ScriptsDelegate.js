@@ -33,6 +33,7 @@ define("org/forgerock/openam/ui/admin/delegates/ScriptsDelegate", [
     obj.validateScript = function (data) {
         return obj.serviceCall({
             url: RealmHelper.decorateURLWithOverrideRealm("/scripts/?_action=validate"),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify(data),
             error: getLocalizedResponse
