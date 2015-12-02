@@ -31,10 +31,11 @@ define("org/forgerock/openam/ui/user/UserModel", [
 
             sync: function (method, model, options) {
                 var clearPassword = _.bind(function () {
-                    delete this.currentPassword;
-                    this.unset("password");
-                    return this;
-                }, this);
+                        delete this.currentPassword;
+                        this.unset("password");
+                        return this;
+                    }, this),
+                    currentPassword;
 
                 if (method === "update" || method === "patch") {
                     if (_.has(this.changed, "password")) {
@@ -52,6 +53,8 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     } else {
                         // overridden implementation for AM, due to the failures which would result
                         // if unchanged attributes are included along with the request
+                        currentPassword = this.currentPassword;
+                        delete this.currentPassword;
                         return ServiceInvoker.restCall(_.extend(
                             {
                                 "type": "PUT",
@@ -66,7 +69,8 @@ define("org/forgerock/openam/ui/user/UserModel", [
                                 "url": RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
                                 "headers": {
                                     "If-Match": this.getMVCCRev(),
-                                    "Accept-API-Version": "protocol=1.0,resource=2.0"
+                                    "Accept-API-Version": "protocol=1.0,resource=2.0",
+                                    "currentpassword": currentPassword
                                 }
                             },
                             options
