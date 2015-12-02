@@ -176,7 +176,6 @@ public class SAML2PostAuthenticationPlugin implements AMPostAuthProcessInterface
      * Clears the session of all the temp data we passed to set up SLO.
      */
     private void clearSession(SSOToken ssoToken) throws SSOException {
-        ssoToken.setProperty(SAML2Constants.SINGLE_LOGOUT, "");
         ssoToken.setProperty(SAML2Constants.RELAY_STATE, "");
         ssoToken.setProperty(SAML2Constants.SESSION_INDEX, "");
         ssoToken.setProperty(SAML2Constants.IDPENTITYID, "");
@@ -200,14 +199,11 @@ public class SAML2PostAuthenticationPlugin implements AMPostAuthProcessInterface
         try {
             final String ssOutEnabled = ssoToken.getProperty(SAML2Constants.SINGLE_LOGOUT);
             if (Boolean.parseBoolean(ssOutEnabled)) {
-                if (request != null) { //classic ui
-                    request.setAttribute(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL,
-                            ssoToken.getProperty(SLO_SESSION_LOCATION) + ssoToken.getProperty(SLO_SESSION_REFERENCE));
-                } else { //xui
-                    ssoToken.setProperty(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL,
-                            ssoToken.getProperty(SLO_SESSION_LOCATION)
-                                    + ESAPI.encoder().encodeForURL(ssoToken.getProperty(SLO_SESSION_REFERENCE)));
-                }
+                request.setAttribute(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL,
+                        ssoToken.getProperty(SLO_SESSION_LOCATION) + ssoToken.getProperty(SLO_SESSION_REFERENCE));
+                ssoToken.setProperty(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL,
+                        ssoToken.getProperty(SLO_SESSION_LOCATION)
+                                + ESAPI.encoder().encodeForURL(ssoToken.getProperty(SLO_SESSION_REFERENCE)));
             }
         } catch (EncodingException | SSOException e) {
             //debug warning and fall through
