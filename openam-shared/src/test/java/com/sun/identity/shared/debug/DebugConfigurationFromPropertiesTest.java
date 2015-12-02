@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug;
 
@@ -39,7 +39,8 @@ public class DebugConfigurationFromPropertiesTest {
         Assert.assertEquals(debugConfigurationFromProperties.getDebugSuffix(), "-MM.dd.yyyy-HH.mm");
         Assert.assertEquals(debugConfigurationFromProperties.getRotationInterval(), -1, "Debug rotation should be " +
                 "empty");
-
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), -1, "Debug file size " +
+                "rotation should be empty");
     }
 
     @Test
@@ -50,18 +51,41 @@ public class DebugConfigurationFromPropertiesTest {
         Assert.assertTrue(debugConfigurationFromProperties.getDebugSuffix().isEmpty(), "Debug suffix should be empty");
         Assert.assertEquals(debugConfigurationFromProperties.getRotationInterval(), -1, "Debug rotation should be " +
                 "empty");
-
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), -1, "Debug file size " +
+                "rotation should be empty");
     }
 
     @Test
-    public void rotationConfig() throws Exception {
+    public void timeRotationConfig() throws Exception {
         DebugConfigurationFromProperties debugConfigurationFromProperties = new DebugConfigurationFromProperties
-                (DEBUG_CONFIG_DIRECTORY + "valid/rotationconfig.properties");
+                (DEBUG_CONFIG_DIRECTORY + "valid/timeRotationConfig.properties");
         Assert.assertTrue(debugConfigurationFromProperties.getDebugPrefix().isEmpty(), "Debug prefix should be empty");
         Assert.assertEquals(debugConfigurationFromProperties.getDebugSuffix(), "-MM.dd.yyyy-HH.mm");
         Assert.assertEquals(debugConfigurationFromProperties.getRotationInterval(), 3);
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), -1, "Debug file size " +
+                "rotation should be empty");
     }
 
+    @Test
+    public void sizeRotationConfig() throws Exception {
+        DebugConfigurationFromProperties debugConfigurationFromProperties = new DebugConfigurationFromProperties
+                (DEBUG_CONFIG_DIRECTORY + "valid/sizeRotationConfig.properties");
+        Assert.assertTrue(debugConfigurationFromProperties.getDebugPrefix().isEmpty(), "Debug prefix should be empty");
+        Assert.assertEquals(debugConfigurationFromProperties.getDebugSuffix(), "-MM.dd.yyyy-HH.mm.ss.SSS");
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationInterval(), -1, "Debug rotation should be " +
+                "empty");
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), 2 << 20);
+    }
+
+    @Test
+    public void sizeAndTimeRotationConfig() throws Exception {
+        DebugConfigurationFromProperties debugConfigurationFromProperties = new DebugConfigurationFromProperties
+                (DEBUG_CONFIG_DIRECTORY + "valid/sizeAndTimeRotationConfig.properties");
+        Assert.assertTrue(debugConfigurationFromProperties.getDebugPrefix().isEmpty(), "Debug prefix should be empty");
+        Assert.assertEquals(debugConfigurationFromProperties.getDebugSuffix(), "-MM.dd.yyyy-HH.mm.ss.SSS");
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationInterval(), 3);
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), 2 << 20);
+    }
      /*
      * Invalid configuration
      */
@@ -74,19 +98,36 @@ public class DebugConfigurationFromPropertiesTest {
 
     @Test(expectedExceptions = InvalidDebugConfigurationException.class)
     public void negativeRotation() throws Exception {
-        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/negativeRotation.properties");
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/negativeTimeRotation.properties");
     }
 
     @Test(expectedExceptions = InvalidDebugConfigurationException.class)
     public void rotationNotCompatibleWithSuffix() throws Exception {
-        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/rotationNotCompatibleWithSuffix" +
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/rotatioTimenNotCompatibleWithSuffix" +
                 ".properties");
     }
 
     @Test(expectedExceptions = InvalidDebugConfigurationException.class)
     public void suffixEmptyAndRotationEnabled() throws Exception {
-        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/suffixEmptyAndRotationEnabled" +
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/suffixEmptyAndRotationTimeEnabled" +
                 ".properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    public void negativeSizeRotation() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/negativeSizeRotation.properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    public void suffixEmptyAndSizeRotationEnable() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/suffixEmptyAndSizeRotationEnable" +
+                ".properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    public void suffixNotCompatibleWithFileSizeRotationEnable() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/suffixNotCompatibleWithFileSize" +
+                "RotationEnable.properties");
     }
 
 }

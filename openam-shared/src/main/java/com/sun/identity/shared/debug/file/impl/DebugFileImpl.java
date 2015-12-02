@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.file.impl;
 
@@ -78,6 +78,8 @@ public class DebugFileImpl implements DebugFile {
     private final AtomicReference<String> debugDirectory = new AtomicReference<>();
 
     private final ReadWriteLock fileLock = new ReentrantReadWriteLock();
+
+    private File currentFile;
 
     /**
      * Constructor
@@ -134,7 +136,7 @@ public class DebugFileImpl implements DebugFile {
             initialize();
         }
 
-        if (needsRotate()) {
+        if (needsTimeRotation() || needsSizeRotation()) {
             rotate();
         }
 
@@ -165,7 +167,8 @@ public class DebugFileImpl implements DebugFile {
      */
     private void close() {
         IOUtils.closeIfNotNull(debugWriter);
-        debugWriter = null;
+        this.debugWriter = null;
+        this.currentFile = null;
     }
 
     /**
@@ -186,7 +189,8 @@ public class DebugFileImpl implements DebugFile {
         newFileName.append(fileName);
 
         //Set suffix
-        if (suffixDateFormat != null && configuration.getRotationInterval() > 0) {
+        if (suffixDateFormat != null &&
+                (configuration.getRotationInterval() > 0 || configuration.getRotationFileSizeInByte() > 0)) {
             synchronized (suffixDateFormat) {
                 newFileName.append(suffixDateFormat.format(new Date(fileCreationTime)));
             }
@@ -210,8 +214,12 @@ public class DebugFileImpl implements DebugFile {
 
             // remember when we rotated last
             fileCreationTime = clock.now();
-            // Is rounded to the lower minute
-            fileCreationTime -= fileCreationTime % (1000 * 60);
+
+            //only if the size rotation is off
+            if (configuration.getRotationFileSizeInByte() == -1) {
+                // Is rounded to the lower minute
+                fileCreationTime -= fileCreationTime % (1000 * 60);
+            }
 
             nextRotation = fileCreationTime + configuration.getRotationInterval() * 60 * 1000;
             boolean directoryAvailable = false;
@@ -237,6 +245,8 @@ public class DebugFileImpl implements DebugFile {
             String debugFilePath = debugDirectory.get() + File.separator + wrapFilename(debugName);
 
             try {
+                this.currentFile = new File(debugFilePath);
+                this.debugWriter = new PrintWriter(new FileWriter(currentFile, true), true);
                 debugWriter = new PrintWriter(new FileWriter(debugFilePath, true), true);
             } catch (IOException ioex) {
                 close();
@@ -250,16 +260,30 @@ public class DebugFileImpl implements DebugFile {
     }
 
     /**
-     * Check if a log rotation is needed
+     * Check if a log rotation is needed depending on the file size
      *
-     * @return true if the log file need to be rotate
+     * @return true if the log file need to be rotated
      */
-    private boolean needsRotate() {
+    private boolean needsSizeRotation() {
+        if (currentFile == null) {
+            return false;
+        }
+
+        return configuration.getRotationFileSizeInByte() != -1
+                && currentFile.length() >= configuration.getRotationFileSizeInByte();
+    }
+
+    /*
+     * Check if a log rotation is needed depending on the time interval
+     *
+     * @return true if the log file need to be rotated
+     */
+    private boolean needsTimeRotation() {
         return configuration.getRotationInterval() > 0 && nextRotation <= clock.now();
     }
 
     private synchronized void rotate() throws IOException {
-        if (needsRotate()) {
+        if (needsTimeRotation() || needsSizeRotation()) {
             initialize();
         }
     }

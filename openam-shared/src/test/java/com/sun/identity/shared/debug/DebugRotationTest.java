@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug;
 
@@ -21,17 +21,55 @@ import com.sun.identity.shared.timeservice.AccelerateTimeService;
 import org.forgerock.util.time.TimeService;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 public class DebugRotationTest extends DebugTestTemplate {
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
 
     @Test
+    public void sizeRotation() throws Exception {
+        String DEBUG_CONFIG_FOR_TEST = "/debug_config_test/debugconfigSizeRotation.properties";
+
+        initializeProperties();
+        initializeProvider(DEBUG_CONFIG_FOR_TEST);
+
+        long minimumBytesRequestedForTest = 5 << 20;
+        String fakeMessage = "A fake message that has to be long enough ! ForgeRock !";
+        int fakeMessageSize = fakeMessage.length();
+        long minimumBytesPrinted  = 0l;
+        String debugName = "debugTestForSizeRotation";
+        IDebug debugTest = provider.getInstance(debugName);
+
+        while (minimumBytesPrinted < minimumBytesRequestedForTest) {
+            debugTest.message(fakeMessage, null);
+            minimumBytesPrinted += fakeMessageSize;
+        }
+        checkLogFileSize(debugName, 2);
+    }
+
+    public void checkLogFileSize(String debugName, int maxMb) {
+        double espilon = 0.1;
+        File folder = new File(debugDirectory);
+        File[] listOfFiles = folder.listFiles();
+        assertFalse(listOfFiles.length == 0, "No logs file were generated");
+        for (File file : listOfFiles) {
+            if (file.getName().matches(".*" + debugName + ".*")) {
+                int megabytes = (int)((file.length()) >>> 20);
+                assertTrue(megabytes - espilon < maxMb, "File '" + file.getName() + "' is over the size limit : '"
+                        + maxMb+ "' < '" + megabytes + "'");
+            }
+        }
+    }
+
     public void rotationInNormalDate() throws Exception {
         Calendar calRandomDate = Calendar.getInstance();
         calRandomDate.set(Calendar.YEAR, 1989);
@@ -87,6 +125,7 @@ public class DebugRotationTest extends DebugTestTemplate {
     }
 
     private void rotation(long fakeInitTime) throws Exception {
+
         String DEBUG_CONFIG_FOR_TEST = "/debug_config_test/debugconfigRotation.properties";
 
         DebugConfigurationFromProperties debugConfigurationFromProperties =

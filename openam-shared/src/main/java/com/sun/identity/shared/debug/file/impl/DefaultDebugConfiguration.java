@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.file.impl;
 
@@ -48,6 +48,11 @@ public class DefaultDebugConfiguration implements DebugConfiguration {
 
     @Override
     public int getRotationInterval() {
+        return -1;
+    }
+
+    @Override
+    public long getRotationFileSizeInByte() {
         return -1;
     }
 }

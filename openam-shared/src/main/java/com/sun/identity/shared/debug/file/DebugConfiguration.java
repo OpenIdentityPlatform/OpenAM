@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.file;
 
@@ -43,5 +43,13 @@ public interface DebugConfiguration {
      * @return the number of minutes before rotating a file. If <= 0, the rotation is disable.
      */
     public int getRotationInterval();
+
+
+    /**
+     * get size rotation in byte
+     *
+     * @return the maximum file size in byte. If <= 0, the rotation is disable.
+     */
+    public long getRotationFileSizeInByte();
 
 }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug;
 
@@ -36,6 +36,8 @@ public final class DebugConstants {
     public static final String CONFIG_DEBUG_LOGFILE_SUFFIX = "org.forgerock.openam.debug.suffix";
 
     public static final String CONFIG_DEBUG_LOGFILE_ROTATION = "org.forgerock.openam.debug.rotation";
+
+    public static final String CONFIG_DEBUG_LOGFILE_MAX_SIZE = "org.forgerock.openam.debug.rotation.maxsize";
 
     public static final String DEFAULT_DEBUG_SUFFIX_FORMAT = "-MM.dd.yyyy-kk.mm";
 
