@@ -15,22 +15,11 @@
  */
 package org.forgerock.openam.core.rest.sms;
 
-import static com.sun.identity.sm.SMSException.STATUS_NO_PERMISSION;
+import static com.sun.identity.sm.SMSException.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.rest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.rest.RestUtils.hasPermission;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
+import static org.forgerock.openam.rest.RestUtils.*;
+import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -43,12 +32,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-
-import org.forgerock.guava.common.base.Joiner;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.utils.RealmNormaliser;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -71,12 +54,25 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.RealmUtils;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 public class SmsRealmProvider implements RequestHandler {
     private static final Debug debug = Debug.getInstance("frRest");
@@ -96,8 +92,11 @@ public class SmsRealmProvider implements RequestHandler {
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
     private RealmNormaliser realmNormaliser;
-    private final static Set<String> BLACKLIST_CHARACTERS = CollectionUtils.asSet("$", "&", "+", ",", "/", ":", ";",
-            "=", "?", "@", " ", "#", "%");
+
+    // This blacklist also includes characters which upset LDAP.
+    private final static Set<String> BLACKLIST_CHARACTERS = CollectionUtils.asSet(
+            "$", "&", "+", ",", "/", ":", ";", "=",
+            "?", "@", " ", "#", "%", "<", ">", "\"", "\\");
 
     public SmsRealmProvider(SessionCache sessionCache,
                             CoreWrapper coreWrapper,
