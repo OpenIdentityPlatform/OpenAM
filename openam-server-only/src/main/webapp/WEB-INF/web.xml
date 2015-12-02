@@ -151,6 +151,60 @@
 
     <!-- filter declaration -->
 
+    <!-- Access audit filter for JATO, Debug.jsp and ssoadm.jsp pages -->
+    <filter>
+        <filter-name>JatoAuditFilter</filter-name>
+        <filter-class>org.forgerock.openam.audit.servlet.AuditAccessServletFilter</filter-class>
+        <init-param>
+            <param-name>auditing-component</param-name>
+            <param-value>JATO</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/service/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/federation/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/realm/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/agentconfig/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/sts/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/delegation/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/idm/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/Debug.jsp</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>SsoAdmJspAuditFilter</filter-name>
+        <filter-class>org.forgerock.openam.audit.servlet.AuditAccessServletFilter</filter-class>
+        <init-param>
+            <param-name>auditing-component</param-name>
+            <param-value>SSOADM</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>SsoAdmJspAuditFilter</filter-name>
+        <url-pattern>/ssoadm.jsp</url-pattern>
+    </filter-mapping>
+
     <filter-mapping>
         <filter-name>AuditContextFilter</filter-name>
         <url-pattern>/*</url-pattern>

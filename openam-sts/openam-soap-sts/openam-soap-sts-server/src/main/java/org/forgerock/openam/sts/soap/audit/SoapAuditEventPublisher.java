@@ -27,6 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditConstants.EventName;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionWrapper;
@@ -112,7 +114,7 @@ public final class SoapAuditEventPublisher implements AuditEventPublisher {
     }
 
     @Override
-    public boolean isAuditing(String realm, String topic) {
+    public boolean isAuditing(String realm, String topic, EventName eventName) {
         return true;
     }
 

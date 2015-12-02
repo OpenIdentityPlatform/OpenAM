@@ -118,7 +118,10 @@ public final class AuditConstants {
         /** RADIUS server component. */
         RADIUS("Radius"),
         /** SSOADM CLI component. */
-        SSOADM("ssoadm");
+        SSOADM("ssoadm"),
+        /** Jato audit event component. */
+        JATO("jato");
+
         private final String name;
 
         Component(String name) {
