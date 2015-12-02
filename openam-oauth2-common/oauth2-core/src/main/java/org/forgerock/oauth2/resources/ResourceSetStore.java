@@ -19,6 +19,7 @@ package org.forgerock.oauth2.resources;
 import java.util.Set;
 
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ResourceSetFilter;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -46,7 +47,20 @@ public interface ResourceSetStore {
      * Reads a {@code ResourceSetDescription} out of the store using its OpenAM Unique ID.
      *
      * @param resourceSetId The resource set ID.
-     * @param resourceOwnerId The ID of the resource owner
+     * @param filter A filter to apply to the read elements.
+     * @return The {@code ResourceSetDescription}.
+     * @throws NotFoundException If the resource set is not found.
+     * @throws ServerException When the resource set description cannot be loaded.
+     */
+    ResourceSetDescription read(String resourceSetId, ResourceSetFilter filter)
+            throws NotFoundException, ServerException;
+
+    /**
+     * Reads a {@code ResourceSetDescription} out of the store using its OpenAM Unique ID.
+     * Only returns a set which is owned by the specified resource owner.
+     *
+     * @param resourceSetId The resource set ID.
+     * @param resourceOwnerId The ID of the resource owner.
      * @return The {@code ResourceSetDescription}.
      * @throws NotFoundException If the resource set is not found.
      * @throws ServerException When the resource set description cannot be loaded.

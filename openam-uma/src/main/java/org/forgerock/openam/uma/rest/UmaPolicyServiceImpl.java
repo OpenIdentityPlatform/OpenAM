@@ -65,6 +65,8 @@ import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.PolicySearch;
 import org.forgerock.openam.uma.ResharingMode;
+import org.forgerock.openam.uma.ResourceSetAcceptAllFilter;
+import org.forgerock.openam.uma.ResourceSetSharedFilter;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyQueryFilterVisitor;
@@ -642,9 +644,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
                         try {
                             Collection<UmaPolicy> umaPolicies = new HashSet<>();
-                            String resourceOwnerId = getResourceOwnerId(context);
                             for (Map.Entry<String, Set<ResourceResponse>> entry : policyMapping.entrySet()) {
-                                ResourceSetDescription resourceSet = getResourceSetDescription(entry.getKey(), resourceOwnerId, context);
+                                ResourceSetDescription resourceSet = getResourceSetDescription(entry.getKey(), context);
                                 UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, entry.getValue());
                                 resolveUIDToUsername(umaPolicy.asJson());
                                 umaPolicies.add(umaPolicy);
@@ -862,11 +863,11 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
     }
 
-    private ResourceSetDescription getResourceSetDescription(String resourceSetId, String resourceOwnerId,
-            Context context) throws ResourceException {
+    private ResourceSetDescription getResourceSetDescription(String resourceSetId, Context context)
+            throws ResourceException {
         try {
             String realm = getRealm(context);
-            return resourceSetStoreFactory.create(realm).read(resourceSetId, resourceOwnerId);
+            return resourceSetStoreFactory.create(realm).read(resourceSetId, ResourceSetAcceptAllFilter.INSTANCE);
         } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new BadRequestException("Invalid ResourceSet UID");
         } catch (ServerException e) {

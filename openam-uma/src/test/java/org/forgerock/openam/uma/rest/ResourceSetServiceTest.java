@@ -35,6 +35,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 
+import org.forgerock.openam.uma.ResourceSetSharedFilter;
 import org.forgerock.services.context.RootContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -97,7 +98,8 @@ public class ResourceSetServiceTest {
         boolean augmentWithPolicy = false;
         ResourceSetDescription resourceSetDescription = mock(ResourceSetDescription.class);
 
-        given(resourceSetStore.read(resourceSetId, resourceOwnerId)).willReturn(resourceSetDescription);
+        given(resourceSetStore.read(eq(resourceSetId), any(ResourceSetSharedFilter.class)))
+                .willReturn(resourceSetDescription);
 
         //When
         ResourceSetDescription resourceSet = service.getResourceSet(context, realm, resourceSetId, resourceOwnerId,
@@ -123,7 +125,8 @@ public class ResourceSetServiceTest {
         Promise<UmaPolicy, ResourceException> policyPromise = Promises.newResultPromise(policy);
         JsonValue policyJson = mock(JsonValue.class);
 
-        given(resourceSetStore.read(resourceSetId, resourceOwnerId)).willReturn(resourceSetDescription);
+        given(resourceSetStore.read(eq(resourceSetId), any(ResourceSetSharedFilter.class)))
+                .willReturn(resourceSetDescription);
         given(policyService.readPolicy(context, resourceSetId)).willReturn(policyPromise);
         given(policy.asJson()).willReturn(policyJson);
 
@@ -212,10 +215,7 @@ public class ResourceSetServiceTest {
         query.setResourceSetQuery(resourceSetQuery);
         queriedResourceSets.add(resourceSetOne);
         queriedResourceSets.add(resourceSetTwo);
-        given(resourceSetStore.query(QueryFilter.and(
-                resourceSetQuery,
-                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
-                .willReturn(queriedResourceSets);
+        given(resourceSetStore.query(resourceSetQuery)).willReturn(queriedResourceSets);
 
         Collection<UmaPolicy> queriedPolicies = new HashSet<UmaPolicy>();
         Pair<QueryResponse, Collection<UmaPolicy>> queriedPoliciesPair = Pair.of(newQueryResponse(), queriedPolicies);
@@ -341,10 +341,7 @@ public class ResourceSetServiceTest {
         given(policyOne.getId()).willReturn("RS_ID_ONE");
         given(policyTwo.getId()).willReturn("RS_ID_THREE");
         given(policyTwo.getResourceSet()).willReturn(resourceSetTwo);
-        given(resourceSetStore.query(QueryFilter.and(
-                resourceSetQuery,
-                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
-                .willReturn(queriedResourceSets);
+        given(resourceSetStore.query(resourceSetQuery)).willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
         given(resourceSetStore.read("RS_ID_THREE", resourceOwnerId)).willReturn(resourceSetThree);
@@ -402,10 +399,7 @@ public class ResourceSetServiceTest {
         given(policyOne.getResourceSet()).willReturn(resourceSetOne);
         given(policyTwo.getId()).willReturn("RS_ID_THREE");
         given(policyTwo.getResourceSet()).willReturn(resourceSetTwo);
-        given(resourceSetStore.query(QueryFilter.and(
-                resourceSetQuery,
-                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
-                .willReturn(queriedResourceSets);
+        given(resourceSetStore.query(resourceSetQuery)).willReturn(queriedResourceSets);
 
         mockPolicyEvaluator("RS_CLIENT_ID");
 
@@ -548,10 +542,7 @@ public class ResourceSetServiceTest {
         given(policyThree.getId()).willReturn("RS_ID_THREE");
         given(policyThree.asJson()).willReturn(policyThreeJson);
         given(policyThree.getResourceSet()).willReturn(resourceSetThree);
-        given(resourceSetStore.query(QueryFilter.and(
-                resourceSetQuery,
-                equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
-                .willReturn(queriedResourceSets);
+        given(resourceSetStore.query(resourceSetQuery)).willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
         given(resourceSetStore.read("RS_ID_THREE", resourceOwnerId)).willReturn(resourceSetThree);

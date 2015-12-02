@@ -17,13 +17,14 @@
 package org.forgerock.openam.oauth2.resources;
 
 import javax.inject.Inject;
-import java.util.Iterator;
+
 import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ResourceSetFilter;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -80,16 +81,24 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     }
 
     @Override
-    public ResourceSetDescription read(String resourceSetId, String resourceOwnerId) throws NotFoundException,
+    public ResourceSetDescription read(String resourceSetId, ResourceSetFilter filter) throws NotFoundException,
             ServerException {
-        Set<ResourceSetDescription> resourceSets = query(QueryFilter.and(
-                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId),
-                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, resourceOwnerId)));
-        if (resourceSets.isEmpty()) {
-            throw new NotFoundException("Resource set does not exist with id " + resourceSetId);
-        } else {
+        Set<ResourceSetDescription> resourceSets =
+                query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+
+        if(filter != null) {
+            resourceSets = filter.filter(resourceSets);
+        }
+        if(!resourceSets.isEmpty()) {
             return resourceSets.iterator().next();
         }
+
+        throw new NotFoundException("Resource set does not exist with id " + resourceSetId);
+    }
+
+    @Override
+    public ResourceSetDescription read(String resourceSetId, String resourceOwnerId) throws NotFoundException, ServerException {
+        return read(resourceSetId, new ResourceSetOwnerFilter(resourceOwnerId));
     }
 
     @Override

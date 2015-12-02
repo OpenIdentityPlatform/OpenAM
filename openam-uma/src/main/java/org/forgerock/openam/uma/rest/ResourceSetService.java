@@ -38,6 +38,9 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.idm.AMIdentity;
+
+import org.forgerock.openam.entitlement.rest.model.json.ResourceSet;
+import org.forgerock.openam.uma.ResourceSetSharedFilter;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -123,6 +126,7 @@ public class ResourceSetService {
         return new Subject(false, principals, Collections.emptySet(), Collections.emptySet());
     }
 
+
     private Promise<Collection<ResourceSetDescription>, ResourceException> getPolicies(final Context context,
             QueryRequest policyQuery, final String resourceOwnerId, final Set<ResourceSetDescription> resourceSets,
             final boolean augmentWithPolicies, final ResourceSetWithPolicyQuery query) {
@@ -151,6 +155,7 @@ public class ResourceSetService {
                                 }
                             }
 
+                            //what does this do? - it filters it
                             filteredResourceSets.addAll(query.getResourceSetQuery().accept(RESOURCE_SET_QUERY_EVALUATOR,
                                     resourceSets));
 
@@ -160,6 +165,44 @@ public class ResourceSetService {
                         }
                     }
                 });
+    }
+
+    /**
+     * Filters the policies based on the provided query.
+     * @param resourceSets The ResourceSets to filter.
+     * @param query The filter to use.
+     * @return The ResourceSets that match the query.
+     */
+    public Collection<ResourceSetDescription> filterPolicies(Set<ResourceSetDescription> resourceSets,
+                                                             ResourceSetWithPolicyQuery query) {
+        Collection<ResourceSetDescription> filteredResourceSets = new HashSet<>();
+        filteredResourceSets.addAll(query.getResourceSetQuery().accept(RESOURCE_SET_QUERY_EVALUATOR,
+                resourceSets));
+        return filteredResourceSets;
+    }
+
+    /**
+     * Checks whether a ResourceSet is accessible by a user.
+     * @param resourceSet The resource set to check.
+     * @param resourceUserId The id of the user to check.
+     * @param realm The realm to check in.
+     * @return @code{true} if the user can access that ResourceSet.
+     */
+    public boolean isSharedWith(ResourceSetDescription resourceSet, String resourceUserId, String realm) {
+        Subject subject = createSubject(resourceUserId, realm);
+        try {
+            Evaluator evaluator = umaProviderSettingsFactory.get(realm).getPolicyEvaluator(subject);
+            String sharedResourceName = resourceSet.getName();
+            List<Entitlement> entitlements = evaluator.evaluate(realm, subject,
+                    sharedResourceName, null, false);
+
+            if (!entitlements.isEmpty()) {
+                return true;
+            }
+        } catch (EntitlementException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -194,9 +237,8 @@ public class ResourceSetService {
             final boolean augmentWithPolicies) {
         final Set<ResourceSetDescription> resourceSets;
         try {
-            resourceSets = resourceSetStoreFactory.create(realm).query(and(
-                    query.getResourceSetQuery(),
-                    equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, resourceOwnerId)));
+            resourceSets = new ResourceSetSharedFilter(this, resourceOwnerId, realm)
+                    .filter(resourceSetStoreFactory.create(realm).query(query.getResourceSetQuery()));
         } catch (ServerException e) {
             return new InternalServerErrorException(e).asPromise();
         }
@@ -209,6 +251,8 @@ public class ResourceSetService {
                     @Override
                     public Promise<Collection<ResourceSetDescription>, ResourceException> apply(
                             final Collection<ResourceSetDescription> filteredResourceSets) {
+                        //if using the getSharedResources function, combine results here? avoids obfuscated merging behaviour
+
                         Promise<Collection<ResourceSetDescription>, ResourceException> resourceSetsPromise;
                         if (query.getPolicyQuery() != null) {
                             QueryRequest policyQuery = newQueryRequest("").setQueryFilter(query.getPolicyQuery());
@@ -301,7 +345,7 @@ public class ResourceSetService {
                                                                               String resourceOwnerId) {
         try {
             ResourceSetDescription resourceSet = resourceSetStoreFactory.create(realm)
-                    .read(resourceSetId, resourceOwnerId);
+                    .read(resourceSetId, new ResourceSetSharedFilter(this, resourceOwnerId, realm));
             return Promises.newResultPromise(resourceSet);
         } catch (NotFoundException e) {
             return new org.forgerock.json.resource.NotFoundException("No resource set with id, " + resourceSetId

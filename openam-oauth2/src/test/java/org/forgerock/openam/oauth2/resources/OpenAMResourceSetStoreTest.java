@@ -116,14 +116,13 @@ public class OpenAMResourceSetStoreTest {
 
         given(dataStore.query(
                 QueryFilter.and(
-                        QueryFilter.and(
-                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
-                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID")),
+                        QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
                         QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
                 .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
-        ResourceSetDescription readResourceSetDescription = store.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID");
+        ResourceSetDescription readResourceSetDescription =
+                store.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID");
 
         //Then
         assertThat(readResourceSetDescription).isEqualTo(readResourceSetDescription);
@@ -153,10 +152,8 @@ public class OpenAMResourceSetStoreTest {
         resourceSetDescription.setRealm("REALM");
         given(dataStore.query(
                 QueryFilter.and(
-                        QueryFilter.and(
-                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
-                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID")),
-                                QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
+                        QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
+                        QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
                 .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
@@ -182,16 +179,15 @@ public class OpenAMResourceSetStoreTest {
     public void shouldDeleteResourceSetToken() throws Exception {
 
         //Given
-        ResourceSetDescription resourceSetDescription = new ResourceSetDescription();
+        ResourceSetDescription resourceSetDescription =
+                new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID", "RESOURCE_OWNER_ID",
+                        Collections.<String, Object>emptyMap());
 
-        resourceSetDescription.setId("RESOURCE_SET_ID");
-        resourceSetDescription.setResourceOwnerId("RESOURCE_OWNER_ID");
         resourceSetDescription.setRealm("REALM");
+
         given(dataStore.query(
                 QueryFilter.and(
-                        QueryFilter.and(
-                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
-                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID")),
+                        QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
                         QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
                 .willReturn(Collections.singleton(resourceSetDescription));
 

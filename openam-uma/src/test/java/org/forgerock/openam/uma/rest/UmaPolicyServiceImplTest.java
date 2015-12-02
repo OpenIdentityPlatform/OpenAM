@@ -44,6 +44,7 @@ import javax.security.auth.Subject;
 
 import com.sun.identity.shared.Constants;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.uma.ResourceSetAcceptAllFilter;
 import org.forgerock.openam.uma.extensions.ResourceDelegationFilter;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
@@ -142,6 +143,8 @@ public class UmaPolicyServiceImplTest {
 
         given(resourceSetStoreFactory.create(anyString())).willReturn(resourceSetStore);
         given(resourceSetStore.read("RESOURCE_SET_ID", RESOURCE_OWNER_ID)).willReturn(resourceSet);
+        given(resourceSetStore.read(eq("RESOURCE_SET_ID"),
+                any(ResourceSetAcceptAllFilter.class))).willReturn(resourceSet);
         given(resourceSetStore.query(QueryFilter.and(
                 QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"))))
                 .willReturn(Collections.singleton(resourceSet));
