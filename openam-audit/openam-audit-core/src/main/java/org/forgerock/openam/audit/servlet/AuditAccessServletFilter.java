@@ -37,7 +37,7 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 /**
- * Servlet filter responsible for auditing access to the SOAP STS.
+ * Servlet filter responsible for auditing access to generic HTTP endpoints.
  *
  * @since 13.0.0
  */
@@ -56,19 +56,19 @@ public class AuditAccessServletFilter implements Filter {
 
         AuditableHttpServletResponse auditableResponse =
                 new AuditableHttpServletResponse((HttpServletResponse) response);
-        Auditor auditor = Singleton.getAuditorFactory().create((HttpServletRequest) request, auditableResponse);
+        Auditor auditor = Singleton.getAuditorFactory().create((HttpServletRequest) request, auditableResponse,
+                component);
 
         try {
-            Singleton.getAuditEventPublisher().publish(AuditConstants.ACCESS_TOPIC,
-                    auditor.auditAccessAttempt(component));
+            Singleton.getAuditEventPublisher().publish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessAttempt());
             try {
                 chain.doFilter(request, auditableResponse);
             } finally {
                 Singleton.getAuditEventPublisher().tryPublish(AuditConstants.ACCESS_TOPIC,
-                        auditor.auditAccessOutcome(component));
+                        auditor.auditAccessOutcome());
             }
         } catch (AuditException e) {
-            getLogger().error("Failed to publish audit event: {}", e.getMessage(), e);
+            Singleton.getLogger().error("Failed to publish audit event: {}", e.getMessage(), e);
         }
     }
 
@@ -77,35 +77,16 @@ public class AuditAccessServletFilter implements Filter {
         // do nothing
     }
 
-    /**
-     * Gets the instance of the provider {@literal key}.
-     *
-     * @param key The key that defines the class to get.
-     * @param <T> The type of class defined by the key.
-     * @return A non-null instance of the class defined by the key.
-     */
-    protected <T> T getInstance(Key<T> key) {
-        return InjectorHolder.getInstance(key);
-    }
-
-    /**
-     * Gets the {@code Logger} instance.
-     *
-     * @return The logger.
-     */
-    protected Logger getLogger() {
-        return getInstance(Key.get(Logger.class, Names.named("frRest")));
-    }
-
     private enum Singleton {
         INSTANCE;
 
         private AuditorFactory auditorFactory;
         private AuditEventPublisher auditEventPublisher;
+        private Logger logger;
 
         Singleton() {
-            this.auditorFactory = getInstance(Key.get(AuditorFactory.class));
-            this.auditEventPublisher = getInstance(Key.get(AuditEventPublisher.class));
+            this.auditorFactory = InjectorHolder.getInstance(Key.get(AuditorFactory.class));
+            this.auditEventPublisher = InjectorHolder.getInstance(Key.get(AuditEventPublisher.class));
         }
 
         private static AuditorFactory getAuditorFactory() {
@@ -116,8 +97,11 @@ public class AuditAccessServletFilter implements Filter {
             return INSTANCE.auditEventPublisher;
         }
 
-        private <T> T getInstance(Key<T> key) {
-            return InjectorHolder.getInstance(key);
+        private static Logger getLogger() {
+            if (INSTANCE.logger == null) {
+                INSTANCE.logger = InjectorHolder.getInstance(Key.get(Logger.class, Names.named("frRest")));
+            }
+            return INSTANCE.logger;
         }
     }
 }

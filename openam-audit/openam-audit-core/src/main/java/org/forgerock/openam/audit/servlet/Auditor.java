@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
-import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.util.time.TimeService;
 
@@ -46,6 +46,7 @@ public class Auditor {
     private final TimeService timeService;
     private final HttpServletRequest request;
     private final AuditableHttpServletResponse response;
+    private final Component component;
     private final long startTime;
 
     /**
@@ -54,23 +55,24 @@ public class Auditor {
      * @param timeService A {@code TimeService} instance.
      * @param request The {@code HttpServletRequest}.
      * @param response The {@code HttpServletResponse}.
+     * @param component The component.
      */
     @Inject
     public Auditor(TimeService timeService, @Assisted HttpServletRequest request,
-            @Assisted AuditableHttpServletResponse response) {
+            @Assisted AuditableHttpServletResponse response, @Assisted Component component) {
         this.timeService = timeService;
         this.request = request;
         this.response = response;
+        this.component = component;
         this.startTime = timeService.now();
     }
 
     /**
      * Creates an audit event that captures details of an attempted HTTP call.
      *
-     * @param component The component.
      * @return An AuditEvent.
      */
-    public AuditEvent auditAccessAttempt(AuditConstants.Component component) {
+    public AuditEvent auditAccessAttempt() {
         return accessEvent()
                 .forHttpServletRequest(request)
                 .timestamp(startTime)
@@ -83,24 +85,22 @@ public class Auditor {
     /**
      * Creates an audit event that captures details of the outcome from a HTTP call.
      *
-     * @param component The component.
      * @return An AuditEvent.
      */
-    public AuditEvent auditAccessOutcome(AuditConstants.Component component) {
+    public AuditEvent auditAccessOutcome() {
         if (response.hasSuccessStatusCode()) {
-            return auditAccessSuccess(component);
+            return auditAccessSuccess();
         } else {
-            return auditAccessFailure(component);
+            return auditAccessFailure();
         }
     }
 
     /**
      * Creates an audit event that captures details of a successfully completed HTTP call.
      *
-     * @param component The component.
      * @return An AuditEvent.
      */
-    public AuditEvent auditAccessSuccess(AuditConstants.Component component) {
+    public AuditEvent auditAccessSuccess() {
         long endTime = timeService.now();
         long elapsedTime = endTime - startTime;
         return accessEvent()
@@ -116,10 +116,9 @@ public class Auditor {
     /**
      * Creates an audit event that captures details of an unsuccessfully completed HTTP call.
      *
-     * @param component The component.
      * @return An AuditEvent.
      */
-    public AuditEvent auditAccessFailure(AuditConstants.Component component) {
+    public AuditEvent auditAccessFailure() {
         long endTime = timeService.now();
         long elapsedTime = endTime - startTime;
         String statusCode = Integer.toString(response.getStatusCode());

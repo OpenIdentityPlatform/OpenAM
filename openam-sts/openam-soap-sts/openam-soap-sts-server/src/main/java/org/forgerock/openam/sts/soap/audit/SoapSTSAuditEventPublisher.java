@@ -41,7 +41,7 @@ import org.slf4j.Logger;
  *
  * @since 13.0.0
  */
-public final class SoapAuditEventPublisher implements AuditEventPublisher {
+public final class SoapSTSAuditEventPublisher implements AuditEventPublisher {
 
     private final String openamAuditServiceVersion;
     private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
@@ -51,7 +51,7 @@ public final class SoapAuditEventPublisher implements AuditEventPublisher {
     private final Logger logger;
 
     @Inject
-    SoapAuditEventPublisher(
+    SoapSTSAuditEventPublisher(
             HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
             @Named(AMSTSConstants.REST_CREATE_ACCESS_AUDIT_EVENT_URL) String openamAuditServiceUrl,
             @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,

@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
  */
 public class AuditableHttpServletResponse extends HttpServletResponseWrapper {
 
+    private static final int LOWEST_ERROR_CODE = SC_BAD_REQUEST;
     private int statusCode = SC_OK;
     private String message = "";
 
@@ -46,7 +47,7 @@ public class AuditableHttpServletResponse extends HttpServletResponseWrapper {
      * @return {@code true} if the response is successful, {@code false} otherwise.
      */
     public boolean hasSuccessStatusCode() {
-        return statusCode < SC_BAD_REQUEST;
+        return statusCode < LOWEST_ERROR_CODE;
     }
 
     /**

@@ -63,14 +63,14 @@ public final class AuditAccessFilter implements Filter {
 
         AuditableHttpServletResponse auditableResponse =
                 new AuditableHttpServletResponse((HttpServletResponse) response);
-        Auditor auditor = auditorFactory.create((HttpServletRequest) request, auditableResponse);
+        Auditor auditor = auditorFactory.create((HttpServletRequest) request, auditableResponse, STS);
 
         try {
-            auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessAttempt(STS));
+            auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessAttempt());
             try {
                 chain.doFilter(request, auditableResponse);
             } finally {
-                auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessOutcome(STS));
+                auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessOutcome());
             }
         } catch (AuditException e) {
             logger.error("Failed to publish audit event: {}", e.getMessage(), e);

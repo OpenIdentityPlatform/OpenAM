@@ -43,14 +43,14 @@ public class AuditEventPublisherTest {
 
     private SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
     private HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
-    private SoapAuditEventPublisher auditEventPublisher;
+    private SoapSTSAuditEventPublisher auditEventPublisher;
 
     @BeforeMethod
     protected void setUp() {
         soapSTSAccessTokenProvider = mock(SoapSTSAccessTokenProvider.class);
         httpURLConnectionWrapperFactory = mock(HttpURLConnectionWrapperFactory.class);
 
-        auditEventPublisher = new SoapAuditEventPublisher(
+        auditEventPublisher = new SoapSTSAuditEventPublisher(
                 httpURLConnectionWrapperFactory,
                 "http://openam.example.com:8080/openam/json/audit/access/?_action=create",
                 "iPlanetDirectoryPro",

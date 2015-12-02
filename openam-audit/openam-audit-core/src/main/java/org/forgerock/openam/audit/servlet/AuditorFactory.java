@@ -18,6 +18,8 @@ package org.forgerock.openam.audit.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.openam.audit.AuditConstants.Component;
+
 /**
  * Factory interface for Guice assisted injection of {@link Auditor}.
  *
@@ -30,7 +32,8 @@ public interface AuditorFactory {
      *
      * @param request HttpServletRequest.
      * @param response Queryable decorator over the HttpServletResponse.
+     * @param component The component.
      * @return new Auditor instance.
      */
-    Auditor create(HttpServletRequest request, AuditableHttpServletResponse response);
+    Auditor create(HttpServletRequest request, AuditableHttpServletResponse response, Component component);
 }

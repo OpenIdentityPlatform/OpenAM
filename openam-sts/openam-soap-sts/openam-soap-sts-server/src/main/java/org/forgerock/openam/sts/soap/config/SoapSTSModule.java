@@ -36,7 +36,7 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
-import org.forgerock.openam.sts.soap.audit.SoapAuditEventPublisher;
+import org.forgerock.openam.sts.soap.audit.SoapSTSAuditEventPublisher;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProviderImpl;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentConfigAccess;
@@ -148,7 +148,7 @@ public class SoapSTSModule extends PrivateModule {
         bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class).in(Scopes.SINGLETON);
         expose(PrincipalFromSession.class);
 
-        bind(AuditEventPublisher.class).to(SoapAuditEventPublisher.class);
+        bind(AuditEventPublisher.class).to(SoapSTSAuditEventPublisher.class);
 
         bind(TimeService.class).toInstance(TimeService.SYSTEM);
         expose(TimeService.class);
