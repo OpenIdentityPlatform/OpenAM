@@ -171,9 +171,9 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      * @return The builder.
      */
     public final AMAccessAuditEventBuilder response(AccessAuditEventBuilder.ResponseStatus status, String statusCode) {
-        JsonValue object = json(object(
+        Object object = object(
                 field("status", status == null ? null : status.toString()),
-                field("statusCode", statusCode)));
+                field("statusCode", statusCode));
         this.jsonValue.put("response", object);
         return this;
     }
@@ -188,10 +188,10 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
     public final AMAccessAuditEventBuilder responseWithDetail(AccessAuditEventBuilder.ResponseStatus status,
             String statusCode, JsonValue detail) {
         Reject.ifNull(detail);
-        JsonValue object = json(object(
+        Object object = object(
                 field("status", status == null ? null : status.toString()),
                 field("statusCode", statusCode),
-                field("detail", detail.getObject())));
+                field("detail", detail.getObject()));
         this.jsonValue.put("response", object);
         return this;
     }
