@@ -1251,7 +1251,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         final String realm = realmContext.getResolvedRealm();
 
         IdentityDetails dtls;
-        ResourceResponse resource;
 
         try {
             SSOToken admin = getSSOToken(getCookieFromServerContext(context));
@@ -1259,8 +1258,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.readInstance :: READ of resourceId={} in realm={} performed by " +
                     "principalName={}", resourceId, realm, principalName);
-            resource = newResourceResponse(resourceId, "0", addRoleInformation(context, resourceId, identityDetailsToJsonValue(dtls)));
-            return newResultPromise(resource);
+            return newResultPromise(buildResourceResponse(resourceId, context, dtls));
         } catch (final NeedMoreCredentials needMoreCredentials) {
             debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : User does not have enough " +
                             "privileges.", resourceId,  needMoreCredentials);
@@ -1286,6 +1284,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
+    protected ResourceResponse buildResourceResponse(String resourceId, Context context, IdentityDetails identityDetails) {
+    	return newResourceResponse(resourceId, "0", addRoleInformation(context, resourceId, identityDetailsToJsonValue(identityDetails)));
+    }
+    
     /*
      * package private for visibility to IdentityResourceV2.
      */
