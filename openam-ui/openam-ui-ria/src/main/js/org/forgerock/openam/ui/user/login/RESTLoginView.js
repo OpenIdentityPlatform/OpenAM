@@ -458,5 +458,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         return uri + RealmHelper.getSubRealm();
     });
 
+    Handlebars.registerHelper("gotoParameter", function () {
+        return _.has(Configuration, "globalData.auth.urlParams.goto")
+            ? "&goto=" + encodeURIComponent(Configuration.globalData.auth.urlParams.goto)
+            : "";
+    });
+
     return new LoginView();
 });
