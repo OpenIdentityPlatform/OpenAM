@@ -99,8 +99,12 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
                 for (String claim : scopeClaims) {
                     Object claimValue = claimValues.get(claim);
                     if (claimValue != null) {
+                        String claimDescription = claimDescriptions.get(claim);
+                        if (claimDescription == null) {
+                            claimDescription = claim;
+                        }
                         claims.put(
-                                encodeForHTML(claimDescriptions.get(claim)),
+                                encodeForHTML(claimDescription),
                                 encodeForHTML(claimValue.toString()));
                         allScopeClaims.add(claim);
                     }
