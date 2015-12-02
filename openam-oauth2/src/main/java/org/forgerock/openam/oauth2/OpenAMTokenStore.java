@@ -442,24 +442,21 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * {@inheritDoc}
      */
     public void updateAuthorizationCode(AuthorizationCode authorizationCode) {
-        deleteAuthorizationCode(authorizationCode.getTokenId());
-
-        // Store in CTS
         try {
-            tokenStore.create(authorizationCode);
+            tokenStore.update(authorizationCode);
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"UPDATED_AUTHORIZATION_CODE", authorizationCode.toString()};
-                auditLogger.logAccessMessage("CREATED_AUTHORIZATION_CODE", obs, null);
+                auditLogger.logAccessMessage("UPDATED_AUTHORIZATION_CODE", obs, null);
             }
         } catch (CoreTokenException e) {
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_UPDATE_AUTHORIZATION_CODE", authorizationCode.toString()};
                 auditLogger.logErrorMessage("FAILED_UPDATE_AUTHORIZATION_CODE", obs, null);
             }
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
+            logger.error("DefaultOAuthTokenStoreImpl::Unable to update authorization code "
                     + authorizationCode.getTokenInfo(), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not create token in CTS", null);
+                    "Internal error", "Could not update token in CTS", null);
         }
     }
 
