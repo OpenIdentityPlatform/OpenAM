@@ -112,10 +112,23 @@
                                  i18nKey="a507"
                                  resourceName="authnContextDeclRef">
                 </AttributeSchema>
-                <AttributeSchema name="forgerock-am-auth-saml2-binding"
+                <AttributeSchema name="forgerock-am-auth-saml2-req-binding"
                                  type="single_choice"
                                  syntax="string"
                                  i18nKey="a508"
+                                 resourceName="reqBinding">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="HTTP-Redirect">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</ChoiceValue>
+                        <ChoiceValue i18nKey="HTTP-POST">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-saml2-binding"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a509"
                                  resourceName="binding">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="HTTP-POST">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</ChoiceValue>
@@ -154,30 +167,12 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-saml2-name-id-format"
-                                 type="single_choice"
+                                 type="single"
                                  syntax="string"
                                  i18nKey="a512"
                                  resourceName="nameIdFormat">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="Persistent">urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</ChoiceValue>
-                        <ChoiceValue i18nKey="Transient">urn:oasis:names:tc:SAML:2.0:nameid-format:transient</ChoiceValue>
-                        <ChoiceValue i18nKey="Unspecified">urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</ChoiceValue>
-                    </ChoiceValues>
                     <DefaultValues>
                         <Value>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="forgerock-am-auth-saml2-req-binding"
-                                 type="single_choice"
-                                 syntax="string"
-                                 i18nKey="a514"
-                                 resourceName="reqBinding">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="HTTP-Redirect">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</ChoiceValue>
-                        <ChoiceValue i18nKey="HTTP-POST">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</ChoiceValue>
-                    </ChoiceValues>
-                    <DefaultValues>
-                        <Value>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-saml2-slo-enabled"
@@ -243,7 +238,7 @@
                             <ChoiceValue i18nKey="false">false</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>false</Value>
+                            <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-saml2-login-chain"
@@ -280,10 +275,23 @@
                                      i18nKey="a507"
                                      resourceName="authnContextDeclRef">
                     </AttributeSchema>
-                    <AttributeSchema name="forgerock-am-auth-saml2-binding"
+                    <AttributeSchema name="forgerock-am-auth-saml2-req-binding"
                                      type="single_choice"
                                      syntax="string"
                                      i18nKey="a508"
+                                     resourceName="reqBinding">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="HTTP-Redirect">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</ChoiceValue>
+                            <ChoiceValue i18nKey="HTTP-POST">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-saml2-binding"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a509"
                                      resourceName="binding">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="HTTP-POST">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</ChoiceValue>
@@ -322,30 +330,12 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-saml2-name-id-format"
-                                     type="single_choice"
+                                     type="single"
                                      syntax="string"
                                      i18nKey="a512"
                                      resourceName="nameIdFormat">
-                        <ChoiceValues>
-                            <ChoiceValue i18nKey="Persistent">urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</ChoiceValue>
-                            <ChoiceValue i18nKey="Transient">urn:oasis:names:tc:SAML:2.0:nameid-format:transient</ChoiceValue>
-                            <ChoiceValue i18nKey="Unspecified">urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</ChoiceValue>
-                        </ChoiceValues>
                         <DefaultValues>
                             <Value>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="forgerock-am-auth-saml2-req-binding"
-                                     type="single_choice"
-                                     syntax="string"
-                                     i18nKey="a514"
-                                     resourceName="reqBinding">
-                        <ChoiceValues>
-                            <ChoiceValue i18nKey="HTTP-Redirect">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</ChoiceValue>
-                            <ChoiceValue i18nKey="HTTP-POST">urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</ChoiceValue>
-                        </ChoiceValues>
-                        <DefaultValues>
-                            <Value>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-saml2-slo-enabled"

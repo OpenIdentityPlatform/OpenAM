@@ -97,6 +97,7 @@ public class SAML2 extends AMLoginModule {
     private String entityName;
     private String metaAlias;
     private String reqBinding;
+    private String binding;
     private String localChain;
     private String sloRelayState;
     private boolean singleLogoutEnabled;
@@ -114,6 +115,8 @@ public class SAML2 extends AMLoginModule {
     private String sessionIndex;
     private boolean isTransient;
     private ResponseInfo respInfo;
+    private String storageKey;
+    private AuthnRequest authnRequest;
 
     private SAML2MetaManager metaManager;
 
@@ -139,6 +142,7 @@ public class SAML2 extends AMLoginModule {
         entityName = CollectionHelper.getMapAttr(options, ENTITY_NAME);
         metaAlias = CollectionHelper.getMapAttr(options, META_ALIAS);
         reqBinding = CollectionHelper.getMapAttr(options, REQ_BINDING);
+        binding = CollectionHelper.getMapAttr(options, BINDING);
         localChain = CollectionHelper.getMapAttr(options, LOCAL_CHAIN);
         singleLogoutEnabled = CollectionHelper.getBooleanMapAttr(options, SLO_ENABLED, false);
         sloRelayState = CollectionHelper.getMapAttr(options, SLO_RELAY_STATE);
@@ -218,7 +222,7 @@ public class SAML2 extends AMLoginModule {
 
         final Map<String, Collection<String>> spConfigAttrsMap
                 = SPSSOFederate.getAttrsMapForAuthnReq(realm, spEntityID);
-        final AuthnRequest authnRequest = SPSSOFederate.createAuthnRequest(realm, spEntityID, params,
+        authnRequest = SPSSOFederate.createAuthnRequest(realm, spEntityID, params,
                 spConfigAttrsMap, extensionsList, spsso, idpsso, ssoURL, false);
         final AuthnRequestInfo reqInfo = new AuthnRequestInfo(request, response, realm, spEntityID, null,
                 authnRequest, null, params);
@@ -227,7 +231,7 @@ public class SAML2 extends AMLoginModule {
             SPCache.requestHash.put(authnRequest.getID(), reqInfo);
         }
 
-        saveAuthnRequestIfFailoverEnabled(authnRequest, reqInfo);
+        saveAuthnRequest(authnRequest, reqInfo);
 
         final Callback[] nextCallbacks = getCallback(REDIRECT);
         final RedirectCallback redirectCallback = (RedirectCallback) nextCallbacks[0];
@@ -247,7 +251,7 @@ public class SAML2 extends AMLoginModule {
         return REDIRECT;
     }
 
-    private void saveAuthnRequestIfFailoverEnabled(final AuthnRequest authnRequest, final AuthnRequestInfo reqInfo)
+    private void saveAuthnRequest(final AuthnRequest authnRequest, final AuthnRequestInfo reqInfo)
             throws SAML2Exception {
 
         final long sessionExpireTimeInSeconds
@@ -296,22 +300,27 @@ public class SAML2 extends AMLoginModule {
         }
 
         final String username;
-        final SAML2ResponseData data;
+        SAML2ResponseData data = null;
 
-        if (SAML2FailoverUtils.isSAML2FailoverEnabled() && !StringUtils.isBlank(key)) {
+        if (!StringUtils.isBlank(key)) {
+            data = (SAML2ResponseData) SAML2Store.getTokenFromStore(key);
+        }
+
+        if (data == null && SAML2FailoverUtils.isSAML2FailoverEnabled() && !StringUtils.isBlank(key)) {
             try {
                 data = (SAML2ResponseData) SAML2FailoverUtils.retrieveSAML2Token(key);
             } catch (SAML2TokenRepositoryException e) {
                 return processError(bundle.getString("samlFailoverError"),
                         "SAML2.handleReturnFromRedirect : Error reading from failover map.", e);
             }
-        } else if (!StringUtils.isBlank(key)) {
-            data = (SAML2ResponseData) SAML2Store.getTokenFromStore(key);
-        } else {
+        }
+
+        if (data == null) {
             return processError(bundle.getString("localLinkError"), "SAML2 :: handleReturnFromRedirect() : "
                     + "Unable to perform local linking - response data key not found");
         }
 
+        storageKey = key;
         assertionSubject = data.getSubject();
         authnAssertion = data.getAssertion();
         sessionIndex = data.getSessionIndex();
@@ -319,7 +328,7 @@ public class SAML2 extends AMLoginModule {
 
         try { //you're already linked or we auto looked up user
             username = SPACSUtils.getPrincipalWithoutLogin(assertionSubject, authnAssertion,
-                    realm, spName, metaManager, entityName);
+                    realm, spName, metaManager, entityName, storageKey);
             if (username != null) {
                 principal = new SAML2Principal(username);
                 return success(authnAssertion, getNameId(), username);
@@ -400,8 +409,9 @@ public class SAML2 extends AMLoginModule {
     private void setCookiesForRedirects(final HttpServletRequest request, final HttpServletResponse response) {
         final Set<String> domains = AuthClientUtils.getCookieDomains();
         final StringBuilder originalUrl = new StringBuilder();
-        final XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
         final String requestedQuery = request.getQueryString();
+
+        final XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
 
         if (xuiState.isXUIEnabled()) {
             originalUrl.append(request.getContextPath());
@@ -475,9 +485,22 @@ public class SAML2 extends AMLoginModule {
      */
     private int success(Assertion assertion, NameID nameId, String userName) throws AuthLoginException, SAML2Exception {
         setSessionProperties(assertion, nameId, userName);
+        setSessionAttributes(assertion, userName);
         DEBUG.message("SAML2 :: User Authenticated via SAML2 - {}", getPrincipal().getName());
         storeUsernamePasswd(DNUtils.DNtoName(getPrincipal().getName()), null);
         return ISAuthConstants.LOGIN_SUCCEED;
+    }
+
+    /**
+     * Also pushes the authnRequest into a local cache so that it - alongside the storage key used to retrieve the
+     * response data - can be used to call into SAML2ServiceProviderAdapter methods.
+     */
+    private void setSessionAttributes(Assertion assertion, String userName) throws AuthLoginException, SAML2Exception {
+        synchronized (SPCache.authnRequestHash) {
+            SPCache.authnRequestHash.put(storageKey, authnRequest);
+        }
+
+        linkAttributeValues(assertion, userName);
     }
 
     /**
@@ -576,8 +599,8 @@ public class SAML2 extends AMLoginModule {
         setUserSessionProperty(SAML2Constants.NAMEID, nameId.toXMLString(true, true));
         setUserSessionProperty(Constants.IS_TRANSIENT, Boolean.toString(isTransient));
         setUserSessionProperty(Constants.REQUEST_ID, respInfo.getResponse().getInResponseTo());
-
-        setAttributeProperties(assertion, userName);
+        setUserSessionProperty(SAML2Constants.BINDING, binding);
+        setUserSessionProperty(Constants.CACHE_KEY, storageKey);
     }
 
     /**
@@ -585,7 +608,7 @@ public class SAML2 extends AMLoginModule {
      * by building them into appropriate strings and asking the auth service to migrate them into session
      * properties once authentication is completed.
      */
-    private void setAttributeProperties(Assertion assertion, String userName)
+    private void linkAttributeValues(Assertion assertion, String userName)
             throws AuthLoginException, SAML2Exception {
 
         final String spName = metaManager.getEntityByMetaAlias(metaAlias);

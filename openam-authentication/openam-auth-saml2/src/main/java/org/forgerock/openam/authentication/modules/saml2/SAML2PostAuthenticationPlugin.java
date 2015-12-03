@@ -36,23 +36,29 @@ import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.profile.CacheObject;
 import com.sun.identity.saml2.profile.IDPProxyUtil;
 import com.sun.identity.saml2.profile.LogoutUtil;
+import com.sun.identity.saml2.profile.ResponseInfo;
 import com.sun.identity.saml2.profile.SPACSUtils;
 import com.sun.identity.saml2.profile.SPCache;
+import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.LogoutRequest;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.DNMapper;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.SAML2Store;
+import org.forgerock.openam.xui.XUIState;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.errors.EncodingException;
 
@@ -99,25 +105,63 @@ public class SAML2PostAuthenticationPlugin implements AMPostAuthProcessInterface
             final NameID nameId = new NameIDImplWithoutSPNameQualifier(nameIdXML);
             final boolean isTransient = Boolean.parseBoolean(ssoToken.getProperty(Constants.IS_TRANSIENT));
             final String requestId = ssoToken.getProperty(Constants.REQUEST_ID);
-
+            final SessionProvider sessionProvider = SessionManager.getProvider();
             final NameIDInfo info = new NameIDInfo(spEntityId, idpEntityId, nameId, SAML2Constants.SP_ROLE, false);
-
             final String ssOutEnabled = ssoToken.getProperty(SAML2Constants.SINGLE_LOGOUT);
+            final String cacheKey = ssoToken.getProperty(Constants.CACHE_KEY);
+            final String realm =
+                    DNMapper.orgNameToRealmName(ssoToken.getProperty(com.sun.identity.shared.Constants.ORGANIZATION));
+
+            SAML2ResponseData data = (SAML2ResponseData) SAML2Store.getTokenFromStore(cacheKey);
+
+            if (data == null && SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+                data = (SAML2ResponseData) SAML2FailoverUtils.retrieveSAML2Token(cacheKey);
+            } else {
+                throw new SAML2Exception("Unable to retrieve response map from data cache.");
+            }
+
             if (Boolean.parseBoolean(ssOutEnabled)) {
                 setupSingleLogOut(ssoToken, metaAlias, sessionIndex, spEntityId, idpEntityId, nameId);
             }
-            configureIdpInitSLO(ssoToken, sessionIndex, metaAlias, info, isTransient, requestId);
+
+            configureIdpInitSLO(sessionProvider, ssoToken, sessionIndex, metaAlias, info, isTransient, requestId);
+            configurePostSSO(spEntityId, realm, request, response, ssoToken, sessionProvider, data.getResponseInfo(),
+                    cacheKey);
             clearSession(ssoToken);
-        } catch (SAML2Exception | SessionException | SSOException e) {
+        } catch (SAML2Exception | SessionException | SSOException | SAML2TokenRepositoryException e) {
             //debug warning and fall through
-            DEBUG.warning("Error saving SAML assertion information in memory. SLO not configured for this session.");
+            DEBUG.warning("Error saving SAML assertion information in memory. SLO not configured for this session.", e);
         }
     }
 
-    private void configureIdpInitSLO(SSOToken session, String sessionIndex, String metaAlias, NameIDInfo info,
-                                     boolean isTransient, String requestID) throws SessionException, SAML2Exception,
-            SSOException {
-        SessionProvider sessionProvider = SessionManager.getProvider();
+    private void configurePostSSO(String spEntityId, String realm, HttpServletRequest request,
+                                  HttpServletResponse response, SSOToken session, SessionProvider sessionProvider,
+                                  ResponseInfo respInfo, String cacheKey)
+            throws SAML2Exception {
+
+        AuthnRequest authnReq = (AuthnRequest) SPCache.authnRequestHash.get(cacheKey);
+        boolean writeFedInfo = Boolean.parseBoolean((String) SPCache.fedAccountHash.get(cacheKey));
+
+        final SAML2ServiceProviderAdapter spAdapter = SAML2Utils.getSPAdapterClass(spEntityId, realm);
+        if (spAdapter != null) {
+            final boolean redirected = spAdapter.postSingleSignOnSuccess(spEntityId, realm, request, response,
+                    null, session, authnReq, respInfo.getResponse(), respInfo.getProfileBinding(), writeFedInfo);
+            final String[] value = new String[] { String.valueOf(redirected) };
+            try {
+                sessionProvider.setProperty(session, SAML2Constants.RESPONSE_REDIRECTED, value);
+            } catch (SessionException | UnsupportedOperationException ex) {
+                DEBUG.warning("SAML2PostAuthenticationPlugin.configurePostSSO :: failed to set properties in session.",
+                        ex);
+            }
+        }
+
+        SPCache.authnRequestHash.remove(cacheKey);
+        SPCache.fedAccountHash.remove(cacheKey);
+    }
+
+    private void configureIdpInitSLO(SessionProvider sessionProvider, SSOToken session, String sessionIndex,
+                                     String metaAlias, NameIDInfo info, boolean isTransient, String requestID)
+            throws SessionException, SAML2Exception, SSOException {
         SPACSUtils.saveInfoInMemory(sessionProvider, session, sessionIndex, metaAlias,
                 info, IDPProxyUtil.isIDPProxyEnabled(requestID), isTransient);
     }
@@ -185,6 +229,7 @@ public class SAML2PostAuthenticationPlugin implements AMPostAuthProcessInterface
         ssoToken.setProperty(SAML2Constants.NAMEID, "");
         ssoToken.setProperty(Constants.IS_TRANSIENT, "");
         ssoToken.setProperty(Constants.REQUEST_ID, "");
+        ssoToken.setProperty(Constants.CACHE_KEY, "");
     }
 
     @Override
@@ -199,15 +244,19 @@ public class SAML2PostAuthenticationPlugin implements AMPostAuthProcessInterface
         try {
             final String ssOutEnabled = ssoToken.getProperty(SAML2Constants.SINGLE_LOGOUT);
             if (Boolean.parseBoolean(ssOutEnabled)) {
-                request.setAttribute(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL,
-                        ssoToken.getProperty(SLO_SESSION_LOCATION) + ssoToken.getProperty(SLO_SESSION_REFERENCE));
-                ssoToken.setProperty(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL,
-                        ssoToken.getProperty(SLO_SESSION_LOCATION)
-                                + ESAPI.encoder().encodeForURL(ssoToken.getProperty(SLO_SESSION_REFERENCE)));
+                final XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
+                final StringBuilder logoutLocation = new StringBuilder();
+                logoutLocation.append(ssoToken.getProperty(SLO_SESSION_LOCATION));
+                if (xuiState.isXUIEnabled()) {
+                    logoutLocation.append(ESAPI.encoder().encodeForURL(ssoToken.getProperty(SLO_SESSION_REFERENCE)));
+                } else {
+                    logoutLocation.append(ssoToken.getProperty(SLO_SESSION_REFERENCE));
+                }
+                request.setAttribute(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL, logoutLocation.toString());
             }
         } catch (EncodingException | SSOException e) {
             //debug warning and fall through
-            DEBUG.warning("Error loading SAML assertion information in memory. SLO failed for this session.");
+            DEBUG.warning("Error loading SAML assertion information in memory. SLO failed for this session.", e);
         }
     }
 

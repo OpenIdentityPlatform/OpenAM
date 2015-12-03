@@ -39,8 +39,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
 
 /**
- * This class provides the memory store for
- * SAML request and response information on Service Provider side.
+ * This class provides the memory store for SAML request and response information on Service Provider side.
  */
 
 public class SPCache {
@@ -81,11 +80,27 @@ public class SPCache {
     }
 
     /**
+     * Map saves the authentication request.
+     * Key   :   A unique key String value
+     * Value : AuthnRequest object
+     */
+    final public static PeriodicCleanUpMap authnRequestHash = new PeriodicCleanUpMap(
+            interval * 1000, interval * 1000);
+
+    /**
+     * Map saves data on whether the account was federated.
+     * Key   :   A unique key String value
+     * Value : String representing boolean val
+     */
+    final public static PeriodicCleanUpMap fedAccountHash = new PeriodicCleanUpMap(
+            interval * 1000, interval * 1000);
+
+    /**
      * Map saves the request info.
      * Key   :   requestID String
      * Value : AuthnRequestInfo object
      */
-    public static PeriodicCleanUpMap requestHash = new PeriodicCleanUpMap(
+    final public static PeriodicCleanUpMap requestHash = new PeriodicCleanUpMap(
         interval * 1000, interval * 1000); 
 
     /**
@@ -93,7 +108,7 @@ public class SPCache {
      * Key   :   requestID String
      * Value : ManageNameIDRequestInfo object
      */
-    protected static PeriodicCleanUpMap mniRequestHash = new PeriodicCleanUpMap(
+    final protected static PeriodicCleanUpMap mniRequestHash = new PeriodicCleanUpMap(
         interval * 1000, interval * 1000);
 
     /**
@@ -101,8 +116,8 @@ public class SPCache {
      * Key  : a String the relayStateID 
      * Value: a String the RelayState Value 
      */
-    public static PeriodicCleanUpMap relayStateHash= new PeriodicCleanUpMap(
-        interval * 1000, interval * 1000); 
+    final public static PeriodicCleanUpMap relayStateHash= new PeriodicCleanUpMap(
+        interval * 1000, interval * 1000);
 
     /**
      * Hashtable stores information required for LogoutRequest consumption.
@@ -112,7 +127,7 @@ public class SPCache {
      *                     - sp token id (String)                     
      * one key --- multiple SPFedSession's
      */
-    public static Hashtable fedSessionListsByNameIDInfoKey = new Hashtable();
+    final public static Hashtable fedSessionListsByNameIDInfoKey = new Hashtable();
 
     /**
      * SP: used to map LogoutRequest ID and inResponseTo in LogoutResponse
@@ -120,7 +135,7 @@ public class SPCache {
      * key : request ID (String)
      * value : original logout request object  (LogotRequest)
      */
-    public static PeriodicCleanUpMap logoutRequestIDHash = 
+    final public static PeriodicCleanUpMap logoutRequestIDHash =
         new PeriodicCleanUpMap(interval * 1000, interval * 1000);
 
     /**
@@ -128,7 +143,7 @@ public class SPCache {
      * Key: requestID String
      * Value: ResponseInfo object
      */
-    protected static PeriodicCleanUpMap responseHash = new PeriodicCleanUpMap(
+    final protected static PeriodicCleanUpMap responseHash = new PeriodicCleanUpMap(
         interval * 1000, interval * 1000);
 
     /**
@@ -136,7 +151,7 @@ public class SPCache {
      * Key: hostEntityID+realmName
      * Value: SPAuthnContextMapper
      */
-    public static Hashtable authCtxObjHash = new Hashtable();
+    final public static Hashtable authCtxObjHash = new Hashtable();
 
     /**
      * Hashtable saves AuthnContext class name and the authLevel. 
@@ -144,7 +159,7 @@ public class SPCache {
      * Value: Map containing AuthContext Class Name as Key and value
      *              is authLevel.
      */
-    public static Hashtable authContextHash = new Hashtable();
+    final public static Hashtable authContextHash = new Hashtable();
 
     /**
      * Hashtable saves the Request Parameters before redirecting
@@ -152,7 +167,7 @@ public class SPCache {
      * Key: requestID a String
      * Value : Request Parameters Map , a Map
      */
-    public static PeriodicCleanUpMap reqParamHash = new PeriodicCleanUpMap(
+    final public static PeriodicCleanUpMap reqParamHash = new PeriodicCleanUpMap(
         SPCache.interval * 1000, SPCache.interval * 1000);
 
 
@@ -161,7 +176,7 @@ public class SPCache {
      * Key : sp account mapper class name
      * Value : sp account mapper object
      */
-    public static Hashtable spAccountMapperCache = new Hashtable();
+    final public static Hashtable spAccountMapperCache = new Hashtable();
     
     /**
      * Cache saves the sp adapter class instance.
@@ -169,7 +184,7 @@ public class SPCache {
      * Value : sp adapter class instance 
      * (<code>SAML2ServiceProviderAdapter</code>)
      */
-    public static Hashtable spAdapterClassCache = new Hashtable();
+    final public static Hashtable spAdapterClassCache = new Hashtable();
 
     /**
      * Cache saves the fedlet adapter class instance.
@@ -184,14 +199,14 @@ public class SPCache {
      * Key : ecp request IDP list finder class name
      * Value : ecp request IDP list finder object
      */
-    public static Hashtable ecpRequestIDPListFinderCache = new Hashtable();
+    final public static Hashtable ecpRequestIDPListFinderCache = new Hashtable();
 
     /**
      * Cache saves the assertion id.
      * Key : assertion ID String
      * Value : Constant  
      */
-    public static PeriodicCleanUpMap assertionByIDCache =
+    final public static PeriodicCleanUpMap assertionByIDCache =
         new PeriodicCleanUpMap(interval * 1000,
         interval * 1000);
     

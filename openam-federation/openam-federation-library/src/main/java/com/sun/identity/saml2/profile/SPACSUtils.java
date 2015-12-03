@@ -2082,7 +2082,8 @@ public class SPACSUtils {
      * This method is a picked apart version of the "processResponse" function.
      */
     public static String getPrincipalWithoutLogin(Subject assertionSubject, Assertion authnAssertion, String realm,
-                                                  String spEntityId, SAML2MetaManager metaManager, String idpEntityId)
+                                                  String spEntityId, SAML2MetaManager metaManager, String idpEntityId,
+                                                  String storageKey)
             throws SAML2Exception {
 
         final EncryptedID encId = assertionSubject.getEncryptedID();
@@ -2164,7 +2165,7 @@ public class SPACSUtils {
         //if we're new and we're persistent, store the federation data in the user pref
         if (isNewAccountLink && isPersistent) {
             try {
-                writeFedData(nameId, spEntityId, realm, metaManager, idpEntityId, userName);
+                writeFedData(nameId, spEntityId, realm, metaManager, idpEntityId, userName, storageKey);
             } catch (SAML2Exception se) {
                 return userName;
             }
@@ -2174,7 +2175,7 @@ public class SPACSUtils {
     }
 
     private static void writeFedData(NameID nameId, String spEntityId, String realm, SAML2MetaManager metaManager,
-                                     String idpEntityId, String userName) throws SAML2Exception {
+                                     String idpEntityId, String userName, String storageKey) throws SAML2Exception {
         final NameIDInfo info;
         final String affiID = nameId.getSPNameQualifier();
         boolean isDualRole = SAML2Utils.isDualRole(spEntityId, realm);
@@ -2202,8 +2203,8 @@ public class SPACSUtils {
         }
 
         // write fed info into data store
+        SPCache.fedAccountHash.put(storageKey, "true");
         AccountUtils.setAccountFederation(info, userName);
-
     }
 
     /**

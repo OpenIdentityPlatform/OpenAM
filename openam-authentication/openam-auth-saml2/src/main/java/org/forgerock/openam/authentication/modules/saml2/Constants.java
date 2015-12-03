@@ -51,6 +51,11 @@ final class Constants {
     public static final String IS_TRANSIENT = "isTransient";
 
     /**
+     * Used to store the key to the assertion and response for the post SSO work.
+     */
+    public static final String CACHE_KEY = "cacheKey";
+
+    /**
      * Used for determining if the request went through an IdP Proxy.
      */
     public static final String REQUEST_ID = "requestId";
