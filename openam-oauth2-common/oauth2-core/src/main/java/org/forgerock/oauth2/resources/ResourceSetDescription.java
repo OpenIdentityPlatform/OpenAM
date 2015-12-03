@@ -250,7 +250,7 @@ public class ResourceSetDescription {
         ResourceSetDescription that = (ResourceSetDescription) o;
 
         if (!clientId.equals(that.clientId)) return false;
-        if (!description.equals(that.description)) return false;
+        if (!description.getObject().equals(that.description.getObject())) return false;
         if (!id.equals(that.id)) return false;
         if (policyUri != null ? !policyUri.equals(that.policyUri) : that.policyUri != null) return false;
 

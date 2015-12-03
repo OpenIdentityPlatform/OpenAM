@@ -126,40 +126,32 @@ public class ResourceSetService {
         return new Subject(false, principals, Collections.emptySet(), Collections.emptySet());
     }
 
-
-    private Promise<Collection<ResourceSetDescription>, ResourceException> getPolicies(final Context context,
-            QueryRequest policyQuery, final String resourceOwnerId, final Set<ResourceSetDescription> resourceSets,
-            final boolean augmentWithPolicies, final ResourceSetWithPolicyQuery query) {
+    private Promise<Set<ResourceSetDescription>, ResourceException> getSharedResourceSets(final Context context,
+            QueryRequest policyQuery, final String resourceOwnerId) {
         return policyService.queryPolicies(context, policyQuery)
                 .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>,
-                        Collection<ResourceSetDescription>, ResourceException>() {
+                        Set<ResourceSetDescription>, ResourceException>() {
                     @Override
-                    public Promise<Collection<ResourceSetDescription>, ResourceException> apply(
+                    public Promise<Set<ResourceSetDescription>, ResourceException> apply(
                             final Pair<QueryResponse, Collection<UmaPolicy>> result) {
-                        final Set<ResourceSetDescription> filteredResourceSets = new HashSet<>();
+                        final Set<ResourceSetDescription> sharedResourceSets = new HashSet<>();
                         try {
                             String realm = context.asContext(RealmContext.class).getResolvedRealm();
                             Subject subject = createSubject(resourceOwnerId, realm);
                             Evaluator evaluator = umaProviderSettingsFactory.get(realm).getPolicyEvaluator(subject);
 
-                            //check to see which of these policies apply to the subject
                             for (UmaPolicy sharedPolicy : result.getSecond()) {
-                                if (!containsResourceSet(resourceSets, sharedPolicy.getResourceSet())) {
+                                if (!containsResourceSet(sharedResourceSets, sharedPolicy.getResourceSet())) {
                                     String sharedResourceName = sharedPolicy.getResourceSet().getName();
                                     List<Entitlement> entitlements = evaluator.evaluate(realm, subject,
                                             sharedResourceName, null, false);
 
                                     if (!entitlements.isEmpty()) {
-                                        resourceSets.add(sharedPolicy.getResourceSet());
+                                        sharedResourceSets.add(sharedPolicy.getResourceSet());
                                     }
                                 }
                             }
-
-                            //what does this do? - it filters it
-                            filteredResourceSets.addAll(query.getResourceSetQuery().accept(RESOURCE_SET_QUERY_EVALUATOR,
-                                    resourceSets));
-
-                            return Promises.newResultPromise((Collection<ResourceSetDescription>) filteredResourceSets);
+                            return Promises.newResultPromise(sharedResourceSets);
                         } catch (EntitlementException e) {
                             return new InternalServerErrorException(e).asPromise();
                         }
@@ -245,13 +237,15 @@ public class ResourceSetService {
 
         QueryRequest policyQuery = newQueryRequest("").setQueryId("searchAll");
         policyQuery.setQueryFilter(QueryFilter.<JsonPointer>alwaysTrue());
-        return getPolicies(context, policyQuery, resourceOwnerId, resourceSets, augmentWithPolicies, query)
-                .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, Collection<ResourceSetDescription>,
+        return getSharedResourceSets(context, policyQuery, resourceOwnerId)
+                .thenAsync(new AsyncFunction<Set<ResourceSetDescription>, Collection<ResourceSetDescription>,
                         ResourceException>() {
                     @Override
                     public Promise<Collection<ResourceSetDescription>, ResourceException> apply(
-                            final Collection<ResourceSetDescription> filteredResourceSets) {
-                        //if using the getSharedResources function, combine results here? avoids obfuscated merging behaviour
+                            final Set<ResourceSetDescription> sharedResourceSets) {
+                        //combine the owned ResourceSets with the shared ones, then filter based on the query
+                        sharedResourceSets.addAll(resourceSets);
+                        final Collection<ResourceSetDescription> filteredResourceSets = filterPolicies(resourceSets, query);
 
                         Promise<Collection<ResourceSetDescription>, ResourceException> resourceSetsPromise;
                         if (query.getPolicyQuery() != null) {
