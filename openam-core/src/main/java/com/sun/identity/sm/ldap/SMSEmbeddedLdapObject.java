@@ -49,6 +49,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.sso.SSOException;
@@ -286,7 +287,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                         "SMSEmbeddedLdapObject.create: Successfully created" +
                                 " entry: " + dn);
             }
-            auditor.auditCreate(attrs);
+            if (auditor != null) {
+                auditor.auditCreate(attrs);
+            }
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
             // During install time and other times,
             // this error gets throws due to unknown issue. Issue:
@@ -315,7 +318,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                 debug.message("SMSEmbeddedLdapObject.modify: Successfully " +
                     "modified entry: " + dn);
             }
-            auditor.auditModify(mods);
+            if (auditor != null) {
+                auditor.auditModify(mods);
+            }
         } else {
             debug.error("SMSEmbeddedLdapObject.modify: Error modifying entry "+
                 dn + " by Principal: " + token.getPrincipal().getName() +
@@ -367,7 +372,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
             throw (new SMSException("", "sms-entry-cannot-delete"));
         }
         objectChanged(dn, DELETE);
-        auditor.auditDelete();
+        if (auditor != null) {
+            auditor.auditDelete();
+        }
     }
 
     /**
@@ -903,6 +910,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
     }
 
     private SMSAuditor newAuditor(SSOToken token, String dn, Map initialState) {
+        if (!AMSetupServlet.isCurrentConfigurationValid()) {
+            return null;
+        }
         String objectId = dn;
         String realm = SMSAuditor.getRealmFromDN(dn);
 
