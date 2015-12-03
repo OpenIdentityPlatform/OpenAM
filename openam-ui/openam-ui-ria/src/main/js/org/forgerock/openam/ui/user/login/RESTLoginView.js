@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
@@ -40,13 +40,18 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
     function populateTemplate () {
         var self = this,
-            showSelfService = Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
+            firstUserNamePassStage = Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
+
 
         // self-service links should be shown only on the first stage of the username/password stages
-        this.data.showForgotPassword = showSelfService && Configuration.globalData.forgotPassword === "true";
-        this.data.showForgotUserName = showSelfService && Configuration.globalData.forgotUsername === "true";
-        this.data.showSelfRegistration = showSelfService && Configuration.globalData.selfRegistration === "true";
-        this.data.showRememberLogin = showSelfService;
+        this.data.showForgotPassword = firstUserNamePassStage && Configuration.globalData.forgotPassword === "true";
+        this.data.showForgotUserName = firstUserNamePassStage && Configuration.globalData.forgotUsername === "true";
+        this.data.showSelfRegistration = firstUserNamePassStage && Configuration.globalData.selfRegistration === "true";
+        this.data.showRememberLogin = firstUserNamePassStage;
+        // socialImplementations links should be shown only on the first stage of the username/password stages
+        // and didn't show at upgrade session page
+        this.data.showSocialLogin = firstUserNamePassStage && !Configuration.loggedUser &&
+                                        !_.isEmpty(Configuration.globalData.socialImplementations);
 
         if (Configuration.backgroundLogin) {
             this.prefillLoginData();
