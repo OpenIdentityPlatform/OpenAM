@@ -24,11 +24,10 @@
  *
  * $Id: WSFedPropertiesModelImpl.java,v 1.14 2009/11/10 01:19:50 exu Exp $
  *
+ * Portions copyright 2012-2016 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2012 ForgeRock Inc
- */
+
 package com.sun.identity.console.federation.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -100,6 +99,8 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         SPEX_DATA_MAP.put(TFACCT_REALM_SELECTION, Collections.EMPTY_SET);
         SPEX_DATA_MAP.put(TFACCT_HOMEREALM_DISC_SERVICE, Collections.EMPTY_SET);
         SPEX_DATA_MAP.put(COT_LIST, Collections.EMPTY_SET);
+        SPEX_DATA_MAP.put(WREPLY_LIST, Collections.EMPTY_SET);
+
     }
 
     static {
@@ -118,6 +119,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         IDPEX_DATA_MAP.put(TFDOMAIN_ATTRIBUTE, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(TFUPN_DOMAIN, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(COT_LIST, Collections.EMPTY_SET);
+        IDPEX_DATA_MAP.put(WREPLY_LIST, Collections.EMPTY_SET);
     }
 
     static {
