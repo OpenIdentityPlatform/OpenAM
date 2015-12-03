@@ -141,7 +141,7 @@ public class ResourceSetService {
                             Evaluator evaluator = umaProviderSettingsFactory.get(realm).getPolicyEvaluator(subject);
 
                             for (UmaPolicy sharedPolicy : result.getSecond()) {
-                                if (!containsResourceSet(sharedResourceSets, sharedPolicy.getResourceSet())) {
+                                if (!sharedResourceSets.contains(sharedPolicy.getResourceSet())) {
                                     String sharedResourceName = sharedPolicy.getResourceSet().getName();
                                     List<Entitlement> entitlements = evaluator.evaluate(realm, subject,
                                             sharedResourceName, null, false);
@@ -194,23 +194,6 @@ public class ResourceSetService {
         } catch (EntitlementException e) {
             e.printStackTrace();
         }
-        return false;
-    }
-
-    /**
-     * This is a temporary work around that won't be needed once the equals method is fixed on JSONValue
-     * todo: fix remove once JSONValue equals has been fixed
-     * @param resourceSets
-     * @param resourceSet
-     * @return True id resourceSets contains resourceSet
-     */
-    private boolean containsResourceSet(Set<ResourceSetDescription> resourceSets, ResourceSetDescription resourceSet) {
-        for (ResourceSetDescription resource : resourceSets) {
-            if (resource.getId().equals(resourceSet.getId())) {
-                return true;
-            }
-        }
-
         return false;
     }
 
