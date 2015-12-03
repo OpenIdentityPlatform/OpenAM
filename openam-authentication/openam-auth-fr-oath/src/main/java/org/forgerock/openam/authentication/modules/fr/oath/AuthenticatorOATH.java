@@ -12,9 +12,6 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2015 ForgeRock AS.
- */
-
-/*
  * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
  */
 
@@ -80,7 +77,7 @@ public class AuthenticatorOATH extends AMLoginModule {
     //static attribute names
     private static final int NUM_CODES = 10;
 
-    private static final String AUTHLEVEL = "iplanet-am-auth-fr-oath-auth-level";
+    private static final String AUTHLEVEL = "iplanet-am-auth-authenticatoroath-auth-level";
     private static final String PASSWORD_LENGTH =
             "iplanet-am-auth-fr-oath-password-length";
     private static final String WINDOW_SIZE =

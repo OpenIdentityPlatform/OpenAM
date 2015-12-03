@@ -55,7 +55,7 @@
                         <Value>org.forgerock.openam.authentication.modules.fr.oath.validators.CodeLengthValidator</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-fr-oath-auth-level"
+                <AttributeSchema name="iplanet-am-auth-authenticatoroath-auth-level"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
@@ -185,7 +185,7 @@
                             <Value>org.forgerock.openam.authentication.modules.fr.oath.validators.CodeLengthValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-fr-oath-auth-level"
+                    <AttributeSchema name="iplanet-am-auth-authenticatoroath-auth-level"
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      i18nKey="a500"
