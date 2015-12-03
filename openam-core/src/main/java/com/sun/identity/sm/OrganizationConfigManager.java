@@ -293,12 +293,15 @@ public class OrganizationConfigManager {
                     + subOrgDN);
             orgExists = true;
         } catch (SMSException smse) {
-            // Realm does not exist, create it
-            if (SMSEntry.debug.messageEnabled()) {
-                SMSEntry.debug.message("OrganizationConfigManager::"
-                        + "createSubOrganization() "
-                        + "New Realm, creating realm: " + subOrgName + "-"
-                        + smse);
+            try {
+                orgExists = !getRealmByAlias(subOrgName).isEmpty();
+            } catch (SSOException e) {
+                SMSEntry.debug.error("OrganizationConfigManager::" +
+                        "createSubOrganization:", e);
+            }
+
+            if (!orgExists) {
+                SMSEntry.debug.message("OrganizationConfigManager::createSubOrganization() New Realm, creating realm: {} - {}", subOrgName, smse);
             }
         }
         Object args[] = { subOrgName };
@@ -437,6 +440,13 @@ public class OrganizationConfigManager {
 
         // Return the newly created organization config manager
         return (ocm);
+    }
+
+    private Set getRealmByAlias(String subOrgName) throws SSOException, SMSException {
+        ServiceManager serviceManager = new ServiceManager(token);
+        return serviceManager.searchOrganizationNames(
+                IdConstants.REPO_SERVICE,
+                IdConstants.ORGANIZATION_ALIAS_ATTR, Collections.singleton(subOrgName));
     }
 
     private void validateOrgName(final String subOrgName) throws SMSException {
