@@ -1,39 +1,40 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * Portions copyright 2014-2015 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     "jquery",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, constants, AbstractDelegate, configuration, eventManager, RealmHelper, URIUtils) {
-    var obj = new AbstractDelegate(constants.host + "/" + constants.context),
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/common/delegates/ServerDelegate",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function ($, AbstractDelegate, Configuration, Constants, URIUtils, ServerDelegate, RealmHelper) {
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context),
         lastKnownSubRealm,
-        lastKnownOverrideRealm;
+        lastKnownOverrideRealm,
+        setRequireMapConfig = function (serverInfo) {
+            require.config({ "map": { "*": {
+                "UserProfileView" : (serverInfo.kbaEnabled === "true"
+                    ? "org/forgerock/commons/ui/user/profile/UserProfileKBAView"
+                    : "org/forgerock/commons/ui/user/profile/UserProfileView")
+            } } });
+
+            return serverInfo;
+        };
 
     /**
      * Makes a HTTP request to the server to get its configuration
@@ -41,13 +42,13 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
      * @param {Function} errorCallback   Error callback function
      */
     obj.getConfiguration = function (successCallback, errorCallback) {
-        if (!configuration.globalData.auth.subRealm) {
+        if (!Configuration.globalData.auth.subRealm) {
             try {
                 console.debug("No current SUB REALM was detected. Applying from current URI values...");
                 var subRealm = RealmHelper.getSubRealm();
                 console.debug("Changing SUB REALM to '" + subRealm + "'");
 
-                configuration.globalData.auth.subRealm = RealmHelper.getSubRealm();
+                Configuration.globalData.auth.subRealm = RealmHelper.getSubRealm();
 
                 lastKnownSubRealm = RealmHelper.getSubRealm();
                 lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
@@ -56,29 +57,18 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
             }
         }
 
-        obj.serviceCall({
-            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-            url: RealmHelper.decorateURIWithRealm("/json/__subrealm__/serverinfo/*"),
-            suppressEvents: true,
-            success: function (response) {
-                var hostname = location.hostname,
-                    fqdn = response.FQDN;
+        ServerDelegate.getConfiguration({ suppressEvents: true }).then(function (response) {
+            var hostname = location.hostname,
+                fqdn = response.FQDN;
 
-                if (fqdn !== null && hostname !== fqdn) {
-                    // Redirect browser back to the server using the FQDN to ensure cookies are set correctly
-                    location.href = URIUtils.getCurrentUrl().replace(hostname, fqdn);
-                } else {
-                    require.config({ "map": { "*": {
-                        "UserProfileView" : (response.kbaEnabled === "true"
-                            ? "org/forgerock/commons/ui/user/profile/UserProfileKBAView"
-                            : "org/forgerock/commons/ui/user/profile/UserProfileView")
-                    } } });
-
-                    successCallback(response);
-                }
-            },
-            error: errorCallback
-        });
+            if (fqdn !== null && hostname !== fqdn) {
+                // Redirect browser back to the server using the FQDN to ensure cookies are set correctly
+                location.href = URIUtils.getCurrentUrl().replace(hostname, fqdn);
+            } else {
+                setRequireMapConfig(response);
+                successCallback(response);
+            }
+        }, errorCallback);
     };
 
     /**
@@ -94,24 +84,21 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
         if (subRealmChanged || overrideRealmChanged) {
             if (currentSubRealm !== lastKnownSubRealm) {
                 console.debug("Changing SUB REALM from '" + lastKnownSubRealm + "' to '" + currentSubRealm + "'");
-                configuration.globalData.auth.subRealm = currentSubRealm;
+                Configuration.globalData.auth.subRealm = currentSubRealm;
                 lastKnownSubRealm = currentSubRealm;
             }
 
             lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
 
-            return obj.serviceCall({
-                type: "GET",
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-                url: RealmHelper.decorateURIWithRealm("/json/__subrealm__/serverinfo/*"),
+            return ServerDelegate.getConfiguration({
                 errorsHandlers: {
                     "unauthorized": { status: "401" },
                     "Bad Request": {
                         status: "400",
-                        event: constants.EVENT_INVALID_REALM
+                        event: Constants.EVENT_INVALID_REALM
                     }
                 }
-            });
+            }).then(setRequireMapConfig);
         } else {
             return $.Deferred().resolve();
         }

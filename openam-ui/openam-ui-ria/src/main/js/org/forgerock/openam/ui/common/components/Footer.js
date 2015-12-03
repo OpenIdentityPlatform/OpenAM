@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/common/components/Footer", [
 
     var Component = Footer.extend({
         getVersion: function () {
-            return ServerDelegate.version();
+            return ServerDelegate.getVersion();
         },
         showVersion: function () {
             return isAdmin();
