@@ -73,6 +73,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class SmsRealmProvider implements RequestHandler {
     private static final Debug debug = Debug.getInstance("frRest");
@@ -94,9 +95,8 @@ public class SmsRealmProvider implements RequestHandler {
     private RealmNormaliser realmNormaliser;
 
     // This blacklist also includes characters which upset LDAP.
-    private final static Set<String> BLACKLIST_CHARACTERS = CollectionUtils.asSet(
-            "$", "&", "+", ",", "/", ":", ";", "=",
-            "?", "@", " ", "#", "%", "<", ">", "\"", "\\");
+    private final static Set<String> BLACKLIST_CHARACTERS = new TreeSet<>(CollectionUtils.asSet(
+            "$", "&", "+", ",", "/", ":", ";", "=", "?", "@", " ", "#", "%", "<", ">", "\"", "\\"));
 
     public SmsRealmProvider(SessionCache sessionCache,
                             CoreWrapper coreWrapper,
