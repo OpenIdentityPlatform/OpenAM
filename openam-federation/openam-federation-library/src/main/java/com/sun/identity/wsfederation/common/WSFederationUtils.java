@@ -24,6 +24,7 @@
  *
  * $Id: WSFederationUtils.java,v 1.6 2009/10/28 23:58:58 exu Exp $
  *
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.common;
@@ -51,6 +52,9 @@ import com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement;
 import com.sun.identity.wsfederation.key.KeyUtil;
 import com.sun.identity.wsfederation.logging.LogUtil;
 import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
+import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
+import com.sun.identity.wsfederation.plugins.whitelist.ValidWReplyExtractor;
+
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +63,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
 /**
  * Utility methods for WS-Federation implementation.
@@ -84,7 +90,11 @@ public class WSFederationUtils {
     public static DataStoreProvider dsProvider;
     
     public static SessionProvider sessionProvider = null;
-    
+
+
+    private static final RedirectUrlValidator<ValidWReplyExtractor.WSFederationEntityInfo> WREPLY_VALIDATOR =
+            new RedirectUrlValidator<ValidWReplyExtractor.WSFederationEntityInfo>(new ValidWReplyExtractor());
+
     static {
         String classMethod = "WSFederationUtils static initializer: ";
         try {
@@ -384,6 +394,87 @@ public class WSFederationUtils {
         } catch (Exception ex) {
             // ignore;
             debug.message("WSFederationUtils.processMultiProtocolLogout", ex);
+        }
+    }
+
+
+    /**
+     * Convenience method to validate a WSFederation wreply URL, often called from a JSP.
+     *
+     * @param request    Used to help establish the realm and hostEntityID.
+     * @param relayState The URL to validate.
+     * @return <code>true</code> if the wreply is valid.
+     */
+    public static boolean isWReplyURLValid(HttpServletRequest request, String relayState) {
+        String metaAlias = WSFederationMetaUtils.getMetaAliasByUri(request.getRequestURI());
+
+        try {
+            WSFederationMetaManager metaManager = new WSFederationMetaManager();
+            return isWReplyURLValid(metaAlias, relayState, metaManager.getRoleByMetaAlias(metaAlias));
+        } catch (WSFederationMetaException e) {
+            debug.warning("Can't get metaManager.", e);
+            return false;
+        }
+    }
+
+    /**
+     * Convenience method to validate a WSFederation wreply URL, often called from a JSP.
+     *
+     * @param metaAlias  The metaAlias of the hosted entity.
+     * @param wreply The URL to validate.
+     * @param role       The role of the caller.
+     * @return <code>true</code> if the wreply is valid.
+     */
+    public static boolean isWReplyURLValid(String metaAlias, String wreply, String role) {
+        boolean result = false;
+
+        if (metaAlias != null) {
+            String realm = WSFederationMetaUtils.getRealmByMetaAlias(metaAlias);
+            try {
+                String hostEntityID = WSFederationUtils.getMetaManager().getEntityByMetaAlias(metaAlias);
+                if (hostEntityID != null) {
+                    validateWReplyURL(realm, hostEntityID, wreply, role);
+                    result = true;
+                }
+            } catch (WSFederationException e) {
+                if (debug.messageEnabled()) {
+                    debug.message("WSFederationUtils.isWReplyURLValid(): wreply " + wreply +
+                            " for role " + role + " triggered an exception: " + e.getMessage(), e);
+                }
+                result = false;
+            }
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("WSFederationUtils.isWReplyURLValid(): wreply " + wreply +
+                    " for role " + role + " was valid? " + result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Validates the Wreply URL against a list of wreply State
+     * URLs created on the hosted service provider.
+     *
+     * @param orgName      realm or organization name the provider resides in.
+     * @param hostEntityId Entity ID of the hosted provider.
+     * @param wreply       wreply URL.
+     * @param role         IDP/SP Role.
+     * @throws WSFederationException if the processing failed.
+     */
+    public static void validateWReplyURL(
+            String orgName,
+            String hostEntityId,
+            String wreply,
+            String role) throws WSFederationException {
+
+        // Check for the validity of the RelayState URL.
+        if (wreply != null && !wreply.isEmpty()) {
+            if (!WREPLY_VALIDATOR.isRedirectUrlValid(wreply,
+                    ValidWReplyExtractor.WSFederationEntityInfo.from(orgName, hostEntityId, role))) {
+                throw new WSFederationException(WSFederationUtils.bundle.getString("invalidWReplyUrl"));
+            }
         }
     }
 }

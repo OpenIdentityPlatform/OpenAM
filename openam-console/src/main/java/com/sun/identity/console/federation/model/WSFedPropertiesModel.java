@@ -24,6 +24,7 @@
  *
  * $Id: WSFedPropertiesModel.java,v 1.10 2008/08/30 01:23:29 babysunil Exp $
  *
+ * Portions copyright 2016 ForgeRock AS.
  */
 
 package com.sun.identity.console.federation.model;
@@ -170,7 +171,8 @@ public interface WSFedPropertiesModel extends EntityModel {
     String TFDOMAIN_ATTRIBUTE = "domainAttribute";
     String TFUPN_DOMAIN = "upnDomain";
     String COT_LIST = "cotlist";
-    
+    String WREPLY_LIST = "wreplyList";
+
     
     /**
      * Returns a map with service provider attributes and values.
