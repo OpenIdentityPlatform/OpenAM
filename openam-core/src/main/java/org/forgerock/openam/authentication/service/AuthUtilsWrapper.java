@@ -11,21 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.service;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
  * Wrapper class around AuthUtils to facilitate testing.
- *
- * @author Phill Cunnington
  */
 public class AuthUtilsWrapper {
 
@@ -50,6 +49,16 @@ public class AuthUtilsWrapper {
     public boolean logout(String sessionID, HttpServletRequest request, HttpServletResponse response)
             throws SSOException {
         return AuthUtils.logout(sessionID, request, response);
+    }
+
+    /**
+     * Returns the logout redirect url set by the post-process plugin, if any has been set.
+     *
+     * @param request the http request to get the logout redirect url for.
+     * @return the logout redirect url or {@code null} if not set.
+     */
+    public String getPostProcessLogoutURL(HttpServletRequest request) {
+        return AuthUtils.getPostProcessURL(request, AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL);
     }
 
 }

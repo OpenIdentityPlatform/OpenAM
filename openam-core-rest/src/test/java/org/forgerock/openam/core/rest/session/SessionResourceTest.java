@@ -35,6 +35,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -45,6 +46,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -675,4 +679,32 @@ public class SessionResourceTest {
         assertThat(promise).failedWithException().isExactlyInstanceOf(BadRequestException.class);
     }
 
+    @Test
+    public void shouldUsePAPLogoutRedirectUrlWhenSet() throws Exception {
+        // Given
+        final String sessionId = "SSO_TOKEN_ID";
+        final String logoutUrl = "http://forgerock.com/about";
+        final ActionRequest request = mock(ActionRequest.class);
+        final HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+        final AttributesContext context = new AttributesContext(new AdviceContext(realmContext,
+                Collections.<String>emptyList()));
+        final SSOTokenID tokenId = mock(SSOTokenID.class);
+        context.getAttributes().put(HttpServletRequest.class.getName(), httpServletRequest);
+
+        given(request.getAction()).willReturn(LOGOUT_ACTION_ID);
+        given(ssoTokenManager.createSSOToken(sessionId)).willReturn(ssoToken);
+        given(ssoToken.getTokenID()).willReturn(tokenId);
+        given(tokenId.toString()).willReturn(sessionId);
+        given(authUtilsWrapper.logout(eq(sessionId), eq(httpServletRequest), any(HttpServletResponse.class)))
+                .willReturn(true);
+        given(authUtilsWrapper.getPostProcessLogoutURL(httpServletRequest)).willReturn(logoutUrl);
+
+
+        // When
+        ActionResponse response = sessionResource.actionInstance(context, sessionId, request)
+                                                 .getOrThrowUninterruptibly();
+
+        // Then
+        assertThat(response).isNotNull().withContent().stringAt("goto").isEqualTo(logoutUrl);
+    }
 }

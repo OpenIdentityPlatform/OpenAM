@@ -18,7 +18,7 @@ package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -26,7 +26,6 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.idm.AMIdentity;
@@ -34,6 +33,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,6 +47,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+
 import org.forgerock.http.header.CookieHeader;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -76,8 +77,8 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.services.context.Context;
 import org.forgerock.services.context.AttributesContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -573,13 +574,10 @@ public class SessionResource implements CollectionResourceProvider {
                     throw new InternalServerErrorException("Error logging out", e);
                 }
 
-                try { //equiv to LogoutViewBean's POST_PROCESS_LOGOUT_URL usage
-                    String papRedirect = ssoToken.getProperty(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL);
-                    if (!StringUtils.isBlank(papRedirect)) {
-                        map.put("goto", papRedirect);
-                    }
-                } catch (SSOException e) {
-                    LOGGER.warning("SessionResource.logout() :: Unable to perform PAP redirect.");
+                //equiv to LogoutViewBean's POST_PROCESS_LOGOUT_URL usage
+                String papRedirect = authUtilsWrapper.getPostProcessLogoutURL(httpServletRequest);
+                if (!StringUtils.isBlank(papRedirect)) {
+                    map.put("goto", papRedirect);
                 }
             }
 
