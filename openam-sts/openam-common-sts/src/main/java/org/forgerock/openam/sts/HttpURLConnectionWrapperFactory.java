@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.sts;
 
+import org.forgerock.http.header.TransactionIdHeader;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.audit.events.TransactionId;
 import org.forgerock.openam.utils.IOUtils;
 
 import javax.inject.Inject;
@@ -85,7 +85,7 @@ public class HttpURLConnectionWrapperFactory {
 
             if (propagateTransactionId) {
                 httpURLConnection.setRequestProperty(
-                        TransactionId.HTTP_HEADER, AuditRequestContext.createSubTransactionIdValue());
+                        TransactionIdHeader.NAME, AuditRequestContext.createSubTransactionIdValue());
             }
 
             int responseCode;

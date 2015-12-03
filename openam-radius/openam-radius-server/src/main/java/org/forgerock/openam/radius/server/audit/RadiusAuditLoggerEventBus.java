@@ -39,7 +39,6 @@ import org.forgerock.openam.audit.AuditConstants.EventName;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.audit.events.TransactionId;
 import org.forgerock.openam.radius.common.Packet;
 import org.forgerock.openam.radius.common.PacketType;
 import org.forgerock.openam.radius.server.RadiusRequest;
@@ -51,6 +50,7 @@ import org.forgerock.openam.radius.server.events.AuthRequestAcceptedEvent;
 import org.forgerock.openam.radius.server.events.AuthRequestChallengedEvent;
 import org.forgerock.openam.radius.server.events.AuthRequestReceivedEvent;
 import org.forgerock.openam.radius.server.events.AuthRequestRejectedEvent;
+import org.forgerock.services.TransactionId;
 
 import com.sun.identity.shared.debug.Debug;
 

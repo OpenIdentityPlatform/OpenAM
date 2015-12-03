@@ -600,20 +600,31 @@ public class RealmContextFilterTest {
     @DataProvider(name = "CRUDPAQ")
     public Object[][] createCRUDPAQRequests() {
         return new Object[][] {
-            { new Request().setMethod("POST").setEntity(new String("{}")), "?_action=create"}, //create
-            { new Request().setMethod("GET"), "" }, //read
+            { newJsonHttpRequest("POST").setEntity(new String("{}")), "?_action=create" }, // create
+            { newJsonHttpRequest("GET"), "" }, //read
             { getUpdateRequest(), "" }, //update
-            { new Request().setMethod("DELETE"), "" }, //delete
-            {new Request().setMethod("PATCH").setEntity(new String("[]")), "" }, //patch
-            { new Request().setMethod("POST"), "?_action=other" }, //action
-            { new Request().setMethod("GET"), "?_queryFilter=true"} //query
+            { newJsonHttpRequest("DELETE"), "" }, //delete
+            { newJsonHttpRequest("PATCH").setEntity(new String("[]")), "" }, //patch
+            { newJsonHttpRequest("POST"), "?_action=other" }, //action
+            { newJsonHttpRequest("GET"), "?_queryFilter=true"} //query
         };
     }
 
     private Request getUpdateRequest() {
-        Request request = new Request().setMethod("PUT");
+        Request request = newJsonHttpRequest("PUT");
         request.getHeaders().put("If-Match", "*");
         request.setEntity(new String("{}"));
+        return withContentType(request);
+    }
+
+    private Request newJsonHttpRequest(String method) {
+        Request request = new Request().setMethod(method);
+        request.getHeaders().put("Content-Type", "application/json");
+        return request;
+    }
+
+    private Request withContentType(Request request) {
+        request.getHeaders().put("Content-Type", "application/json");
         return request;
     }
 

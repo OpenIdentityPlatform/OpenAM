@@ -26,9 +26,9 @@ import java.util.Set;
 
 import org.forgerock.guice.core.GuiceModuleLoader;
 import org.forgerock.guice.core.InjectorConfiguration;
+import org.forgerock.http.header.TransactionIdHeader;
 import org.forgerock.openam.audit.context.AuditContextFilter;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.audit.events.TransactionId;
 import org.forgerock.openam.audit.context.TransactionIdConfiguration;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -77,7 +77,7 @@ public class AuditContextFilterTest {
         final AuditContextFilter auditContextFilter = new AuditContextFilter();
         final TransactionIdCollector transactionIdCollector = new TransactionIdCollector();
 
-        when(httpServletRequest.getHeader(TransactionId.HTTP_HEADER)).thenReturn(txIdHttpHeader);
+        when(httpServletRequest.getHeader(TransactionIdHeader.NAME)).thenReturn(txIdHttpHeader);
         doAnswer(transactionIdCollector).when(filterChain).doFilter(httpServletRequest, httpServletResponse);
 
         // When
@@ -98,7 +98,7 @@ public class AuditContextFilterTest {
         final AuditContextFilter auditContextFilter = new AuditContextFilter();
         final TransactionIdCollector transactionIdCollector = new TransactionIdCollector();
 
-        when(httpServletRequest.getHeader(TransactionId.HTTP_HEADER)).thenReturn(txIdHttpHeader);
+        when(httpServletRequest.getHeader(TransactionIdHeader.NAME)).thenReturn(txIdHttpHeader);
         doAnswer(transactionIdCollector).when(filterChain).doFilter(httpServletRequest, httpServletResponse);
 
         // When

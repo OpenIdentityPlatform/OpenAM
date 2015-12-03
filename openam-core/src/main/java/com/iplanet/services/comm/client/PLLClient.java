@@ -55,8 +55,8 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import javax.servlet.http.Cookie;
 
+import org.forgerock.http.header.TransactionIdHeader;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.audit.events.TransactionId;
 import org.forgerock.openam.utils.IOUtils;
 
 /**
@@ -188,7 +188,7 @@ public class PLLClient {
                 conn.setRequestProperty("Cookie", cookies);
             }
             conn.setRequestProperty("Content-Type", "text/xml;charset=UTF-8");
-            conn.setRequestProperty(TransactionId.HTTP_HEADER, AuditRequestContext.createSubTransactionIdValue());
+            conn.setRequestProperty(TransactionIdHeader.NAME, AuditRequestContext.createSubTransactionIdValue());
 
             // Output ...
             String xml = set.toXMLString();

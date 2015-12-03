@@ -120,13 +120,12 @@
         <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
 
         <!-- Required for setting classpaths on tools and fedlet -->
-        <forgerock.util.version>3.0.0</forgerock.util.version>
+        <forgerock.util.version>3.0.1</forgerock.util.version>
 
-        <forgerock.bloomfilter.version>1.0.0</forgerock.bloomfilter.version>
+        <forgerock.bloomfilter.version>1.0.1</forgerock.bloomfilter.version>
         <forgerock.ui.version>10.0.1</forgerock.ui.version>
         <forgerock.audit.version>2.0.0</forgerock.audit.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
-        <forgerock.selfservice.version>0.10.0</forgerock.selfservice.version>
 
         <guice.version>3.0</guice.version>
         <restlet.version>2.3.4</restlet.version>
@@ -498,7 +497,7 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-bom</artifactId>
-                <version>2.1.1</version>
+                <version>3.0.0</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -1681,22 +1680,6 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-bloomfilter-monitoring</artifactId>
                 <version>${forgerock.bloomfilter.version}</version>
-            </dependency>
-            <!-- TODO the BOM has a typo in this dependency artifact id! remove once the next version of the BOM is released -->
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-audit-handler-jdbc</artifactId>
-                <version>${forgerock.audit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-selfservice-core</artifactId>
-                <version>${forgerock.selfservice.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-selfservice-stages</artifactId>
-                <version>${forgerock.selfservice.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>

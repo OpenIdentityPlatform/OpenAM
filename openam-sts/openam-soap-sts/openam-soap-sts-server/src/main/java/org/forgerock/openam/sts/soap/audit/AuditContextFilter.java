@@ -16,8 +16,9 @@
 
 package org.forgerock.openam.sts.soap.audit;
 
-import org.forgerock.audit.events.TransactionId;
+import org.forgerock.http.header.TransactionIdHeader;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.services.TransactionId;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -66,7 +67,7 @@ public class AuditContextFilter implements Filter {
     private void setRequestContext(ServletRequest request) {
         if (request instanceof HttpServletRequest) {
             if (trustHttpTransactionHeader()) {
-                String transactionIdHeader = ((HttpServletRequest) request).getHeader(TransactionId.HTTP_HEADER);
+                String transactionIdHeader = ((HttpServletRequest) request).getHeader(TransactionIdHeader.NAME);
                 if (transactionIdHeader != null && !transactionIdHeader.trim().isEmpty()) {
                     AuditRequestContext.set(
                             new AuditRequestContext(new TransactionId(transactionIdHeader)));

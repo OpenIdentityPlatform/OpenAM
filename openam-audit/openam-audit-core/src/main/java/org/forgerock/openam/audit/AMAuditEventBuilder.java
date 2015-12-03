@@ -109,5 +109,5 @@ public interface AMAuditEventBuilder<T extends AMAuditEventBuilder<T>> {
      * @param context The request context.
      * @return This builder.
      */
-    T transactionIdFromRootContext(Context context);
+    T transactionIdFromContext(Context context);
 }

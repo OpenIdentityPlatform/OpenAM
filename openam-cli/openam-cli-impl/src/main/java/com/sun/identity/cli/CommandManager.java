@@ -47,8 +47,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import org.forgerock.audit.events.TransactionId;
 import org.forgerock.guice.core.InjectorConfiguration;
+import org.forgerock.services.TransactionId;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
 import com.iplanet.am.util.SystemProperties;

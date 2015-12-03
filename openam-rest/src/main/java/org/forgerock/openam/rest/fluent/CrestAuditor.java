@@ -93,7 +93,7 @@ class CrestAuditor {
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
-                    .forHttpCrestRequest(context, request)
+                    .forHttpRequest(context, request)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
@@ -120,7 +120,7 @@ class CrestAuditor {
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
-                    .forHttpCrestRequest(context, request)
+                    .forHttpRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
@@ -152,7 +152,7 @@ class CrestAuditor {
             final long elapsedTime = endTime - startTime;
             JsonValue detail = json(object(field(ACCESS_RESPONSE_DETAIL_REASON, message)));
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
-                    .forHttpCrestRequest(context, request)
+                    .forHttpRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)

@@ -43,8 +43,9 @@ import com.iplanet.services.comm.share.NotificationSet;
 import com.iplanet.services.comm.share.PLLBundle;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.shared.Constants;
+
+import org.forgerock.http.header.TransactionIdHeader;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.audit.events.TransactionId;
 
 public class NotificationSender {
 
@@ -69,7 +70,7 @@ public class NotificationSender {
             conn.setUseCaches(useCache);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "text/xml;charset=UTF-8");
-            conn.setRequestProperty(TransactionId.HTTP_HEADER, AuditRequestContext.createSubTransactionIdValue());
+            conn.setRequestProperty(TransactionIdHeader.NAME, AuditRequestContext.createSubTransactionIdValue());
             String xml = set.toXMLString();
             // compute length in case iWS set arbitrary length
             int requestLength = xml.getBytes("UTF-8").length;
