@@ -73,8 +73,6 @@ public final class AuditConstants {
      * Predefined components for audit events.
      */
     public enum Component {
-        /** PLL audit event component. */
-        PLL("PLL"),
         /** OAuth2, OpenID Connect and UMA audit event components. */
         OAUTH("OAuth"),
         /** CTS audit event component. */

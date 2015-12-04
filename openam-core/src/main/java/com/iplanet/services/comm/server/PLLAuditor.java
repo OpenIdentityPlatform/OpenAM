@@ -185,7 +185,7 @@ public class PLLAuditor {
         method = "unknown";
         userId = "";
         trackingId = "";
-        component = Component.PLL;
+        component = null;
         realm = NO_REALM;
     }
 
