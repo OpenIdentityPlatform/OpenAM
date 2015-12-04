@@ -62,6 +62,9 @@ define("org/forgerock/openam/ui/user/UserModel", [
                                     _.chain(this.toJSON())
                                         .pick(["givenName", "sn", "mail", "postalAddress", "telephoneNumber"])
                                         .mapValues(function (val) {
+                                            return typeof val === "string" ? val.trim() : val;
+                                        })
+                                        .mapValues(function (val) {
                                             return val || [];
                                         })
                                         .value()
