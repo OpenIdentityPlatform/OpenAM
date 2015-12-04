@@ -190,8 +190,7 @@
                 "registrationComplete" : "Registration complete"
             },
             "RestLogoutTemplate" : {
-                "loggedOut" : "You have been logged out.",
-                "returnToLogin" : "Return to Login page"
+                "loggedOut" : "You have been logged out."
             },
             "ChangesPendingTemplate": {
                 "undo": "Undo Changes",

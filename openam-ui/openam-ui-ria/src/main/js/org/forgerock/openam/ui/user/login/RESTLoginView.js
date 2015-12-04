@@ -76,10 +76,16 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         }
     }
 
+    function routeToLoginUnavailable (urlParams) {
+        Router.navigate(
+            Router.getLink(Router.configuration.routes.loginFailure) + RealmHelper.getSubRealm() + urlParams, {
+                trigger: true
+            });
+    }
+
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
         genericTemplate: "templates/openam/RESTLoginTemplate.html",
-        unavailableTemplate: "templates/openam/RESTLoginUnavailableTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
 
         data: {},
@@ -118,7 +124,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         },
 
         formSubmit: function (e) {
-            var submitContent, expire;
+            var submitContent,
+                expire;
+
             e.preventDefault();
 
             submitContent = new Form2js(this.$el[0]);
@@ -138,7 +146,21 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             // END CUSTOM STAGE-SPECIFIC LOGIC HERE
 
-            EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, submitContent);
+            EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, {
+                submitContent:submitContent,
+                failureCallback: function () {
+                    // If its not the first stage then render the Login Unavailable view with link back to login screen.
+                    var urlParams;
+                    if (Configuration.globalData.auth.currentStage > 1) {
+                        urlParams = URIUtils.getCurrentFragmentQueryString();
+                        if (urlParams) {
+                            urlParams = "&" + urlParams;
+                        }
+                        // Go to the Login Unavailable view with all the original url params.
+                        routeToLoginUnavailable(urlParams);
+                    }
+                }
+            });
         },
 
         render: function (args) {
@@ -219,18 +241,31 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     }
                 }
             }, this), _.bind(function (error) {
-                // If we can't render a login form, then the user must not be able to login
-                this.template = this.unavailableTemplate;
-                this.parentRender(function () {
-                    if (error) {
-                        Messages.addMessage({
-                            type: Messages.TYPE_DANGER,
-                            message: error.message
-                        });
-                    }
-                });
+                if (error) {
+                    Messages.addMessage({
+                        type: Messages.TYPE_DANGER,
+                        message: error.message
+                    });
+                }
+
+                /**
+                 * We havent managed to get a successful responce from the server
+                 * This could be due to many reasons, including that the params are incorrect
+                 * For example requesting service=thewrongname. So here we use the RESTLoginHelper.filterUrlParams
+                 * function to only return the params we which to save. The authIndexType and authIndexValue
+                 * would normally only be applied when the user has logged in, so they should not contain invalid values
+                 */
+
+                routeToLoginUnavailable (
+                    RESTLoginHelper.filterUrlParams (
+                        URIUtils.parseQueryString (
+                            URIUtils.getCurrentCompositeQueryString()
+                        )
+                    )
+                );
             }, this));
         },
+
 
         renderForm: function (reqs, urlParams) {
             var cleaned = _.clone(reqs),
@@ -458,7 +493,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         if (uri.slice(-1) !== "/") {
             uri += "/";
         }
-
         return uri + RealmHelper.getSubRealm();
     });
 

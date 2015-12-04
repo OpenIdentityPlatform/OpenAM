@@ -52,9 +52,16 @@ define("config/routes/AMRoutesConfig", [], function () {
             forceUpdate: true
         },
         loggedOut: {
-            view: "org/forgerock/openam/ui/user/logout/RESTLogoutView",
+            view: "org/forgerock/openam/ui/user/login/RESTLogoutView",
             url: /loggedOut([^\&]+)?(&.+)?/,
             pattern: "loggedOut??",
+            defaults: ["/", ""],
+            argumentNames: ["realm", "additionalParameters"]
+        },
+        loginFailure: {
+            view: "org/forgerock/openam/ui/user/login/LoginFailureView",
+            url: /failedLogin([^\&]+)?(&.+)?/,
+            pattern: "failedLogin??",
             defaults: ["/", ""],
             argumentNames: ["realm", "additionalParameters"]
         }

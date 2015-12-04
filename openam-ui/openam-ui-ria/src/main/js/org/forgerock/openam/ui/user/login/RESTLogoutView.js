@@ -23,15 +23,14 @@
  */
 
 
-define("org/forgerock/openam/ui/user/logout/RESTLogoutView", [
+define("org/forgerock/openam/ui/user/login/RESTLogoutView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function (AbstractView, Router, Configuration, Constants, EventManager, UiUtils, LoginHelper) {
+], function (AbstractView, Router, Configuration, Constants, EventManager, LoginHelper) {
 
     var LogoutView = AbstractView.extend({
         template: "templates/openam/RESTLogoutTemplate.html",
@@ -41,9 +40,6 @@ define("org/forgerock/openam/ui/user/logout/RESTLogoutView", [
             "click #gotoLogin": "gotoLoginViewClick"
         },
         render: function (args, callback) {
-
-            //Navigation.reload(callback);
-
             this.parentRender(callback);
         },
         gotoLoginViewClick: function (e) {
