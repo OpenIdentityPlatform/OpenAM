@@ -18,7 +18,7 @@ package com.sun.identity.sm;
 import java.util.Iterator;
 import javax.security.auth.Subject;
 
-import org.forgerock.openam.audit.AuditConstants.ConfigOperations;
+import org.forgerock.openam.audit.AuditConstants.ConfigOperation;
 import org.forgerock.openam.auditors.SMSAuditFilter;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.RDN;
@@ -30,7 +30,7 @@ import org.forgerock.opendj.ldap.RDN;
 public class EntitlementIndexConfigFilter implements SMSAuditFilter {
 
     @Override
-    public boolean isAudited(String objectId, String realm, ConfigOperations operation, Subject subject) {
+    public boolean isAudited(String objectId, String realm, ConfigOperation operation, Subject subject) {
         return !isIndexChange(DN.valueOf(objectId));
     }
 

@@ -45,10 +45,10 @@ public final class AMConfigAuditEventBuilder extends ConfigAuditEventBuilder<AMC
      * {@link org.forgerock.audit.events.AuditEventBuilder#eventName(String)} as it allows OpenAM to manage event
      * names better and documentation to be automatically generated for new events.
      *
-     * @param operation one of the predefined operations from {@link AuditConstants.ConfigOperations}
+     * @param operation one of the predefined operations from {@link AuditConstants.ConfigOperation}
      * @return this builder
      */
-    public AMConfigAuditEventBuilder operation(AuditConstants.ConfigOperations operation) {
+    public AMConfigAuditEventBuilder operation(AuditConstants.ConfigOperation operation) {
         return operation(operation.toString());
     }
 

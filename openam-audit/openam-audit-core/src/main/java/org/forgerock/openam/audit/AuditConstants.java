@@ -131,17 +131,17 @@ public final class AuditConstants {
     /**
      * Predefined operations for configuration events.
      */
-    public enum ConfigOperations {
+    public enum ConfigOperation {
         /** Creation operation.*/
         CREATE("CREATE"),
         /** Modification operation. */
-        MODIFY("MODIFY"),
+        UPDATE("UPDATE"),
         /** Deletion operation. */
         DELETE("DELETE");
 
         private final String name;
 
-        ConfigOperations(String name) {
+        ConfigOperation(String name) {
             this.name = name;
         }
 

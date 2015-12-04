@@ -16,7 +16,7 @@
 package org.forgerock.openam.auditors;
 
 import javax.security.auth.Subject;
-import org.forgerock.openam.audit.AuditConstants.ConfigOperations;
+import org.forgerock.openam.audit.AuditConstants.ConfigOperation;
 
 /**
  * An interface for creating filters that block specific config changes from being audited
@@ -34,7 +34,7 @@ public interface SMSAuditFilter {
      * @param subject The subject the operation is being performed as (not necessarily the logged in user)
      * @return Whether or not an audit entry should be made for this config change
      */
-    boolean isAudited(String objectId, String realm, ConfigOperations operation, Subject subject);
+    boolean isAudited(String objectId, String realm, ConfigOperation operation, Subject subject);
 
 }
 

@@ -19,7 +19,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.openam.audit.AuditConstants.ConfigOperations;
+import org.forgerock.openam.audit.AuditConstants.ConfigOperation;
 import org.forgerock.openam.auditors.SMSAuditFilter;
 import java.security.AccessController;
 import java.util.Collections;
@@ -43,7 +43,7 @@ public class UmaAuditFilter implements SMSAuditFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isAudited(String objectId, String realm, ConfigOperations operation, Subject subject) {
+    public boolean isAudited(String objectId, String realm, ConfigOperation operation, Subject subject) {
         try {
             DN dn = DN.valueOf(objectId);
             if (isPolicy(dn)) {

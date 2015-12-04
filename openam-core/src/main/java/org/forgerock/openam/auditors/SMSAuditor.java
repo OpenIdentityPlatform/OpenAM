@@ -20,7 +20,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
 
 import javax.inject.Inject;
 
@@ -74,7 +73,7 @@ public class SMSAuditor extends ConfigAuditor {
      * @param mods The list of modifications being applied
      */
     public void auditModify(ModificationItem[] mods) {
-        if (shouldAudit(AuditConstants.ConfigOperations.MODIFY)) {
+        if (shouldAudit(AuditConstants.ConfigOperation.UPDATE)) {
             Map<String, Object> finalState = deriveFinalState(mods);
             String[] fieldList = new String[mods.length];
             for(int i = 0; i < mods.length; i++) {

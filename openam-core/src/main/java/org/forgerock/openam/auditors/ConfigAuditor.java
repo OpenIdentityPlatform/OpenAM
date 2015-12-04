@@ -15,13 +15,16 @@
  */
 package org.forgerock.openam.auditors;
 
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.audit.AuditConstants.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
 import org.forgerock.openam.audit.AMConfigAuditEventBuilder;
 import org.forgerock.openam.audit.AuditConstants;
@@ -30,6 +33,7 @@ import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,12 +51,11 @@ public abstract class ConfigAuditor {
     private final Set<SMSAuditFilter> filters;
     private final long startTime;
     private final String runAsName;
-    private final String beforeString;
+    private final JsonValue beforeState;
     private static final ObjectMapper mapper = new ObjectMapper();
     private final String objectId;
     private final String realm;
     private final SSOToken runAs;
-    private final Map<String, Object> initialState;
 
     /**
      * Creates the base for a ConfigAuditor
@@ -74,10 +77,9 @@ public abstract class ConfigAuditor {
         this.objectId = objectId;
         this.startTime = System.currentTimeMillis();
         this.filters = filters;
-        this.initialState = initialState;
         this.runAs = runAs;
 
-        if(realm == null) {
+        if (realm == null) {
             this.realm = AuditConstants.NO_REALM;
         } else {
             this.realm = realm;
@@ -85,13 +87,13 @@ public abstract class ConfigAuditor {
 
         String runAsName = null;
 
-        if(runAs != null) {
+        if (runAs != null) {
             runAsName = AMAuditEventBuilderUtils.getUserId(runAs);
         }
 
         this.runAsName = runAsName;
 
-        this.beforeString = convertObjectToString(initialState);
+        this.beforeState = convertObjectToJsonValue(initialState);
     }
 
     /**
@@ -103,13 +105,13 @@ public abstract class ConfigAuditor {
      * @param newState The state of the entry which is created
      */
     public void auditCreate(Map<String, Object> newState) {
-        if (shouldAudit(ConfigOperations.CREATE)) {
-            String afterString = convertObjectToString(newState);
+        if (shouldAudit(ConfigOperation.CREATE)) {
+            JsonValue afterState = convertObjectToJsonValue(newState);
 
             AMConfigAuditEventBuilder builder = getBaseBuilder()
-                    .operation(ConfigOperations.CREATE)
-                    .before(beforeString)
-                    .after(afterString);
+                    .operation(ConfigOperation.CREATE);
+            recordBeforeStateIfNotNull(builder, beforeState);
+            recordAfterStateIfNotNull(builder, afterState);
 
             auditEventPublisher.tryPublish(CONFIG_TOPIC, builder.toEvent());
         }
@@ -125,13 +127,13 @@ public abstract class ConfigAuditor {
      * @param modifiedAttributes The attributes modified
      */
     public void auditModify(Map<String, Object> finalState, String[] modifiedAttributes) {
-        if (shouldAudit(ConfigOperations.MODIFY)) {
-            String afterString = convertObjectToString(finalState);
+        if (shouldAudit(ConfigOperation.UPDATE)) {
+            JsonValue afterState = convertObjectToJsonValue(finalState);
             AMConfigAuditEventBuilder builder = getBaseBuilder()
-                    .operation(ConfigOperations.MODIFY)
-                    .before(beforeString)
-                    .changedFields(modifiedAttributes)
-                    .after(afterString);
+                    .operation(ConfigOperation.UPDATE)
+                    .changedFields(modifiedAttributes);
+            recordBeforeStateIfNotNull(builder, beforeState);
+            recordAfterStateIfNotNull(builder, afterState);
 
             auditEventPublisher.tryPublish(CONFIG_TOPIC, builder.toEvent());
         }
@@ -145,21 +147,22 @@ public abstract class ConfigAuditor {
      * captured in the debug logs but otherwise ignored.
      */
     public void auditDelete() {
-        if (shouldAudit(ConfigOperations.DELETE)) {
-
+        if (shouldAudit(ConfigOperation.DELETE)) {
+            JsonValue afterState = json(object());
             AMConfigAuditEventBuilder builder = getBaseBuilder()
-                    .operation(ConfigOperations.DELETE)
-                    .before(beforeString)
-                    .after("{}");
+                    .operation(ConfigOperation.DELETE)
+                    .after(afterState);
+            recordBeforeStateIfNotNull(builder, beforeState);
 
             auditEventPublisher.tryPublish(CONFIG_TOPIC, builder.toEvent());
         }
     }
 
-    private String convertObjectToString(Object obj) {
+    private JsonValue convertObjectToJsonValue(Object obj) {
         try {
-            return mapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
+            String json = mapper.writeValueAsString(obj);
+            return new JsonValue(mapper.readValue(json, Map.class));
+        } catch (IOException e) {
             debug.warning("ConfigAuditor: Failed to populate field");
             return null;
         }
@@ -185,7 +188,7 @@ public abstract class ConfigAuditor {
      * @return The initial state (key: attribute name)
      */
     protected Map<String, Object> getInitialState() {
-        return initialState;
+        return beforeState.asMap();
     }
 
     /**
@@ -193,17 +196,29 @@ public abstract class ConfigAuditor {
      * @param operation The operation that is being applied to the object
      * @return True if auditing is enabled for configuration, and the specific operation is audited for the object.
      */
-    protected boolean shouldAudit(ConfigOperations operation) {
+    protected boolean shouldAudit(ConfigOperation operation) {
         return auditEventPublisher.isAuditing(realm, CONFIG_TOPIC, EventName.AM_CONFIG_CHANGE)
                     && isAudited(operation);
     }
 
-    private boolean isAudited(ConfigOperations operation) {
+    private boolean isAudited(ConfigOperation operation) {
         for (SMSAuditFilter filter : filters) {
             if (!filter.isAudited(objectId, realm, operation, SubjectUtils.createSubject(runAs))) {
                 return false;
             }
         }
         return true;
+    }
+
+    private void recordBeforeStateIfNotNull(AMConfigAuditEventBuilder builder, JsonValue beforeState) {
+        if (beforeState != null) {
+            builder.before(beforeState);
+        }
+    }
+
+    private void recordAfterStateIfNotNull(AMConfigAuditEventBuilder builder, JsonValue afterState) {
+        if (afterState != null) {
+            builder.after(afterState);
+        }
     }
 }
