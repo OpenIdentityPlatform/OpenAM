@@ -30,7 +30,6 @@ import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.encode.Base64url;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +48,7 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
     private final List<AuthorizationCodeRequestValidator> requestValidators;
     private final TokenStore tokenStore;
     private final TokenInvalidator tokenInvalidator;
+    private final GrantTypeAccessTokenGenerator accessTokenGenerator;
 
     /**
      * Constructs a new AuthorizationCodeGrantTypeHandler.
@@ -58,15 +58,17 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
      * @param tokenStore An instance of the TokenStore.
      * @param tokenInvalidator An instance of the TokenInvalidator.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param accessTokenGenerator An instance of the GrantTypeAccessTokenGenerator.
      */
     @Inject
     public AuthorizationCodeGrantTypeHandler(List<AuthorizationCodeRequestValidator> requestValidators,
             ClientAuthenticator clientAuthenticator, TokenStore tokenStore, TokenInvalidator tokenInvalidator,
-            OAuth2ProviderSettingsFactory providerSettingsFactory) {
+            OAuth2ProviderSettingsFactory providerSettingsFactory, GrantTypeAccessTokenGenerator accessTokenGenerator) {
         super(providerSettingsFactory, clientAuthenticator);
         this.requestValidators = requestValidators;
         this.tokenStore = tokenStore;
         this.tokenInvalidator = tokenInvalidator;
+        this.accessTokenGenerator = accessTokenGenerator;
     }
 
     /**
@@ -99,7 +101,6 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
             }
         }
 
-        RefreshToken refreshToken = null;
         AccessToken accessToken;
         Set<String> authorizationScope;
         // Only allow one request per code through here at a time, to prevent replay.
@@ -138,27 +139,12 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
             final String validatedClaims = providerSettings.validateRequestedClaims(
                     authorizationCode.getStringProperty(OAuth2Constants.Custom.CLAIMS));
 
-            if (providerSettings.issueRefreshTokens()) {
-                refreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
-                        resourceOwnerId, redirectUri, authorizationScope, request);
-
-                if (!StringUtils.isBlank(validatedClaims)) {
-                    refreshToken.setStringProperty(OAuth2Constants.Custom.CLAIMS, validatedClaims);
-                }
-
-                tokenStore.updateRefreshToken(refreshToken);
-            }
-
-            accessToken = tokenStore.createAccessToken(grantType, OAuth2Constants.Bearer.BEARER, code,
-                    resourceOwnerId, clientRegistration.getClientId(), redirectUri, authorizationScope,
-                    refreshToken, authorizationCode.getNonce(), validatedClaims, request);
+            accessToken = accessTokenGenerator.generateAccessToken(providerSettings, grantType,
+                    clientRegistration.getClientId(), resourceOwnerId, redirectUri, authorizationScope, validatedClaims,
+                    code, authorizationCode.getNonce(), request);
 
             authorizationCode.setIssued();
             tokenStore.updateAuthorizationCode(authorizationCode);
-        }
-
-        if (refreshToken != null) {
-            accessToken.addExtraData(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getTokenId());
         }
 
         final String nonce = authorizationCode.getNonce();

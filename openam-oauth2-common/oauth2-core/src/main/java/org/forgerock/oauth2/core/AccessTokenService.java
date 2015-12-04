@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.AuthorizationDeclinedException;
+import org.forgerock.oauth2.core.exceptions.AuthorizationPendingException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
@@ -58,7 +59,8 @@ public interface AccessTokenService {
      */
     AccessToken requestAccessToken(OAuth2Request request) throws InvalidGrantException, RedirectUriMismatchException,
             InvalidClientException, InvalidRequestException, InvalidCodeException, ServerException,
-            UnauthorizedClientException, InvalidScopeException, NotFoundException;
+            UnauthorizedClientException, InvalidScopeException, NotFoundException, AuthorizationPendingException,
+            ExpiredTokenException, AuthorizationDeclinedException, BadRequestException;
 
     /**
      * Handles a request to refresh an already issued access token for a OAuth2 client, validates that the request is

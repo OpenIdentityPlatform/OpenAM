@@ -14,47 +14,42 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.oauth2.restlet;
+package org.forgerock.oauth2.core;
 
-import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 import static org.forgerock.json.JsonValue.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.DEVICE_CODE;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.ClientRegistration;
-import org.forgerock.oauth2.core.ClientRegistrationStore;
-import org.forgerock.oauth2.core.DeviceCode;
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.restlet.Request;
-import org.restlet.data.Method;
-import org.restlet.data.Reference;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class DeviceTokenResourceTest {
+public class DeviceCodeGrantTypeHandlerTest {
 
-    private DeviceTokenResource resource;
+    private DeviceCodeGrantTypeHandler grantTypeHandler;
     @Mock
     private TokenStore tokenStore;
     @Mock
@@ -62,61 +57,103 @@ public class DeviceTokenResourceTest {
     @Mock
     private OAuth2ProviderSettings providerSettings;
     @Mock
-    private Request request;
+    private OAuth2Request request;
+    @Mock
+    private AccessToken accessToken;
+    @Mock
+    private RefreshToken refreshToken;
+    private GrantTypeAccessTokenGenerator accessTokenGenerator;
 
     @BeforeMethod
     public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        initMocks(this);
+
+        OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
+        when(providerSettingsFactory.get(request)).thenReturn(providerSettings);
+        when(providerSettings.getDeviceCodePollInterval()).thenReturn(5);
+        when(providerSettings.validateRequestedClaims(anyString())).thenAnswer(new Answer<String>() {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable {
+                return (String) invocation.getArguments()[0];
+            }
+        });
+
+        ClientAuthenticator clientAuthenticator = mock(ClientAuthenticator.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        when(clientAuthenticator.authenticate(eq(request), anyString())).thenReturn(clientRegistration);
+
+        accessTokenGenerator = new GrantTypeAccessTokenGenerator(tokenStore);
+        when(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+                anySetOf(String.class), any(RefreshToken.class), anyString(), anyString(), any(OAuth2Request.class)))
+                .thenReturn(accessToken);
+        when(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
+                any(OAuth2Request.class))).thenReturn(refreshToken);
 
         ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
         InvalidClientException expectedResult = mock(InvalidClientException.class);
-        when(expectedResult.getError()).thenReturn(new String("invalid_client"));
+        when(expectedResult.getError()).thenReturn("invalid_client");
         when(failureFactory.getException()).thenReturn(expectedResult);
         when(failureFactory.getException(anyString())).thenReturn(expectedResult);
         when(failureFactory.getException(any(OAuth2Request.class), anyString())).thenReturn(expectedResult);
 
-        when(request.getMethod()).thenReturn(Method.POST);
-
-        resource = spy(new DeviceTokenResource(tokenStore, mockOAuth2RequestFactory(), clientRegistrationStore,
-                mockProviderSettingsFactory(), null, failureFactory));
-
-        when(providerSettings.getDeviceCodePollInterval()).thenReturn(5);
-
-        when(resource.getRequest()).thenReturn(request);
+        grantTypeHandler = new DeviceCodeGrantTypeHandler(providerSettingsFactory, clientAuthenticator, tokenStore,
+                clientRegistrationStore, failureFactory, accessTokenGenerator);
     }
 
     @Test
-    public void shouldIssueTokens() throws Exception {
+    public void shouldIssueAccessToken() throws Exception {
         // Given
-        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
+        Set<String> scope = new HashSet<>();
+        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE", scope);
         mockClientRegistration();
-        mockDeviceCodeRead(issuedDeviceCode());
+        mockDeviceCodeRead(authorizeDeviceCode(field(CLAIMS, asSet("CLAIMS"))));
 
         // When
-        JacksonRepresentation<Map<String, Object>> result =
-                (JacksonRepresentation<Map<String, Object>>) resource.issueTokens(null);
+        grantTypeHandler.handle(request);
 
         // Then
-        assertThat(result.getObject()).containsOnly(entry("access_token", "TOKEN"));
+        verify(tokenStore).createAccessToken(DEVICE_CODE, BEARER, null, "RESOURCE_OWNER_ID", "CLIENT_ID", null, scope,
+                null, null, "CLAIMS", request);
+        verify(accessToken, never()).addExtraData(eq(REFRESH_TOKEN), anyString());
+    }
+
+    @Test
+    public void shouldIssueRefreshToken() throws Exception {
+        // Given
+        Set<String> scope = new HashSet<>();
+        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE", scope);
+        mockClientRegistration();
+        mockDeviceCodeRead(authorizeDeviceCode(field(CLAIMS, asSet("CLAIMS"))));
+        given(providerSettings.issueRefreshTokens()).willReturn(true);
+
+        // When
+        grantTypeHandler.handle(request);
+
+        // Then
+        verify(tokenStore).createAccessToken(DEVICE_CODE, BEARER, null, "RESOURCE_OWNER_ID", "CLIENT_ID", null, scope,
+                refreshToken, null, "CLAIMS", request);
+        verify(tokenStore).createRefreshToken(DEVICE_CODE, "CLIENT_ID", "RESOURCE_OWNER_ID", null, scope, request);
+        verify(accessToken).addExtraData(eq(REFRESH_TOKEN), anyString());
     }
 
     @Test
     public void shouldCatchInvalidClients() throws Exception {
         // Given
         InvalidClientException expectedResult = mock(InvalidClientException.class);
-        when(expectedResult.getError()).thenReturn(new String("invalid_client"));
+        when(expectedResult.getError()).thenReturn("invalid_client");
 
-        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
+        Set<String> scope = new HashSet<>();
+        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE", scope);
         given(clientRegistrationStore.get(anyString(), any(OAuth2Request.class)))
                 .willThrow(expectedResult);
 
         // When
         try {
-            resource.issueTokens(null);
+            grantTypeHandler.handle(request);
 
             // Then - exception
             fail("Should have exception");
-        } catch (OAuth2RestletException e) {
+        } catch (OAuth2Exception e) {
             assertThat(e.getError().equals("invalid_client"));
         }
     }
@@ -133,15 +170,16 @@ public class DeviceTokenResourceTest {
     @Test(dataProvider = "invalidParameters")
     public void shouldCatchInvalidParameters(String clientId, String clientSecret, String code) throws Exception {
         // Given
-        mockRequestRealmClientIdClientSecretAndCode("REALM", clientId, clientSecret, code);
+        Set<String> scope = new HashSet<>();
+        mockRequestRealmClientIdClientSecretAndCode("REALM", clientId, clientSecret, code, scope);
 
         // When
         try {
-            resource.issueTokens(null);
+            grantTypeHandler.handle(request);
 
             // Then - exception
             fail("Should have exception");
-        } catch (OAuth2RestletException e) {
+        } catch (OAuth2Exception e) {
             assertThat(e.getError().equals("bad_request"));
         }
     }
@@ -149,16 +187,17 @@ public class DeviceTokenResourceTest {
     @Test
     public void shouldCatchInvalidClientSecret() throws Exception {
         // Given
-        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "SECRET", "CODE");
+        Set<String> scope = new HashSet<>();
+        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "SECRET", "CODE", scope);
         mockClientRegistration();
 
         // When
         try {
-            resource.issueTokens(null);
+            grantTypeHandler.handle(request);
 
             // Then - exception
             fail("Should have exception");
-        } catch (OAuth2RestletException e) {
+        } catch (OAuth2Exception e) {
             assertThat(e.getError().equals("invalid_client"));
         }
     }
@@ -166,17 +205,18 @@ public class DeviceTokenResourceTest {
     @Test
     public void shouldCatchNonExistingDeviceCode() throws Exception {
         // Given
-        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
+        Set<String> scope = new HashSet<>();
+        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "SECRET", "CODE", scope);
         mockClientRegistration();
         mockDeviceCodeRead(null);
 
         // When
         try {
-            resource.issueTokens(null);
+            grantTypeHandler.handle(request);
 
             // Then - exception
             fail("Should have exception");
-        } catch (OAuth2RestletException e) {
+        } catch (OAuth2Exception e) {
             assertThat(e.getError().equals("authorization_declined"));
         }
     }
@@ -184,17 +224,18 @@ public class DeviceTokenResourceTest {
     @Test
     public void shouldCatchExpiredDeviceCode() throws Exception {
         // Given
-        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
+        Set<String> scope = new HashSet<>();
+        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "SECRET", "CODE", scope);
         mockClientRegistration();
         mockDeviceCodeRead(deviceCode(field("expireTime", asSet("1"))));
 
         // When
         try {
-            resource.issueTokens(null);
+            grantTypeHandler.handle(request);
 
             // Then - exception
             fail("Should have exception");
-        } catch (OAuth2RestletException e) {
+        } catch (OAuth2Exception e) {
             assertThat(e.getError().equals("bad_request"));
         }
     }
@@ -202,17 +243,18 @@ public class DeviceTokenResourceTest {
     @Test
     public void shouldCatchPendingDeviceCode() throws Exception {
         // Given
-        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
+        Set<String> scope = new HashSet<>();
+        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "SECRET", "CODE", scope);
         mockClientRegistration();
         mockDeviceCodeRead(deviceCode(field("expireTime", asSet(String.valueOf(System.currentTimeMillis() + 5000)))));
 
         // When
         try {
-            resource.issueTokens(null);
+            grantTypeHandler.handle(request);
 
             // Then - exception
             fail("Should have exception");
-        } catch (OAuth2RestletException e) {
+        } catch (OAuth2Exception e) {
             assertThat(e.getError().equals("authorization_pending"));
         }
     }
@@ -220,7 +262,8 @@ public class DeviceTokenResourceTest {
     @Test
     public void shouldCatchTooRapidRequests() throws Exception {
         // Given
-        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "CLIENT_SECRET", "CODE");
+        Set<String> scope = new HashSet<>();
+        mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "SECRET", "CODE", scope);
         mockClientRegistration();
         mockDeviceCodeRead(deviceCode(
                 field("expireTime", asSet(String.valueOf(System.currentTimeMillis() + 5000))),
@@ -229,11 +272,11 @@ public class DeviceTokenResourceTest {
 
         // When
         try {
-            resource.issueTokens(null);
+            grantTypeHandler.handle(request);
 
             // Then - exception
             fail("Should have exception");
-        } catch (OAuth2RestletException e) {
+        } catch (OAuth2Exception e) {
             assertThat(e.getError().equals("bad_request"));
         }
     }
@@ -241,42 +284,28 @@ public class DeviceTokenResourceTest {
     private void mockClientRegistration() throws Exception {
         ClientRegistration registration = mock(ClientRegistration.class);
         given(clientRegistrationStore.get(eq("CLIENT_ID"), any(OAuth2Request.class))).willReturn(registration);
+        given(registration.getClientId()).willReturn("CLIENT_ID");
         given(registration.getClientSecret()).willReturn("CLIENT_SECRET");
     }
 
-    private void mockDeviceCodeRead(DeviceCode deviceCode) throws ServerException, NotFoundException, InvalidGrantException {
+    private void mockDeviceCodeRead(DeviceCode deviceCode) throws ServerException, NotFoundException,
+            InvalidGrantException {
         given(tokenStore.readDeviceCode(eq("CLIENT_ID"), eq("CODE"), any(OAuth2Request.class))).willReturn(deviceCode);
     }
 
     private void mockRequestRealmClientIdClientSecretAndCode(String realm, String clientId, String clientSecret,
-            String code) {
-        given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) realm)));
-        given(request.getResourceRef()).willReturn(new Reference()
-                .addQueryParameter("client_id", clientId)
-                .addQueryParameter("client_secret", clientSecret)
-                .addQueryParameter("code", code));
+            String code, Set<String> scope) {
+        given(request.getParameter(REALM)).willReturn(realm);
+        given(request.getParameter(CLIENT_ID)).willReturn(clientId);
+        given(request.getParameter(CLIENT_SECRET)).willReturn(clientSecret);
+        given(request.getParameter(CODE)).willReturn(code);
+        given(request.getParameter(GRANT_TYPE)).willReturn(DEVICE_CODE);
+        given(request.getParameter(SCOPE)).willReturn(scope);
     }
 
-    private OAuth2ProviderSettingsFactory mockProviderSettingsFactory() throws NotFoundException {
-        OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
-        when(providerSettingsFactory.get(any(OAuth2Request.class))).thenReturn(providerSettings);
-        return providerSettingsFactory;
-    }
-
-    private OAuth2RequestFactory<Request> mockOAuth2RequestFactory() {
-        OAuth2RequestFactory<Request> requestFactory = mock(OAuth2RequestFactory.class);
-        when(requestFactory.create(any(Request.class))).then(new Answer<OAuth2Request>() {
-            @Override
-            public OAuth2Request answer(InvocationOnMock invocation) throws Throwable {
-                return new RestletOAuth2Request((Request) invocation.getArguments()[0]);
-            }
-        });
-        return requestFactory;
-    }
-
-    private static DeviceCode issuedDeviceCode(Map.Entry<String, Object>... fields) {
-        DeviceCode deviceCode = deviceCode();
-        deviceCode.setTokens(singletonMap("access_token", "TOKEN"));
+    private static DeviceCode authorizeDeviceCode(Map.Entry<String, Object>... fields) {
+        DeviceCode deviceCode = deviceCode(fields);
+        deviceCode.setAuthorized(true);
         return deviceCode;
     }
 
@@ -287,7 +316,8 @@ public class DeviceTokenResourceTest {
                     field("id", asSet("123")),
                     field("user_code", asSet("456")),
                     field("realm", asSet("REALM")),
-                    field("clientID", asSet("CLIENT_ID"))));
+                    field("clientID", asSet("CLIENT_ID")),
+                    field("userName", asSet("RESOURCE_OWNER_ID"))));
             for (Map.Entry<String, Object> field : fields) {
                 json.put(field.getKey(), field.getValue());
             }
@@ -296,5 +326,4 @@ public class DeviceTokenResourceTest {
             throw new IllegalStateException(e);
         }
     }
-
 }

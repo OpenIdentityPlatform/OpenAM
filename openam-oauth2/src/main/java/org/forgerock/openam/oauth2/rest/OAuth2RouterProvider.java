@@ -40,7 +40,6 @@ import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
 import org.forgerock.oauth2.restlet.AuthorizeResource;
 import org.forgerock.oauth2.restlet.DeviceCodeResource;
 import org.forgerock.oauth2.restlet.DeviceCodeVerificationResource;
-import org.forgerock.oauth2.restlet.DeviceTokenResource;
 import org.forgerock.oauth2.restlet.TokenEndpointFilter;
 import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
@@ -144,8 +143,6 @@ public class OAuth2RouterProvider implements Provider<Router> {
         router.attach("/device/user", auditWithOAuthFilter(wrap(DeviceCodeVerificationResource.class)));
         router.attach("/device/code", auditWithOAuthFilter(wrap(DeviceCodeResource.class),
                 formAuditor(RESPONSE_TYPE, GRANT_TYPE, CLIENT_ID, SCOPE), noBodyAuditor()));
-        router.attach("/device/token", auditWithOAuthFilter(wrap(DeviceTokenResource.class),
-                noBodyAuditor(), jacksonAuditor(SCOPE, TOKEN_TYPE)));
 
         return router;
     }

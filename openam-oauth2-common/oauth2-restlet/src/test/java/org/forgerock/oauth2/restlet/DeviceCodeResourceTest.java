@@ -44,6 +44,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -139,9 +140,10 @@ public class DeviceCodeResourceTest {
 
         // Then
         verify(clientRegistrationStore).get(eq("CLIENT_ID"), notNull(OAuth2Request.class));
-        verify(tokenStore).createDeviceCode(eq(asSet("some", "scopes")), eq("CLIENT_ID"), eq("NONCE"),
-                eq("RESPONSE_TYPE"), eq("STATE"), eq("ACR_VALUES"), eq("PROMPT"), eq("UI_LOCALES"), eq("LOGIN_HINT"),
-                eq(55), eq("CLAIMS"), any(OAuth2Request.class), eq("CODE_CHALLENGE"), eq("CODE_CHALLENGE_METHOD"));
+        verify(tokenStore).createDeviceCode(eq(asSet("some", "scopes")), any(ResourceOwner.class), eq("CLIENT_ID"),
+                eq("NONCE"), eq("RESPONSE_TYPE"), eq("STATE"), eq("ACR_VALUES"), eq("PROMPT"), eq("UI_LOCALES"),
+                eq("LOGIN_HINT"), eq(55), eq("CLAIMS"), any(OAuth2Request.class), eq("CODE_CHALLENGE"),
+                eq("CODE_CHALLENGE_METHOD"));
 
         assertThat(result.getObject()).containsOnly(
                 entry("device_code", DEVICE_CODE.getDeviceCode()),
@@ -205,9 +207,9 @@ public class DeviceCodeResourceTest {
     }
 
     private void mockDeviceCodeCreation() throws ServerException, NotFoundException {
-        given(tokenStore.createDeviceCode(anySet(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anyString(), anyString(), anyInt(), anyString(), any(OAuth2Request.class), anyString(),
-                anyString())).willReturn(DEVICE_CODE);
+        given(tokenStore.createDeviceCode(anySet(), any(ResourceOwner.class), anyString(), anyString(), anyString(),
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyInt(), anyString(),
+                any(OAuth2Request.class), anyString(), anyString())).willReturn(DEVICE_CODE);
     }
 
     private OAuth2ProviderSettingsFactory mockProviderSettingsFactory() throws NotFoundException {

@@ -16,6 +16,10 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.AuthorizationDeclinedException;
+import org.forgerock.oauth2.core.exceptions.AuthorizationPendingException;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
@@ -61,11 +65,16 @@ public abstract class GrantTypeHandler {
      * @throws UnauthorizedClientException If the client's authorization fails.
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     * @throws ExpiredTokenException If the token has expired.
+     * @throws AuthorizationPendingException If authorization is still pending.
+     * @throws AuthorizationDeclinedException If authorization has been declined.
+     * @throws BadRequestException If the request is invalid or malformed.
      */
     public AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException,
             InvalidClientException, InvalidRequestException, InvalidGrantException,
             InvalidCodeException, ServerException, UnauthorizedClientException, InvalidScopeException,
-            NotFoundException {
+            NotFoundException, ExpiredTokenException, AuthorizationPendingException, AuthorizationDeclinedException,
+            BadRequestException {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
                 providerSettings.getTokenEndpoint());
@@ -75,5 +84,6 @@ public abstract class GrantTypeHandler {
     protected abstract AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
             OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException, InvalidRequestException,
             InvalidGrantException, InvalidCodeException, ServerException, UnauthorizedClientException,
-            InvalidScopeException, NotFoundException, InvalidClientException;
+            InvalidScopeException, NotFoundException, InvalidClientException, AuthorizationDeclinedException,
+            ExpiredTokenException, BadRequestException, AuthorizationPendingException;
 }

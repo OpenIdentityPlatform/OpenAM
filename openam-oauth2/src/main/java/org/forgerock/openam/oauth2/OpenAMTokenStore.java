@@ -801,8 +801,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     /**
      * {@inheritDoc}
      */
-    public DeviceCode createDeviceCode(Set<String> scope, String clientId, String nonce, String responseType,
-            String state, String acrValues, String prompt, String uiLocales, String loginHint,
+    public DeviceCode createDeviceCode(Set<String> scope, ResourceOwner resourceOwner, String clientId, String nonce,
+            String responseType, String state, String acrValues, String prompt, String uiLocales, String loginHint,
             Integer maxAge, String claims, OAuth2Request request, String codeChallenge, String codeChallengeMethod)
             throws ServerException, NotFoundException {
 
@@ -837,8 +837,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         long expiryTime = System.currentTimeMillis() + (1000 * providerSettings.getDeviceCodeLifetime());
-        final DeviceCode code = new DeviceCode(deviceCode, userCode, clientId, nonce, responseType, state,
-                acrValues, prompt, uiLocales, loginHint, maxAge, claims, expiryTime, scope,
+        String resourceOwnerId = resourceOwner == null ? null : resourceOwner.getId();
+        final DeviceCode code = new DeviceCode(deviceCode, userCode, resourceOwnerId, clientId, nonce,
+                responseType, state, acrValues, prompt, uiLocales, loginHint, maxAge, claims, expiryTime, scope,
                 realmNormaliser.normalise(request.<String>getParameter(REALM)), codeChallenge, codeChallengeMethod);
 
         // Store in CTS

@@ -15,24 +15,37 @@
  */
 package org.forgerock.oauth2.restlet;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.CLIENT_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.SCOPE;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.forgerock.oauth2.core.AuthorizationService;
-import org.forgerock.oauth2.core.AuthorizationToken;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.DeviceCode;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.ResourceOwner;
+import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.Utils;
+import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
@@ -68,7 +81,10 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     private final TokenStore tokenStore;
     private final OAuth2RequestFactory<Request> requestFactory;
     private final AuthorizationService authorizationService;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ExceptionHandler exceptionHandler;
+    private final ResourceOwnerSessionValidator resourceOwnerSessionValidator;
+    private final ClientRegistrationStore clientRegistrationStore;
 
     /**
      * Constructs user code verification resource for OAuth2 Device Flow
@@ -79,13 +95,18 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     public DeviceCodeVerificationResource(XUIState xuiState, @Named("OAuth2Router") Router router,
             BaseURLProviderFactory baseURLProviderFactory, OAuth2Representation representation,
             TokenStore tokenStore, OAuth2RequestFactory<Request> requestFactory,
-            AuthorizationService authorizationService, ExceptionHandler exceptionHandler) {
+            AuthorizationService authorizationService, OAuth2ProviderSettingsFactory providerSettingsFactory,
+            ExceptionHandler exceptionHandler, ResourceOwnerSessionValidator resourceOwnerSessionValidator,
+            ClientRegistrationStore clientRegistrationStore) {
         super(router, baseURLProviderFactory, xuiState);
         this.representation = representation;
         this.tokenStore = tokenStore;
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
+        this.providerSettingsFactory = providerSettingsFactory;
         this.exceptionHandler = exceptionHandler;
+        this.resourceOwnerSessionValidator = resourceOwnerSessionValidator;
+        this.clientRegistrationStore = clientRegistrationStore;
     }
 
     /**
@@ -112,23 +133,23 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         addRequestParamsFromDeviceCode(restletRequest, deviceCode);
 
         try {
-            AuthorizationToken token = null;
             final String decision = request.getParameter("decision");
             if (StringUtils.isNotEmpty(decision)) {
                 final boolean consentGiven = "allow".equalsIgnoreCase(decision);
                 final boolean saveConsent = "on".equalsIgnoreCase(request.<String>getParameter("save_consent"));
+                if (saveConsent) {
+                    saveConsent(request);
+                }
                 if (consentGiven) {
-                    token = authorizationService.authorize(request, consentGiven, saveConsent);
+                    ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
+                    deviceCode.setResourceOwnerId(resourceOwner.getId());
+                    deviceCode.setAuthorized(true);
+                    tokenStore.updateDeviceCode(deviceCode, request);
                 } else {
                     tokenStore.deleteDeviceCode(deviceCode.getClientId(), deviceCode.getDeviceCode(), request);
                 }
             } else {
-                token = authorizationService.authorize(request);
-            }
-
-            if (token != null) {
-                deviceCode.setTokens(token.getToken());
-                tokenStore.updateDeviceCode(deviceCode, request);
+                authorizationService.authorize(request);
             }
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("client_id")) {
@@ -143,10 +164,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         } catch (ResourceOwnerConsentRequired e) {
             return representation.getRepresentation(getContext(), request, "authorize.ftl",
                     getDataModel(e, request));
-        } catch (InvalidClientException e) {
-            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
-                    request.<String>getParameter("state"));
-        } catch (RedirectUriMismatchException e) {
+        } catch (InvalidClientException | RedirectUriMismatchException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
@@ -156,6 +174,18 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         }
 
         return getTemplateRepresentation(THANKS_PAGE, request, null);
+    }
+
+    private void saveConsent(OAuth2Request request) throws NotFoundException, ServerException, InvalidScopeException,
+            AccessDeniedException, ResourceOwnerAuthenticationRequired, InteractionRequiredException,
+            BadRequestException, LoginRequiredException, InvalidClientException {
+        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
+        ClientRegistration clientRegistration =
+                clientRegistrationStore.get(request.<String>getParameter(CLIENT_ID), request);
+        Set<String> scope = Utils.splitScope(request.<String>getParameter(SCOPE));
+        Set<String> validatedScope = providerSettings.validateAuthorizationScope(clientRegistration, scope, request);
+        providerSettings.saveConsent(resourceOwner, clientRegistration.getClientId(), validatedScope);
     }
 
     private Representation getTemplateRepresentation(String template, OAuth2Request request, String errorCode) {
