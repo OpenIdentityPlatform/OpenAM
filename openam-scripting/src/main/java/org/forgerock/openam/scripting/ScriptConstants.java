@@ -67,7 +67,6 @@ public final class ScriptConstants {
     public static final String AUTHENTICATION_SERVER_SIDE_NAME = "AUTHENTICATION_SERVER_SIDE";
     public static final String POLICY_CONDITION_NAME = "POLICY_CONDITION";
     public static final String OIDC_CLAIMS_NAME = "OIDC_CLAIMS";
-    public static final String SDK_NAME = "SDK";
 
     /**
      * The context in which a script will be used.
@@ -76,8 +75,7 @@ public final class ScriptConstants {
         AUTHENTICATION_SERVER_SIDE,
         AUTHENTICATION_CLIENT_SIDE,
         POLICY_CONDITION,
-        OIDC_CLAIMS,
-        SDK
+        OIDC_CLAIMS
     }
 
     /**
@@ -89,9 +87,7 @@ public final class ScriptConstants {
         AUTH_MODULE_CLIENT_SIDE("Scripted Module - Client Side", ""),
         DEVICE_ID_MATCH_SERVER_SIDE("Device Id (Match) - Server Side", "703dab1a-1921-4981-98dd-b8e5349d8548"),
         DEVICE_ID_MATCH_CLIENT_SIDE("Device Id (Match) - Client Side", "157298c0-7d31-4059-a95b-eeb08473b7e5"),
-        OIDC_CLAIMS_SCRIPT("OIDC Claims Script", "36863ffb-40ec-48b9-94b1-9a99f71cc3b5"),
-        SDK_SCRIPT("SDK Script", "862da73e-1beb-11e5-9a21-1697f925ec7b");
-
+        OIDC_CLAIMS_SCRIPT("OIDC Claims Script", "36863ffb-40ec-48b9-94b1-9a99f71cc3b5");
         private final String displayName;
         private final String id;
 

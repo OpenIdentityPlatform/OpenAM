@@ -101,8 +101,6 @@ public final class AuditConstants {
         SESSION("Session"),
         /** Script audit event component. */
         SCRIPT("Script"),
-        /** Batch audit event component. */
-        BATCH("Batch"),
         /** Configuration audit event component. */
         CONFIG("Config"),
         /** STS audit event component. */

@@ -33,7 +33,6 @@
                         <ChoiceValue i18nKey="script-type-02">AUTHENTICATION_SERVER_SIDE</ChoiceValue>
                         <ChoiceValue i18nKey="script-type-03">AUTHENTICATION_CLIENT_SIDE</ChoiceValue>
                         <ChoiceValue i18nKey="script-type-04">OIDC_CLAIMS</ChoiceValue>
-                        <ChoiceValue i18nKey="script-type-05">SDK</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>POLICY_CONDITION</Value>
@@ -343,59 +342,6 @@
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>
-                <SubConfiguration name="SDK" id="scriptContext">
-                    <AttributeValuePair>
-                        <Attribute name="i18nKey"/>
-                        <Value>script-type-05</Value>
-                    </AttributeValuePair>
-                    <AttributeValuePair>
-                        <Attribute name="defaultScript"/>
-                        <Value>@GlobalSdkClaimsScriptId@</Value>
-                    </AttributeValuePair>
-                    <AttributeValuePair>
-                        <Attribute name="languages" />
-                        <Value>GROOVY</Value>
-                    </AttributeValuePair>
-                    <SubConfiguration name="engineConfiguration" id="engineConfiguration">
-                        <AttributeValuePair>
-                            <Attribute name="whiteList"/>
-                            <Value>java.lang.Boolean</Value>
-                            <Value>java.lang.Byte</Value>
-                            <Value>java.lang.Character</Value>
-                            <Value>java.lang.Character$Subset</Value>
-                            <Value>java.lang.Character$UnicodeBlock</Value>
-                            <Value>java.lang.Double</Value>
-                            <Value>java.lang.Float</Value>
-                            <Value>java.lang.Integer</Value>
-                            <Value>java.lang.Long</Value>
-                            <Value>java.lang.Math</Value>
-                            <Value>java.lang.Number</Value>
-                            <Value>java.lang.Object</Value>
-                            <Value>java.lang.Short</Value>
-                            <Value>java.lang.StrictMath</Value>
-                            <Value>java.lang.String</Value>
-                            <Value>java.lang.Void</Value>
-                            <Value>java.util.ArrayList</Value>
-                            <Value>java.util.HashSet</Value>
-                            <Value>java.util.HashMap</Value>
-                            <Value>java.util.HashMap$Entry</Value>
-                            <Value>java.util.HashMap$KeyIterator</Value>
-                            <Value>java.util.LinkedHashMap</Value>
-                            <Value>java.util.LinkedHashSet</Value>
-                            <Value>java.util.LinkedList</Value>
-                            <Value>java.util.TreeMap</Value>
-                            <Value>java.util.TreeSet</Value>
-                            <Value>com.sun.identity.shared.debug.Debug</Value>
-                            <Value>java.util.LinkedHashMap$Entry</Value>
-                            <Value>java.util.LinkedHashMap$LinkedEntrySet</Value>
-                            <Value>java.util.HashMap$Node</Value>
-                            <Value>org.forgerock.json.JsonValue</Value>
-                            <Value>org.forgerock.openam.scripting.rest.batch.helpers.Requester</Value>
-                            <Value>org.forgerock.json.resource.UriRouterContext</Value>
-                            <Value>org.forgerock.openam.scripting.rest.batch.helpers.ScriptResponse</Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
-                </SubConfiguration>
                 <SubConfiguration name="globalScripts" id="globalScripts">
                     <SubConfiguration name="@GlobalEntitlementConditionScriptId@" id="globalScript">
                         <AttributeValuePair>
@@ -499,30 +445,6 @@
                             <Attribute name="script"/>
                             <Value>
                                 ${inject.content.oidc-claims-extension-groovy}
-                            </Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
-                    <SubConfiguration name="@GlobalSdkClaimsScriptId@" id="globalScript">
-                        <AttributeValuePair>
-                            <Attribute name="name"/>
-                            <Value>SDK Script</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="description"/>
-                            <Value>Default global script for SDK</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="context"/>
-                            <Value>SDK</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="language"/>
-                            <Value>GROOVY</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="script"/>
-                            <Value>
-                                ${inject.content.sdk-groovy}
                             </Value>
                         </AttributeValuePair>
                     </SubConfiguration>

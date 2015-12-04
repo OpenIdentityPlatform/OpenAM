@@ -16,7 +16,6 @@
 package org.forgerock.openam.scripting.rest.batch;
 
 import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.openam.scripting.ScriptConstants.SDK_NAME;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -80,7 +79,7 @@ public class BatchResource extends RealmAwareResource {
     private final Requester requester;
 
     @Inject
-    public BatchResource(@Named(SDK_NAME) ScriptEvaluator scriptEvaluator,
+    public BatchResource(ScriptEvaluator scriptEvaluator,
                          ScriptingServiceFactory scriptingServiceFactory,
                          @Named("frRest") Debug debug,
                          ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler,

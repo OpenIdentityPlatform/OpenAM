@@ -16,15 +16,12 @@
 
 package org.forgerock.openam.scripting.rest;
 
-import static org.forgerock.openam.audit.AuditConstants.Component.BATCH;
-import static org.forgerock.openam.audit.AuditConstants.Component.SCRIPT;
+import static org.forgerock.openam.audit.AuditConstants.Component.*;
 
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
-import org.forgerock.openam.scripting.rest.batch.BatchResource;
 
 /**
  * A {@link RestRouteProvider} that add route for the scripting endpoint.
@@ -41,9 +38,5 @@ public class ScriptingRestRouteProvider extends AbstractRestRouteProvider {
                 .authorizeWith(PrivilegeAuthzModule.class)
                 .toCollection(ScriptResource.class);
 
-        realmRouter.route("batch")
-                .auditAs(BATCH)
-                .authorizeWith(AdminOnlyAuthzModule.class)
-                .toCollection(BatchResource.class);
     }
 }
