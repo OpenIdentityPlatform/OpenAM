@@ -70,6 +70,11 @@ public class JdbcAuditEventHandlerFactoryTest {
         configAttributes.put("activityEventColumns", singleton("[runAs]=runas"));
         configAttributes.put("accessEventColumns", singleton("[server/ip]=server_ip"));
         configAttributes.put("configEventColumns", singleton("[objectId]=objectid"));
+        configAttributes.put("bufferingEnabled", singleton("true"));
+        configAttributes.put("bufferingMaxSize", singleton("5000"));
+        configAttributes.put("bufferingWriteInterval", singleton("60"));
+        configAttributes.put("bufferingWriterThreads", singleton("1"));
+        configAttributes.put("bufferingMaxBatchedEvents", singleton("100"));
     }
 
     @Test

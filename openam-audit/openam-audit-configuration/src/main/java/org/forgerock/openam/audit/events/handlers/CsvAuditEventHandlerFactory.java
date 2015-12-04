@@ -26,6 +26,7 @@ import org.forgerock.audit.events.handlers.AuditEventHandler;
 import org.forgerock.audit.handlers.csv.CsvAuditEventHandler;
 import org.forgerock.audit.handlers.csv.CsvAuditEventHandlerConfiguration;
 import org.forgerock.audit.providers.DefaultKeyStoreHandlerProvider;
+import org.forgerock.audit.handlers.csv.CsvAuditEventHandlerConfiguration.EventBufferingConfiguration;
 import org.forgerock.openam.audit.AuditEventHandlerFactory;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
 import org.forgerock.openam.utils.StringUtils;
@@ -44,7 +45,7 @@ import java.util.Set;
 @Singleton
 public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
 
-    private final Debug debug = Debug.getInstance("amAudit");
+    private static final Debug DEBUG = Debug.getInstance("amAudit");
 
     @Override
     public AuditEventHandler create(AuditEventHandlerConfiguration configuration) throws AuditException {
@@ -59,6 +60,7 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
         csvHandlerConfiguration.setEnabled(getBooleanMapAttr(attributes, "enabled", true));
         setFileRotationPolicies(csvHandlerConfiguration, attributes);
         setFileRetentionPolicies(csvHandlerConfiguration, attributes);
+        csvHandlerConfiguration.setBufferingConfiguration(getBufferingConfiguration(attributes));
 
         return new CsvAuditEventHandler(csvHandlerConfiguration, configuration.getEventTopicsMetaData(),
                 new DefaultKeyStoreHandlerProvider());
@@ -89,11 +91,18 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
 
     private void setFileRetentionPolicies(CsvAuditEventHandlerConfiguration csvHandlerConfiguration,
             Map<String, Set<String>> attributes) {
-        int maxNumberOfHistoryFiles = getIntMapAttr(attributes, "retentionMaxNumberOfHistoryFiles", -1, debug);
+        int maxNumberOfHistoryFiles = getIntMapAttr(attributes, "retentionMaxNumberOfHistoryFiles", -1, DEBUG);
         csvHandlerConfiguration.getFileRetention().setMaxNumberOfHistoryFiles(maxNumberOfHistoryFiles);
-        long maxDiskSpaceToUse = getLongMapAttr(attributes, "retentionMaxDiskSpaceToUse", -1L, debug);
+        long maxDiskSpaceToUse = getLongMapAttr(attributes, "retentionMaxDiskSpaceToUse", -1L, DEBUG);
         csvHandlerConfiguration.getFileRetention().setMaxDiskSpaceToUse(maxDiskSpaceToUse);
-        long minFreeSpaceRequired = getLongMapAttr(attributes, "retentionMinFreeSpaceRequired", -1L, debug);
+        long minFreeSpaceRequired = getLongMapAttr(attributes, "retentionMinFreeSpaceRequired", -1L, DEBUG);
         csvHandlerConfiguration.getFileRetention().setMinFreeSpaceRequired(minFreeSpaceRequired);
+    }
+
+    private EventBufferingConfiguration getBufferingConfiguration(Map<String, Set<String>> attributes) {
+        EventBufferingConfiguration bufferingConfiguration = new EventBufferingConfiguration();
+        bufferingConfiguration.setEnabled(getBooleanMapAttr(attributes, "bufferingEnabled", true));
+        bufferingConfiguration.setAutoFlush(getBooleanMapAttr(attributes, "bufferingAutoFlush", false));
+        return bufferingConfiguration;
     }
 }

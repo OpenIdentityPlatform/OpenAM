@@ -86,11 +86,6 @@
                             <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
-                        <DefaultValues>
-                            <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="rotationEnabled" type="single" syntax="boolean"
                                      i18nKey="audit.handlers.file.rotationEnabled">
                         <BooleanValues>
@@ -140,6 +135,31 @@
                             <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.csv.buffering.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingAutoFlush" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.csv.buffering.autoFlush">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
 
                 <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
@@ -163,11 +183,6 @@
                                     className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
-                        <DefaultValues>
-                            <Value>org.forgerock.openam.audit.events.handlers.SyslogAuditEventHandlerFactory</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host" />
                     <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port" />
                     <AttributeSchema name="transportProtocol" i18nKey="audit.handlers.syslog.transportProtocol"
@@ -182,16 +197,6 @@
                     </AttributeSchema>
                     <AttributeSchema name="connectTimeout" type="single"
                                      i18nKey="audit.handlers.syslog.connectTimeout" />
-                    <AttributeSchema name="buffering" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.syslog.buffering.enabled">
-                        <BooleanValues>
-                            <BooleanTrueValue>true</BooleanTrueValue>
-                            <BooleanFalseValue>false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility"
                                      type="single_choice">
                         <ChoiceValues>
@@ -222,6 +227,21 @@
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>USER</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.syslog.buffering.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.SyslogAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
@@ -363,6 +383,40 @@
                                     <Value>config</Value>
                                 </AttributeValuePair>
                             </DefaultValuesClassName>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.jdbc.buffering.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingMaxSize" type="single"
+                                     i18nKey="audit.handlers.jdbc.buffering.maxSize">
+                        <DefaultValues>
+                            <Value>100000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingWriteInterval" type="single"
+                                     i18nKey="audit.handlers.jdbc.buffering.interval">
+                        <DefaultValues>
+                            <Value>5</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingWriterThreads" type="single"
+                                     i18nKey="audit.handlers.jdbc.buffering.writerThreads">
+                        <DefaultValues>
+                            <Value>1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingMaxBatchedEvents" type="single"
+                                     i18nKey="audit.handlers.jdbc.buffering.maxBatchedEvents">
+                        <DefaultValues>
+                            <Value>100</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
@@ -434,11 +488,6 @@
                             <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
-                        <DefaultValues>
-                            <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="rotationEnabled" type="single" syntax="boolean"
                                      i18nKey="audit.handlers.file.rotationEnabled">
                         <BooleanValues>
@@ -488,6 +537,31 @@
                             <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.csv.buffering.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingAutoFlush" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.csv.buffering.autoFlush">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
 
                 <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
@@ -511,11 +585,6 @@
                                     className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
-                        <DefaultValues>
-                            <Value>org.forgerock.openam.audit.events.handlers.SyslogAuditEventHandlerFactory</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host" />
                     <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port" />
                     <AttributeSchema name="transportProtocol" i18nKey="audit.handlers.syslog.transportProtocol"
@@ -530,16 +599,6 @@
                     </AttributeSchema>
                     <AttributeSchema name="connectTimeout" type="single"
                                      i18nKey="audit.handlers.syslog.connectTimeout" />
-                    <AttributeSchema name="buffering" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.syslog.buffering.enabled">
-                        <BooleanValues>
-                            <BooleanTrueValue>true</BooleanTrueValue>
-                            <BooleanFalseValue>false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility"
                                      type="single_choice">
                         <ChoiceValues>
@@ -570,6 +629,21 @@
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>USER</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.syslog.buffering.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.SyslogAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
@@ -711,6 +785,40 @@
                                     <Value>config</Value>
                                 </AttributeValuePair>
                             </DefaultValuesClassName>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.jdbc.buffering.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingMaxSize" type="single"
+                                     i18nKey="audit.handlers.jdbc.buffering.maxSize">
+                        <DefaultValues>
+                            <Value>100000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingWriteInterval" type="single"
+                                     i18nKey="audit.handlers.jdbc.buffering.interval">
+                        <DefaultValues>
+                            <Value>5</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingWriterThreads" type="single"
+                                     i18nKey="audit.handlers.jdbc.buffering.writerThreads">
+                        <DefaultValues>
+                            <Value>1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="bufferingMaxBatchedEvents" type="single"
+                                     i18nKey="audit.handlers.jdbc.buffering.maxBatchedEvents">
+                        <DefaultValues>
+                            <Value>100</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">

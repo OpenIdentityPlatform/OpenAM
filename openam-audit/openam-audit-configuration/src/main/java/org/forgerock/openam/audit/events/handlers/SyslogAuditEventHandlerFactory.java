@@ -66,7 +66,7 @@ public class SyslogAuditEventHandlerFactory implements AuditEventHandlerFactory 
         }
         setConnectTimeout(syslogHandlerConfiguration, attributes);
         EventBufferingConfiguration eventBufferingConfiguration = new EventBufferingConfiguration();
-        eventBufferingConfiguration.setEnabled(getBooleanMapAttr(attributes, "buffering", true));
+        eventBufferingConfiguration.setEnabled(getBooleanMapAttr(attributes, "bufferingEnabled", true));
         syslogHandlerConfiguration.setBufferingConfiguration(eventBufferingConfiguration);
 
         String facility = getMapAttr(attributes, "facility");

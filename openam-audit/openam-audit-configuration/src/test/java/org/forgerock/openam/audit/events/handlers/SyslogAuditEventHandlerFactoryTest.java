@@ -57,7 +57,7 @@ public class SyslogAuditEventHandlerFactoryTest {
         configAttributes.put("port", singleton("1000"));
         configAttributes.put("transportProtocol", singleton(TransportProtocol.UDP.name()));
         configAttributes.put("connectTimeout", singleton("10"));
-        configAttributes.put("buffering", singleton("true"));
+        configAttributes.put("bufferingEnabled", singleton("true"));
         configAttributes.put("facility", singleton(Facility.USER.name()));
     }
 

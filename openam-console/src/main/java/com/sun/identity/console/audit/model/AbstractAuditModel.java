@@ -35,7 +35,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceSchema;
-import org.forgerock.openam.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.Collator;
@@ -57,10 +56,10 @@ import java.util.Set;
  */
 public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
 
-    private static final String RESOURCE_BUNDLE_NAME = "audit";
-    private static final String SECTION_FILE_NAME = "audit.section.properties";
+    private static final String AUDIT_BUNDLE_NAME = "audit";
+    private static final String SECTION_FILE_NAME_SUFFIX = ".section.properties";
 
-    protected ResourceBundle auditResourceBundle;
+    protected ResourceBundle handlerResourceBundle;
 
     /**
      * Create a new {@code AbstractAuditModel}.
@@ -94,13 +93,13 @@ public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
     @Override
     protected void initialize(HttpServletRequest req, String rbName) {
         super.initialize(req, rbName);
-        auditResourceBundle = AMResBundleCacher.getBundle(RESOURCE_BUNDLE_NAME, locale);
+        handlerResourceBundle = AMResBundleCacher.getBundle(AUDIT_BUNDLE_NAME, locale);
     }
 
     @Override
     public String getLocalizedString(String key) {
-        if (auditResourceBundle.containsKey(key)) {
-            return Locale.getString(auditResourceBundle, key, debug);
+        if (handlerResourceBundle.containsKey(key)) {
+            return Locale.getString(handlerResourceBundle, key, debug);
         } else {
             return super.getLocalizedString(key);
         }
@@ -141,8 +140,9 @@ public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
         try {
             String schemaId = getServiceConfig().getSubConfig(handlerName).getSchemaID();
             ServiceSchema handlerSchema = getServiceSchema().getSubSchema(schemaId);
-            xmlBuilder = new PropertyXMLBuilder(handlerSchema, this, getHandlerResourceBundle(handlerSchema),
-                    getSectionsForHandler(schemaId), SECTION_FILE_NAME);
+            updateHandlerResourceBundle(handlerSchema);
+            xmlBuilder = new PropertyXMLBuilder(handlerSchema, this, handlerResourceBundle,
+                    getSectionsForHandler(schemaId), schemaId + SECTION_FILE_NAME_SUFFIX);
             xmlBuilder.setAllAttributeReadOnly(readOnly);
             xmlBuilder.setSupportSubConfig(false);
             return xmlBuilder.getXML();
@@ -161,8 +161,9 @@ public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
     public String getAddEventHandlerPropertyXML(String schemaId) throws AMConsoleException {
         try {
             ServiceSchema handlerSchema = getServiceSchema().getSubSchema(schemaId);
-            xmlBuilder = new PropertyXMLBuilder(handlerSchema, this, getHandlerResourceBundle(handlerSchema),
-                    getSectionsForHandler(schemaId), SECTION_FILE_NAME);
+            updateHandlerResourceBundle(handlerSchema);
+            xmlBuilder = new PropertyXMLBuilder(handlerSchema, this, handlerResourceBundle,
+                    getSectionsForHandler(schemaId), schemaId + SECTION_FILE_NAME_SUFFIX);
             xmlBuilder.setSupportSubConfig(false);
             String xml = xmlBuilder.getXML();
             String attributeNameXML = AMAdminUtils.getStringFromInputStream(getClass().getClassLoader()
@@ -374,12 +375,10 @@ public abstract class AbstractAuditModel extends AMServiceProfileModelImpl {
         }
     }
 
-    private ResourceBundle getHandlerResourceBundle(ServiceSchema handlerSchema) {
+    private void updateHandlerResourceBundle(ServiceSchema handlerSchema) {
         String handlerBundleName = handlerSchema.getI18NFileName();
-        if (StringUtils.isEmpty(handlerBundleName) || RESOURCE_BUNDLE_NAME.equals(handlerBundleName)) {
-            return auditResourceBundle;
-        } else {
-            return new MultiResourceBundle(locale, handlerSchema.getI18NFileName(), RESOURCE_BUNDLE_NAME);
+        if (isNotEmpty(handlerBundleName) && !AUDIT_BUNDLE_NAME.equals(handlerBundleName)) {
+            handlerResourceBundle = new MultiResourceBundle(locale, handlerBundleName, AUDIT_BUNDLE_NAME);
         }
     }
 

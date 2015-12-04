@@ -60,6 +60,8 @@ public class CsvAuditEventHandlerFactoryTest {
         configAttributes.put("enabled", singleton("true"));
         configAttributes.put("topics", singleton("access"));
         configAttributes.put("location", singleton(logDirName));
+        configAttributes.put("bufferingEnabled", singleton("true"));
+        configAttributes.put("bufferingAutoFlush", singleton("false"));
         AuditEventHandlerConfiguration configuration = AuditEventHandlerConfiguration.builder()
                 .withName("CSV Handler")
                 .withAttributes(configAttributes)
@@ -82,6 +84,8 @@ public class CsvAuditEventHandlerFactoryTest {
         configAttributes.put("enabled", singleton("false"));
         configAttributes.put("topics", singleton("access"));
         configAttributes.put("location", singleton(logDirName));
+        configAttributes.put("bufferingEnabled", singleton("true"));
+        configAttributes.put("bufferingAutoFlush", singleton("false"));
         AuditEventHandlerConfiguration configuration = AuditEventHandlerConfiguration.builder()
                 .withName("CSV Handler")
                 .withAttributes(configAttributes)

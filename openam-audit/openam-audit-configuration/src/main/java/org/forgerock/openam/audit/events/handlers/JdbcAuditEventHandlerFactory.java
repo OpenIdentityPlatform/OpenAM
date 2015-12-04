@@ -68,7 +68,7 @@ public final class JdbcAuditEventHandlerFactory implements AuditEventHandlerFact
         tableMappings.add(getTableMapping(CONFIG_TOPIC, attributes));
         handlerConfig.setTableMappings(tableMappings);
 
-        handlerConfig.setBufferingConfiguration(new EventBufferingConfiguration());
+        handlerConfig.setBufferingConfiguration(getBufferingConfiguration(attributes));
 
         return new JdbcAuditEventHandler(handlerConfig, configuration.getEventTopicsMetaData(),
                 getDataSource(attributes));
@@ -114,5 +114,15 @@ public final class JdbcAuditEventHandlerFactory implements AuditEventHandlerFact
         hikariConfig.setMinimumIdle(getIntMapAttr(attributes, "minIdle", 10, DEBUG));
         hikariConfig.setMaximumPoolSize(getIntMapAttr(attributes, "maxPoolSize", 10, DEBUG));
         return hikariConfig;
+    }
+
+    private EventBufferingConfiguration getBufferingConfiguration(Map<String, Set<String>> attributes) {
+        EventBufferingConfiguration bufferingConfiguration = new EventBufferingConfiguration();
+        bufferingConfiguration.setEnabled(getBooleanMapAttr(attributes, "bufferingEnabled", true));
+        bufferingConfiguration.setMaxSize(getIntMapAttr(attributes, "bufferingMaxSize", 100000, DEBUG));
+        bufferingConfiguration.setWriteInterval(getMapAttr(attributes, "bufferingWriteInterval", "5") + " seconds");
+        bufferingConfiguration.setWriterThreads(getIntMapAttr(attributes, "bufferingWriterThreads", 1, DEBUG));
+        bufferingConfiguration.setMaxBatchedEvents(getIntMapAttr(attributes, "bufferingMaxBatchedEvents", 100, DEBUG));
+        return bufferingConfiguration;
     }
 }
