@@ -146,15 +146,18 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .userId(getUserIdForAccessOutcome(request, response))
                     .trackingIds(getTrackingIdsForAccessOutcome(request, response));
 
+            JsonValue detail = null;
             if (responseDetailCreator != null) {
                 try {
-                    JsonValue detail = responseDetailCreator.apply(entity);
-                    builder.responseWithDetail(SUCCESSFUL, "", elapsedTime, MILLISECONDS, detail);
+                    detail = responseDetailCreator.apply(entity);
                 } catch (AuditException e) {
-                    debug.warning("An error occured when fetching response body details for audit", e);
+                    debug.warning("An error occurred when fetching response body details for audit", e);
                 }
-            } else {
+            }
+            if (detail == null) {
                 builder.response(SUCCESSFUL, "", elapsedTime, MILLISECONDS);
+            } else {
+                builder.responseWithDetail(SUCCESSFUL, "", elapsedTime, MILLISECONDS, detail);
             }
 
             addHttpData(request, builder);
