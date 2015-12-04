@@ -151,7 +151,7 @@ public final class JsonPolicyParser implements PolicyParser {
             throw new EntitlementException(EntitlementException.INVALID_VALUE,
                     new Object[] { ex.getUnrecognizedPropertyName() });
         } catch (JsonMappingException ex) {
-            throw new EntitlementException(EntitlementException.INVALID_JSON, ex, ex.getCause().getMessage());
+            throw new EntitlementException(EntitlementException.INVALID_JSON, ex, ex.getMessage());
         } catch (IOException e) {
             throw new EntitlementException(EntitlementException.UNABLE_TO_CREATE_POLICY, e);
         }
