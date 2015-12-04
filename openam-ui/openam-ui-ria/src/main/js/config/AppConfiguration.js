@@ -103,10 +103,10 @@ define("config/AppConfiguration", [
         }, {
             moduleClass: "org/forgerock/commons/ui/common/main/ValidatorsManager",
             configuration: {
-                policyDelegate: "org/forgerock/openam/ui/common/delegates/PolicyDelegate",
                 validators: { },
                 loader: [
-                     { "validators": "config/validators/CommonValidators" }
+                     { "validators": "config/validators/CommonValidators" },
+                     { "validators": "config/validators/AMValidators" }
                 ]
             }
         }, {

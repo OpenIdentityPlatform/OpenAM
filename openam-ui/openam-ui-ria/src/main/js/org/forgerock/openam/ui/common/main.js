@@ -25,6 +25,5 @@
 define([
     "./util/Constants",
     "./util/RealmHelper",
-    "./delegates/SiteConfigurationDelegate",
-    "./delegates/PolicyDelegate"
+    "./delegates/SiteConfigurationDelegate"
 ]);

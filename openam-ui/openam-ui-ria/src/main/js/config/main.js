@@ -26,6 +26,7 @@
 define("config/main", [
     "./errorhandlers/CommonErrorHandlers",
     "./validators/CommonValidators",
+    "./validators/AMValidators",
 
     "./routes/CommonRoutesConfig",  // In FR-Commons
     "./routes/AMRoutesConfig",

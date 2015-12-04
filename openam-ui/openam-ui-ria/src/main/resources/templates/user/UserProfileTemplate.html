@@ -15,9 +15,12 @@
                     {{#user}}
                         {{> form/_basicInput property="username" label="common.user.username" readonly=true}}
                         {{> form/_basicInput property="givenName" label="common.user.givenName"}}
-                        {{> form/_basicInput property="sn" label="common.user.sn"}}
-                        {{> form/_basicInput type="email" property="mail" label="common.user.emailAddress"}}
-                        {{> form/_basicInput type="tel" property="telephoneNumber" label="common.user.phoneNumber"}}
+                        {{> form/_basicInput property="sn" label="common.user.sn" required="true"}}
+                        {{> form/_basicInput type="email" property="mail" label="common.user.emailAddress"
+                            extraAttributes='data-validator="validEmailAddressFormat" data-validator-event="keyup"' }}
+                        {{> form/_basicInput type="tel" property="telephoneNumber" label="common.user.phoneNumber"
+                            extraAttributes='data-validator="validPhoneFormat" data-validator-event="keyup"'}}
+
                     {{/user}}
                 </div>
                 <div class="panel-footer clearfix">
