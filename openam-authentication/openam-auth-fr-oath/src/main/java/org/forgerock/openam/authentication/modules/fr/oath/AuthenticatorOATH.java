@@ -294,7 +294,11 @@ public class AuthenticatorOATH extends AMLoginModule {
                         throw new AuthLoginException(amAuthOATH, "authFailed", null); //invalid so error
                     } else {
                         if (settings == null) {
-                            return LOGIN_NO_DEVICE;
+                            if (isOptional) {
+                                return LOGIN_OPTIONAL;
+                            } else {
+                                return LOGIN_NO_DEVICE;
+                            }
                         } else {
                             replaceHeader(LOGIN_SAVED_DEVICE, MODULE_NAME);
                             return LOGIN_SAVED_DEVICE;
