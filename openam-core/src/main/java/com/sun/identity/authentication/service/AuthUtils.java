@@ -115,7 +115,11 @@ public class AuthUtils extends AuthClientUtils {
      * Composite Advices
      */
     public static final int MODULE = 3;
-    
+
+    /**
+     * Name of parameter used to indicate authn process MUST be run.
+     */
+    public static final String FORCE_AUTH = "ForceAuth";
     
     private static ArrayList pureJAASModuleClasses = new ArrayList();
     private static ArrayList ISModuleClasses = new ArrayList();
@@ -272,6 +276,7 @@ public class AuthUtils extends AuthClientUtils {
                     }
                     authContext =
                     loginState.createAuthContext(request,response,sid,dataHash);
+                    loginState.setForceAuth(Boolean.parseBoolean(request.getParameter(FORCE_AUTH)));
                     authContext.setLoginState(loginState);
                     String queryOrg =
                     getQueryOrgName(request,getOrgParam(dataHash));

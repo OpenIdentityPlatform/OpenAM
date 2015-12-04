@@ -19,6 +19,7 @@ package org.forgerock.openam.core.rest.authn;
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
 
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
@@ -158,6 +159,7 @@ public class RestAuthenticationHandler {
                     .indexType(indexType)
                     .indexValue(indexValue)
                     .sessionId(sessionId)
+                    .forceAuth(request.getParameter(AuthUtils.FORCE_AUTH))
                     .sessionUpgrade(sessionUpgradeSSOTokenId);
 
             loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);

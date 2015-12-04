@@ -172,8 +172,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     // If we have a token, let's see who we are logged in as....
                     SessionManager.getLoggedUser(function (user) {
 
-                        if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase() &&
-                            urlParams.ForceAuth !== "true") {
+                        if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase()) {
                             Configuration.setProperty("loggedUser", user);
                             delete auth.passedInRealm;
 

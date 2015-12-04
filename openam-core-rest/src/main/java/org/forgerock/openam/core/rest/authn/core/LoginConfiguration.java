@@ -32,6 +32,7 @@ public class LoginConfiguration {
     private String indexValue;
     private String sessionId = "";
     private String ssoTokenId = "";
+    private boolean forceAuth = false;
 
     /**
      * Sets the HttpServletRequest which initiated/continued the login process.
@@ -164,6 +165,24 @@ public class LoginConfiguration {
             this.ssoTokenId = ssoTokenId;
         }
         return this;
+    }
+
+    /**
+     * Sets the request's ForceAuth parameter.
+     * @param forceAuthReqParam Parameter from the request
+     * @return This LoginConfiguration object.
+     */
+    public LoginConfiguration forceAuth(String forceAuthReqParam) {
+        forceAuth = Boolean.parseBoolean(forceAuthReqParam);
+        return this;
+    }
+
+    /**
+     * Returns if this login configuration has ForceAuth enabled.
+     * @return This login configuration's ForceAuth setting.
+     */
+    public boolean isForceAuth() {
+        return forceAuth;
     }
 
     /**

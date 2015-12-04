@@ -187,11 +187,11 @@ public class LoginAuthenticator {
         HttpServletResponse response = loginConfiguration.getHttpResponse();
         SessionID sessionID = new SessionID(loginConfiguration.getSessionId());
         boolean isSessionUpgrade = false;
-        if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull()) {
+        if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull() || loginConfiguration.isForceAuth()) {
             sessionID = new SessionID(loginConfiguration.getSSOTokenId());
             SSOToken ssoToken = coreServicesWrapper.getExistingValidSSOToken(sessionID);
             isSessionUpgrade = checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(),
-                    loginConfiguration.getIndexValue());
+                    loginConfiguration.getIndexValue()) || loginConfiguration.isForceAuth();
         }
         boolean isBackPost = false;
         return coreServicesWrapper.getAuthContext(request, response, sessionID, isSessionUpgrade, isBackPost);
@@ -270,6 +270,7 @@ public class LoginAuthenticator {
     private boolean noMoreAuthenticationRequired(SSOToken ssoToken, LoginConfiguration loginConfiguration)
             throws AuthLoginException, SSOException {
         return ssoToken != null &&
-                !checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(), loginConfiguration.getIndexValue());
+                !checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(), loginConfiguration.getIndexValue())
+                && !loginConfiguration.isForceAuth();
     }
 }
