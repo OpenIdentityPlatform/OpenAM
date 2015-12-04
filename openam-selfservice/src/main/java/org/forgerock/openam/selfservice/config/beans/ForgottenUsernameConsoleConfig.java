@@ -156,6 +156,9 @@ public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
         return validQueryAttributes;
     }
 
+    /**
+     * Builder for {@link ForgottenUsernameConsoleConfig}.
+     */
     @ConfigSource({"MailServer", "selfService"})
     public static final class ForgottenUsernameBuilder
             extends CommonConsoleConfigBuilder<ForgottenUsernameConsoleConfig> {
@@ -172,64 +175,133 @@ public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {
         private boolean kbaEnabled;
         private final Set<String> validQueryAttributes;
 
+        /**
+         * Constructs a new forgotten username builder.
+         */
         public ForgottenUsernameBuilder() {
             subjectTranslations = new HashMap<>();
             messageTranslations = new HashMap<>();
             validQueryAttributes = new HashSet<>();
         }
 
+        /**
+         * Sets whether the service is enabled.
+         *
+         * @param enabled
+         *         whether the service is enabled
+         */
         @ConfigAttribute("selfServiceForgottenUsernameEnabled")
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
+        /**
+         * Sets the config provider class.
+         *
+         * @param configProviderClass
+         *         config provider class
+         */
         @ConfigAttribute("selfServiceForgottenUsernameServiceConfigClass")
         public void setConfigProviderClass(String configProviderClass) {
             this.configProviderClass = configProviderClass;
         }
 
+        /**
+         * Sets the token expiry time.
+         *
+         * @param tokenExpiry
+         *         token expiry time
+         */
         @ConfigAttribute("selfServiceForgottenUsernameTokenTTL")
         public void setTokenExpiry(long tokenExpiry) {
             this.tokenExpiry = tokenExpiry;
         }
 
+        /**
+         * Sets whether email is enabled.
+         *
+         * @param emailEnabled
+         *         whether email is enabled
+         */
         @ConfigAttribute("selfServiceForgottenUsernameEmailUsernameEnabled")
         public void setEmailEnabled(boolean emailEnabled) {
             this.emailEnabled = emailEnabled;
         }
 
+        /**
+         * Sets the email subject translations.
+         *
+         * @param subjectTranslations
+         *         email subject translations
+         */
         @ConfigAttribute(value = "selfServiceForgottenUsernameEmailSubject",
                 transformer = LocaleMessageTransformer.class)
         public void setSubjectTranslations(Map<Locale, String> subjectTranslations) {
             this.subjectTranslations.putAll(subjectTranslations);
         }
 
+        /**
+         * Sets the email body translations.
+         *
+         * @param messageTranslations
+         *         email body translations
+         */
         @ConfigAttribute(value = "selfServiceForgottenUsernameEmailBody",
                 transformer = LocaleMessageTransformer.class)
         public void setMessageTranslations(Map<Locale, String> messageTranslations) {
             this.messageTranslations.putAll(messageTranslations);
         }
 
+        /**
+         * Sets whether captcha is enabled.
+         *
+         * @param captchaEnabled
+         *         whether captcha is enabled
+         */
         @ConfigAttribute("selfServiceForgottenUsernameCaptchaEnabled")
         public void setCaptchaEnabled(boolean captchaEnabled) {
             this.captchaEnabled = captchaEnabled;
         }
 
+        /**
+         * Sets whether KBA is enabled.
+         *
+         * @param kbaEnabled
+         *         whether KBA is enabled
+         */
         @ConfigAttribute("selfServiceForgottenUsernameKbaEnabled")
         public void setKbaEnabled(boolean kbaEnabled) {
             this.kbaEnabled = kbaEnabled;
         }
 
+        /**
+         * Sets the minimum number of answers to be verified.
+         *
+         * @param minimumAnswersToVerify
+         *         minimum number of answers to be verified
+         */
         @ConfigAttribute("selfServiceMinimumAnswersToVerify")
         public void setMinimumAnswersToVerify(int minimumAnswersToVerify) {
             this.minimumAnswersToVerify = minimumAnswersToVerify;
         }
 
+        /**
+         * Sets whether show username is enabled.
+         *
+         * @param showUsernameEnabled
+         *         whether show username is enabled
+         */
         @ConfigAttribute("selfServiceForgottenUsernameShowUsernameEnabled")
         public void setShowUsernameEnabled(boolean showUsernameEnabled) {
             this.showUsernameEnabled = showUsernameEnabled;
         }
 
+        /**
+         * Sets the set of valid query attributes.
+         *
+         * @param validQueryAttributes
+         *         valid query attributes
+         */
         @ConfigAttribute("selfServiceValidQueryAttributes")
         public void setValidQueryAttributes(Set<String> validQueryAttributes) {
             this.validQueryAttributes.addAll(validQueryAttributes);

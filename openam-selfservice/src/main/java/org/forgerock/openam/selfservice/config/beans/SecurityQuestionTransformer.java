@@ -33,14 +33,14 @@ import java.util.regex.Pattern;
  */
 public final class SecurityQuestionTransformer implements ConfigTransformer<Map<String, Map<String, String>>> {
 
-    private final static Pattern questionPattern = Pattern.compile("^(\\w+)\\|(\\w+)\\|(.+)$");
+    private final static Pattern QUESTION_PATTERN = Pattern.compile("^(\\w+)\\|(\\w+)\\|(.+)$");
 
     @Override
     public Map<String, Map<String, String>> transform(Set<String> values, Class<?> parameterType) {
         Map<String, Map<String, String>> localisedQuestions = new HashMap<>();
 
         for (String question : values) {
-            Matcher matcher = questionPattern.matcher(question);
+            Matcher matcher = QUESTION_PATTERN.matcher(question);
 
             if (!matcher.matches()) {
                 throw new IllegalArgumentException(

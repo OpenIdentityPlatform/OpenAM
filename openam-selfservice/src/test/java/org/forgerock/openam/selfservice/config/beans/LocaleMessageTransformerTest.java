@@ -19,7 +19,6 @@ package org.forgerock.openam.selfservice.config.beans;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
-import org.forgerock.openam.selfservice.config.beans.LocaleMessageTransformer;
 import org.forgerock.openam.sm.config.ConfigTransformer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

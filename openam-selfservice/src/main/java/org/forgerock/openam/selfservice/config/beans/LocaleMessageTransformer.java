@@ -36,14 +36,14 @@ import java.util.regex.Pattern;
  */
 final class LocaleMessageTransformer implements ConfigTransformer<Map<Locale, String>> {
 
-    private final static Pattern localeMessagePattern = Pattern.compile("^(\\w+)\\|(.+)$");
+    private final static Pattern LOCALE_MESSAGE_PATTERN = Pattern.compile("^(\\w+)\\|(.+)$");
 
     @Override
     public Map<Locale, String> transform(Set<String> values, Class<?> parameterType) {
         Map<Locale, String> messageTranslations = new HashMap<>();
 
         for (String value : values) {
-            Matcher matcher = localeMessagePattern.matcher(value);
+            Matcher matcher = LOCALE_MESSAGE_PATTERN.matcher(value);
 
             if (!matcher.matches()) {
                 throw new IllegalArgumentException(

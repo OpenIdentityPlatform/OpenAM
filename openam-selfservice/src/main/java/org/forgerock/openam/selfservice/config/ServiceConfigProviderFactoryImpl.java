@@ -37,6 +37,9 @@ public final class ServiceConfigProviderFactoryImpl implements ServiceConfigProv
 
     /**
      * Constructs a new service provider factory instance.
+     *
+     * @param injector
+     *         dependency injector
      */
     @Inject
     public ServiceConfigProviderFactoryImpl(Injector injector) {

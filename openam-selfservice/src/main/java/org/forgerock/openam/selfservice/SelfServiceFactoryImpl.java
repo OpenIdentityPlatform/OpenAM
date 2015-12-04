@@ -66,7 +66,8 @@ class SelfServiceFactoryImpl implements SelfServiceFactory {
         KeyPairProvider keyPairProvider = keyPairProviderFactory.getProvider(realm);
         SnapshotTokenHandlerFactory tokenHandlerFactory = keyPairInjector.getInjectedWith(keyPairProvider);
         ClassLoader classLoader = getClass().getClassLoader();
-        return new AnonymousProcessService(serviceConfig, stageProvider, tokenHandlerFactory, processStore, classLoader);
+        return new AnonymousProcessService(serviceConfig, stageProvider,
+                tokenHandlerFactory, processStore, classLoader);
     }
 
 }

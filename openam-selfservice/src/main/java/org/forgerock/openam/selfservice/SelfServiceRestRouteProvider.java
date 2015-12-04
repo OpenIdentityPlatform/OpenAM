@@ -45,7 +45,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                                 .exceptRead()
                                 .exceptActions("submitRequirements"))
                 .toRequestHandler(RoutingMode.STARTS_WITH, Key
-                        .get(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>(){}));
+                        .get(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() { }));
 
         realmRouter
                 .route("/selfservice/forgottenPassword")
@@ -54,7 +54,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                                 .exceptRead()
                                 .exceptActions("submitRequirements"))
                 .toRequestHandler(RoutingMode.STARTS_WITH, Key
-                        .get(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>(){}));
+                        .get(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() { }));
 
         realmRouter
                 .route("/selfservice/forgottenUsername")
@@ -63,7 +63,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                                 .exceptRead()
                                 .exceptActions("submitRequirements"))
                 .toRequestHandler(RoutingMode.STARTS_WITH, Key
-                        .get(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>(){}));
+                        .get(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() { }));
 
         realmRouter
                 .route("/selfservice/user")

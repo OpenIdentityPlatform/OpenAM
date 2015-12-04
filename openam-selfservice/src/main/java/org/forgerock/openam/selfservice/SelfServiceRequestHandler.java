@@ -31,7 +31,6 @@ import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.sm.config.ConsoleConfigListener;
-import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.slf4j.Logger;

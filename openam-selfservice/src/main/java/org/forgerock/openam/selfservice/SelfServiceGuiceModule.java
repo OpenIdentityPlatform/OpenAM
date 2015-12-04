@@ -65,7 +65,7 @@ public final class SelfServiceGuiceModule extends PrivateModule {
     protected void configure() {
         install(new FactoryModuleBuilder()
                 .implement(SnapshotTokenHandlerFactory.class, JwtSnapshotTokenHandlerFactory.class)
-                .build(new TypeLiteral<KeyPairInjector<SnapshotTokenHandlerFactory>>() {}));
+                .build(new TypeLiteral<KeyPairInjector<SnapshotTokenHandlerFactory>>() { }));
 
         bind(ProcessStore.class).to(ProcessStoreImpl.class);
         bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
@@ -81,9 +81,9 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         }
 
         // Registration CREST services
-        expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() {});
-        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() {});
-        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() {});
+        expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() { });
+        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() { });
+        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() { });
         expose(UserUpdateService.class);
         expose(KbaResource.class);
         // Exposed to be accessible to custom progress stages

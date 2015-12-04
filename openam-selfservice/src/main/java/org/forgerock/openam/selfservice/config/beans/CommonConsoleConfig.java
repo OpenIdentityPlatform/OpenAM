@@ -78,8 +78,8 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
     }
 
     /**
-     * Gets the security questions in the expected format:
-     * <pre>Map&lt;id,Map&lt;locale,question&gt;&gt;</pre>
+     * Gets the security questions.
+     * Expected format: <pre>Map&lt;id,Map&lt;locale,question&gt;&gt;</pre>
      *
      * @return security questions
      */

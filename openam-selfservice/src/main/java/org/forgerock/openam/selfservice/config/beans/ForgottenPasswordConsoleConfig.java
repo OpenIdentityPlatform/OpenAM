@@ -157,6 +157,9 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
         return validQueryAttributes;
     }
 
+    /**
+     * Builder for {@link ForgottenPasswordConsoleConfig}.
+     */
     @ConfigSource({"MailServer", "selfService"})
     public static final class ForgottenPasswordBuilder
             extends CommonConsoleConfigBuilder<ForgottenPasswordConsoleConfig> {
@@ -173,64 +176,134 @@ public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {
         private boolean kbaEnabled;
         private final Set<String> validQueryAttributes;
 
+        /**
+         * Constructs a new builder.
+         */
         public ForgottenPasswordBuilder() {
             subjectTranslations = new HashMap<>();
             messageTranslations = new HashMap<>();
             validQueryAttributes = new HashSet<>();
         }
 
+        /**
+         * Sets the email verification url.
+         *
+         * @param emailVerificationUrl
+         *         email verification url
+         */
         @ConfigAttribute("selfServiceForgottenPasswordConfirmationUrl")
         public void setEmailVerificationUrl(String emailVerificationUrl) {
             this.emailVerificationUrl = emailVerificationUrl;
         }
 
+        /**
+         * Sets whether the service is enabled.
+         *
+         * @param enabled
+         *         whether the service is enabled
+         */
         @ConfigAttribute("selfServiceForgottenPasswordEnabled")
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
+
+        /**
+         * Sets the config provider class.
+         *
+         * @param configProviderClass
+         *         config provider class
+         */
         @ConfigAttribute("selfServiceForgottenPasswordServiceConfigClass")
         public void setConfigProviderClass(String configProviderClass) {
             this.configProviderClass = configProviderClass;
         }
 
+        /**
+         * Sets the token expiry time.
+         *
+         * @param tokenExpiry
+         *         token expiry time
+         */
         @ConfigAttribute("selfServiceForgottenPasswordTokenTTL")
         public void setTokenExpiry(long tokenExpiry) {
             this.tokenExpiry = tokenExpiry;
         }
 
+        /**
+         * Sets whether email is enabled.
+         *
+         * @param emailEnabled
+         *         whether email is enabled
+         */
         @ConfigAttribute("selfServiceForgottenPasswordEmailVerificationEnabled")
         public void setEmailEnabled(boolean emailEnabled) {
             this.emailEnabled = emailEnabled;
         }
 
+        /**
+         * Sets the email subject translations.
+         *
+         * @param subjectTranslations
+         *         email subject translations
+         */
         @ConfigAttribute(value = "selfServiceForgottenPasswordEmailSubject",
                 transformer = LocaleMessageTransformer.class)
         public void setSubjectTranslations(Map<Locale, String> subjectTranslations) {
             this.subjectTranslations.putAll(subjectTranslations);
         }
 
+        /**
+         * Sets the email body translations.
+         *
+         * @param messageTranslations
+         *         email body translations
+         */
         @ConfigAttribute(value = "selfServiceForgottenPasswordEmailBody",
                 transformer = LocaleMessageTransformer.class)
         public void setMessageTranslations(Map<Locale, String> messageTranslations) {
             this.messageTranslations.putAll(messageTranslations);
         }
 
+        /**
+         * Sets whether captcha is enabled.
+         *
+         * @param captchaEnabled
+         *         whether captcha is enabled
+         */
         @ConfigAttribute("selfServiceForgottenPasswordCaptchaEnabled")
         public void setCaptchaEnabled(boolean captchaEnabled) {
             this.captchaEnabled = captchaEnabled;
         }
 
+        /**
+         * Sets whether KBA is enabled.
+         *
+         * @param kbaEnabled
+         *         whether KBA is enabled
+         */
         @ConfigAttribute("selfServiceForgottenPasswordKbaEnabled")
         public void setKbaEnabled(boolean kbaEnabled) {
             this.kbaEnabled = kbaEnabled;
         }
 
+        /**
+         * Sets the minimum number of answers to be verified.
+         *
+         * @param minimumAnswersToVerify
+         *         minimum number of answers to be verified
+         */
         @ConfigAttribute("selfServiceMinimumAnswersToVerify")
         public void setMinimumAnswersToVerify(int minimumAnswersToVerify) {
             this.minimumAnswersToVerify = minimumAnswersToVerify;
         }
 
+        /**
+         * Sets the valid set of query attributes.
+         *
+         * @param validQueryAttributes
+         *         valid query attributes
+         */
         @ConfigAttribute("selfServiceValidQueryAttributes")
         public void setValidQueryAttributes(Set<String> validQueryAttributes) {
             this.validQueryAttributes.addAll(validQueryAttributes);

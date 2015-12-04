@@ -143,6 +143,9 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
         return minimumAnswersToDefine;
     }
 
+    /**
+     * Builder for {@link UserRegistrationConsoleConfig}.
+     */
     @ConfigSource({"MailServer", "selfService"})
     public static final class UserRegistrationBuilder
             extends CommonConsoleConfigBuilder<UserRegistrationConsoleConfig> {
@@ -158,58 +161,121 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
         private boolean captchaEnabled;
         private boolean kbaEnabled;
 
+        /**
+         * Constructs a new builder.
+         */
         public UserRegistrationBuilder() {
             subjectTranslations = new HashMap<>();
             messageTranslations = new HashMap<>();
         }
 
+        /**
+         * Sets whether the service is enabled.
+         *
+         * @param enabled
+         *         whether the service is enabled
+         */
         @ConfigAttribute("selfServiceUserRegistrationEnabled")
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
+        /**
+         * Sets the config provider class.
+         *
+         * @param configProviderClass
+         *         config provider class
+         */
         @ConfigAttribute("selfServiceUserRegistrationServiceConfigClass")
         public void setConfigProviderClass(String configProviderClass) {
             this.configProviderClass = configProviderClass;
         }
 
+        /**
+         * Sets the token expiry time.
+         *
+         * @param tokenExpiry
+         *         token expiry time
+         */
         @ConfigAttribute("selfServiceUserRegistrationTokenTTL")
         public void setTokenExpiry(long tokenExpiry) {
             this.tokenExpiry = tokenExpiry;
         }
 
+        /**
+         * Sets whether email is enabled.
+         *
+         * @param emailEnabled
+         *         whether email is enabled
+         */
         @ConfigAttribute("selfServiceUserRegistrationEmailVerificationEnabled")
         public void setEmailEnabled(boolean emailEnabled) {
             this.emailEnabled = emailEnabled;
         }
 
+        /**
+         * Sets the email subject translations.
+         *
+         * @param subjectTranslations
+         *         email subject translations
+         */
         @ConfigAttribute(value = "selfServiceUserRegistrationEmailSubject",
                 transformer = LocaleMessageTransformer.class)
         public void setSubjectTranslations(Map<Locale, String> subjectTranslations) {
             this.subjectTranslations.putAll(subjectTranslations);
         }
 
+        /**
+         * Sets the email body translations.
+         *
+         * @param messageTranslations
+         *         email body translations
+         */
         @ConfigAttribute(value = "selfServiceUserRegistrationEmailBody",
                 transformer = LocaleMessageTransformer.class)
         public void setMessageTranslations(Map<Locale, String> messageTranslations) {
             this.messageTranslations.putAll(messageTranslations);
         }
 
+        /**
+         * Sets whether captcha is enabled.
+         *
+         * @param captchaEnabled
+         *         whether captcha is enabled
+         */
         @ConfigAttribute("selfServiceUserRegistrationCaptchaEnabled")
         public void setCaptchaEnabled(boolean captchaEnabled) {
             this.captchaEnabled = captchaEnabled;
         }
 
+        /**
+         * Sets whether KBA is enabled.
+         *
+         * @param kbaEnabled
+         *         whether KBA is enabled
+         */
         @ConfigAttribute("selfServiceUserRegistrationKbaEnabled")
         public void setKbaEnabled(boolean kbaEnabled) {
             this.kbaEnabled = kbaEnabled;
         }
 
+        /**
+         * Sets the email verification URL.
+         *
+         * @param emailVerificationUrl
+         *         email verification URL
+         */
         @ConfigAttribute("selfServiceUserRegistrationConfirmationUrl")
         public void setEmailVerificationUrl(String emailVerificationUrl) {
             this.emailVerificationUrl = emailVerificationUrl;
         }
 
+        /**
+         * Sets the minimum number of answers to be defined.
+         *
+         * @param minimumAnswersToDefine
+         *         minimum number of answers to be defined
+         */
         @ConfigAttribute("selfServiceMinimumAnswersToDefine")
         public void setMinimumAnswersToDefine(int minimumAnswersToDefine) {
             this.minimumAnswersToDefine = minimumAnswersToDefine;

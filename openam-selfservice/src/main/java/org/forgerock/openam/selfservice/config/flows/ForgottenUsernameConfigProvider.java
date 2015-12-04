@@ -36,8 +36,6 @@ import org.forgerock.selfservice.stages.user.UserQueryConfig;
 import org.forgerock.services.context.Context;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 /**
