@@ -54,7 +54,7 @@ import java.util.Set;
  * Utility methods for managing entitlements.
  */
 public final class EntitlementUtils {
-
+    private static final EntitlementRegistry registry = EntitlementRegistry.load();
 
     public static final String SERVICE_NAME = "sunEntitlementService";
     public static final String INDEXES_NAME = "sunEntitlementIndexes";
@@ -398,22 +398,16 @@ public final class EntitlementUtils {
      * @return the class represented by the name
      */
     public static Class<? extends EntitlementCombiner> getEntitlementCombiner(String name) {
-
         Reject.ifNull(name);
-
-        EntitlementRegistry registry = new EntitlementRegistry();
         Class<? extends EntitlementCombiner> combinerClass = registry.getCombinerType(name);
-
         if (combinerClass != null) {
             return combinerClass;
         }
-
         try {
             return Class.forName(name).asSubclass(EntitlementCombiner.class);
         } catch (ClassNotFoundException ex) {
             PolicyConstants.DEBUG.error("EntitlementService.getEntitlementCombiner", ex);
         }
-
         return DenyOverride.class;
     }
 
