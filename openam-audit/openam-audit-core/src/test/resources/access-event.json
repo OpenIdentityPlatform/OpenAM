@@ -1,7 +1,7 @@
 {
   "timestamp": "2015-07-08T21:01:03.629Z",
   "eventName": "AM-ACCESS-ATTEMPT",
-  "component": "CREST",
+  "component": "Audit",
   "transactionId": "ad1f26e3-1ced-418d-b6ec-c8488411a625",
   "userId": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
   "client": {

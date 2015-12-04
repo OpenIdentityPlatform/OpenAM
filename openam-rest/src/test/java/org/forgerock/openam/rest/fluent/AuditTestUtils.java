@@ -60,6 +60,6 @@ public class AuditTestUtils {
             }
         };
         final Context clientContext = ClientContext.newInternalClientContext(subjectContext);
-        return new RequestAuditContext(new AuditInfoContext(clientContext, AuditConstants.Component.CREST));
+        return new RequestAuditContext(new AuditInfoContext(clientContext, AuditConstants.Component.AUDIT));
     }
 }

@@ -81,8 +81,6 @@ public final class AuditConstants {
         POLICY_AGENT("Policy Agent"),
         /** Authentication audit event component. */
         AUTHENTICATION("Authentication"),
-        /** CREST audit event component. */
-        CREST("CREST"),
         /** Dashboard audit event component. */
         DASHBOARD("Dashboard"),
         /** Server Info audit event component. */
