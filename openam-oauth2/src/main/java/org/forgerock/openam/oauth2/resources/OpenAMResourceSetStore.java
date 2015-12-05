@@ -80,10 +80,11 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     }
 
     @Override
-    public ResourceSetDescription read(String resourceSetId) throws NotFoundException,
+    public ResourceSetDescription read(String resourceSetId, String resourceOwnerId) throws NotFoundException,
             ServerException {
         Set<ResourceSetDescription> resourceSets = query(QueryFilter.and(
-                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId)));
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId),
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, resourceOwnerId)));
         if (resourceSets.isEmpty()) {
             throw new NotFoundException("Resource set does not exist with id " + resourceSetId);
         } else {
@@ -98,7 +99,7 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
                 throw new ServerException("Could not read token with id, " + resourceSetDescription.getId()
                         + ", in realm, " + realm);
             }
-            read(resourceSetDescription.getId());
+            read(resourceSetDescription.getId(), resourceSetDescription.getResourceOwnerId());
             delegate.update(resourceSetDescription);
         } catch (org.forgerock.openam.sm.datalayer.store.NotFoundException e) {
             throw new NotFoundException("Resource set does not exist with id " + resourceSetDescription.getId());
@@ -110,7 +111,7 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     @Override
     public void delete(String resourceSetId, String resourceOwnerId) throws NotFoundException, ServerException {
         try {
-            ResourceSetDescription token = read(resourceSetId);
+            ResourceSetDescription token = read(resourceSetId, resourceOwnerId);
             delegate.delete(token.getId());
         } catch (org.forgerock.openam.sm.datalayer.store.NotFoundException e) {
             throw new NotFoundException("Could not find resource set");

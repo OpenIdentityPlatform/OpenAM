@@ -24,7 +24,7 @@
 
     <filter>
         <filter-name>audit_context_filter</filter-name>
-        <filter-class>org.forgerock.openam.audit.context.AuditContextFilter</filter-class>
+        <filter-class>org.forgerock.openam.sts.soap.audit.AuditContextFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>audit_context_filter</filter-name>

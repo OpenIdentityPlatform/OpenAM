@@ -28,8 +28,18 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.FIELD})
 public @interface Field {
 
-    public CoreTokenField field();
-    public boolean generated() default false;
-    public Class<? extends Converter> converter() default Converter.IdentityConverter.class;
+    /**
+     * The {@code CoreTokenField}.
+     */
+    CoreTokenField field();
 
+    /**
+     * Whether the field value should be generated.
+     */
+    boolean generated() default false;
+
+    /**
+     * The field converter.
+     */
+    Class<? extends Converter> converter() default Converter.IdentityConverter.class;
 }

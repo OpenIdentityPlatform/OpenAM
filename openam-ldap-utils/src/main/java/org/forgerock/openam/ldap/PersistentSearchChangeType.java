@@ -49,6 +49,7 @@ public final class PersistentSearchChangeType {
      */
     public static final int ALL_OPERATIONS = ADDED | MODIFIED | REMOVED | RENAMED;
 
-    private PersistentSearchChangeType() {}
+    private PersistentSearchChangeType() {
+    }
 
 }

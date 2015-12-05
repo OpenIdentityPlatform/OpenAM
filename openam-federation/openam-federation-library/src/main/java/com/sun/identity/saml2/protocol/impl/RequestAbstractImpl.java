@@ -24,9 +24,8 @@
  *
  * $Id: RequestAbstractImpl.java,v 1.5 2008/06/25 05:48:00 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.protocol.impl;
 
 
@@ -306,24 +305,12 @@ public abstract class RequestAbstractImpl implements RequestAbstract {
     public boolean isSigned() {
         return isSigned;
     }
-    
-    /**
-     * Return whether the signature is valid or not.
-     *
-     * @param senderCert Certificate containing the public key
-     *             which may be used for  signature verification;
-     *             This certificate may also may be used to check
-     *             against the certificate included in the signature
-     * @return true if the signature is valid; false otherwise.
-     * @throws SAML2Exception if the signature could not be verified
-     */
-    public boolean isSignatureValid(X509Certificate senderCert)
+
+    @Override
+    public boolean isSignatureValid(Set<X509Certificate> verificationCerts)
         throws SAML2Exception {
-	if (isSignatureValid == null) {
-            isSignatureValid = Boolean.valueOf(
-                SigManager.getSigInstance().verify(
-		    signedXMLString, getID(), senderCert)
-            );
+        if (isSignatureValid == null) {
+            isSignatureValid = SigManager.getSigInstance().verify(signedXMLString, getID(), verificationCerts);
         }
         return isSignatureValid.booleanValue();
     }

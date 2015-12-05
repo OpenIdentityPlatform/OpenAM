@@ -59,6 +59,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.PEMDecoder;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -97,7 +98,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
      * @param pemDecoder A {@code PEMDecoder} instance.
      */
     OpenAMClientRegistration(AMIdentity amIdentity, PEMDecoder pemDecoder, OpenIdResolverService resolverService,
-            OAuth2ProviderSettings providerSettings) throws InvalidClientException {
+            OAuth2ProviderSettings providerSettings, ClientAuthenticationFailureFactory failureFactory) throws InvalidClientException {
         this.amIdentity = amIdentity;
         this.pemDecoder = pemDecoder;
         this.resolverService = resolverService;
@@ -105,7 +106,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             this.digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new InvalidClientException("SHA-256 algorithm MessageDigest not available");
+            throw failureFactory.getException("SHA-256 algorithm MessageDigest not available");
         }
     }
 

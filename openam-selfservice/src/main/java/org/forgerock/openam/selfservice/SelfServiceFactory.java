@@ -17,7 +17,6 @@
 package org.forgerock.openam.selfservice;
 
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 
 /**
@@ -30,11 +29,13 @@ public interface SelfServiceFactory {
     /**
      * Creates a new service instance based on the passed service config.
      *
+     * @param realm
+     *         the realm
      * @param serviceConfig
      *         service config
      *
      * @return new self service instance
      */
-    RequestHandler getService(ProcessInstanceConfig<CustomSupportConfigVisitor> serviceConfig);
+    RequestHandler getService(String realm, ProcessInstanceConfig serviceConfig);
 
 }

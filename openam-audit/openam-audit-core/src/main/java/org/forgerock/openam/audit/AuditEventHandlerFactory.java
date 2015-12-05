@@ -15,50 +15,34 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.openam.audit.AuditConstants.EventHandlerType.CSV;
-
 import org.forgerock.audit.AuditException;
+import org.forgerock.audit.AuditService;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
-import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandler;
-import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandlerConfiguration;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.audit.configuration.AuditEventHandlerConfigurationWrapper;
-
-import javax.inject.Singleton;
+import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
 
 /**
- * Factory for creation of audit event handlers.
- *
- * Facilitates mocking of audit event handlers.
+ * A factory for creating an audit event handler. Implementations of this interface are required to create an instance
+ * of {@link AuditEventHandler}, based on the configuration attributes supplied. Instances of
+ * {@link AuditEventHandlerFactory} are injected with Guice and implementation class names can be configured in the
+ * Audit Logging Configuration Service.
  *
  * @since 13.0.0
+ * @see AuditEventHandler
  */
-@Singleton
-public class AuditEventHandlerFactory {
+public interface AuditEventHandlerFactory {
 
     /**
-     * Create an instance of {@link AuditEventHandler} based on the given configuration.
+     * Create an instance of {@link AuditEventHandler}. This method will be called every time configuration for audit
+     * logging in OpenAM has changed. The returned handler will be added to the appropriate
+     * {@link AuditService}, which will in turn call {@link AuditEventHandler#startup()}. If this
+     * method returns {@code null} then nothing will be added to the {@link AuditService}.
      *
-     * @param config Configuration to apply to the audit event handler.
-     * @return An instance of {@link AuditEventHandler}.
-     * @throws AuditException If the event handler described by the configuration does not exist or it failed to be
-     * configured.
+     * @param configuration
+     *              The configuration properties to use when creating the handler.
+     *
+     * @return An instance of {@link AuditEventHandler} or null if this handler is disabled.
+     *
+     * @throws AuditException If an error occurred during creation of the handler.
      */
-    public AuditEventHandler create(AuditEventHandlerConfigurationWrapper config) throws AuditException {
-        if (CSV.equals(config.getType())) {
-            return getCsvEventHandler((CSVAuditEventHandlerConfiguration) config.getConfiguration());
-        }
-
-        throw new AuditException("No event handler exists for " + config.getName());
-    }
-
-    private CSVAuditEventHandler getCsvEventHandler(CSVAuditEventHandlerConfiguration config) throws AuditException {
-        try {
-            CSVAuditEventHandler csvHandler = new CSVAuditEventHandler();
-            csvHandler.configure(config);
-            return csvHandler;
-        } catch (ResourceException e) {
-            throw new AuditException(e);
-        }
-    }
+    AuditEventHandler create(AuditEventHandlerConfiguration configuration) throws AuditException;
 }

@@ -47,7 +47,13 @@ if [ -n "$EXT_CLASSPATH" ] ; then
     CLASSPATH=$EXT_CLASSPATH:$CLASSPATH
 fi
 
+if [ "$1" == "-debug" ] ; then
+    DEBUG="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9897"
+    shift
+fi
+
 $JAVA_HOME/bin/java -Xms256m -Xmx512m -cp "$CLASSPATH" \
+    $DEBUG \
     -D"sun.net.client.defaultConnectTimeout=3000" \
     -D"openam.naming.sitemonitor.disabled=true" \
     -D"com.iplanet.am.serverMode=false" \

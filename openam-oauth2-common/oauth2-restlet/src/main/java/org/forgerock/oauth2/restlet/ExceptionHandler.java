@@ -128,6 +128,7 @@ public class ExceptionHandler {
         }
         final Map<String, String> data = new HashMap<>(exception.asMap());
         final String realm = requestFactory.create(request).getParameter("realm");
+        data.put("realm", realm);
         data.put("baseUrl", baseURLProviderFactory.get(realm).getURL(ServletUtils.getRequest(request)));
         response.setEntity(representation.getRepresentation(context, "page", "error.ftl", data));
     }

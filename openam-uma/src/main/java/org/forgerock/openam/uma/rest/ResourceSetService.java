@@ -301,7 +301,7 @@ public class ResourceSetService {
                                                                               String resourceOwnerId) {
         try {
             ResourceSetDescription resourceSet = resourceSetStoreFactory.create(realm)
-                    .read(resourceSetId);
+                    .read(resourceSetId, resourceOwnerId);
             return Promises.newResultPromise(resourceSet);
         } catch (NotFoundException e) {
             return new org.forgerock.json.resource.NotFoundException("No resource set with id, " + resourceSetId
@@ -366,7 +366,7 @@ public class ResourceSetService {
                 } else {
                     RealmContext realmContext = context.asContext(RealmContext.class);
                     resourceSet = resourceSetStoreFactory.create(realmContext.getResolvedRealm())
-                            .read(entry.getKey());
+                            .read(entry.getKey(), resourceOwnerId);
                 }
                 if (augmentWithPolicies) {
                     resourceSet.setPolicy(entry.getValue().asJson());

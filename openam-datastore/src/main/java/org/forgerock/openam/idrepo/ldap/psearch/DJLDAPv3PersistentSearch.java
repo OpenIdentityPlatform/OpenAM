@@ -47,16 +47,18 @@ public class DJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<IdRepoListe
     private static final Debug DEBUG = Debug.getInstance("PersistentSearch");
     private final SearchResultEntryHandler resultEntryHandler = new PSearchResultEntryHandler();
     private final Set<IdentityMovedOrRenamedListener> movedOrRenamedListenerSet = new HashSet<>(1);
+    private final String usersSearchAttributeName;
 
     public DJLDAPv3PersistentSearch(Map<String, Set<String>> configMap, ConnectionFactory factory) {
         super(CollectionHelper.getIntMapAttr(configMap, LDAP_RETRY_INTERVAL, 3000, DEBUG),
-                DN.valueOf(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN)),
-                LDAPUtils.parseFilter(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_FILTER),
-                        Filter.objectClassPresent()),
-                LDAPUtils.getSearchScope(
-                        CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_SCOPE),
-                        SearchScope.WHOLE_SUBTREE),
-                factory);
+                DN.valueOf(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN)), LDAPUtils
+                        .parseFilter(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_FILTER),
+                                Filter.objectClassPresent()), LDAPUtils
+                        .getSearchScope(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_SCOPE),
+                                SearchScope.WHOLE_SUBTREE), factory,
+                CollectionHelper.getMapAttr(configMap, LDAP_USER_SEARCH_ATTR));
+        usersSearchAttributeName = CollectionHelper.getMapAttr(configMap, LDAP_USER_SEARCH_ATTR);
+
     }
 
     /**
@@ -117,6 +119,10 @@ public class DJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<IdRepoListe
 
                     for (IdType idType : listenerEntry.getValue()) {
                         listener.objectChanged(dn, idType, type.intValue(), listener.getConfigMap());
+                        if (idType.equals(IdType.USER)) {
+                            listener.objectChanged(entry.parseAttribute(usersSearchAttributeName).asString(), idType,
+                                    type.intValue(), listener.getConfigMap());
+                        }
                     }
                 }
             }

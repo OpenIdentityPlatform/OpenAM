@@ -352,7 +352,7 @@
             </Organization>
         </Schema>
         <Configuration>
-          <OrganizationConfiguration name="/">
+            <OrganizationConfiguration name="/">
                 <AttributeValuePair>
                     <Attribute name="sunAMAuthHOTPAuthLevel"/>
                     <Value>0</Value>

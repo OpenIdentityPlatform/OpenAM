@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,23 +22,16 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * "Portions Copyrighted 2011-2013 ForgeRock Inc"
- */
-
-
 define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager"
-], function (constants, AbstractDelegate, configuration, eventManager) {
+    "org/forgerock/commons/ui/common/main/AbstractDelegate"
+], function (constants, AbstractDelegate) {
     var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/frrest/oauth2/token");
 
     /**
      * Gets all the OAuth 2 tokens for a user
-     * @param successCallback
-     * @param errorCallback
+     * @param {Function} successCallback Success callback function
+     * @param {Function} errorCallback Error callback function
      */
     obj.getAllTokens = function (successCallback, errorCallback) {
 
@@ -52,12 +45,12 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
 
     /**
      *  Deletes a token given a tokenID
-     * @param successCallback success handler
-     * @param errorCallback error handler
-     * @param id TokenID
+     * @param {Function} successCallback success handler
+     * @param {Function} errorCallback error handler
+     * @param {String} id TokenID
      */
     obj.deleteToken = function (successCallback, errorCallback, id) {
-        obj.serviceCall({ type: "DELETE", url: "/" + id, success: function (data) {
+        obj.serviceCall({ type: "DELETE", url: "/" + id, success: function () {
             if (successCallback) {
                 successCallback(id);
             }
@@ -65,10 +58,10 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
     };
 
     /**
-     * Gets a token given a tokenID
-     * @param successCallback success handler
-     * @param errorCallback error handler
-     * @param id TokenID
+     * Gets a token given a token ID
+     * @param {Function} successCallback success handler
+     * @param {Function} errorCallback error handler
+     * @param {String} id TokenID
      */
     obj.getTokenByID = function (successCallback, errorCallback, id) {
         obj.serviceCall({ url: "/" + id, success: function (data) {
@@ -76,28 +69,6 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
                 successCallback(data);
             }
         }, error: errorCallback });
-    };
-
-    /**
-     * See AbstractDelegate.patchEntityDifferences
-     */
-    obj.patchTokenDifferences = function (oldTokenData, newTokenData, successCallback, errorCallback,
-                                          noChangesCallback) {
-        obj.patchEntityDifferences({
-            id: oldTokenData._id,
-            rev: oldTokenData._rev
-        }, oldTokenData, newTokenData, successCallback, errorCallback, noChangesCallback);
-    };
-
-    /**
-     * See AbstractDelegate.patchEntity
-     */
-    obj.patchSelectedTokenAttributes = function (id, rev, patchDefinitionObject, successCallback, errorCallback,
-                                                 noChangesCallback) {
-        obj.patchEntity({
-            id: id,
-            rev: rev
-        }, patchDefinitionObject, successCallback, errorCallback, noChangesCallback);
     };
 
     return obj;

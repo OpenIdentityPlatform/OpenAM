@@ -33,11 +33,24 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
      */
     obj.decorateURLWithOverrideRealm = function (uri) {
         var overrideRealm = obj.getOverrideRealm(),
-            prepend;
+            prepend, idx, fragment;
 
         if (overrideRealm) {
+            if (uri.indexOf("realm=") !== -1) {
+                // URI is already decorated by some other means
+                return uri;
+            }
+            idx = uri.indexOf("#");
+            if (idx !== -1) {
+                fragment = uri.slice(idx);
+                uri = uri.slice(0, idx);
+            }
+
             prepend = uri.indexOf("?") === -1 ? "?" : "&";
             uri = uri + prepend + "realm=" + overrideRealm;
+            if (fragment) {
+                uri = uri + fragment;
+            }
         }
 
         return uri;
@@ -81,6 +94,22 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
     };
 
     /**
+     * Determines the current realm by examining both the override realm and the subRealm.
+     * The subRealm is determined from the /XUI/#login/realmName format.
+     * The overrideRealm is determined from either the /XUI/?realm=/realmName#login/ or /XUI/#login/&realm=/realmName
+     * format.
+     *
+     * Please note that the realm value determined by XUI does not take DNS aliases into account, hence it can be
+     * potentially incorrect when overrideRealm is not specified in the request.
+     *
+     * @returns {String} The realm determined from the request without the leading '/'.
+     */
+    obj.getRealm = function () {
+        var realm = obj.getOverrideRealm() || obj.getSubRealm();
+        return (realm.substring(0, 1) === "/") ? realm.substring(1) : realm;
+    };
+
+    /**
      * Determines the current override realm from the URI query string and hash fragment query string
      * @returns {String} Override realm AS IS (no slash modification) (e.g. <code>/</code> or <code>/realm1</code>)
      */
@@ -100,7 +129,7 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
         var subRealmSplit = URIUtils.getCurrentFragment().split("/"),
             page = subRealmSplit.shift().split("&")[0],
             subRealmSpecifiablePages =
-                [ "login", "passwordReset", "continuePasswordReset", "register", "continueRegister" ],
+                ["login", "passwordReset", "continuePasswordReset", "register", "continueRegister"],
             subRealm;
 
         if (page && _.include(subRealmSpecifiablePages, page)) {

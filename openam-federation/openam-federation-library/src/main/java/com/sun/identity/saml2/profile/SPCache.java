@@ -112,7 +112,7 @@ public class SPCache {
      *                     - sp token id (String)                     
      * one key --- multiple SPFedSession's
      */
-    protected static Hashtable fedSessionListsByNameIDInfoKey = new Hashtable();
+    public static Hashtable fedSessionListsByNameIDInfoKey = new Hashtable();
 
     /**
      * SP: used to map LogoutRequest ID and inResponseTo in LogoutResponse

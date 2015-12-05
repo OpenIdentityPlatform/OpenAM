@@ -24,32 +24,42 @@
 
 package org.forgerock.openam.upgrade.helpers;
 
+import static org.forgerock.openam.utils.CollectionUtils.*;
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchemaImpl;
-import java.util.Set;
-import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeUtils;
 import org.forgerock.openam.upgrade.VersionUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Used to upgrade the iPlanetAMAuthService.
  */
 public class AuthServiceHelper extends AbstractUpgradeHelper {
     // new modules
-    private final static String SECURID = "com.sun.identity.authentication.modules.securid.SecurID";
-    private final static String ADAPTIVE = "org.forgerock.openam.authentication.modules.adaptive.Adaptive";
-    private final static String OAUTH2 = "org.forgerock.openam.authentication.modules.oauth2.OAuth";
-    private final static String OATH = "org.forgerock.openam.authentication.modules.oath.OATH";
-    private final static String PERSISTENT_COOKIE = "org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie";
-    private final static String OPEN_ID_CONNECT = "org.forgerock.openam.authentication.modules.oidc.OpenIdConnect";
-    private final static String SCRIPTED = "org.forgerock.openam.authentication.modules.scripted.Scripted";
-    private final static String SCRIPTED_DEVICE_PRINT = "org.forgerock.openam.authentication.modules.deviceprint.DeviceIdMatch";
-    private final static String DEVICE_PRINT_PERSIST = "org.forgerock.openam.authentication.modules.deviceprint.DeviceIdSave";
+    private final static String NEW_SECURID = "com.sun.identity.authentication.modules.securid.SecurID";
+    private final static String NEW_ADAPTIVE = "org.forgerock.openam.authentication.modules.adaptive.Adaptive";
+    private final static String NEW_OAUTH2 = "org.forgerock.openam.authentication.modules.oauth2.OAuth";
+    private final static String NEW_OATH = "org.forgerock.openam.authentication.modules.oath.OATH";
+    private final static String NEW_PERSISTENT_COOKIE = "org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie";
+    private final static String NEW_OPEN_ID_CONNECT = "org.forgerock.openam.authentication.modules.oidc.OpenIdConnect";
+    private final static String NEW_SCRIPTED = "org.forgerock.openam.authentication.modules.scripted.Scripted";
+    private final static String NEW_SCRIPTED_DEVICE_PRINT = "org.forgerock.openam.authentication.modules.deviceprint.DeviceIdMatch";
+    private final static String NEW_DEVICE_PRINT_PERSIST = "org.forgerock.openam.authentication.modules.deviceprint.DeviceIdSave";
+    private final static String NEW_SAML2 = "org.forgerock.openam.authentication.modules.saml2.SAML2";
+
+    // Note: Add new modules to this array.
+    private final static List<String> NEW_MODULES = Arrays.asList(
+            NEW_SECURID, NEW_ADAPTIVE, NEW_OAUTH2, NEW_OATH, NEW_PERSISTENT_COOKIE,
+            NEW_OPEN_ID_CONNECT, NEW_SCRIPTED, NEW_SCRIPTED_DEVICE_PRINT,
+            NEW_DEVICE_PRINT_PERSIST, NEW_SAML2);
 
     // remove modules
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";
     private final static String UNIX = "com.sun.identity.authentication.modules.unix.Unix";
+    private final static String WSS_AUTH = "com.sun.identity.authentication.modules.wss.WSSAuthModule";
     private final static String ATTR = "iplanet-am-auth-authenticators";
     // other attributes
     private final static String XUI = "openam-xui-interface-enabled";
@@ -74,26 +84,15 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
 
         Set<String> defaultValues = existingAttr.getDefaultValues();
 
-        if (defaultValues.contains(SECURID) && defaultValues.contains(ADAPTIVE) && defaultValues.contains(OAUTH2)
-                && defaultValues.contains(OATH) && defaultValues.contains(PERSISTENT_COOKIE)
-                && defaultValues.contains(OPEN_ID_CONNECT) && defaultValues.contains(SCRIPTED)
-                && defaultValues.contains(SCRIPTED_DEVICE_PRINT) && defaultValues.contains(DEVICE_PRINT_PERSIST)
-                && !defaultValues.contains(SAFEWORD) && !defaultValues.contains(UNIX)) {
+        if (defaultValues.containsAll(NEW_MODULES)) {
             // nothing to do
             return null;
         }
 
-        defaultValues.add(SECURID);
-        defaultValues.add(ADAPTIVE);
-        defaultValues.add(OAUTH2);
-        defaultValues.add(OATH);
-        defaultValues.add(PERSISTENT_COOKIE);
-        defaultValues.add(OPEN_ID_CONNECT);
-        defaultValues.add(SCRIPTED);
-        defaultValues.add(SCRIPTED_DEVICE_PRINT);
-        defaultValues.add(DEVICE_PRINT_PERSIST);
+        defaultValues.addAll(NEW_MODULES);
         defaultValues.remove(SAFEWORD);
         defaultValues.remove(UNIX);
+        defaultValues.remove(WSS_AUTH);
         newAttr = updateDefaultValues(newAttr, defaultValues);
 
         return newAttr;

@@ -122,6 +122,11 @@ public class CoreTokenConstants {
     public static final String CTS_STORE_MAX_CONNECTIONS = "org.forgerock.services.cts.store.max.connections";
 
     /**
+     * Default maximum number of connections to the token store.
+     */
+    public static final String CTS_STORE_MAX_CONNECTIONS_DEFAULT = "10";
+
+    /**
      * The maximum duration in seconds to wait whilst placing tasks on the asynchronous work queue.
      */
     public static final String CTS_ASYNC_QUEUE_TIMEOUT = "org.forgerock.services.cts.async.queue.timeout";

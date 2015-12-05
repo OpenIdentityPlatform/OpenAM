@@ -223,7 +223,7 @@ public class PolicyGraphTest {
         PolicyGraph graph = makePolicyGraph(policies);
         graph.computeGraph();
 
-        given(resourceSetStore.read(anyString()))
+        given(resourceSetStore.read(anyString(), anyString()))
                 .willReturn(new ResourceSetDescription(RESOURCE_SET_ID, "RESOURCE_SERVER_ID", ALICE, null));
 
         given(delegate.updatePolicies(isNull(Context.class), anySet()))
@@ -257,7 +257,7 @@ public class PolicyGraphTest {
         PolicyGraph graph = makePolicyGraph(policies);
         graph.computeGraph();
 
-        given(resourceSetStore.read(anyString()))
+        given(resourceSetStore.read(anyString(), anyString()))
                 .willReturn(new ResourceSetDescription(RESOURCE_SET_ID, "RESOURCE_SERVER_ID", ALICE, null));
 
         given(delegate.updatePolicies(isNull(Context.class), anySet()))

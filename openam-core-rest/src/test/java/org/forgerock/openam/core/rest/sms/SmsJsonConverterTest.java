@@ -32,6 +32,7 @@ import java.util.Set;
 import org.assertj.core.api.Assertions;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
@@ -243,4 +244,10 @@ public class SmsJsonConverterTest {
         converter.fromJson(jsonRepresentation);
     }
 
+    @Test(expectedExceptions = BadRequestException.class)
+    public void invalidValueTypeResultsInBadRequestException() throws Exception {
+        given(serviceSchema.validateAttributes(any(Map.class))).willReturn(true);
+
+        converter.fromJson(json(object(field(INT_VALUE_NAME, "blabla"))));
+    }
 }

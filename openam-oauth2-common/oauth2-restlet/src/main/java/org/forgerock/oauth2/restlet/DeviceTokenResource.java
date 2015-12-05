@@ -32,6 +32,7 @@ import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.AuthorizationDeclinedException;
 import org.forgerock.oauth2.core.exceptions.AuthorizationPendingException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
@@ -55,16 +56,18 @@ public class DeviceTokenResource extends ServerResource {
     private final ClientRegistrationStore clientRegistrationStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ExceptionHandler exceptionHandler;
+    private final ClientAuthenticationFailureFactory failureFactory;
 
     @Inject
     public DeviceTokenResource(TokenStore tokenStore, OAuth2RequestFactory<Request> requestFactory,
             ClientRegistrationStore clientRegistrationStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            ExceptionHandler exceptionHandler) {
+            ExceptionHandler exceptionHandler, ClientAuthenticationFailureFactory failureFactory) {
         this.tokenStore = tokenStore;
         this.requestFactory = requestFactory;
         this.clientRegistrationStore = clientRegistrationStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.exceptionHandler = exceptionHandler;
+        this.failureFactory = failureFactory;
     }
 
     @Post
@@ -84,7 +87,7 @@ public class DeviceTokenResource extends ServerResource {
 
             ClientRegistration client = clientRegistrationStore.get(clientId, request);
             if (!clientSecret.equals(client.getClientSecret())) {
-                throw new InvalidClientException();
+                throw failureFactory.getException();
             }
 
             DeviceCode deviceCode = tokenStore.readDeviceCode(clientId, code, request);

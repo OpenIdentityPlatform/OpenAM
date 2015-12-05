@@ -204,7 +204,7 @@ public class SessionRequestHandler implements RequestHandler {
              * Note, this also acts as a filter since we must have a valid session identifier in order to proceed.
              */
             requesterSession = sessionCache.getSession(sid);
-            auditor.setAuthenticationId(requesterSession.getClientID());
+            auditor.setUserId(requesterSession.getClientID());
             auditor.setTrackingId(requesterSession.getProperty(Constants.AM_CTX_ID));
             auditor.setRealm(requesterSession.getProperty(Constants.ORGANIZATION));
             auditor.auditAccessAttempt();

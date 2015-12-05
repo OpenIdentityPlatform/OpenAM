@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: AttributeQueryUtil.java,v 1.11 2009/07/24 22:51:48 madan_ranganath Exp $
  *
- * Portions copyright 2010-2014 ForgeRock AS.
+ * Portions copyright 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
@@ -44,6 +44,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import org.w3c.dom.Element;
 
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
@@ -502,12 +504,11 @@ public class AttributeQueryUtil {
             throw new SAML2Exception(SAML2Utils.bundle.getString(
                 "attrQueryIssuerNotFound"));
         }
-        X509Certificate signingCert =
-            KeyUtil.getVerificationCert(attrqDesc, requestedEntityID,
-            SAML2Constants.ATTR_QUERY_ROLE);
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(attrqDesc, requestedEntityID,
+                SAML2Constants.ATTR_QUERY_ROLE);
 
-        if (signingCert != null) {
-            boolean valid = attrQuery.isSignatureValid(signingCert);
+        if (!signingCerts.isEmpty()) {
+            boolean valid = attrQuery.isSignatureValid(signingCerts);
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(
                     "AttributeQueryUtil.verifyAttributeQuery: " +
@@ -532,11 +533,8 @@ public class AttributeQueryUtil {
         EncryptedID encryptedID = subject.getEncryptedID();
 
         if (encryptedID != null) {
-            String alias = SAML2Utils.getEncryptionCertAlias(realm, 
-                attrAuthorityEntityID, SAML2Constants.ATTR_AUTH_ROLE); 
-            PrivateKey privateKey = keyProvider.getPrivateKey(alias);
-            
-            nameID = encryptedID.decrypt(privateKey);
+            nameID = encryptedID.decrypt(KeyUtil.getDecryptionKeys(realm, attrAuthorityEntityID,
+                    SAML2Constants.ATTR_AUTH_ROLE));
         } else {
             nameID = subject.getNameID();
         }
@@ -585,11 +583,8 @@ public class AttributeQueryUtil {
         EncryptedID encryptedID = subject.getEncryptedID();
 
         if (encryptedID != null) {
-            String alias = SAML2Utils.getEncryptionCertAlias(realm, 
-                attrAuthorityEntityID, SAML2Constants.ATTR_AUTH_ROLE); 
-            PrivateKey privateKey = keyProvider.getPrivateKey(alias);
-            
-            nameID = encryptedID.decrypt(privateKey);
+            nameID = encryptedID.decrypt(KeyUtil.getDecryptionKeys(realm, attrAuthorityEntityID,
+                    SAML2Constants.ATTR_AUTH_ROLE));
         } else {
             nameID = subject.getNameID();
         }
@@ -814,17 +809,11 @@ public class AttributeQueryUtil {
         }
     }
 
-    private static EncryptedAssertion encryptAssertion(Assertion assertion,
-        EncryptedID encryptedID, String attrAuthorityEntityID,
-        String requesterEntityID, String realm, String attrQueryProfileAlias)
-        throws SAML2Exception {
-
-        String alias = SAML2Utils.getEncryptionCertAlias(realm, 
-            attrAuthorityEntityID, SAML2Constants.ATTR_AUTH_ROLE); 
-        PrivateKey privateKey = keyProvider.getPrivateKey(alias);
-
-        SecretKey secretKey = EncManager.getEncInstance().getSecretKey(
-            encryptedID.toXMLString(true, true), privateKey);
+    private static EncryptedAssertion encryptAssertion(Assertion assertion, EncryptedID encryptedID,
+            String attrAuthorityEntityID, String requesterEntityID, String realm, String attrQueryProfileAlias)
+            throws SAML2Exception {
+        SecretKey secretKey = EncManager.getEncInstance().getSecretKey(encryptedID.toXMLString(true, true),
+                KeyUtil.getDecryptionKeys(realm, attrAuthorityEntityID, SAML2Constants.ATTR_AUTH_ROLE));
 
         AttributeQueryDescriptorElement aqd =
             metaManager.getAttributeQueryDescriptor(realm, requesterEntityID);
@@ -1068,8 +1057,8 @@ public class AttributeQueryUtil {
         
         SOAPMessage resMsg = null;
         try {
-            resMsg = SAML2Utils.sendSOAPMessage(attrQueryXMLString,
-                attributeServiceURL, true);
+            resMsg = SOAPCommunicator.getInstance().sendSOAPMessage(attrQueryXMLString,
+                    attributeServiceURL, true);
         } catch (SOAPException se) {
             SAML2Utils.debug.error(
                 "AttributeQueryUtil.sendAttributeQuerySOAP: ", se);
@@ -1077,7 +1066,7 @@ public class AttributeQueryUtil {
                 SAML2Utils.bundle.getString("errorSendingAttributeQuery"));
         }
         
-        Element respElem = SAML2Utils.getSamlpElement(resMsg, "Response");
+        Element respElem = SOAPCommunicator.getInstance().getSamlpElement(resMsg, "Response");
         Response response =
             ProtocolFactory.getInstance().createResponse(respElem);
 
@@ -1134,12 +1123,11 @@ public class AttributeQueryUtil {
                 "responseNotSigned"));
         }
 
-        X509Certificate signingCert =
-            KeyUtil.getVerificationCert(aad, attrAuthorityEntityID,
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(aad, attrAuthorityEntityID,
                 SAML2Constants.ATTR_AUTH_ROLE);
 
-        if (signingCert != null) {
-            boolean valid = response.isSignatureValid(signingCert);
+        if (!signingCerts.isEmpty()) {
+            boolean valid = response.isSignatureValid(signingCerts);
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(
                     "AttributeQueryUtil.verifyResponse: " +
@@ -1594,15 +1582,8 @@ public class AttributeQueryUtil {
                                       String spEntityID) throws SAML2Exception 
     {
         if (eAssertion != null) {
-            String alias = SAML2Utils.getEncryptionCertAlias("/", spEntityID,
-                                      SAML2Constants.ATTR_QUERY_ROLE);
-            PrivateKey privateKey = 
-                       KeyUtil.getKeyProviderInstance().getPrivateKey(alias);
-            if (privateKey != null) {
-                Assertion assertion = eAssertion.decrypt(privateKey);
-                return assertion;
-            }
-        }        
+            return eAssertion.decrypt(KeyUtil.getDecryptionKeys("/", spEntityID, SAML2Constants.ATTR_QUERY_ROLE));
+        }
         return null;
     }
 }

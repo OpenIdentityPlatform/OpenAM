@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2006-2009 Sun Microsystems Inc.
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.shared.resourcename;
@@ -33,30 +33,68 @@ import java.util.StringTokenizer;
  */
 public abstract class BasePrefixResourceName<T, E extends Exception> implements BaseResourceName<T, E> {
 
+    /**
+     * The object to return on a wildcard match.
+     */
     protected final T wildcardMatch;
+
+    /**
+     * The object to return on a super-resource match.
+     */
     protected final T superResourceMatch;
+
+    /**
+     * The object to return on a sub-resource match.
+     */
     protected final T subResourceMatch;
+
+    /**
+     * The object to return on no match.
+     */
     protected final T noMatch;
+
+    /**
+     * The object to return on an exact match.
+     */
     protected final T exactMatch;
 
+    /**
+     * Delimiter.
+     */
     protected String delimiter = "/";
+
+    /**
+     * Whether matching is case sensitive.
+     */
     protected boolean caseSensitive = false;
+
     /**
      * String indicating default wild card pattern.
      */
     protected String wildcard = "*";
+
+    /**
+     * String indicating default wild card pattern length.
+     */
     protected int wildcardLength = 1;
+
     /**
      * String indicating default one level wild card pattern.
      */
     protected String oneLevelWildcard = "-*-";
+
+    /**
+     * String indicating default one level wild card pattern length.
+     */
     protected int oneLevelWildcardLength = 3;
+
     /**
      * boolean indicating if the wild card pattern is embedded
      * in the one level wild card pattern eg. wildcard is "*"
      * while one level wild card pattern is "-*-".
      */
     protected boolean wildcardEmbedded = true;
+
     /**
      * boolean indicating if the one level wild card pattern is embedded
      * in the wild card pattern eg. one level wildcard is "*"
@@ -64,12 +102,25 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
      */
     protected boolean oneLevelWildcardEmbedded = false;
 
+    /**
+     * Debug instance.
+     */
     protected Debug debug;
-    private static String PROTO_DELIMITER = "://";
-    private static int PROTO_DELIMITER_SIZE = PROTO_DELIMITER.length();
+    private static final String PROTO_DELIMITER = "://";
+    private static final int PROTO_DELIMITER_SIZE = PROTO_DELIMITER.length();
     private static final String CURRENT_PATH = ".";
     private static final String PARENT_PATH = "..";
 
+    /**
+     * Constructs a new BasePrefixResourceName instance.
+     *
+     * @param debug The debug instance.
+     * @param exactMatch The object to return on an exact match.
+     * @param noMatch The object to return on no match.
+     * @param subResourceMatch The object to return on a sub-resource match.
+     * @param superResourceMatch The object to return on a super-resource match.
+     * @param wildcardMatch The object to return on a wildcard match.
+     */
     protected BasePrefixResourceName(Debug debug, T exactMatch, T noMatch, T subResourceMatch, T superResourceMatch,
             T wildcardMatch) {
         this.debug = debug;
@@ -107,6 +158,7 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
         // use default values
     }
 
+    @Override
     public Set<String> getServiceTypeNames() {
         return null;
     }
@@ -346,11 +398,9 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
      * specifies if the resources are exact match, or
      * otherwise.
      */
-
     public T oneLevelWildcardCompare(String requestResource,
             String targetResource,
-            boolean wildcardCompare)
-    {
+            boolean wildcardCompare) {
         // requestResource & targetResource are not null,
         // have no ending delimiters and if case insensitive
         // compare is defined, are already lowercase.
@@ -362,19 +412,19 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
         int i = 0;
         int j = 0;
         while (st1.hasMoreTokens()) {
-            requestTokens[i++] = (String)st1.nextToken();
+            requestTokens[i++] = (String) st1.nextToken();
         }
         while (st2.hasMoreTokens()) {
-            targetTokens[j++] = (String)st2.nextToken();
+            targetTokens[j++] = (String) st2.nextToken();
         }
         boolean wildcardMatch = false;
         j = 0;
-        for (i = 0; i < requestTokens.length; ) {
+        for (i = 0; i < requestTokens.length;) {
             String requestToken = requestTokens[i++];
             if (j < targetTokens.length) {
                 T matchTokensResult = null;
-                String targetToken = aggregateWildcard( targetTokens[j++]);
-                matchTokensResult = matchTokens( targetToken, requestToken);
+                String targetToken = aggregateWildcard(targetTokens[j++]);
+                matchTokensResult = matchTokens(targetToken, requestToken);
                 if (matchTokensResult.equals(noMatch)) {
                     return matchTokensResult;
                 }
@@ -382,7 +432,7 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
                     wildcardMatch = true;
                 }
             } else {
-                if ( i  <= requestTokens.length )  {
+                if (i  <= requestTokens.length)  {
                     return superResourceMatch;
                 } else {
                     return noMatch;
@@ -391,8 +441,8 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
         }
         // request tokens are over
         // check if target tokens still remain
-        if ( j <  targetTokens.length) {
-            if ( j == targetTokens.length-1  && aggregateWildcard(targetTokens[j]).equals(oneLevelWildcard)) {
+        if (j < targetTokens.length) {
+            if (j == targetTokens.length - 1  && aggregateWildcard(targetTokens[j]).equals(oneLevelWildcard)) {
                 // last token is a wildcard
                 return this.wildcardMatch;
             }
@@ -410,7 +460,7 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
      * to just one.  So "a[*][*][*]b" where one level wild pattern is
      * "[*]" reduces to "a[*]b".
      */
-    private String aggregateWildcard ( String targetToken) {
+    private String aggregateWildcard(String targetToken) {
         int len = 0;
         if (targetToken == null || (len = targetToken.length()) == 0) {
             return targetToken;
@@ -450,8 +500,7 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
      */
 
     private T matchTokens(String targetToken,
-            String requestToken)
-    {
+            String requestToken) {
         int wildcardIndex = 0;
         if (targetToken == null && requestToken == null) {
             return exactMatch;
@@ -465,15 +514,14 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
         int targetTokenLength = targetToken.length();
         int requestTokenLength = requestToken.length();
 
-        if (targetToken.indexOf(oneLevelWildcard, beginTargetIndex) != -1 ) {
+        if (targetToken.indexOf(oneLevelWildcard, beginTargetIndex) != -1) {
             while ((wildcardIndex = targetToken.indexOf(oneLevelWildcard,
-                    beginTargetIndex)) != -1 ) {
+                    beginTargetIndex)) != -1) {
                 if (wildcardIndex > beginTargetIndex) {
                     substr = targetToken.substring(beginTargetIndex,
                             wildcardIndex);
                     if ((beginRequestIndex = requestToken.indexOf(
-                            substr,beginRequestIndex)) == -1)
-                    {
+                            substr, beginRequestIndex)) == -1) {
                         return noMatch;
                     }
                     beginTargetIndex = beginTargetIndex + substr.length()
@@ -484,10 +532,9 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
                         // check if only wild card
                         if (targetTokenLength == oneLevelWildcardLength) {
                             return wildcardMatch;
-                        } else {// has more string after wild card
+                        } else { // has more string after wild card
                             // advance over the wildcard and go back to while
-                            beginTargetIndex = beginTargetIndex +
-                                    oneLevelWildcardLength;
+                            beginTargetIndex = beginTargetIndex + oneLevelWildcardLength;
                             continue;
                         }
                     }
@@ -503,7 +550,7 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
             // get the remaining request
             String remRequest = requestToken.substring(beginRequestIndex, requestTokenLength);
             int remRequestIndex = -1;
-            if ((remRequestIndex = remRequest.lastIndexOf(targetStr, remRequest.length() - 1)) == -1 ) {
+            if ((remRequestIndex = remRequest.lastIndexOf(targetStr, remRequest.length() - 1)) == -1) {
                 return noMatch;
             } else {
                 beginRequestIndex = beginRequestIndex + remRequestIndex;
@@ -535,14 +582,14 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
         // Remove duplicate /
         if (superResource.endsWith(delimiter) && subResource.startsWith(delimiter)) {
             superResource = superResource.substring(0,
-                    superResource.length() -1);
+                    superResource.length() - 1);
         }
 
         if (!superResource.endsWith(delimiter) && !subResource.startsWith(delimiter)) {
             subResource = delimiter + subResource;
         }
 
-        return superResource+subResource;
+        return superResource + subResource;
     }
 
     /**
@@ -561,7 +608,7 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
      */
     public String getSubResource(String resource, String superResource) {
         String subResource = null;
-        if ( !superResource.endsWith(delimiter) ) {
+        if (!superResource.endsWith(delimiter)) {
             superResource = superResource + delimiter;
         }
         if (resource.startsWith(superResource)) {
@@ -571,29 +618,30 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
     }
 
 
-    /* Splits the given resource name
+    /**
+     * Splits the given resource name.
      * @param res the resource name to be split
      * @return an array of (String) split resource names
      */
     public String[] split(String res) {
         String protocol = "";
-        int doubleD = res.indexOf(delimiter+delimiter);
+        int doubleD = res.indexOf(delimiter + delimiter);
         if (doubleD != -1) {
             protocol = res.substring(0, doubleD + 2);
-            res = res.substring(doubleD+2);
+            res = res.substring(doubleD + 2);
         }
         StringTokenizer st = new StringTokenizer(res, delimiter);
         int n = st.countTokens();
         String[] retVal = new String[n];
-        for (int i=0; i<n; i++) {
+        for (int i = 0; i < n; i++) {
             retVal[i] = st.nextToken();
         }
         retVal[0] =  protocol + retVal[0];
-        if (res.startsWith(delimiter) ) {
+        if (res.startsWith(delimiter)) {
             retVal[0] = retVal[0] + delimiter;
         }
-        if (res.endsWith(delimiter) ) {
-            retVal[n-1] = retVal[n-1] + delimiter;
+        if (res.endsWith(delimiter)) {
+            retVal[n - 1] = retVal[n - 1] + delimiter;
         }
         return retVal;
     }
@@ -611,8 +659,7 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
      * @return the prefix resource string in its canonicalized form.
      * @throws E if resource is invalid
      */
-    public String canonicalize(String res) throws E
-    {
+    public String canonicalize(String res) throws E {
         boolean errorCondition = false;
         int startOneLevelIndex = res.indexOf(oneLevelWildcard);
         int endOneLevelIndex = (startOneLevelIndex != -1) ? startOneLevelIndex + oneLevelWildcardLength - 1 : -1;
@@ -623,9 +670,9 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
 
         boolean oneLevelFound = false;
         if (wildcardEmbedded) {
-            while (startWildcardIndex != -1 && (startWildcardIndex + wildcardLength <= resLength )) {
-                if (startOneLevelIndex != -1 ) {
-                    if ( startWildcardIndex >=startOneLevelIndex && endOneLevelIndex >= endWildcardIndex) {
+            while (startWildcardIndex != -1 && (startWildcardIndex + wildcardLength <= resLength)) {
+                if (startOneLevelIndex != -1) {
+                    if (startWildcardIndex >= startOneLevelIndex && endOneLevelIndex >= endWildcardIndex) {
                         oneLevelFound = true;
                     } else {
                         errorCondition = true;
@@ -638,7 +685,7 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
                         break;
                     }
                 }
-                startOneLevelIndex = res.indexOf(oneLevelWildcard, endOneLevelIndex +1);
+                startOneLevelIndex = res.indexOf(oneLevelWildcard, endOneLevelIndex + 1);
                 endOneLevelIndex = (startOneLevelIndex != -1) ? startOneLevelIndex + oneLevelWildcardLength - 1 : -1;
                 startWildcardIndex = res.indexOf(wildcard, endWildcardIndex + 1);
                 endWildcardIndex = (startWildcardIndex != -1) ? startWildcardIndex + wildcardLength - 1 : -1;
@@ -646,10 +693,10 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
         }
         boolean wildcardFound = false;
         if (oneLevelWildcardEmbedded) {
-            while (startOneLevelIndex != -1 && (startOneLevelIndex + oneLevelWildcardLength <= resLength )) {
+            while (startOneLevelIndex != -1 && (startOneLevelIndex + oneLevelWildcardLength <= resLength)) {
 
-                if (startWildcardIndex != -1 ) {
-                    if ( startOneLevelIndex >=startWildcardIndex && endWildcardIndex >= endOneLevelIndex) {
+                if (startWildcardIndex != -1) {
+                    if (startOneLevelIndex >= startWildcardIndex && endWildcardIndex >= endOneLevelIndex) {
                         wildcardFound = true;
                     } else {
                         errorCondition = true;
@@ -663,13 +710,13 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
                     }
                 }
                 startOneLevelIndex = res.indexOf(oneLevelWildcard,
-                        endOneLevelIndex +1);
-                endOneLevelIndex = (startOneLevelIndex != -1) ?
-                        startOneLevelIndex + oneLevelWildcardLength - 1 :-1;
+                        endOneLevelIndex + 1);
+                endOneLevelIndex = (startOneLevelIndex != -1)
+                        ? startOneLevelIndex + oneLevelWildcardLength - 1 : -1;
                 startWildcardIndex =
                         res.indexOf(wildcard, endWildcardIndex + 1);
-                endWildcardIndex = (startWildcardIndex != -1) ?
-                        startWildcardIndex + wildcardLength - 1 :-1;
+                endWildcardIndex = (startWildcardIndex != -1)
+                        ? startWildcardIndex + wildcardLength - 1 : -1;
             }
         }
         if (!oneLevelWildcardEmbedded && !wildcardEmbedded) {
@@ -764,7 +811,8 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
 
     /**
      * Construct the exception that will be thrown if the resource is invalid during canonicalize.
-     * @return
+     * @param args The exception arguments.
+     * @return An exception.
      */
     protected abstract E constructResourceInvalidException(Object[] args);
 }

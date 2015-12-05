@@ -68,6 +68,12 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
                     // Redirect browser back to the server using the FQDN to ensure cookies are set correctly
                     location.href = URIUtils.getCurrentUrl().replace(hostname, fqdn);
                 } else {
+                    require.config({ "map": { "*": {
+                        "UserProfileView" : (response.kbaEnabled === "true"
+                            ? "org/forgerock/commons/ui/user/profile/UserProfileKBAView"
+                            : "org/forgerock/commons/ui/user/profile/UserProfileView")
+                    } } });
+
                     successCallback(response);
                 }
             },
@@ -77,8 +83,10 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
 
     /**
      * Checks for a change of realm
+     * @returns {Promise} If the realm has changed then a promise that will contain the response from the
+     * serverinfo/* REST call, otherwise an empty successful promise.
      */
-    obj.checkForDifferences = function (route, params) {
+    obj.checkForDifferences = function () {
         var currentSubRealm = RealmHelper.getSubRealm(),
             currentOverrideRealm = RealmHelper.getOverrideRealm(),
             subRealmChanged = lastKnownSubRealm !== currentSubRealm,

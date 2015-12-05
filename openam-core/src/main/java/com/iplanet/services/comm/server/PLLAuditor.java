@@ -15,9 +15,9 @@
  */
 package com.iplanet.services.comm.server;
 
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILED;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -54,7 +54,7 @@ public class PLLAuditor {
     private long startTime;
     private String method;
     private String trackingId;
-    private String authenticationId;
+    private String userId;
     private String realm;
     private Component component;
     private boolean accessAttemptAudited;
@@ -81,7 +81,7 @@ public class PLLAuditor {
      * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     public void auditAccessAttempt() {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                     .forHttpServletRequest(httpServletRequest)
@@ -89,7 +89,7 @@ public class PLLAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
-                    .authentication(authenticationId)
+                    .userId(userId)
                     .request(PLL, method)
                     .trackingId(trackingId)
                     .toEvent();
@@ -108,7 +108,7 @@ public class PLLAuditor {
         if (!accessAttemptAudited) {
             auditAccessAttempt();
         }
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
@@ -118,8 +118,8 @@ public class PLLAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .response(SUCCESS, "", elapsedTime, MILLISECONDS)
-                    .authentication(authenticationId)
+                    .response(SUCCESSFUL, "", elapsedTime, MILLISECONDS)
+                    .userId(userId)
                     .request(PLL, method)
                     .trackingId(trackingId)
                     .toEvent();
@@ -154,7 +154,7 @@ public class PLLAuditor {
         if (!accessAttemptAudited) {
             auditAccessAttempt();
         }
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
@@ -165,8 +165,8 @@ public class PLLAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .responseWithDetail(FAILURE, errorCode == null ? "" : errorCode, elapsedTime, MILLISECONDS, detail)
-                    .authentication(authenticationId)
+                    .responseWithDetail(FAILED, errorCode == null ? "" : errorCode, elapsedTime, MILLISECONDS, detail)
+                    .userId(userId)
                     .request(PLL, method)
                     .trackingId(trackingId)
                     .toEvent();
@@ -183,9 +183,9 @@ public class PLLAuditor {
         accessAttemptAudited = false;
         startTime = System.currentTimeMillis();
         method = "unknown";
-        authenticationId = "";
+        userId = "";
         trackingId = "";
-        component = Component.PLL;
+        component = null;
         realm = NO_REALM;
     }
 
@@ -216,7 +216,7 @@ public class PLLAuditor {
      */
     public void setSsoToken(SSOToken ssoToken) {
         this.trackingId = getTrackingIdFromSSOToken(ssoToken);
-        this.authenticationId = getUserId(ssoToken);
+        this.userId = getUserId(ssoToken);
     }
 
     /**
@@ -227,10 +227,10 @@ public class PLLAuditor {
     }
 
     /**
-     * @param authenticationId Identifies Subject of authentication.
+     * @param userId Identifies Subject of authentication.
      */
-    public void setAuthenticationId(String authenticationId) {
-        this.authenticationId = authenticationId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     /**

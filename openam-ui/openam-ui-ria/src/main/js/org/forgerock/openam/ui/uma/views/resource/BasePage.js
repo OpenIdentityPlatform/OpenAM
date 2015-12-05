@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
     "backbone.paginator",
-    "backgrid",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "backgrid-filter",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/views/share/CommonShare",
@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator"
 ], function ($, AbstractView, Backbone, BackbonePaginator, Backgrid, BackgridFilter,
-            BackgridUtils, CommonShare, Configuration, Constants, RealmHelper, ThemeablePaginator) {
+            BackgridUtils, CommonShare, Configuration, Constants, RealmHelper) {
     var BasePage = AbstractView.extend({
         createCollection: function (url, queryFilters) {
             var self = this;
@@ -141,7 +141,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
             });
 
             this.parentRender(function () {
-                self.$el.find(".backgrid-container").append(grid.render().el);
+                self.$el.find(".table-container").append(grid.render().el);
                 self.$el.find(".panel-body").append(paginator.render().el);
 
                 self.data.collection.fetch({ reset: true, processData: false }).done(function () {

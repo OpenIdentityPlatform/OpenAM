@@ -41,6 +41,7 @@ import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -483,6 +484,17 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                             }
                         }
                     }
+                }).thenOnResult(new ResultHandler<UmaPolicy>() {
+                    @Override
+                    public void handleResult(UmaPolicy currentUmaPolicy) {
+                        String uid = contextHelper.getUserId(context);
+                        Set<String> underlyingPolicyIds = new HashSet<>(currentUmaPolicy.getUnderlyingPolicyIds());
+                        Set<JsonValue> newUnderlyingPolicies = updatedUmaPolicy.asUnderlyingPolicies(uid);
+                        for (JsonValue value : newUnderlyingPolicies) {
+                            underlyingPolicyIds.remove(value.get("name").asString());
+                        }
+                        policyResourceDelegate.deletePolicies(context, underlyingPolicyIds);
+                    }
                 })
                 .thenAsync(new UpdatePolicyGraphStatesFunction<UmaPolicy>(resourceSet, context))
                 .thenAsync(new UpdateUmaPolicyFunction(context, updatedUmaPolicy, resourceSetId, resourceSet));
@@ -855,7 +867,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             Context context) throws ResourceException {
         try {
             String realm = getRealm(context);
-            return resourceSetStoreFactory.create(realm).read(resourceSetId);
+            return resourceSetStoreFactory.create(realm).read(resourceSetId, resourceOwnerId);
         } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new BadRequestException("Invalid ResourceSet UID");
         } catch (ServerException e) {

@@ -36,8 +36,15 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
             var url = scopedByRealm(realm, "authentication");
 
             return $.when(
-                obj.serviceCall({ url: url + "?_action=schema", type: "POST" }),
-                obj.serviceCall({ url: url })
+                obj.serviceCall({
+                    url: url + "?_action=schema",
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "POST"
+                }),
+                obj.serviceCall({
+                    url: url,
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                })
             ).then(function (schemaData, valuesData) {
                 return {
                     schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
@@ -48,6 +55,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
         update: function (realm, data) {
             return obj.serviceCall({
                 url: scopedByRealm(realm, "authentication"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data)
             });
@@ -57,8 +65,14 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 var url = scopedByRealm(realm, "authentication");
 
                 return $.when(
-                    obj.serviceCall({ url: url + "/chains?_queryFilter=true" }),
-                    obj.serviceCall({ url: url })
+                    obj.serviceCall({
+                        url: url + "/chains?_queryFilter=true",
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                    }),
+                    obj.serviceCall({
+                        url: url,
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                    })
                 ).then(function (chainsData, authenticationData) {
                     _.each(chainsData[0].result, function (chainData) {
 
@@ -81,6 +95,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
             create: function (realm, data) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/chains?_action=create"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST",
                     data: JSON.stringify(data)
                 });
@@ -90,9 +105,18 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     url = scopedByRealm(realm, "authentication");
 
                 return $.when(
-                    obj.serviceCall({ url: url }),
-                    obj.serviceCall({ url: url + "/chains/" + name }),
-                    obj.serviceCall({ url: url + "/modules?_queryFilter=true" })
+                    obj.serviceCall({
+                        url: url,
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                    }),
+                    obj.serviceCall({
+                        url: url + "/chains/" + name,
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                    }),
+                    obj.serviceCall({
+                        url: url + "/modules?_queryFilter=true",
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                    })
                 ).then(function (authenticationData, chainData, modulesData) {
 
                     if (chainData[0]._id === authenticationData[0].adminAuthModule) {
@@ -103,7 +127,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                         chainData[0].orgConfig = true;
                     }
 
-                    _.each(chainData[0].authChainConfiguration, function (chainLink, index) {
+                    _.each(chainData[0].authChainConfiguration, function (chainLink) {
                         moduleName = _.find(modulesData[0].result, { _id: chainLink.module });
                         // The server allows for deletion of modules that are in use within a chain. The chain itself
                         // will still have a reference to the deleted module.
@@ -122,12 +146,14 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
             remove: function (realm, name) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/chains/" + name),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "DELETE"
                 });
             },
             update: function (realm, name, data) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/chains/" + name),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "PUT",
                     data: JSON.stringify(data)
                 });
@@ -136,19 +162,22 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
         modules: {
             all: function (realm) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules?_queryFilter=true")
+                    url: scopedByRealm(realm, "authentication/modules?_queryFilter=true"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 }).done(SMSDelegateUtils.sortResultBy("_id"));
             },
             create: function (realm, data, type) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/modules/" + type + "?_action=create"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST",
                     data: JSON.stringify(data)
                 });
             },
             get: function (realm, name, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name)
+                    url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 }).then(function (data) {
                     return data;
                 });
@@ -157,7 +186,8 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 var promise = $.Deferred(),
                     request = obj.serviceCall({
                         url: scopedByRealm(realm, 'authentication/modules?_queryFilter=_id eq "' + name +
-                            '"&_fields=_id')
+                            '"&_fields=_id'),
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     });
 
                 request.done(function (data) {
@@ -168,12 +198,14 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
             remove: function (realm, name, type) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "DELETE"
                 });
             },
             update: function (realm, name, type, data) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "PUT",
                     data: JSON.stringify(data)
                 });
@@ -181,8 +213,15 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
             types: {
                 all: function (realm) {
                     return obj.serviceCall({
-                        url: scopedByRealm(realm, "authentication/modules/types?_queryFilter=true")
+                        url: scopedByRealm(realm, "authentication/modules/types?_queryFilter=true"),
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }).done(SMSDelegateUtils.sortResultBy("name"));
+                },
+                get: function (realm, type) {
+                    // TODO: change this to a proper server-side call when OPENAM-7242 is implemented
+                    return obj.authentication.modules.types.all(realm).then(function (data) {
+                        return _.findWhere(data.result, { "_id": type });
+                    });
                 }
             }
         }
@@ -192,7 +231,8 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
         commonTasks: {
             all: function (realm) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "commontasks?_queryFilter=true")
+                    url: scopedByRealm(realm, "commontasks?_queryFilter=true"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 });
             }
         }

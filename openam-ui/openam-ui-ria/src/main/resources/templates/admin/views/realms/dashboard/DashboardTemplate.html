@@ -8,15 +8,15 @@
 <div class="page-description">
     <ul class="list-inline fr-list-inline-piped">
         <li>
-            {{#equals realm.status 'Active'}}
+            {{#if realm.active}}
             <span class="text-success">
                 <i class="fa fa-check-circle"></i> {{realm.status}}
             </span>
             {{else}}
             <span class="text-warning">
-                <i class="fa fa-exclamation-triangle"></i> {{realm.status}}
+                <i class="fa fa-ban"></i> {{realm.status}}
             </span>
-            {{/equals}}
+            {{/if}}
         </li>
         {{#if realm.aliases}}
         <li class="text-muted">

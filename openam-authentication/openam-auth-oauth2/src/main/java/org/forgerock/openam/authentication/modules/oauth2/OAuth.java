@@ -22,12 +22,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-
-/*
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.authentication.modules.oauth2;
+
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
@@ -42,6 +41,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.URLEncDec;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +72,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
@@ -84,12 +85,12 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.openam.xui.XUIState;
 import org.forgerock.util.encode.Base64url;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owasp.esapi.ESAPI;
-
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 public class OAuth extends AMLoginModule {
 
@@ -102,7 +103,7 @@ public class OAuth extends AMLoginModule {
     private JwtHandlerConfig jwtHandlerConfig;
     String serverName = "";
     private ResourceBundle bundle = null;
-    private static final SecureRandom random = new SecureRandom();    
+    private static final SecureRandom random = new SecureRandom();
     String data = "";
     String userPassword = "";
     String proxyURL = "";
@@ -148,23 +149,41 @@ public class OAuth extends AMLoginModule {
             case ISAuthConstants.LOGIN_START: {
                 config.validateConfiguration();
                 serverName = request.getServerName();
-                String requestedURI = request.getRequestURI();
+                StringBuilder originalUrl = new StringBuilder();
                 String requestedQuery = request.getQueryString();
+                String realm = null;
 
                 String authCookieName = AuthUtils.getAuthCookieName();
+
+                final XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
+
+                if (xuiState.isXUIEnabled()) {
+                    // When XUI is in use the request URI points to the authenticate REST endpoint, which shouldn't be
+                    // presented to the end-user, hence we use the contextpath only and rely on index.html and the
+                    // XUIFilter to direct the user towards the XUI.
+                    originalUrl.append(request.getContextPath());
+                    // The REST endpoint always exposes the realm parameter even if it is not actually present on the
+                    // query string (e.g. DNS alias or URI segment was used), so this logic here is just to make sure if
+                    // the realm parameter was not present on the querystring, then we add it there.
+                    if (requestedQuery != null && !requestedQuery.contains("realm=")) {
+                        realm = request.getParameter("realm");
+                    }
+                } else {
+                    //In case of legacy UI the request URI will be /openam/UI/Login, which is safe to use.
+                    originalUrl.append(request.getRequestURI());
+                }
+
+                if (StringUtils.isNotEmpty(realm)) {
+                    originalUrl.append("?realm=").append(URLEncDec.encode(realm));
+                }
 
                 if (requestedQuery != null) {
                     if (requestedQuery.endsWith(authCookieName + "=")) {
                         requestedQuery = requestedQuery.substring(0,
                                 requestedQuery.length() - authCookieName.length() - 1);
                     }
-                    requestedURI += "?" + requestedQuery;
-                }
-
-                // Bit of a hack but required for when the XUI is using the OAuth module so the redirect goes back to
-                // the XUI to handle the next authentication stage and not straight to the authenticate REST endpoint
-                if (requestedURI.contains("/json/authenticate")) {
-                    requestedURI = requestedURI.replace("/json/authenticate", "");
+                    originalUrl.append(originalUrl.indexOf("?") == - 1 ? '?' : '&');
+                    originalUrl.append(requestedQuery);
                 }
 
                 // Find the domains for which we are configured
@@ -197,7 +216,7 @@ public class OAuth extends AMLoginModule {
                     CookieUtils.addCookieToResponse(response,
                             CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
                     CookieUtils.addCookieToResponse(response,
-                            CookieUtils.newCookie(COOKIE_ORIG_URL, requestedURI, "/", domain));
+                            CookieUtils.newCookie(COOKIE_ORIG_URL, originalUrl.toString(), "/", domain));
                     CookieUtils.addCookieToResponse(response,
                             CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", domain));
                     if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
@@ -207,8 +226,7 @@ public class OAuth extends AMLoginModule {
                 }
 
                 // The Proxy is used to return with a POST to the module
-                setUserSessionProperty(ISAuthConstants.FULL_LOGIN_URL,
-                        requestedURI);
+                setUserSessionProperty(ISAuthConstants.FULL_LOGIN_URL, originalUrl.toString());
 
                 setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
@@ -230,7 +248,18 @@ public class OAuth extends AMLoginModule {
             }
 
             case GET_OAUTH_TOKEN_STATE: {
-                final String csrfState = request.getParameter("state");
+
+                final String csrfState;
+
+                if (request.getParameter("jsonContent") != null) {
+                    final JsonValue jval = JsonValueBuilder.toJsonValue(request.getParameter("jsonContent"));
+                    csrfState = jval.get("state").asString();
+                    code =jval.get(PARAM_CODE).asString();
+                } else {
+                    csrfState = request.getParameter("state");
+                    code = request.getParameter(PARAM_CODE);
+                }
+
                 if (csrfState == null) {
                     OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because there was no state "
                             + "parameter");
@@ -248,10 +277,9 @@ public class OAuth extends AMLoginModule {
                     }
 
                     // We are being redirected back from an OAuth 2 Identity Provider
-                    code = request.getParameter(PARAM_CODE);
                     if (code == null || code.isEmpty()) {
-                            OAuthUtil.debugMessage("OAuth.process(): LOGIN_IGNORE");
-                            return ISAuthConstants.LOGIN_START;
+                        OAuthUtil.debugMessage("OAuth.process(): LOGIN_IGNORE");
+                        return ISAuthConstants.LOGIN_START;
                     }
 
                     validateInput("code", code, "HTTPParameterValue", 512, false);
@@ -271,10 +299,7 @@ public class OAuth extends AMLoginModule {
                         JwtHandler jwtHandler = new JwtHandler(jwtHandlerConfig);
                         try {
                             jwtClaims = jwtHandler.validateJwt(idToken);
-                        } catch (RuntimeException e) {
-                            debug.warning("Cannot validate JWT", e);
-                            throw e;
-                        } catch (AuthLoginException e) {
+                        } catch (RuntimeException | AuthLoginException e) {
                             debug.warning("Cannot validate JWT", e);
                             throw e;
                         }
@@ -408,7 +433,7 @@ public class OAuth extends AMLoginModule {
                 String mail = getMail(profileSvcResponse, config.getMailAttribute());
                 OAuthUtil.debugMessage("Mail found = " + mail);
                 try {
-                    OAuthUtil.sendEmail(config.getEmailFrom(), mail, data, 
+                    OAuthUtil.sendEmail(config.getEmailFrom(), mail, data,
                             config.getSMTPConfig(), bundle, proxyURL);
                 } catch (NoEmailSentException ex) {
                     OAuthUtil.debugError("No mail sent due to error", ex);

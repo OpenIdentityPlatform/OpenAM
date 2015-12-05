@@ -32,6 +32,9 @@
 
 package com.sun.identity.authentication.spi;
 
+import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.*;
+import static org.forgerock.openam.utils.StringUtils.*;
+
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMUser;
 import com.iplanet.am.sdk.AMUserPasswordValidation;
@@ -42,6 +45,8 @@ import com.iplanet.dpro.session.service.SessionCount;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.audit.AuthenticationModuleEventAuditor;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
@@ -67,6 +72,8 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 import org.forgerock.openam.ldap.LDAPUtils;
 
 import javax.security.auth.Subject;
@@ -261,7 +268,14 @@ public abstract class AMLoginModule implements LoginModule {
     protected static AMResourceBundleCache amCache =
         AMResourceBundleCache.getInstance();
 
-//    AuthenticationAuditor authenticationAuditor;
+    protected final AuthenticationModuleEventAuditor auditor;
+
+    /**
+     * No argument constructor for {@link AMLoginModule}.
+     */
+    public AMLoginModule() {
+        auditor = InjectorHolder.getInstance(AuthenticationModuleEventAuditor.class);
+    }
     
     /**
      * Clone Callback[], and save it in the internal/external
@@ -2079,56 +2093,6 @@ public abstract class AMLoginModule implements LoginModule {
      * @param moduleName name of module
      */
     private void setSuccessModuleName(String moduleName) {
-        //-----------------------------------
-
-//        int authLevel = getAuthLevel();
-//        String ip = loginState.getClient();
-//        Principal modulePrincipal = getPrincipal();
-//        String principalName = null;
-//        if (modulePrincipal != null) {
-//            principalName = modulePrincipal.getName();
-//        }
-//
-//        Map<String, String> info = new HashMap<>();
-//        if (StringUtils.isNotEmpty(ip)) {
-//            info.put("ipAddress", ip);
-//        }
-//        String authLevelAsString = String.valueOf(authLevel);
-//        info.put("authLevel", authLevelAsString);
-//
-//        long time = Calendar.getInstance().getTimeInMillis();
-//
-//        authenticationAuditor = InjectorHolder.getInstance(AuthenticationAuditor.class);
-//
-//        AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
-//        builder.eventName("Successful authentication through module " + moduleName + " of class " + moduleClass)
-//                .transactionId(AuditRequestContext.getTransactionIdValue())
-//                .time(time)
-//                .entries(moduleName, "Successful authentication", info);
-//
-//        String orgDN = loginState.getOrgDN();
-//        String realmName = null;
-//        CoreWrapper cw = new CoreWrapper();
-//        if (orgDN != null) {
-//            realmName = cw.convertOrgNameToRealmName(orgDN);
-//            builder.realm(realmName);
-//        }
-//        if (principalName != null && orgDN != null) {
-//            String usersUniversalId = cw.getIdentity(principalName, realmName).getUniversalId();
-//            builder.authentication(usersUniversalId);
-//        } else if (principalName != null) {
-//            builder.authentication(principalName);
-//        }
-//
-//        try {
-//            authenticationAuditor.publish(builder.toEvent());
-//        } catch (AuditException e) {
-//            //Do nothing
-//            int i = 0;
-//        }
-
-        //-----------------------------------
-
         // get login state for this authentication session
         if (loginState == null) {
             loginState = getLoginState();
@@ -2145,6 +2109,8 @@ public abstract class AMLoginModule implements LoginModule {
         if (getPrincipal() != null && getPrincipal().getName() != null) {
             loginState.saveAuthenticatedPrincipal(getPrincipal().getName());
         }
+
+        auditor.auditModuleSuccess(loginState, getPrincipal(), getAuditEntryDetail());
     }
     
     /**
@@ -2315,56 +2281,6 @@ public abstract class AMLoginModule implements LoginModule {
      */
     
     private void setFailureModuleName(String moduleName) {
-        //-----------------------------------
-
-//        int authLevel = getAuthLevel();
-//        String ip = loginState.getClient();
-//        Principal modulePrincipal = getPrincipal();
-//        String principalName = null;
-//        if (modulePrincipal != null) {
-//            principalName = modulePrincipal.getName();
-//        }
-//
-//        Map<String, String> info = new HashMap<>();
-//        if (StringUtils.isNotEmpty(ip)) {
-//            info.put("ipAddress", ip);
-//        }
-//        String authLevelAsString = String.valueOf(authLevel);
-//        info.put("authLevel", authLevelAsString);
-//
-//        long time = Calendar.getInstance().getTimeInMillis();
-//
-//        authenticationAuditor = InjectorHolder.getInstance(AuthenticationAuditor.class);
-//
-//        AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
-//        builder.eventName("Failure to authenticate through module " + moduleName + " of class " + moduleClass)
-//                .transactionId(AuditRequestContext.getTransactionIdValue())
-//                .time(time)
-//                .entries(moduleName, "Failure to authenticate", info);
-//
-//        String orgDN = loginState.getOrgDN();
-//        String realmName = null;
-//        CoreWrapper cw = new CoreWrapper();
-//        if (orgDN != null) {
-//            realmName = cw.convertOrgNameToRealmName(orgDN);
-//            builder.realm(realmName);
-//        }
-//        if (principalName != null && orgDN != null) {
-//            String usersUniversalId = cw.getIdentity(principalName, realmName).getUniversalId();
-//            builder.authentication(usersUniversalId);
-//        } else if (principalName != null) {
-//            builder.authentication(principalName);
-//        }
-//
-//        try {
-//            authenticationAuditor.publish(builder.toEvent());
-//        } catch (AuditException e) {
-//            //Do nothing
-//            int i = 0;
-//        }
-
-        //-----------------------------------
-
         // get login state for this authentication session
         if (loginState == null) {
             loginState = getLoginState();
@@ -2378,7 +2294,8 @@ public abstract class AMLoginModule implements LoginModule {
         }
         loginState.setFailureModuleName(moduleName);
         loginState.saveSharedStateAttributes();
-        return ;
+
+        auditor.auditModuleFailure(loginState, getPrincipal(), getAuditEntryDetail());
     }
     
     /**
@@ -2479,7 +2396,7 @@ public abstract class AMLoginModule implements LoginModule {
        if (loginState == null) {
            loginState = getLoginState();
             if (loginState == null) {
-                debug.error("Unable to create Identity: " + userName); 
+                debug.error("Unable to create Identity: " + userName);
                return ;
             }
         }
@@ -2846,7 +2763,7 @@ public abstract class AMLoginModule implements LoginModule {
         }
         return aliasAttrNames;
     }
-    
+
     /**
      * Returns the principals authenticated in the current authentication process or an empty set if login state is
      * unavailable or no authenticated principals are present.
@@ -2866,11 +2783,27 @@ public abstract class AMLoginModule implements LoginModule {
         return loginState.getAuthenticatedPrincipals();
     }
 
-//    public String getModuleClass() {
-//        return moduleClass;
-//    }
-//
-//    public String getModuleName() {
-//        return moduleName;
-//    }
+    /**
+     * Supply the additional detail to be logged with this module's completion event. Subclasses can override this
+     * method to add more specific detail.
+     *
+     * @return The audit entry detail.
+     */
+    protected AuthenticationAuditEntry getAuditEntryDetail() {
+        AuthenticationAuditEntry entryDetail = new AuthenticationAuditEntry();
+        entryDetail.setModuleId(moduleName);
+
+        String ip = loginState.getClient();
+        if (isNotEmpty(ip)) {
+            entryDetail.addInfo(IP_ADDRESS, ip);
+        }
+        AuthContext.IndexType indexType = loginState.getIndexType();
+        if (indexType != null) {
+            entryDetail.addInfo(AUTH_INDEX, indexType.toString());
+        }
+        entryDetail.addInfo(AUTH_LEVEL, String.valueOf(getAuthLevel()));
+        entryDetail.addInfo(MODULE_CLASS, moduleClass);
+
+        return entryDetail;
+    }
 }

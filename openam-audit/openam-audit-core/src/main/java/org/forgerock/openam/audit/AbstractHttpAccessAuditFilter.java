@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.audit;
 
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILURE;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESS;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILED;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -92,14 +92,14 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
 
     private void auditAccessAttempt(Request request, Context context) throws AuditException {
         String realm = getRealm(context);
-        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(context.asContext(RequestAuditContext.class).getRequestReceivedTime())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
-                    .authentication(getUserIdForAccessAttempt(request))
+                    .userId(getUserIdForAccessAttempt(request))
                     .trackingIds(getTrackingIdsForAccessAttempt(request))
                     .forRequest(request, context);
 
@@ -109,7 +109,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
 
     private void auditAccessSuccess(Request request, Context context, Response response) {
         String realm = getRealm(context);
-        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime();
@@ -119,9 +119,9 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .authentication(getUserIdForAccessOutcome(response))
+                    .userId(getUserIdForAccessOutcome(response))
                     .trackingIds(getTrackingIdsForAccessOutcome(response))
-                    .response(SUCCESS, "", elapsedTime, MILLISECONDS)
+                    .response(SUCCESSFUL, "", elapsedTime, MILLISECONDS)
                     .forRequest(request, context);
 
             auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
@@ -130,7 +130,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
 
     private void auditAccessFailure(Request request, Context context, Response response) {
         String realm = getRealm(context);
-        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());
@@ -143,9 +143,9 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .authentication(getUserIdForAccessOutcome(response))
+                    .userId(getUserIdForAccessOutcome(response))
                     .trackingIds(getTrackingIdsForAccessOutcome(response))
-                    .responseWithDetail(FAILURE, responseCode, elapsedTime, MILLISECONDS, responseDetail)
+                    .responseWithDetail(FAILED, responseCode, elapsedTime, MILLISECONDS, responseDetail)
                     .forRequest(request, context);
 
             auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());

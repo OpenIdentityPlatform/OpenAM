@@ -140,12 +140,12 @@ public class UmaPolicyServiceImplTest {
         resourceSet.setDescription(json(object(field("name", "NAME"), field("scopes", array("SCOPE_A", "SCOPE_B", "SCOPE_C")))));
 
         given(resourceSetStoreFactory.create(anyString())).willReturn(resourceSetStore);
-        given(resourceSetStore.read("RESOURCE_SET_ID")).willReturn(resourceSet);
+        given(resourceSetStore.read("RESOURCE_SET_ID", RESOURCE_OWNER_ID)).willReturn(resourceSet);
         given(resourceSetStore.query(QueryFilter.and(
                 QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"))))
                 .willReturn(Collections.singleton(resourceSet));
-        doThrow(org.forgerock.oauth2.core.exceptions.NotFoundException.class).when(resourceSetStore).read("OTHER_ID");
-        doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).read("FAILING_ID");
+        doThrow(org.forgerock.oauth2.core.exceptions.NotFoundException.class).when(resourceSetStore).read("OTHER_ID", RESOURCE_OWNER_ID);
+        doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).read("FAILING_ID", RESOURCE_OWNER_ID);
         doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).query(QueryFilter.and(
                 QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "FAILING_ID")));
         given(lazyAuditLogger.get()).willReturn(auditLogger);

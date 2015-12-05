@@ -48,9 +48,10 @@ public abstract class OAuth2AbstractAccessAuditFilter extends AbstractRestletAcc
      * @param providers
      */
     public OAuth2AbstractAccessAuditFilter(AuditConstants.Component component, Restlet restlet,
-                                           AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
-                                           Set<OAuth2AuditContextProvider> providers) {
-        super(component, restlet, auditEventPublisher, auditEventFactory);
+            AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
+            Set<OAuth2AuditContextProvider> providers, RestletBodyAuditor requestDetailCreator,
+            RestletBodyAuditor responseDetailCreator) {
+        super(component, restlet, auditEventPublisher, auditEventFactory, requestDetailCreator, responseDetailCreator);
         this.providers = providers;
     }
 

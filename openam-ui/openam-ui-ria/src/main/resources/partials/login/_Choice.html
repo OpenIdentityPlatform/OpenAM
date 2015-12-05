@@ -1,8 +1,30 @@
-<label class="choice-callback">{{prompt}}</label>
-<div class="btn-group btn-group-justified" data-toggle="buttons">
-{{#each values}}
-    <label class="btn btn-default {{this.active}}">
-        <input type="radio" name="callback_{{../index}}" id="callback_{{../index}}_{{key}}" autocomplete="off" {{checked}} value="{{key}}">{{value}}
-    </label>
-{{/each}}
-</div>
+<label for="callback_{{index}}" id="label_callback_{{index}}">{{prompt}}</label>
+
+{{#if values.[2]}}
+
+    {{!-- if there are more than two values then use a select --}}
+    <select class="form-control" name="callback_{{index}}" id="callback_{{index}}">
+    {{#each values}}
+        <option value="{{key}}" {{#if active}}selected{{/if}}>{{value}}</option>
+    {{/each}}
+    </select>
+
+{{else}}
+
+    {{!-- if there are two or less values then use a btn-group-justified --}}
+    <div class="btn-group btn-group-justified" data-toggle="buttons" role="radiogroup" aria-labelledby="label_callback_{{index}}">
+    {{#each values}}
+        <label class="btn btn-default {{#if active}}active{{/if}}">
+            <input
+                type="radio"
+                name="callback_{{../index}}"
+                id="callback_{{../index}}_{{key}}"
+                autocomplete="off"
+                checked="{{active}}"
+                value="{{key}}">
+            {{value}}
+        </label>
+    {{/each}}
+    </div>
+
+{{/if}}

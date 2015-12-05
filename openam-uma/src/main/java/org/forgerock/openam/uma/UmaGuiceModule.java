@@ -19,6 +19,7 @@ package org.forgerock.openam.uma;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
 
+import org.forgerock.openam.auditors.SMSAuditFilter;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -45,6 +46,7 @@ import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
+import org.forgerock.openam.core.rest.UiRolePredicate;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.entitlement.rest.PolicyResource;
@@ -91,6 +93,12 @@ public class UmaGuiceModule extends AbstractModule {
 
         MapBinder.newMapBinder(binder(), String.class, ClaimGatherer.class)
                 .addBinding(IdTokenClaimGatherer.FORMAT).to(IdTokenClaimGatherer.class);
+
+        Multibinder.newSetBinder(binder(), SMSAuditFilter.class)
+                .addBinding().to(UmaAuditFilter.class);
+
+        Multibinder.newSetBinder(binder(), UiRolePredicate.class)
+                .addBinding().to(UmaUserUiRolePredicate.class);
     }
 
     @Provides

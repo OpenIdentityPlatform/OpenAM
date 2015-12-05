@@ -24,10 +24,7 @@
  *
  * $Id: CLIRequest.java,v 1.15 2008/10/30 18:25:01 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.cli;
@@ -89,6 +86,14 @@ public class CLIRequest {
      */
     public String[] getOptions() {
         return argv;
+    }
+
+    /**
+     * Sets options for the request.
+     *
+     */
+    public void setOptions(String[] argv) {
+        this.argv = argv;
     }
 
     /**

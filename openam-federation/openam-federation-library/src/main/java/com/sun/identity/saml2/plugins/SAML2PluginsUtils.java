@@ -35,6 +35,8 @@ import com.sun.identity.plugin.configuration.ConfigurationManager;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 
+import java.util.Map;
+
 /**
  * The <code>SAML2PluginsUtils</code> contains utility methods for SAML 2.0 plugins classes.
  */
@@ -87,7 +89,11 @@ public class SAML2PluginsUtils {
 
         if (ci != null) {
             try {
-                result = CollectionHelper.getMapAttr(ci.getConfiguration(realm, null), PROFILE_ATTRIBUTE);
+                final Map config = ci.getConfiguration(realm, null);
+                // Will be null in Fedlet case
+                if (config != null) {
+                    result = CollectionHelper.getMapAttr(config, PROFILE_ATTRIBUTE);
+                }
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("SAML2PluginsUtils.getProfileAttribute: attr=" + result);
                 }

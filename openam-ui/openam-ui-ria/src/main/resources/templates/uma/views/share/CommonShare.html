@@ -1,5 +1,5 @@
 <div class="page-header page-header-no-border clearfix">
-    <span id="umaShareImage" class="header-icon pull-left fa fa-file-image-o bg-primary">
+    <span id="umaShareImage" class="header-icon pull-left fa bg-primary">
         {{#if icon}}
         <img title="{{ name }}" src="{{ icon }}"/>
         {{else}}
@@ -17,8 +17,6 @@
             <div class="media" id="shareCounter">&nbsp;</div>
         </div>
 
-        <div id="advancedView" class="form-group"></div>
-
         {{#if notFound}}
         <div class="col-sm-12">
             <div class="striped-list " id="resourceList">
@@ -27,7 +25,7 @@
         </div>
         {{else}}
 
-        <div class="row ">
+        <div class="row" role="form">
             <div id="selectUser" class="form-group col-sm-6">
                 <label>{{t 'uma.share.people'}}</label>
                 <select multiple class="selectize" placeholder="{{t 'common.form.startTypingToSearch'}}">
@@ -48,12 +46,7 @@
             </div>
         </div>
 
-        <!--<div id="selectAuthentication" class="float-left">
-            <label>Authentication method</label>
-        </div>-->
-
     <div class="clearfix pull-right">
-        <a href="#" id="toggleAdvanced" role="button" class="btn btn-default"><i class="fa fa-cog"></i> {{t 'uma.share.advanced'}}</a>
         <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="btn btn-primary" disabled/>
     </div>
     {{/if}}

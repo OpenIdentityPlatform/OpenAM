@@ -31,14 +31,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * Thread Safety: Uses ConcurrentHashMap and limited synchronized to ensure thread-safety
  * and atomicity.
  *
- * Type K is the first value.
- * Type V is the second value.
+ * @param <K> the first value.
+ * @param <V> the second value.
  */
 public class SingleValueMapper<K, V> {
     private final ConcurrentHashMap<K, V> map = new ConcurrentHashMap<K, V>();
     private final ConcurrentHashMap<V, K> reverse = new ConcurrentHashMap<V, K>();
 
     /**
+     * Gets the value corresponding to the specified key.
+     *
      * @param k The key to fetch a value for. May not be null.
      * @return A possibly null value for the given key.
      */
@@ -48,6 +50,8 @@ public class SingleValueMapper<K, V> {
     }
 
     /**
+     * Gets the key corresponding to the specified value.
+     *
      * @param v The value to get the key for. May not be null.
      * @return A possibly null key for the given value.
      */

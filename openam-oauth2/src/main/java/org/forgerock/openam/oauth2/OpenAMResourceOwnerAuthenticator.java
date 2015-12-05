@@ -75,7 +75,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
     /**
      * {@inheritDoc}
      */
-    public ResourceOwner authenticate(OAuth2Request request) throws NotFoundException {
+    public ResourceOwner authenticate(OAuth2Request request, boolean useSession) throws NotFoundException {
         SSOToken token = null;
         try {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
@@ -83,12 +83,13 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         } catch (Exception e){
             logger.warning("No SSO Token in request", e);
         }
-        if (token == null) {
+        if (token == null || !useSession) {
             final String username = request.getParameter(USERNAME);
             final char[] password = request.getParameter(PASSWORD) == null ? null :
                     request.<String>getParameter(PASSWORD).toCharArray();
             final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
-            return authenticate(username, password, realm);
+            final String authChain = request.getParameter(AUTH_CHAIN);
+            return authenticate(username, password, realm, authChain);
         } else {
             try {
                 final AMIdentity id = IdUtils.getIdentity(
@@ -97,7 +98,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
 
                 long authTime = stringToDate(token.getProperty(ISAuthConstants.AUTH_INSTANT)).getTime();
 
-                return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id, authTime);
+                return new OpenAMResourceOwner(id.getName(), id, authTime);
             } catch (SSOException e) {
                 logger.error("Unable to create ResourceOwner", e);
             } catch (ParseException e) {
@@ -109,13 +110,19 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         return null;
     }
 
-    private ResourceOwner authenticate(String username, char[] password, String realm) {
+    private ResourceOwner authenticate(String username, char[] password, String realm, String service) {
 
         ResourceOwner ret = null;
         AuthContext lc = null;
         try {
             lc = new AuthContext(realm);
-            lc.login(ServletUtils.getRequest(Request.getCurrent()), ServletUtils.getResponse(Response.getCurrent()));
+            if (service != null) {
+                lc.login(AuthContext.IndexType.SERVICE, service, null, ServletUtils.getRequest(Request.getCurrent()),
+                        ServletUtils.getResponse(Response.getCurrent()));
+            } else {
+                lc.login(ServletUtils.getRequest(Request.getCurrent()), ServletUtils.getResponse(Response.getCurrent()));
+            }
+
             while (lc.hasMoreRequirements()) {
                 Callback[] callbacks = lc.getRequirements();
                 ArrayList missing = new ArrayList();
@@ -171,6 +178,6 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         final AMIdentity id = IdUtils.getIdentity(
                 AccessController.doPrivileged(AdminTokenAction.getInstance()),
                 token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
-        return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id);
+        return new OpenAMResourceOwner(id.getName(), id);
     }
 }

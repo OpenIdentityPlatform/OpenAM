@@ -13,16 +13,19 @@
  *
  * Copyrighted [2015] [Intellectual Reserve, Inc (IRI)]
  */
+/*
+ * Portions copyright 2015 ForgeRock AS
+ */
+
 package org.forgerock.openam.radius.server.spi.handlers;
 
 import java.util.Properties;
 
 import org.forgerock.openam.radius.common.AccessAccept;
-import org.forgerock.openam.radius.common.AccessRequest;
-import org.forgerock.openam.radius.server.RadiusAuthResult;
-import org.forgerock.openam.radius.server.RadiusAuthResultStatus;
 import org.forgerock.openam.radius.server.RadiusProcessingException;
-import org.forgerock.openam.radius.server.RadiusResponseHandler;
+import org.forgerock.openam.radius.server.RadiusRequest;
+import org.forgerock.openam.radius.server.RadiusRequestContext;
+import org.forgerock.openam.radius.server.RadiusResponse;
 import org.forgerock.openam.radius.server.spi.AccessRequestHandler;
 
 /**
@@ -36,11 +39,11 @@ public class AcceptAllHandler implements AccessRequestHandler {
     }
 
     @Override
-    public RadiusAuthResult handle(AccessRequest request, RadiusResponseHandler respHandler)
+    public void handle(RadiusRequest request, RadiusResponse response, RadiusRequestContext reqCtx)
             throws RadiusProcessingException {
         final AccessAccept resp = new AccessAccept();
-        respHandler.send(resp);
-        return new RadiusAuthResult(RadiusAuthResultStatus.SUCCESS);
+        response.setResponsePacket(resp);
+        return;
     }
 
 }

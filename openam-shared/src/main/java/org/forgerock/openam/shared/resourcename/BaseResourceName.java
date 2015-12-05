@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2006-2009 Sun Microsystems Inc.
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.shared.resourcename;
@@ -43,18 +43,18 @@ public interface BaseResourceName<T, E extends Exception> {
      * @return service type names for which the resource
      * comparator can be used
      */
-    public Set<String> getServiceTypeNames();
+    Set<String> getServiceTypeNames();
 
     /**
      * Initializes the resource name with configuration information,
-     * usually set by the administrators
+     * usually set by the administrators.
      *
      * @param configParams configuration parameters as a map.
-     * The keys of the map are the configuration parameters. 
+     * The keys of the map are the configuration parameters.
      * Each key is corresponding to one <code>String</code> value
      * which specifies the configuration parameter value.
      */
-    public void initialize(Map configParams);
+    void initialize(Map configParams);
 
     /**
      * Compares two resources.
@@ -78,9 +78,8 @@ public interface BaseResourceName<T, E extends Exception> {
      *     with respect to the wildcard
      * </ul>
      */
-    public T compare(
-            String origRes, String compRes, boolean wildcardCompare);
-    
+    T compare(String origRes, String compRes, boolean wildcardCompare);
+
     /**
      * Appends sub-resource to super-resource.
      *
@@ -89,7 +88,7 @@ public interface BaseResourceName<T, E extends Exception> {
      *
      * @return returns the combination resource.
      */
-    public String append(String superResource, String subResource);
+    String append(String superResource, String subResource);
 
     /**
      * Gets sub-resource from an original resource minus
@@ -105,22 +104,20 @@ public interface BaseResourceName<T, E extends Exception> {
      * ends with. If the first parameter does not begin with the
      * the first parameter, then the return value is null.
      */
-    public String getSubResource(String res, String superRes);
+    String getSubResource(String res, String superRes);
 
     /**
-     * Gets the canonicalized form of a resource string
-     * 
+     * Gets the canonicalized form of a resource string.
+     *
      * @param res the resource string to be canonicalized
      * @return the resource string in its canonicalized form.
      * @throws E if resource string is invalid
      */
-    public String canonicalize(String res) throws E;
+    String canonicalize(String res) throws E;
 
-
-    /******* this method will be removed after the demo ********/
     /**
      * Method to split a resource into the smallest necessary
-     * sub resource units
+     * sub resource units.
      *
      * @param res name of the resource to be split
      *
@@ -128,6 +125,6 @@ public interface BaseResourceName<T, E extends Exception> {
      * element being what the original resource begins with, and
      * the last one being what it ends with
      */
-    public String[] split(String res);
+    String[] split(String res);
 
 }

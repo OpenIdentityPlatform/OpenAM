@@ -11,17 +11,32 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import com.google.inject.assistedinject.Assisted;
 import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.sm.ldap.ConfigAuditorFactory;
+
+import javax.annotation.Nullable;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
+
+import org.forgerock.audit.events.AuditEventBuilder;
+import org.forgerock.guice.core.GuiceModuleLoader;
+import org.forgerock.guice.core.InjectorConfiguration;
+import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.AuditEventPublisherImpl;
+import org.forgerock.openam.audit.AuditServiceProvider;
+import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
@@ -34,6 +49,12 @@ import org.forgerock.opendj.ldap.ResultHandler;
 import org.forgerock.opendj.ldap.schema.Schema;
 import org.forgerock.opendj.ldif.LDIFEntryReader;
 import static org.mockito.Mockito.*;
+
+import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
@@ -65,8 +86,30 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
         }
     };
 
+    public static class TestGuiceModule extends AbstractModule {
+
+        @Override
+        protected void configure() {
+            bind(ConfigAuditorFactory.class).toInstance(new ConfigAuditorFactory() {
+                @Override
+                public SMSAuditor create(SSOToken runAs, @Assisted("realm") @Nullable String realm, @Assisted("objectId") String objectId, Map initialState) {
+                    return mock(SMSAuditor.class);
+                }
+            });
+            bind(AuditEventPublisher.class).toInstance(mock(AuditEventPublisherImpl.class));
+            bind(AuditEventBuilder.class).toInstance(mock(AuditEventBuilder.class));
+            bind(AuditServiceProvider.class).toInstance(mock(AuditServiceProvider.class));
+        }
+    }
+
     @BeforeClass
     public void setUpSuite() throws Exception {
+        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
+            @Override
+            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> aClass) {
+                return Collections.<Class<? extends Module>>singleton(TestGuiceModule.class);
+            }
+        });
         PowerMockito.mockStatic(WebtopNaming.class);
         idRepoListener = PowerMockito.mock(IdRepoListener.class);
         when(WebtopNaming.getAMServerID()).thenReturn("01");

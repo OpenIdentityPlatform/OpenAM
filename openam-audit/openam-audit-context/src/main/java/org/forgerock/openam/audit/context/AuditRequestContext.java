@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.audit.context;
 
+import org.forgerock.audit.events.TransactionId;
 import org.forgerock.util.Reject;
 
 import java.util.HashMap;

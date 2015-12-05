@@ -17,13 +17,14 @@
 package org.forgerock.openam.sm.datalayer.impl.uma;
 
 import static org.forgerock.json.JsonValue.*;
+
+import java.util.Calendar;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.Type;
-
-import java.util.Calendar;
 
 @Type(TokenType.UMA_AUDIT_ENTRY)
 public class UmaAuditEntry {
@@ -119,7 +120,7 @@ public class UmaAuditEntry {
                 field("resourceSetName", resourceSetName),
                 field("requestingPartyId", requestingPartyId),
                 field("type", type),
-                field("eventTime", eventTime)));
+                field("eventTime", eventTime.getTimeInMillis())));
         return auditEntry;
     }
 }

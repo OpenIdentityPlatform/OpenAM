@@ -34,8 +34,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                 newLink = !self.data.linkConfig,
                 linkConfig = self.data.linkConfig || { module: "", options: {}, criteria: "" },
                 formData = self.data,
-                title = linkConfig.module ? $.t("console.authentication.editChains.editModule") :
-                    $.t("console.authentication.editChains.newModule");
+                title = linkConfig.module ? $.t("console.authentication.editChains.editModule")
+                    : $.t("console.authentication.editChains.newModule");
 
             UIUtils.fillTemplateWithData(self.editLinkTemplate, {
                 linkConfig: linkConfig,
@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                     linkConfig: linkConfig
                 }, function (tableTemplate) {
                     BootstrapDialog.show({
-                        message: function (dialog) {
+                        message: function () {
                             var $template = $("<div></div>").append(template);
                             $template.find("#editLinkOptions").append(tableTemplate);
                             return $template;
@@ -54,6 +54,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                         title: title,
                         closable: false,
                         buttons: [{
+                            label: $.t("common.form.cancel"),
+                            action: function (dialog) {
+                                view.parent.validateChain();
+                                dialog.close();
+                            }
+                        }, {
                             label: $.t("common.form.ok"),
                             cssClass: "btn-primary",
                             id: "saveBtn",
@@ -76,36 +82,29 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                 view.render();
                                 dialog.close();
                             }
-                        }, {
-                            label: $.t("common.form.cancel"),
-                            action: function (dialog) {
-                                view.parent.validateChain();
-                                dialog.close();
-                            }
                         }],
-
                         onshow: function (dialog) {
                             dialog.getButton("saveBtn").disable();
                             dialog.getModalBody().find("#selectModule").selectize({
                                 options: formData.allModules,
                                 render: {
                                     item: function (item) {
-                                        return "<div>" + item._id + " - <span class='text-muted'><em>"
-                                            + item.typeDescription + "</em></span></div>";
+                                        return "<div>" + item._id + " - <span class='text-muted'><em>" +
+                                            item.typeDescription + "</em></span></div>";
                                     },
                                     option: function (item) {
-                                        return "<div><div>" + item._id + "</div><div class='small text-muted'><em>"
-                                            + item.typeDescription + "</em></div></div>";
+                                        return "<div><div>" + item._id + "</div><div class='small text-muted'><em>" +
+                                            item.typeDescription + "</em></div></div>";
                                     }
                                 },
-                                onChange: function (value) {
+                                onChange: function () {
                                     dialog.options.validateDialog(dialog);
                                 }
 
                             });
 
                             dialog.getModalBody().find("#selectCriteria").selectize({
-                                onChange: function (value) {
+                                onChange: function () {
                                     dialog.options.validateDialog(dialog);
                                 }
                             });

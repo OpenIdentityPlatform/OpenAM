@@ -16,32 +16,25 @@
 
 package org.forgerock.openam.rest.authz;
 
-import static org.forgerock.json.resource.ResourceException.*;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.authz.filter.api.AuthorizationResult;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
+import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
+import org.forgerock.openam.utils.Config;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.authz.filter.api.AuthorizationResult;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.services.context.Context;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
-import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.utils.Config;
-import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.net.HttpURLConnection;
 
 /**
  * This CrestAuthorizationModule protects the token generation service. It limits consumption to action invocations
@@ -66,23 +59,8 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialAndAdminUserOnl
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context context, CreateRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeRead(Context context, ReadRequest request) {
-        return authorize(context);
-    }
-
-    @Override
     public Promise<AuthorizationResult, ResourceException> authorizeUpdate(Context context, UpdateRequest request) {
         return rejectConsumption();
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeDelete(Context context, DeleteRequest request) {
-        return authorize(context);
     }
 
     @Override
@@ -95,38 +73,23 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialAndAdminUserOnl
         return rejectConsumption();
     }
 
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeQuery(Context context, QueryRequest request) {
-        return authorize(context);
-    }
-
     private Promise<AuthorizationResult, ResourceException> rejectConsumption() {
         return Promises.newResultPromise(AuthorizationResult.accessDenied("TokenGenerationServiceAuthzModule: " +
                 "invoked functionality is not authorized for any user."));
     }
 
     @Override
-    protected Promise<AuthorizationResult, ResourceException> authorize(Context context) {
-        SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
-        String userId;
-        SSOToken token;
-        try {
-            token = tokenContext.getCallerSSOToken();
-            userId = token.getPrincipal().getName();
-        } catch (SSOException e) {
-            if (debug.messageEnabled()) {
-                debug.message("TokenGenerationServiceAuthzModule :: Unable to obtain SSOToken or principal", e);
-            }
-            return getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e).asPromise();
-        }
-
+    protected Promise<AuthorizationResult, ResourceException> validateToken(Context context, SSOToken token)
+            throws SSOException, ResourceException {
+        String userId = token.getPrincipal().getName();
         if (agentIdentity.isSoapSTSAgent(token)) {
             if (debug.messageEnabled()) {
-                debug.message("TokenGenerationServiceAuthzModule :: User, " + userId + " accepted as Soap STS Agent.");
+                debug.message("{} :: User, {} accepted as Soap STS Agent", moduleName, userId);
             }
             return Promises.newResultPromise(AuthorizationResult.accessPermitted());
         } else {
-            return super.authorize(context);
+            return super.validateToken(context, token);
         }
     }
+
 }

@@ -270,19 +270,7 @@ public class Agent {
      *  This method starts up the monitoring agent.  Returns either
      *  zero (0) if intialization has completed successfully, or one (1)
      *  if not.
-     *  @param OpenSSOServerID The OpenAM server's ID in the site
-     *  @param svrProtocol OpenAM server's protocol (http/https)
-     *  @param svrName OpenAM server's hostname
-     *  @param svrPort OpenAM server's port
-     *  @param svrURI OpenAM server's URI
-     *  @param siteID OpenAM server's Site ID
-     *  @param openSSOServerID OpenAM server's ID
-     *  @param isEmbeddedDS Whether the OpenAM server is using an embedded DS
-     *  @param siteIdTbl the Site ID table for this installation
-     *  @param serverIdTbl the Server ID table for this installation
-     *  @param namingTbl the Naming table for this installation
-     *  @param stDate start date/time for this OpenAM server
-     *  @return Success (0) or Failure (1)
+     *  @param srvInfo Server information
      */
     private static void startMonitoringAgent(SSOServerInfo svrInfo) {
         agentSvrInfo = svrInfo;
@@ -1589,32 +1577,17 @@ public class Agent {
      *  the HashMap of attributes/values:
      *    CLIConstants.ATTR_NAME_AGENT_TYPE
      *      type is extracted from the set; can be:
-     *        J2EEAgent, WSPAgent, WSCAgent, 2.2_Agent
-     *        WSPAgent, STSAgent, WebAgent, DiscoveryAgent
+     *        J2EEAgent, 2.2_Agent
+     *         WebAgent
      *        don't do "SharedAgent" (authenticators)
      *
      *    J2EEAgent should have:
      *      "com.sun.identity.agents.config.login.url"
      *      "com.sun.identity.client.notification.url"
      *      "groupmembership"
-     *    WSPAgent should have:
-     *      "wspendpoint"
-     *      "wspproxyendpoint"
-     *      "groupmembership"
-     *    WSCAgent should have:
-     *      "wspendpoint"
-     *      "wspproxyendpoint"
-     *      "groupmembership"
-     *    STSAgent should have:
-     *      "stsendpoint"
-     *      "groupmembership"
      *    WebAgent should have:
      *      "com.sun.identity.agents.config.agenturi.prefix"
      *      "com.sun.identity.agents.config.login.url"
-     *      "groupmembership"
-     *    DiscoveryAgent should have:
-     *      "discoveryendpoint"
-     *      "authnserviceendpoint"
      *      "groupmembership"
      *    2.2_Agent should have:
      *      "groupmembership"
@@ -1809,164 +1782,8 @@ public class Agent {
                 } catch (SnmpStatusException ex) {
                     debug.error(classMethod + agtname + ": " + ex.getMessage());
                 }
-            } else if (atype.equals("WSPAgent")) {
-                SsoServerWSSAgentsWSPAgentEntryImpl aei =
-                        new SsoServerWSSAgentsWSPAgentEntryImpl(sunMib);
-                String wep = hm.get("wsendpoint");
-                if (wep == null) {
-                    wep = NotAvail;
-                }
-                String wpep = hm.get("wspproxyendpoint");
-                if (wpep == null) {
-                    wpep = NotAvail;
-                }
-                String mgrp = hm.get("groupmembership");
-                if (mgrp == null) {
-                    mgrp = None;
-                }
-                aei.WssAgentsWSPAgentName = agtname;
-                aei.WssAgentsWSPAgentSvcEndPoint = wep;
-                aei.WssAgentsWSPAgentProxy = wpep;
-                aei.WssAgentsWSPAgentIndex = new Integer(wspi++);
-                aei.SsoServerRealmIndex = ri;
-                // no entry for group membership...
-                ObjectName aname =
-                        aei.createSsoServerWSSAgentsWSPAgentEntryObjectName(server);
-
-                if (aname == null) {
-                    debug.error(classMethod +
-                            "Error creating object for Policy WSP Agent '" +
-                            agtname + "'");
-                    continue;
-                }
-
-                try {
-                    if (wsptab != null) {
-                        wsptab.addEntry(aei, aname);
-                        if ((server != null) && (aei != null)) {
-                            server.registerMBean(aei, aname);
-                        }
-                    } else {
-                        debug.error(classMethod + "WSPAgent: agtname = " +
-                                agtname + ", wep = " + wep +
-                                ", wpep = " + wpep + ", mgrp = " + mgrp +
-                                ", realm = " + realm);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                }
-            } else if (atype.equals("WSCAgent")) {
-                SsoServerWSSAgentsWSCAgentEntryImpl aei =
-                        new SsoServerWSSAgentsWSCAgentEntryImpl(sunMib);
-                String wep = hm.get("wsendpoint");
-                if (wep == null) {
-                    wep = None;
-                }
-                String wpep = hm.get("wspproxyendpoint");
-                if (wpep == null) {
-                    wpep = None;
-                }
-                String mgrp = hm.get("groupmembership");
-                if (mgrp == null) {
-                    mgrp = None;
-                }
-                aei.WssAgentsWSCAgentName = agtname;
-                aei.WssAgentsWSCAgentSvcEndPoint = wep;
-                aei.WssAgentsWSCAgentProxy = wpep;
-                aei.WssAgentsWSCAgentIndex = new Integer(wsci++);
-                aei.SsoServerRealmIndex = ri;
-                // no entry for group membership...
-                ObjectName aname =
-                        aei.createSsoServerWSSAgentsWSCAgentEntryObjectName(server);
-
-                if (aname == null) {
-                    debug.error(classMethod +
-                            "Error creating object for Policy WSC Agent '" +
-                            agtname + "'");
-                    continue;
-                }
-
-                try {
-                    wsctab.addEntry(aei, aname);
-                    if ((server != null) && (aei != null)) {
-                        server.registerMBean(aei, aname);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                }
-            } else if (atype.equals("STSAgent")) {
-                SsoServerWSSAgentsSTSAgentEntryImpl aei =
-                        new SsoServerWSSAgentsSTSAgentEntryImpl(sunMib);
-                String sep = hm.get("stsendpoint");
-                aei.WssAgentsSTSAgentName = agtname;
-                aei.WssAgentsSTSAgentSvcTokenEndPoint = sep;
-                aei.WssAgentsSTSAgentIndex = new Integer(stsi++);
-                aei.WssAgentsSTSAgentSvcMEXEndPoint = NotAvail; // notretrieved
-                aei.SsoServerRealmIndex = ri;
-                // no entry for group membership...
-
-                ObjectName aname =
-                        aei.createSsoServerWSSAgentsSTSAgentEntryObjectName(server);
-
-                if (aname == null) {
-                    debug.error(classMethod +
-                            "Error creating object for Policy STS Agent '" +
-                            agtname + "'");
-                    continue;
-                }
-
-                try {
-                    ststab.addEntry(aei, aname);
-                    if ((server != null) && (aei != null)) {
-                        server.registerMBean(aei, aname);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                }
-            } else if (atype.equals("DiscoveryAgent")) {
-                SsoServerWSSAgentsDSCAgentEntryImpl aei =
-                        new SsoServerWSSAgentsDSCAgentEntryImpl(sunMib);
-                String dep = hm.get("discoveryendpoint");
-                if (dep == null) {
-                    dep = NotAvail;
-                }
-                String aep = hm.get("authnserviceendpoint");
-                if (aep == null) {
-                    aep = NotAvail;
-                }
-                aei.WssAgentsDSCAgentName = agtname;
-                aei.WssAgentsDSCAgentWebSvcEndPoint = dep;
-                aei.WssAgentsDSCAgentSvcEndPoint = aep;
-                aei.WssAgentsDSCAgentIndex = new Integer(dsci++);
-                aei.SsoServerRealmIndex = ri;
-                // no entry for group membership...
-                ObjectName aname =
-                        aei.createSsoServerWSSAgentsDSCAgentEntryObjectName(server);
-
-                if (aname == null) {
-                    debug.error(classMethod +
-                            "Error creating object for Policy Discovery Agent '" +
-                            agtname + "'");
-                    continue;
-                }
-
-                try {
-                    dsctab.addEntry(aei, aname);
-                    if ((server != null) && (aei != null)) {
-                        server.registerMBean(aei, aname);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                }
-            } else if (atype.equals("SharedAgent")) {
+            }
+            else if (atype.equals("SharedAgent")) {
                 // SharedAgent type are agent authenticators
             } else {
                 debug.error(classMethod + "agent type = " + atype +
@@ -1984,26 +1801,15 @@ public class Agent {
      *  the HashMap of attributes/values:
      *    CLIConstants.ATTR_NAME_AGENT_TYPE
      *      type is extracted from the set; can be:
-     *        STSAgent, WSPAgent, WSCAgent, WebAgent
-     *        J2EEAgent, DiscoveryAgent
+     *        WebAgent
+     *        J2EEAgent
      *        don't do "SharedAgent" (authenticators)
-     *    WSPAgent should have:
-     *      "wspendpoint"
-     *      "wspproxyendpoint"
-     *    WSCAgent should have:
-     *      "wspendpoint"
-     *      "wspproxyendpoint"
      *    WebAgent should have:
      *      "com.sun.identity.agents.config.agenturi.prefix"
      *      "com.sun.identity.agents.config.login.url"
      *    J2EEAgents should have:
      *      "com.sun.identity.agents.config.login.url"
      *      "com.sun.identity.client.notification.url"
-     *    DiscoveryAgent should have:
-     *      "discoveryendpoint"
-     *      "authnserviceendpoint"
-     *    STSAgent should have:
-     *      "stsendpoint"
      *    2.2_Agent
      *      no groups
      */
@@ -2145,163 +1951,6 @@ public class Agent {
 
                 try {
                     j2eetab.addEntry(aei, aname);
-                    if ((server != null) && (aei != null)) {
-                        server.registerMBean(aei, aname);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                }
-            } else if (atype.equals("WSPAgent")) {
-                if (wsptab == null) {
-                    continue;  // no table to put it into
-                }
-                SsoServerWSSAgentsWSPAgtGrpEntryImpl aei =
-                        new SsoServerWSSAgentsWSPAgtGrpEntryImpl(sunMib);
-                String wep = hm.get("wsendpoint");
-                if (wep == null) {
-                    wep = NotAvail;
-                }
-                String wpep = hm.get("wspproxyendpoint");
-                if (wpep == null) {
-                    wpep = NotAvail;
-                }
-                aei.WssAgentsWSPAgtGrpName = agtname;
-                aei.WssAgentsWSPAgtGrpSvcEndPoint = wep;
-                aei.WssAgentsWSPAgtGrpProxy = wpep;
-                aei.WssAgentsWSPAgtGrpIndex = new Integer(wspi++);
-                aei.SsoServerRealmIndex = ri;
-                ObjectName aname =
-                        aei.createSsoServerWSSAgentsWSPAgtGrpEntryObjectName(
-                                server);
-
-                if (aname == null) {
-                    debug.error(classMethod +
-                            "Error creating object for Policy WSP Agent Group '" +
-                            agtname + "'");
-                    continue;
-                }
-
-                try {
-                    wsptab.addEntry(aei, aname);
-                    if ((server != null) && (aei != null)) {
-                        server.registerMBean(aei, aname);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                }
-            } else if (atype.equals("WSCAgent")) {
-                if (wsctab == null) {
-                    continue;  // no table to put it into
-                }
-                SsoServerWSSAgentsWSCAgtGrpEntryImpl aei =
-                        new SsoServerWSSAgentsWSCAgtGrpEntryImpl(sunMib);
-                String wep = hm.get("wsendpoint");
-                if (wep == null) {
-                    wep = NotAvail;
-                }
-                String wpep = hm.get("wspproxyendpoint");
-                if (wpep == null) {
-                    wpep = NotAvail;
-                }
-                aei.WssAgentsWSCAgtGrpName = agtname;
-                aei.WssAgentsWSCAgtGrpSvcEndPoint = wep;
-                aei.WssAgentsWSCAgtGrpProxy = wpep;
-                aei.WssAgentsWSCAgtGrpIndex = new Integer(wsci++);
-                aei.SsoServerRealmIndex = ri;
-                ObjectName aname =
-                        aei.createSsoServerWSSAgentsWSCAgtGrpEntryObjectName(
-                                server);
-
-                if (aname == null) {
-                    debug.error(classMethod +
-                            "Error creating object for Policy WSC Agent Group '" +
-                            agtname + "'");
-                    continue;
-                }
-
-                try {
-                    wsctab.addEntry(aei, aname);
-                    if ((server != null) && (aei != null)) {
-                        server.registerMBean(aei, aname);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                }
-            } else if (atype.equals("STSAgent")) {
-                if (ststab == null) {
-                    continue;  // no table to put it into
-                }
-                SsoServerWSSAgentsSTSAgtGrpEntryImpl aei =
-                        new SsoServerWSSAgentsSTSAgtGrpEntryImpl(sunMib);
-                String sep = hm.get("stsendpoint");
-                if (sep == null) {
-                    sep = NotAvail;
-                }
-                aei.WssAgentsSTSAgtGrpName = agtname;
-                aei.WssAgentsSTSAgtGrpSvcEndPoint = sep;
-                aei.WssAgentsSTSAgtGrpIndex = new Integer(stsi++);
-                aei.WssAgentsSTSAgtGrpSvcMEXEndPoint = NotAvail; //notretrieved
-                aei.SsoServerRealmIndex = ri;
-
-                ObjectName aname =
-                        aei.createSsoServerWSSAgentsSTSAgtGrpEntryObjectName(
-                                server);
-
-                if (aname == null) {
-                    debug.error(classMethod +
-                            "Error creating object for Policy STS Agent Group '" +
-                            agtname + "'");
-                    continue;
-                }
-
-                try {
-                    ststab.addEntry(aei, aname);
-                    if ((server != null) && (aei != null)) {
-                        server.registerMBean(aei, aname);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod + agtname + ": " + ex.getMessage());
-                }
-            } else if (atype.equals("DiscoveryAgent")) {
-                if (dsctab == null) {
-                    continue;  // no table to put it into
-                }
-                SsoServerWSSAgentsDSCAgtGrpEntryImpl aei =
-                        new SsoServerWSSAgentsDSCAgtGrpEntryImpl(sunMib);
-                String dep = hm.get("discoveryendpoint");
-                if (dep == null) {
-                    dep = NotAvail;
-                }
-                String aep = hm.get("authnserviceendpoint");
-                if (aep == null) {
-                    aep = NotAvail;
-                }
-                aei.WssAgentsDSCAgtGrpName = agtname;
-                aei.WssAgentsDSCAgtGrpWebSvcEndPoint = dep;
-                aei.WssAgentsDSCAgtGrpSvcEndPoint = aep;
-                aei.WssAgentsDSCAgtGrpIndex = new Integer(dsci++);
-                aei.SsoServerRealmIndex = ri;
-                ObjectName aname =
-                        aei.createSsoServerWSSAgentsDSCAgtGrpEntryObjectName(
-                                server);
-
-                if (aname == null) {
-                    debug.error(classMethod +
-                            "Error creating object for Policy Discovery Agent " +
-                            "Group '" + agtname + "'");
-                    continue;
-                }
-
-                try {
-                    dsctab.addEntry(aei, aname);
                     if ((server != null) && (aei != null)) {
                         server.registerMBean(aei, aname);
                     }

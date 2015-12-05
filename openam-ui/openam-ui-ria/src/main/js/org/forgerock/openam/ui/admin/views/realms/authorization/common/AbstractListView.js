@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
         deleteRecord: function (e, id, callback) {
             var self = this,
                 item = self.data.items.get(id),
-                onSuccess = function (model, response, options) {
+                onSuccess = function () {
                     self.data.items.fetch({ reset: true });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
@@ -44,10 +44,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
                         callback();
                     }
                 },
-                onError = function (model, response, options) {
+                onError = function (model, response) {
                     self.data.items.fetch({ reset: true });
-                    Messages.messages.addMessage({
-                        message: response.responseJSON.message,
+                    Messages.addMessage({
+                        response: response,
                         type: Messages.TYPE_DANGER
                     });
                 };

@@ -19,6 +19,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -26,9 +27,11 @@ import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.XACMLConstants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.EntitlementIndexConfigFilter;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.auditors.SMSAuditFilter;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfigurationImpl;
 import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
@@ -87,6 +90,10 @@ public class EntitlementGuiceModule extends AbstractModule {
         bind(ResourceTypeConfiguration.class).to(ResourceTypeConfigurationImpl.class);
         bind(ResourceTypeService.class).to(ResourceTypeServiceImpl.class);
         bind(ConstraintValidator.class).to(ConstraintValidatorImpl.class);
+
+        //audit filter
+        Multibinder.newSetBinder(binder(), SMSAuditFilter.class)
+                .addBinding().to(EntitlementIndexConfigFilter.class);
 
         install(new FactoryModuleBuilder()
                 .implement(ApplicationService.class, ApplicationServiceImpl.class)

@@ -21,9 +21,7 @@ import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.impl.queue.config.CTSQueueConfiguration;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.forgerock.openam.utils.ModifiedProperty;
@@ -57,7 +55,8 @@ public class CTSDataLayerConfiguration extends LdapDataLayerConfiguration {
         hosts.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_HOSTNAME));
         username.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_USERNAME));
         password.set(AMPasswordUtil.decrypt(SystemProperties.get(CoreTokenConstants.CTS_STORE_PASSWORD)));
-        maxConnections.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS));
+        maxConnections.set(SystemProperties.get(
+                CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS, CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS_DEFAULT));
         sslMode.set(SystemProperties.getAsBoolean(CoreTokenConstants.CTS_STORE_SSL_ENABLED, false));
         heartbeat.set(SystemProperties.getAsInt(Constants.LDAP_HEARTBEAT, -1));
     }

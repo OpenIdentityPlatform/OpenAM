@@ -72,6 +72,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
 import org.forgerock.openam.ldap.LDAPAuthUtils;
+import org.forgerock.openam.ldap.LDAPConstants;
 import org.forgerock.openam.ldap.LDAPUtilException;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.ModuleState;
@@ -1076,7 +1077,7 @@ public class AMSDKRepo extends IdRepo {
                 //Throw Fatal exception for errCode 19(eg.,Password too short)
                 //as it breaks password policy for password length.
                 IdRepoFatalException ide = new IdRepoFatalException(
-                   IdRepoBundle.BUNDLE_NAME, "313", args);
+                   IdRepoBundle.BUNDLE_NAME, LDAPConstants.CONSTRAINT_VIOLATED_ERROR, args);
                 ide.setLDAPErrorCode(ldapError);
                 throw ide;
             } else {

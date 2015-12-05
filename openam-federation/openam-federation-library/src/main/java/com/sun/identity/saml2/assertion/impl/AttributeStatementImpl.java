@@ -73,14 +73,13 @@ import com.sun.identity.saml2.common.SAML2SDKUtils;
  */
 public class AttributeStatementImpl implements AttributeStatement {
 
-    private List attrs = null;
-    private List encAttrs = null;
+    private List<Attribute> attrs = null;
+    private List<EncryptedAttribute> encAttrs = null;
     private boolean mutable = true;
 
     // Validate the object according to the schema.
-    private void validateData()
-        throws SAML2Exception
-    {
+    private void validateData() throws SAML2Exception {
+
         if ((attrs == null || attrs.isEmpty()) &&
             (encAttrs == null || encAttrs.isEmpty()))
         {
@@ -92,13 +91,10 @@ public class AttributeStatementImpl implements AttributeStatement {
             throw new SAML2Exception(
                 SAML2SDKUtils.bundle.getString("missingElement"));
         }
-
     }
 
     // used by the constructors.
-    private void parseElement(Element element)
-        throws SAML2Exception
-    {
+    private void parseElement(Element element) throws SAML2Exception {
         // make sure that the input xml block is not null
         if (element == null) {
             if (SAML2SDKUtils.debug.messageEnabled()) {
@@ -171,9 +167,7 @@ public class AttributeStatementImpl implements AttributeStatement {
      * Class constructor with <code>AttributeStatement</code> in
      * <code>Element</code> format.
      */
-    public AttributeStatementImpl(org.w3c.dom.Element element)
-        throws com.sun.identity.saml2.common.SAML2Exception
-    {
+    public AttributeStatementImpl(org.w3c.dom.Element element) throws SAML2Exception {
         parseElement(element);
     }
 
@@ -181,9 +175,7 @@ public class AttributeStatementImpl implements AttributeStatement {
      * Class constructor with <code>AttributeStatement</code> in xml string
      * format.
      */
-    public AttributeStatementImpl(String xmlString)
-        throws com.sun.identity.saml2.common.SAML2Exception
-    {
+    public AttributeStatementImpl(String xmlString) throws SAML2Exception {
         Document doc = XMLUtils.toDOMDocument(xmlString, SAML2SDKUtils.debug);
         if (doc == null) {
             throw new SAML2Exception(
@@ -198,7 +190,8 @@ public class AttributeStatementImpl implements AttributeStatement {
      * @return List of <code>Attribute</code>(s) in the statement.
      * @see #setAttribute(List)
      */
-    public List getAttribute() {
+    @Override
+    public List<Attribute> getAttribute() {
         return attrs;
     }
 
@@ -209,9 +202,8 @@ public class AttributeStatementImpl implements AttributeStatement {
      * @throws SAML2Exception if the object is immutable.
      * @see #getAttribute()
      */
-    public void setAttribute(List value)
-        throws SAML2Exception
-    {
+    @Override
+    public void setAttribute(List<Attribute> value) throws SAML2Exception {
         if (!mutable) {
             throw new SAML2Exception(
                 SAML2SDKUtils.bundle.getString("objectImmutable"));
@@ -225,7 +217,8 @@ public class AttributeStatementImpl implements AttributeStatement {
      * @return List of <code>EncryptedAttribute</code>(s) in the statement.
      * @see #setEncryptedAttribute(List)
      */
-    public List getEncryptedAttribute() {
+    @Override
+    public List<EncryptedAttribute> getEncryptedAttribute() {
         return encAttrs;
     }
 
@@ -236,9 +229,8 @@ public class AttributeStatementImpl implements AttributeStatement {
      * @throws SAML2Exception if the object is immutable.
      * @see #getEncryptedAttribute()
      */
-    public void setEncryptedAttribute(List value)
-        throws SAML2Exception
-    {
+    @Override
+    public void setEncryptedAttribute(List value) throws SAML2Exception {
         if (!mutable) {
             throw new SAML2Exception(
                 SAML2SDKUtils.bundle.getString("objectImmutable"));
@@ -249,6 +241,7 @@ public class AttributeStatementImpl implements AttributeStatement {
     /**
      * Makes the object immutable.
      */
+    @Override
     public void makeImmutable() {
         if (mutable) {
             if (attrs != null) {
@@ -272,6 +265,7 @@ public class AttributeStatementImpl implements AttributeStatement {
      * @return <code>true</code> if the object is mutable;
      *          <code>false</code> otherwise.
      */
+    @Override
     public boolean isMutable() {
         return mutable;
     }
@@ -283,9 +277,8 @@ public class AttributeStatementImpl implements AttributeStatement {
      *          By default name space name is prepended to the element name.
      * @throws SAML2Exception if the object does not conform to the schema.
      */
-    public java.lang.String toXMLString()
-        throws SAML2Exception
-    {
+    @Override
+    public String toXMLString() throws SAML2Exception {
         return this.toXMLString(true, false);
     }
 
@@ -299,9 +292,9 @@ public class AttributeStatementImpl implements AttributeStatement {
      * @return A string containing the valid XML for this element
      * @throws SAML2Exception if the object does not conform to the schema.
      */
-    public java.lang.String toXMLString(boolean includeNS, boolean declareNS)
-        throws SAML2Exception
-    {
+    @Override
+    public String toXMLString(boolean includeNS, boolean declareNS) throws SAML2Exception {
+
         validateData();
         StringBuffer result = new StringBuffer(1000);
         String prefix = "";
@@ -333,6 +326,4 @@ public class AttributeStatementImpl implements AttributeStatement {
         result.append("</").append(prefix).append("AttributeStatement>");
         return result.toString();
     }
-
 }
-

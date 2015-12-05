@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,17 +24,9 @@
  *
  * $Id: LogMessageProviderBase.java,v 1.7 2009/10/22 21:04:37 veiming Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.log.messageid;
-
-/**
- * This is the base class for all Log Message Provider class. It provides
- * methods to generate XML for documenting log message.
- */
 
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogRecord;
@@ -57,11 +49,14 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-public class LogMessageProviderBase
-    implements LogMessageProvider
-{
+/**
+ * This is the base class for all Log Message Provider class. It provides
+ * methods to generate XML for documenting log message.
+ */
+public class LogMessageProviderBase implements LogMessageProvider {
+
     private List messageIDs = new ArrayList();
-    private Map hashMessageIDs = new HashMap();
+    private Map<String, LogMessageID> hashMessageIDs = new HashMap<>();
     private String xmlDefinitionFilename;
 
     protected LogMessageProviderBase(String xmlDef)
@@ -84,9 +79,10 @@ public class LogMessageProviderBase
      *
      * @return all hash message IDs.
      */
-//    public Map<String, LogMessageID> getAllHashMessageIDs() {
-//        return hashMessageIDs;
-//    }
+    @Override
+    public Map<String, LogMessageID> getAllHashMessageIDs() {
+        return hashMessageIDs;
+    }
 
     /**
      * Returns Log Record. <code>null</code> is returned if there are no
@@ -105,7 +101,7 @@ public class LogMessageProviderBase
         Object ssoToken
     ) {
         LogRecord logRec = null;
-        LogMessageID logMsgId = (LogMessageID)hashMessageIDs.get(messageIDName);
+        LogMessageID logMsgId = hashMessageIDs.get(messageIDName);
 
         if (logMsgId != null) {
             logRec = (ssoToken != null) ?

@@ -15,15 +15,9 @@
  */
 package org.forgerock.openam.rest.fluent;
 
-import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
-import static org.forgerock.json.resource.ResourceException.getException;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
-import org.forgerock.services.context.Context;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
@@ -37,15 +31,20 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Response;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.audit.AuditEventFactory;
-import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.Reject;
 import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.ResultHandler;
+import org.forgerock.util.promise.RuntimeExceptionHandler;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Filter which will audit any requests that pass through it.
@@ -55,22 +54,18 @@ import org.forgerock.util.promise.ResultHandler;
 public class AuditFilter implements Filter {
 
     private final Debug debug;
-    private final AuditEventPublisher auditEventPublisher;
-    private final AuditEventFactory auditEventFactory;
+    private final CrestAuditorFactory crestAuditorFactory;
 
     /**
      * Guiced constructor.
      *
      * @param debug Debug instance.
-     * @param auditEventPublisher AuditEventPublisher to which publishing of events can be delegated.
-     * @param auditEventFactory AuditEventFactory for audit event builders.
+     * @param crestAuditorFactory CrestAuditorFactory for CrestAuditor instances.
      */
     @Inject
-    public AuditFilter(@Named("frRest") Debug debug, AuditEventPublisher auditEventPublisher,
-                       AuditEventFactory auditEventFactory) {
+    public AuditFilter(@Named("frRest") Debug debug, CrestAuditorFactory crestAuditorFactory) {
         this.debug = debug;
-        this.auditEventPublisher = auditEventPublisher;
-        this.auditEventFactory = auditEventFactory;
+        this.crestAuditorFactory = crestAuditorFactory;
     }
 
     /**
@@ -95,7 +90,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleAction(context, request), auditor);
+        return auditResponse(next.handleAction(context, request), auditor, request);
     }
 
     /**
@@ -120,7 +115,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleCreate(context, request), auditor);
+        return auditResponse(next.handleCreate(context, request), auditor, request);
     }
 
     /**
@@ -145,7 +140,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleDelete(context, request), auditor);
+        return auditResponse(next.handleDelete(context, request), auditor, request);
     }
 
     /**
@@ -170,7 +165,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handlePatch(context, request), auditor);
+        return auditResponse(next.handlePatch(context, request), auditor, request);
     }
 
     /**
@@ -196,7 +191,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleQuery(context, request, handler), auditor);
+        return auditResponse(next.handleQuery(context, request, handler), auditor, request);
     }
 
     /**
@@ -221,7 +216,7 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleRead(context, request), auditor);
+        return auditResponse(next.handleRead(context, request), auditor, request);
     }
 
     /**
@@ -246,16 +241,16 @@ public class AuditFilter implements Filter {
             return new InternalServerErrorException().asPromise();
         }
 
-        return auditResponse(next.handleUpdate(context, request), auditor);
+        return auditResponse(next.handleUpdate(context, request), auditor, request);
     }
 
     private <T extends Response> Promise<T, ResourceException> auditResponse(Promise<T, ResourceException> promise,
-            final CrestAuditor auditingHandler) {
+            final CrestAuditor auditingHandler, final Request request) {
         return promise
                 .thenOnResult(new ResultHandler<Response>() {
                     @Override
                     public void handleResult(Response response) {
-                        auditingHandler.auditAccessSuccess();
+                        auditingHandler.auditAccessSuccess(getDetail(request, response));
                     }
                 })
                 .thenOnException(new ExceptionHandler<ResourceException>() {
@@ -263,10 +258,148 @@ public class AuditFilter implements Filter {
                     public void handleException(ResourceException exception) {
                         auditingHandler.auditAccessFailure(exception.getCode(), exception.getMessage());
                     }
+                })
+                .thenOnRuntimeException(new RuntimeExceptionHandler() {
+                    @Override
+                    public void handleRuntimeException(RuntimeException exception) {
+                        auditingHandler.auditAccessFailure(ResourceException.INTERNAL_ERROR, exception.getMessage());
+                    }
                 });
     }
 
     private CrestAuditor newAuditor(Context context, Request request) {
-        return new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
+        return crestAuditorFactory.create(context, request);
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to the a successful
+     * {@link Response} to a {@link Request}. This information is logged in the access audit log.
+     *
+     * @param request The {@link Request} instance from which details may be taken. Cannot be null.
+     * @param response The {@link Response} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details.
+     */
+    private JsonValue getDetail(Request request, Response response) {
+        Reject.ifNull(request, "request cannot be null.");
+        Reject.ifNull(request, "response cannot be null.");
+
+        RequestType requestType = request.getRequestType();
+
+        switch (requestType) {
+            case CREATE:
+                return getCreateSuccessDetail((CreateRequest) request, (ResourceResponse) response);
+            case READ:
+                return getReadSuccessDetail((ReadRequest) request, (ResourceResponse) response);
+            case UPDATE:
+                return getUpdateSuccessDetail((UpdateRequest) request, (ResourceResponse) response);
+            case DELETE:
+                return getDeleteSuccessDetail((DeleteRequest) request, (ResourceResponse) response);
+            case PATCH:
+                return getPatchSuccessDetail((PatchRequest) request, (ResourceResponse) response);
+            case ACTION:
+                return getActionSuccessDetail((ActionRequest) request, (ActionResponse) response);
+            case QUERY:
+                return getQuerySuccessDetail((QueryRequest) request, (QueryResponse) response);
+            default:
+                throw new IllegalStateException("Unknown RequestType");
+        }
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link CreateRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link CreateRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    public JsonValue getCreateSuccessDetail(CreateRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link ReadRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link ReadRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    public JsonValue getReadSuccessDetail(ReadRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link UpdateRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link UpdateRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    public JsonValue getUpdateSuccessDetail(UpdateRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link UpdateRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link UpdateRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    public JsonValue getDeleteSuccessDetail(DeleteRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ResourceResponse} to a successful {@link PatchRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link PatchRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ResourceResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    public JsonValue getPatchSuccessDetail(PatchRequest request, ResourceResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link ActionResponse} to a successful {@link ActionRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link ActionRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link ActionResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    public JsonValue getActionSuccessDetail(ActionRequest request, ActionResponse response) {
+        return null;
+    }
+
+    /**
+     * Provides additional details (e.g. failure description or summary of the payload) relating to an
+     * {@link QueryResponse} to a successful {@link QueryRequest}. This information is logged in the access
+     * audit log. Subclasses can implement this method if they need to return details.
+     *
+     * @param request The {@link QueryRequest} instance from which details may be taken. Cannot be null.
+     * @param response The {@link QueryResponse} instance from which details may be taken. Cannot be null.
+     * @return {@link JsonValue} free-form details, or null to indicate no details. The default for no overridden
+     * implementation is provided here as null.
+     */
+    public JsonValue getQuerySuccessDetail(QueryRequest request, QueryResponse response) {
+        return null;
     }
 }

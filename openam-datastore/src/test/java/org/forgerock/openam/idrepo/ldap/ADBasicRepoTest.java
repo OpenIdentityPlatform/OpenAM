@@ -15,18 +15,19 @@
  */
 package org.forgerock.openam.idrepo.ldap;
 
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdType;
-import static org.fest.assertions.Assertions.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.fail;
 
 import org.forgerock.openam.utils.MapHelper;
 import org.forgerock.opendj.ldap.MemoryBackend;
 import org.forgerock.opendj.ldap.RequestContext;
 import org.forgerock.opendj.ldap.RequestHandler;
 import org.forgerock.opendj.ldap.ResultCode;
-import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
 
 /**
  * Contains basic test cases in a standard AD setup, where login and lookup occurs based on the CN attribute.

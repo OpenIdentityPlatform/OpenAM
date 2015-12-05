@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.upgrade.helpers;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
@@ -32,11 +33,19 @@ import org.forgerock.openam.upgrade.UpgradeException;
  */
 public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
 
+    private final Set<String> tokenLifetimeAttributeNames = new HashSet<>();
+
     public OAuth2ProviderUpgradeHelper() {
         attributes.add(ID_TOKEN_SIGNING_ALGORITHMS);
         attributes.add(JKWS_URI);
         attributes.add(SUPPORTED_CLAIMS);
         attributes.add(OIDC_CLAIMS_EXTENSION_SCRIPT);
+
+        tokenLifetimeAttributeNames.add(AUTHZ_CODE_LIFETIME_NAME);
+        tokenLifetimeAttributeNames.add(REFRESH_TOKEN_LIFETIME_NAME);
+        tokenLifetimeAttributeNames.add(ACCESS_TOKEN_LIFETIME_NAME);
+        tokenLifetimeAttributeNames.add(JWT_TOKEN_LIFETIME_NAME);
+        attributes.addAll(tokenLifetimeAttributeNames);
     }
 
     @Override
@@ -64,6 +73,8 @@ public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
             if (!oldAttr.getDefaultValues().equals(newAttr.getDefaultValues())) {
                 return updateDefaultValues(oldAttr, newAttr.getDefaultValues());
             }
+        } else if (tokenLifetimeAttributeNames.contains(newAttr.getName())) {
+            return newAttr;
         }
 
         return null;

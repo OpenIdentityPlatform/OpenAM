@@ -17,13 +17,17 @@ package org.forgerock.openam.radius.server;
 
 import java.security.AccessController;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.radius.server.audit.RadiusAuditLoggerEventBus;
+import org.forgerock.openam.radius.server.audit.RadiusAuditor;
 import org.forgerock.openam.radius.server.config.RadiusServer;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import org.forgerock.openam.radius.server.config.RadiusServerManager;
-import org.forgerock.openam.radius.server.monitoring.RadiusServerEventMonitorMXBean;
 import org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar;
 import org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrator;
 
@@ -42,20 +46,35 @@ public class RadiusServerGuiceModule extends AbstractModule {
 
     private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
-    static {
-        LOG.message("Radius Server module static block.");
-    }
+    /**
+     * EventBus used by the RADIUS server to notify both the Common Audit Logging framework and the
+     * RadiusServiceEventRegistrar that totals number of packets, accepted/rejected requests etc.
+     */
+    private static EventBus radiusEventBus = new EventBus();
 
+    /**
+     * The event registrar that totals number of packets, accepted/rejected requests etc.
+     */
+    private static RadiusServerEventRegistrar eventRegistrar = new RadiusServerEventRegistrar(radiusEventBus);
 
     @Override
     protected void configure() {
         LOG.message("RadiusServerGuiceModule - Entering configure.");
-        bind(RadiusServer.class).to(RadiusServerManager.class);
-        bind(RadiusServerEventRegistrator.class).to(RadiusServerEventRegistrar.class).asEagerSingleton();
-        bind(RadiusServerEventMonitorMXBean.class).to(RadiusServerEventRegistrar.class).asEagerSingleton();
+
+        // This should not be Eager Singleton as it relies on being able to obtain config, which
+        // relies on this being called from the AMSetupServlet. Eager Singletons get created before
+        // that.
+        bind(RadiusServer.class).to(RadiusServerManager.class).in(Singleton.class);
+        bind(RadiusAuditor.class).to(RadiusAuditLoggerEventBus.class).in(Singleton.class);
         LOG.message("RadiusServerGuiceModule - Leaving configure.");
     }
 
+    /**
+     * Guice provider for the ServiceConfigManager.
+     *
+     * @return a ServiceConfigurationManager that can be used
+     * @throws RadiusLifecycleException - when the service config manager can not be obtained.
+     */
     @Provides
     @Named("RadiusServer")
     protected ServiceConfigManager getRadiusServiceConfigManger() throws RadiusLifecycleException {
@@ -68,5 +87,28 @@ public class RadiusServerGuiceModule extends AbstractModule {
             throw new RadiusLifecycleException("Could not obtain ServiceConfigManger for the RADIUS service.", e);
         }
         return mgr;
+    }
+
+    /**
+     * Get the radius eventBus.
+     *
+     * @return the event bus used by radius components to publish and subscribe for events.
+     */
+    @Provides
+    @Named("RadiusEventBus")
+    protected EventBus getRadiusEventBus() {
+        return radiusEventBus;
+    }
+
+    /**
+     * Get the RadiusServerEventRegistrator.
+     *
+     * @return the RadiusServerEventRegistrator.
+     */
+    @Provides
+    @Singleton
+    @Inject
+    public RadiusServerEventRegistrator getRadiusServerEventRegistrator() {
+        return eventRegistrar;
     }
 }

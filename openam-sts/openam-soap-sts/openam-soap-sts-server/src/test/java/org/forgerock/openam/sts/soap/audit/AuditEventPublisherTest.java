@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionWrapper;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
@@ -42,14 +43,14 @@ public class AuditEventPublisherTest {
 
     private SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
     private HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
-    private AuditEventPublisher auditEventPublisher;
+    private SoapSTSAuditEventPublisher auditEventPublisher;
 
     @BeforeMethod
     protected void setUp() {
         soapSTSAccessTokenProvider = mock(SoapSTSAccessTokenProvider.class);
         httpURLConnectionWrapperFactory = mock(HttpURLConnectionWrapperFactory.class);
 
-        auditEventPublisher = new AuditEventPublisher(
+        auditEventPublisher = new SoapSTSAuditEventPublisher(
                 httpURLConnectionWrapperFactory,
                 "http://openam.example.com:8080/openam/json/audit/access/?_action=create",
                 "iPlanetDirectoryPro",
@@ -72,7 +73,7 @@ public class AuditEventPublisherTest {
         given(httpURLConnectionWrapperFactory.httpURLConnectionWrapper(urlCaptor.capture())).willReturn(httpURLConnectionWrapper);
 
         // When
-        auditEventPublisher.publish(auditEvent);
+        auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, auditEvent);
 
         // Then
         verify(soapSTSAccessTokenProvider, times(1)).getAccessToken();
@@ -92,7 +93,7 @@ public class AuditEventPublisherTest {
         given(httpURLConnectionWrapperFactory.httpURLConnectionWrapper(any(URL.class))).willThrow(new RuntimeException());
 
         // When
-        auditEventPublisher.publish(mock(AuditEvent.class));
+        auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, mock(AuditEvent.class));
 
         // Then
         verify(soapSTSAccessTokenProvider, times(1)).getAccessToken();

@@ -24,17 +24,24 @@ import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAsse
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenID;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPermissionFactory;
 import org.forgerock.authz.filter.crest.AuthorizationFilters;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.session.SessionCache;
 import org.forgerock.services.context.Context;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.json.JsonValue;
@@ -104,17 +111,31 @@ public class PrivilegeAuthzModuleTest {
     @Mock
     private SSOToken token;
     @Mock
+    private SSOTokenID tokenID;
+    @Mock
     private CollectionResourceProvider provider;
+    @Mock
+    private CoreWrapper coreWrapper;
+    @Mock
+    private Session session;
+    @Mock
+    private SessionCache sessionCache;
 
     private CrestAuthorizationModule module;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         final Map<String, PrivilegeDefinition> definitions = new HashMap<>();
         definitions.put("evaluate", PrivilegeDefinition.getInstance("evaluate", PrivilegeDefinition.Action.READ));
         definitions.put("blowup", PrivilegeDefinition.getInstance("destroy", PrivilegeDefinition.Action.MODIFY));
-        module = new PrivilegeAuthzModule(evaluator, definitions, factory);
+
+        given(session.getClientDomain()).willReturn("/abc");
+        given(token.getTokenID()).willReturn(tokenID);
+        given(coreWrapper.convertOrgNameToRealmName(anyString())).willReturn("/abc");
+        given(sessionCache.getSession(any(SessionID.class))).willReturn(session);
+
+        module = new PrivilegeAuthzModule(evaluator, definitions, factory, sessionCache, coreWrapper);
     }
 
     @Test

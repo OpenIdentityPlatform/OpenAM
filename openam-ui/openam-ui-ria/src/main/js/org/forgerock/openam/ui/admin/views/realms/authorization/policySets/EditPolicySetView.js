@@ -29,6 +29,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
+    "bootstrap-tabdrop",
     "selectize"
 ], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesDelegate, FormHelper, Messages, AbstractView,
              EventManager, Router, Constants, UIUtils) {
@@ -43,12 +44,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             "click #delete": "onDeleteClick"
         },
 
-        initialize: function (options) {
+        initialize: function () {
             AbstractView.prototype.initialize.call(this);
             this.model = null;
         },
 
-        onModelSync: function (model, response) {
+        onModelSync: function () {
             this.renderAfterSyncModel();
         },
 
@@ -99,6 +100,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                             realmPath: self.realmPath,
                             policySetModel: self.model
                         }, function (policiesNumber) {
+                            self.$el.find(".tab-menu .nav-tabs").tabdrop();
+
                             if (policiesNumber > 0) {
                                 self.data.disableSettingsEdit = true;
                                 self.$el.find("#saveChanges, #delete").attr("disabled", true);
@@ -188,7 +191,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
         },
 
         // TODO this should be removed and common 'pending changes' widget should be used instead
-        revertChanges: function (e) {
+        revertChanges: function () {
             this.resTypesSelection[0].selectize.clear(true);
             this.resTypesSelection[0].selectize.addItems(
                 _.pluck(this.data.options.selectedResourceTypesInitial, "uuid"));
@@ -208,7 +211,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
 
             if (savePromise) {
                 savePromise
-                    .done(function (response) {
+                    .done(function () {
                         if (self.newEntity) {
                             Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {
                                 args: _.map([self.realmPath, self.model.id], encodeURIComponent),
@@ -233,16 +236,16 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
 
         deletePolicySet: function () {
             var self = this,
-                onSuccess = function (model, response, options) {
+                onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsPolicySets, {
                         args: [encodeURIComponent(self.realmPath)],
                         trigger: true
                     });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
-                onError = function (model, response, options) {
+                onError = function (model, response) {
                     Messages.addMessage({
-                        message: response.responseJSON.message,
+                        response: response,
                         type: Messages.TYPE_DANGER
                     });
                 };
@@ -258,7 +261,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
 
-            _.each(dataFields, function (field, key, list) {
+            _.each(dataFields, function (field) {
                 dataField = field.getAttribute("data-field");
 
                 if (field.type === "checkbox") {

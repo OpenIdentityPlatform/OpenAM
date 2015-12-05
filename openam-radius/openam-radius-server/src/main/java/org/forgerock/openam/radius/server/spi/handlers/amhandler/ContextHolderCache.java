@@ -111,8 +111,8 @@ public class ContextHolderCache {
      *
      * @param key
      *            - key with which the specified value is to be associated
-     * @param value
-     *            - value to be associated with the specified key
+     * @param contextHolder
+     *            - the <code>ContextHolder</code> associated with the specified key
      * @return the previous value associated with key, or null if there was no entry for key. (A null return can also
      *         indicate that the cache previously associated null with key.)
      */
@@ -148,7 +148,7 @@ public class ContextHolderCache {
     private void updateCacheSize() {
         final int desiredMaxSize = contextCacheSize.getDesiredCacheSize();
         final int actualMaxSize = cache.getMaxSize();
-        if ( desiredMaxSize != actualMaxSize) {
+        if (desiredMaxSize != actualMaxSize) {
             final LeastRecentlyUsed<String, ContextHolder> newCache = new LeastRecentlyUsed<String, ContextHolder>(
                     desiredMaxSize);
 
@@ -163,10 +163,11 @@ public class ContextHolderCache {
                 // cache we need to reverse the entries, copy the desiredSize number off the back (the most recently
                 // used), Then insert the entries we copied into the new cache, making sure to enter the least recently
                 // used first.
-                final LinkedList<Entry<String, ContextHolder>> entriesAsList = new LinkedList<Entry<String, ContextHolder>>(
-                        cache.entrySet());
+                final LinkedList<Entry<String, ContextHolder>> entriesAsList =
+                        new LinkedList<Entry<String, ContextHolder>>(cache.entrySet());
                 final Iterator<Entry<String, ContextHolder>> itr = entriesAsList.descendingIterator();
-                final LinkedList<Entry<String, ContextHolder>> entriesToCopy = new LinkedList<Entry<String, ContextHolder>>();
+                final LinkedList<Entry<String, ContextHolder>> entriesToCopy =
+                        new LinkedList<Entry<String, ContextHolder>>();
 
                 int numberCopied = 0;
                 while (itr.hasNext() && numberCopied++ < desiredMaxSize) {

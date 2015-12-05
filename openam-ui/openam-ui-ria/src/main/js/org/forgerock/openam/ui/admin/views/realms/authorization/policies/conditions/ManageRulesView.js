@@ -89,7 +89,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 operators = _.pluck(this.data.operators, "title"),
                 properties = null;
 
-            function buildListItem (data, container, parent) {
+            function buildListItem (data, container) {
                 if (_.isArray(data) === false) {
                     data = [data];
                 }
@@ -152,7 +152,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 delay: 100,
 
                 // set item relative to cursor position
-                onDragStart: function (item, container, _super) {
+                onDragStart: function (item, container) {
                     var offset = item.offset(),
                         pointer = container.rootGroup.pointer,
                         editRuleView = null;
@@ -181,7 +181,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     });
                 },
 
-                onDrop: function (item, container, _super, event) {
+                onDrop: function (item, container, _super) {
                     var rule = null, clonedItem, newHeight, animeAttrs;
 
                     clonedItem = $("<li/>").css({
@@ -228,9 +228,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
                     if (parentIsContainer) {
                         return $children;
-                    }
-
-                    else if ($children[0]) {
+                    } else if ($children[0]) {
                         if (result[self.properties]) {
                             result[self.properties] = $children;
                         } else if (result[self.property]) {
@@ -383,7 +381,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             return properties;
         },
 
-        save: function (e) {
+        save: function () {
             if (this.sortingInitialised !== true) {
                 return;
             }
@@ -424,10 +422,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
          */
         identifyDroppableLogical: function () {
             var rootLogical = this.$el.find("#operator" + this.idPrefix + "0"),
-                nestedItems ,
-                nestedLogicals ,
-                nestedLogicalsLength ,
-                nestedRules ,
+                nestedItems,
+                nestedLogicals,
+                nestedLogicalsLength,
+                nestedRules,
                 logical,
                 canHaveMultiple,
                 notIsEmpty,

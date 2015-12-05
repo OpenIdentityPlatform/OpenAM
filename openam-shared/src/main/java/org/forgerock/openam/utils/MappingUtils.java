@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -24,9 +24,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-public class MappingUtils {
+/**
+ * Utility method for parsing mappings.
+ */
+public final class MappingUtils {
+
     private static Debug debug = Debug.getInstance("amAuth");
     private static final String EQUALS = "=";
+
+    private MappingUtils() {
+    }
 
     /**
      * This method parses out the local_attribute=source_attributes as they are encapsulated in the authN module
@@ -52,14 +59,14 @@ public class MappingUtils {
                 parsedMappings.put(key, value);
             } else {
                 if (debug.warningEnabled()) {
-                    debug.warning("In MappingUtils.parseMappings, the user-entered attribute mappings contain " +
-                            "duplicate entries. The first entry will be preserved: " + configuredMappings);
+                    debug.warning("In MappingUtils.parseMappings, the user-entered attribute mappings contain "
+                            + "duplicate entries. The first entry will be preserved: " + configuredMappings);
                 }
             }
         }
         if (parsedMappings.isEmpty()) {
-            throw new IllegalArgumentException("The mapping Set does not contain any mappings in format " +
-                    "local_attribute=source_attribute.");
+            throw new IllegalArgumentException("The mapping Set does not contain any mappings in format "
+                    + "local_attribute=source_attribute.");
         }
         return Collections.unmodifiableMap(parsedMappings);
     }

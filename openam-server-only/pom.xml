@@ -266,15 +266,6 @@
                             <targetPath>legal-notices</targetPath>
                         </webResource>
                         <webResource>
-                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/wsdl</directory>
-                            <includes>
-                                <include>*.wsdl</include>
-                                <include>*.xsd</include>
-                            </includes>
-                            <targetPath>WEB-INF/wsdl</targetPath>
-                            <filtering>false</filtering>
-                        </webResource>
-                        <webResource>
                             <directory>${project.basedir}/../openam-schema/openam-idsvcs-schema/src/main/resources/xml
                             </directory>
                             <includes>
@@ -293,15 +284,6 @@
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
-                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss
-                            </directory>
-                            <includes>
-                                <include>sun-jaxws.xml</include>
-                            </includes>
-                            <targetPath>WEB-INF</targetPath>
-                            <filtering>false</filtering>
-                        </webResource>
-                        <webResource>
                             <!-- This pickup the remaining moved elements build from the
                                  "openam-server-prepare-war"
                                  step from a Temp Area -->
@@ -318,6 +300,22 @@
                             </directory>
                             <includes>
                                 <include>stsstore.jks</include>
+                            </includes>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-audit/openam-audit-configuration/src/main/resources</directory>
+                            <includes>
+                                <include>audit.properties</include>
+                            </includes>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-selfservice/src/main/resources</directory>
+                            <includes>
+                                <include>selfService*.properties</include>
                             </includes>
                             <targetPath>WEB-INF/classes</targetPath>
                             <filtering>false</filtering>
@@ -476,6 +474,55 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>precommit</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <script language="groovy"><![CDATA[
+                                            File libs = new File(project.getProperty("project.build.directory") +
+                                                    "/generated-sources/license/THIRD-PARTY.txt")
+                                            File thirdParty = new File(project.getProperty("basedir") +
+                                                    "/../legal/THIRDPARTYREADME.txt")
+                                            List published = thirdParty.readLines().findAll { s -> s.startsWith("Version:") }
+                                            List missing = [];
+                                            libs.eachLine { line ->
+                                                (line =~ /\(([^:\(]+):([^:]+):([^ ]+)/).each { match, groupId, artifactId, version ->
+                                                    if (!groupId.startsWith("org.forgerock") &&
+                                                            !published.any { s -> s.contains(artifactId) && s.contains(version) }) {
+                                                        missing.add("$groupId:$artifactId:$version")
+                                                    }
+                                                }
+                                            }
+                                            if (!missing.isEmpty()) {
+                                                throw new Exception("Missing libraries from THIRDPARTYREADME.txt:\n" +
+                                                        missing.join("\n"))
+                                            }
+                                        ]]></script>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.codehaus.groovy</groupId>
+                                <artifactId>groovy-jsr223</artifactId>
+                                <version>2.3.3</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <properties>
@@ -502,13 +549,6 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-ui-policy</artifactId>
-            <type>zip</type>
-            <classifier>www</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
@@ -519,13 +559,11 @@
         <dependency>
             <groupId>org.forgerock.http</groupId>
             <artifactId>chf-http-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.http</groupId>
             <artifactId>chf-client-apache-sync</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -611,6 +649,11 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-audit-configuration</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-audit-rest</artifactId>
         </dependency>
 
         <dependency>
@@ -712,6 +755,11 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-fr-oath</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-saml2</artifactId>
         </dependency>
 
         <dependency>

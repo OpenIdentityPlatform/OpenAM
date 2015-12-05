@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts;
 
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.openam.audit.context.TransactionId;
+import org.forgerock.audit.events.TransactionId;
 import org.forgerock.openam.utils.IOUtils;
 
 import javax.inject.Inject;

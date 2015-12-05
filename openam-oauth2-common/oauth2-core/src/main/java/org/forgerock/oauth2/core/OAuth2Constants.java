@@ -212,6 +212,10 @@ public class OAuth2Constants {
          */
         public static final String POST_LOGOUT_REDIRECT_URI = "post_logout_redirect_uri";
 
+        /**
+         * Parameter usage location: Specify the authentication chain to use
+         */
+        public static final String AUTH_CHAIN = "auth_chain";
     }
 
     public class CoreTokenParams{
@@ -1069,7 +1073,6 @@ public class OAuth2Constants {
         public static final String TYPE = "type";
         public static final String SCOPES = "scopes";
         public static final String ICON_URI = "icon_uri";
-        public static final String CLIENT_ID = "client_id";
         public static final String LABELS = "labels";
     }
 

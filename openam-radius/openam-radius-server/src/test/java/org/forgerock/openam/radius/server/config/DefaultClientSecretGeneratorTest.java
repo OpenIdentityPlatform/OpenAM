@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.radius.server.config;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Set;
 
@@ -24,14 +24,18 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 /**
- * Test for DefaultClientSecretGenerator.
+ * Test for <code>DefaultClientSecretGenerator</code>.
+ *
+ * @see org.forgerock.openam.radius.server.config.DefaultClientSecretGenerator
  */
 public class DefaultClientSecretGeneratorTest {
 
     Logger logger = LoggerFactory.getLogger(DefaultClientSecretGeneratorTest.class.getSimpleName());
 
     /**
-     * Test for method getDefaultValues()
+     * Test for method getDefaultValues().
+     *
+     * @see org.forgerock.openam.radius.server.config.DefaultClientSecretGenerator#getDefaultValues
      */
     @Test
     public void testGetDefaultValues() {
@@ -43,8 +47,7 @@ public class DefaultClientSecretGeneratorTest {
         for (int i = 0; i < testIterations; ++i) {
             // when
             @SuppressWarnings("unchecked")
-            final
-            Set<String> secretHolder = secretGenerator.getDefaultValues();
+            final Set<String> secretHolder = secretGenerator.getDefaultValues();
 
             // then
             assertThat(secretHolder).isNotNull();

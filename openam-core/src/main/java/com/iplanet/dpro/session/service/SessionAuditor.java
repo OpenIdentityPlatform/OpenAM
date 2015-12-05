@@ -18,10 +18,15 @@ package com.iplanet.dpro.session.service;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
 import static org.forgerock.openam.audit.AuditConstants.ACTIVITY_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.utils.StringUtils.isEmpty;
 
+import com.ctc.wstx.util.StringUtil;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.DNMapper;
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
 import org.forgerock.openam.audit.AuditConstants.EventName;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
@@ -61,21 +66,29 @@ public final class SessionAuditor {
     }
 
     public void auditActivity(InternalSession session, EventName eventName) {
-        if (auditEventPublisher.isAuditing(NO_REALM, ACTIVITY_TOPIC)) {
+        String realm = session.getClientDomain();
+        realm = isEmpty(realm) ? NO_REALM : DNMapper.orgNameToRealmName(realm);
+
+        if (auditEventPublisher.isAuditing(realm, ACTIVITY_TOPIC, eventName)) {
 
             String contextId = session.getProperty(Constants.AM_CTX_ID);
 
-            AuditEvent auditEvent = auditEventFactory.activityEvent()
+            AMActivityAuditEventBuilder builder = auditEventFactory.activityEvent()
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(eventName)
                     .component(Component.SESSION)
-                    .authentication(session.getProperty(Constants.UNIVERSAL_IDENTIFIER))
                     .trackingId(contextId)
                     .runAs(getUserId(getAdminToken()))
                     .objectId(contextId)
                     .operation(getCrudType(eventName))
-                    .toEvent();
-            auditEventPublisher.tryPublish(ACTIVITY_TOPIC, auditEvent);
+                    .realm(realm);
+
+            String uid = session.getProperty(Constants.UNIVERSAL_IDENTIFIER);
+            if (StringUtils.isNotEmpty(uid)) {
+                builder.userId(uid);
+            }
+
+            auditEventPublisher.tryPublish(ACTIVITY_TOPIC, builder.toEvent());
 
         }
     }

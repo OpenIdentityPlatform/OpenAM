@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.oauth2.core.AuthorizeRequestValidator;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
@@ -86,10 +87,12 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
         final ClientRegistration clientRegistration = clientRegistrationStore.get(
                 request.<String>getParameter(CLIENT_ID), request);
         if (Utils.isOpenIdConnectClient(clientRegistration)) {
-            final boolean openIdConnectRequested = Utils.splitScope(request.<String>getParameter(SCOPE)).contains(OPENID);
             final Set<String> responseTypes = Utils.splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
-
-            if (!openIdConnectRequested) {
+            Set<String> requestedScopes = Utils.splitScope(request.<String>getParameter(SCOPE));
+            if (CollectionUtils.isEmpty(requestedScopes)) {
+                requestedScopes = clientRegistration.getDefaultScopes();
+            }
+            if (!requestedScopes.contains(OPENID)) {
                 throw new InvalidRequestException("Missing expected scope=openid from request",
                         Utils.isOpenIdConnectFragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
             }

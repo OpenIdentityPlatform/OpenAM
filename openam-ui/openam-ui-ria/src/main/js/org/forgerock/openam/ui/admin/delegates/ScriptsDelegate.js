@@ -24,15 +24,16 @@ define("org/forgerock/openam/ui/admin/delegates/ScriptsDelegate", [
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json");
 
     function getLocalizedResponse (response) {
-        Messages.messages.addMessage({
-            type: "error",
-            message: JSON.parse(response.responseText).message
+        Messages.addMessage({
+            type: Messages.TYPE_DANGER,
+            response: response
         });
     }
 
     obj.validateScript = function (data) {
         return obj.serviceCall({
             url: RealmHelper.decorateURLWithOverrideRealm("/scripts/?_action=validate"),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify(data),
             error: getLocalizedResponse

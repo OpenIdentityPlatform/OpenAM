@@ -15,6 +15,9 @@
  */
 package org.forgerock.openam.audit.configuration;
 
+import org.forgerock.audit.events.EventTopicsMetaData;
+import org.forgerock.audit.events.handlers.AuditEventHandler;
+
 import java.util.Set;
 
 /**
@@ -63,16 +66,23 @@ public interface AuditServiceConfigurationProvider {
     /**
      * Get the default audit event handler configuration.
      *
-     * @return The default audit event handler configuration.
+     * @return The default audit event handler configurations.
      */
-    Set<AuditEventHandlerConfigurationWrapper> getDefaultEventHandlerConfigurations();
+    Set<AuditEventHandlerConfiguration> getDefaultEventHandlerConfigurations();
 
     /**
      * Get the audit event handler configuration for the specified realm. If no configuration exists for this realm, the
      * default configuration will be returned.
      *
      * @param realm The realm for which the configuration is required.
-     * @return The audit event handler configuration.
+     * @return The audit event handler configurations.
      */
-    Set<AuditEventHandlerConfigurationWrapper> getRealmEventHandlerConfigurations(String realm);
+    Set<AuditEventHandlerConfiguration> getRealmEventHandlerConfigurations(String realm);
+
+    /**
+     * Provides meta-data describing the audit event topics the {@link AuditEventHandler} may have to handle.
+     *
+     * @return The event topics meta-data.
+     */
+    EventTopicsMetaData getEventTopicsMetaData();
 }

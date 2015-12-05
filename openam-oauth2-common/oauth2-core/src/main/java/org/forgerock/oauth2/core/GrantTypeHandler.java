@@ -16,7 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -55,7 +55,6 @@ public abstract class GrantTypeHandler {
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
      * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
-     * @throws ClientAuthenticationFailedException If client authentication fails.
      * @throws InvalidGrantException If the requested grant on the request is not supported.
      * @throws InvalidCodeException If the authorization code on the request has expired.
      * @throws ServerException If any internal server error occurs.
@@ -64,7 +63,7 @@ public abstract class GrantTypeHandler {
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     public AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException,
-            InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException, InvalidGrantException,
+            InvalidClientException, InvalidRequestException, InvalidGrantException,
             InvalidCodeException, ServerException, UnauthorizedClientException, InvalidScopeException,
             NotFoundException {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);

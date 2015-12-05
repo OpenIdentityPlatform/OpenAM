@@ -15,24 +15,14 @@
  */
 package org.forgerock.openam.rest.fluent;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.audit.events.AuditEventBuilder.EVENT_NAME;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Requests.*;
-import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
-import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
-import static org.forgerock.openam.rest.fluent.JsonUtils.jsonFromFile;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.forgerock.openam.rest.fluent.AuditTestUtils.*;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.mockito.BDDMockito.*;
 
 import org.forgerock.audit.AuditException;
-import org.forgerock.audit.events.AuditEvent;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.context.RequestAuditContext;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
@@ -43,35 +33,26 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.services.context.SecurityContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-import org.forgerock.openam.rest.resource.AuditInfoContext;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
-import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import javax.security.auth.Subject;
 
 /**
  * @since 13.0.0
  */
 public abstract class AbstractAuditFilterTest {
 
+    protected CrestAuditor auditor;
+    protected CrestAuditorFactory auditorFactory;
     protected AuditEventFactory auditEventFactory;
     protected AuditEventPublisher auditEventPublisher;
     protected Context context;
@@ -87,9 +68,11 @@ public abstract class AbstractAuditFilterTest {
 
     @BeforeMethod
     protected void setUp() throws Exception {
+        auditor = mock(CrestAuditor.class);
+        auditorFactory = mock(CrestAuditorFactory.class);
         auditEventPublisher = mock(AuditEventPublisher.class);
         auditEventFactory = mockAuditEventFactory();
-        context = new RequestAuditContext(fakeContext());
+        context = mockAuditContext();
         queryResourceHandler = mock(QueryResourceHandler.class);
         filterChain = mock(RequestHandler.class);
         createRequest = newCreateRequest("mockResource", json(object()));
@@ -99,6 +82,7 @@ public abstract class AbstractAuditFilterTest {
         patchRequest = newPatchRequest("mockResource");
         actionRequest = newActionRequest("mockResource", "actionId");
         queryRequest = newQueryRequest("mockResource");
+        given(auditorFactory.create(any(Context.class), any(Request.class))).willReturn(auditor);
     }
 
     @SuppressWarnings("unchecked")
@@ -111,50 +95,34 @@ public abstract class AbstractAuditFilterTest {
 
     @SuppressWarnings("unchecked")
     @Test(dataProvider = "auditedCrudpaqOperations")
-    public void publishesAccessAndSuccessAuditEventsForSuccessfulAuditedRequests(Runnable filteredOp) throws Exception {
+    public void shouldAuditAttemptAndSuccessEventsForSuccessfulAuditedRequests(Runnable filteredOp) throws Exception {
         // Given
-        givenAccessAuditingEnabled();
         givenFilteredCrudpaqOperationSucceeds();
 
         // When
         filteredOp.run();
 
         // Then
-        verifyPublishAccessEvent(AuditConstants.EventName.AM_ACCESS_ATTEMPT);
-        verifyTryPublishAccessEvent(AuditConstants.EventName.AM_ACCESS_OUTCOME);
+        verify(auditor).auditAccessAttempt();
+        verify(auditor).auditAccessSuccess(any(JsonValue.class));
     }
 
     @Test(dataProvider = "auditedCrudpaqOperations")
-    public void publishesAccessAndFailureAuditEventsForUnsuccessfulAuditedRequests(Runnable filteredOp) throws Exception {
+    public void shouldAuditAttemptAndFailureEventsForUnsuccessfulAuditedRequests(Runnable filteredOp) throws Exception {
         // Given
-        givenAccessAuditingEnabled();
         givenFilteredCrudpaqOperationFails();
 
         // When
         filteredOp.run();
 
         // Then
-        verifyPublishAccessEvent(AuditConstants.EventName.AM_ACCESS_ATTEMPT);
-        verifyTryPublishAccessEvent(AuditConstants.EventName.AM_ACCESS_OUTCOME);
+        verify(auditor).auditAccessAttempt();
+        verify(auditor).auditAccessFailure(anyInt(), anyString());
     }
 
     @Test(dataProvider = "unauditedCrudpaqOperations")
     public void publishesNoAuditsEventsForUnauditedRequests(Runnable filteredOp) throws Exception {
         // Given
-        givenAccessAuditingEnabled();
-        givenFilteredCrudpaqOperationSucceeds();
-
-        // When
-        filteredOp.run();
-
-        // Then
-        verifyNoEventsPublished();
-    }
-
-    @Test(dataProvider = "auditedCrudpaqOperations")
-    public void publishesNoAuditsEventsIfAccessAuditingDisabled(Runnable filteredOp) throws Exception {
-        // Given
-        givenAccessAuditingDisabled();
         givenFilteredCrudpaqOperationSucceeds();
 
         // When
@@ -167,54 +135,21 @@ public abstract class AbstractAuditFilterTest {
     @Test(dataProvider = "auditedCrudpaqOperations")
     public void cancelsOperationIfAccessAuditingGeneratesException(Runnable filteredOp) throws Exception {
         // Given
-        givenAccessAuditingEnabled();
         givenAccessAuditingFails();
 
         // When
         filteredOp.run();
 
         // Then
-        verifyPublishAccessEvent(AuditConstants.EventName.AM_ACCESS_ATTEMPT);
-        verifyTryPublishAccessEventNotCalled();
+        verify(auditor).auditAccessAttempt();
+        verifyNoOutcomeEventsPublished();
         verifyNoMoreInteractions(filterChain);
     }
 
-    private Context fakeContext() throws Exception {
-        final Context httpContext = new HttpContext(
-                jsonFromFile("/org/forgerock/openam/rest/fluent/httpContext.json"),
-                AbstractAuditFilterTest.class.getClassLoader());
-        final Subject callerSubject = new Subject();
-        final Context securityContext = new SecurityContext(httpContext, null, null);
-        final Context subjectContext = new SSOTokenContext(securityContext) {
-            @Override
-            public Subject getCallerSubject() {
-                return callerSubject;
-            }
-        };
-        return new AuditInfoContext(subjectContext, AuditConstants.Component.CREST);
-    }
-
-    private AuditEventFactory mockAuditEventFactory() {
-        AuditEventFactory auditEventFactory = mock(AuditEventFactory.class);
-        when(auditEventFactory.accessEvent(NO_REALM)).thenAnswer(new Answer<AMAccessAuditEventBuilder>() {
-            @Override
-            public AMAccessAuditEventBuilder answer(InvocationOnMock invocation) throws Throwable {
-                return new AMAccessAuditEventBuilder();
-            }
-        });
-        return auditEventFactory;
-    }
-
-    private void givenAccessAuditingEnabled() {
-        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)).willReturn(true);
-    }
-
-    private void givenAccessAuditingDisabled() {
-        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)).willReturn(false);
-    }
-
     private void givenAccessAuditingFails() throws AuditException {
-        doThrow(AuditException.class).when(auditEventPublisher).publish(eq(ACCESS_TOPIC), any(AuditEvent.class));
+        doThrow(AuditException.class).when(auditor).auditAccessSuccess(any(JsonValue.class));
+        doThrow(AuditException.class).when(auditor).auditAccessFailure(anyInt(), anyString());
+        doThrow(AuditException.class).when(auditor).auditAccessAttempt();
     }
 
     @SuppressWarnings("unchecked")
@@ -277,32 +212,13 @@ public abstract class AbstractAuditFilterTest {
         return new InternalServerErrorException("expected exception").asPromise();
     }
 
-    private void verifyPublishAccessEvent(AuditConstants.EventName eventName) throws AuditException {
-        ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
-        verify(auditEventPublisher).publish(eq(ACCESS_TOPIC), auditEventCaptor.capture());
-        assertThat(getEventName(auditEventCaptor)).isEqualTo(eventName.toString());
-    }
-
-    private void verifyTryPublishAccessEvent(AuditConstants.EventName eventName) {
-        ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
-        verify(auditEventPublisher).tryPublish(eq(ACCESS_TOPIC), auditEventCaptor.capture());
-        assertThat(getEventName(auditEventCaptor)).isEqualTo(eventName.toString());
-    }
-
-    private String getEventName(ArgumentCaptor<AuditEvent> auditEventCaptor) {
-        return auditEventCaptor.getValue().getValue().get(EVENT_NAME).asString();
-    }
-
     private void verifyNoEventsPublished() throws AuditException {
-        verifyPublishAccessEventNotCalled();
-        verifyTryPublishAccessEventNotCalled();
+        verify(auditor, never()).auditAccessAttempt();
+        verifyNoOutcomeEventsPublished();
     }
 
-    private void verifyPublishAccessEventNotCalled() throws AuditException {
-        verify(auditEventPublisher, never()).publish(any(String.class), any(AuditEvent.class));
-    }
-
-    private void verifyTryPublishAccessEventNotCalled() {
-        verify(auditEventPublisher, never()).tryPublish(any(String.class), any(AuditEvent.class));
+    private void verifyNoOutcomeEventsPublished() {
+        verify(auditor, never()).auditAccessSuccess(any(JsonValue.class));
+        verify(auditor, never()).auditAccessFailure(anyInt(), anyString());
     }
 }

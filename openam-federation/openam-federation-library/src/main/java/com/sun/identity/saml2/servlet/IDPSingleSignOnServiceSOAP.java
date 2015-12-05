@@ -24,18 +24,25 @@
  *
  * $Id: IDPSingleSignOnServiceSOAP.java,v 1.3 2009/10/14 23:59:44 exu Exp $
  *
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS
  */
 package com.sun.identity.saml2.servlet;
 
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
+import com.sun.identity.saml2.profile.FederatedSSOException;
 import com.sun.identity.saml2.profile.IDPSSOFederate;
+
 import java.io.IOException;
+import java.io.OutputStream;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletException;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
 
 /**
  * This class <code>SPSingleSignOnServiceSOAP</code> receives and processes 
@@ -51,7 +58,11 @@ public class IDPSingleSignOnServiceSOAP extends HttpServlet {
             
         // handle DOS attack
         SAMLUtils.checkHTTPContentLength(req);
-        IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
+        try {
+            IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
+        } catch (FederatedSSOException e) {
+            sendError(resp, e.getFaultCode(), e.getMessageCode(), e.getDetail());
+        }
     }
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -59,6 +70,38 @@ public class IDPSingleSignOnServiceSOAP extends HttpServlet {
             
         // handle DOS attack
         SAMLUtils.checkHTTPContentLength(req);
-        IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
+        try {
+            IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
+        } catch (FederatedSSOException e) {
+            sendError(resp, e.getFaultCode(), e.getMessageCode(), e.getDetail());
+        }
+    }
+
+    private void sendError(HttpServletResponse response, String faultCode, String rbKey, String detail)
+            throws IOException {
+        try {
+            SOAPMessage soapFault = SOAPCommunicator.getInstance().createSOAPFault(faultCode, rbKey, detail);
+            if (soapFault != null) {
+                //  Need to call saveChanges because we're
+                // going to use the MimeHeaders to set HTTP
+                // response information. These MimeHeaders
+                // are generated as part of the save.
+                if (soapFault.saveRequired()) {
+                    soapFault.saveChanges();
+                }
+                response.setStatus(HttpServletResponse.SC_OK);
+                SAML2Utils.putHeaders(soapFault.getMimeHeaders(), response);
+                // Write out the message on the response stream
+                try (OutputStream os = response.getOutputStream()) {
+                    soapFault.writeTo(os);
+                    os.flush();
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }
+        } catch (SOAPException ex) {
+            SAML2Utils.debug.error("IDPSingleSignOnServiceSOAP.sendError:" , ex);
+        }
+
     }
 }

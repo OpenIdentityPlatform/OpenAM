@@ -953,7 +953,7 @@
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
                             <Value>oathDeviceProfilesContainer</Value>
-                            <Value>kbaInformationContainer</Value>
+                            <Value>kbaInfoContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1048,7 +1048,7 @@
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
                             <Value>devicePrintProfiles</Value>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
@@ -1332,7 +1332,7 @@
                         syntax="string"
                         i18nKey="a20387">
                         <DefaultValues>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1634,7 +1634,7 @@
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
                             <Value>oathDeviceProfilesContainer</Value>
-                            <Value>kbaInformationContainer</Value>
+                            <Value>kbaInfoContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1732,7 +1732,7 @@
                             <Value>createTimestamp</Value>
                             <Value>oathDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -1888,7 +1888,7 @@
                         syntax="string"
                         i18nKey="a20387">
                         <DefaultValues>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2191,7 +2191,7 @@
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
                             <Value>oathDeviceProfilesContainer</Value>
-                            <Value>kbaInformationContainer</Value>
+                            <Value>kbaInfoContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2289,7 +2289,7 @@
                             <Value>createTimestamp</Value>
                             <Value>oathDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -2438,7 +2438,7 @@
                         syntax="string"
                         i18nKey="a20387">
                         <DefaultValues>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2830,7 +2830,7 @@
                             <Value>createTimestamp</Value>
                             <Value>oathDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -2982,7 +2982,7 @@
                         syntax="string"
                         i18nKey="a20387">
                         <DefaultValues>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3280,7 +3280,7 @@
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
                             <Value>oathDeviceProfilesContainer</Value>
-                            <Value>kbaInformationContainer</Value>
+                            <Value>kbaInfoContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3375,7 +3375,7 @@
                             <Value>createTimestamp</Value>
                             <Value>oathDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -3515,7 +3515,7 @@
                         syntax="string"
                         i18nKey="a20387">
                         <DefaultValues>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3837,7 +3837,7 @@
                             <Value>iplanet_am_user_password_reset_question_answer</Value>
                             <Value>iplanet_am_user_password_reset_force_reset</Value>
                             <Value>sunIdentityMSISDNNumber</Value>
-                            <Value>kbaInformation</Value>
+                            <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
                     </AttributeSchema>

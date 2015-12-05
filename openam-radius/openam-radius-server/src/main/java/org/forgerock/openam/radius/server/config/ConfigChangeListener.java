@@ -50,8 +50,7 @@ public class ConfigChangeListener implements ServiceListener {
     /**
      * Construct a ConfigChangeListener.
      *
-     * @param scm
-     *            - a ServiceConfigurationManager for the RADIUS service.
+     * @param serviceConfigurationManager - a ServiceConfigurationManager for the RADIUS service.
      */
     @Inject
     public ConfigChangeListener(@Named("RadiusServer") ServiceConfigManager serviceConfigurationManager) {

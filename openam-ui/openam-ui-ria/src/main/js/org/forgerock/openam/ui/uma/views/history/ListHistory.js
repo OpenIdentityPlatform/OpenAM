@@ -28,22 +28,22 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "underscore",
     "backbone",
     "backbone.paginator",
-    "backgrid",
     "backgrid-filter",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
+    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, AbstractView, BackgridUtils, Configuration,
-             Constants, RealmHelper, ThemeablePaginator) {
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, AbstractView,
+             Configuration, Constants, BackgridUtils, RealmHelper) {
     var HistoryView = AbstractView.extend({
         template: "templates/uma/views/history/ListHistory.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {},
 
-        render: function (args, callback) {
+        render: function () {
             var self = this,
                 collection,
                 grid,
@@ -93,7 +93,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                     label: $.t("uma.history.grid.header.2"),
                     cell: "string",
                     formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
-                        fromRaw: function (rawValue, model) {
+                        fromRaw: function (rawValue) {
                             return $.t("uma.history.grid.types." + rawValue.toLowerCase());
                         }
                     }),
@@ -119,7 +119,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
             });
 
             self.parentRender(function () {
-                self.$el.find("#backgridContainer").append(grid.render().el);
+                self.$el.find(".table-container").append(grid.render().el);
                 self.$el.find(".panel-body").append(paginator.render().el);
                 collection.fetch({ processData: false, reset: true });
             });

@@ -27,7 +27,7 @@
 #
 
 #
-# Portions Copyrighted [2010] [ForgeRock AS]
+# Portions Copyrighted 2010-2015 ForgeRock AS.
 #
 
 /* The following keys are used to configure the Debug service.
@@ -560,15 +560,6 @@ com.sun.identity.loginurl.goto=goto
 
 # Authentication web service URL for WSS Liberty use cases
 com.sun.identity.liberty.authnsvc.url=@SERVER_PROTOCOL@://@SERVER_HOST@:@SERVER_PORT@/@DEPLOY_URI@/Liberty/authnsvc
-
-# STS End User Token Plugin class
-com.sun.identity.wss.sts.clientusertoken=com.sun.identity.wss.sts.STSClientUserToken
-
-# WSS Provider Configuration Plugin class
-com.sun.identity.wss.provider.config.plugin=com.sun.identity.wss.provider.plugins.AgentProvider
-
-# WSS Authenticator Plugin Class
-com.sun.identity.wss.security.authenticator=com.sun.identity.wss.security.handler.DefaultAuthenticator
 
 com.sun.identity.jsr196.authenticated.user=AUTHENTICATED_USERS
 

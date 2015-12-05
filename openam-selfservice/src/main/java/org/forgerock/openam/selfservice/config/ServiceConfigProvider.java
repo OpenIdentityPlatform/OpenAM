@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.selfservice.config;
 
-import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.services.context.Context;
 
@@ -26,9 +25,10 @@ import org.forgerock.services.context.Context;
  * @param <C>
  *         the console configuration type
  *
+ * @supported.all.api
  * @since 13.0.0
  */
-public interface ServiceConfigProvider<C extends ConsoleConfig> {
+public interface ServiceConfigProvider<C extends SelfServiceConsoleConfig> {
 
 
     /**
@@ -53,6 +53,6 @@ public interface ServiceConfigProvider<C extends ConsoleConfig> {
      *
      * @return service config
      */
-    ProcessInstanceConfig<CustomSupportConfigVisitor> getServiceConfig(C config, Context context, String realm);
+    ProcessInstanceConfig getServiceConfig(C config, Context context, String realm);
 
 }

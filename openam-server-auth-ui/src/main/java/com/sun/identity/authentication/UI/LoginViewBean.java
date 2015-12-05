@@ -1281,8 +1281,8 @@ public class LoginViewBean extends AuthViewBeanBase {
                     }
                 } else if (callbacks[i] instanceof RedirectCallback) {
                     RedirectCallback rc = (RedirectCallback) callbacks[i];
-                    String status = 
-                        request.getParameter(rc.getStatusParameter()); 
+                    String status =
+                            request.getParameter(rc.getStatusParameter());
                     clearCookie(rc.getRedirectBackUrlCookieName());
                     loginDebug.message("Redirect callback : set status");                        
                     rc.setStatus(status);
@@ -1531,6 +1531,10 @@ public class LoginViewBean extends AuthViewBeanBase {
             if ((new_org != null && new_org.equals("true")) &&
                 (encoded != null && encoded.equals("true"))){
                 indexName = Base64.decodeAsUTF8String(reqModule);
+                if (indexName == null && loginDebug.warningEnabled()) {
+                    loginDebug.warning("As parameter 'encoded' is true, module name '{}' should be base64 encoded",
+                            reqModule);
+                }
             } else {
                 indexName = reqModule;
             }

@@ -14,26 +14,18 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-
 define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessDelegate",
+    "org/forgerock/commons/ui/user/delegates/AnonymousProcessDelegate",
     "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, RealmHelper) {
+], function ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, Constants, RealmHelper) {
 
     return AnonymousProcessView.extend({
-        initialize: function () {
-            AnonymousProcessView.prototype.initialize.call(this);
-
-            _.extend(this.events, {
-                "click #anonymousProcessReturn": "returnToLoginPage"
-            });
-        },
-
-        render: function (args, callback) {
+        render: function () {
             var params = Router.convertCurrentUrlToJSON().params,
                 overrideRealm = RealmHelper.getOverrideRealm(),
                 subRealm = RealmHelper.getSubRealm(),
@@ -41,9 +33,11 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
                 realmPath = "/",
                 continueRoute;
 
-            if (endpoint === "userRegistration") {
+            this.events["click #anonymousProcessReturn"] = "returnToLoginPage";
+
+            if (endpoint === Constants.SELF_SERVICE_REGISTER) {
                 continueRoute = Router.configuration.routes.continueSelfRegister;
-            } else if (endpoint === "forgottenPassword") {
+            } else if (endpoint === Constants.SELF_SERVICE_RESET_PASSWORD) {
                 continueRoute = Router.configuration.routes.continuePasswordReset;
             }
 

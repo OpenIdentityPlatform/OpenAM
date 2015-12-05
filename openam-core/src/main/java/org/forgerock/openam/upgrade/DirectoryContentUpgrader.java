@@ -74,8 +74,8 @@ public class DirectoryContentUpgrader {
     private static final String OATH_DEVICE_OC = "oathDeviceProfilesContainer";
     private static final String OATH2FAENABLED = "oath2faEnabled";
 
-    // Knowledge Based Authentication information container - the object class for kbaInformation
-    private static final String KBA_INFO_OC = "kbaInformationContainer";
+    // Knowledge Based Authentication information container - the object class for kbaInfo
+    private static final String KBA_INFO_OC = "kbaInfoContainer";
 
     private final List<Upgrader> upgraders = new ArrayList<Upgrader>();
     private final ConnectionFactory<Connection> connFactory;

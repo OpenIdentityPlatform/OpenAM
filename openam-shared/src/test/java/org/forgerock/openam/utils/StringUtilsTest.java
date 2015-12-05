@@ -22,7 +22,6 @@ package org.forgerock.openam.utils;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Locale;
 
 import org.testng.annotations.Test;
 

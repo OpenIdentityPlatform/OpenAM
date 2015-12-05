@@ -96,20 +96,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     if (key === "type") {
                         itemToDisplay["console.common.type"] = $.t(self.subjectI18n.key + type +
                             self.subjectI18n.title);
-                    } else {
-                        if (type === self.IDENTITY_RESOURCE) {
-                            // Do not display the Identities subject values, but display the merged hidden data instead.
-                            if (key !== "subjectValues") {
-                                list = "";
-                                _.forOwn(val, function (prop) {
-                                    list += prop + " ";
-                                });
+                    } else if (type === self.IDENTITY_RESOURCE) {
+                        // Do not display the Identities subject values, but display the merged hidden data instead.
+                        if (key !== "subjectValues") {
+                            list = "";
+                            _.forOwn(val, function (prop) {
+                                list += prop + " ";
+                            });
 
-                                itemToDisplay[self.subjectI18n.key + type + self.subjectI18n.props + key] = list;
-                            }
-                        } else {
-                            itemToDisplay[self.subjectI18n.key + type + self.subjectI18n.props + key] = val;
+                            itemToDisplay[self.subjectI18n.key + type + self.subjectI18n.props + key] = list;
                         }
+                    } else {
+                        itemToDisplay[self.subjectI18n.key + type + self.subjectI18n.props + key] = val;
                     }
                 });
             }

@@ -34,6 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageSubjectsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageEnvironmentsView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "bootstrap-tabdrop",
     "selectize"
 ], function ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, PolicyModel, PolicySetModel,
              PoliciesDelegate, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
@@ -61,7 +62,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             { name: "subjects", attr: ["subject"] },
             { name: "environments", attr: ["condition"] },
             { name: "responseAttributes", action: "getAllResponseAttributes" },
-            { name: "settings", attr: ["name", "description"] }
+            { name: "settings", attr: ["name", "description", "active"] }
         ],
 
         render: function (args, callback) {
@@ -155,6 +156,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                                     return (promises[promises.length] = $.Deferred()).resolve;
                                 };
 
+                            self.$el.find(".tab-menu .nav-tabs").tabdrop();
                             self.buildResourceTypeSelection();
 
                             ManageSubjectsView.render(self.data, resolve());
@@ -228,13 +230,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
 
-            _.each(dataFields, function (field, key, list) {
+            _.each(dataFields, function (field) {
                 dataField = field.getAttribute("data-field");
 
                 if (field.type === "checkbox") {
-                    if (field.checked) {
-                        app[dataField].push(field.value);
-                    }
+                    app[dataField] = field.checked;
                 } else {
                     app[dataField] = field.value;
                 }
@@ -245,7 +245,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             var savePromise,
                 self = this,
                 activeTabIndex,
-                activeTab ,
+                activeTab,
                 activeTabProperties;
 
             this.updateFields();
@@ -270,7 +270,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
             if (savePromise) {
                 savePromise
-                    .done(function (response) {
+                    .done(function () {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
                         if (self.newEntity) {
@@ -295,16 +295,16 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
         deletePolicy: function () {
             var self = this,
-                onSuccess = function (model, response, options) {
+                onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {
                         args: _.map([self.data.realmPath, self.data.policySetName], encodeURIComponent),
                         trigger: true
                     });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
-                onError = function (model, response, options) {
+                onError = function (model, response) {
                     Messages.addMessage({
-                        message: response.responseJSON.message,
+                        response: response,
                         type: Messages.TYPE_DANGER
                     });
                 };

@@ -15,84 +15,91 @@
 */
 package org.forgerock.openam.audit;
 
+import static java.util.Collections.singletonList;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
+
 import org.forgerock.audit.events.AuthenticationAuditEventBuilder;
+import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import com.iplanet.sso.SSOToken;
 
 /**
- * Shut up checkstyle.
+ * Builder for OpenAM audit authentication events.
+ *
+ * @since 13.0.0
  */
-public class AMAuthenticationAuditEventBuilder extends
-        AuthenticationAuditEventBuilder<AMAuthenticationAuditEventBuilder> {
+public final class AMAuthenticationAuditEventBuilder
+        extends AuthenticationAuditEventBuilder<AMAuthenticationAuditEventBuilder>
+        implements AMAuditEventBuilder<AMAuthenticationAuditEventBuilder> {
 
-//        /**
-//         * Provide value for "contextId" audit log field.
-//         *
-//         * @param contexts Map "contexts" value.
-//         * @return this builder for method chaining.
-//         */
-//        public AMAuthenticationAuditEventBuilder contexts(Map<String, String> contexts) {
-//                putContexts(jsonValue, contexts);
-//                return this;
-//        }
-//
-//        /**
-//         * Provide single value which will be used in "contexts" audit log field.
-//         *
-//         * @param context Context key which will be used in the "contexts" audit log field.
-//         * @param contextId Context key which will be used in the "contexts" audit log field.
-//         * @return this builder for method chaining.
-//         */
-//        public AMAuthenticationAuditEventBuilder context(AuditConstants.Context context, String contextId) {
-//                putContexts(jsonValue, Collections.singletonMap(context.toString(), contextId));
-//                return this;
-//        }
-//
-//        /**
-//         * Provide value for "realm" audit log field.
-//         *
-//         * @param value Value that should be stored in the 'realm' audit log field.
-//         * @return this builder for method chaining.
-//         */
-//        public AMAuthenticationAuditEventBuilder realm(String value) {
-//                putRealm(jsonValue, value);
-//                return this;
-//        }
-//
-//        /**
-//         * Provide value for "timestamp" audit log field.
-//         *
-//         * @param value Value that should be stored in the 'timestamp' audit log field.
-//         * @return this builder for method chaining.
-//         */
-//        public AMAuthenticationAuditEventBuilder time(long value) {
-//                timestamp(value);
-//                return this;
-//        }
-//
-//        /**
-//         * Provide value for "entries" audit log field.
-//         *
-//         * @param entries Entries that should be stored in the 'entries' audit log field.
-//         * @return this builder for method chaining.
-//         */
-//        public AMAuthenticationAuditEventBuilder entries(List<?> entries) {
-//                super.entries(entries);
-//                return this;
-//        }
-//
-//        /**
-//         * Provide a single value for the "entries" audit log field.
-//         *
-//         * @param moduleId The "moduleId" field for the single "entries" entry in the audit logs.
-//         * @param result The "result" field for the single "entries" entry in the audit logs.
-//         * @param info The "info" field for the single "entries" entry in the audit logs.
-//         * @return this builder for method chaining.
-//         */
-//        public AMAuthenticationAuditEventBuilder entries(String moduleId, String result, Map<String, String> info) {
-//                Map<String, Object> map = new HashMap<>();
-//                map.put("moduleId", moduleId);
-//                map.put("result", result);
-//                map.put("info", info);
-//                entries(Collections.singletonList(map));
-//                return this;
-//        }
+    @Override
+    public AMAuthenticationAuditEventBuilder realm(String value) {
+        putRealm(jsonValue, value);
+        return this;
+    }
+
+    /**
+     * Provide value for "entries" audit log field.
+     *
+     * @param entries Entries that should be stored in the 'entries' audit log field.
+     * @return this builder for method chaining.
+     */
+    public AMAuthenticationAuditEventBuilder entryList(List<AuthenticationAuditEntry> entries) {
+        List<Map<String, Object>> convertedEntries = new ArrayList<>();
+        for (AuthenticationAuditEntry entry : entries) {
+            convertedEntries.add(entry.toMap());
+        }
+        super.entries(convertedEntries);
+        return this;
+    }
+
+    /**
+     * Provide a single value for the "entries" audit log field.
+     *
+     * @param authenticationAuditEntry The single entry object representing the fields to be audited in the "entries"
+     *              field in the audit logs.
+     * @return this builder for method chaining.
+     */
+    public AMAuthenticationAuditEventBuilder entry(AuthenticationAuditEntry authenticationAuditEntry) {
+        if (authenticationAuditEntry != null) {
+            super.entries(singletonList(authenticationAuditEntry.toMap()));
+        }
+        return this;
+    }
+
+    @Override
+    public AMAuthenticationAuditEventBuilder component(AuditConstants.Component value) {
+        putComponent(jsonValue, value.toString());
+        return this;
+    }
+
+    @Override
+    public AMAuthenticationAuditEventBuilder eventName(AuditConstants.EventName name) {
+        return eventName(name.toString());
+    }
+
+    /**
+     * A principal of the authentication event.
+     *
+     * @param principal the principal
+     * @return an audit authentication event builder
+     */
+    public AMAuthenticationAuditEventBuilder principal(String principal) {
+        if (isNotEmpty(principal)) {
+            principal(singletonList(principal));
+        }
+        return this;
+    }
+
+    @Override
+    public AMAuthenticationAuditEventBuilder trackingIdFromSSOToken(SSOToken ssoToken) {
+        trackingId(getTrackingIdFromSSOToken(ssoToken));
+        return this;
+    }
+
 }

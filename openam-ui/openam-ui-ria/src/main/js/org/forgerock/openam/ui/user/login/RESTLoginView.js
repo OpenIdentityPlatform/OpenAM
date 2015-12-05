@@ -19,6 +19,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/CookieHelper",
@@ -27,61 +28,50 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "handlebars",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/util/ModuleLoader",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, AbstractView, AuthNDelegate, Configuration, Constants, CookieHelper, EventManager, Form2js,
-             Handlebars, i18nManager, Messages, ModuleLoader, RESTLoginHelper, RealmHelper, Router, SessionManager,
-             UIUtils, URIUtils) {
+], function ($, _, AbstractView, AuthNDelegate, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager,
+            Form2js, Handlebars, i18nManager, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils,
+            URIUtils) {
 
-    function populateTemplate (view, populatedTemplate) {
-        // A rendered template will be a string; an error will be an object
-        if (typeof populatedTemplate === "string") {
-            view.template = "templates/openam/authn/" + view.reqs.stage + ".html";
-        } else {
-            view.template = view.genericTemplate;
-        }
+    function populateTemplate () {
+        var self = this,
+            showSelfService = Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
 
-        view.data.showForgotPassword = false;
-        view.data.showRegister = false;
-        view.data.showSpacer = false;
-
-        if (Configuration.globalData.forgotPassword === "true") {
-            view.data.showForgotPassword = true;
-        }
-        if (Configuration.globalData.selfRegistration === "true") {
-            if (view.data.showForgotPassword) {
-                view.data.showSpacer = true;
-            }
-            view.data.showRegister = true;
-        }
+        // self-service links should be shown only on the first stage of the username/password stages
+        this.data.showForgotPassword = showSelfService && Configuration.globalData.forgotPassword === "true";
+        this.data.showForgotUserName = showSelfService && Configuration.globalData.forgotUsername === "true";
+        this.data.showSelfRegistration = showSelfService && Configuration.globalData.selfRegistration === "true";
+        this.data.showRememberLogin = showSelfService;
 
         if (Configuration.backgroundLogin) {
-            view.reloadData();
-            var args = {
+            this.prefillLoginData();
+
+            BootstrapDialog.show({
                 title: $.t("common.form.sessionExpired"),
-                cssClass: "loginDialog",
+                cssClass: "login-dialog",
                 closable: false,
-                message: $(populatedTemplate),
-                onshow: function (dialog) {
-                    view.element = dialog.$modal;
-                    dialog.$modalBody.find("form").removeClass("col-sm-6 col-sm-offset-3");
-                    view.rebind();
+                message: $("<div></div>"),
+                onshow: function () {
+                    var dialog = this;
+                    // change the target element of the view
+                    self.noBaseTemplate = true;
+                    self.element = dialog.message;
+                },
+                onshown: function () {
+                    // return back to the default state
+                    delete self.noBaseTemplate;
+                    self.element = "#content";
                 }
-            };
-            ModuleLoader.load("org/forgerock/commons/ui/common/components/BootstrapDialog")
-                .then(function (BootstrapDialog) {
-                    BootstrapDialog.show(args);
-                });
+            });
         }
     }
 
     var LoginView = AbstractView.extend({
-
         template: "templates/openam/RESTLoginTemplate.html",
         genericTemplate: "templates/openam/RESTLoginTemplate.html",
         unavailableTemplate: "templates/openam/RESTLoginUnavailableTemplate.html",
@@ -89,26 +79,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
         data: {},
         events: {
-            "click input[type=submit]": "formSubmit",
-            "click #passwordReset": "selfServiceClick",
-            "click #register": "selfServiceClick"
-        },
-
-        selfServiceClick: function (e) {
-            e.preventDefault();
-
-            var overrideRealmParameter = RealmHelper.getOverrideRealm(),
-                realmPath;
-
-            if (overrideRealmParameter) {
-                realmPath = overrideRealmParameter.substring(0, 1) === "/" ?
-                    overrideRealmParameter.slice(1) :
-                    overrideRealmParameter;
-            } else {
-                realmPath = RealmHelper.getSubRealm();
-            }
-
-            location.href = e.target.href + realmPath;
+            "click input[type=submit]": "formSubmit"
         },
 
         autoLogin: function () {
@@ -116,9 +87,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 submitContent = {},
                 auth = Configuration.globalData.auth;
 
-            _.each(_.keys(auth.urlParams),function (key) {
+            _.each(_.keys(auth.urlParams), function (key) {
                 if (key.indexOf("IDToken") > -1) {
-                    index = parseInt(key.substring(7),10) - 1;
+                    index = parseInt(key.substring(7), 10) - 1;
                     submitContent["callback_" + index] = auth.urlParams["IDToken" + key.substring(7)];
                 }
             });
@@ -150,7 +121,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             // START CUSTOM STAGE-SPECIFIC LOGIC HERE
 
-            // Known to be used by DataStore1.html
+            // Known to be used by username/password based authn stages
             if (this.$el.find("[name=loginRemember]:checked").length !== 0) {
                 expire = new Date();
                 expire.setDate(expire.getDate() + 20);
@@ -165,9 +136,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, submitContent);
         },
 
-        render: function (args, callback) {
+        render: function (args) {
             var urlParams = {}, // Deserialized querystring params
-                promise = $.Deferred(),
                 auth = Configuration.globalData.auth;
 
             if (args && args.length) {
@@ -184,8 +154,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 }
             }
 
-            AuthNDelegate.getRequirements().done(_.bind(function (reqs) {
-
+            AuthNDelegate.getRequirements().then(_.bind(function (reqs) {
                 var auth = Configuration.globalData.auth;
 
                 // Clear out existing session if instructed
@@ -199,13 +168,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 if (reqs.hasOwnProperty("tokenId")) {
                     // Set a variable for the realm passed into the browser so there can be a
                     // check to make sure it is the same as the current user's realm
-                    auth.passedInRealm = auth.subRealm;
+                    auth.passedInRealm = RealmHelper.getRealm();
                     // If we have a token, let's see who we are logged in as....
                     SessionManager.getLoggedUser(function (user) {
 
-                        if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase()
-                            && urlParams.ForceAuth !== "true")
-                        {
+                        if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase() &&
+                            urlParams.ForceAuth !== "true") {
                             Configuration.setProperty("loggedUser", user);
                             delete auth.passedInRealm;
 
@@ -221,9 +189,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                 });
 
                                 // Copied from EVENT_LOGIN_REQUEST handler
-                                if (Configuration.gotoURL
-                                    && _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1)
-                                {
+                                if (Configuration.gotoURL &&
+                                    _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1) {
                                     console.log("Auto redirect to " + Configuration.gotoURL);
                                     Router.navigate(Configuration.gotoURL, { trigger: true });
                                     delete Configuration.gotoURL;
@@ -242,39 +209,60 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
                 } else { // We aren't logged in yet, so render a form...
                     this.renderForm(reqs, urlParams);
-                    promise.resolve();
-
+                    if (CookieHelper.getCookie("invalidRealm")) {
+                        CookieHelper.deleteCookie("invalidRealm");
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
+                    }
                 }
-            }, this))
-            .fail(_.bind(function (error) {
+            }, this), _.bind(function (error) {
                 // If we can't render a login form, then the user must not be able to login
                 this.template = this.unavailableTemplate;
                 this.parentRender(function () {
                     if (error) {
-                        Messages.messages.addMessage(error);
+                        Messages.addMessage({
+                            type: Messages.TYPE_DANGER,
+                            message: error.message
+                        });
                     }
                 });
-
             }, this));
-
-            promise.done(function () {
-                if (CookieHelper.getCookie("invalidRealm")) {
-                    CookieHelper.deleteCookie("invalidRealm");
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
-                }
-            });
         },
 
         renderForm: function (reqs, urlParams) {
             var cleaned = _.clone(reqs),
                 implicitConfirmation = true,
-                promise = $.Deferred();
+                promise = $.Deferred(),
+                usernamePasswordStages = ["DataStore1", "AD1", "JDBC1", "LDAP1", "Membership1", "RADIUS1"],
+                template,
+                self = this;
+
+            this.userNamePasswordStage = _.contains(usernamePasswordStages, reqs.stage);
 
             cleaned.callbacks = [];
             _.each(reqs.callbacks, function (element) {
 
+                var redirectForm,
+                    redirectCallback;
+
                 if (element.type === "RedirectCallback") {
-                    window.location.replace(element.output[0].value);
+
+                    redirectCallback = _.object(_.map(element.output, function (o) {
+                        return [o.name, o.value];
+                    }));
+
+                    redirectForm = $("<form action='" + redirectCallback.redirectUrl + "' method='POST'></form>");
+
+                    if (redirectCallback.redirectMethod === "POST") {
+
+                        _.each(redirectCallback.redirectData, function (v, k) {
+                            redirectForm.append(
+                                "<input type='hidden' name='" + k + "' value='" + v + "' aria-hidden='true' />");
+                        });
+
+                        redirectForm.appendTo("body").submit();
+                    } else {
+                        window.location.replace(redirectCallback.redirectUrl);
+                    }
                 }
 
                 if (element.type === "ConfirmationCallback") {
@@ -302,7 +290,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     },
                     output: [{
                         name: "options",
-                        value: [ $.t("common.user.login") ]
+                        value: [$.t("common.user.login")]
                     }],
                     type: "ConfirmationCallback",
                     isSubmit: true
@@ -318,32 +306,32 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 Configuration.globalData.auth.autoLoginAttempts++;
             } else {
                 // Attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                UIUtils.compileTemplate(
-                    "templates/openam/authn/" + reqs.stage + ".html",
-                    _.extend(Configuration.globalData, this.data))
-                    .always(_.partial(function (view, template) {
-                        populateTemplate(view, template);
-                        view.parentRender(_.bind(function () {
-                            view.reloadData();
+                template = "templates/openam/authn/" + reqs.stage + ".html";
+                UIUtils.compileTemplate(template, _.extend({}, Configuration.globalData, this.data))
+                    .always(function (compiledTemplate) {
+                        // A rendered template will be a string; an error will be an object
+                        self.template = typeof compiledTemplate === "string" ? template : self.genericTemplate;
+
+                        populateTemplate.call(self);
+                        self.parentRender(function () {
+                            self.prefillLoginData();
                             // Resolve a promise when all templates will be loaded
                             promise.resolve();
-                        }, view));
-                    }, this));
+                        });
+                    });
             }
             return promise;
         },
-        reloadData: function () {
-            // This function is useful for adding logic that is used by stage-specific custom templates.
-
+        prefillLoginData: function () {
             var login = CookieHelper.getCookie("login");
 
             if (this.$el.find("[name=loginRemember]").length !== 0 && login) {
                 this.$el.find("input[type=text]:first").val(login);
-                this.$el.find("[name=loginRemember]").attr("checked","true");
+                this.$el.find("[name=loginRemember]").attr("checked", "true");
                 this.$el.find("[type=password]").focus();
             } else {
-                this.$el.find(":input:not([type='radio']):not([type='checkbox'])"
-                    + ":not([type='submit']):not([type='button']):first").focus();
+                this.$el.find(":input:not([type='radio']):not([type='checkbox'])" +
+                    ":not([type='submit']):not([type='button']):first").focus();
             }
         },
 
@@ -352,20 +340,20 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             // Rest does not accept the params listed in the array below as is
             // they must be transformed into the "authIndexType" and "authIndexValue" params
-            _.each(["authlevel","module","service","user"],function (p) {
-                if (urlParams[p]) {
-                    urlParams.authIndexType = ((p === "authlevel") ? "level" : p);
-                    urlParams.authIndexValue = urlParams[p];
-                    //***note special case for authLevel
-                    Configuration.globalData.auth.additional += "&authIndexType=" + ((p === "authlevel") ? "level" : p)
-                        + "&authIndexValue=" + urlParams[p];
+            _.each(["authlevel", "module", "service", "user", "resource", "resourceURL"], function (param) {
+                if (urlParams[param]) {
+                    urlParams.authIndexType = ((param === "authlevel") ? "level" : param);
+                    urlParams.authIndexValue = urlParams[param];
+                    //*** Note special case for authLevel
+                    Configuration.globalData.auth.additional += "&authIndexType=" +
+                        ((param === "authlevel") ? "level" : param) + "&authIndexValue=" + urlParams[param];
                 }
             });
 
             // Special case for SSORedirect
             if (urlParams.goto && urlParams.goto.indexOf("/SSORedirect") === 0) {
                 urlParams.goto = "/" + Constants.context + urlParams.goto;
-                Configuration.globalData.auth.additional.replace("&goto=","&goto=" + "/" + Constants.context);
+                Configuration.globalData.auth.additional.replace("&goto=", "&goto=" + "/" + Constants.context);
             }
 
             Configuration.globalData.auth.urlParams = urlParams;
@@ -382,7 +370,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             }
         });
 
+        function generateId (name) {
+            return _.isEmpty(name) ? "" : _.camelCase(name);
+        }
+
         renderContext = {
+            id: generateId(this.input.name),
             index: this.input.index,
             value: this.input.value,
             prompt: prompt
@@ -420,8 +413,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
                 if (options && options.value !== undefined) {
                     // if there is only one option then mark it as default.
-                    defaultOption = options.value.length > 1 ?
-                        _.find(this.output, { name: "defaultOption" }) : { "value": 0 };
+                    defaultOption = options.value.length > 1
+                        ? _.find(this.output, { name: "defaultOption" }) : { "value": 0 };
 
                     _.each(options.value, function (option, key) {
                         btnClass = (defaultOption && defaultOption.value === key) ? "btn-primary" : "btn-default";
@@ -436,16 +429,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             case "ChoiceCallback":
                 options = _.find(this.output, { name: "choices" });
 
-                // FIXME: If more than two then maybe a vertical radio list.
                 if (options && options.value !== undefined) {
                     result += renderPartial("Choice", {
                         values: _.map(options.value, function (option, key) {
-                            var checked = (self.input.value === key) ? "checked" : "", // Default option
-                                active = checked ? "active" : "";
-
                             return {
-                                active: active,
-                                checked: checked,
+                                active: self.input.value === key,
                                 key: key,
                                 value: option
                             };
@@ -459,6 +447,21 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         }
 
         return new Handlebars.SafeString(result);
+    });
+
+    Handlebars.registerHelper("decorateWithRealm", function (uri) {
+        uri = RealmHelper.decorateURLWithOverrideRealm(uri);
+        if (uri.slice(-1) !== "/") {
+            uri += "/";
+        }
+
+        return uri + RealmHelper.getSubRealm();
+    });
+
+    Handlebars.registerHelper("gotoParameter", function () {
+        return _.has(Configuration, "globalData.auth.urlParams.goto")
+            ? "&goto=" + encodeURIComponent(Configuration.globalData.auth.urlParams.goto)
+            : "";
     });
 
     return new LoginView();

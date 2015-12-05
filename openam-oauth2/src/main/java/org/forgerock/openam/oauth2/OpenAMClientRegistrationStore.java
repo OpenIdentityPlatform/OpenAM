@@ -33,6 +33,9 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.services.context.Context;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -58,21 +61,23 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
     private final PEMDecoder pemDecoder;
     private final OpenIdResolverService resolverService;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final ClientAuthenticationFailureFactory failureFactory;
 
     /**
      * Constructs a new OpenAMClientRegistrationStore.
-     *
      * @param realmNormaliser An instance of the RealmNormaliser.
      * @param pemDecoder A {@code PEMDecoder} instance.
+     * @param failureFactory
      */
     @Inject
     public OpenAMClientRegistrationStore(RealmNormaliser realmNormaliser, PEMDecoder pemDecoder,
             @Named(OAuth2Constants.Custom.JWK_RESOLVER) OpenIdResolverService resolverService,
-            OAuth2ProviderSettingsFactory providerSettingsFactory) {
+            OAuth2ProviderSettingsFactory providerSettingsFactory, ClientAuthenticationFailureFactory failureFactory) {
         this.realmNormaliser = realmNormaliser;
         this.pemDecoder = pemDecoder;
         this.resolverService = resolverService;
         this.providerSettingsFactory = providerSettingsFactory;
+        this.failureFactory = failureFactory;
     }
 
     /**
@@ -82,8 +87,8 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
             throws InvalidClientException, NotFoundException {
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
-        return new OpenAMClientRegistration(getIdentity(clientId, realm), pemDecoder, resolverService,
-                providerSettingsFactory.get(request));
+        return new OpenAMClientRegistration(getIdentity(clientId, realm, request), pemDecoder, resolverService,
+                providerSettingsFactory.get(request), failureFactory);
     }
 
     /**
@@ -94,11 +99,15 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
 
         final String normalisedRealm = realmNormaliser.normalise(realm);
         return new OpenAMClientRegistration(getIdentity(clientId, normalisedRealm), pemDecoder, resolverService,
-                providerSettingsFactory.get(normalisedRealm, context));
+                providerSettingsFactory.get(normalisedRealm, context), failureFactory);
+    }
+
+    private AMIdentity getIdentity(String uName, String realm) throws InvalidClientException {
+        return getIdentity(uName, realm, null);
     }
 
     @SuppressWarnings("unchecked")
-    private AMIdentity getIdentity(String uName, String realm) throws InvalidClientException {
+    private AMIdentity getIdentity(String uName, String realm, OAuth2Request request) throws InvalidClientException {
         final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
         final AMIdentity theID;
 
@@ -118,7 +127,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
             }
 
             if (results == null || results.size() != 1) {
-                throw new InvalidClientException("Client authentication failed");
+                throw failureFactory.getException(request, "Client authentication failed");
 
             }
 
@@ -128,14 +137,14 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
             if (theID.isActive()){
                 return theID;
             } else {
-                throw new InvalidClientException("Client authentication failed");
+                throw failureFactory.getException(request, "Client authentication failed");
             }
         } catch (SSOException e) {
             logger.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
-            throw new InvalidClientException("Client authentication failed");
+            throw failureFactory.getException(request, "Client authentication failed");
         } catch (IdRepoException e) {
             logger.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
-            throw new InvalidClientException("Client authentication failed");
+            throw failureFactory.getException(request, "Client authentication failed");
         }
     }
 }

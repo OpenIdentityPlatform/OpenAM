@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "backgrid",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -56,13 +56,12 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     });
 
     CommonShare = AbstractView.extend({
-        initialize: function (options) {
+        initialize: function () {
             this.parentModel = null;
         },
         template: "templates/uma/views/share/CommonShare.html",
         events: {
-            "click input#shareButton": "save",
-            "click #toggleAdvanced": "onToggleAdvanced"
+            "click input#shareButton": "save"
         },
         enableOrDisableShareButton: function () {
             var subjectValid = this.$el.find("#selectUser select")[0].selectize.getValue().length > 0,
@@ -76,14 +75,14 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                            response.responseJSON.message);
             // TODO : Fire and event message
         },
-        onParentModelSync: function (model, response) {
+        onParentModelSync: function (model) {
             // Hardwire the policyID into the policy as it's ID
             model.get("policy").set("policyId", this.parentModel.id);
 
             this.render();
         },
 
-        /**
+        /*
          * @returns Boolean whether the parent model required sync'ing
          */
         syncParentModel: function (id) {
@@ -104,7 +103,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         renderDialog: function (args, callback) {
             var self = this,
                 $div = $("<div></div>"),
-                data = {},
                 options = {
                     type: BootstrapDialog.TYPE_PRIMARY,
                     title: $.t("uma.share.shareResource"),
@@ -118,12 +116,12 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                             dialog.close();
                         }
                     }],
-                    onshow: function (dialog) {
+                    onshow: function () {
                         self.element = $div;
                         self.render(args, callback);
                     },
 
-                    onshown: function (dialog) {
+                    onshown: function () {
                         self.renderShareCounter(callback);
                     }
                 };
@@ -173,7 +171,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                     name: "scopes",
                     label: $.t("uma.resources.show.grid.2"),
                     cell: Backgrid.Cell.extend({
-                        render:function () {
+                        render: function () {
                             var formatted = this.model.get("scopes").pluck("name").join(", ");
                             this.$el.empty();
                             this.$el.append(formatted);
@@ -198,7 +196,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 self.renderShareCounter(callback);
                 self.$el.find("#advancedView").append(grid.render().el);
                 self.$el.find("#umaShareImage img").error(function () {
-                    $(this).parent().addClass("no-image");
+                    $(this).parent().addClass("fa-file-image-o no-image");
                 });
             });
         },
@@ -211,7 +209,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 persist: false,
                 create: false,
                 hideSelected: true,
-                onChange: function (values) {
+                onChange: function () {
                     self.enableOrDisableShareButton();
                 }
             });
@@ -284,7 +282,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             });
 
             this.parentModel.get("policy").save()
-            .done(function (response) {
+            .done(function () {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
                 self.reset();
             })
@@ -302,12 +300,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             var policy = this.parentModel.get("policy"),
                 permissionCount = policy ? policy.get("permissions").length : 0;
             ShareCounter.render(permissionCount, callback);
-        },
-
-        onToggleAdvanced: function (event) {
-            event.preventDefault();
-            this.$el.find("#uma").toggleClass("advanced-mode");
-            this.$el.find("#toggleAdvanced").blur();
         }
     });
 

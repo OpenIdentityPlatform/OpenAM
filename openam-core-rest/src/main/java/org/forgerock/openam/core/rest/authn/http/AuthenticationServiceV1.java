@@ -16,32 +16,26 @@
 
 package org.forgerock.openam.core.rest.authn.http;
 
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.forgerock.json.JsonValue.*;
 
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.Locale;
-
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 import org.forgerock.http.header.AcceptLanguageHeader;
-import org.forgerock.http.header.MalformedHeaderException;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.context.AttributesContext;
 import org.forgerock.http.header.ContentTypeHeader;
+import org.forgerock.http.header.MalformedHeaderException;
 import org.forgerock.http.protocol.Entity;
 import org.forgerock.http.protocol.Form;
 import org.forgerock.http.protocol.Request;
@@ -54,6 +48,8 @@ import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException
 import org.forgerock.openam.http.annotations.Contextual;
 import org.forgerock.openam.http.annotations.Post;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.services.context.AttributesContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.restlet.resource.ResourceException;
 
@@ -74,6 +70,7 @@ public class AuthenticationServiceV1 {
     private static final String ALWAYS_EXPIRE_HEADER = "0";
     private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
     private static final String REALM = "realm";
+    private static final String JSONCONTENT = "jsonContent";
 
     private final RestAuthenticationHandler restAuthenticationHandler;
 
@@ -118,7 +115,6 @@ public class AuthenticationServiceV1 {
             return handleErrorResponse(httpRequest, Status.UNSUPPORTED_MEDIA_TYPE, null);
         }
 
-        final HttpServletRequest request = getHttpServletRequest(context);
         final HttpServletResponse response = getHttpServletResponse(context);
 
         Form urlQueryString = getUrlQueryString(httpRequest);
@@ -132,6 +128,7 @@ public class AuthenticationServiceV1 {
                 DEBUG.message("AuthenticationService.authenticate() :: JSON parsing error", e);
                 return handleErrorResponse(httpRequest, Status.BAD_REQUEST, e);
             }
+            final HttpServletRequest request = getHttpServletRequest(context, jsonContent);
             JsonValue jsonResponse;
 
             if (jsonContent != null && jsonContent.size() > 0) {
@@ -181,7 +178,7 @@ public class AuthenticationServiceV1 {
      *
      * @return The HttpServletRequest
      */
-    private HttpServletRequest getHttpServletRequest(Context context) {
+    private HttpServletRequest getHttpServletRequest(Context context, JsonValue jsonValue) {
         AttributesContext requestContext = context.asContext(AttributesContext.class);
         Map<String, Object> requestAttributes = requestContext.getAttributes();
         final HttpServletRequest request = (HttpServletRequest) requestAttributes.get(HttpServletRequest.class.getName());
@@ -189,10 +186,12 @@ public class AuthenticationServiceV1 {
         // The request contains the realm query param then use that over any realm parsed from the URI
         final String queryParamRealm = request.getParameter(REALM);
         if (queryParamRealm != null && !queryParamRealm.isEmpty()) {
-            return request;
+            RealmContext rc = new RealmContext(context);
+            rc.setOverrideRealm(queryParamRealm);
+            return wrapRequest(request, rc, jsonValue);
         }
 
-        return wrapRequest(request, context.asContext(RealmContext.class));
+        return wrapRequest(request, context.asContext(RealmContext.class), jsonValue);
     }
 
     /**
@@ -201,14 +200,22 @@ public class AuthenticationServiceV1 {
      * @param request The HttpServletRequest.
      * @return The wrapped HttpServletRequest.
      */
-    private HttpServletRequest wrapRequest(HttpServletRequest request, final RealmContext realmContext) {
+    private HttpServletRequest wrapRequest(final HttpServletRequest request,
+                                           final RealmContext realmContext,
+                                           final JsonValue jsonValue) {
 
         return new HttpServletRequestWrapper(request) {
+
             @Override
             public String getParameter(String name) {
                 if (REALM.equals(name)) {
                     return realmContext.getResolvedRealm();
                 }
+
+                if (JSONCONTENT.equals(name)) {
+                    return jsonValue.toString();
+                }
+
                 return super.getParameter(name);
             }
 

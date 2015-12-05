@@ -22,6 +22,8 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorServiceFactory;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
+import org.forgerock.openam.shared.security.crypto.KeyPairProviderFactory;
+import org.forgerock.openam.shared.security.crypto.KeyPairProviderFactoryImpl;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -29,8 +31,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+/**
+ * Guice module for OpenAM shared bindings.
+ */
 @GuiceModule
 public class SharedGuiceModule extends AbstractModule {
+
+    /**
+     * The Debug instance annotation name for the thread manager.
+     */
     public static final String DEBUG_THREAD_MANAGER = "amThreadManager";
 
     @Override
@@ -39,6 +48,7 @@ public class SharedGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(DEBUG_THREAD_MANAGER))
                 .toInstance(Debug.getInstance(DEBUG_THREAD_MANAGER));
         bind(ShutdownManager.class).toInstance(com.sun.identity.common.ShutdownManager.getInstance());
+        bind(KeyPairProviderFactory.class).to(KeyPairProviderFactoryImpl.class);
     }
 
     @Provides @Inject
@@ -48,11 +58,7 @@ public class SharedGuiceModule extends AbstractModule {
 
     @Provides @Inject @Singleton
     ThreadMonitor provideThreadMonitor(ExecutorServiceFactory factory,
-                                              ShutdownManager wrapper,
-                                              @Named(DEBUG_THREAD_MANAGER) Debug debug) {
-        return new ThreadMonitor(
-                factory.createCachedThreadPool(DEBUG_THREAD_MANAGER),
-                wrapper,
-                debug);
+            ShutdownManager wrapper, @Named(DEBUG_THREAD_MANAGER) Debug debug) {
+        return new ThreadMonitor(factory.createCachedThreadPool(DEBUG_THREAD_MANAGER), wrapper, debug);
     }
 }

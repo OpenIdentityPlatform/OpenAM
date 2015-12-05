@@ -15,32 +15,42 @@
  */
 package org.forgerock.openam.audit;
 
+import static java.util.Collections.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
-import static org.forgerock.openam.utils.ClientUtils.getClientIPAddress;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.utils.ClientUtils.*;
 
-import com.iplanet.sso.SSOToken;
-import org.forgerock.audit.events.AccessAuditEventBuilder;
-import org.forgerock.http.protocol.Header;
-import org.forgerock.services.context.Context;
-import org.forgerock.http.MutableUri;
-import org.forgerock.services.context.ClientContext;
-import org.forgerock.http.protocol.Headers;
-import org.forgerock.http.protocol.Request;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.audit.events.AccessAuditEventBuilder;
+import org.forgerock.http.MutableUri;
+import org.forgerock.http.protocol.Form;
+import org.forgerock.http.protocol.Header;
+import org.forgerock.http.protocol.Headers;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.ClientContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.Reject;
+
+import com.iplanet.sso.SSOToken;
 
 /**
  * Builder for OpenAM audit access events.
  *
  * @since 13.0.0
  */
-public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessAuditEventBuilder> {
+public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessAuditEventBuilder>
+        implements AMAuditEventBuilder<AMAccessAuditEventBuilder> {
 
     /**
      * Provide value for "component" audit log field.
@@ -53,13 +63,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         return this;
     }
 
-    /**
-     * Adds trackingId from property of {@link SSOToken}, if the provided
-     * <code>SSOToken</code> is not <code>null</code>.
-     *
-     * @param ssoToken The SSOToken from which the trackingId value will be retrieved.
-     * @return this builder
-     */
+    @Override
     public AMAccessAuditEventBuilder trackingIdFromSSOToken(SSOToken ssoToken) {
         trackingId(getTrackingIdFromSSOToken(ssoToken));
         return this;
@@ -80,10 +84,11 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
                 request.getLocalAddr(),
                 request.getLocalPort(),
                 request.getLocalName());
-        http(
+        httpRequest(
+                request.isSecure(),
                 request.getMethod(),
                 request.getRequestURL().toString(),
-                request.getQueryString() == null ? "" : request.getQueryString(),
+                getQueryParametersAsMap(request),
                 getHeadersAsMap(request));
         return this;
     }
@@ -102,10 +107,16 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
                 clientInfo.getRemotePort(),
                 isReverseDnsLookupEnabled() ? clientInfo.getRemoteHost() : "");
         MutableUri uri = request.getUri();
-        http(
+        String uriScheme = request.getUri().getScheme();
+        if (StringUtils.isNotEmpty(uriScheme)) {
+            uriScheme = uriScheme.toLowerCase();
+        }
+        boolean isSecure = "https".equals(uriScheme);
+        httpRequest(
+                isSecure,
                 request.getMethod(),
                 uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + uri.getPath(),
-                uri.getQuery() == null ? "" : uri.getQuery(),
+                getQueryParametersAsMap(request.getForm()),
                 getHeadersAsMap(request.getHeaders()));
         return this;
     }
@@ -123,6 +134,26 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
     }
 
     /**
+     * Adds a JSON object of detail for the request.
+     * @param detail A JsonValue object containing extra attributes of the request.
+     * @return This builder.
+     */
+    public AMAccessAuditEventBuilder requestDetail(JsonValue detail) {
+        return addDetail(detail, REQUEST);
+    }
+
+    private AMAccessAuditEventBuilder addDetail(JsonValue detail, String field) {
+        if (detail != null) {
+            if (jsonValue.isDefined(field)) {
+                jsonValue.get(field).put(DETAIL, detail.getObject());
+            } else {
+                this.jsonValue.put(field, object(field(DETAIL, detail.getObject())));
+            }
+        }
+        return this;
+    }
+
+    /**
      * Provide value for "realm" audit log field.
      *
      * @param realm The "realm" value.
@@ -133,26 +164,63 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         return this;
     }
 
+    /**
+     * Set response without elapsed time.
+     * @param status The status of the response.
+     * @param statusCode The status code, if applicable.
+     * @return The builder.
+     */
+    public final AMAccessAuditEventBuilder response(AccessAuditEventBuilder.ResponseStatus status, String statusCode) {
+        Object object = object(
+                field("status", status == null ? null : status.toString()),
+                field("statusCode", statusCode));
+        this.jsonValue.put("response", object);
+        return this;
+    }
+
+    /**
+     * Set response with detail without elapsed time.
+     * @param status The status of the response.
+     * @param statusCode The status code, if applicable.
+     * @param detail The detail of the response.
+     * @return The builder.
+     */
+    public final AMAccessAuditEventBuilder responseWithDetail(AccessAuditEventBuilder.ResponseStatus status,
+            String statusCode, JsonValue detail) {
+        Reject.ifNull(detail);
+        Object object = object(
+                field("status", status == null ? null : status.toString()),
+                field("statusCode", statusCode),
+                field("detail", detail.getObject()));
+        this.jsonValue.put("response", object);
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
     private Map<String, List<String>> getHeadersAsMap(HttpServletRequest request) {
-        Map<String, List<String>> headers = new HashMap<>();
-        Enumeration headerNamesEnumeration = request.getHeaderNames();
-        while (headerNamesEnumeration.hasMoreElements()) {
-            String headerName = (String) headerNamesEnumeration.nextElement();
-            List<String> headerValues = new ArrayList<>();
-            Enumeration headersEnumeration = request.getHeaders(headerName);
-            while (headersEnumeration.hasMoreElements()) {
-                headerValues.add((String) headersEnumeration.nextElement());
-            }
-            headers.put(headerName, headerValues);
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (Enumeration<String> e = request.getHeaderNames(); e.hasMoreElements();) {
+            String name = e.nextElement();
+            headers.put(name, list(request.getHeaders(name)));
         }
         return headers;
     }
 
     private Map<String, List<String>> getHeadersAsMap(Headers requestHeaders) {
-        Map<String, List<String>> headers = new HashMap<>();
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         for (Map.Entry<String, Header> header : requestHeaders.asMapOfHeaders().entrySet()) {
             headers.put(header.getKey(), new ArrayList<>(header.getValue().getValues()));
         }
         return headers;
+    }
+
+    private Map<String, List<String>> getQueryParametersAsMap(HttpServletRequest request) {
+        return AMAuditEventBuilderUtils.getQueryParametersAsMap(request.getQueryString());
+    }
+
+    private Map<String, List<String>> getQueryParametersAsMap(Form form) {
+        Map<String, List<String>> queryParameters = new LinkedHashMap<>();
+        queryParameters.putAll(form);
+        return queryParameters;
     }
 }

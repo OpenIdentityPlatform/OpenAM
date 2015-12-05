@@ -16,16 +16,18 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView", [
     "jquery",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, AbstractView, Configuration, Constants, Form, FormHelper, SMSRealmDelegate) {
+], function ($, _, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSRealmDelegate) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
@@ -39,7 +41,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
             this.data.realmLocation = args[0];
 
-            SMSRealmDelegate.authentication.get(this.data.realmLocation).done(function (data) {
+            SMSRealmDelegate.authentication.get(this.data.realmLocation).then(function (data) {
                 self.data.formData = data;
 
                 self.parentRender(function () {
@@ -51,6 +53,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
                     if (callback) {
                         callback();
                     }
+                });
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
                 });
             });
         },
@@ -67,8 +74,16 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             this.data.form.reset();
         },
         save: function (event) {
-            var promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, this.data.form.data());
+            var data = this.data.form.data(),
+                promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, data),
+                self = this;
 
+            promise.then(function () {
+                // update formData for correct re-render tab after saving
+                _.extend(self.data.formData.values, data);
+
+            });
+            // animate save button
             FormHelper.bindSavePromiseToElement(promise, event.currentTarget);
         }
     });

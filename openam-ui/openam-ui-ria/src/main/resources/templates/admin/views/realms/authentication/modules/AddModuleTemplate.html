@@ -1,13 +1,14 @@
 <div class="form-group">
     <label>{{t "console.authentication.modules.moduleName"}}</label>
-    <input type="text" id="newModuleName" class="form-control" placeholder=""  value="">
+    <input autofocus type="text" id="newModuleName" class="form-control" placeholder=""  value="">
 </div>
 <div class="form-group">
     <label>{{t "console.authentication.modules.moduleType"}}</label>
     <select class="form-control" id="newModuleType">
         <option disabled selected value="">{{t "console.authentication.modules.selectModuleType"}}</option>
-        {{#each moduleTypes}}
+        {{#each types}}
         <option value="{{ _id }}">{{ name }}</option>
         {{/each}}
     </select>
 </div>
+<div id="alertContainer"></div>

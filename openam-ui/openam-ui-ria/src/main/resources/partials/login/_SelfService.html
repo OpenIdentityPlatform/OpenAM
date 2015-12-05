@@ -1,0 +1,18 @@
+<nav class="text-center clearfix remember-forgot" role="navigation">
+    <ul>
+        {{#if showForgotUserName}}
+            <li><a href="{{decorateWithRealm (url 'forgotUsername')}}">{{t "templates.user.LoginTemplate.forgotUsername"}}</a></li>
+        {{/if}}
+
+        {{#if showForgotPassword}}
+            <li><a href="{{decorateWithRealm (url 'passwordReset')}}">{{t "templates.user.LoginTemplate.resetPassword"}}</a></li>
+        {{/if}}
+    </ul>
+</nav>
+
+{{#if showSelfRegistration}}
+    <div class="toggle-login-register">
+        <hr>
+        {{t "templates.login.newHere" }} <a href="{{decorateWithRealm (url 'selfRegistration')}}">{{t "templates.login.createAccount" }}</a>
+    </div>
+{{/if}}

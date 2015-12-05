@@ -38,28 +38,29 @@ public class RadiusServiceManager implements SetupListener, ShutdownListener {
 
     private static final Debug LOG = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
-    private RadiusServerManager radiusServiceStarter = null;
+    private RadiusServerManager radiusServiceManager = null;
 
     @Override
     public synchronized void setupComplete() {
-        LOG.message("RadiusServiceManager's addListener() called.");
-        if (radiusServiceStarter == null) {
-            LOG.message("No instance of radiusServiceStarter yet. Obtaining from Guice.");
-            radiusServiceStarter = InjectorHolder.getInstance(RadiusServerManager.class);
+        LOG.message("Entering RadiusServiceManager.setupComplete");
+        if (radiusServiceManager == null) {
+            LOG.message("No instance of radiusServerManager yet. Obtaining from Guice.");
+            radiusServiceManager = InjectorHolder.getInstance(RadiusServerManager.class);
             ShutdownManager.getInstance().addShutdownListener(this);
-            radiusServiceStarter.startUp();
+            radiusServiceManager.startUp();
         } else {
             LOG.warning("addListener called but radiusServiceStarter already exists");
         }
+        LOG.message("Leaving RadiusServiceManager.setupComplete");
     }
 
     @Override
     public synchronized void shutdown() {
-        LOG.message("RadiusServiceManager's shutdown() called");
-        if (radiusServiceStarter != null) {
-            radiusServiceStarter.shutdown();
-            radiusServiceStarter = null;
+        LOG.message("Entering RadiusServiceManager.shutdown");
+        if (radiusServiceManager != null) {
+            radiusServiceManager.shutdown();
+            radiusServiceManager = null;
         }
+        LOG.message("Leaving RadiusServiceManager.shutdown");
     }
-
 }

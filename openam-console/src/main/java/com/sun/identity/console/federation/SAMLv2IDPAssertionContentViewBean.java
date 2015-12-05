@@ -24,7 +24,7 @@
  *
  * $Id: SAMLv2IDPAssertionContentViewBean.java,v 1.5 2008/09/25 01:52:20 babysunil Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.federation;
@@ -246,29 +246,19 @@ public class SAMLv2IDPAssertionContentViewBean extends SAMLv2Base {
         return map;
     }
     
-    private Map getExtendedValues() {
-        Map extendedValues = new HashMap();
+    private Map<String, Set<String>> getExtendedValues() {
+        Map<String, Set<String>> extendedValues = new HashMap<>();
         try {
-            
-            //gets extended metadata values
-            SAMLv2Model model = (SAMLv2Model)getModel();
-            Map attr = model.getExtendedIdentityProviderAttributes(
-                    realm, entityName);
-            Set entries = attr.entrySet();
-            Iterator iterator = entries.iterator();
-            
-            //the list of values is converted to a set
-            while (iterator.hasNext()) {
-                Map.Entry entry = (Map.Entry)iterator.next();
-                extendedValues.put((String)entry.getKey(),
-                        convertListToSet((List)entry.getValue()) );
+            SAMLv2Model model = (SAMLv2Model) getModel();
+            Map<String, List<String>> attr = model.getExtendedIdentityProviderAttributes(realm, entityName);
+
+            for (Map.Entry<String, List<String>> entry : attr.entrySet()) {
+                extendedValues.put(entry.getKey(), convertListToSet(entry.getValue()) );
             }
         } catch (AMConsoleException e) {
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-                    e.getMessage() );
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage() );
         }
         return extendedValues;
     }
-
 }
 

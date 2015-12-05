@@ -56,7 +56,10 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+
+import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
+import org.forgerock.oauth2.core.IntrospectableToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -67,7 +70,7 @@ import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -117,7 +120,6 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         this.dnWrapper = dnWrapper;
 
     }
-
 
     /**
      * {@inheritDoc}
@@ -186,12 +188,17 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                             AccessController.doPrivileged(AdminTokenAction.getInstance()),
                             token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
 
-                    return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id, authTime);
+                    return new OpenAMResourceOwner(id.getName(), id, authTime);
 
                 } catch (Exception e) { //Exception as chance of MANY exception types here.
                     logger.error("Error authenticating user against OpenAM: ", e);
                     throw new LoginRequiredException();
                 }
+            } else if (PASSWORD.equals(request.getParameter(GRANT_TYPE))) {
+                // If we're doing password grant type, the SSOToken will have been created and deleted again within
+                // OpenAMResourceOwnerAuthenticator. The request will not have a session, and so the token will have
+                // been null from the attempted creation in L148.
+                return getResourceOwner(request.getToken(AccessToken.class));
             } else {
                 if (openIdPrompt.containsNone()) {
                     logger.error("Not pre-authenticated and prompt parameter equals none.");
@@ -205,15 +212,17 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                 } else if (!isRefreshToken(request)) {
                     throw authenticationRequired(request);
                 } else {
-                    RefreshToken refreshToken = request.getToken(RefreshToken.class);
-                    return new OpenAMResourceOwner(
-                            refreshToken.getResourceOwnerId(), IdUtils.getIdentity(refreshToken.getResourceOwnerId(),
-                            refreshToken.getRealm()));
+                    return getResourceOwner(request.getToken(RefreshToken.class));
                 }
             }
         } catch (SSOException | UnsupportedEncodingException | URISyntaxException e) {
             throw new AccessDeniedException(e);
         }
+    }
+
+    private ResourceOwner getResourceOwner(IntrospectableToken token) {
+        return new OpenAMResourceOwner(token.getResourceOwnerId(), IdUtils.getIdentity(token.getResourceOwnerId(),
+                token.getRealm()));
     }
 
     private boolean isRefreshToken(OAuth2Request request) {
@@ -252,7 +261,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     private long getMaxAge(OAuth2Request request)
             throws URISyntaxException, AccessDeniedException, ServerException,
             NotFoundException, EncodingException, UnauthorizedClientException, ResourceOwnerAuthenticationRequired,
-            SSOException, ParseException, ClientAuthenticationFailedException, InvalidClientException, InvalidRequestException {
+            SSOException, ParseException, InvalidClientAuthZHeaderException, InvalidClientException, InvalidRequestException {
 
         final ClientCredentials clientCredentials = clientCredentialsReader.extractCredentials(request, null);
 

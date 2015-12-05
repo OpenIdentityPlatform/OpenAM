@@ -20,8 +20,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "underscore",
     "backbone",
     "backbone.paginator",
-    "backgrid",
     "backgrid-filter",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, Configuration,
+], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Configuration,
              EventManager, Router, Constants, BackgridUtils, URLHelper, PoliciesDelegate, PolicyModel,
              AbstractListView) {
     var PoliciesView = AbstractListView.extend({
@@ -103,6 +103,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                     editable: false
                 },
                 {
+                    name: "active",
+                    label: $.t("console.authorization.policies.list.grid.1"),
+                    cell: BackgridUtils.TemplateCell.extend({
+                        template: "templates/admin/backgrid/cell/StatusCell.html"
+                    }),
+                    sortable: false,
+                    editable: false
+                },
+                {
                     name: "",
                     cell: BackgridUtils.TemplateCell.extend({
                         className: "fr-col-btn-2",
@@ -111,7 +120,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                             "click .edit-row-item": "editItem",
                             "click .delete-row-item": "deleteItem"
                         },
-                        editItem: function (e) {
+                        editItem: function () {
                             Router.routeTo(Router.configuration.routes.realmsPolicyEdit, {
                                 args: _.map([self.data.realmPath, self.data.policySetModel.id, this.model.id],
                                     encodeURIComponent),
@@ -154,7 +163,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
 
                     if (self.data.items.length) {
                         self.renderToolbar();
-                        self.$el.find(".backgrid-container").append(grid.render().el);
+                        self.$el.find(".table-container").append(grid.render().el);
                         self.$el.find("#paginationContainer").append(paginator.render().el);
                     }
 

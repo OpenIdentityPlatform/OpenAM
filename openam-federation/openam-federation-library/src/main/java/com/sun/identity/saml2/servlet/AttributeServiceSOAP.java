@@ -38,6 +38,8 @@ import javax.servlet.ServletException;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import org.w3c.dom.Element;
 
 
@@ -78,13 +80,11 @@ public class AttributeServiceSOAP extends HttpServlet {
         SAMLUtils.checkHTTPContentLength(req);
 
         AttributeQuery attrQuery = null;
-        MimeHeaders headers = SAML2Utils.getHeaders(req);
 
         try {
-            InputStream is = req.getInputStream();
-            SOAPMessage msg = SAML2Utils.mf.createMessage(headers, is);
-            Element elem = SAML2Utils.getSamlpElement(msg,
-                SAML2Constants.ATTRIBUTE_QUERY);
+            SOAPMessage msg = SOAPCommunicator.getInstance().getSOAPMessage(req);
+            Element elem = SOAPCommunicator.getInstance().getSamlpElement(msg,
+                    SAML2Constants.ATTRIBUTE_QUERY);
             attrQuery =
                 ProtocolFactory.getInstance().createAttributeQuery(elem);
         } catch (Exception ex) {
@@ -140,13 +140,13 @@ public class AttributeServiceSOAP extends HttpServlet {
             Response samlResp = AttributeQueryUtil.processAttributeQuery(
                 attrQuery, req, resp, attrAuthorityEntityID, realm,
                 attrQueryProfileAlias);
-            replymsg = SAML2Utils.createSOAPMessage(
-                samlResp.toXMLString(true, true), false);
+            replymsg = SOAPCommunicator.getInstance().createSOAPMessage(
+                    samlResp.toXMLString(true, true), false);
         } catch (Throwable t) {
             SAML2Utils.debug.error("AttributeServiceSOAP.doGetPost: " +
                 "Unable to create SOAP message:", t);
-            replymsg = SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT,
-                "unableToCreateSOAPMessage", null);
+            replymsg = SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "unableToCreateSOAPMessage", null);
         }
 
         try {

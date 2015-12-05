@@ -13,14 +13,17 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.rest.query;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.*;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -28,9 +31,6 @@ import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class QueryResponsePresentationTest {
 
@@ -145,6 +145,24 @@ public class QueryResponsePresentationTest {
         QueryRequest sortedRequest = makeSortedQueryRequest("^name");
         QueryResponsePresentation.perform(mockHandler, sortedRequest, makeResourceResponses("ghj,def,abc"));
         assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("abc");
+    }
+
+    @Test
+    public void shouldNotSortResultsOnUncomparableObjects()  {
+        QueryRequest sortedRequest = makeSortedQueryRequest("^name");
+
+        List<ResourceResponse> responseList = new ArrayList<>();
+        responseList.add(Responses.newResourceResponse(null, null, JsonValueBuilder.jsonValue()
+                .put("name", Collections.singletonMap("key2", "value2"))
+                .put("place", "a").build()
+        ));
+        responseList.add(Responses.newResourceResponse(null, null, JsonValueBuilder.jsonValue()
+                .put("name", Collections.singletonMap("key1", "value1"))
+                .put("place", "z").build()
+        ));
+
+        QueryResponsePresentation.perform(mockHandler, sortedRequest, responseList);
+        assertThat(extractId(captor.getAllValues(), 0)).isEqualTo("a");
     }
 
     @Test

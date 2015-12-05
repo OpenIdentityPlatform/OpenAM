@@ -37,6 +37,9 @@ public final class ServiceConfigProviderFactoryImpl implements ServiceConfigProv
 
     /**
      * Constructs a new service provider factory instance.
+     *
+     * @param injector
+     *         dependency injector
      */
     @Inject
     public ServiceConfigProviderFactoryImpl(Injector injector) {
@@ -46,7 +49,7 @@ public final class ServiceConfigProviderFactoryImpl implements ServiceConfigProv
 
     @Override
     @SuppressWarnings("unchecked")
-    public <C extends ConsoleConfig> ServiceConfigProvider<C> getProvider(C config) {
+    public <C extends SelfServiceConsoleConfig> ServiceConfigProvider<C> getProvider(C config) {
         String providerClassName = config.getConfigProviderClass();
         ServiceConfigProvider<?> provider = providers.get(providerClassName);
 
@@ -70,8 +73,7 @@ public final class ServiceConfigProviderFactoryImpl implements ServiceConfigProv
 
             return injector.getInstance(providerClass);
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Unknown class name for provider", e);
+            throw new IllegalArgumentException("Unknown class name " + className + " for provider", e);
         }
     }
-
 }

@@ -29,13 +29,12 @@ define("org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate", [
             var app = {
                 id: key
             };
-            _.each(apps[key], function (v,k) { app[k] = v[0]; });
+            _.each(apps[key], function (v, k) { app[k] = v[0]; });
             return app;
         });
     }
 
     obj.getMyApplications = function () {
-        var self = this;
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/assigned"),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
@@ -43,7 +42,6 @@ define("org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate", [
     };
 
     obj.getAvailableApplications = function () {
-        var self = this;
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/available"),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }

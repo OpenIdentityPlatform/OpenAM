@@ -24,6 +24,13 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
     "org/forgerock/openam/ui/common/components/TreeNavigation"
 ], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, TreeNavigation) {
     var RealmTreeNavigationView = TreeNavigation.extend({
+        events: {
+            "click [data-event]": "sendEvent"
+        },
+        sendEvent: function (e) {
+            e.preventDefault();
+            EventManager.sendEvent($(e.currentTarget).data().event, this.data.realmPath);
+        },
         template: "templates/admin/views/realms/RealmTreeNavigationTemplate.html",
         realmExists: function (path) {
             return SMSGlobalDelegate.realms.get(path);
@@ -32,20 +39,16 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
             var self = this;
 
             this.data.realmPath = args[0];
-            this.data.realmName = this.data.realmPath === "/" ? $.t("console.common.topLevelRealm") :
-                this.data.realmPath;
+            this.data.realmName = this.data.realmPath === "/" ? $.t("console.common.topLevelRealm")
+                : this.data.realmPath;
 
             this.realmExists(this.data.realmPath).done(function () {
                 TreeNavigation.prototype.render.call(self, args, callback);
             }).fail(function (xhr) {
-                if (_.isObject(xhr) && _.isObject(xhr.responseJSON) && xhr.responseJSON.code === 401) {
-                    // session timeout, redirect to login page
-                    Router.routeTo(Router.configuration.routes.login, {
-                        args: [],
-                        trigger: true
-                    });
-                } else {
-                    // invalid realm specificied, return to realm list page
+                /**
+                 * If a non-existant realm was specified, return to realms list
+                 */
+                if (xhr.status === 404) {
                     Router.routeTo(Router.configuration.routes.realms, {
                         args: [],
                         trigger: true

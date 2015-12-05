@@ -2,5 +2,5 @@
     <div class="page-header">
         <h1>{{t "openam.authentication.unavailable"}}</h1>
     </div>
-    <a title='{{t "templates.user.RestLogoutTemplate.returnToLogin"}}' href="#login/{{auth.subRealm}}">{{t "templates.user.RestLogoutTemplate.returnToLogin"}}</a>
+    <a title='{{t "templates.user.RestLogoutTemplate.returnToLogin"}}' href="{{ routeTo 'login' '/'auth.subRealm }}">{{t "templates.user.RestLogoutTemplate.returnToLogin"}}</a>
 </div>

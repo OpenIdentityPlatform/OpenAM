@@ -45,7 +45,7 @@ define("org/forgerock/openam/ui/admin/models/Form", [
          * Passwords are not delivered to the UI from the server. Thus we set a placeholder informing the user that
          * the password will remain unchanged if they do nothing
          */
-        $(element).find("input:password").attr("placeholder", $.t("common.form.unchanged"));
+        $(element).find("input:password").attr("placeholder", $.t("common.form.passwordPlaceholder"));
 
         $(element).find(".help-block").addClass("hidden-lg hidden-md hidden-sm").each(function () {
             var group = $(this).parent(),

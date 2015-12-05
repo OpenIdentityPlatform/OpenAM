@@ -28,7 +28,7 @@
  * OF SUCH DAMAGE.
  */
 /**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 package com.sun.identity.shared.encode;
 
@@ -81,8 +81,14 @@ public class Base64 {
      * Decodes the supplied String into a UTF-8 String.
      *
      * @param s String to encode.
+     * @return the base64 decoded value or null if the input was not base64 encoded.
      */
     public static String decodeAsUTF8String(String s) {
-        return new String(decode(s), Charset.forName("UTF-8"));
+        byte[] decodedValue = decode(s);
+        if (decodedValue != null) {
+            return new String(decode(s), Charset.forName("UTF-8"));
+        } else {
+            return null;
+        }
     }
 }

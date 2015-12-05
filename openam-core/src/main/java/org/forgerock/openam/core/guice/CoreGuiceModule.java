@@ -66,10 +66,27 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+import com.sun.identity.sm.ldap.ConfigAuditorFactory;
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.ServletContext;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.auditors.SMSAuditFilter;
+import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CTSPersistentStoreImpl;
 import org.forgerock.openam.cts.CoreTokenConfig;
@@ -102,6 +119,8 @@ import org.forgerock.openam.session.blacklist.NoOpSessionBlacklist;
 import org.forgerock.openam.session.blacklist.SessionBlacklist;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.openam.sm.config.ConsoleConfigHandlerImpl;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
@@ -113,21 +132,6 @@ import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.thread.ExecutorServiceFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.ServletContext;
-import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -181,6 +185,8 @@ public class CoreGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
         bind(Debug.class).annotatedWith(Names.named(DataLayerConstants.DATA_LAYER_DEBUG))
                 .toInstance(Debug.getInstance(DataLayerConstants.DATA_LAYER_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named("amSMS"))
+                .toInstance(Debug.getInstance("amSMS"));
 
         bind(Debug.class).annotatedWith(Names.named(PolicyMonitor.POLICY_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(PolicyMonitor.POLICY_MONITOR_DEBUG));
@@ -255,6 +261,12 @@ public class CoreGuiceModule extends AbstractModule {
                 .implement(AMIdentityRepository.class, AMIdentityRepository.class)
                 .build(AMIdentityRepositoryFactory.class));
 
+        install(new FactoryModuleBuilder()
+                .implement(SMSAuditor.class, SMSAuditor.class)
+                .build(ConfigAuditorFactory.class));
+
+        Multibinder.newSetBinder(binder(), SMSAuditFilter.class);
+
         Multibinder.newSetBinder(binder(), IdRepoCreationListener.class);
 
         bind(Stats.class)
@@ -266,6 +278,8 @@ public class CoreGuiceModule extends AbstractModule {
         bind(SessionCookies.class).toInstance(SessionCookies.getInstance());
         bind(SessionURL.class).toInstance(SessionURL.getInstance());
         bind(SessionServiceURLService.class).toInstance(SessionServiceURLService.getInstance());
+
+        bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
     }
 
     @Provides

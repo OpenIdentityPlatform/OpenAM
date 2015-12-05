@@ -16,5 +16,7 @@
 
 /**
  * Contains classes for handling self service console configuration.
+ *
+ * @supported.api
  */
 package org.forgerock.openam.selfservice.config;

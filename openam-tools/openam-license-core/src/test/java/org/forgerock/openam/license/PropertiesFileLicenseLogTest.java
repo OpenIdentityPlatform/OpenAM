@@ -1,6 +1,4 @@
 /*
- * Copyright 2014 ForgeRock, AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.license;
@@ -40,7 +40,7 @@ import static org.testng.Assert.assertTrue;
  * @since 12.0.0
  */
 public class PropertiesFileLicenseLogTest {
-    private static final Random random = new Random();
+    private static final Random RANDOM = new Random();
     /** A temporary directory to log into. */
     private File logDir;
 
@@ -49,8 +49,10 @@ public class PropertiesFileLicenseLogTest {
         // Attempt to create a temporary log directory (Files.createTempDirectory only available in Java 7)
         int tries = 0;
         do {
-            if (tries++ > 3) { throw new SkipException("Unable to create temp dir"); }
-            logDir = new File(System.getProperty("java.io.tmpdir") + File.separator + "licensetest" + random.nextInt());
+            if (tries++ > 3) {
+                throw new SkipException("Unable to create temp dir");
+            }
+            logDir = new File(System.getProperty("java.io.tmpdir") + File.separator + "licensetest" + RANDOM.nextInt());
         } while (!logDir.mkdir());
 
         System.out.println("tmpdir = " + logDir);

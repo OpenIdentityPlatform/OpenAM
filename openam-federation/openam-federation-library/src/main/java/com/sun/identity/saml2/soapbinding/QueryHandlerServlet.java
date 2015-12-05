@@ -24,13 +24,11 @@
  *
  * $Id: QueryHandlerServlet.java,v 1.9 2009/09/22 22:49:28 madan_ranganath Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.soapbinding;
 
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
@@ -67,6 +65,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -132,16 +131,9 @@ public class QueryHandlerServlet extends HttpServlet {
                         + ",queryMetaAlias=" + queryMetaAlias
                         + ", pdpEntityID=" + pdpEntityID);
             }
-            
-            // Get all the headers from the HTTP request
-            MimeHeaders headers = SAML2Utils.getHeaders(request);
-            
-            // Get the body of the HTTP request
-            InputStream is = request.getInputStream();
-            
-            //create SOAPMessage
-            SOAPMessage soapMsg = SAML2Utils.mf.createMessage(headers, is);
-            Element soapBody = SAML2Utils.getSOAPBody(soapMsg);
+
+            SOAPMessage soapMsg = SOAPCommunicator.getInstance().getSOAPMessage(request);
+            Element soapBody = SOAPCommunicator.getInstance().getSOAPBody(soapMsg);
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "SOAPMessage received.:"
                         + XMLUtils.print(soapBody));
@@ -158,8 +150,8 @@ public class QueryHandlerServlet extends HttpServlet {
                 // Error
                debug.error(classMethod + "SOAPMessage is null");
                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-               reply = SAML2Utils.createSOAPFault(
-                    SAML2Constants.SERVER_FAULT,"invalidQuery",null);
+               reply = SOAPCommunicator.getInstance().createSOAPFault(
+                       SAML2Constants.SERVER_FAULT, "invalidQuery", null);
             }
              // Write out the message on the response stream
             OutputStream os = response.getOutputStream();
@@ -202,22 +194,22 @@ public class QueryHandlerServlet extends HttpServlet {
         SOAPMessage soapMessage = null;
         String pepEntityID = null;
         try {
-            Element soapBody = SAML2Utils.getSOAPBody(soapMsg);
+            Element soapBody = SOAPCommunicator.getInstance().getSOAPBody(soapMsg);
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "SOAPMessage recd. :"
                         + XMLUtils.print(soapBody));
             }
-            Element reqAbs = SAML2Utils.getSamlpElement(soapMsg,
-                                                        REQUEST_ABSTRACT);
+            Element reqAbs = SOAPCommunicator.getInstance().getSamlpElement(soapMsg,
+                    REQUEST_ABSTRACT);
             
             Response samlResponse = 
                 processSAMLRequest(realm,pdpEntityID,reqAbs,request,soapMsg);
-            soapMessage = SAML2Utils.createSOAPMessage(
-                samlResponse.toXMLString(true,true), false);
+            soapMessage = SOAPCommunicator.getInstance().createSOAPMessage(
+                    samlResponse.toXMLString(true, true), false);
         } catch (SAML2Exception se) {
             debug.error(classMethod + "XACML Response Error SOAP Fault", se);
-            soapMessage = SAML2Utils.createSOAPFault(
-                    SAML2Constants.SERVER_FAULT,"invalidQuery",se.getMessage());
+            soapMessage = SOAPCommunicator.getInstance().createSOAPFault(
+                    SAML2Constants.SERVER_FAULT, "invalidQuery", se.getMessage());
         }
         return soapMessage;
     }
@@ -365,14 +357,11 @@ public class QueryHandlerServlet extends HttpServlet {
                         SAML2Utils.getSAML2MetaManager().
                         getPolicyEnforcementPointDescriptor(
                         realm,pepEntityID);
-                X509Certificate cert = 
-                        KeyUtil.getPEPVerificationCert(pep,pepEntityID);
-                if (cert == null ||
-                        !samlRequest.isSignatureValid(cert)) {
+                Set<X509Certificate> verificationCerts = KeyUtil.getPEPVerificationCerts(pep, pepEntityID);
+                if (verificationCerts.isEmpty() || !samlRequest.isSignatureValid(verificationCerts)) {
                     // error
                     debug.error(classMethod + "Invalid signature in message");
                     throw new SAML2Exception("invalidQuerySignature");
-                    
                 } else {
                     debug.message(classMethod + "Valid signature found");                    
                 }

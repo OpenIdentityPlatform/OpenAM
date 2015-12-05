@@ -14,8 +14,6 @@
  * Portions copyright 2014-2015 ForgeRock AS.
  */
 
-
-
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/SubjectResponseAttributesView", [
     "jquery",
     "underscore",

@@ -18,7 +18,7 @@ package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.*;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -261,12 +261,27 @@ public class PendingRequestsService {
                 .thenAsync(new AsyncFunction<UmaPolicy, UmaPolicy, ResourceException>() {
                     @Override
                     public Promise<UmaPolicy, ResourceException> apply(UmaPolicy umaPolicy) {
-                        if (umaPolicy.getScopes().containsAll(scopes)) {
-                            return Promises.newResultPromise(umaPolicy);
+                        JsonValue policyJson = umaPolicy.asJson();
+                        JsonValue subjectPermission = null;
+                        for (JsonValue permission : policyJson.get(PERMISSIONS_KEY)) {
+                            if (permission.get(SUBJECT_KEY).asString().equals(request.getRequestingPartyId())) {
+                                subjectPermission = permission;
+                                break;
+                            }
                         }
-                        scopes.addAll(umaPolicy.getScopes());
-                        return policyService.updatePolicy(context, request.getResourceSetId(),
-                                createPolicyJson(request.getResourceSetId(), request.getRequestingPartyId(), scopes));
+                        if (subjectPermission == null) {
+                            subjectPermission = json(object(
+                                    field(SUBJECT_KEY, request.getRequestingPartyId()),
+                                    field(SCOPES_KEY, array())));
+                            policyJson.get(PERMISSIONS_KEY).add(subjectPermission.getObject());
+                        }
+
+                        Set<String> subjectScopes =
+                                new HashSet<>(subjectPermission.get(SCOPES_KEY).asCollection(String.class));
+                        subjectScopes.addAll(scopes);
+                        subjectPermission.put(SCOPES_KEY, subjectScopes);
+
+                        return policyService.updatePolicy(context, request.getResourceSetId(), policyJson);
                     }
                 }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
                     @Override
@@ -282,11 +297,11 @@ public class PendingRequestsService {
 
     private JsonValue createPolicyJson(String resourceSetId, String requestingPartyId, Collection<String> scopes) {
         return json(object(
-                field("policyId", resourceSetId),
-                field("permissions", array(
+                field(POLICY_ID_KEY, resourceSetId),
+                field(PERMISSIONS_KEY, array(
                         object(
-                                field("subject", requestingPartyId),
-                                field("scopes", scopes)
+                                field(SUBJECT_KEY, requestingPartyId),
+                                field(SCOPES_KEY, scopes)
                         )
                 ))));
     }

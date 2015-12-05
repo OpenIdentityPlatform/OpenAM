@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 
 import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.OrderedSet;
@@ -913,8 +914,8 @@ public class IDPProxyUtil {
    public static Map getSessionPartners(SOAPMessage message) {
        try { 
             Map sessMap = new HashMap(); 
-            Element reqElem = SAML2Utils.getSamlpElement(message, 
-                "LogoutRequest");
+            Element reqElem = SOAPCommunicator.getInstance().getSamlpElement(message,
+                    "LogoutRequest");
             LogoutRequest logoutReq = 
                 ProtocolFactory.getInstance().createLogoutRequest(reqElem);
             List siList = logoutReq.getSessionIndex();

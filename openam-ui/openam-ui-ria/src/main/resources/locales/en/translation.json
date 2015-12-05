@@ -120,6 +120,9 @@
                         "requests" : "Requests"
                     },
                     "console": "Console"
+                },
+                "username" : {
+                    "label" : "Signed in as"
                 }
             }
         }
@@ -134,14 +137,17 @@
                 "noAccountQuestion" : "Don't have an account?",
                 "registerAccount" : "Register your account",
                 "problemLoggingQuestion" : "Having trouble logging in?",
-                "resetPassword" : "Reset your password",
-                "siteIdentification" : "Site Identification",
-                "siteIdentificationExplanation" : "Please enter your login name.<br />Your site image and pass phrase will be displayed here.",
-                "socialAuthentication" : "Or login with:"
+                "socialAuthentication" : "Or login with:",
+                "resetPassword" : "Forgot Password?",
+                "forgotUsername" : "Forgot Username?"
             },
             "404" : {
                 "pageNotFound" : "Page not found",
                 "requestedPageCouldNotBeFound" : "The requested page could not be found."
+            },
+            "403" : {
+                "title" : "Forbidden",
+                "description" : "You are not authorized to view this page."
             },
             "DefaultBaseTemplate" : {
                 "orPhone" : ", or phone"
@@ -300,12 +306,22 @@
             "allow": "Allow",
             "deny": "Deny",
             "notApplicable": "n/a",
+            "enable": "Enable",
+            "disable": "Disable",
+            "enabled": "Enabled",
+            "disabled": "Disabled",
+            "activate": "Activate",
+            "deactivate": "Deactivate",
+            "active": "Active",
+            "inactive": "Inactive",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
+            "build": "Build",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
             "deleteSelected" : "Delete Selected",
             "startTypingToSearch": "Start typing to search",
-            "unchanged": "unchanged",
+            "passwordPlaceholder": "••••••••••••",
+            "redirecting": "Redirecting...",
             "validation" : {
                 "VALID_PHONE_FORMAT": "Contains invalid characters",
                 "VALID_NAME_FORMAT": "Contains invalid characters",
@@ -322,7 +338,7 @@
                 "atLeastOneNumber" : "At least one number",
                 "atLeast8Characters" : "At least 8 characters",
                 "cannotMatchLogin" : "Cannot match login",
-                "confirmationMatchesPassword" : "Confirmation matches password",
+                "confirmationMatchesPassword" : "Confirmation must match password",
                 "usernameExists" : "Username already exists",
                 "emailAddressAlreadyExists" : "Email address already exists",
                 "onlyAlphabeticCharacters" : "Only alphabetic characters",
@@ -348,24 +364,44 @@
             }
         },
         "user" : {
+            "userQuery" : {
+                "mainEnterPrompt": "Enter your ",
+                "optionalEnterPrompt": "or your ",
+                "orAllEnterPrompt" : "or all of the following information",
+                "title" : "Enter details to find your account",
+                "any" : "Any of these:"
+            },
             "passwordReset" : {
                 "title": "Reset Your Password",
                 "completed": "Your password has been successfully reset.",
                 "failed": "Unable to reset your password",
                 "tryAgain": "Try Resetting Your Password Again",
-                "return": "Return to Login Page"
+                "answerQuestions": "Answer the security questions below to reset your password."
             },
             "selfRegistration" : {
                 "title": "Register Your Account",
                 "completed": "Your account has been successfully registered.",
                 "failed": "Unable to register your account",
-                "tryAgain": "Try Registering Again",
-                "return": "Return to Login Page"
+                "tryAgain": "Try Registering Again"
             },
-            "emailVerification" : {
-                "description" : "Enter the email address associated with your account to reset your password. We will send you an email that will allow you to reset your password.",
-                "send": "Send"
+            "forgotUsername" : {
+                "title" : "Retrieve Your Username",
+                "checkEmail" : "An email containing your username has been sent to your account.",
+                "failed": "Unable to retrieve your username",
+                "found": "Username found:",
+                "tryAgain": "Try Finding Your Username Again",
+                "answerQuestions": "Answer the security questions below to retrieve your username."
             },
+            "kba" : {
+                "description": "Select security question(s) below. These questions will help us verify your identity if you forget your password.",
+                "provideAnother": "Add another question",
+                "selectQuestion": "Select a security question",
+                "provideYourOwn": "Provide your own",
+                "customQuestion": "Custom Security Question",
+                "answer": "Security Answer",
+                "securityQuestions": "Security Questions"
+            },
+            "returnToLoginPage": "Return to Login Page",
             "userIdValidation" : "Enter the username or email address associated with your account. We will send you an email with a link that will allow you to reset your password.",
             "emailValidation" : "Enter your email address to proceed. We will send you an email with a link that will allow you to continue registering.",
             "send": "Send",
@@ -373,10 +409,12 @@
             "user" : "User",
             "login" : "Log in",
             "loginConfirm" : "You have already logged in. Do you want to log out and then login to a different organization?",
-            "profile" : "Profile",
+            "selfService" : "Self-service",
+            "administration": "Administration",
             "basicInfo" : "Basic Info",
             "myProfile" : "My Profile",
             "userProfile" : "User profile",
+            "profile": "Profile",
             "username" : "Username",
             "emailAddress" : "Email address",
             "givenName" : "First Name",
@@ -494,7 +532,7 @@
             "unavailable": "Unable to login to OpenAM"
         },
         "deviceManagement": {
-            "header": "Device Management",
+            "header": "Authentication Devices",
             "noneFound": "You have not registered any devices",
             "menu": {
                 "recoveryCodes": "Recovery Codes",
@@ -525,8 +563,7 @@
                 "success": "Resource successfully shared",
                 "fail": "Failed to share resource"
             },
-            "notSpecifiedResource": "You have not specified a resource to share.",
-            "advanced" : "Advanced"
+            "notSpecifiedResource": "You have not specified a resource to share."
         },
         "resources": {
             "title": "Resources",
@@ -579,6 +616,7 @@
                 "subtitle": "Users allowed to access this resource and their permissions",
                 "grid": ["User", "Last accessed", "Permissions"],
                 "share": "Share",
+                "editLabels" : "Edit Labels",
                 "revoke": "Unshare Resource",
                 "revokeAllMessage": "Are you sure you want to revoke all access?",
                 "resource" : "Resource",
@@ -669,7 +707,8 @@
                 "inUse": {
                     "title": "Edit module",
                     "message": "The <code>__moduleName__</code> module is being used by the following Authentication Chain(s) <code>__usedChains__</code>. Editing this module may change their behaviour. <br><br>Are you sure you want to continue?"
-                }
+                },
+                "moduleNameValidationError" : "Spaces are not allowed in a module's name"
             },
             "chains": {
                 "title" : "Authentication Chains",
@@ -758,22 +797,12 @@
             "title": "Realms",
             "description" : "Use realms to organize subjects and configuration data. Within each realm you can configure data stores, administration privileges, authentication chains, authorization policies, and other realm-specific settings.",
             "newRealm": "New Realm",
-            "actions": {
-                "edit": "Edit",
-                "disable": "Disable",
-                "activate": "Activate",
-                "delete": "Delete"
-            },
-            "active": "Active",
-            "inactive": "Inactive",
-            "realmName": "Realm name",
-            "realmPath": "Path",
-            "realmAliases": "Realm/DNS Aliases",
+            "header": ["Realm name", "Status", "Path", "Realm/DNS Aliases"],
+            "parentRealmCannotDeleted": "Parent-realms cannot be deleted. Please delete any sub-realms first.",
             "warningDialog": {
                 "title": "Delete \"__realmName__\"?",
-                "activeMessage": "This is an active realm. All configuration data will be lost if deleted. You can set the realm as inactive to prevent login but retain configuration data. <br>Do you want to delete the realm?",
-                "inactiveMessage": "This is an inactive realm. No one can currently login. All configuration data will be lost if deleted. <br>Are you sure you want to delete the realm?",
-                "deactivate" : "Deactivate"
+                "activateMessage": "This is an active realm. All configuration data will be lost if deleted. You can set the realm as inactive to prevent login but retain configuration data. <br>Do you want to delete this realm?",
+                "deactivateMessage": "This is an inactive realm. No one can currently login. All configuration data will be lost if deleted. <br>Are you sure you want to delete this realm?"
             },
             "createUpdateRealmDialog": {
                 "createTitle": "New Realm",
@@ -781,7 +810,7 @@
             },
             "realmStatusPopover": {
                 "title": "Realm Status",
-                "content": "If the realm is disabled, all OpenAM services will be unavailable for all users in this realm."
+                "content": "If the realm is inactive, all OpenAM services will be unavailable for all users in this realm."
             },
             "realmAliasesPopover": {
                 "title": "Realm/DNS Aliases",
@@ -1079,7 +1108,7 @@
                     }
                 },
                 "list": {
-                    "grid": ["Name"],
+                    "grid": ["Name", "Status"],
                     "addNew": "Add a New Policy",
                     "description": "Create, edit or delete authorization policies that apply to this policy set.",
                     "noPolicies": "You haven't added any policies to this set yet."

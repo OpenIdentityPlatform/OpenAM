@@ -17,9 +17,7 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -41,6 +39,6 @@ public interface TokenIntrospectionService {
      * @param request The OAuth 2.0 request
      * @return Details of the specified token.
      */
-    JsonValue introspect(OAuth2Request request) throws InvalidClientException, InvalidRequestException, NotFoundException, ClientAuthenticationFailedException, ServerException, BadRequestException, InvalidGrantException;
+    JsonValue introspect(OAuth2Request request) throws InvalidClientException, InvalidRequestException, NotFoundException, ServerException, BadRequestException, InvalidGrantException;
 
 }

@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect.restlet;
 
 import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
+import static org.forgerock.openam.rest.audit.RestletBodyAuditor.noBodyAuditor;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -92,6 +93,7 @@ public class WebFinger extends Application {
     }
 
     private Filter auditWithOAuthFilter(Restlet restlet) {
-        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders);
+        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders, noBodyAuditor(),
+                noBodyAuditor());
     }
 }

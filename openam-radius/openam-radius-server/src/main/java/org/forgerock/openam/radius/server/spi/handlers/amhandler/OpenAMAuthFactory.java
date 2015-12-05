@@ -26,6 +26,14 @@ import com.sun.identity.authentication.spi.AuthLoginException;
  */
 public class OpenAMAuthFactory {
 
+    /**
+     * Return on OpenAM auth context for the requested realm.
+     *
+     * @param realm the realm to which the returned <code>AuthContext</code> should relate.
+     * @return a newly created <code>AuthContext</code> that may be used to authenticate a subject against realm.
+     * @throws AuthLoginException - if AuthContext creation fails. This exception is kept for backward compatibility
+     *             only.
+     */
     public AuthContext getAuthContext(String realm) throws AuthLoginException {
         return new AuthContext(realm);
     }

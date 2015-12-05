@@ -21,6 +21,7 @@ import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
+import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import java.security.SignatureException;
@@ -236,7 +237,11 @@ public class RestAuthenticationHandler {
 
                 JsonValue jsonCallbacks;
                 try {
-                    jsonCallbacks = handleCallbacks(request, response, postBody, callbacks);
+                    if (callbacks.length == 1 && callbacks[0] instanceof RedirectCallback && postBody != null) {
+                        jsonCallbacks = null;
+                    } else {
+                        jsonCallbacks = handleCallbacks(request, response, postBody, callbacks);
+                    }
                 } catch (RestAuthResponseException e) {
                     // Include the authId in the JSON response.
                     if (authId == null) {

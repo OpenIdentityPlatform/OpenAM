@@ -53,7 +53,7 @@ public class AccessManager {
                   "attribute-schema-not-exist=Attribute schema {0} did not exist.",
                   "application-type-invalid=Application Type {0} is invalid.",
                   "actions-required=actions attributes are required. Example: get=true",
-                  "resources-required=resources attributes are required. This defines the resources that are supported by this application.",
+                  "resources-required=resources attributes are required. This defines the resources that are supported by this policy set.",
                   "subjects-required=subjects attributes are required. This defines the subject plugin classes for administration console.",
                   "conditions-required=conditions attributes are required. This defines the condition plugin classes for administration console.",
                   "entitlement-combiner-required=entitlementCombiner attribute is required.",
@@ -1941,7 +1941,7 @@ public class AccessManager {
           mandatoryOptions={
                   "realm|e|s|Name of realm.",
                   "agentname|b|s|Name of agent.",
-                  "agenttype|t|s|Type of agent. Possible values: J2EEAgent, WebAgent, WSCAgent, WSPAgent, STSAgent, DiscoveryAgent, 2.2_Agent, SharedAgent, OAuth2Client"
+                  "agenttype|t|s|Type of agent. Possible values: J2EEAgent, WebAgent, 2.2_Agent, SharedAgent, OAuth2Client"
           },
           optionAliases={},
           macro="authentication",
@@ -2658,12 +2658,12 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.CreateApplication",
-          description="Create application.",
+          description="Create policy set.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
                   "applicationtype|t|s|Application type name",
-                  "name|m|s|Application name"},
+                  "name|m|s|Policy set name"},
           optionAliases={},
           macro="authentication",
           optionalOptions={
@@ -2728,7 +2728,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.ListApplications",
-          description="List applications in a realm.",
+          description="List policy set in a realm.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name"},
@@ -2736,16 +2736,16 @@ public class AccessManager {
           macro="authentication",
           optionalOptions={},
           resourceStrings={
-                  "list-applications-no-entries=There were no applications."})
+                  "list-applications-no-entries=There were no policy sets."})
   private String list_appls;
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.ShowApplication",
-          description="Show application attributes.",
+          description="Show policy set attributes.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
-                  "name|m|s|Application name"},
+                  "name|m|s|Policy set name"},
           optionAliases={},
           macro="authentication",
           optionalOptions={},
@@ -2755,11 +2755,11 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.SetApplication",
-          description="Set application attributes.",
+          description="Set policy set attributes.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
-                  "name|m|s|Application name"},
+                  "name|m|s|Policy set name"},
           optionAliases={},
           macro="authentication",
           optionalOptions={
@@ -2772,16 +2772,16 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.DeleteApplications",
-          description="Delete applications.",
+          description="Delete policy sets.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
-                  "names|m|m|Application names"},
+                  "names|m|m|Policy set names"},
           optionAliases={},
           macro="authentication",
           optionalOptions={},
           resourceStrings={
-                  "delete-applications-succeeded=Applications were deleted."})
+                  "delete-applications-succeeded=Policy sets were deleted."})
   private String delete_appls;
 
   @SubCommandInfo(
@@ -2812,34 +2812,34 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.CreateApplicationPrivilege",
-          description="Add an application privilege to delegate resources of a given application.",
+          description="Add a policy set privilege to delegate resources of a given policy set.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
                   "name|m|s|Name for the this delegation",
-                  "application|t|s|Application name",
+                  "application|t|s|Policy set name",
                   "actions|a|s|Possible values are READ, MODIFY, DELEGATE, ALL",
                   "subjecttype|b|s|Possible values are User or Group",
                   "subjects|s|m|Subject name"},
           optionAliases={},
           optionalOptions={
                   "description|p|s|Description for the this delegation.",
-                  "resources|r|m|Resources to delegate, All resources in the applications will be delegated if this option is absent."},
+                  "resources|r|m|Resources to delegate, All resources in the policy set will be delegated if this option is absent."},
           macro="authentication",
           resourceStrings={
                   "privilege-application-action-invalid={0} was invalid. Supported ones are READ, MODIFY, DELEGATE, ALL.",
                   "privilege-application-subject-type-invalid={0} was invalid. Supported ones are User and Group",
-                  "privilege-application-application-invalid={0} was invalid. Either the application did not exist or you did not have permissions to delegate it.",
+                  "privilege-application-application-invalid={0} was invalid. Either the policy set did not exist or you did not have permissions to delegate it.",
                   "create-application-privilege-succeeded={0} was added."})
   private String add_app_priv;
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.DeleteApplicationPrivilege",
-          description="Remove an application privileges.",
+          description="Remove policy set privileges.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
-                  "names|m|m|Names of application privilege to be removed"},
+                  "names|m|m|Names of policy set privileges to be removed"},
           optionAliases={},
           optionalOptions={},
           macro="authentication",
@@ -2850,11 +2850,11 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.ShowApplicationPrivilege",
-          description="Show application privilege.",
+          description="Show policy set privilege.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
-                  "name|m|s|Name of application privilege"},
+                  "name|m|s|Name of policy set privilege"},
           optionAliases={},
           optionalOptions={},
           macro="authentication",
@@ -2868,7 +2868,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.ListApplicationPrivileges",
-          description="List application privileges in a realm.",
+          description="List policy set privileges in a realm.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name"},
@@ -2881,7 +2881,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.UpdateApplicationPrivilege",
-          description="Update an application privilege.",
+          description="Update a policy set privilege.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
@@ -2898,7 +2898,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.SetApplicationPrivilegeSubjects",
-          description="Set application privilege subjects.",
+          description="Set policy set privilege subjects.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
@@ -2907,30 +2907,30 @@ public class AccessManager {
                   "subjects|s|m|Subject name"},
           optionAliases={},
           optionalOptions={
-                  "add|p|u|Subjects are added to this application if this option is set. Otherwise, subjects in the current application privilege will be overwritten."},
+                  "add|p|u|Subjects are added to this policy set if this option is set. Otherwise, subjects in the current policy set privilege will be overwritten."},
           macro="authentication",
           resourceStrings={})
   private String update_app_priv_subjects;
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.SetApplicationPrivilegeResources",
-          description="Set application privilege resources.",
+          description="Set policy set privilege resources.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
                   "name|m|s|Name for the this delegation",
-                  "application|t|s|Application name"},
+                  "application|t|s|Policy set name"},
           optionAliases={},
           optionalOptions={
-                  "add|p|u|Resources are added to this application if this option is set. Otherwise, resources in the current application privilege will be overwritten.",
-                  "resources|r|m|Resources to delegate, All resources in the applications will be delegated if this option is absent."},
+                  "add|p|u|Resources are added to this policy set if this option is set. Otherwise, resources in the current policy set privilege will be overwritten.",
+                  "resources|r|m|Resources to delegate, All resources in the policy set will be delegated if this option is absent."},
           macro="authentication",
           resourceStrings={})
   private String update_app_priv_resources;
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.RemoveApplicationPrivilegeSubjects",
-          description="Remove application privilege subjects.",
+          description="Remove policy set privilege subjects.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
@@ -2941,23 +2941,23 @@ public class AccessManager {
           optionalOptions={},
           macro="authentication",
           resourceStrings={
-                  "remove-application-privilege-subjects-emptied-subjects=Unable to processed this request because you have removed all the subjects in the application privilege."})
+                  "remove-application-privilege-subjects-emptied-subjects=Unable to process this request because you have removed all the subjects in the policy set privilege."})
   private String remove_app_priv_subjects;
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.RemoveApplicationPrivilegeResources",
-          description="Remove application privilege resources.",
+          description="Remove policy set privilege resources.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Realm name",
                   "name|m|s|Name for the this delegation",
-                  "application|t|s|Application name"},
+                  "application|t|s|Policy set name"},
           optionAliases={},
           optionalOptions={
-                  "resources|r|m|Resources to removed, All resources in the applications will be removed if this option is absent."},
+                  "resources|r|m|Resources to removed, All resources in the policy set will be removed if this option is absent."},
           macro="authentication",
           resourceStrings={
-                  "remove-application-privilege-resources-emptied-resources=Unable to processed this request because you have removed all the resources in the application privilege."})
+                  "remove-application-privilege-resources-emptied-resources=Unable to process this request because you have removed all the resources in the policy set privilege."})
   private String remove_app_priv_resources;
 
   @SubCommandInfo(

@@ -1,3 +1,4 @@
+//@Checkstyle:off
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
@@ -26,6 +27,7 @@
  *
  * Portions Copyrighted 2015 ForgeRock AS.
  */
+//@Checkstyle:on
 
 package org.forgerock.openam.ldap;
 
@@ -33,14 +35,9 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.Attributes;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.Modification;
 import org.forgerock.opendj.ldap.ModificationType;
@@ -54,21 +51,24 @@ import org.forgerock.opendj.ldif.ChangeRecord;
 import org.forgerock.opendj.ldif.ChangeRecordVisitor;
 import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
 
-import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.shared.debug.Debug;
 
-public class LdifUtils {
-    
+/**
+ * Utility class for LDIF operations.
+ */
+public final class LdifUtils {
+
     private static final Debug DEBUG = Debug.getInstance("amUtil");
-    
+
     private LdifUtils() {
     }
-    
+
     /**
      * Creates LDAP schema from LDIF file.
      *
      * @param file file containing LDIF entries.
      * @param ld LDAP Connection.
+     * @throws IOException If an error occurs when reading the LDIF file.
      */
     public static void createSchemaFromLDIF(String file, Connection ld) throws IOException {
         try (InputStream fileInput = new FileInputStream(file)) {
@@ -82,17 +82,18 @@ public class LdifUtils {
      *
      * @param stream Data input stream containing LDIF entries.
      * @param ld LDAP Connection.
+     * @throws IOException If an error occurs when reading the LDIF file.
      */
     public static void createSchemaFromLDIF(InputStream stream, Connection ld) throws IOException {
         createSchemaFromLDIF(new LDIFChangeRecordReader(new BufferedInputStream(stream)), ld);
     }
-    
 
     /**
      * Creates LDAP schema from LDIF file.
      *
      * @param ldif LDIF object.
      * @param ld LDAP Connection.
+     * @throws IOException If an error occurs when reading the LDIF file.
      */
     public static void createSchemaFromLDIF(LDIFChangeRecordReader ldif, final Connection ld) throws IOException {
         while (ldif.hasNext()) {
@@ -130,7 +131,7 @@ public class LdifUtils {
                     }
                     return null;
                 }
-                
+
                 @Override
                 public Void visitChangeRecord(Void aVoid, ModifyDNRequest change) {
                     return null;

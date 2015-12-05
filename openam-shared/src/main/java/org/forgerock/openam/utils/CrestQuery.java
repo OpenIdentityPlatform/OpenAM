@@ -13,6 +13,7 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.utils;
 
 import org.forgerock.json.JsonPointer;
@@ -29,17 +30,29 @@ public class CrestQuery {
     private final String queryId;
     private final QueryFilter<JsonPointer> queryFilter;
 
+    /**
+     * Constructs a new CrestQuery instance with the specified query id.
+     *
+     * @param queryIdPattern The query id.
+     */
     public CrestQuery(String queryIdPattern) {
         this.queryId = queryIdPattern;
         this.queryFilter = null;
     }
 
+    /**
+     * Constructs a new CrestQuery instance with the specified query filter.
+     *
+     * @param queryFilter The query filter.
+     */
     public CrestQuery(QueryFilter<JsonPointer> queryFilter) {
         this.queryFilter = queryFilter;
         this.queryId = null;
     }
 
     /**
+     * Gets the CREST query id.
+     *
      * @return the trimmed query id string.
      */
     public String getQueryId() {
@@ -50,6 +63,8 @@ public class CrestQuery {
     }
 
     /**
+     * Gets the CREST query filter.
+     *
      * @return the query filter
      */
     public QueryFilter<JsonPointer> getQueryFilter() {
@@ -57,6 +72,8 @@ public class CrestQuery {
     }
 
     /**
+     * Determines if the CREST query is based on a query id.
+     *
      * @return true if the object contains a query id.
      */
     public boolean hasQueryId() {
@@ -64,6 +81,8 @@ public class CrestQuery {
     }
 
     /**
+     * Determines if the CREST query is based on a query filter.
+     *
      * @return true if the object contains a query filter.
      */
     public boolean hasQueryFilter() {

@@ -1,11 +1,13 @@
 {
     "common": {
         "form": {
-            "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved."
+            "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
+            "build": "Build"
         }
     },
     "form": {
         "description": "This application is requesting the following private information:",
+        "noScopes": "This application is requesting access to your account",
         "signedInAs": "You are signed in as:",
         "save": "Save Consent",
         "allow": "Allow",

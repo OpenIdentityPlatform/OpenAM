@@ -516,32 +516,21 @@ public class FSUtils {
         return null;
     }
 
-    public static boolean needSetLBCookieAndRedirect(
-        HttpServletRequest request, HttpServletResponse response,
-        boolean isIDP) {
-
+    public static boolean requireAddCookie(HttpServletRequest request) {
         List remoteServiceURLs = FSUtils.getRemoteServiceURLs(request);
         if ((remoteServiceURLs == null) || (remoteServiceURLs.isEmpty())) {
             return false;
         }
 
-        Cookie lbCookie = CookieUtils.getCookieFromReq(request,
-            getlbCookieName());
-        if (lbCookie != null) {
-            return false;
-        }
+        Cookie lbCookie = CookieUtils.getCookieFromReq(request, getlbCookieName());
+        return lbCookie == null;
+    }
 
-
-        if (debug.messageEnabled()) {
-            debug.message("FSUtils.needSetLBCookieAndRedirect:" +
-                " lbCookie not set.");
-        }
-
-        setlbCookie(response);
+    public static boolean requireRedirect(HttpServletRequest request) {
 
         // turn off cookie hash redirect by default
         String tmpStr = SystemPropertiesManager.get(
-            "com.sun.identity.federation.cookieHashRedirectEnabled");
+                "com.sun.identity.federation.cookieHashRedirectEnabled");
         if ((tmpStr == null) || (!(tmpStr.equalsIgnoreCase("true")))) {
             return false;
         }
@@ -550,13 +539,43 @@ public class FSUtils {
         if (redirected != null) {
             if (debug.messageEnabled()) {
                 debug.message("FSUtils.needSetLBCookieAndRedirect: " +
-                " redirected already and lbCookie not set correctly.");
+                        " redirected already and lbCookie not set correctly.");
             }
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * Detects if a request simply needs loadbalancer cookies adding and to be redirected to
+     * be handled elsewhere.
+     *
+     * @param request The HTTP request in question.
+     * @param response The response associated with the request.
+     * @param isIDP Whether this entity is acting as an IDP.
+     * @return false if not, otherwise redirects.
+     */
+    public static boolean needSetLBCookieAndRedirect(HttpServletRequest request, HttpServletResponse response,
+                                                     boolean isIDP) {
+
+        if (!requireAddCookie(request)) {
+            return false;
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("FSUtils.needSetLBCookieAndRedirect:" +
+                " lbCookie not set.");
+        }
+
+        setlbCookie(response);
+
+        if (!requireRedirect(request)) {
+            return false;
+        }
+
         String queryString = request.getQueryString();
-        StringBuffer reqURLSB = new StringBuffer();
+        StringBuilder reqURLSB = new StringBuilder();
         reqURLSB.append(request.getRequestURL().toString())
             .append("?redirected=1");
         if (queryString != null) {

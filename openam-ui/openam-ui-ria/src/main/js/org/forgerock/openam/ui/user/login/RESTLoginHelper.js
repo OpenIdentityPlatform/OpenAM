@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
 
     obj.login = function (params, successCallback, errorCallback) {
         var self = this;
-        AuthNDelegate.getRequirements().done(function (requirements) {
+        AuthNDelegate.getRequirements().then(function (requirements) {
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
 
@@ -117,7 +117,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 promise.reject();
             });
         } else {
-            if (url !== Constants.CONSOLE_PATH || _.contains(Configuration.loggedUser.uiroles, "ui-admin")) {
+            if (url !== Constants.CONSOLE_PATH) {
                 if (!Configuration.globalData.auth.urlParams) {
                     Configuration.globalData.auth.urlParams = {};
                 }
@@ -131,7 +131,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     };
 
     obj.filterUrlParams = function (params) {
-        var paramsToSave = ["arg","authIndexType","authIndexValue","goto","gotoOnFail","ForceAuth","locale"],
+        var paramsToSave = ["arg", "authIndexType", "authIndexValue", "goto", "gotoOnFail", "ForceAuth", "locale"],
             filteredParams = {};
 
         _.each(paramsToSave, function (p) {
@@ -147,10 +147,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
         SessionDelegate.isSessionValid(tokenCookie).then(function (result) {
             if (result.valid) {
-                SessionDelegate.logout(tokenCookie).then(function () {
+                SessionDelegate.logout(tokenCookie).then(function (response) {
                     obj.removeSessionCookie();
 
-                    successCallback();
+                    successCallback(response);
                     return true;
 
                 }, obj.removeSessionCookie);
@@ -179,7 +179,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     obj.removeSessionCookie = function () {
         var auth = Configuration.globalData.auth;
         if (auth.cookieDomains && auth.cookieDomains.length !== 0) {
-            _.each(auth.cookieDomains,function (cookieDomain) {
+            _.each(auth.cookieDomains, function (cookieDomain) {
                 CookieHelper.deleteCookie(auth.cookieName, "/", cookieDomain);
             });
         } else {

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,8 @@
  *
  * $Id: QueryClient.java,v 1.9 2009/10/29 00:19:21 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 package com.sun.identity.saml2.soapbinding;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
@@ -60,13 +60,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.soap.SOAPConstants;
 import org.w3c.dom.Document;
@@ -580,20 +583,14 @@ public class QueryClient {
                             SAML2SDKUtils.bundle.getString(
                             "assertionNotEncrypted"));
                 }
-                PrivateKey decryptionKey = null;
-                List encAssertions = samlResponse.getEncryptedAssertion();
-                List decAssertions = null;
+                Set<PrivateKey> decryptionKeys;
+                List<EncryptedAssertion> encAssertions = samlResponse.getEncryptedAssertion();
                 if (encAssertions != null) {
-                    Iterator encIter = encAssertions.iterator();
-                    while (encIter.hasNext()) {
-                        if (decryptionKey == null) {
-                            decryptionKey = KeyUtil.getDecryptionKey(pepConfig);
-                        }
-                        Assertion assertion =
-                                ((EncryptedAssertion) encIter.next()).
-                                decrypt(decryptionKey);
+                    decryptionKeys = KeyUtil.getDecryptionKeys(pepConfig);
+                    for (EncryptedAssertion encAssertion : encAssertions) {
+                        Assertion assertion = encAssertion.decrypt(decryptionKeys);
                         if (assertions == null) {
-                            assertions = new ArrayList();
+                            assertions = new ArrayList<>();
                         }
                         assertions.add(assertion);
                     }
@@ -613,13 +610,13 @@ public class QueryClient {
                 
                 // validate Issuer  in Assertion
                 Iterator assertionIter = assertions.iterator();
-                X509Certificate cert = null;
+                Set<X509Certificate> verificationCerts = null;
                 XACMLPDPDescriptorElement pdpDesc = null;
                 if (wantAssertionSigned) {
                     pdpDesc =
                             saml2MetaManager.getPolicyDecisionPointDescriptor(
                             realm,pdpEntityID);
-                    cert = KeyUtil.getPDPVerificationCert(pdpDesc,pdpEntityID);
+                    verificationCerts = KeyUtil.getPDPVerificationCerts(pdpDesc,pdpEntityID);
                 }
                 
                 while (assertionIter.hasNext()) {
@@ -659,8 +656,7 @@ public class QueryClient {
                             debug.message(classMethod + "wantAssertionSigned "
                                     + wantAssertionSigned);
                         }
-                        if (!assertion.isSigned() ||
-                                !assertion.isSignatureValid(cert)){
+                        if (!assertion.isSigned() || !assertion.isSignatureValid(verificationCerts)) {
                             debug.error(classMethod +
                                     "Assertion is not signed or signature " +
                                     "is not valid.");
@@ -679,7 +675,7 @@ public class QueryClient {
                 }
                 if (debug.messageEnabled()) {
                     debug.message(classMethod + " Response : " +
-                            response.toXMLString(true,true));
+                            response.toXMLString(true, true));
                 }
             } catch (SAML2MetaException sme) {
                 if (debug.messageEnabled()) {
@@ -871,17 +867,14 @@ public class QueryClient {
                 getAttributeValueFromPEPConfig(pepConfig,
                 "wantXACMLAuthzDecisionResponseSigned");
         
-        boolean valid = false;
+        boolean valid;
         if (wantResponseSigned != null &&
                 wantResponseSigned.equalsIgnoreCase("true")) {
-            XACMLPDPDescriptorElement
-                    pdpDescriptor  =
-                    saml2MetaManager.
-                    getPolicyDecisionPointDescriptor(null, pdpEntityID);
-            X509Certificate signingCert =
-                    KeyUtil.getPDPVerificationCert(pdpDescriptor,pdpEntityID);
-            if (signingCert != null) {
-                valid = response.isSignatureValid(signingCert);
+            XACMLPDPDescriptorElement pdpDescriptor = saml2MetaManager.getPolicyDecisionPointDescriptor(null,
+                    pdpEntityID);
+            Set<X509Certificate> signingCerts = KeyUtil.getPDPVerificationCerts(pdpDescriptor, pdpEntityID);
+            if (!signingCerts.isEmpty()) {
+                valid = response.isSignatureValid(signingCerts);
                 if (debug.messageEnabled()) {
                     debug.message(classMethod + "Signature is valid :" + valid);
                 }

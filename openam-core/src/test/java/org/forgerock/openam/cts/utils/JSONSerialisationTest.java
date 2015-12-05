@@ -22,13 +22,16 @@ import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.service.InternalSession;
+import org.forgerock.audit.events.EventTopicsMetaData;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AMAuditService;
+import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.AuditEventPublisherImpl;
 import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
-import org.forgerock.openam.audit.configuration.AuditEventHandlerConfigurationWrapper;
+import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurationListener;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurationProvider;
 import org.forgerock.openam.core.guice.CoreGuiceModule;
@@ -185,6 +188,7 @@ public class JSONSerialisationTest extends GuiceTestCase {
         protected void configure() {
             bind(AuditServiceConfigurationProvider.class).to(DummyAuditServiceConfigurationProvider.class);
             bind(AuditServiceProvider.class).to(DummyAuditServiceProvider.class);
+            bind(AuditEventPublisher.class).to(AuditEventPublisherImpl.class);
         }
     }
 
@@ -216,12 +220,17 @@ public class JSONSerialisationTest extends GuiceTestCase {
         }
 
         @Override
-        public Set<AuditEventHandlerConfigurationWrapper> getDefaultEventHandlerConfigurations() {
+        public Set<AuditEventHandlerConfiguration> getDefaultEventHandlerConfigurations() {
             return null;
         }
 
         @Override
-        public Set<AuditEventHandlerConfigurationWrapper> getRealmEventHandlerConfigurations(String realm) {
+        public Set<AuditEventHandlerConfiguration> getRealmEventHandlerConfigurations(String realm) {
+            return null;
+        }
+
+        @Override
+        public EventTopicsMetaData getEventTopicsMetaData() {
             return null;
         }
     }

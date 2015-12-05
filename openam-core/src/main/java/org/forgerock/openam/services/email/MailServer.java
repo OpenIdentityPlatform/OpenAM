@@ -26,7 +26,17 @@ package org.forgerock.openam.services.email;
 
 import javax.mail.MessagingException;
 import java.util.Map;
+import java.util.Set;
 
+/**
+ * Pluggable interface for all email sending in OpenAM. Can be configured on a per-realm or global basis via the
+ * {@code forgerockMailServerImplClassName} attribute of the Email Service.
+ * <p>
+ * The implementation <strong>must</strong> provide a constructor taking a single String argument, which is the name
+ * of the realm that service is being constructed for.
+ *
+ * @supported.all.api
+ */
 public interface MailServer {
 
     /**
@@ -50,7 +60,7 @@ public interface MailServer {
      * @param options SMTPHostName, SMTPPort, SMTPUser, SMTPUserPassword.
      * @throws MessagingException in case where the module was unable to send the e-mail.
      */
-    void sendHtmlEmail(String from, String to, String subject, String message, Map options)
+    void sendHtmlEmail(String from, String to, String subject, String message, Map<String, Set<String>> options)
             throws MessagingException;
 
     /**
@@ -65,7 +75,7 @@ public interface MailServer {
      * @throws MessagingException in case where the module was unable to send the e-mail
      */
     void sendEmail(String from, String to, String subject,
-                          String message, Map options) throws MessagingException;
+                          String message, Map<String, Set<String>> options) throws MessagingException;
 
     /**
      * Sends an email message using default MailServer settings

@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 */
 package org.forgerock.openam.entitlement.rest;
 
@@ -37,6 +38,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -363,7 +365,7 @@ public class ApplicationV1FilterTest {
     /**
      * Verifies that update fails when the selected application cannot be found.
      */
-    @Test (expectedExceptions = BadRequestException.class)
+    @Test (expectedExceptions = NotFoundException.class)
     public void updateFailsWhenApplicationMissing() throws Exception {
         // Given
         given(contextHelper.getRealm(context)).willReturn("/abc");

@@ -19,20 +19,20 @@
 
 package org.forgerock.openam.radius.server;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
-import java.io.UnsupportedEncodingException;
+import java.net.Inet4Address;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
+import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.openam.radius.common.AccessAccept;
 import org.forgerock.openam.radius.common.AccessReject;
 import org.forgerock.openam.radius.common.Packet;
+import org.forgerock.openam.radius.common.PacketType;
 import org.forgerock.openam.radius.common.Utils;
 import org.forgerock.openam.radius.server.config.ClientConfig;
 import org.forgerock.openam.radius.server.spi.handlers.AcceptAllHandler;
@@ -40,6 +40,11 @@ import org.forgerock.openam.radius.server.spi.handlers.RejectAllHandler;
 import org.forgerock.util.promise.PromiseImpl;
 import org.testng.annotations.Test;
 
+/**
+ * Test for the <code>RadiusRequestHandler</code> class.
+ *
+ * @see org.forgerock.openam.radius.server.RadiusRequestHandler
+ */
 public class RadiusRequestHandlerTest {
 
     private final String res = "01 00 00 38 0f 40 3f 94 73 97 80 57 bd 83 d5 cb "
@@ -50,80 +55,120 @@ public class RadiusRequestHandlerTest {
      * Test that when run is called with an AcceptAllHandler then the RadiusAuthResponse contains a success code and an
      * AcceptResponse is sent.
      *
-     * @throws UnsupportedEncodingException
-     * @throws InterruptedException
-     * @throws RadiusProcessingException
+     * @throws InterruptedException - when an interrupt occurs.
+     * @throws RadiusProcessingException - when something goes wrong processing a RADIUS packet.
+     * @throws UnknownHostException - if the host can't be determined
      */
-    @Test
-    public void testRun() throws UnsupportedEncodingException, InterruptedException, RadiusProcessingException {
+    @Test(enabled = true)
+    public void testRun() throws UnknownHostException, InterruptedException, RadiusProcessingException {
 
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
+        String url = "forgerock.org";
+        InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
+        when(reqCtx.getSource()).thenReturn(socketAddress);
         when(clientConfig.getName()).thenReturn("TestConfig");
-        when(clientConfig.getAccessRequestHandlerClass()).thenReturn(AcceptAllHandler.class);
 
         final ByteBuffer bfr = Utils.toBuffer(res);
-        final PromiseImpl<RadiusAuthResult, RadiusProcessingException> promise = PromiseImpl.create();
-        final RadiusRequestHandler handler = new RadiusRequestHandler(reqCtx, bfr, promise, promise);
+        final PromiseImpl<RadiusResponse, RadiusProcessingException> promise = PromiseImpl.create();
+        EventBus eventBus = new EventBus();
+
+        AccessRequestHandlerFactory accessRequestHandlerFactory = mock(AccessRequestHandlerFactory.class);
+        when(accessRequestHandlerFactory.getAccessRequestHandler(reqCtx)).thenReturn(new AcceptAllHandler());
+        final RadiusRequestHandler handler = new RadiusRequestHandler(accessRequestHandlerFactory, reqCtx, bfr, promise,
+                promise, eventBus);
         handler.run();
 
         // when
-        final RadiusAuthResult result = promise.getOrThrow();
+        final RadiusResponse result = promise.getOrThrow();
 
         // then
-        assertThat(result.getRequestResult().equals(RadiusAuthResultStatus.COMPLETED));
+        assertThat(result.getResponsePacket().getType()).isEqualTo(PacketType.ACCESS_ACCEPT);
         verify(reqCtx, times(1)).send(isA(AccessAccept.class));
-  }
+    }
 
-    @Test
-    public void testRunReject() throws UnsupportedEncodingException, InterruptedException, RadiusProcessingException {
+    /**
+     * Test that when run is called with an RejectAllHandler that the resultant promise returns a RadiusResponse
+     * containing an ACCESS_REJECT packet.
+     *
+     * @throws InterruptedException - when an interrupt occurs.
+     * @throws RadiusProcessingException - when something goes wrong processing a RADIUS packet.
+     * @throws UnknownHostException - if the host can't be determined
+     */
+    @Test(enabled = true)
+    public void testRunReject()
+            throws UnknownHostException, InterruptedException, RadiusProcessingException {
 
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
+        String url = "forgerock.org";
+        InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
+
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
+        when(reqCtx.getSource()).thenReturn(socketAddress);
         when(clientConfig.getName()).thenReturn("TestConfig");
         when(clientConfig.getAccessRequestHandlerClass()).thenReturn(RejectAllHandler.class);
 
-
         final ByteBuffer bfr = Utils.toBuffer(res);
-        final PromiseImpl<RadiusAuthResult, RadiusProcessingException> promise = PromiseImpl.create();
-        final RadiusRequestHandler handler = new RadiusRequestHandler(reqCtx, bfr, promise, promise);
+        final PromiseImpl<RadiusResponse, RadiusProcessingException> promise = PromiseImpl.create();
+        EventBus eventBus = new EventBus();
+
+        AccessRequestHandlerFactory accessRequestHandlerFactory = mock(AccessRequestHandlerFactory.class);
+        when(accessRequestHandlerFactory.getAccessRequestHandler(reqCtx)).thenReturn(new RejectAllHandler());
+
+        final RadiusRequestHandler handler = new RadiusRequestHandler(accessRequestHandlerFactory, reqCtx, bfr, promise,
+                promise, eventBus);
         handler.run();
 
         // when
-        final RadiusAuthResult result = promise.getOrThrow();
+        final RadiusResponse result = promise.getOrThrow();
 
         // then
-        assertThat(result.getRequestResult().equals(RadiusAuthResultStatus.FAILED));
+        assertThat(result.getResponsePacket().getType()).isEqualTo(PacketType.ACCESS_REJECT);
         verify(reqCtx, times(1)).send(isA(AccessReject.class));
     }
 
+    /**
+     * Test that when run is called with an CatestrophicHandler that the promise returns a RadiusProcessingException.
+     *
+     * @throws InterruptedException - when an interrupt occurs.
+     * @throws RadiusProcessingException - when something goes wrong processing a RADIUS packet.
+     * @throws UnknownHostException - if the host can't be determined
+     */
     @Test(expectedExceptions = RadiusProcessingException.class)
-    public void testRunCatestrophic() throws UnsupportedEncodingException, InterruptedException,
-            RadiusProcessingException {
+    public void testRunCatestrophic() throws InterruptedException, RadiusProcessingException, UnknownHostException {
 
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
+        String url = "forgerock.org";
+        InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
+        when(reqCtx.getSource()).thenReturn(socketAddress);
         when(clientConfig.getName()).thenReturn("TestConfig");
         when(clientConfig.getAccessRequestHandlerClass()).thenReturn(CatastrophicHandler.class);
 
         final ByteBuffer bfr = Utils.toBuffer(res);
-        final PromiseImpl<RadiusAuthResult, RadiusProcessingException> promise = PromiseImpl.create();
-        final RadiusRequestHandler handler = new RadiusRequestHandler(reqCtx, bfr, promise, promise);
+        final PromiseImpl<RadiusResponse, RadiusProcessingException> promise = PromiseImpl.create();
+        EventBus eventBus = new EventBus();
+
+        AccessRequestHandlerFactory accessRequestHandlerFactory = mock(AccessRequestHandlerFactory.class);
+        when(accessRequestHandlerFactory.getAccessRequestHandler(reqCtx)).thenReturn(new CatastrophicHandler());
+
+        final RadiusRequestHandler handler = new RadiusRequestHandler(accessRequestHandlerFactory, reqCtx, bfr, promise,
+                promise, eventBus);
         handler.run();
 
         // when
-        final RadiusAuthResult result = promise.getOrThrow();
+        final RadiusResponse result = promise.getOrThrow();
 
         // then
-        assertThat(result.getRequestResult().equals(RadiusAuthResultStatus.FAILED));
+        assertThat(result.getResponsePacket().getType()).isEqualTo(PacketType.ACCESS_REJECT);
         verify(reqCtx, never()).send(isA(Packet.class));
     }
 }

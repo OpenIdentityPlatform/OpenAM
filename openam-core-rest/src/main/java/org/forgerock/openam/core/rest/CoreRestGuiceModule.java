@@ -16,19 +16,12 @@
 
 package org.forgerock.openam.core.rest;
 
-import static com.google.inject.multibindings.MapBinder.newMapBinder;
-import static org.forgerock.http.handler.Handlers.chainOf;
-import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
-import static org.forgerock.http.routing.RoutingMode.EQUALS;
-import static org.forgerock.http.routing.Version.version;
-import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.Set;
+import static com.google.inject.multibindings.MapBinder.*;
+import static org.forgerock.http.handler.Handlers.*;
+import static org.forgerock.http.routing.RouteMatchers.*;
+import static org.forgerock.http.routing.RoutingMode.*;
+import static org.forgerock.http.routing.Version.*;
+import static org.forgerock.openam.audit.AuditConstants.Component.*;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -36,16 +29,28 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
-import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.http.routing.RouteMatchers;
 import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
 import org.forgerock.openam.audit.AuditConstants.Component;
@@ -58,6 +63,8 @@ import org.forgerock.openam.core.rest.cts.CoreTokenResource;
 import org.forgerock.openam.core.rest.cts.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.core.rest.record.DebugRecorder;
 import org.forgerock.openam.core.rest.record.DefaultDebugRecorder;
+import org.forgerock.openam.core.rest.session.AnyOfAuthzModule;
+import org.forgerock.openam.core.rest.session.SessionResourceAuthzModule;
 import org.forgerock.openam.core.rest.sms.SmsCollectionProvider;
 import org.forgerock.openam.core.rest.sms.SmsCollectionProviderFactory;
 import org.forgerock.openam.core.rest.sms.SmsGlobalSingletonProvider;
@@ -69,10 +76,14 @@ import org.forgerock.openam.core.rest.sms.SmsSingletonProviderFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.http.annotations.Endpoints;
+import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.utils.Config;
+import org.forgerock.services.routing.RouteMatcher;
 
 /**
  * Guice module for binding the core REST endpoints.
@@ -103,13 +114,22 @@ public class CoreRestGuiceModule extends AbstractModule {
         bind(DebugRecorder.class).to(DefaultDebugRecorder.class);
 
         MapBinder<RouteMatcher<Request>, Handler> chfEndpointHandlers = newMapBinder(binder(),
-                new TypeLiteral<RouteMatcher<Request>>() {}, new TypeLiteral<Handler>() {});
+                new TypeLiteral<RouteMatcher<Request>>() {
+                }, new TypeLiteral<Handler>() {
+                });
         chfEndpointHandlers.addBinding(requestUriMatcher(EQUALS, "authenticate"))
                 .to(Key.get(Handler.class, Names.named("AuthenticateHandler")));
 
         MapBinder<Component, AbstractHttpAccessAuditFilter> httpAccessAuditFilterMapBinder
                 = newMapBinder(binder(), Component.class, AbstractHttpAccessAuditFilter.class);
         httpAccessAuditFilterMapBinder.addBinding(AUTHENTICATION).to(AuthenticationAccessAuditFilter.class);
+
+        Multibinder<UiRolePredicate> userUiRolePredicates = Multibinder.newSetBinder(binder(),
+                UiRolePredicate.class);
+
+        userUiRolePredicates.addBinding().to(SelfServiceUserUiRolePredicate.class);
+        userUiRolePredicates.addBinding().to(GlobalAdminUiRolePredicate.class);
+        userUiRolePredicates.addBinding().to(RealmAdminUiRolePredicate.class);
     }
 
     @Provides
@@ -131,9 +151,13 @@ public class CoreRestGuiceModule extends AbstractModule {
     /**
      * Returns the first path segment from a uri template. For example {@code /foo/bar} becomes {@code foo}.
      *
-     * @param path the full uri template path.
+     * @param path
+     *         the full uri template path.
+     *
      * @return the first non-empty path segment.
-     * @throws IllegalArgumentException if the path contains no non-empty segments.
+     *
+     * @throws IllegalArgumentException
+     *         if the path contains no non-empty segments.
      */
     private static String firstPathSegment(final String path) {
         for (String part : path.split("/")) {
@@ -149,9 +173,10 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getUsersResourceV1(MailServerLoader mailServerLoader,
-                                                 IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
+                restSecurityProvider, configHandler, uiRolePredicates);
     }
 
     @Provides
@@ -159,10 +184,10 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getUsersResourceV2(MailServerLoader mailServerLoader,
-                                                 IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
-                                                         restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory);
+                restSecurityProvider, configHandler, baseURLProviderFactory, uiRolePredicates);
     }
 
     @Provides
@@ -170,10 +195,11 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV3 getUsersResource(MailServerLoader mailServerLoader,
-                                               IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-                                               BaseURLProviderFactory baseURLProviderFactory) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory,
+            @Named("PatchableUserAttributes") Set<String> patchableAttributes, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV3(IdentityResourceV2.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory);
+                restSecurityProvider, configHandler, baseURLProviderFactory, patchableAttributes, uiRolePredicates);
     }
 
     @Provides
@@ -181,9 +207,10 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader,
-                                                  IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
+                restSecurityProvider, configHandler, uiRolePredicates);
     }
 
     @Provides
@@ -191,10 +218,10 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getGroupsResourceV2(MailServerLoader mailServerLoader,
-                                                  IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-                                                  RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory);
+                restSecurityProvider, configHandler, baseURLProviderFactory, uiRolePredicates);
     }
 
     @Provides
@@ -202,10 +229,10 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV3 getGroupsResource(MailServerLoader mailServerLoader,
-                                                IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-                                                RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV3(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityServices,
-                coreWrapper, restSecurityProvider, baseURLProviderFactory);
+                coreWrapper, restSecurityProvider, configHandler, baseURLProviderFactory, Collections.<String>emptySet(), uiRolePredicates);
     }
 
     @Provides
@@ -213,9 +240,10 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader,
-                                                  IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
+                restSecurityProvider, configHandler, uiRolePredicates);
     }
 
     @Provides
@@ -223,10 +251,10 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getAgentsResourceV2(MailServerLoader mailServerLoader,
-                                                  IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-                                                  RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory);
+                restSecurityProvider, configHandler, baseURLProviderFactory, uiRolePredicates);
     }
 
     @Provides
@@ -234,10 +262,10 @@ public class CoreRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV3 getAgentsResource(MailServerLoader mailServerLoader,
-                                                IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-                                                RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         return new IdentityResourceV3(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityServices,
-                coreWrapper, restSecurityProvider, baseURLProviderFactory);
+                coreWrapper, restSecurityProvider, configHandler, baseURLProviderFactory, Collections.<String>emptySet(), uiRolePredicates);
     }
 
     @Provides
@@ -274,4 +302,29 @@ public class CoreRestGuiceModule extends AbstractModule {
         titleProperties.load(getClass().getClassLoader().getResourceAsStream("amConsole.properties"));
         return titleProperties;
     }
+
+    @Provides
+    @Inject
+    public AnyOfAuthzModule getSessionResourceAuthzModule(SSOTokenManager ssoTokenManager,
+            PrivilegeAuthzModule privilegeAuthzModule,
+            AdminOnlyAuthzModule adminOnlyAuthzModule) {
+        SessionResourceAuthzModule sessionResourceAuthzModule = new SessionResourceAuthzModule(ssoTokenManager);
+        List<CrestAuthorizationModule> authzList = new ArrayList<>(3);
+        authzList.add(adminOnlyAuthzModule);
+        authzList.add(privilegeAuthzModule);
+        authzList.add(sessionResourceAuthzModule);
+        return new AnyOfAuthzModule(authzList);
+
+    }
+
+    @Provides
+    @Named("PatchableUserAttributes")
+    public Set<String> getPatchableUserAttributes() {
+        Set<String> patchableAttributes = new HashSet<>();
+        patchableAttributes.add("userPassword");
+        patchableAttributes.add("kbaInfo");
+        return patchableAttributes;
+    }
+
 }
+

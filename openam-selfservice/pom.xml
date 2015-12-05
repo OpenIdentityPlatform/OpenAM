@@ -28,6 +28,10 @@
     <name>OpenAM Self Service</name>
     <description>Home for OpenAM self service integration</description>
 
+    <properties>
+        <checkstyleFailOnError>true</checkstyleFailOnError>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>

@@ -27,6 +27,10 @@
 
     <artifactId>openam-tokens</artifactId>
 
+    <properties>
+        <checkstyleFailOnError>true</checkstyleFailOnError>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -38,8 +42,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
         </dependency>
     </dependencies>
 </project>

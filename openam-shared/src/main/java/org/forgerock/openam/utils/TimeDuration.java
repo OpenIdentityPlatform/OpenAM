@@ -1,8 +1,4 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2012 ForgeRock US Inc. All Rights Reserved
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -13,18 +9,16 @@
  * When distributing Covered Software, include this CDDL Header Notice in each file and include
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information:
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * "Portions copyright [year] [name of copyright owner]".
- *
+ * Copyright 2012-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.utils;
 
 /**
  * Simple Class to Provide Time Duration Calculation for certain
  * events within the OpenAM framework.
- *
- * @author jeff.schenk@forgerock.com
  */
 public class TimeDuration {
     /**
@@ -94,10 +88,10 @@ public class TimeDuration {
     /**
      * Get Elapsed Timing in String Form.
      *
-     * @param _duration long primitive.
+     * @param duration long primitive.
      * @return String of Duration.
      */
-    public static String getDurationToString(long _duration) {
+    public static String getDurationToString(long duration) {
         long days;
         long hours;
         long minutes;
@@ -105,13 +99,13 @@ public class TimeDuration {
         long milliseconds;
         // **************************************
         // First Convert Duration into Seconds.
-        long timeInSeconds = _duration / 1000;
+        long timeInSeconds = duration / 1000;
         if (timeInSeconds <= 0) {
-            return (_duration + "ms");
+            return (duration + "ms");
         }
         // *****************************
         // Save our Milliseconds.
-        milliseconds = (_duration - (timeInSeconds * 1000));
+        milliseconds = (duration - (timeInSeconds * 1000));
         // *****************************
         // Now Convert the seconds.
         days = timeInSeconds / (3600 * 24);

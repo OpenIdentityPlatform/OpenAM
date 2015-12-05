@@ -1,6 +1,4 @@
 /*
- * Copyright 2014 ForgeRock, AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -19,10 +19,10 @@ package org.forgerock.openam.utils;
 import javax.crypto.Cipher;
 
 /**
- * A {@link CipherProvider} that caches ciphers in per-thread storage. To avoid using an actual thread-local (and polluting
- * any thread pools that may touch this), we instead maintain our own map from thread id to cipher instances. As this
- * is just a normal (concurrent) map, then it can be garbage collected as normal so there is no memory leak on
- * hot-redeploy.
+ * A {@link CipherProvider} that caches ciphers in per-thread storage. To avoid using an actual thread-local
+ * (and polluting any thread pools that may touch this), we instead maintain our own map from thread id to cipher
+ * instances. As this is just a normal (concurrent) map, then it can be garbage collected as normal so there is no
+ * memory leak on hot-redeploy.
  *
  * @since 12.0.0
  */
@@ -59,6 +59,11 @@ public class PerThreadCipherProvider implements CipherProvider {
         };
     }
 
+    /**
+     * Constructs a new PerThreadCipherProvider instance.
+     *
+     * @param delegate The {@code CipherProvider} delegate.
+     */
     public PerThreadCipherProvider(CipherProvider delegate) {
         this(delegate, DEFAULT_MAX_SIZE);
     }

@@ -15,22 +15,14 @@
  */
 package org.forgerock.openam.core.rest.sms;
 
-import static com.sun.identity.sm.SMSException.STATUS_NO_PERMISSION;
+import static com.sun.identity.sm.SMSException.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.rest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.rest.RestUtils.hasPermission;
-import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.rest.RestUtils.*;
+import static org.forgerock.util.promise.Promises.*;
 
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -40,7 +32,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -63,12 +54,26 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.RealmUtils;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class SmsRealmProvider implements RequestHandler {
     private static final Debug debug = Debug.getInstance("frRest");
@@ -78,11 +83,28 @@ public class SmsRealmProvider implements RequestHandler {
     private static final String INACTIVE_VALUE = "Inactive";
     private static final String ACTIVE_ATTRIBUTE_NAME = "active";
     private static final String ALIASES_ATTRIBUTE_NAME = "aliases";
-    private static final String REALM_NAME_ATTRIBUTE_NAME = "name";
-    private static final String PATH_ATTRIBUTE_NAME = "parentPath";
+    protected static final String REALM_NAME_ATTRIBUTE_NAME = "name";
+    protected static final String PATH_ATTRIBUTE_NAME = "parentPath";
     private static final String PARENT_I18N_KEY = "a109";
     private static final String ACTIVE_I18N_KEY = "a108";
-    public static final String ROOT_SERVICE = "";
+    private static final String ROOT_SERVICE = "";
+    private static final String BAD_REQUEST_REALM_NAME_ERROR_MESSAGE
+            = "Realm name specified in URL does not match realm name specified in JSON";
+    private final SessionCache sessionCache;
+    private final CoreWrapper coreWrapper;
+    private RealmNormaliser realmNormaliser;
+
+    // This blacklist also includes characters which upset LDAP.
+    private final static Set<String> BLACKLIST_CHARACTERS = new TreeSet<>(CollectionUtils.asSet(
+            "$", "&", "+", ",", "/", ":", ";", "=", "?", "@", " ", "#", "%", "<", ">", "\"", "\\"));
+
+    public SmsRealmProvider(SessionCache sessionCache,
+                            CoreWrapper coreWrapper,
+                            RealmNormaliser realmNormaliser) {
+        this.sessionCache = sessionCache;
+        this.coreWrapper = coreWrapper;
+        this.realmNormaliser = realmNormaliser;
+    }
 
     /**
      * Create an amAdmin SSOToken
@@ -168,6 +190,15 @@ public class SmsRealmProvider implements RequestHandler {
         ))));
     }
 
+    private boolean containsBlacklistedCharacters(String realmName) {
+        for (String blacklistCharacter : BLACKLIST_CHARACTERS) {
+            if (realmName.contains(blacklistCharacter)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,
             CreateRequest createRequest) {
@@ -180,8 +211,8 @@ public class SmsRealmProvider implements RequestHandler {
                 throw new BadRequestException("No realm name provided");
             }
 
-            if (realmName.contains("/")) {
-                throw new BadRequestException("Realm names cannot contain '/'");
+            if (containsBlacklistedCharacters(realmName)) {
+                throw new BadRequestException("Realm names cannot contain: " + BLACKLIST_CHARACTERS.toString());
             }
 
             RealmContext realmContext = serverContext.asContext(RealmContext.class);
@@ -307,10 +338,12 @@ public class SmsRealmProvider implements RequestHandler {
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-        final RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realmPath = realmContext.getResolvedRealm();
 
         try {
+            final SessionID sessionID = new SessionID(getUserSsoToken(context).getTokenID().toString());
+            final String realmPath =
+                    coreWrapper.convertOrgNameToRealmName(sessionCache.getSession(sessionID).getClientDomain());
+
             final OrganizationConfigManager ocm = new OrganizationConfigManager(getUserSsoToken(context), realmPath);
 
             //Return realm query is being performed on
@@ -330,6 +363,9 @@ public class SmsRealmProvider implements RequestHandler {
         } catch (SSOException ex) {
             debug.error("RealmResource :: QUERY by " + principalName + " failed : " + ex);
             return new ForbiddenException().asPromise();
+        } catch (SessionException ex) {
+            debug.error("RealmResource :: QUERY by " + principalName + " failed : " + ex);
+            return new InternalServerErrorException().asPromise();
         } catch (SMSException ex) {
             debug.error("RealmResource :: QUERY by " + principalName + " failed :" + ex);
             switch (ex.getExceptionCode()) {
@@ -346,6 +382,12 @@ public class SmsRealmProvider implements RequestHandler {
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         RealmContext realmContext = context.asContext(RealmContext.class);
         String realmPath = realmContext.getResolvedRealm();
+
+        if(!request.getResourcePath().isEmpty()) {
+            //if the resource path is not empty, the realm has not resolved correctly
+            return new NotFoundException("Realm \"" + RealmUtils.concatenateRealmPath(RealmUtils.cleanRealm(realmPath),
+                    RealmUtils.cleanRealm(request.getResourcePath())) + "\" is not a valid realm.").asPromise();
+        }
 
         try {
             JsonValue jsonResponse = getJsonValue(realmPath);
@@ -439,6 +481,16 @@ public class SmsRealmProvider implements RequestHandler {
             return new BadRequestException("Invalid attribute values").asPromise();
         }
 
+        // protect against attempts to change a realm that does not exist as this results in unexpected behaviour
+        try {
+            String requestPath = getExpectedPathFromRequestContext(request);
+            if (!realmPath.equals(requestPath)) {
+                return new BadRequestException(BAD_REQUEST_REALM_NAME_ERROR_MESSAGE).asPromise();
+            }
+        } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+            return new BadRequestException(BAD_REQUEST_REALM_NAME_ERROR_MESSAGE).asPromise();
+        }
+
         final JsonValue realmDetails = request.getContent();
 
         try {
@@ -463,6 +515,20 @@ public class SmsRealmProvider implements RequestHandler {
             debug.error("RealmResource.updateInstance() : Cannot UPDATE " + realmPath, e);
             return new PermanentException(401, "Access Denied", null).asPromise();
         }
+    }
+
+    protected String getExpectedPathFromRequestContext(UpdateRequest request)
+            throws org.forgerock.oauth2.core.exceptions.NotFoundException {
+        String contextPath = request.getContent().get(PATH_ATTRIBUTE_NAME).asString();
+        String realmName = request.getContent().get(REALM_NAME_ATTRIBUTE_NAME).asString();
+
+        if (contextPath.endsWith("/")) {
+            contextPath = contextPath.substring(0, contextPath.lastIndexOf('/'));
+        }
+        if (!realmName.startsWith("/")) {
+            realmName = "/" + realmName;
+        }
+        return realmNormaliser.normalise(contextPath + realmName);
     }
 
     private void checkValues(JsonValue content) throws BadRequestException {

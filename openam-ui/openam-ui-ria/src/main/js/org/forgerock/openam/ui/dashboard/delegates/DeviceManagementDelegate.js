@@ -30,6 +30,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
                                                      Configuration.loggedUser.get("uid") +
                                                      "/devices/2fa/oath/" +
                                                      uuid),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             method: "DELETE"
         });
     };
@@ -41,6 +42,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
             url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
                                                   Configuration.loggedUser.get("uid") +
                                                   "/devices/2fa/oath/?_action=skip"),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             data: JSON.stringify(skipOption),
             method: "POST"
         });
@@ -50,10 +52,12 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
         var path = "__subrealm__/users/" + Configuration.loggedUser.get("uid") + "/devices/2fa/oath/";
         return $.when(
             obj.serviceCall({
-                url: RealmHelper.decorateURIWithSubRealm(path + "?_queryFilter=true")
+                url: RealmHelper.decorateURIWithSubRealm(path + "?_queryFilter=true"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }),
             obj.serviceCall({
                 url: RealmHelper.decorateURIWithRealm(path + "?_action=check"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 method: "POST"
             })
         ).then(function (devicesData, statusData) {

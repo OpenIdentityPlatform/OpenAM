@@ -24,6 +24,7 @@
  *
  * $Id: Assertion.java,v 1.2 2008/06/25 05:47:39 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
@@ -34,6 +35,10 @@ import java.util.List;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Set;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.sun.identity.saml2.assertion.impl.AssertionImpl;
 import com.sun.identity.saml2.common.SAML2Exception;
 
 /**
@@ -43,7 +48,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * and Attribute assertions.
  * @supported.all.api
  */
-
+@JsonDeserialize(as=AssertionImpl.class)
 public interface Assertion {
 
     /**
@@ -51,7 +56,7 @@ public interface Assertion {
      *
      * @return The version number of the assertion.
      */
-    public String getVersion();
+    String getVersion();
 
     /**
      * Sets the version number of the assertion.
@@ -59,14 +64,14 @@ public interface Assertion {
      * @param version the version number.
      * @exception SAML2Exception if the object is immutable
      */
-    public void setVersion(String version) throws SAML2Exception;
+    void setVersion(String version) throws SAML2Exception;
 
     /**
      * Returns the time when the assertion was issued
      *
      * @return the time of the assertion issued
      */
-    public Date getIssueInstant();
+    Date getIssueInstant();
 
     /**
      * Sets the time when the assertion was issued
@@ -74,14 +79,14 @@ public interface Assertion {
      * @param issueInstant the issue time of the assertion
      * @exception SAML2Exception if the object is immutable
     */
-    public void setIssueInstant(Date issueInstant) throws SAML2Exception;
+    void setIssueInstant(Date issueInstant) throws SAML2Exception;
 
     /**
      * Returns the subject of the assertion
      *
      * @return the subject of the assertion
      */
-    public Subject getSubject();
+    Subject getSubject();
 
     /**
      * Sets the subject of the assertion
@@ -89,14 +94,14 @@ public interface Assertion {
      * @param subject the subject of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setSubject(Subject subject) throws SAML2Exception;
+    void setSubject(Subject subject) throws SAML2Exception;
 
     /**
      * Returns the advice of the assertion
      *
      * @return the advice of the assertion
      */
-    public Advice getAdvice();
+    Advice getAdvice();
 
     /**
      * Sets the advice of the assertion
@@ -104,21 +109,21 @@ public interface Assertion {
      * @param advice the advice of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setAdvice(Advice advice) throws SAML2Exception;
+    void setAdvice(Advice advice) throws SAML2Exception;
 
     /**
      * Returns the signature of the assertion
      *
      * @return the signature of the assertion
      */
-    public String getSignature();
+    String getSignature();
 
     /**
      * Returns the conditions of the assertion
      *
      * @return the conditions of the assertion
      */
-    public Conditions getConditions();
+    Conditions getConditions();
 
     /**
      * Sets the conditions of the assertion
@@ -126,14 +131,14 @@ public interface Assertion {
      * @param conditions the conditions of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setConditions(Conditions conditions) throws SAML2Exception;
+    void setConditions(Conditions conditions) throws SAML2Exception;
 
     /**
      * Returns the id of the assertion
      *
      * @return the id of the assertion
      */
-    public String getID();
+    String getID();
 
     /**
      * Sets the id of the assertion
@@ -141,35 +146,35 @@ public interface Assertion {
      * @param id the id of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setID(String id) throws SAML2Exception;
+    void setID(String id) throws SAML2Exception;
 
     /**
      * Returns the statements of the assertion
      *
      * @return the statements of the assertion
      */
-    public List getStatements();
+    List<Object> getStatements();
 
     /**
      * Returns the <code>AuthnStatements</code> of the assertion
      *
      * @return the <code>AuthnStatements</code> of the assertion
      */
-    public List getAuthnStatements();
+    List<AuthnStatement> getAuthnStatements();
 
     /**
      * Returns the <code>AuthzDecisionStatements</code> of the assertion
      *
      * @return the <code>AuthzDecisionStatements</code> of the assertion
      */
-    public List getAuthzDecisionStatements();
+    List<AuthzDecisionStatement> getAuthzDecisionStatements();
 
     /**
      * Returns the attribute statements of the assertion
      *
      * @return the attribute statements of the assertion
      */
-    public List getAttributeStatements();
+    List<AttributeStatement> getAttributeStatements();
 
     /**
      * Sets the statements of the assertion
@@ -177,7 +182,7 @@ public interface Assertion {
      * @param statements the statements of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setStatements(List statements) throws SAML2Exception;
+    void setStatements(List<Object> statements) throws SAML2Exception;
 
     /**
      * Sets the <code>AuthnStatements</code> of the assertion
@@ -185,7 +190,7 @@ public interface Assertion {
      * @param statements the <code>AuthnStatements</code> of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setAuthnStatements(List statements) throws SAML2Exception;
+    void setAuthnStatements(List<AuthnStatement> statements) throws SAML2Exception;
 
     /**
      * Sets the <code>AuthzDecisionStatements</code> of the assertion
@@ -194,7 +199,7 @@ public interface Assertion {
      *        the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setAuthzDecisionStatements(List statements)
+    void setAuthzDecisionStatements(List<AuthzDecisionStatement> statements)
         throws SAML2Exception;
 
     /**
@@ -203,14 +208,14 @@ public interface Assertion {
      * @param statements the attribute statements of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setAttributeStatements(List statements) throws SAML2Exception;
+    void setAttributeStatements(List<AttributeStatement> statements) throws SAML2Exception;
 
     /**
      * Returns the issuer of the assertion
      *
      * @return the issuer of the assertion
      */
-    public Issuer getIssuer();
+    Issuer getIssuer();
 
     /**
      * Sets the issuer of the assertion
@@ -218,26 +223,25 @@ public interface Assertion {
      * @param issuer the issuer of the assertion
      * @exception SAML2Exception if the object is immutable
      */
-    public void setIssuer(Issuer issuer) throws SAML2Exception;
+    void setIssuer(Issuer issuer) throws SAML2Exception;
 
     /**
      * Return true if the assertion is signed 
      *
      * @return true if the assertion is signed
      */
-    public boolean isSigned();
+    boolean isSigned();
 
     /**
      * Return whether the signature is valid or not.
      *
-     * @param senderCert Certificate containing the public key
-     *             which may be used for  signature verification;
-     *             This certificate may also may be used to check
-     *             against the certificate included in the signature
+     * @param verificationCerts Certificates containing the public keys which may be used for signature verification;
+     *                          This certificate may also may be used to check against the certificate included in the
+     *                          signature.
      * @return true if the signature is valid; false otherwise.
      * @throws SAML2Exception if the signature could not be verified
      */
-    public boolean isSignatureValid(X509Certificate senderCert)
+    boolean isSignatureValid(Set<X509Certificate> verificationCerts)
         throws SAML2Exception;
     
     /**
@@ -249,7 +253,7 @@ public interface Assertion {
      *         <code>NotOnOrAfter</code> (current time exclusive) values 
      *         and true otherwise or if no conditions specified.
      */
-    public boolean isTimeValid();
+    boolean isTimeValid();
 
     /**
      * Signs the Assertion.
@@ -261,7 +265,7 @@ public interface Assertion {
      *             will not include any certificate
      * @exception SAML2Exception if it could not sign the assertion.
      */
-    public void sign(
+    void sign(
         PrivateKey privateKey,
         X509Certificate cert
     ) throws SAML2Exception;
@@ -284,7 +288,7 @@ public interface Assertion {
      * @return <code>EncryptedAssertion</code> object
      * @throws SAML2Exception if error occurs during the encryption process.
      */
-    public EncryptedAssertion encrypt(
+    EncryptedAssertion encrypt(
         Key recipientPublicKey,
         String dataEncAlgorithm,
         int dataEncStrength,
@@ -300,7 +304,7 @@ public interface Assertion {
     * @return A String representation
     * @exception SAML2Exception if something is wrong during conversion
      */
-    public String toXMLString(boolean includeNSPrefix, boolean declareNS)
+    String toXMLString(boolean includeNSPrefix, boolean declareNS)
      throws SAML2Exception;
 
    /**
@@ -309,18 +313,18 @@ public interface Assertion {
     * @return A String representation
     * @exception SAML2Exception if something is wrong during conversion
     */
-    public String toXMLString() throws SAML2Exception;
+    String toXMLString() throws SAML2Exception;
 
    /**
     * Makes the object immutable
     */
-    public void makeImmutable();
+    void makeImmutable();
 
    /**
     * Returns true if the object is mutable
     *
     * @return true if the object is mutable
     */
-    public boolean isMutable();
+    boolean isMutable();
 
 }

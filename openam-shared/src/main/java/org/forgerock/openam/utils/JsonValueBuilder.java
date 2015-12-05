@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2015 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -27,11 +27,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Builder factory class for a fluent way of creating JsonValue objects.
- *
- * @author Phill Cunnington
  */
-public class JsonValueBuilder {
-    private static final ObjectMapper mapper = new ObjectMapper();
+public final class JsonValueBuilder {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private JsonValueBuilder() {
+    }
 
     /**
      * Creates a Builder object for creating JsonValue objects.
@@ -47,11 +49,11 @@ public class JsonValueBuilder {
      *
      * @param json The json String.
      * @return A JsonValue object.
-     * @throws IOException If there is a problem parsing the json String.
+     * @throws JsonException If there is a problem parsing the json String.
      */
     public static JsonValue toJsonValue(String json) throws JsonException {
         try {
-            return new JsonValue(mapper.readValue(json, Map.class));
+            return new JsonValue(MAPPER.readValue(json, Map.class));
         } catch (IOException e) {
             throw new JsonException("Failed to parse json", e);
         }
@@ -70,7 +72,7 @@ public class JsonValueBuilder {
      */
     public static JsonValue toJsonArray(final String json) throws JsonException {
         try {
-            return new JsonValue(mapper.readValue(json, List.class));
+            return new JsonValue(MAPPER.readValue(json, List.class));
         } catch (IOException e) {
             throw new JsonException("Failed to parse json", e);
         }
@@ -83,6 +85,6 @@ public class JsonValueBuilder {
      * @see <a href="http://wiki.fasterxml.com/JacksonBestPracticesPerformance">Jackson Best Practices: Performance</a>
      */
     public static ObjectMapper getObjectMapper() {
-        return mapper;
+        return MAPPER;
     }
 }

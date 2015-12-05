@@ -15,11 +15,12 @@
  */
 package org.forgerock.openam.rest.fluent;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.getTokenFromContext;
 
@@ -29,7 +30,6 @@ import org.forgerock.audit.AuditException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Request;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -90,7 +90,7 @@ class CrestAuditor {
      * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     void auditAccessAttempt() throws AuditException {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpCrestRequest(context, request)
@@ -106,12 +106,16 @@ class CrestAuditor {
 
     /**
      * Publishes an event with details of the successfully completed CREST operation, if the 'access' topic is audited.
+     * Provides additional detail.
      * <p/>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
+     *
+     * @param responseDetail Additional details relating to the response (e.g. failure description or summary
+     *                       of the payload). Can be null if there are no additional details.
      */
-    void auditAccessSuccess() {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+    void auditAccessSuccess(JsonValue responseDetail) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
@@ -120,8 +124,12 @@ class CrestAuditor {
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
-                    .component(component)
-                    .response(SUCCESS, "", elapsedTime, MILLISECONDS);
+                    .component(component);
+            if (responseDetail == null) {
+                builder.response(SUCCESSFUL, "", elapsedTime, MILLISECONDS);
+            } else {
+                builder.responseWithDetail(SUCCESSFUL, "", elapsedTime, MILLISECONDS, responseDetail);
+            }
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
@@ -138,7 +146,7 @@ class CrestAuditor {
      * @param message    A human-readable description of the error that occurred.
      */
     void auditAccessFailure(int resultCode, String message) {
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
@@ -149,7 +157,7 @@ class CrestAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .responseWithDetail(FAILURE, Integer.toString(resultCode), elapsedTime, MILLISECONDS, detail);
+                    .responseWithDetail(FAILED, Integer.toString(resultCode), elapsedTime, MILLISECONDS, detail);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
@@ -159,5 +167,6 @@ class CrestAuditor {
     private void addSessionDetailsFromSSOTokenContext(AMAccessAuditEventBuilder builder, Context context) {
         SSOToken callerToken = getTokenFromContext(context, debug);
         builder.trackingIdFromSSOToken(callerToken);
+        builder.userId(getUserId(callerToken));
     }
 }

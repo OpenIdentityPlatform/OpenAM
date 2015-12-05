@@ -16,27 +16,25 @@
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.*;
+
 import com.sun.identity.authentication.spi.RedirectCallback;
+import java.util.Collections;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.Collections;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
-import static org.forgerock.json.JsonValue.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertEquals;
 
 public class RestAuthRedirectCallbackHandlerTest {
 
@@ -85,7 +83,7 @@ public class RestAuthRedirectCallbackHandlerTest {
 
         given(redirectCallback.getRedirectUrl()).willReturn("REDIRECT_URL");
         given(redirectCallback.getMethod()).willReturn("REDIRECT_METHOD");
-        given(redirectCallback.getRedirectData()).willReturn(Collections.emptyMap());
+        given(redirectCallback.getRedirectData()).willReturn(Collections.<String, String>emptyMap());
 
         //When
         JsonValue json = restAuthRedirectCallbackHandler.convertToJson(redirectCallback, 1);

@@ -19,6 +19,7 @@ package org.forgerock.openam.uma.rest;
 import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 import static org.forgerock.openam.uma.UmaConstants.*;
+import static org.forgerock.openam.rest.audit.RestletBodyAuditor.*;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -27,9 +28,11 @@ import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
+import org.forgerock.openam.rest.audit.RestletBodyAuditor;
 import org.forgerock.openam.rest.audit.UMAAccessAuditFilter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
+import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
 import org.restlet.Restlet;
 import org.restlet.routing.Filter;
@@ -77,11 +80,13 @@ public class UmaRouterProvider implements Provider<Router> {
     @Override
     public Router get() {
         Router router = new RestletRealmRouter(realmValidator, coreWrapper);
-        router.attach("/permission_request", auditWithUmaFilter(getRestlet(PERMISSION_REQUEST_ENDPOINT)));
-        router.attach("/authz_request", auditWithUmaFilter(getRestlet(AUTHORIZATION_REQUEST_ENDPOINT)));
+        router.attach("/permission_request", auditWithUmaFilter(getRestlet(PERMISSION_REQUEST_ENDPOINT),
+                jsonAuditor(RESOURCE_SET_ID, SCOPES), noBodyAuditor()));
+        router.attach("/authz_request", auditWithUmaFilter(getRestlet(AUTHORIZATION_REQUEST_ENDPOINT),
+                noBodyAuditor(), noBodyAuditor()));
         // Well-Known Discovery
         router.attach("/.well-known/uma-configuration", auditWithUmaFilter(
-                        wrap(UmaWellKnownConfigurationEndpoint.class)));
+                        wrap(UmaWellKnownConfigurationEndpoint.class), noBodyAuditor(), noBodyAuditor()));
         return router;
     }
 
@@ -89,7 +94,9 @@ public class UmaRouterProvider implements Provider<Router> {
         return InjectorHolder.getInstance(Key.get(Restlet.class, Names.named(name)));
     }
 
-    private Filter auditWithUmaFilter(Restlet restlet) {
-        return new UMAAccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders);
+    private Filter auditWithUmaFilter(Restlet restlet, RestletBodyAuditor<?> requestDetailCreator,
+            RestletBodyAuditor<?> responseDetailCreator) {
+        return new UMAAccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders, requestDetailCreator,
+                responseDetailCreator);
     }
 }

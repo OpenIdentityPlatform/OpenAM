@@ -2,13 +2,12 @@
     border-bottom: 1px solid #2b2f31;
 }
 
-.navbar-brand {
-    padding: 8px 15px 0;
+.am-panel-card:hover {
+    border-color: #486B64;
 }
 
-.card {
-    background-color: #1F2223;
-    border: 1px solid #444;
+.am-panel-card:hover .card-icon-circle {
+    background-color: #7CCABA;
 }
 
 .dropdown-header {
@@ -17,4 +16,22 @@
 
 .btn-toolbar.page-toolbar {
     border-color: #444;
+}
+
+label {
+    font-weight: normal;
+}
+
+.navbar-inverse {
+    background-image: -webkit-linear-gradient(top, #373c3e 0%, #1f2223 100%);
+    background-image: -o-linear-gradient(top, #373c3e 0%, #1f2223 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#373c3e), to(#1f2223));
+    background-image: linear-gradient(to bottom, #373c3e 0%, #1f2223 100%);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff373c3e', endColorstr='#ff1f2223', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+}
+
+#loginContent > li > a {
+    margin: -3px 0 -4px;
 }

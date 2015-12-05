@@ -17,7 +17,7 @@
 define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
     "jquery",
     "backbone",
-    "backgrid",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/views/resource/BasePage",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
@@ -40,6 +40,11 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
         deleteLabel: function () {
             var self = this,
                 buttons = [{
+                    label: $.t("common.form.cancel"),
+                    action: function (dialog) {
+                        dialog.close();
+                    }
+                }, {
                     id: "ok",
                     label: $.t("common.form.ok"),
                     cssClass: "btn-primary btn-danger",
@@ -61,11 +66,6 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
                             dialog.enableButtons(true);
                             dialog.getButton("ok").text($.t("common.form.ok"));
                         });
-                    }
-                }, {
-                    label: $.t("common.form.cancel"),
-                    action: function (dialog) {
-                        dialog.close();
                     }
                 }];
 

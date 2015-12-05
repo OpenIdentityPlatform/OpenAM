@@ -34,6 +34,8 @@ import java.security.Key;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.sun.identity.saml2.assertion.impl.AttributeImpl;
 import com.sun.identity.saml2.common.SAML2Exception;
 
 /**
@@ -61,12 +63,13 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * </pre>
  * @supported.all.api 
  */
+@JsonDeserialize(as=AttributeImpl.class)
 public interface Attribute {
 
     /**
      * Makes the object immutable.
      */
-    public void makeImmutable();
+    void makeImmutable();
 
     /**
      * Returns the mutability of the object.
@@ -74,7 +77,7 @@ public interface Attribute {
      * @return <code>true</code> if the object is mutable;
      *                <code>false</code> otherwise.
      */
-    public boolean isMutable();
+    boolean isMutable();
 
     /**
      * Returns the <code>AttributeValue</code>(s) of the <code>Attribute</code>.
@@ -83,7 +86,7 @@ public interface Attribute {
      *                 of the <code>Attribute</code>.
      * @see #setAttributeValue(List)
      */
-    public List getAttributeValue();
+    List getAttributeValue();
 
     /**
      * Sets the <code>AttributeValue</code>(s) of the <code>Attribute</code>.
@@ -93,8 +96,7 @@ public interface Attribute {
      * @throws SAML2Exception if the object is immutable.
      * @see #getAttributeValue()
      */
-    public void setAttributeValue(List value)
-        throws SAML2Exception;
+    void setAttributeValue(List value) throws SAML2Exception;
 
     /**
      * Returns the <code>AttributeValue</code>(s) of the <code>Attribute</code>.
@@ -103,7 +105,7 @@ public interface Attribute {
      *                 <code>AttributeValue</code>(s).
      * @see #setAttributeValueString(List)
      */
-    public List getAttributeValueString();
+    List getAttributeValueString();
 
     /**
      * Sets the value of <code>AttributeValue</code> element(s).
@@ -113,8 +115,7 @@ public interface Attribute {
      * @throws SAML2Exception if the object is immutable.
      * @see #getAttributeValueString()
      */
-    public void setAttributeValueString(List value)
-        throws SAML2Exception;
+    void setAttributeValueString(List value) throws SAML2Exception;
 
     /**
      * Returns the <code>Name</code> of the attribute.
@@ -122,7 +123,7 @@ public interface Attribute {
      * @return the <code>Name</code> of the attribute.
      * @see #setName(String)
      */
-    public String getName();
+    String getName();
 
     /**
      * Sets the <code>Name</code> of the attribute.
@@ -131,8 +132,7 @@ public interface Attribute {
      * @throws SAML2Exception if the object is immutable.
      * @see #getName()
      */
-    public void setName(String value)
-        throws SAML2Exception;
+    void setName(String value) throws SAML2Exception;
 
     /**
      * Returns the <code>NameFormat</code> of the attribute.
@@ -140,7 +140,7 @@ public interface Attribute {
      * @return the value of <code>NameFormat</code>.
      * @see #setNameFormat(String)
      */
-    public String getNameFormat();
+    String getNameFormat();
 
     /**
      * Sets the <code>NameFormat</code> of the attribute.
@@ -149,8 +149,7 @@ public interface Attribute {
      * @throws SAML2Exception if the object is immutable.
      * @see #getNameFormat()
      */
-    public void setNameFormat(String value)
-        throws SAML2Exception;
+    void setNameFormat(String value) throws SAML2Exception;
 
     /**
      * Returns the <code>FriendlyName</code> of the attribute.
@@ -158,7 +157,7 @@ public interface Attribute {
      * @return the value of <code>FriendlyName</code> of the attribute.
      * @see #setFriendlyName(String)
      */
-    public String getFriendlyName();
+    String getFriendlyName();
 
     /**
      * Sets the <code>FriendlyName</code> of the attribute.
@@ -167,8 +166,7 @@ public interface Attribute {
      * @throws SAML2Exception if the object is immutable.
      * @see #getFriendlyName()
      */
-    public void setFriendlyName(String value)
-        throws SAML2Exception;
+    void setFriendlyName(String value) throws SAML2Exception;
 
     /**
      * Returns the <code>anyAttribute</code> of the attribute.
@@ -177,7 +175,7 @@ public interface Attribute {
      *                Both the name and value are String object types.
      * @see #setAnyAttribute(Map)
      */
-    public Map getAnyAttribute();
+    Map getAnyAttribute();
 
     /**
      * Sets the <code>anyAttribute</code> of the attribute.
@@ -187,8 +185,7 @@ public interface Attribute {
      * @throws SAML2Exception if the object is immutable.
      * @see #getAnyAttribute()
      */
-    public void setAnyAttribute(Map value)
-        throws SAML2Exception;
+    void setAnyAttribute(Map value) throws SAML2Exception;
 
     /**
      * Returns an <code>EncryptedAttribute</code> object.
@@ -208,12 +205,8 @@ public interface Attribute {
      * @return <code>EncryptedAttribute</code> object
      * @throws SAML2Exception if error occurs during the encryption process.
      */
-    public EncryptedAttribute encrypt(
-        Key recipientPublicKey,
-        String dataEncAlgorithm,
-        int dataEncStrength,
-        String recipientEntityID)
-        throws SAML2Exception;
+    EncryptedAttribute encrypt(Key recipientPublicKey, String dataEncAlgorithm,
+                               int dataEncStrength, String recipientEntityID) throws SAML2Exception;
     
  
     /**
@@ -223,8 +216,7 @@ public interface Attribute {
      *         By default name space name is prepended to the element name.
      * @throws SAML2Exception if the object does not conform to the schema.
      */
-    public String toXMLString()
-        throws SAML2Exception;
+    String toXMLString() throws SAML2Exception;
 
     /**
      * Returns a String representation of the element.
@@ -236,8 +228,7 @@ public interface Attribute {
      * @return A string containing the valid XML for this element
      * @throws SAML2Exception if the object does not conform to the schema.
      */
-    public String toXMLString(boolean includeNS, boolean declareNS)
-        throws SAML2Exception;
+    String toXMLString(boolean includeNS, boolean declareNS) throws SAML2Exception;
 
 }
 

@@ -25,12 +25,22 @@ import javax.inject.Named;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * A custom converter that converted {@code Set}s to {@code byte} arrays.
+ *
+ * @since 13.0.0
+ */
 public class SetToJsonBytesConverter implements Converter<Set<?>, byte[]> {
 
     private final ObjectMapper mapper;
     private static final TypeReference<Set<Object>> MAP_TYPE = new TypeReference<Set<Object>>() {
     };
 
+    /**
+     * Constructs a new SetToJsonBytesConverter instance.
+     *
+     * @param mapper A {@code ObjectMapper} instance.
+     */
     @Inject
     public SetToJsonBytesConverter(@Named("cts-json-object-mapper") ObjectMapper mapper) {
         this.mapper = mapper;

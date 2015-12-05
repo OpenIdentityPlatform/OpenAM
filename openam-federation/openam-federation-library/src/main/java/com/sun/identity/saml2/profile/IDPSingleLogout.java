@@ -1754,8 +1754,17 @@ public class IDPSingleLogout {
         return false;
     }
 
-    private static List<SingleLogoutServiceElement> getSPSLOServiceEndpoints(String realm, String spEntityID)
-            throws SAML2Exception {
+    /**
+     * Gets the single log out end points for the Service Provider.
+     *
+     * @param realm the realm that the service provider is configured within
+     * @param spEntityID the id for the service provider configuration entity
+     * @return a list of Single Logout Service elements
+     * @throws SAML2Exception if there was a problem retrieving the SP SSO Descriptor Element
+     */
+    public static List<SingleLogoutServiceElement> getSPSLOServiceEndpoints(
+            final String realm,
+            final String spEntityID) throws SAML2Exception {
         // get SPSSODescriptor
         SPSSODescriptorElement spsso = sm.getSPSSODescriptor(realm, spEntityID);
 

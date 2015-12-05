@@ -34,6 +34,9 @@ import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.Locale;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.forgerock.openam.ldap.LDAPConstants;
 
 /**
  * The exception class whose instance is thrown if there is any error during the
@@ -53,6 +56,8 @@ public class IdRepoException extends Exception implements L10NMessage {
             .getInstance();
 
     private transient Debug debug = AMIdentityRepository.debug;
+
+    private final static Pattern PATTERN = Pattern.compile("(.*)(?=: (.*?)uid=)|(.*)(?=(.*?)uid=)|(.*)");
 
     // Instance variables
     private String message;
@@ -233,5 +238,33 @@ public class IdRepoException extends Exception implements L10NMessage {
      */
     public String getMessage() {
         return message;
+    }
+
+    /**
+     * If this error is an instance of a LDAP Constraint Violated Error (LDAP code 313)
+     * attempts to return useful information about the error that occured without
+     * leaking additional information about the system to the calling user.
+     *
+     * If this error is not an instance of LDAP Constraint Violated Error, the message
+     * of the error is returned.
+     *
+     * @return a user-facing representation of this exception.
+     */
+    public String getConstraintViolationDetails() {
+        if (!LDAPConstants.CONSTRAINT_VIOLATED_ERROR.equals(getErrorCode()) || args == null || args.length < 3) {
+            return getMessage();
+        }
+
+        String argMatch = (String) args[2];
+
+        if (argMatch != null) {
+            Matcher matcher = PATTERN.matcher(argMatch);
+
+            if (matcher.find()) {
+                return matcher.group(0).trim();
+            }
+        }
+
+        return "Cannot update attributes due to server's attribute constraints being violated.";
     }
 }

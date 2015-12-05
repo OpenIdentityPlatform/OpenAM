@@ -15,6 +15,27 @@
  */
 package org.forgerock.openam.idrepo.ldap;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.utils.CollectionUtils.asOrderedSet;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.fail;
+
+import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.MapHelper;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.mockito.ArgumentCaptor;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
@@ -24,24 +45,6 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.sm.SchemaType;
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-
-import org.forgerock.openam.utils.CrestQuery;
-import org.forgerock.openam.utils.MapHelper;
-import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.ResultCode;
-import org.mockito.ArgumentCaptor;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class GenericRepoTest extends IdRepoTestBase {
 

@@ -259,7 +259,7 @@
             <cc name="soap-encryption-key-alias"
                 tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
             </cc>
-            <fieldhelp name="helpSoapKeystoreSignatureKeyAlias" defaultValue="soap.sts.keystore.signature.key.alias.help" />
+            <fieldhelp name="helpSoapKeystoreEncryptionKeyAlias" defaultValue="soap.sts.keystore.encryption.key.alias.help" />
         </property>
 
         <property>

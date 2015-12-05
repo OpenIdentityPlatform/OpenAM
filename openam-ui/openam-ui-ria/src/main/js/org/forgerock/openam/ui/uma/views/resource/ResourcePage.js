@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
-    "backgrid",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/uma/views/share/CommonShare",
@@ -104,28 +104,28 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 message: $.t("uma.resources.show.revokeAllMessage"),
                 closable: false,
                 buttons: [{
+                    label: $.t("common.form.cancel"),
+                    action: function (dialog) {
+                        dialog.close();
+                    }
+                }, {
                     id: "btnOk",
                     label: $.t("common.form.ok"),
                     cssClass: "btn-primary btn-danger",
                     action: function (dialog) {
                         dialog.enableButtons(false);
                         dialog.getButton("btnOk").text($.t("common.form.working"));
-                        self.model.get("policy").destroy().done(function () {
+                        self.model.get("policy").destroy().then(function () {
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllPoliciesSuccess");
                             self.onModelChange(self.model);
-                        }).fail(function (error) {
+                        }, function (response) {
                             Messages.addMessage({
-                                response: error.responseText,
+                                response: response,
                                 type: Messages.TYPE_DANGER
                             });
                         }).always(function () {
                             dialog.close();
                         });
-                    }
-                }, {
-                    label: $.t("common.form.cancel"),
-                    action: function (dialog) {
-                        dialog.close();
                     }
                 }]
             });
@@ -281,7 +281,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             this.id = id;
         },
         renderWithModel: function (callback) {
-            var collection, grid, options, RevokeCell, SelectizeCell, self = this;
+            var collection, grid, RevokeCell, self = this;
 
             /**
              * FIXME: Ideally the data needs to the be whole model, but I'm told it's also global so we're
@@ -362,15 +362,15 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     self.renderLabelsOptions();
 
                     if (self.model.has("policy") && self.model.get("policy").get("permissions").length > 0) {
-                        self.$el.find("li#unshare").removeClass("disabled");
+                        self.$el.find("li#unshare").removeClass("disabled").find("a").attr("aria-disabled", false);
                     }
 
-                    self.$el.find("#backgridContainer").append(grid.render().el);
+                    self.$el.find(".table-container").append(grid.render().el);
                     // FIXME: Re-enable filtering and pagination
                     // self.$el.find("#paginationContainer").append(paginator.render().el);
 
                     self.$el.find("#umaShareImage img").error(function () {
-                        $(this).parent().addClass("no-image");
+                        $(this).parent().addClass("fa-file-image-o no-image");
                     });
 
                     var starredLabel = _.find(this.allLabels, { type: "STAR" }),

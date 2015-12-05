@@ -20,9 +20,11 @@ import static com.google.inject.multibindings.MapBinder.newMapBinder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.audit.AuditConstants.EventName;
 import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
 import static org.forgerock.openam.audit.AuditConstants.Component.CONFIG;
@@ -68,6 +70,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.SingletonResourceProvider;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
@@ -98,6 +101,8 @@ import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -331,7 +336,7 @@ public class RestRouterIT extends GuiceTestCase {
 
         Router internalRouter = InjectorHolder.getInstance(Key.get(Router.class, Names.named("InternalCrestRouter")));
 
-        Context context = mockSecurityContext();
+        Context context = mockRequiredContexts();
         ReadRequest request = Requests.newReadRequest("internal/123");
 
         // When
@@ -342,7 +347,14 @@ public class RestRouterIT extends GuiceTestCase {
     }
 
     private Context mockContext() {
-        AttributesContext httpRequestContext = new AttributesContext(new SessionContext(new RootContext(), mock(Session.class)));
+        return mockContext(null);
+    }
+
+    private Context mockContext(Context parent) {
+        if (parent == null) {
+            parent = new RootContext();
+        }
+        AttributesContext httpRequestContext = new AttributesContext(new SessionContext(parent, mock(Session.class)));
 
         HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
         httpRequestContext.getAttributes().put(HttpServletRequest.class.getName(), httpServletRequest);
@@ -350,8 +362,11 @@ public class RestRouterIT extends GuiceTestCase {
         return new RequestAuditContext(httpRequestContext);
     }
 
-    private Context mockSecurityContext() {
-        return new SecurityContext(mockContext(), null, null);
+    private Context mockRequiredContexts() {
+        final HttpContext httpContext = new HttpContext(json(object(
+                field(HttpContext.ATTR_HEADERS, Collections.singletonMap("Accept-Language", Arrays.asList("en"))),
+                field(HttpContext.ATTR_PARAMETERS, Collections.emptyMap()))), null);
+        return new SecurityContext(mockContext(httpContext), null, null);
     }
 
     private Request newRequest(String method, String uri) throws URISyntaxException {
@@ -363,7 +378,7 @@ public class RestRouterIT extends GuiceTestCase {
     }
 
     private void auditingOff() {
-        given(auditEventPublisher.isAuditing(NO_REALM, ACCESS_TOPIC)).willReturn(false);
+        given(auditEventPublisher.isAuditing(eq(NO_REALM), eq(ACCESS_TOPIC), any(EventName.class))).willReturn(false);
     }
 
     private void mockDnsAlias(String alias, String realm) throws Exception {

@@ -31,7 +31,7 @@
             </a>
         </li>
         <li>
-            <a href="#settingsTab" role="tab" data-toggle="tab" aria-expanded="false">{{t "common.form.settings"}}</a>
+            <a href="#settingsTab" role="tab" data-toggle="tab" aria-expanded="false">{{t "common.form.details"}}</a>
         </li>
     </ul>
 </div>
@@ -102,6 +102,19 @@
                     <label class="col-sm-2 control-label" for="policyDescription">{{t "console.common.description"}}</label>
                     <div class="col-sm-9">
                         <textarea class="form-control" id="policyDescription" data-field="description">{{entity.description}}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="policyActive">{{t "common.user.active"}}</label>
+                    <div class="col-sm-9">
+                        <div class="control-group">
+                            <div class="checkbox checkbox-slider-primary checkbox-slider checkbox-slider--b checkbox-slider-md">
+                                <label>
+                                    <input id="policyActive" type="checkbox" data-field="active" {{#if entity.active}}checked{{/if}}>
+                                    <span></span> {{!-- This span is required by titatoggle, for adding styles.  --}}
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

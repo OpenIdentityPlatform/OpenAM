@@ -28,29 +28,24 @@
  */
 package com.sun.identity.saml2.profile;
 
-import com.sun.identity.liberty.ws.paos.PAOSException;
+import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.liberty.ws.paos.PAOSConstants;
+import com.sun.identity.liberty.ws.paos.PAOSException;
 import com.sun.identity.liberty.ws.paos.PAOSHeader;
 import com.sun.identity.liberty.ws.paos.PAOSRequest;
-import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Issuer;
-import com.sun.identity.saml2.common.*;
-import com.sun.identity.saml2.logging.LogUtil;
+import com.sun.identity.saml2.common.QuerySignatureUtil;
+import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.ecp.ECPFactory;
 import com.sun.identity.saml2.ecp.ECPRelayState;
 import com.sun.identity.saml2.ecp.ECPRequest;
-import com.sun.identity.saml2.key.KeyUtil;
-import com.sun.identity.saml2.plugins.SAML2IDPFinder;
-import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
-import com.sun.identity.saml2.protocol.AuthnRequest;
-import com.sun.identity.saml2.protocol.Extensions;
-import com.sun.identity.saml2.protocol.GetComplete;
-import com.sun.identity.saml2.protocol.NameIDPolicy;
-import com.sun.identity.saml2.protocol.ProtocolFactory;
-import com.sun.identity.saml2.protocol.RequestedAuthnContext;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.AffiliationDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement;
@@ -58,31 +53,41 @@ import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
+import com.sun.identity.saml2.key.KeyUtil;
+import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.saml2.plugins.SAML2IDPFinder;
+import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.plugins.SPAuthnContextMapper;
-import com.sun.identity.saml2.protocol.Scoping; 
+import com.sun.identity.saml2.protocol.AuthnRequest;
+import com.sun.identity.saml2.protocol.Extensions;
+import com.sun.identity.saml2.protocol.GetComplete;
 import com.sun.identity.saml2.protocol.IDPEntry;
 import com.sun.identity.saml2.protocol.IDPList;
+import com.sun.identity.saml2.protocol.NameIDPolicy;
+import com.sun.identity.saml2.protocol.ProtocolFactory;
+import com.sun.identity.saml2.protocol.RequestedAuthnContext;
+import com.sun.identity.saml2.protocol.Scoping;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.PrivateKey;
-import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 
 /**
  * This class reads the query parameters and performs the required
@@ -127,26 +132,35 @@ public class SPSSOFederate {
                                  HttpServletResponse response,
                                  String metaAlias,
                                  String idpEntityID,
-                                 Map paramsMap) 
+                                 Map paramsMap)
                                  throws SAML2Exception {
 
         try {
             // get the sp entity ID from the metaAlias
-            String spEntityID = sm.getEntityByMetaAlias(metaAlias);
+            String spEntityID = getSPEntityId(metaAlias);
             String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
+
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("SPSSOFederate : spEntityID is :" 
-                                            + spEntityID);
+                SAML2Utils.debug.message("SPSSOFederate : spEntityID is :" + spEntityID);
                 SAML2Utils.debug.message("SPSSOFederate realm is :" + realm);
             }
-            initiateAuthnRequest(request,response,spEntityID,
-                                 idpEntityID,realm,paramsMap);
+
+            initiateAuthnRequest(request, response, spEntityID,  idpEntityID, realm, paramsMap);
         } catch (SAML2MetaException sme) {
-            SAML2Utils.debug.error("SPSSOFederate: Error retreiving spEntityID"+
-                                   " from MetaAlias",sme);
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("metaAliasError"));
+            SAML2Utils.debug.error("SPSSOFederate: Error retreiving spEntityID from MetaAlias",sme);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("metaAliasError"));
         }
+    }
+
+    /**
+     * Gets the SP Entity ID from the metaAlias.
+     *
+     * @param metaAlias the metaAlias String
+     * @return the EntityId of the SP from the meta Alias
+     * @throws SAML2MetaException if there was a problem extracting
+     */
+    public static String getSPEntityId(String metaAlias) throws SAML2MetaException {
+        return sm.getEntityByMetaAlias(metaAlias);
     }
 
     /**
@@ -169,46 +183,36 @@ public class SPSSOFederate {
      *              AuthLevel, and sunamcompositeadvice.
      * @throws SAML2Exception if error initiating request to IDP.
      */
-    public static void initiateAuthnRequest(HttpServletRequest request,
-                                 HttpServletResponse response,
-                                 String spEntityID,
-                                 String idpEntityID,
-                                 String realmName,
-                                 Map paramsMap) 
-                                 throws SAML2Exception {
+    private static void initiateAuthnRequest(HttpServletRequest request, HttpServletResponse response, String spEntityID,
+                                 String idpEntityID, String realmName, Map paramsMap)
+            throws SAML2Exception {
 
         if (FSUtils.needSetLBCookieAndRedirect(request, response, false)) {
             return;
         }
 
         if (spEntityID == null) {
-            SAML2Utils.debug.error("SPSSOFederate:Service Provider ID  "
-                                   + " is missing.");
-            String[] data = {spEntityID};
-            LogUtil.error(Level.INFO,LogUtil.INVALID_SP,data,null);
-            throw new SAML2Exception(
-                 SAML2Utils.bundle.getString("nullSPEntityID"));
+            SAML2Utils.debug.error("SPSSOFederate:Service Provider ID  is missing.");
+            String[] data = { spEntityID };
+            LogUtil.error(Level.INFO, LogUtil.INVALID_SP, data, null);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("nullSPEntityID"));
         }
         
         if (idpEntityID == null)  {
-            SAML2Utils.debug.error("SPSSOFederate: Identity Provider ID " 
-                                    + "is missing .");
+            SAML2Utils.debug.error("SPSSOFederate: Identity Provider ID is missing .");
             String[] data = { idpEntityID };
-            LogUtil.error(Level.INFO,LogUtil.INVALID_IDP,data,null);
-            throw new SAML2Exception(
-                 SAML2Utils.bundle.getString("nullIDPEntityID"));
+            LogUtil.error(Level.INFO, LogUtil.INVALID_IDP, data, null);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("nullIDPEntityID"));
         }
         
-        String binding = getParameter(paramsMap,SAML2Constants.REQ_BINDING);
+        String binding = getParameter(paramsMap, SAML2Constants.REQ_BINDING);
         if (binding == null) {
             binding = SAML2Constants.HTTP_REDIRECT;
         }
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message("SPSSOFederate: in initiateSSOFed");
-            SAML2Utils.debug.message("SPSSOFederate: spEntityID is : "
-                                      + spEntityID);
-            SAML2Utils.debug.message("SPSSOFederate: idpEntityID : " 
-                                      + idpEntityID);
+            SAML2Utils.debug.message("SPSSOFederate: spEntityID is : " + spEntityID);
+            SAML2Utils.debug.message("SPSSOFederate: idpEntityID : "  + idpEntityID);
         }
         
         String realm = getRealm(realmName);
@@ -216,38 +220,29 @@ public class SPSSOFederate {
         try {
             // Retreive MetaData 
             if (sm == null) {
-                throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("errorMetaManager"));
+                throw new SAML2Exception(SAML2Utils.bundle.getString("errorMetaManager"));
             }
-            SPSSOConfigElement spEntityCfg = 
-                            sm.getSPSSOConfig(realm,spEntityID);
-            Map spConfigAttrsMap=null;
-            if (spEntityCfg != null) {
-                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg);
-            }
+
+            Map spConfigAttrsMap = getAttrsMapForAuthnReq(realm, spEntityID);
+
              // get SPSSODescriptor
-            SPSSODescriptorElement spsso = 
-                                sm.getSPSSODescriptor(realm,spEntityID);
+            SPSSODescriptorElement spsso = getSPSSOForAuthnReq(realm, spEntityID);
 
             if (spsso == null) {
                 String[] data = { spEntityID };
-                LogUtil.error(Level.INFO,LogUtil.SP_METADATA_ERROR,data,
-                              null);
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
+                LogUtil.error(Level.INFO, LogUtil.SP_METADATA_ERROR, data, null);
+                throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
             }
-            List extensionsList = getExtensionsList(sm,spEntityID,realm);
+
+            List extensionsList = getExtensionsList(spEntityID, realm);
             
             // get IDP Descriptor
-            IDPSSODescriptorElement idpsso =
-                    sm.getIDPSSODescriptor(realm,idpEntityID);
+            IDPSSODescriptorElement idpsso = getIDPSSOForAuthnReq(realm, idpEntityID);
 
             if (idpsso == null) {
                 String[] data = { idpEntityID };
-                LogUtil.error(Level.INFO,LogUtil.IDP_METADATA_ERROR,data,
-                              null);
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
+                LogUtil.error(Level.INFO, LogUtil.IDP_METADATA_ERROR, data, null);
+                throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
             }
             
             List ssoServiceList = idpsso.getSingleSignOnService();
@@ -255,108 +250,59 @@ public class SPSSOFederate {
 
             if (ssoURL == null || ssoURL.length() == 0) {
               String[] data = { idpEntityID };
-              LogUtil.error(Level.INFO,LogUtil.SSO_NOT_FOUND,data,
-                            null);
-              throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("ssoServiceNotfound"));
+              LogUtil.error(Level.INFO, LogUtil.SSO_NOT_FOUND, data, null);
+              throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotfound"));
             }
 
             // create AuthnRequest 
-            AuthnRequest authnRequest = createAuthnRequest(realm,spEntityID,
-                paramsMap,spConfigAttrsMap,extensionsList,spsso, idpsso,
-                ssoURL, false);
+            AuthnRequest authnRequest = createAuthnRequest(realm, spEntityID, paramsMap, spConfigAttrsMap,
+                    extensionsList, spsso, idpsso, ssoURL, false);
                
             // invoke SP Adapter class if registered
-            SAML2ServiceProviderAdapter spAdapter = 
-                SAML2Utils.getSPAdapterClass(spEntityID, realmName); 
+            SAML2ServiceProviderAdapter spAdapter = SAML2Utils.getSPAdapterClass(spEntityID, realmName);
             if (spAdapter != null) {
-                spAdapter.preSingleSignOnRequest(spEntityID, idpEntityID,
-                    realmName, request, response, authnRequest);
+                spAdapter.preSingleSignOnRequest(spEntityID, idpEntityID, realmName, request, response, authnRequest);
             }
 
-            String authReqXMLString = authnRequest.toXMLString(true,true);
+            String authReqXMLString = authnRequest.toXMLString(true, true);
         
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("SPSSOFederate: AuthnRequest:" 
-                                          +authReqXMLString);
+                SAML2Utils.debug.message("SPSSOFederate: AuthnRequest:" + authReqXMLString);
             }
+
             // Default URL if relayState not present? in providerConfig?
             // TODO get Default URL from metadata 
-            String relayState = getParameter(paramsMap,
-                SAML2Constants.RELAY_STATE);
+            String relayState = getParameter(paramsMap, SAML2Constants.RELAY_STATE);
 
             // Validate the RelayState URL.
-            SAML2Utils.validateRelayStateURL(realm,
-                                             spEntityID,
-                                             relayState,
-                                             SAML2Constants.SP_ROLE);
+            SAML2Utils.validateRelayStateURL(realm, spEntityID, relayState, SAML2Constants.SP_ROLE);
 
             // check if relayState is present and get the unique
             // id which will be appended to the SSO URL before
             // redirecting.
             String relayStateID = null;
-            if (relayState != null && relayState.length()> 0) {
-                relayStateID = getRelayStateID(relayState,
-                    authnRequest.getID());
+            if (relayState != null && relayState.length() > 0) {
+                relayStateID = getRelayStateID(relayState, authnRequest.getID());
             }
 
-	    if (binding.equals(SAML2Constants.HTTP_POST)) {
-                if (((idpsso != null) && idpsso.isWantAuthnRequestsSigned()) ||
-                    ((spsso != null) && spsso.isAuthnRequestsSigned()) ) {
-                    String certAlias = getParameter(spConfigAttrsMap,
-                        SAML2Constants.SIGNING_CERT_ALIAS);
-		    signAuthnRequest(certAlias,authnRequest);
-	        }
-                String authXMLString = authnRequest.toXMLString(true,true);
-
-                if (SAML2Utils.debug.messageEnabled()) {
-                    SAML2Utils.debug.message(
-                        "SPSSOFederate.initiateAuthnRequest: " +
-                        "SAML Response content :\n" + authXMLString);
-                }
-                String encodedReqMsg = SAML2Utils.encodeForPOST(authXMLString);
-                SAML2Utils.postToTarget(request, response, "SAMLRequest",
-                    encodedReqMsg, "RelayState", relayStateID, ssoURL);
-	    } else {
-                // encode the xml string
-                String encodedXML = SAML2Utils.encodeForRedirect(
-                    authReqXMLString);
-        
-                StringBuffer queryString = new StringBuffer();
-                queryString.append(SAML2Constants.SAML_REQUEST)
-                           .append(SAML2Constants.EQUAL).append(encodedXML);
-        
-                if ((relayStateID != null) && (relayStateID.length() > 0)) {
-                    queryString.append("&").append(SAML2Constants.RELAY_STATE)
-                               .append("=")
-                               .append(URLEncDec.encode(relayStateID));
-                }
-
-                StringBuffer redirectURL = 
-                    new StringBuffer().append(ssoURL).append(ssoURL.contains("?") ? "&" : "?");
-                // sign the query string
-                if (((idpsso != null) && idpsso.isWantAuthnRequestsSigned()) ||
-                    ((spsso != null) && spsso.isAuthnRequestsSigned()) ) {
-                    String certAlias = getParameter(spConfigAttrsMap,
-                        SAML2Constants.SIGNING_CERT_ALIAS);
-                    String signedQueryStr = signQueryString(
-                        queryString.toString(), certAlias);
-                    redirectURL.append(signedQueryStr);
-                } else {
-                    redirectURL.append(queryString);
-                }
-                response.sendRedirect(redirectURL.toString());
+            if (binding.equals(SAML2Constants.HTTP_POST)) {
+                String encodedReqMsg = getPostBindingMsg(idpsso, spsso, spConfigAttrsMap, authnRequest);
+                SAML2Utils.postToTarget(request, response, "SAMLRequest", encodedReqMsg, "RelayState", relayStateID, ssoURL);
+            } else {
+                String redirect = getRedirect(authReqXMLString, relayStateID, ssoURL, idpsso, spsso, spConfigAttrsMap);
+                response.sendRedirect(redirect);
             }
+
             String[] data = { ssoURL };
-            LogUtil.access(Level.INFO,LogUtil.REDIRECT_TO_IDP,data,
-                           null);
+            LogUtil.access(Level.INFO, LogUtil.REDIRECT_TO_IDP, data, null);
             AuthnRequestInfo reqInfo = 
-                new AuthnRequestInfo(request,response,realm,spEntityID,
-                                     idpEntityID,authnRequest,relayState,
-                                     paramsMap);
+                new AuthnRequestInfo(request, response, realm, spEntityID,
+                        idpEntityID, authnRequest, relayState, paramsMap);
+
             synchronized(SPCache.requestHash) {             
                 SPCache.requestHash.put(authnRequest.getID(),reqInfo);
             }
+
             if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                 // sessionExpireTime is counted in seconds
                 long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;
@@ -380,6 +326,121 @@ public class SPSSOFederate {
             SAML2Utils.debug.error("SPSSOFederate:Error retrieving metadata", sme);
             throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
         }
+    }
+
+    /**
+     * Gets the redirect String.
+     *
+     * @param authReqXMLString Auth Request XML.
+     * @param relayStateID the id of the relay state
+     * @param ssoURL the url for the reidrect
+     * @param idpsso the idp descriptor to use
+     * @param spsso the sp descriptor to use
+     * @param spConfigAttrsMap the sp configuration details
+     * @return a String to use for the redirect request.
+     * @throws SAML2Exception if there is a problem creating the redirect string
+     */
+    public static String getRedirect(String authReqXMLString, String relayStateID, String ssoURL,
+                                      IDPSSODescriptorElement idpsso, SPSSODescriptorElement spsso, Map spConfigAttrsMap)
+            throws SAML2Exception {
+
+        // encode the xml string
+        String encodedXML = SAML2Utils.encodeForRedirect(authReqXMLString);
+
+        StringBuilder queryString = new StringBuilder();
+        queryString.append(SAML2Constants.SAML_REQUEST).append(SAML2Constants.EQUAL).append(encodedXML);
+
+        if ((relayStateID != null) && (relayStateID.length() > 0)) {
+            queryString.append("&").append(SAML2Constants.RELAY_STATE)
+                    .append("=")
+                    .append(URLEncDec.encode(relayStateID));
+        }
+
+        StringBuilder redirectURL =
+                new StringBuilder().append(ssoURL).append(ssoURL.contains("?") ? "&" : "?");
+        // sign the query string
+        if (idpsso.isWantAuthnRequestsSigned() || spsso.isAuthnRequestsSigned()) {
+            String certAlias = getParameter(spConfigAttrsMap, SAML2Constants.SIGNING_CERT_ALIAS);
+            String signedQueryStr = signQueryString(queryString.toString(), certAlias);
+            redirectURL.append(signedQueryStr);
+        } else {
+            redirectURL.append(queryString);
+        }
+
+        return redirectURL.toString();
+    }
+
+    /**
+     * Gets the SP SSO Descriptor for the given sp entity id in the given realm.
+     *
+     * @param realm the realm the sp is configured in
+     * @param spEntityID the entity id of the sp to get the Descriptor for
+     * @return the SPSSODescriptorElement for the requested sp entity
+     * @throws SAML2MetaException if there is a problem looking up the SPSSODescriptorElement.
+     */
+    public static SPSSODescriptorElement getSPSSOForAuthnReq(String realm, String spEntityID)
+            throws SAML2MetaException {
+        return sm.getSPSSODescriptor(realm, spEntityID);
+    }
+
+    /**
+     * Gets the Configuration attributes for the given sp entity id in the given realm.
+     * @param realm the realm the sp is configured in
+     * @param spEntityID the entity id of the sp to get the attributes map for
+     * @return a map of SAML2 Attributes with String keys mapped to a collection of values
+     * @throws SAML2MetaException
+     */
+    public static Map<String, Collection<String>> getAttrsMapForAuthnReq(String realm, String spEntityID)
+            throws SAML2MetaException {
+
+        SPSSOConfigElement spEntityCfg = sm.getSPSSOConfig(realm, spEntityID);
+        Map spConfigAttrsMap = null;
+
+        if (spEntityCfg != null) {
+            spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg);
+        }
+
+        return spConfigAttrsMap;
+    }
+
+    /**
+     * Gets the IDP SSO Descriptor for the given sp entity id in the given realm.
+     *
+     * @param realm the realm the idp is configured in
+     * @param idpEntityID the entity id of the idp[ to get the Descriptor for
+     * @return the SPSSODescriptorElement for the requested idp entity
+     * @throws SAML2MetaException if there is a problem looking up the IDPSSODescriptorElement.
+     */
+    public static IDPSSODescriptorElement getIDPSSOForAuthnReq(String realm, String idpEntityID)
+            throws SAML2MetaException {
+        return sm.getIDPSSODescriptor(realm, idpEntityID);
+    }
+
+    /**
+     * Gets the Post Binding message
+     *
+     * @param idpsso
+     * @param spsso
+     * @param spConfigAttrsMap
+     * @param authnRequest
+     * @return
+     * @throws SAML2Exception
+     */
+    public static String getPostBindingMsg(IDPSSODescriptorElement idpsso, SPSSODescriptorElement spsso,
+                                            Map spConfigAttrsMap, AuthnRequest authnRequest)
+            throws SAML2Exception {
+
+        if (idpsso.isWantAuthnRequestsSigned() || spsso.isAuthnRequestsSigned()) {
+            String certAlias = getParameter(spConfigAttrsMap, SAML2Constants.SIGNING_CERT_ALIAS);
+            signAuthnRequest(certAlias, authnRequest);
+        }
+        String authXMLString = authnRequest.toXMLString(true, true);
+
+        if (SAML2Utils.debug.messageEnabled()) {
+            SAML2Utils.debug.message("SPSSOFederate.initiateAuthnRequest: SAML Response content :\n" + authXMLString);
+        }
+
+        return SAML2Utils.encodeForPOST(authXMLString);
     }
 
     /**
@@ -444,7 +505,7 @@ public class SPSSOFederate {
             LogUtil.access(Level.INFO, LogUtil.RECEIVED_HTTP_REQUEST_ECP, data,
                 null);
 
-            List extensionsList = getExtensionsList(sm,spEntityID,realm);
+            List extensionsList = getExtensionsList(spEntityID, realm);
 
             // create AuthnRequest 
             AuthnRequest authnRequest = createAuthnRequest(realm, spEntityID,
@@ -564,12 +625,12 @@ public class SPSSOFederate {
 
             String body = authnRequest.toXMLString(true, true);
             try {
-                SOAPMessage reply = SAML2Utils.createSOAPMessage(header, body,
-                    false);
+                SOAPMessage reply = SOAPCommunicator.getInstance().createSOAPMessage(header, body,
+                        false);
 
                 String[] data2 = { spEntityID, realm, "" };
                 if (LogUtil.isAccessLoggable(Level.FINE)) {
-                    data2[2] = SAML2Utils.soapMessageToString(reply);
+                    data2[2] = SOAPCommunicator.getInstance().soapMessageToString(reply);
                 }
                 LogUtil.access(Level.INFO, LogUtil.SEND_ECP_PAOS_REQUEST, data2,
                     null);
@@ -631,6 +692,7 @@ public class SPSSOFederate {
 
     /**
      * Checks if the request is from ECP.
+     *
      * @param request the HttpServletRequest.
      * @return true if the request is from ECP.
      */
@@ -706,18 +768,31 @@ public class SPSSOFederate {
         issuer.setValue(spEntityID);
         return issuer;
     }
-    
-    /* Create AuthnRequest */
-    private static AuthnRequest createAuthnRequest(String realmName,
-        String spEntityID,
-        Map paramsMap,
-        Map spConfigMap,
-        List extensionsList,
-        SPSSODescriptorElement spsso,
-        IDPSSODescriptorElement idpsso,
-        String ssourl,
-        boolean isForECP
-        ) throws SAML2Exception {
+
+    /**
+     * Create an AuthnRequest.
+     *
+     * @param realmName the authentication realm for this request
+     * @param spEntityID the entity id for the service provider
+     * @param paramsMap the map of parameters for the authentication request
+     * @param spConfigMap the configuration map for the service provider
+     * @param extensionsList a list of extendsions for the authentication request
+     * @param spsso the SPSSODescriptorElement for theservcie provider
+     * @param idpsso the IDPSSODescriptorElement for the identity provider
+     * @param ssourl the url for the single sign on request
+     * @param isForECP boolean to indicatge if the request originated from an ECP
+     * @return a new AuthnRequest object
+     * @throws SAML2Exception
+     */
+    public static AuthnRequest createAuthnRequest(final String realmName,
+                                                  final String spEntityID,
+                                                  final Map paramsMap,
+                                                  final Map spConfigMap,
+                                                  final List extensionsList,
+                                                  final SPSSODescriptorElement spsso,
+                                                  final IDPSSODescriptorElement idpsso,
+                                                  final String ssourl,
+                                                  final boolean isForECP) throws SAML2Exception {
         // generate unique request ID
         String requestID = SAML2Utils.generateID();
         if ((requestID == null) || (requestID.length() == 0)) {
@@ -833,8 +908,14 @@ public class SPSSOFederate {
         return authnReq;        
     }
 
-    /* Returns value of parameter in the SP SSO Config */
-    public static Boolean getAttrValueFromMap(Map attrMap,String attrName) {
+    /**
+     * Returns value of an boolean parameter in the SP SSO Config.
+     * @param attrMap the map of attributes for the sso config
+     * @param attrName the key to get the boolean value for
+     * @return the value of the parameter in the sso config or null if the attribute was not found or was
+     * not a boolean parameter
+     */
+    public static Boolean getAttrValueFromMap(final Map attrMap, final String attrName) {
         Boolean boolVal = null;
         if (attrMap!=null && attrMap.size()> 0) {
             String attrVal = getParameter(attrMap,attrName);
@@ -847,9 +928,14 @@ public class SPSSOFederate {
           return boolVal;
      }
 
-
-    /* Returns the SingleSignOnService URL */
-    static String getSSOURL(List ssoServiceList, String binding) {
+    /**
+     * Returns the SingleSignOnService URL.
+     *
+     * @param ssoServiceList list of sso services
+     * @param binding binding of the sso service to get the url for
+     * @return a string url for the sso service
+     */
+    public static String getSSOURL(List ssoServiceList, String binding) {
          String ssoURL = null;
          if ((ssoServiceList != null) && (!ssoServiceList.isEmpty())) {
             Iterator i = ssoServiceList.iterator();
@@ -918,12 +1004,23 @@ public class SPSSOFederate {
         return ol;
     }
 
-    /* Returns the realm */
-    private static String getRealm(String realm) {
+    /**
+     * Fills in the realm with the default top level realm if it does not contain a more specific subrealm.
+     * i.e. if it is null or empty it becomes "/"
+     * @param realm the current realm
+     * @return the realm to use
+     */
+    public static String getRealm(final String realm) {
         return ((realm == null) || (realm.length() == 0)) ? "/" : realm;
     }
 
-    /* Returns value of isPassive attribute */
+    /**
+     * Gets isPassive attribute from the config map and parameters map.
+     *
+     * @param paramsMap the map of the parameters
+     * @param spConfigAttrsMap the map of the configuration
+     * @return boolean to indicate if the request should be passive
+     */
     private static Boolean doPassive(Map paramsMap,Map spConfigAttrsMap){
         // get isPassive
         Boolean isPassive=Boolean.FALSE;
@@ -946,7 +1043,7 @@ public class SPSSOFederate {
 
     /* Returns value of ForceAuthn */
     private static Boolean isForceAuthN(Map paramsMap,Map spConfigAttrsMap) {
-        Boolean isforceAuthn= Boolean.FALSE;
+        Boolean isforceAuthn;
         String forceAuthn = getParameter(paramsMap,SAML2Constants.FORCEAUTHN);
         if ((forceAuthn != null) && 
                 ((forceAuthn.equals(SAML2Constants.TRUE) ||
@@ -1019,7 +1116,12 @@ public class SPSSOFederate {
         return attrIndex;      
     }
   
-    /* Returns the query parameter value for the param specified */
+    /**
+     * Gets the query parameter value for the param specified.
+     * @param paramsMap the map of parameters
+     * @param attrName the parameter name to get the value for
+     * @return the string value for the given parameter
+     */
     public static String getParameter(Map paramsMap,String attrName) {
         String attrVal = null;
         if ((paramsMap != null) && (!paramsMap.isEmpty())) { 
@@ -1031,9 +1133,14 @@ public class SPSSOFederate {
         return attrVal;
     }
     
-    /* Returns the extensions list */
-    private static List getExtensionsList(SAML2MetaManager sm,
-                                String entityID,String realm) {
+    /**
+     * Gets the extensions list for the sp entity.
+     *
+     * @param entityID the entity of the id for get the extensions list for
+     * @param realm the realm that the entity is configured in
+     * @return a List ofd the extensions for the sso request
+     */
+    public static List getExtensionsList(String entityID,String realm) {
         List extensionsList = null;
         try {
             EntityDescriptorElement ed = sm.getEntityDescriptor(realm,entityID);
@@ -1063,6 +1170,13 @@ public class SPSSOFederate {
     }
 
 
+    /**
+     * Gets the Relay State ID for the request.
+     *
+     * @param relayState the relay state
+     * @param requestID the request id
+     * @return the relay state id
+     */
     public static String getRelayStateID(String relayState, String requestID) {
         
         SPCache.relayStateHash.put(requestID, new CacheObject(relayState));
@@ -1121,10 +1235,15 @@ public class SPSSOFederate {
         return reqCtx;
    }
 
-   /** 
-    * Signs the query string.
-    */
-    public static String signQueryString(String queryString,String certAlias)
+    /**
+     * Signs the query string.
+     *
+     * @param queryString the query string
+     * @param certAlias the certificate alias
+     * @return the signed query string
+     * @throws SAML2Exception
+     */
+    public static String signQueryString(final String queryString, final String certAlias)
         throws SAML2Exception {
         if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message("SPSSOFederate:queryString:" 
@@ -1137,8 +1256,15 @@ public class SPSSOFederate {
         return QuerySignatureUtil.sign(queryString,privateKey);
     }
 
-    public static void signAuthnRequest(String certAlias,
-        AuthnRequest authnRequest) throws SAML2Exception {
+    /**
+     * Sign an authentication request.
+     *
+     * @param certAlias the certificate alias
+     * @param authnRequest the authentication request to sign
+     * @throws SAML2Exception the signed authentication request
+     */
+    public static void signAuthnRequest(final String certAlias,
+                                        final AuthnRequest authnRequest) throws SAML2Exception {
 
         KeyProvider kp = KeyUtil.getKeyProviderInstance();
         if (kp == null) {

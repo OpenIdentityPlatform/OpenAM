@@ -178,4 +178,16 @@
         </triggers>
         <actions />
     </logmessage>
+    <logmessage name="UPDATED_AUTHORIZATION_CODE" id="17"
+                loglevel="LL_INFO"
+                description="Updated an OAuth2 authorization code">
+        <datainfo>
+            <item>message</item>
+            <item>token info</item>
+        </datainfo>
+        <triggers>
+            <item>Updated an OAuth2 authorization code</item>
+        </triggers>
+        <actions />
+    </logmessage>
 </logmessages>

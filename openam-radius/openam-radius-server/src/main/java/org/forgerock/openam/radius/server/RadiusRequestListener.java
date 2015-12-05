@@ -29,11 +29,12 @@ import java.text.MessageFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.forgerock.openam.radius.common.PacketType;
+import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.openam.radius.server.config.ClientConfig;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import org.forgerock.openam.radius.server.config.RadiusServiceConfig;
-import org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrator;
+import org.forgerock.openam.radius.server.events.PacketProcessedEvent;
+import org.forgerock.openam.radius.server.events.PacketReceivedEvent;
 import org.forgerock.util.promise.PromiseImpl;
 
 import com.sun.identity.shared.debug.Debug;
@@ -80,31 +81,42 @@ public class RadiusRequestListener implements Runnable {
     private volatile Thread listenerThread = null;
 
     /**
-     * An interface through which we can notify the registrar of events occurring
-     */
-    private final RadiusServerEventRegistrator eventRegistrator;
-
-    /**
      * Service factory from which we may obtain an executor service that is automatically wired up to shutdown when the
      * shutdown listener event triggers.
      */
     private final ExecutorService executorService;
 
     /**
+     * Issue events so that we can do things like audit events and JMXMonitoring etc.
+     */
+    private EventBus eventBus;
+
+    /**
+     * A factory that a <code>RadiusRequestHandler</code> may use to create <code>AccessRequestHandler</code> instances.
+     */
+    private AccessRequestHandlerFactory accessRequestHandlerFactory;
+
+    /**
      * Construct listener, opens the DatagramChannel to receive requests, sets up the thread pool, and launches the
      * listener's thread which will capture the requests, drop unauthorized clients, and spool to the thread pool.
      *
-     * @param config
-     *            the configuration loaded from our admin console pages
-     * @throws RadiusLifecycleException
+     * @param config the configuration loaded from our admin console pages
+     * @param executorService the thread pool executor to process radius requests.
+     * @param eventBus may used to notify interested parties when events occur during the processing of radius events.
+     * @param accessRequestHandlerFactory used to obtain access request handler classes for specific clients, as defined
+     *            in the configuration.
+     * @throws RadiusLifecycleException when the config is insufficient or invalid.
      */
-    public RadiusRequestListener(RadiusServiceConfig config, RadiusServerEventRegistrator eventRegistrator,
-            ExecutorService executorService)
+    public RadiusRequestListener(final RadiusServiceConfig config,
+            final ExecutorService executorService,
+            final EventBus eventBus,
+            final AccessRequestHandlerFactory accessRequestHandlerFactory)
             throws RadiusLifecycleException {
         LOG.warning("RADIUS service enabled. Starting Listener.");
         this.config = config;
-        this.eventRegistrator = eventRegistrator;
         this.executorService = executorService;
+        this.eventBus = eventBus;
+        this.accessRequestHandlerFactory = accessRequestHandlerFactory;
 
         // lets get our inbound channel opened and bound
         try {
@@ -234,9 +246,11 @@ public class RadiusRequestListener implements Runnable {
                 try {
                     iAddr = (InetSocketAddress) channel.receive(bfr);
                     if (iAddr == null) {
-                        continue; // no datagram was available, it happens, just go back to listening
+                        // no datagram was available, it happens, just go back to listening
+                        LOG.message("DatagramChannel receive returned null. No datagram available.");
+                        continue;
                     } else {
-                        eventRegistrator.packetReceived();
+                        eventBus.post(new PacketReceivedEvent());
                     }
                 } catch (final ClosedByInterruptException c) {
                     interrupted = true;
@@ -267,17 +281,16 @@ public class RadiusRequestListener implements Runnable {
                 bfr.flip();
                 final RadiusRequestContext reqCtx = new RadiusRequestContext(clientConfig, channel, iAddr);
 
-                final PromiseImpl<RadiusAuthResult, RadiusProcessingException> promise = PromiseImpl.create();
-                final RadiusRequestHandler requestHandler = new RadiusRequestHandler(reqCtx, bfr, promise, promise);
-                eventRegistrator.packetAccepted();
+                final PromiseImpl<RadiusResponse, RadiusProcessingException> promise = PromiseImpl.create();
+                final RadiusRequestHandler requestHandler = new RadiusRequestHandler(accessRequestHandlerFactory,
+                        reqCtx, bfr, promise, promise,
+                        eventBus);
 
                 executorService.execute(requestHandler);
 
                 try {
-                    final RadiusAuthResult result = promise.getOrThrow();
-                    eventRegistrator.packetProcessed();
-                    final PacketType finalPacketTypeSent = result.getFinalPacketType();
-                    notifyRegistrarOfResult(finalPacketTypeSent);
+                    final RadiusResponse result = promise.getOrThrow();
+                    eventBus.post(new PacketProcessedEvent());
 
                 } catch (final RadiusProcessingException e) {
                     final RadiusProcessingExceptionNature nature = e.getNature();
@@ -315,29 +328,6 @@ public class RadiusRequestListener implements Runnable {
         }
         LOG.message("RADIUS Listener Exited.");
         this.listenerThread = null;
-    }
-
-    /**
-     * @param finalPacketType
-     */
-    private void notifyRegistrarOfResult(PacketType finalPacketTypeSent) {
-        if (finalPacketTypeSent != null) {
-            LOG.message("finalPacketType sent in response to auth request: '" + finalPacketTypeSent.toString() + "'");
-            switch (finalPacketTypeSent) {
-            case ACCESS_ACCEPT:
-                eventRegistrator.authRequestAccepted();
-                break;
-            case ACCESS_REJECT:
-                eventRegistrator.authRequestRejected();
-                break;
-            default:
-                // Anything else here should have resulted in a RadiusProcessingException
-                LOG.error("Unexpected final packet type sent to client.");
-                break;
-            }
-        } else {
-            LOG.error("final packet type was null!");
-        }
     }
 
     private void dumpBannerToLog() {

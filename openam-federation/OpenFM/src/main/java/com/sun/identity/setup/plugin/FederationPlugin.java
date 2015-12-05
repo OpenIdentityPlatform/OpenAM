@@ -24,31 +24,26 @@
  *
  * $Id: FederationPlugin.java,v 1.8 2008/10/30 18:24:04 mallas Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
                                                                                 
 package com.sun.identity.setup.plugin;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.configuration.FedLibSystemProperties;
 import com.sun.identity.saml.common.SAMLSiteID;
 import com.sun.identity.setup.ConfiguratorPlugin;
 import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.configuration.ConfigurationFileLocator;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.InputStreamReader;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import javax.servlet.ServletContext;
 
@@ -133,9 +128,7 @@ public class FederationPlugin implements ConfiguratorPlugin {
                "com.sun.identity.authentication.modules.federation.Federation");
             modules.add(
                "com.sun.identity.authentication.modules.sae.SAE");
-            modules.add(
-               "com.sun.identity.authentication.modules.wss.WSSAuthModule");
-            
+
             ss.setAttributeDefaults(values);
         } catch (SSOException e) {
             e.printStackTrace();

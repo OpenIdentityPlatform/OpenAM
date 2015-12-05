@@ -41,15 +41,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             var self = this;
 
             this.data.realmPath = args[0];
-            this.data.name = args[1];
-            this.data.type = args[2];
+            this.data.type = args[1];
+            this.data.name = args[2];
 
             $.when(
                 SMSGlobalDelegate.authentication.modules.schema(this.data.type),
-                SMSRealmDelegate.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type)
-            ).done(function (schemaData, valuesData) {
+                SMSRealmDelegate.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type),
+                SMSRealmDelegate.authentication.modules.types.get(this.data.realmPath, this.data.type)
+            ).done(function (schemaData, valuesData, moduleType) {
                 self.data.schema = schemaData;
                 self.data.values = valuesData;
+                self.data.typeDescription = moduleType.name;
 
                 self.parentRender(function () {
                     if (!self.data.schema.grouped) {

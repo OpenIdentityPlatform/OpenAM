@@ -11,16 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.common;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.sun.identity.shared.encode.URLEncDec;
 import org.apache.commons.lang.RandomStringUtils;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class SAML2UtilsTest {
@@ -45,7 +49,29 @@ public class SAML2UtilsTest {
             String randomString = RandomStringUtils.randomAlphanumeric(size);
             String encoded = SAML2Utils.encodeForRedirect(randomString);
             String decoded = SAML2Utils.decodeFromRedirect(URLEncDec.decode(encoded));
-            Assert.assertEquals(decoded, randomString);
+            assertThat(decoded).isEqualTo(randomString);
         }
+    }
+
+    @Test
+    public void getMappedAttributesTest() {
+
+        List<String> mappings = new ArrayList<>(6);
+
+        mappings.add("invalid entry");
+        mappings.add("name1=value");
+        mappings.add("name2=\"static value\"");
+        mappings.add("name3=\"static cn=value\"");
+        mappings.add("urn:oasis:names:tc:SAML:2.0:attrname-format:uri|urn:mace:dir:attribute-def:name4=value");
+        mappings.add("urn:oasis:names:tc:SAML:2.0:attrname-format:uri|name5=\"static value\"");
+
+        Map<String, String> mappedAttributes = SAML2Utils.getMappedAttributes(mappings);
+
+        assertThat(mappedAttributes).isNotNull().hasSize(5);
+        assertThat(mappedAttributes).containsEntry("name1", "value");
+        assertThat(mappedAttributes).containsEntry("name2", "\"static value\"");
+        assertThat(mappedAttributes).containsEntry("name3", "\"static cn=value\"");
+        assertThat(mappedAttributes).containsEntry("urn:oasis:names:tc:SAML:2.0:attrname-format:uri|urn:mace:dir:attribute-def:name4", "value");
+        assertThat(mappedAttributes).containsEntry("urn:oasis:names:tc:SAML:2.0:attrname-format:uri|name5", "\"static value\"");
     }
 }

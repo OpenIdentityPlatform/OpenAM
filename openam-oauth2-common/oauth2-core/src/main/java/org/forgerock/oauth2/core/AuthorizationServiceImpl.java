@@ -29,6 +29,7 @@ import org.forgerock.guava.common.base.Predicates;
 import org.forgerock.guava.common.collect.Maps;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -61,28 +62,31 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private final ResourceOwnerConsentVerifier consentVerifier;
     private final ClientRegistrationStore clientRegistrationStore;
     private final AuthorizationTokenIssuer tokenIssuer;
+    private final ClientAuthenticationFailureFactory failureFactory;
 
     /**
      * Constructs a new AuthorizationServiceImpl.
-     *
      * @param requestValidators A {@code List} of AuthorizeRequestValidators.
      * @param resourceOwnerSessionValidator An instance of the ResourceOwnerSessionValidator.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param consentVerifier An instance of the ResourceOwnerConsentVerifier.
      * @param clientRegistrationStore An instance of the ClientRegistrationStore.
      * @param tokenIssuer An instance of the AuthorizationTokenIssuer.
+     * @param failureFactory The factory which creates ClientExceptions
      */
     @Inject
     public AuthorizationServiceImpl(List<AuthorizeRequestValidator> requestValidators,
             ResourceOwnerSessionValidator resourceOwnerSessionValidator,
             OAuth2ProviderSettingsFactory providerSettingsFactory, ResourceOwnerConsentVerifier consentVerifier,
-            ClientRegistrationStore clientRegistrationStore, AuthorizationTokenIssuer tokenIssuer) {
+            ClientRegistrationStore clientRegistrationStore, AuthorizationTokenIssuer tokenIssuer,
+            ClientAuthenticationFailureFactory failureFactory) {
         this.requestValidators = requestValidators;
         this.resourceOwnerSessionValidator = resourceOwnerSessionValidator;
         this.providerSettingsFactory = providerSettingsFactory;
         this.consentVerifier = consentVerifier;
         this.clientRegistrationStore = clientRegistrationStore;
         this.tokenIssuer = tokenIssuer;
+        this.failureFactory = failureFactory;
     }
 
     /**
@@ -132,9 +136,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                 logger.debug("Couldn't get user info - continuing to display consent page without claims.", e);
             }
 
-            final String clientName = clientRegistration.getDisplayName(locale);
+            String clientName = clientRegistration.getDisplayName(locale);
             if (clientName == null) {
-                throw new InvalidClientException("Display name has not been set.");
+                clientName = clientRegistration.getClientId();
+                logger.warn("Client does not have a display name or client name set. using client ID {} for display",
+                        clientName);
             }
             final String displayDescription = clientRegistration.getDisplayDescription(locale);
             final String clientDescription = displayDescription == null ? "" : displayDescription;

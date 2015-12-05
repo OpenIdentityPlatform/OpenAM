@@ -31,6 +31,8 @@
 package com.sun.identity.saml2.assertion;
 
 import java.util.Date;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.sun.identity.saml2.assertion.impl.AuthnStatementImpl;
 import com.sun.identity.saml2.common.SAML2Exception;
 
 /**
@@ -62,6 +64,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * </pre>
  * @supported.all.api
  */
+@JsonDeserialize(as=AuthnStatementImpl.class)
 public interface AuthnStatement extends Statement {
 
     /**

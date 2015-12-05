@@ -17,9 +17,11 @@
 package org.forgerock.openam.selfservice;
 
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.openam.selfservice.config.custom.CustomSupportConfigVisitor;
+import org.forgerock.openam.shared.security.crypto.KeyPairProvider;
+import org.forgerock.openam.shared.security.crypto.KeyPairProviderFactory;
 import org.forgerock.selfservice.core.AnonymousProcessService;
 import org.forgerock.selfservice.core.ProcessStore;
+import org.forgerock.selfservice.core.ProgressStageProvider;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
 
@@ -32,31 +34,40 @@ import javax.inject.Inject;
  */
 class SelfServiceFactoryImpl implements SelfServiceFactory {
 
-    private final SnapshotTokenHandlerFactory tokenHandlerFactory;
+    private final ProgressStageProvider stageProvider;
+    private final KeyPairInjector<SnapshotTokenHandlerFactory> keyPairInjector;
+    private final KeyPairProviderFactory keyPairProviderFactory;
     private final ProcessStore processStore;
-    private final CustomSupportConfigVisitor stageConfigVisitor;
 
     /**
      * Constructs the default forgotten password service provider.
      *
-     * @param tokenHandlerFactory
-     *         snapshot token handler factory
+     * @param stageProvider
+     *         progress stage provider
+     * @param keyPairInjector
+     *         key pair provider injector
+     * @param keyPairProviderFactory
+     *         key pair provider factory
      * @param processStore
      *         local process store
-     * @param stageConfigVisitor
-     *         stage config visitor
      */
     @Inject
-    SelfServiceFactoryImpl(SnapshotTokenHandlerFactory tokenHandlerFactory,
-            ProcessStore processStore, CustomSupportConfigVisitor stageConfigVisitor) {
-        this.tokenHandlerFactory = tokenHandlerFactory;
+    SelfServiceFactoryImpl(ProgressStageProvider stageProvider,
+            KeyPairInjector<SnapshotTokenHandlerFactory> keyPairInjector,
+            KeyPairProviderFactory keyPairProviderFactory, ProcessStore processStore) {
+        this.stageProvider = stageProvider;
+        this.keyPairInjector = keyPairInjector;
+        this.keyPairProviderFactory = keyPairProviderFactory;
         this.processStore = processStore;
-        this.stageConfigVisitor = stageConfigVisitor;
     }
 
     @Override
-    public RequestHandler getService(ProcessInstanceConfig<CustomSupportConfigVisitor> serviceConfig) {
-        return new AnonymousProcessService<>(serviceConfig, stageConfigVisitor, tokenHandlerFactory, processStore);
+    public RequestHandler getService(String realm, ProcessInstanceConfig serviceConfig) {
+        KeyPairProvider keyPairProvider = keyPairProviderFactory.getProvider(realm);
+        SnapshotTokenHandlerFactory tokenHandlerFactory = keyPairInjector.getInjectedWith(keyPairProvider);
+        ClassLoader classLoader = getClass().getClassLoader();
+        return new AnonymousProcessService(serviceConfig, stageProvider,
+                tokenHandlerFactory, processStore, classLoader);
     }
 
 }

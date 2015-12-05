@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.shared.concurrency;
 
 import com.sun.identity.shared.debug.Debug;
@@ -189,6 +190,8 @@ public class ThreadMonitor {
         }
 
         /**
+         * Gets the future for the task.
+         *
          * @return May be null if called before the task has been started.
          */
         private synchronized Future<?> getFuture() {
@@ -196,6 +199,8 @@ public class ThreadMonitor {
         }
 
         /**
+         * Sets the future for the started task.
+         *
          * @param future The future for the started task. Must not be null.
          */
         private synchronized void setFuture(Future<?> future) {
@@ -247,11 +252,15 @@ public class ThreadMonitor {
      */
     private interface StartThread {
         /**
+         * Starts the thread.
+         *
          * @return The future based on the result of submitting a Runnable to an ExecutorService. Not null.
          */
         Future<?> start();
 
         /**
+         * Returns the Identification details of the thread.
+         *
          * @return Identification details of the thread.
          */
         String toString();

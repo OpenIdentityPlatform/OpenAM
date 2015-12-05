@@ -16,14 +16,18 @@
 
 package org.forgerock.openam.uma.rest;
 
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.utils.Config;
@@ -61,7 +65,8 @@ public class UmaPolicyResourceAuthzFilter extends ResourceOwnerOrSuperUserAuthzM
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context context, CreateRequest request) {
         try {
-            if (!getUserId(context).equalsIgnoreCase(getUserIdFromUri(context))) {
+            SSOTokenContext ssoTokenContext = context.asContext(SSOTokenContext.class);
+            if (!getUserId(ssoTokenContext.getCallerSSOToken()).equalsIgnoreCase(getUserIdFromUri(context))) {
                 return Promises.newResultPromise(
                         AuthorizationResult.accessDenied("Only resource owner of resource set can create UMA "
                                 + "policies for it."));
@@ -70,6 +75,8 @@ public class UmaPolicyResourceAuthzFilter extends ResourceOwnerOrSuperUserAuthzM
             }
         } catch (ResourceException e) {
             return e.asPromise();
+        } catch (SSOException e) {
+            return newResultPromise(AuthorizationResult.accessDenied("Not authorized."));
         }
     }
 }

@@ -118,11 +118,12 @@ public class OpenAMResourceSetStoreTest {
                 QueryFilter.and(
                         QueryFilter.and(
                                 QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
-                                QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM")))))
+                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID")),
+                        QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
                 .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
-        ResourceSetDescription readResourceSetDescription = store.read("RESOURCE_SET_ID");
+        ResourceSetDescription readResourceSetDescription = store.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID");
 
         //Then
         assertThat(readResourceSetDescription).isEqualTo(readResourceSetDescription);
@@ -135,7 +136,7 @@ public class OpenAMResourceSetStoreTest {
         given(dataStore.read("123")).willThrow(new org.forgerock.openam.sm.datalayer.store.NotFoundException("not found"));
 
         //When
-        store.read("123");
+        store.read("123", "RESOURCE_OWNER_ID");
 
         //Then
         //Excepted NotFoundException
@@ -154,7 +155,8 @@ public class OpenAMResourceSetStoreTest {
                 QueryFilter.and(
                         QueryFilter.and(
                                 QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
-                                QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM")))))
+                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID")),
+                                QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
                 .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
@@ -189,7 +191,8 @@ public class OpenAMResourceSetStoreTest {
                 QueryFilter.and(
                         QueryFilter.and(
                                 QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
-                                QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM")))))
+                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID")),
+                        QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
                 .willReturn(Collections.singleton(resourceSetDescription));
 
         //When

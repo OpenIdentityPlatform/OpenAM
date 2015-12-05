@@ -26,7 +26,6 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
 
 import java.security.KeyPair;
 import java.security.MessageDigest;
@@ -56,6 +55,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -95,10 +95,16 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     private final SSOTokenManager ssoTokenManager;
     private final CookieExtractor cookieExtractor;
     private final SecureRandom secureRandom;
+    private final ClientAuthenticationFailureFactory failureFactory;
+
+    //removed 0, 1, U, u, 8, 9 and l due to similarities to O, I, V, v, B, g and I on some displays
+    protected final static String ALPHABET = "234567ABCDEFGHIJKLMNOPQRSTVWXYZabcdefghijkmnopqrstvwxyz";
+
+    private final static int CODE_LENGTH = 8;
+    private final static int NUM_RETRIES = 10;
 
     /**
      * Constructs a new OpenAMTokenStore.
-     *
      * @param tokenStore An instance of the OAuthTokenStore.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param clientRegistrationStore An instance of the OpenIdConnectClientRegistrationStore.
@@ -106,12 +112,14 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * @param ssoTokenManager An instance of the SSOTokenManager
      * @param cookieExtractor An instance of the CookieExtractor
      * @param auditLogger An instance of OAuth2AuditLogger
+     * @param failureFactory
      */
     @Inject
     public OpenAMTokenStore(OAuthTokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
-            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger, SecureRandom secureRandom) {
+            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger, SecureRandom secureRandom,
+            ClientAuthenticationFailureFactory failureFactory) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.clientRegistrationStore = clientRegistrationStore;
@@ -121,6 +129,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         this.auditLogger = auditLogger;
         this.logger = logger;
         this.secureRandom = secureRandom;
+        this.failureFactory = failureFactory;
     }
 
     /**
@@ -289,7 +298,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             }
 
         } catch (UnauthorizedClientException e) {
-            throw new InvalidClientException(e.getMessage());
+            throw failureFactory.getException(request, e.getMessage());
         }
 
     }
@@ -322,7 +331,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
                     }
                 }
             } catch (UnauthorizedClientException e) {
-                throw new InvalidClientException(e.getMessage());
+                throw failureFactory.getException(request, e.getMessage());
             } catch (JSONException e) {
                 //if claims object not found, fall through
             }
@@ -598,59 +607,44 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * {@inheritDoc}
      */
     public void updateAuthorizationCode(AuthorizationCode authorizationCode) {
-        deleteAuthorizationCode(authorizationCode.getTokenId());
-
-        // Store in CTS
         try {
-            tokenStore.create(authorizationCode);
+            tokenStore.update(authorizationCode);
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"UPDATED_AUTHORIZATION_CODE", authorizationCode.toString()};
-                auditLogger.logAccessMessage("CREATED_AUTHORIZATION_CODE", obs, null);
+                auditLogger.logAccessMessage("UPDATED_AUTHORIZATION_CODE", obs, null);
             }
         } catch (CoreTokenException e) {
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_UPDATE_AUTHORIZATION_CODE", authorizationCode.toString()};
                 auditLogger.logErrorMessage("FAILED_UPDATE_AUTHORIZATION_CODE", obs, null);
             }
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
+            logger.error("DefaultOAuthTokenStoreImpl::Unable to update authorization code "
                     + authorizationCode.getTokenInfo(), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not create token in CTS", null);
+                    "Internal error", "Could not update token in CTS", null);
         }
     }
 
     public void updateAccessToken(AccessToken accessToken) {
         try {
-            deleteAccessToken(accessToken.getTokenId());
-            tokenStore.create(accessToken);
-        } catch (ServerException e) {
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to delete access token "
-                    + accessToken.getTokenId(), e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not delete token in CTS", null);
+            tokenStore.update(accessToken);
         } catch (CoreTokenException e) {
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to create access token "
+            logger.error("DefaultOAuthTokenStoreImpl::Unable to update access token "
                     + accessToken.getTokenId(), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not create token in CTS", null);
+                    "Internal error", "Could not update token in CTS", null);
         }
     }
 
     @Override
     public void updateRefreshToken(RefreshToken refreshToken) {
         try {
-            deleteRefreshToken(refreshToken.getTokenId());
-            tokenStore.create(refreshToken);
+            tokenStore.update(refreshToken);
         } catch (CoreTokenException e) {
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token "
+            logger.error("DefaultOAuthTokenStoreImpl::Unable to update refresh token "
                     + refreshToken.getTokenId(), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not create token in CTS", null);
-        } catch (InvalidRequestException e) {
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to delete refresh token "
-                    + refreshToken.getTokenId(), e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not delete token in CTS", null);
+                    "Internal error", "Could not update token in CTS", null);
         }
     }
 
@@ -816,27 +810,29 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String deviceCode = UUID.randomUUID().toString();
+        final StringBuilder codeBuilder = new StringBuilder(CODE_LENGTH);
 
         String userCode = null;
+
         int i;
-        for (i = 0; userCode == null && i < 10; i++) {
-            // A 6-byte array will result in an 8-char Base64 user code.
-            byte[] randomBytes = new byte[6];
-            secureRandom.nextBytes(randomBytes);
-            userCode = Base64.encode(randomBytes);
+        for (i = 0; i < NUM_RETRIES; i++) {
+            for (int k = 0; k < CODE_LENGTH; k++) {
+                codeBuilder.append(ALPHABET.charAt(secureRandom.nextInt(ALPHABET.length())));
+            }
             try {
-                readDeviceCode(userCode, request);
+                readDeviceCode(codeBuilder.toString(), request);
+                codeBuilder.delete(0, codeBuilder.length());
                 // code can be found - try again
             } catch (InvalidGrantException e) {
                 // Good, it doesn't exist yet.
+                userCode = codeBuilder.toString();
                 break;
             } catch (ServerException e) {
                 logger.message("Could not query CTS, assume duplicate to be safe", e);
             }
-            userCode = null;
         }
 
-        if (i == 10) {
+        if (i == NUM_RETRIES) {
             throw new ServerException("Could not generate a unique user code");
         }
 

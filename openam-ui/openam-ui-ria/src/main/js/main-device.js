@@ -18,6 +18,7 @@ require.config({
     map: {
         "*" : {
             "ThemeManager" : "org/forgerock/openam/ui/common/util/ThemeManager",
+            "Router": "org/forgerock/openam/ui/common/SingleRouteRouter",
             // TODO: Remove this when there are no longer any references to the "underscore" dependency
             "underscore"   : "lodash"
         }
@@ -52,11 +53,12 @@ require([
     "text!templates/user/DeviceDoneTemplate.html",
     "text!templates/common/LoginBaseTemplate.html",
     "text!templates/common/FooterTemplate.html",
+    "text!templates/common/LoginHeaderTemplate.html",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "ThemeManager",
-    "org/forgerock/commons/ui/common/util/URIUtils"
+    "Router"
 ], function ($, HandleBars, Configuration, Constants, DeviceTemplate, DeviceDoneTemplate,
-            LoginBaseTemplate, FooterTemplate, i18nManager, ThemeManager, URIUtils) {
+            LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate, i18nManager, ThemeManager, Router) {
     var data = window.pageData,
         template = data.done ? DeviceDoneTemplate : DeviceTemplate;
 
@@ -69,12 +71,16 @@ require([
     });
 
     Configuration.globalData = { realm : data.realm };
+    Router.currentRoute = {
+        navGroup: "user"
+    };
 
     ThemeManager.getTheme().always(function (theme) {
         data.theme = theme;
 
         $("#wrapper").html(HandleBars.compile(LoginBaseTemplate)(data));
         $("#footer").html(HandleBars.compile(FooterTemplate)(data));
+        $("#loginBaseLogo").html(HandleBars.compile(LoginHeaderTemplate)(data));
         $("#content").html(HandleBars.compile(template)(data));
     });
 });

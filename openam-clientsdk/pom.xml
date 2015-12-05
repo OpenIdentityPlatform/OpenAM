@@ -57,7 +57,6 @@
                     <include>amSecurity.properties</include>
                     <include>amSession.properties</include>
                     <include>debugconfig.properties</include>
-                    <include>famSTS.properties</include>
                     <include>fmConfigurationService.properties</include>
                     <include>fmLibertySecurity.properties</include>
                     <include>fmSessionProvider.properties</include>
@@ -329,7 +328,6 @@
                         <filter>
                             <artifact>org.forgerock.openam:OpenFM</artifact>
                             <includes>
-                                <include>famSTS.properties</include>
                                 <include>fmConfigurationService.properties</include>
                                 <include>fmLibertySecurity.properties</include>
                                 <include>fmSessionProvider.properties</include>
@@ -347,21 +345,7 @@
                                 <include>com/sun/identity/setup/InsertWebXMLContent*</include>
                                 <include>com/sun/identity/setup/ParseInputData*</include>
                                 <include>com/sun/identity/setup/SwapClientConfig*</include>
-                                <include>com/sun/identity/wss/logging/**</include>
-                                <include>com/sun/identity/wss/provider/**</include>
-                                <include>com/sun/identity/wss/security/**</include>
-                                <include>com/sun/identity/wss/sts/config/STSRemoteConfig*</include>
-                                <include>com/sun/identity/wss/sts/spi/FAMTransportPipeFactory*</include>
-                                <include>com/sun/identity/wss/sts/*</include>
-                                <include>com/sun/identity/wss/trust/**</include>
-                                <include>com/sun/identity/wss/xmlenc/**</include>
-                                <include>com/sun/identity/wss/xmlsig/**</include>
                             </includes>
-                            <excludes>
-                                <exclude>com/sun/identity/wss/sts/FAMSTSImpl*</exclude>
-                                <exclude>com/sun/identity/wss/sts/STSContextListener*</exclude>
-                                <exclude>com/sun/identity/wss/sts/SecurityTokenService*</exclude>
-                            </excludes>
                         </filter>
                         <filter>
                             <artifact>org.forgerock.openam:openam-federation-library</artifact>

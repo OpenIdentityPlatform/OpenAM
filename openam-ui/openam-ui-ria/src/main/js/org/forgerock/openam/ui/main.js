@@ -14,8 +14,6 @@
  * Portions copyright 2015 ForgeRock AS.
  */
 
-
-
 define("org/forgerock/openam/ui/main", [
     "./common/delegates/SiteConfigurationDelegate",
     "./user/login/RESTLoginHelper",

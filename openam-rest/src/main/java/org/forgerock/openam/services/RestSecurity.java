@@ -36,6 +36,12 @@ import org.forgerock.openam.rest.ServiceConfigUtils;
 import java.security.AccessController;
 import java.util.Set;
 
+/**
+ * Provides REST security configuration.
+ * <p>
+ * Given this is deprecated {@link org.forgerock.openam.sm.config.ConsoleConfigHandler} should be used instead.
+ */
+@Deprecated
 public class RestSecurity {
 
     private static Debug debug = Debug.getInstance("frRest");
@@ -210,7 +216,7 @@ public class RestSecurity {
             throw new ServiceNotFoundException(message);
         }
     }
-
+    
     public String getSelfRegistrationConfirmationUrl() {
     	return restSecurityConfiguration.selfRegistrationConfirmationUrl;
     }
@@ -224,7 +230,7 @@ public class RestSecurity {
             throw new ServiceNotFoundException(message);
         }
     }
-
+    
     public String getForgotPasswordConfirmationUrl() {
     	return restSecurityConfiguration.forgotPasswordConfirmationUrl;
     }
@@ -242,11 +248,11 @@ public class RestSecurity {
             throw new ServiceNotFoundException(message);
         }
     }
-
+    
     public Set<String> getProtectedUserAttributes() {
         return restSecurityConfiguration.protectedUserAttributes;
     }
-
+    
     public String getSuccessfulUserRegistrationDestination() {
     	return restSecurityConfiguration.successfulUserRegistrationDestination;
     }

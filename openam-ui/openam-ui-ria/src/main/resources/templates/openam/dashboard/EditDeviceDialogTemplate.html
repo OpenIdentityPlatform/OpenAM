@@ -1,4 +1,4 @@
-<div class="form-horizontal">
+<form class="form-horizontal">
 
     <div class="form-group">
         <label class="control-label col-sm-4">{{t 'openam.deviceManagement.deviceDetailsDialog.deviceName'}}</label>
@@ -11,7 +11,7 @@
         <label class="control-label col-sm-4">{{t 'openam.deviceManagement.deviceDetailsDialog.skip'}}</label>
         <div class="col-sm-7 skip-checkbox">
             <input class="checkbox" type="checkbox" name="deviceSkip" {{#if skipped}} checked {{/if}}>
-            <a data-toggle="popover" tabindex="0" class="pull-left"><i class="fa fa-question-circle"></i></a>
+            <a data-toggle="popover" role="button" aria-dropeffect="popup" tabindex="0" class="pull-left"><i class="fa fa-question-circle"></i></a>
         </div>
     </div>
 
@@ -23,4 +23,4 @@
         </div>
     </div>
 
-</div>
+</form>

@@ -16,17 +16,14 @@
 
 package org.forgerock.openam.forgerockrest.guice;
 
-import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
-import com.google.inject.name.Names;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
-import com.sun.identity.shared.debug.Debug;
+import java.util.HashMap;
+import java.util.Map;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
@@ -87,6 +84,15 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 .getInstance("validate", PrivilegeDefinition.Action.READ));
         definitions.put("template", PrivilegeDefinition
                 .getInstance("template", PrivilegeDefinition.Action.READ));
+
+        definitions.put("getPropertyNames",
+                PrivilegeDefinition.getInstance("getPropertyNames", PrivilegeDefinition.Action.READ));
+        definitions.put("getProperty",
+                PrivilegeDefinition.getInstance("getProperty", PrivilegeDefinition.Action.READ));
+        definitions.put("setProperty",
+                PrivilegeDefinition.getInstance("setProperty", PrivilegeDefinition.Action.MODIFY));
+        definitions.put("deleteProperty",
+                PrivilegeDefinition.getInstance("deleteProperty", PrivilegeDefinition.Action.MODIFY));
 
         return definitions;
     }

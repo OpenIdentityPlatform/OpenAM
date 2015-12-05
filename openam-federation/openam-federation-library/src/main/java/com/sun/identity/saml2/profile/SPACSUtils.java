@@ -28,29 +28,6 @@
  */
 package com.sun.identity.saml2.profile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.ServletException;
-
-import javax.xml.soap.SOAPConnection;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.liberty.ws.soapbinding.Message;
 import com.sun.identity.liberty.ws.soapbinding.SOAPBindingException;
@@ -62,29 +39,28 @@ import com.sun.identity.plugin.monitoring.MonitorManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
-import com.sun.identity.saml2.common.SAML2FailoverUtils;
-import com.sun.identity.saml2.plugins.SAML2PluginsUtils;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.Advice;
-import com.sun.identity.saml2.assertion.AssertionFactory;
-import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.assertion.Assertion;
+import com.sun.identity.saml2.assertion.AssertionFactory;
+import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.assertion.AttributeStatement;
-import com.sun.identity.saml2.assertion.NameID;
-import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.EncryptedAttribute;
+import com.sun.identity.saml2.assertion.EncryptedID;
+import com.sun.identity.saml2.assertion.Issuer;
+import com.sun.identity.saml2.assertion.NameID;
+import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.common.AccountUtils;
 import com.sun.identity.saml2.common.NameIDInfo;
 import com.sun.identity.saml2.common.NameIDInfoKey;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
 import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.ecp.ECPFactory;
 import com.sun.identity.saml2.ecp.ECPRelayState;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
@@ -98,6 +74,7 @@ import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.saml2.plugins.SAML2PluginsUtils;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.plugins.SPAccountMapper;
 import com.sun.identity.saml2.plugins.SPAttributeMapper;
@@ -108,8 +85,32 @@ import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.Status;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.encode.URLEncDec;
+import com.sun.identity.shared.xml.XMLUtils;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -213,7 +214,7 @@ public class SPACSUtils {
         }
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message("SPACSUtils.getResponse: got response="
-                + respInfo.getResponse().toXMLString(true, true));
+                    + respInfo.getResponse().toXMLString(true, true));
         }
         return respInfo;
     }
@@ -271,8 +272,8 @@ public class SPACSUtils {
                         null,
                         null);
             SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
-                "missingArtifact",
-                SAML2Utils.bundle.getString("missingArtifact"));
+                    "missingArtifact",
+                    SAML2Utils.bundle.getString("missingArtifact"));
             throw new SAML2Exception(
                         SAML2Utils.bundle.getString("missingArtifact"));
         }
@@ -379,8 +380,8 @@ public class SPACSUtils {
                     + "ArtifactResolve=" + resolveString);
             }
 
-            SOAPConnection con = SAML2Utils.scf.createConnection();
-            SOAPMessage msg = SAML2Utils.createSOAPMessage(resolveString, true);
+            SOAPConnection con = SOAPCommunicator.getInstance().openSOAPConnection();
+            SOAPMessage msg = SOAPCommunicator.getInstance().createSOAPMessage(resolveString, true);
 
             IDPSSOConfigElement config = null;
             config = sm.getIDPSSOConfig(orgName, idpEntityID);
@@ -539,7 +540,7 @@ public class SPACSUtils {
         }
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message("SPACSUtils: IDP artifact resolution "
-                + "service url =" + location);
+                    + "service url =" + location);
         }
         return location;
     }
@@ -562,7 +563,7 @@ public class SPACSUtils {
         String method = "SPACSUtils.getResponseFromSOAP:";
         Element resElem = null;
         try {
-            resElem = SAML2Utils.getSamlpElement(resMsg, "ArtifactResponse");
+            resElem = SOAPCommunicator.getInstance().getSamlpElement(resMsg, "ArtifactResponse");
         } catch (SAML2Exception se) {
             String[] data = {idpEntityID};
             LogUtil.error(Level.INFO,
@@ -620,9 +621,9 @@ public class SPACSUtils {
                                 sm,
                                 SAML2Constants.WANT_ARTIFACT_RESPONSE_SIGNED);
         if (wantArtiRespSigned != null && wantArtiRespSigned.equals("true")) {
-            X509Certificate cert = KeyUtil.getVerificationCert(
-                idp, idpEntityID, SAML2Constants.IDP_ROLE);
-            if (!artiResp.isSigned() || !artiResp.isSignatureValid(cert)) {
+            Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(idp, idpEntityID,
+                    SAML2Constants.IDP_ROLE);
+            if (!artiResp.isSigned() || !artiResp.isSignatureValid(verificationCerts)) {
                 if (SAML2Utils.debug.messageEnabled()) {
                    SAML2Utils.debug.message(method 
                         + "ArtifactResponse's signature is invalid.");
@@ -697,9 +698,9 @@ public class SPACSUtils {
                         LogUtil.ARTIFACT_RESPONSE_INVALID_STATUS_CODE,
                         data,
                         null);
-            SAMLUtils.sendError(request, response, 
-                response.SC_INTERNAL_SERVER_ERROR, "invalidStatusCode",
-                SAML2Utils.bundle.getString("invalidStatusCode"));
+            SAMLUtils.sendError(request, response,
+                    response.SC_INTERNAL_SERVER_ERROR, "invalidStatusCode",
+                    SAML2Utils.bundle.getString("invalidStatusCode"));
             throw new SAML2Exception(
                 SAML2Utils.bundle.getString("invalidStatusCode"));
         } 
@@ -735,7 +736,7 @@ public class SPACSUtils {
     {
         Message message = null;
         try {
-            message = new Message(SAML2Utils.getSOAPMessage(request));
+            message = new Message(SOAPCommunicator.getInstance().getSOAPMessage(request));
         } catch (SOAPException soapex) {
             String[] data = { hostEntityId } ;
             LogUtil.error(Level.INFO,
@@ -827,8 +828,7 @@ public class SPACSUtils {
             throw se;
         }
 
-        X509Certificate cert = KeyUtil.getVerificationCert(idpDesc,
-            idpEntityID, SAML2Constants.IDP_ROLE);
+        Set<X509Certificate> certificates = KeyUtil.getVerificationCerts(idpDesc, idpEntityID, SAML2Constants.IDP_ROLE);
         List assertions = resp.getAssertion();
         if ((assertions != null) && (!assertions.isEmpty())) {
             for(Iterator iter = assertions.iterator(); iter.hasNext(); ) {
@@ -848,7 +848,7 @@ public class SPACSUtils {
                         SAML2Utils.bundle.getString("assertionNotSigned"));
                     throw new SAML2Exception(
                         SAML2Utils.bundle.getString("assertionNotSigned"));
-                } else if (!assertion.isSignatureValid(cert)) {
+                } else if (!assertion.isSignatureValid(certificates)) {
                     if (SAML2Utils.debug.messageEnabled()) {
                         SAML2Utils.debug.message(
                             "SPACSUtils.getResponseFromPostECP: " + 
@@ -952,55 +952,6 @@ public class SPACSUtils {
         }
 
         if (resp != null) {
-            // verify signature in Response
-            boolean needPOSTResponseSigned =
-                SAML2Utils.wantPOSTResponseSigned(
-                    orgName,hostEntityId,SAML2Constants.SP_ROLE);
-            String idpEntityID = null;
-            Issuer issuer = resp.getIssuer();
-            if (issuer != null) {
-                idpEntityID = issuer.getValue();
-            } else {
-                List assertions = resp.getAssertion();
-                if ((assertions != null) && (!assertions.isEmpty())) {
-                    for (Iterator iter = assertions.iterator();
-                                  iter.hasNext(); ) {
-                        Assertion assertion = (Assertion)iter.next();
-                        idpEntityID = assertion.getIssuer().getValue();
-                        break;
-                    }
-                }
-            }
-            IDPSSODescriptorElement idp = null;
-            try {
-                idp = metaManager.getIDPSSODescriptor(orgName,idpEntityID);
-            } catch (SAML2MetaException se) {
-                String[] data = {orgName,hostEntityId,idpEntityID};
-                LogUtil.error(Level.INFO,
-                              LogUtil.IDP_META_NOT_FOUND,
-                              data,
-                              null);
-                SAMLUtils.sendError(request, response,
-                    response.SC_INTERNAL_SERVER_ERROR,
-                    "failedToGetIDPSSODescriptor", se.getMessage());
-                throw se;
-           }
-           if (needPOSTResponseSigned) {
-               X509Certificate cert = KeyUtil.getVerificationCert(
-                idp, idpEntityID, SAML2Constants.IDP_ROLE);
-                if (!resp.isSigned() || !resp.isSignatureValid(cert)) {
-                    SAML2Utils.debug.error(classMethod +
-                         " Signature in Response is invalid "); 
-                    String[] data = { orgName , hostEntityId , idpEntityID };
-                    LogUtil.error(Level.INFO,
-                        LogUtil.POST_RESPONSE_INVALID_SIGNATURE,data,null);
-                    SAMLUtils.sendError(request, response,
-                        response.SC_INTERNAL_SERVER_ERROR, "invalidSignature",
-                        SAML2Utils.bundle.getString("invalidSignature"));
-                    throw new SAML2Exception(
-                       SAML2Utils.bundle.getString("invalidSignInResponse"));
-               }
-            }
             String[] data = {""};
             if (LogUtil.isAccessLoggable(Level.FINE)) {
                 data[0] = resp.toXMLString();
@@ -1089,36 +1040,14 @@ public class SPACSUtils {
         // get mappers
         SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, hostEntityId);
         SPAttributeMapper attrMapper = SAML2Utils.getSPAttributeMapper(realm, hostEntityId);
-        
-        boolean needAttributeEncrypted = false;
-        boolean needNameIDEncrypted = false;
+
         String assertionEncryptedAttr =
-            SAML2Utils.getAttributeValueFromSPSSOConfig(
-                spssoconfig,
-                SAML2Constants.WANT_ASSERTION_ENCRYPTED);
-        if (assertionEncryptedAttr == null ||
-            !assertionEncryptedAttr.equals("true"))
-        {
-            String attrEncryptedStr =
-                SAML2Utils.getAttributeValueFromSPSSOConfig(
-                    spssoconfig,
-                    SAML2Constants.WANT_ATTRIBUTE_ENCRYPTED);
-            if (attrEncryptedStr != null &&
-                attrEncryptedStr.equals("true"))
-            {
-                needAttributeEncrypted = true;
-            }
-            String idEncryptedStr =
-                SAML2Utils.getAttributeValueFromSPSSOConfig(
-                    spssoconfig,
-                    SAML2Constants.WANT_NAMEID_ENCRYPTED);
-            if (idEncryptedStr != null &&
-                idEncryptedStr.equals("true"))
-            {
-                needNameIDEncrypted = true;
-            }
-        }
-        PrivateKey decryptionKey = KeyUtil.getDecryptionKey(spssoconfig);
+                SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
+
+        boolean needAttributeEncrypted = getNeedAttributeEncrypted(assertionEncryptedAttr, spssoconfig);
+        boolean needNameIDEncrypted = getNeedNameIDEncrypted(assertionEncryptedAttr, spssoconfig);
+
+        Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
         if (needNameIDEncrypted && encId == null) {
             SAML2Utils.debug.error(classMethod +
                                    "process: NameID was not encrypted.");
@@ -1132,7 +1061,7 @@ public class SPACSUtils {
         }
         if (encId != null) {
             try {
-                nameId = encId.decrypt(decryptionKey);
+                nameId = encId.decrypt(decryptionKeys);
             } catch (SAML2Exception se) {
                 // invoke SPAdapter for failure
                 invokeSPAdapterForSSOFailure(hostEntityId, realm,
@@ -1246,9 +1175,7 @@ public class SPACSUtils {
         List attrs = null;
         for (Iterator it = assertions.iterator(); it.hasNext(); ) {
             Assertion assertion = (Assertion)it.next();
-            List origAttrs = getSAMLAttributes(assertion,
-                 needAttributeEncrypted,
-                 decryptionKey);
+            List origAttrs = getSAMLAttributes(assertion, needAttributeEncrypted, decryptionKeys);
             if (origAttrs != null && !origAttrs.isEmpty()) {
                 if (attrs == null) {
                     attrs = new ArrayList();
@@ -1480,6 +1407,29 @@ public class SPACSUtils {
         return session;
     }
 
+    private static boolean getNeedNameIDEncrypted(String assertionEncryptedAttr, SPSSOConfigElement spssoconfig) {
+        if (Boolean.parseBoolean(assertionEncryptedAttr)) {
+            String idEncryptedStr = SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
+                    SAML2Constants.WANT_NAMEID_ENCRYPTED);
+            if (Boolean.parseBoolean(idEncryptedStr)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean getNeedAttributeEncrypted(String assertionEncryptedAttr, SPSSOConfigElement spssoconfig) {
+        if (Boolean.parseBoolean(assertionEncryptedAttr)) {
+            String attrEncryptedStr =
+                    SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ATTRIBUTE_ENCRYPTED);
+            if (Boolean.parseBoolean(attrEncryptedStr)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private static void invokeSPAdapterForSSOFailure(String hostEntityId,
         String realm, HttpServletRequest request, HttpServletResponse response,
@@ -1508,7 +1458,7 @@ public class SPACSUtils {
         }
     }
 
-    private static void saveInfoInMemory(SessionProvider sessionProvider,
+    public static void saveInfoInMemory(SessionProvider sessionProvider,
         Object session, String sessionIndex, String metaAlias,
         NameIDInfo info, boolean isIDPProxy, boolean isTransient)
         throws SAML2Exception {
@@ -1522,7 +1472,7 @@ public class SPACSUtils {
         String[] fromToken = null;
         try {
             fromToken = sessionProvider.
-                getProperty(session, infoKeyAttribute);
+                    getProperty(session, infoKeyAttribute);
             if (fromToken == null || fromToken.length == 0 ||
                 fromToken[0] == null || fromToken[0].length() == 0) {
                 String[] values = { infoKeyString };
@@ -1637,7 +1587,7 @@ public class SPACSUtils {
                }    
             }
             SPCache.fedSessionListsByNameIDInfoKey.put(infoKeyString,
-                                                   fedSessions);
+                    fedSessions);
             if ((agent != null) && agent.isRunning() && (saml2Svc != null)) {
                 saml2Svc.setFedSessionCount(
 		    (long)SPCache.fedSessionListsByNameIDInfoKey.size());
@@ -1900,43 +1850,40 @@ public class SPACSUtils {
         return result;
     }
 
-    // gets the attributes from AttibuteStates in the assertions.
-    private static List getSAMLAttributes(Assertion assertion,
-                                boolean needAttributeEncrypted,
-                                PrivateKey decryptionKey)
-    {
-        List attrList = null;
+    /**
+     * Gets the attributes from an assert's AttributeStates.
+     *
+     * @param assertion The assertion from which to pull the AttributeStates.
+     * @param needAttributeEncrypted Whether attributes must be encrypted (or else rejected).
+     * @param privateKeys Private keys used to decrypt those encrypted attributes.
+     * @return a list of attributes pulled from the provided assertion.
+     */
+    public static List<Attribute> getSAMLAttributes(Assertion assertion, boolean needAttributeEncrypted,
+                                                     Set<PrivateKey> privateKeys) {
+        List<Attribute> attrList = null;
         if (assertion != null) {
-            List statements = assertion.getAttributeStatements();
-            if (statements != null && statements.size() > 0 ) {
-                for (Iterator it = statements.iterator(); it.hasNext(); ) {
-                    AttributeStatement statement =
-                        (AttributeStatement)it.next();
-                    List attributes = statement.getAttribute();
-                    if (needAttributeEncrypted &&
-                        attributes != null && !attributes.isEmpty())
-                    {
+            List<AttributeStatement> statements = assertion.getAttributeStatements();
+            if (CollectionUtils.isNotEmpty(statements)) {
+                for (AttributeStatement statement : statements) {
+                    List<Attribute> attributes = statement.getAttribute();
+                    if (needAttributeEncrypted && attributes != null && !attributes.isEmpty()) {
                         SAML2Utils.debug.error("Attribute not encrypted.");
                         return null;
                     }
                     if (attributes != null) {
                         if (attrList == null) {
-                            attrList = new ArrayList();
+                            attrList = new ArrayList<>();
                         }
                         attrList.addAll(attributes);
                     }
-                    List encAttrs = statement.getEncryptedAttribute();
+                    List<EncryptedAttribute> encAttrs = statement.getEncryptedAttribute();
                     if (encAttrs != null) {
-                        for (Iterator encIter = encAttrs.iterator();
-                                encIter.hasNext(); )
-                        {
+                        for (EncryptedAttribute encAttr : encAttrs) {
                             if (attrList == null) {
-                                attrList = new ArrayList();
+                                attrList = new ArrayList<>();
                             }
                             try {
-                                attrList.add(
-                                    ((EncryptedAttribute) encIter.next()).
-                                        decrypt(decryptionKey));
+                                attrList.add((encAttr).decrypt(privateKeys));
                             } catch (SAML2Exception se) {
                                 SAML2Utils.debug.error("Decryption error:", se);
                                 return null;
@@ -2126,4 +2073,157 @@ public class SPACSUtils {
         map.put(SAML2Constants.SESSION_INDEX, respInfo.getSessionIndex());
         return map;
     }
+
+    /**
+     * Returns the username if there was one from the Assertion we were able to map into a local user account. Returns
+     * null if not. Should only be used from the SP side. Should only be called in conjuncture with the Auth Module.
+     * In addition, it performs what attribute federation it can.
+     *
+     * This method is a picked apart version of the "processResponse" function.
+     */
+    public static String getPrincipalWithoutLogin(Subject assertionSubject, Assertion authnAssertion, String realm,
+                                                  String spEntityId, SAML2MetaManager metaManager, String idpEntityId)
+            throws SAML2Exception {
+
+        final EncryptedID encId = assertionSubject.getEncryptedID();
+        final SPSSOConfigElement spssoconfig = metaManager.getSPSSOConfig(realm, spEntityId);
+        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+        final SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, spEntityId);
+
+        boolean needNameIDEncrypted = false;
+        NameID nameId = assertionSubject.getNameID();
+
+        String assertionEncryptedAttr =
+                SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
+        if (assertionEncryptedAttr == null || !Boolean.parseBoolean(assertionEncryptedAttr)) {
+            String idEncryptedStr =
+                    SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_NAMEID_ENCRYPTED);
+            if (idEncryptedStr != null && Boolean.parseBoolean(idEncryptedStr)) {
+                needNameIDEncrypted = true;
+            }
+        }
+
+        if (needNameIDEncrypted && encId == null) {
+            throw new SAML2Exception(SAML2Utils.bundle.getString("nameIDNotEncrypted"));
+        }
+        if (encId != null) {
+            nameId = encId.decrypt(decryptionKeys);
+        }
+
+        SPSSODescriptorElement spDesc = null;
+        try {
+            spDesc = metaManager.getSPSSODescriptor(realm, spEntityId);
+        } catch (SAML2MetaException ex) {
+            SAML2Utils.debug.error("Unable to read SPSSODescription", ex);
+        }
+
+        if (spDesc == null) {
+            throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
+        }
+
+        final String nameIDFormat = nameId.getFormat();
+
+        if (nameIDFormat != null) {
+            List spNameIDFormatList = spDesc.getNameIDFormat();
+
+            if (CollectionUtils.isNotEmpty(spNameIDFormatList) && !spNameIDFormatList.contains(nameIDFormat)) {
+                Object[] args = {nameIDFormat};
+                throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "unsupportedNameIDFormatSP", args);
+            }
+        }
+
+        final boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
+        final boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
+        final boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
+
+        final boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
+                && acctMapper.shouldPersistNameIDFormat(realm, spEntityId, idpEntityId, nameIDFormat));
+
+        String userName = null;
+        boolean isNewAccountLink = false;
+
+        try {
+            if (shouldPersistNameID) {
+                try {
+                    userName = SAML2Utils.getDataStoreProvider().getUserID(realm, SAML2Utils.getNameIDKeyMap(
+                            nameId, spEntityId, idpEntityId, realm, SAML2Constants.SP_ROLE));
+                } catch (DataStoreProviderException dse) {
+                    throw new SAML2Exception(dse.getMessage());
+                }
+            }
+
+            //if we can't get an already linked account, see if we'll be generating a new one based on federated data
+            if (userName == null) {
+                userName = acctMapper.getIdentity(authnAssertion, spEntityId, realm);
+                isNewAccountLink = true; //we'll use this later to inform us
+            }
+        } catch (SAML2Exception se) {
+            return null;
+        }
+
+        //if we're new and we're persistent, store the federation data in the user pref
+        if (isNewAccountLink && isPersistent) {
+            try {
+                writeFedData(nameId, spEntityId, realm, metaManager, idpEntityId, userName);
+            } catch (SAML2Exception se) {
+                return userName;
+            }
+        }
+
+        return userName;
+    }
+
+    private static void writeFedData(NameID nameId, String spEntityId, String realm, SAML2MetaManager metaManager,
+                                     String idpEntityId, String userName) throws SAML2Exception {
+        final NameIDInfo info;
+        final String affiID = nameId.getSPNameQualifier();
+        boolean isDualRole = SAML2Utils.isDualRole(spEntityId, realm);
+        AffiliationDescriptorType affiDesc = null;
+
+        if (affiID != null && !affiID.isEmpty()) {
+            affiDesc = metaManager.getAffiliationDescriptor(realm, affiID);
+        }
+
+        if (affiDesc != null) {
+            if (!affiDesc.getAffiliateMember().contains(spEntityId)) {
+                throw new SAML2Exception("Unable to locate SP Entity ID in the affiliate descriptor.");
+            }
+            if (isDualRole) {
+                info = new NameIDInfo(affiID, idpEntityId, nameId, SAML2Constants.DUAL_ROLE, true);
+            } else {
+                info = new NameIDInfo(affiID, idpEntityId, nameId, SAML2Constants.SP_ROLE, true);
+            }
+        } else {
+            if (isDualRole) {
+                info = new NameIDInfo(spEntityId, idpEntityId, nameId, SAML2Constants.DUAL_ROLE, false);
+            } else {
+                info = new NameIDInfo(spEntityId, idpEntityId, nameId, SAML2Constants.SP_ROLE, false);
+            }
+        }
+
+        // write fed info into data store
+        AccountUtils.setAccountFederation(info, userName);
+
+    }
+
+    /**
+     * Gets the attributes for this assertion in a new List.
+     * @param authnAssertion Assertion from which to reead the attributes.
+     * @param needAttributeEncrypted Whether the attributes must be encrypted.
+     * @param decryptionKeys The keys used to decrypt the attributes, if they're encrypted.
+     * @return a List of the attributes in this assertion.
+     */
+    public static List<Attribute> getAttrs(Assertion authnAssertion, boolean needAttributeEncrypted,
+                                           Set<PrivateKey> decryptionKeys) {
+        final List<Attribute> origAttrs = getSAMLAttributes(authnAssertion, needAttributeEncrypted, decryptionKeys);
+
+        List<Attribute> attrs = null;
+        if (origAttrs != null && !origAttrs.isEmpty()) {
+            attrs = new ArrayList<>();
+            attrs.addAll(origAttrs);
+        }
+
+        return attrs;
+    }
+
 }

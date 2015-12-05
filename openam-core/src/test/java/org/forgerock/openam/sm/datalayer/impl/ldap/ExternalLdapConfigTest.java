@@ -60,7 +60,7 @@ public class ExternalLdapConfigTest extends PowerMockTestCase {
         // When
         config.update(dataLayerConfiguration);
         // Then
-        PowerMockito.verifyStatic(times(4));
+        PowerMockito.verifyStatic(times(3));
         SystemProperties.get(anyString());
 
         PowerMockito.verifyStatic();

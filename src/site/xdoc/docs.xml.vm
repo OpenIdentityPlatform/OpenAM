@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2015 ForgeRock AS.
+  !    
+-->
+<document
+ xmlns="http://maven.apache.org/XDOC/2.0"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+ <properties>
+  <title>OpenAM Core User Documentation</title>
+  <author email="openam-dev@forgerock.org">ForgeRock AS</author>
+ </properties>
+ <body>
+  <section name="Core Documentation">
+   <p>This core documentation is <strong>in progress</strong> as part of
+   the OpenAM project.</p>
+   <p>For completed, released documentation, see <a
+   href="http://docs.forgerock.org/en/openam/">docs.forgerock.org</a>.</p>
+   <dl>
+    <dt>OpenAM Release Notes</dt>
+    <dd>
+     <a href="./doc/bootstrap/release-notes/index.html">HTML</a>,
+     <a href="./doc/OpenAM-${project.version}-Release-Notes.pdf">PDF</a>
+    </dd>
+
+    <dt>Getting Started With OpenAM</dt>
+    <dd>
+     <a href="./doc/bootstrap/getting-started/index.html">HTML</a>,
+     <a href="./doc/OpenAM-${project.version}-Getting-Started.pdf">PDF</a>
+    </dd>
+
+    <dt>OpenAM Installation Guide</dt>
+    <dd>
+     <a href="./doc/bootstrap/install-guide/index.html">HTML</a>,
+     <a href="./doc/OpenAM-${project.version}-Install-Guide.pdf">PDF</a>
+    </dd>
+
+    <dt>OpenAM Upgrade Guide</dt>
+    <dd>
+     <a href="./doc/bootstrap/upgrade-guide/index.html">HTML</a>,
+     <a href="./doc/OpenAM-${project.version}-Upgrade-Guide.pdf">PDF</a>
+    </dd>
+
+    <dt>OpenAM Administration Guide</dt>
+    <dd>
+     <a href="./doc/bootstrap/admin-guide/index.html">HTML</a>,
+     <a href="./doc/OpenAM-Admin-Guide.pdf">PDF</a>
+    </dd>
+
+    <dt>OpenAM Developer's Guide</dt>
+    <dd>
+     <a href="./doc/bootstrap/dev-guide/index.html">HTML</a>,
+     <a href="./doc/OpenAM-${project.version}-Dev-Guide.pdf">PDF</a>
+    </dd>
+
+    <dt>OpenAM Deployment Planning Guide</dt>
+    <dd>
+     <a href="./doc/bootstrap/deployment-planning/index.html">HTML</a>,
+     <a href="./doc/OpenAM-${project.version}-Deployment-Planning.pdf">PDF</a>
+    </dd>
+
+    <dt>OpenAM Reference</dt>
+    <dd>
+     <a href="./doc/bootstrap/reference/index.html">HTML</a>,
+     <a href="./doc/OpenAM-${project.version}-Reference.pdf">PDF</a>
+    </dd>
+    
+    <dt>OpenAM Javadoc</dt>
+    <dd>
+     <a href="./apidocs/index.html">HTML</a>
+    </dd>
+
+    <dt>Java EE Policy Agent Release Notes</dt>
+    <dd>
+     <a href="./doc/bootstrap/jee-release-notes/index.html">HTML</a>,
+     <a href="./doc/OpenAM-Jee-Release-Notes.pdf">PDF</a>
+    </dd>
+
+    <dt>Java EE Policy Agent User's Guide</dt>
+    <dd>
+     <a href="./doc/bootstrap/jee-users-guide/index.html">HTML</a>,
+     <a href="./doc/OpenAM-Jee-Users-Guide.pdf">PDF</a>
+    </dd>
+
+    <dt>Java EE Policy Agent Reference</dt>
+    <dd>
+     <a href="./doc/bootstrap/jee-reference/index.html">HTML</a>,
+     <a href="./doc/OpenAM-Jee-Reference.pdf">PDF</a>
+    </dd>
+
+    <dt>Web Policy Agent Release Notes</dt>
+    <dd>
+     <a href="./doc/bootstrap/web-release-notes/index.html">HTML</a>,
+     <a href="./doc/OpenAM-Web-Release-Notes.pdf">PDF</a>
+    </dd>
+
+    <dt>Web Policy Agent User's Guide</dt>
+    <dd>
+     <a href="./doc/bootstrap/web-users-guide/index.html">HTML</a>,
+     <a href="./doc/OpenAM-Web-Users-Guide.pdf">PDF</a>
+    </dd>
+
+   </dl>
+  </section>
+ </body>
+</document>

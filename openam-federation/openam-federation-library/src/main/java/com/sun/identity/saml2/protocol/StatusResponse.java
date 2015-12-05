@@ -24,9 +24,8 @@
  *
  * $Id: StatusResponse.java,v 1.2 2008/06/25 05:47:58 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.protocol;
 
 import com.sun.identity.saml.xmlsig.XMLSignatureException;
@@ -37,6 +36,8 @@ import java.security.Signature;
 import java.util.Date;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Set;
+
 import com.sun.identity.saml2.xmlsig.SigManager;
 
 /**
@@ -247,14 +248,13 @@ public interface StatusResponse {
      * Returns whether the signature on the <code>StatusResponse</code>
      * is valid or not.
      *
-     * @param senderCert Certificate containing the public key
-     *             which may be used for  signature verification;
-     *             This certificate may also may be used to check
-     *             against the certificate included in the signature
+     * @param verificationCerts Certificates containing the public keys which may be used for signature verification;
+     *                          This certificate may also may be used to check against the certificate included in the
+     *                          signature.
      * @return true if the signature is valid; false otherwise.
      * @throws SAML2Exception if the signature could not be verified
      */
-    public boolean isSignatureValid(X509Certificate senderCert)
+    public boolean isSignatureValid(Set<X509Certificate> verificationCerts)
         throws SAML2Exception;
     
     /**

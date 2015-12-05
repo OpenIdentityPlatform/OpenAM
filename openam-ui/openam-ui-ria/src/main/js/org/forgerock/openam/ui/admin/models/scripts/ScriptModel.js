@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
             };
         },
 
-        validate: function (attrs, options) {
+        validate: function (attrs) {
             if (attrs.name.trim() === "") {
                 return "scriptErrorNoName";
             }
@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
             }
         },
 
-        parse: function (resp, options) {
+        parse: function (resp) {
             if (resp && resp.script) {
                 resp.script = Base64.decodeUTF8(resp.script);
             }

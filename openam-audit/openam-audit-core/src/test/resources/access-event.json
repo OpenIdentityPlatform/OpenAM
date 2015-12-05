@@ -1,11 +1,9 @@
 {
   "timestamp": "2015-07-08T21:01:03.629Z",
   "eventName": "AM-ACCESS-ATTEMPT",
-  "component": "CREST",
+  "component": "Audit",
   "transactionId": "ad1f26e3-1ced-418d-b6ec-c8488411a625",
-  "authentication": {
-    "id": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org"
-  },
+  "userId": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
   "client": {
     "host": null,
     "ip": "172.16.101.7",
@@ -21,16 +19,29 @@
     "operation": "READ"
   },
   "http": {
-    "method": "GET",
-    "path": "/some/path",
-    "queryString": "p1=v1&p2=v2",
-    "headers": {  }
+    "request": {
+      "secure": false,
+      "method": "GET",
+      "path": "/some/path",
+      "queryParameters": {
+        "p1": ["v1"],
+        "p2": ["v2"]
+      },
+      "headers": {
+        "h1": ["v1"],
+        "h2": ["v2"]
+      },
+      "cookies": {
+        "JSESSIONID": "92F2583684E45A3612AAC1743FE70362",
+        "amlbcookie": "01"
+      }
+    }
   },
   "response": {
-    "status": "SUCCESS",
+    "status": "SUCCESSFUL",
     "statusCode": "200",
     "elapsedTime": 42,
-    "elapsedTimeUnits": "ms"
+    "elapsedTimeUnits": "MILLISECONDS"
   },
   "trackingIds": ["12345"]
 }

@@ -17,9 +17,12 @@
 package org.forgerock.openam.utils.file;
 
 /**
- * FileSize units
+ * FileSize units.
  */
 public enum FileSizeUnit {
+    /**
+     * Gigabyte file size unit.
+     */
     GB {
         @Override
         public long convert(long sourceDuration, FileSizeUnit sourceUnit) {
@@ -46,6 +49,9 @@ public enum FileSizeUnit {
             return value;
         }
     },
+    /**
+     * Megabyte file size unit.
+     */
     MB {
         @Override
         public long convert(long sourceDuration, FileSizeUnit sourceUnit) {
@@ -72,6 +78,9 @@ public enum FileSizeUnit {
             return GB.toGB(value) / 1024;
         }
     },
+    /**
+     * Kilobyte file size unit.
+     */
     KB {
         @Override
         public long convert(long sourceDuration, FileSizeUnit sourceUnit) {
@@ -98,6 +107,9 @@ public enum FileSizeUnit {
             return MB.toGB(value) / 1024;
         }
     },
+    /**
+     * Byte file size unit.
+     */
     B {
         @Override
         public long convert(long sourceDuration, FileSizeUnit sourceUnit) {
@@ -125,35 +137,43 @@ public enum FileSizeUnit {
         }
     };
 
-    public abstract long convert(long sourceDuration, FileSizeUnit sourceUnit);
     /**
-     * Convert to B
+     * Converts a value to a specified unit.
      *
-     * @param value
+     * @param sourceDuration the value.
+     * @param sourceUnit the unit.
+     * @return The converted duration.
+     */
+    public abstract long convert(long sourceDuration, FileSizeUnit sourceUnit);
+
+    /**
+     * Convert to B.
+     *
+     * @param value the value
      * @return size in B
      */
     public abstract long toB(long value);
 
     /**
-     * Convert to KB
+     * Convert to KB.
      *
-     * @param value
+     * @param value the value
      * @return size in KB
      */
     public abstract long toKB(long value);
 
     /**
-     * Convert to MB
+     * Convert to MB.
      *
-     * @param value
+     * @param value the value
      * @return size in MB
      */
     public abstract long toMB(long value);
 
     /**
-     * Convert to GB
+     * Convert to GB.
      *
-     * @param value
+     * @param value the value
      * @return size in GB
      */
     public abstract long toGB(long value);

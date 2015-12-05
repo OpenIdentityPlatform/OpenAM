@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,24 +24,22 @@
  *
  * $Id: DoManageNameID.java,v 1.26 2009/11/24 21:53:27 madan_ranganath Exp $
  *
- * Portions copyright 2013 ForgeRock AS
+ * Portions copyright 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.security.Key;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -51,6 +49,8 @@ import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConnectionFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -60,7 +60,6 @@ import com.sun.identity.plugin.monitoring.MonitorManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
-import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -69,7 +68,6 @@ import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.common.AccountUtils;
 import com.sun.identity.saml2.common.NameIDInfo;
-import com.sun.identity.saml2.common.NameIDInfoKey;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
@@ -77,7 +75,6 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.metadata.AffiliationDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.ManageNameIDServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.key.EncInfo;
@@ -474,22 +471,18 @@ public class DoManageNameID {
             return true;
         }
                 
-        boolean valid = false;
-        X509Certificate signingCert = null;
+        boolean valid;
+        Set<X509Certificate> signingCerts;
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
-            SPSSODescriptorElement spSSODesc =
-                metaManager.getSPSSODescriptor(realm, remoteEntity);
-            signingCert = KeyUtil.getVerificationCert(spSSODesc, remoteEntity,
-                SAML2Constants.SP_ROLE);
+            SPSSODescriptorElement spSSODesc = metaManager.getSPSSODescriptor(realm, remoteEntity);
+            signingCerts = KeyUtil.getVerificationCerts(spSSODesc, remoteEntity, SAML2Constants.SP_ROLE);
         } else {
-            IDPSSODescriptorElement idpSSODesc = 
-                metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            signingCert = KeyUtil.getVerificationCert(idpSSODesc, remoteEntity,
-                SAML2Constants.IDP_ROLE);
+            IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(realm, remoteEntity);
+            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, remoteEntity, SAML2Constants.IDP_ROLE);
         }
 
-        if (signingCert != null) {
-            valid = mniRequest.isSignatureValid(signingCert);
+        if (!signingCerts.isEmpty()) {
+            valid = mniRequest.isSignatureValid(signingCerts);
                 if (debug.messageEnabled()) {
                 debug.message(method + "Signature is : " + valid);
             }
@@ -591,30 +584,25 @@ public class DoManageNameID {
             return true;
         }
                 
-        boolean valid = false;
-        X509Certificate signingCert = null;
+        boolean valid;
+        Set<X509Certificate> signingCerts;
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
-            SPSSODescriptorElement spSSODesc =
-                metaManager.getSPSSODescriptor(realm, remoteEntity);
-            signingCert = KeyUtil.getVerificationCert(spSSODesc, remoteEntity,
-                SAML2Constants.SP_ROLE);
+            SPSSODescriptorElement spSSODesc = metaManager.getSPSSODescriptor(realm, remoteEntity);
+            signingCerts = KeyUtil.getVerificationCerts(spSSODesc, remoteEntity, SAML2Constants.SP_ROLE);
         } else {
-            IDPSSODescriptorElement idpSSODesc = 
-                     metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            signingCert = KeyUtil.getVerificationCert(idpSSODesc, remoteEntity,
-                SAML2Constants.IDP_ROLE);
+            IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(realm, remoteEntity);
+            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, remoteEntity, SAML2Constants.IDP_ROLE);
         }
         
-        if (signingCert != null) {
-            valid = mniResponse.isSignatureValid(signingCert);
+        if (!signingCerts.isEmpty()) {
+            valid = mniResponse.isSignatureValid(signingCerts);
                 if (debug.messageEnabled()) {
                 debug.message(method + "Signature is : " + valid);
                 }
         } else {
             logError("missingSigningCertAlias", 
                              LogUtil.METADATA_ERROR, null);
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("missingSigningCertAlias"));
+            throw new SAML2Exception(SAML2Utils.bundle.getString("missingSigningCertAlias"));
         }
         
         return valid;
@@ -825,7 +813,7 @@ public class DoManageNameID {
         }
 
         // Retrieve a SOAPMessage
-        SOAPMessage message = SAML2Utils.getSOAPMessage(request);
+        SOAPMessage message = SOAPCommunicator.getInstance().getSOAPMessage(request);
 
         ManageNameIDRequest mniRequest = getMNIRequest(message);
         remoteEntityID = mniRequest.getIssuer().getValue();
@@ -859,8 +847,8 @@ public class DoManageNameID {
         signMNIResponse(mniResponse, realm, hostEntity, 
             hostEntityRole, remoteEntityID);
 
-        SOAPMessage reply = SAML2Utils.createSOAPMessage(
-            mniResponse.toXMLString(true, true), false);
+        SOAPMessage reply = SOAPCommunicator.getInstance().createSOAPMessage(
+                mniResponse.toXMLString(true, true), false);
         if (reply != null) {
             /*  Need to call saveChanges because we're
              * going to use the MimeHeaders to set HTTP
@@ -1399,8 +1387,8 @@ public class DoManageNameID {
     // This is the application code for handling the message.
     static private ManageNameIDRequest getMNIRequest(SOAPMessage message)
                 throws SAML2Exception {
-        Element reqElem = SAML2Utils.getSamlpElement(message, 
-            "ManageNameIDRequest");
+        Element reqElem = SOAPCommunicator.getInstance().getSamlpElement(message,
+                "ManageNameIDRequest");
         ManageNameIDRequest manageRequest = 
             pf.createManageNameIDRequest(reqElem);
         return manageRequest;
@@ -1480,15 +1468,15 @@ public class DoManageNameID {
         
         SOAPMessage resMsg = null;
         try {
-            resMsg = SAML2Utils.sendSOAPMessage(mniRequestXMLString, mniURL,
-                true);
+            resMsg = SOAPCommunicator.getInstance().sendSOAPMessage(mniRequestXMLString, mniURL,
+                    true);
         } catch (SOAPException se) {
             debug.error(SAML2Utils.bundle.getString("invalidSOAPMessge"), se);
             return false;
         }
         
-        Element mniRespElem = SAML2Utils.getSamlpElement(resMsg,
-             "ManageNameIDResponse");
+        Element mniRespElem = SOAPCommunicator.getInstance().getSamlpElement(resMsg,
+                "ManageNameIDResponse");
         ManageNameIDResponse mniResponse = 
             mniResponse = pf.createManageNameIDResponse(mniRespElem);
         
@@ -1925,14 +1913,10 @@ public class DoManageNameID {
 
             return newID;
         }
-        
-        String alias = SAML2Utils.getEncryptionCertAlias(realm, hostEntityID, 
-            hostEntityRole);
 
-        PrivateKey privateKey = keyProvider.getPrivateKey(alias);
         NewEncryptedID encryptedID = request.getNewEncryptedID();
-        
-        return encryptedID.decrypt(privateKey);
+
+        return encryptedID.decrypt(KeyUtil.getDecryptionKeys(realm, hostEntityID, hostEntityRole));
     }    
 
     static private NameID getNameIDFromMNIRequest(ManageNameIDRequest request, 
@@ -1951,20 +1935,15 @@ public class DoManageNameID {
             return request.getNameID();
         }
         
-        String alias = SAML2Utils.getEncryptionCertAlias(realm, hostEntity, 
-            hostEntityRole);
-
         if (debug.messageEnabled()) {
             debug.message(method + "realm is : "+ realm);
             debug.message(method + "hostEntity is : " + hostEntity);
             debug.message(method + "Host Entity role is : " + hostEntityRole);
-            debug.message(method + "Cert Alias is : " + alias);
         }
         
-        PrivateKey privateKey = keyProvider.getPrivateKey(alias);
         EncryptedID encryptedID = request.getEncryptedID();
         
-        return encryptedID.decrypt(privateKey);
+        return encryptedID.decrypt(KeyUtil.getDecryptionKeys(realm, hostEntity, hostEntityRole));
     }    
 
     /**

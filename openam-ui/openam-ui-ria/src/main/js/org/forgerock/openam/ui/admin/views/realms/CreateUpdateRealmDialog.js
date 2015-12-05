@@ -40,6 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
          *          self.render();
          *      }
          * });
+         * @param {Map} options A Map containing the options for the create/update realm dialog.
          */
         show: function (options) {
             var self = this,
@@ -78,8 +79,15 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                     });
                 }
 
-                data.schema.properties.parentPath["enum"] = options.allRealmPaths;
-                data.schema.properties.parentPath.options = { "enum_titles": options.allRealmPaths };
+                if (newRealm) {
+                    // Only create dropdowns if the field is editable
+                    data.schema.properties.parentPath["enum"] = options.allRealmPaths;
+                    data.schema.properties.parentPath.options = { "enum_titles": options.allRealmPaths };
+                } else {
+                    // Once created, it should not be possible to edit a realm's name or who it's parent is.
+                    data.schema.properties.name.readonly = true;
+                    data.schema.properties.parentPath.readonly = true;
+                }
 
                 BootstrapDialog.show({
                     title: $.t("console.realms.createUpdateRealmDialog." + i18nTitleKey, { realmPath: realmName }),
@@ -89,6 +97,12 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                         return element;
                     },
                     buttons: [{
+                        label: $.t("common.form.cancel"),
+                        action: function (dialog) {
+                            dialog.close();
+                        }
+                    }, {
+                        id: "submitButton",
                         label: $.t("common.form." + i18nButtonKey),
                         cssClass: "btn-primary",
                         action: function (dialog) {
@@ -113,37 +127,41 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                                 }
                             });
                         }
-                    }, {
-                        label: $.t("common.form.cancel"),
-                        action: function (dialog) {
-                            dialog.close();
-                        }
                     }],
                     onshow: function (dialog) {
                         if (!self.data.newRealm) {
                             dialog.$modalBody.find(".container-path").hide();
                             dialog.$modalBody.find(".container-name").hide();
+                        } else {
+                            dialog.getButton("submitButton").disable();
                         }
+
+                        dialog.$modalBody.on("change keyup", "input[name=\"root[name]\"]", function () {
+                            var realmName = _.trim(dialog.$modalBody.find("input[name=\"root[name]\"]").val());
+                            if (realmName.length > 0) {
+                                dialog.getButton("submitButton").enable();
+                            } else {
+                                dialog.getButton("submitButton").disable();
+                            }
+                        });
                     },
                     onshown: function (dialog) {
-                        self.dialogOnShown(dialog);
+                        dialog.$modalBody.find("[data-toggle='popover-realm-status']").popover({
+                            content: $.t("console.realms.realmStatusPopover.content"),
+                            placement: "left",
+                            title: $.t("console.realms.realmStatusPopover.title"),
+                            trigger: "focus"
+                        });
+
+                        dialog.$modalBody.find("[data-toggle='popover-realm-aliases']").popover({
+                            content: $.t("console.realms.realmAliasesPopover.content"),
+                            html: true,
+                            placement: "left",
+                            title: $.t("console.realms.realmAliasesPopover.title"),
+                            trigger: "focus"
+                        });
                     }
                 });
-            });
-        },
-        dialogOnShown: function (dialog) {
-            dialog.$modalBody.find("[data-toggle='popover-realm-status']").popover({
-                content: $.t("console.realms.realmStatusPopover.content"),
-                placement: "left",
-                title: $.t("console.realms.realmStatusPopover.title"),
-                trigger: "focus"
-            });
-            dialog.$modalBody.find("[data-toggle='popover-realm-aliases']").popover({
-                content: $.t("console.realms.realmAliasesPopover.content"),
-                html: true,
-                placement: "left",
-                title: $.t("console.realms.realmAliasesPopover.title"),
-                trigger: "focus"
             });
         }
     });

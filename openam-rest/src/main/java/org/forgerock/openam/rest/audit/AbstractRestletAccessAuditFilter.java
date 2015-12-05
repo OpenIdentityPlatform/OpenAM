@@ -15,21 +15,23 @@
  */
 package org.forgerock.openam.rest.audit;
 
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILED;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailableTrackingIds;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.rest.service.RestletRealmRouter.REALM;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 import static org.restlet.ext.servlet.ServletUtils.getRequest;
 
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.forgerock.audit.AuditException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -41,9 +43,7 @@ import org.restlet.representation.BufferingRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.routing.Filter;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
-import java.util.Set;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Responsible for logging access audit events for restlet requests.
@@ -52,32 +52,39 @@ import java.util.Set;
  */
 public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
+    private static Debug debug = Debug.getInstance("amAudit");
+
     private final AuditEventPublisher auditEventPublisher;
     private final AuditEventFactory auditEventFactory;
     private final Component component;
+    private final RestletBodyAuditor<?> requestDetailCreator;
+    private final RestletBodyAuditor<?> responseDetailCreator;
 
     /**
      * Create a new filter for the given component and restlet.
-     *
-     * @param component The component for which events will be logged.
+     *  @param component The component for which events will be logged.
      * @param restlet The restlet for which events will be logged.
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
+     * @param requestDetailCreator
+     * @param responseDetailCreator
      */
     public AbstractRestletAccessAuditFilter(Component component, Restlet restlet,
-                                            AuditEventPublisher auditEventPublisher,
-                                            AuditEventFactory auditEventFactory) {
-        setNext(restlet);
+            AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
+            RestletBodyAuditor<?> requestDetailCreator, RestletBodyAuditor<?> responseDetailCreator) {
+        this.requestDetailCreator = requestDetailCreator;
+        this.responseDetailCreator = responseDetailCreator;
         this.auditEventPublisher = auditEventPublisher;
         this.auditEventFactory = auditEventFactory;
         this.component = component;
+        setNext(restlet);
     }
 
     @Override
     protected int beforeHandle(Request request, Response response) {
         try {
             Representation representation = request.getEntity();
-            // If the representation is transient we can only read it's entity once, so we have to wrap it in a
+            // If the representation is transient we can only read its entity once, so we have to wrap it in a
             // buffer in order to read from it during the event logging and later during authentication
             if (representation.isTransient()) {
                 request.setEntity(new BufferingRepresentation(request.getEntity()));
@@ -103,15 +110,19 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
     private void auditAccessAttempt(Request request) throws AuditException {
         String realm = getRealmFromRequest(request);
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(request.getDate().getTime())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
-                    .authentication(getUserIdForAccessAttempt(request))
+                    .userId(getUserIdForAccessAttempt(request))
                     .trackingIds(getTrackingIdsForAccessAttempt(request));
+
+            if (requestDetailCreator != null) {
+                builder.requestDetail(requestDetailCreator.apply(request.getEntity()));
+            }
 
             addHttpData(request, builder);
 
@@ -121,19 +132,30 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
     private void auditAccessSuccess(Request request, Response response) {
         String realm = getRealmFromRequest(request);
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - request.getDate().getTime();
 
+            final Representation entity = response.getEntity();
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .authentication(getUserIdForAccessOutcome(request, response))
-                    .trackingIds(getTrackingIdsForAccessOutcome(request, response))
-                    .response(SUCCESS, "", elapsedTime, MILLISECONDS);
+                    .userId(getUserIdForAccessOutcome(request, response))
+                    .trackingIds(getTrackingIdsForAccessOutcome(request, response));
+
+            if (responseDetailCreator != null) {
+                try {
+                    JsonValue detail = responseDetailCreator.apply(entity);
+                    builder.responseWithDetail(SUCCESSFUL, "", elapsedTime, MILLISECONDS, detail);
+                } catch (AuditException e) {
+                    debug.warning("An error occured when fetching response body details for audit", e);
+                }
+            } else {
+                builder.response(SUCCESSFUL, "", elapsedTime, MILLISECONDS);
+            }
 
             addHttpData(request, builder);
 
@@ -143,7 +165,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
     private void auditAccessFailure(Request request, Response response) {
         String realm = getRealmFromRequest(request);
-        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC)) {
+        if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
             long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());
@@ -156,9 +178,9 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
-                    .authentication(getUserIdForAccessOutcome(request, response))
+                    .userId(getUserIdForAccessOutcome(request, response))
                     .trackingIds(getTrackingIdsForAccessOutcome(request, response))
-                    .responseWithDetail(FAILURE, responseCode, elapsedTime, MILLISECONDS, responseDetail);
+                    .responseWithDetail(FAILED, responseCode, elapsedTime, MILLISECONDS, responseDetail);
 
             addHttpData(request, builder);
 

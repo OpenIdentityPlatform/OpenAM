@@ -3,7 +3,10 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <display-name>OpenAM Services</display-name>
 
-    <!-- Initialises the Guice Injector. -->
+    <listener>
+        <listener-class>com.sun.identity.setup.SystemStartupInjectorListener</listener-class>
+    </listener>
+
     <listener>
         <listener-class>org.forgerock.openam.core.guice.OpenAMServletContextListener</listener-class>
     </listener>
@@ -148,6 +151,60 @@
 
     <!-- filter declaration -->
 
+    <!-- Access audit filter for JATO, Debug.jsp and ssoadm.jsp pages -->
+    <filter>
+        <filter-name>JatoAuditFilter</filter-name>
+        <filter-class>org.forgerock.openam.audit.servlet.AuditAccessServletFilter</filter-class>
+        <init-param>
+            <param-name>auditing-component</param-name>
+            <param-value>JATO</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/service/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/federation/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/realm/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/agentconfig/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/sts/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/delegation/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/idm/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JatoAuditFilter</filter-name>
+        <url-pattern>/Debug.jsp</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>SsoAdmJspAuditFilter</filter-name>
+        <filter-class>org.forgerock.openam.audit.servlet.AuditAccessServletFilter</filter-class>
+        <init-param>
+            <param-name>auditing-component</param-name>
+            <param-value>SSOADM</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>SsoAdmJspAuditFilter</filter-name>
+        <url-pattern>/ssoadm.jsp</url-pattern>
+    </filter-mapping>
+
     <filter-mapping>
         <filter-name>AuditContextFilter</filter-name>
         <url-pattern>/*</url-pattern>
@@ -203,10 +260,6 @@
     </listener>
     <listener>
         <listener-class>com.sun.identity.authentication.service.AuthServletContextListener</listener-class>
-    </listener>
-
-    <listener>
-        <listener-class>com.sun.identity.wss.sts.STSContextListener</listener-class>
     </listener>
 
     <!-- listener declaration -->
@@ -544,6 +597,10 @@
         <jsp-file>/saml2/jsp/spAssertionConsumer.jsp</jsp-file>
     </servlet>
     <servlet>
+        <servlet-name>AuthConsumer</servlet-name>
+        <jsp-file>/saml2/jsp/saml2AuthAssertionConsumer.jsp</jsp-file>
+    </servlet>
+    <servlet>
         <servlet-name>SPSloInit</servlet-name>
         <jsp-file>/saml2/jsp/spSingleLogoutInit.jsp</jsp-file>
     </servlet>
@@ -618,14 +675,6 @@
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>com.sun.identity.rest.FederationRestService</param-value>
         </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <description>JAX-WS endpoint - sts</description>
-        <display-name>sts</display-name>
-        <servlet-name>sts</servlet-name>
-        <servlet-class>com.sun.identity.wss.sts.SecurityTokenService</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
@@ -776,6 +825,10 @@
     <servlet-mapping>
         <servlet-name>Consumer</servlet-name>
         <url-pattern>/Consumer/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuthConsumer</servlet-name>
+        <url-pattern>/AuthConsumer/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SSOPOST</servlet-name>
@@ -1012,23 +1065,6 @@
     <servlet-mapping>
         <servlet-name>federationrest</servlet-name>
         <url-pattern>/federationws/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>sts</servlet-name>
-        <url-pattern>/sts</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>sts</servlet-name>
-        <url-pattern>/sts/mex</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>sts</servlet-name>
-        <url-pattern>/sts/soap11</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>sts</servlet-name>
-        <url-pattern>/sts/mexsoap11</url-pattern>
     </servlet-mapping>
 
     <!-- end of servlet mapping -->

@@ -83,7 +83,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
         },
 
         validate: function (inputs) {
-            // This is very simple native validation for supporting browsers for now. 
+            // This is very simple native validation for supporting browsers for now.
             // More complexity to come later.
             var self = this;
             self.valid = true;

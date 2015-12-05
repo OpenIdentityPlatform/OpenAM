@@ -33,10 +33,6 @@ public class UmaRestRouteProvider extends AbstractRestRouteProvider {
     @Override
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
 
-        realmRouter.route("serverinfo/uma")
-                .auditAs(OAUTH)
-                .toSingleton(UmaConfigurationResource.class);
-
         realmRouter.route("users/{user}/uma/policies")
                 .auditAs(OAUTH)
                 .authorizeWith(UmaPolicyResourceAuthzFilter.class)

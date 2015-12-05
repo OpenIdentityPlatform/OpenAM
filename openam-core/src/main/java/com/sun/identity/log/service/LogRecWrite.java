@@ -29,7 +29,7 @@
  */
 package com.sun.identity.log.service;
 
-import static org.forgerock.audit.events.AccessAuditEventBuilder.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 
@@ -51,12 +51,15 @@ import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.utils.StringUtils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -74,7 +77,7 @@ import java.util.logging.Level;
 public class LogRecWrite implements LogOperation, ParseOutput {
 
     private static final String EVALUATION_REALM = "org.forgerock.openam.agents.config.policy.evaluation.realm";
-    
+
     String _logname;
     String _loggedBySid;
     Vector _records = new Vector();
@@ -91,27 +94,27 @@ public class LogRecWrite implements LogOperation, ParseOutput {
             slsi = Agent.getLoggingSvcMBean();
             slei = slsi.getHandler(SsoServerLoggingSvcImpl.REMOTE_HANDLER_NAME);
         }
-        
+
         Logger logger = (Logger)Logger.getLogger(_logname);
         if (Debug.messageEnabled()) {
             Debug.message("LogRecWrite: exec: logname = " + _logname);
         }
-        
-        Level level = 
+
+        Level level =
             Level.parse(((com.sun.identity.log.service.LogRecord)_records.
         elementAt(0)).level);
         String msg = ((com.sun.identity.log.service.LogRecord)_records.
         elementAt(0)).msg;
         Map logInfoMap = ((com.sun.identity.log.service.LogRecord)_records.
         elementAt(0)).logInfoMap;
-        Object [] parameters = 
+        Object [] parameters =
             ((com.sun.identity.log.service.LogRecord)_records.
         elementAt(0)).parameters;
-        
+
         try {
             msg = new String(com.sun.identity.shared.encode.Base64.decode(msg));
         } catch(RuntimeException ex){
-            // if message is not base64 encoded just ignore & 
+            // if message is not base64 encoded just ignore &
             // write msg as it is.
             if (Debug.messageEnabled()) {
                 Debug.message("LogRecWrite: message is not base64 encoded");
@@ -138,7 +141,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
                     // here fill up logInfo into the newlr
                     rec = LogSSOTokenDetails.logSSOTokenInfo(rec, loginIDToken);
 
-                    // now take one be one values from logInfoMap and overwrite 
+                    // now take one be one values from logInfoMap and overwrite
                     // any populated value from sso token.
                     Set keySet = logInfoMap.keySet();
                     Iterator i = keySet.iterator();
@@ -154,7 +157,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
                                    com.sun.identity.shared.encode.Base64.decode(
                                         value));
                                 } catch(RuntimeException ex){
-                                    // if message is not base64 encoded just 
+                                    // if message is not base64 encoded just
                                     // ignore & write msg as it is.
                                     if (Debug.messageEnabled()) {
                                         Debug.message(
@@ -174,7 +177,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         rec.addLogInfo(LogConstants.LOG_LEVEL, rec.getLevel().toString());
 
         rec.setParameters(parameters);
-        
+
         SSOToken loggedByToken = null;
         String realm = NO_REALM;
         try {
@@ -200,7 +203,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
     private void auditAccessMessage(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
             LogRecord record, String realm) {
 
-        if (!auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)) {
+        if (!auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
             return;
         }
 
@@ -227,13 +230,15 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         int queryStringIndex = resourceUrl.indexOf('?');
         String queryString = queryStringIndex > -1 ? resourceUrl.substring(queryStringIndex) : "";
         String path = resourceUrl.replace(queryString, "");
+        Map<String, List<String>> queryParameters = AMAuditEventBuilderUtils.getQueryParametersAsMap(queryString);
 
         AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.POLICY_AGENT)
-                .authentication(clientId)
-                .http("UNKNOWN", path, queryString, Collections.<String, List<String>>emptyMap())
+                .userId(clientId)
+                .httpRequest(hasSecureScheme(resourceUrl), "UNKNOWN", path, queryParameters,
+                        Collections.<String, List<String>>emptyMap())
                 .request("HTTP", "UNKNOWN")
                 .client(clientIp)
                 .trackingId(contextId)
@@ -242,7 +247,21 @@ public class LogRecWrite implements LogOperation, ParseOutput {
 
         auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, auditEvent);
     }
-    
+
+    private boolean hasSecureScheme(String resourceUrl) {
+        URI resourceURI;
+        try {
+            resourceURI = new URI(resourceUrl);
+            String scheme = resourceURI.getScheme();
+            if (StringUtils.isNotEmpty(scheme) && "https".equals(scheme.toLowerCase())) {
+                return true;
+            }
+        } catch (URISyntaxException e) {
+            //Fall through...
+        }
+        return false;
+    }
+
     /**
      * The method that implements the ParseOutput interface. This is called
      * by the SAX parser.
@@ -252,13 +271,13 @@ public class LogRecWrite implements LogOperation, ParseOutput {
      * @param pcdata given data to be parsed.
      */
     public void process(String name, Vector elems, Hashtable atts,
-    String pcdata) { 
-        
+    String pcdata) {
+
         _logname = ((Log) elems.elementAt(0))._logname;
         _loggedBySid = ((Log) elems.elementAt(0))._loggedBySid;
-        
+
         for (int i = 1; i < elems.size(); i++) {
-            com.sun.identity.log.service.LogRecord lr = 
+            com.sun.identity.log.service.LogRecord lr =
                 (com.sun.identity.log.service.LogRecord)elems.elementAt(i);
             _records.addElement(lr);
         }

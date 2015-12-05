@@ -246,10 +246,10 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                  resourceName="codeChallengeAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="plain">plain</ChoiceValue>
-                        <ChoiceValue i18nKey="s256">s256</ChoiceValue>
+                        <ChoiceValue i18nKey="S256">S256</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>s256</Value>
+                        <Value>S256</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
@@ -481,10 +481,10 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                      resourceName="codeChallengeAlgorithm">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="plain">plain</ChoiceValue>
-                            <ChoiceValue i18nKey="s256">s256</ChoiceValue>
+                            <ChoiceValue i18nKey="S256">S256</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>s256</Value>
+                            <Value>S256</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-auth-level"

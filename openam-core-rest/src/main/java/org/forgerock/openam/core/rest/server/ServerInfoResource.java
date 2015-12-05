@@ -16,18 +16,8 @@
 package org.forgerock.openam.core.rest.server;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.core.rest.server.SelfServiceInfo.SelfServiceInfoBuilder;
 import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.net.URI;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -45,7 +35,6 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -62,31 +51,48 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.ServiceConfigUtils;
-import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.net.URI;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents Server Information that can be queried via a REST interface.
- *
+ * <p>
  * This resources acts as a read only resource for the moment.
  */
 public class ServerInfoResource extends RealmAwareResource {
 
     private final Debug debug;
-    private final RestSecurityProvider restSecurityProvider;
     private final Map<String, ServiceConfig> realmSocialAuthServiceConfigMap = new ConcurrentHashMap<>();
+    private final ConsoleConfigHandler configHandler;
+    private final RestSecurityProvider restSecurityProvider;
 
     private final static String COOKIE_DOMAINS = "cookieDomains";
     private final static String ALL_SERVER_INFO = "*";
 
     @Inject
-    public ServerInfoResource(@Named("frRest") Debug debug,
-                              RestSecurityProvider restSecurityProvider) {
+    public ServerInfoResource(@Named("frRest") Debug debug, ConsoleConfigHandler configHandler, RestSecurityProvider restSecurityProvider) {
         this.debug = debug;
+        this.configHandler = configHandler;
         this.restSecurityProvider = restSecurityProvider;
     }
 
@@ -119,33 +125,39 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * Retrieves all server info set on the server.
      *
-     * @param context Current Server Context.
-     * @param realm realm in whose security context we use.
+     * @param context
+     *         Current Server Context.
+     * @param realm
+     *         realm in whose security context we use.
      */
     private Promise<ResourceResponse, ResourceException> getAllServerInfo(Context context, String realm) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
-        Set<String> protectedUserAttributes;
         ResourceResponse resource;
-        RestSecurity restSecurity = restSecurityProvider.get(realm);
 
         //added for the XUI to be able to understand its locale to request the appropriate translations to cache
-        ISLocaleContext locale = new ISLocaleContext();
+        ISLocaleContext localeContext = new ISLocaleContext();
         HttpContext httpContext = context.asContext(HttpContext.class);
-        locale.setLocale(httpContext); //we have nothing else to go on at this point other than their request
+        localeContext.setLocale(httpContext); //we have nothing else to go on at this point other than their request
+
+        SelfServiceInfo selfServiceInfo = configHandler.getConfig(realm, SelfServiceInfoBuilder.class);
+        RestSecurity restSecurity = restSecurityProvider.get(realm);
+        Set<String> protectedUserAttributes = new HashSet<>();
+        protectedUserAttributes.addAll(selfServiceInfo.getProtectedUserAttributes());
+        protectedUserAttributes.addAll(restSecurity.getProtectedUserAttributes());
 
         try {
             cookieDomains = AuthClientUtils.getCookieDomains();
-            protectedUserAttributes = restSecurity.getProtectedUserAttributes();
             result.put("domains", cookieDomains);
             result.put("protectedUserAttributes", protectedUserAttributes);
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"));
             result.put("secureCookie", CookieUtils.isCookieSecure());
-            result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
-            result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
-            result.put("lang", locale.getLocale().getLanguage());
-            result.put("successfulUserRegistrationDestination",
-                    restSecurity.getSuccessfulUserRegistrationDestination());
+            result.put("forgotPassword", String.valueOf(selfServiceInfo.isForgottenPasswordEnabled()));
+            result.put("forgotUsername", String.valueOf(selfServiceInfo.isForgottenUsernameEnabled()));
+            result.put("kbaEnabled", String.valueOf(selfServiceInfo.isKbaEnabled()));
+            result.put("selfRegistration", String.valueOf(selfServiceInfo.isUserRegistrationEnabled()));
+            result.put("lang", getJsLocale(localeContext.getLocale()));
+            result.put("successfulUserRegistrationDestination", selfServiceInfo.getSuccessDestination());
             result.put("socialImplementations", getSocialAuthnImplementations(realm));
             result.put("referralsEnabled", String.valueOf(PolicyConfig.isReferralsEnabled()));
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
@@ -173,12 +185,22 @@ public class ServerInfoResource extends RealmAwareResource {
         }
     }
 
+
+    private String getJsLocale(Locale locale) {
+        String jsLocale = locale.getLanguage();
+        if (StringUtils.isNotEmpty(locale.getCountry())) {
+            jsLocale += "-" + locale.getCountry();
+        }
+        return jsLocale;
+    }
+
     /**
      * Read out the data whose schema is defined in the file socialAuthN.xml. The enabled implementations value gives
      * us the social authentication implementations we care about.  We use the values there to index into the display
      * names, auth chains and icons.
      *
-     * @param realm The realm/organization name
+     * @param realm
+     *         The realm/organization name
      */
     private List<SocialAuthenticationImplementation> getSocialAuthnImplementations(String realm) {
 
@@ -244,9 +266,13 @@ public class ServerInfoResource extends RealmAwareResource {
      * Given the specified name, use the serviceConfig object to retrieve the entire set of [name]=value pairs
      * specified.
      *
-     * @param serviceConfig The service config
-     * @param name The implementation name we're looking for, e.g. google
-     * @param attributeName The attribute we're interested in
+     * @param serviceConfig
+     *         The service config
+     * @param name
+     *         The implementation name we're looking for, e.g. google
+     * @param attributeName
+     *         The attribute we're interested in
+     *
      * @return The value (as in [name]=value) corresponding to the specified name, or null if not found.
      */
     private String getEntryForImplementation(ServiceConfig serviceConfig, String name, String attributeName) {

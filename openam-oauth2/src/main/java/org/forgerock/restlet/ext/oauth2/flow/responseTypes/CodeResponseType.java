@@ -61,7 +61,7 @@ public class CodeResponseType implements ResponseType {
         final Set<String> scope = (Set<String>) data.get(OAuth2Constants.CoreTokenParams.SCOPE);
 
         final OAuth2Request request = requestFactory.create(Request.getCurrent());
-        final ResourceOwner resourceOwner = ownerAuthenticator.authenticate(request);
+        final ResourceOwner resourceOwner = ownerAuthenticator.authenticate(request, true);
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);
         final String redirectUri = (String) data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
         final String nonce = (String) data.get(OAuth2Constants.Custom.NONCE);

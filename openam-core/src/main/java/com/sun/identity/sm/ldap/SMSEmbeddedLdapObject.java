@@ -28,6 +28,7 @@
 */
 package com.sun.identity.sm.ldap;
 
+import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +48,8 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.sso.SSOException;
@@ -59,6 +62,8 @@ import com.sun.identity.sm.SMSNotificationManager;
 import com.sun.identity.sm.SMSObjectDB;
 import com.sun.identity.sm.SMSObjectListener;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.opends.server.core.AddOperation;
@@ -114,6 +119,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
     static LinkedHashSet smsAttributes;
     static final String SMS_EMBEDDED_LDAP_OBJECT_SEARCH_LIMIT = 
         "com.sun.identity.sm.sms_embedded_ldap_object_search_limit";
+    private ConfigAuditorFactory auditorFactory;
 
     /**
      * Public constructor for SMSEmbeddedLdapObject
@@ -127,6 +133,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
      * Synchronized initialized method
      */
     private synchronized void initialize() throws SMSException {
+        auditorFactory = InjectorHolder.getInstance(ConfigAuditorFactory.class);
         if (initialized) {
             return;
         }
@@ -150,7 +157,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                 attrValues.add(SMSEntry.OC_TOP);
                 attrValues.add(SMSEntry.OC_ORG_UNIT);
                 attrs.put(SMSEntry.ATTR_OBJECTCLASS, attrValues);
-                create(serviceDN, attrs);
+                internalCreate(null, serviceDN, attrs);
             }
         } catch (Exception e) {
             // Unable to initialize (trouble!!)
@@ -204,8 +211,8 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         if (SMSNotificationManager.isCacheEnabled() &&
             entriesNotPresent.contains(dn)) {
             if (debug.messageEnabled()) {
-                debug.message("SMSEmbeddedLdapObject:read Entry not present: "+
-                    dn + " (checked in cached)");
+                debug.message("SMSEmbeddedLdapObject:read Entry not present: " +
+                        dn + " (checked in cached)");
             }
             return (null);
         }
@@ -260,7 +267,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
     public void create(SSOToken token, String dn, Map attrs)
         throws SMSException, SSOException {
 
-        create(dn, attrs);
+        internalCreate(token, dn, attrs);
         // Update entryPresent cache
         objectChanged(dn, ADD);
     }
@@ -268,24 +275,27 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
     /**
      * Create an entry in the directory using the principal name
      */
-    private static void create(String dn, Map attrs)
+    private void internalCreate(SSOToken token, String dn, Map attrs)
             throws SMSException, SSOException {
-
+        SMSAuditor auditor = newAuditor(token, dn, null);
         List attrList = copyMapToAttrList(attrs);
         AddOperation ao = icConn.processAdd(dn, attrList);
         ResultCode resultCode = ao.getResultCode();
         if (resultCode == ResultCode.SUCCESS) {
             if (debug.messageEnabled()) {
                 debug.message(
-                    "SMSEmbeddedLdapObject.create: Successfully created" +
-                    " entry: " + dn);
+                        "SMSEmbeddedLdapObject.create: Successfully created" +
+                                " entry: " + dn);
+            }
+            if (auditor != null) {
+                auditor.auditCreate(attrs);
             }
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
-                    // During install time and other times,
-                    // this error gets throws due to unknown issue. Issue: 
-                    // Hence mask it.
-                    debug.warning("SMSEmbeddedLdapObject.create: Entry " +
-                        "Already Exists Error for DN" + dn);
+            // During install time and other times,
+            // this error gets throws due to unknown issue. Issue:
+            // Hence mask it.
+            debug.warning("SMSEmbeddedLdapObject.create: Entry " +
+                "Already Exists Error for DN" + dn);
         } else {
             debug.error("SMSEmbeddedLdapObject.create: Error creating entry: "+
                 dn + ", error code = " + resultCode);
@@ -299,7 +309,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
      */
     public void modify(SSOToken token, String dn, ModificationItem mods[])
         throws SMSException, SSOException {
-
+        SMSAuditor auditor = newAuditor(token, dn, readCurrentState(dn));
         List modList = copyModItemsToLDAPModList(mods);
         ModifyOperation mo = icConn.processModify(dn, modList);
         ResultCode resultCode = mo.getResultCode();
@@ -307,6 +317,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
             if (debug.messageEnabled()) {
                 debug.message("SMSEmbeddedLdapObject.modify: Successfully " +
                     "modified entry: " + dn);
+            }
+            if (auditor != null) {
+                auditor.auditModify(mods);
             }
         } else {
             debug.error("SMSEmbeddedLdapObject.modify: Error modifying entry "+
@@ -321,6 +334,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
      */
     public void delete(SSOToken token, String dn) throws SMSException,
             SSOException {
+        SMSAuditor auditor = newAuditor(token, dn, readCurrentState(dn));
         // Check if there are sub-entries, delete if present
         Iterator se = subEntries(token, dn, "*", 0, false, false).iterator();
         while (se.hasNext()) {
@@ -337,7 +351,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         // Loop through the suborg at the first level and if there
         // is no next suborg, delete that.
         Set subOrgNames = searchSubOrgNames(token, dn, "*", 0, false, false,
-            false);
+                false);
         
         for (Iterator so = subOrgNames.iterator(); so.hasNext(); ) {
             String subOrg = (String) so.next();
@@ -358,6 +372,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
             throw (new SMSException("", "sms-entry-cannot-delete"));
         }
         objectChanged(dn, DELETE);
+        if (auditor != null) {
+            auditor.auditDelete();
+        }
     }
 
     /**
@@ -461,7 +478,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         // Construct the filter
         String[] objs = { filter, sidFilter };
         String sfilter = MessageFormat.format(
-            getServiceIdSearchFilter(), (Object[])objs);
+                getServiceIdSearchFilter(), (Object[]) objs);
         Set answer = getSubEntries(token, dn, sfilter, numOfEntries,
                 sortResults, ascendingOrder);
         return (answer);
@@ -477,8 +494,8 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         throws SSOException, SMSException {
 
         InternalSearchOperation iso = searchObjects(startDN, filter,
-            SearchScope.WHOLE_SUBTREE, numOfEntries, sortResults,
-            ascendingOrder);
+                SearchScope.WHOLE_SUBTREE, numOfEntries, sortResults,
+                ascendingOrder);
 
         ResultCode resultCode = iso.getResultCode();
         if (resultCode == ResultCode.SIZE_LIMIT_EXCEEDED) {
@@ -553,9 +570,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         // sorting is not implemented
         try {
             // Get the sub entries
-            InternalSearchOperation iso = icConn.processSearch(startDN, scope, 
-                DereferencePolicy.NEVER_DEREF_ALIASES, numOfEntries, 0, false,
-                filter, null, null, null);
+            InternalSearchOperation iso = icConn.processSearch(startDN, scope,
+                    DereferencePolicy.NEVER_DEREF_ALIASES, numOfEntries, 0, false,
+                    filter, null, null, null);
 
             return iso;
         } catch (DirectoryException dex) {
@@ -778,7 +795,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         SearchScope scope = (recursive) ? SearchScope.WHOLE_SUBTREE :
             SearchScope.SINGLE_LEVEL;
         InternalSearchOperation iso = searchObjects(dn, filter,
-            scope, numOfEntries, sortResults, ascendingOrder);
+                scope, numOfEntries, sortResults, ascendingOrder);
 
         ResultCode resultCode = iso.getResultCode();
         if (resultCode == ResultCode.NO_SUCH_OBJECT) {
@@ -812,8 +829,8 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
             debug.message("SMSEmbeddedLdapObject.searchSubOrganizationName: " +
                 "Successfully obtained suborganization names for : " + dn);
             debug.message("SMSEmbeddedLdapObject.searchSubOrganizationName: " +
-                "Successfully obtained suborganization names  : " +
-                answer.toString());
+                    "Successfully obtained suborganization names  : " +
+                    answer.toString());
         }
         return answer;
     }
@@ -882,16 +899,43 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
 
         String[] objs = { filter };
         String sfilter = MessageFormat.format(
-            FILTER_PATTERN_SEARCH_ORG, (Object[])objs);
+                FILTER_PATTERN_SEARCH_ORG, (Object[]) objs);
         if (debug.messageEnabled()) {
             debug.message("SMSEmbeddedLdapObject.searchOrganizationNames: " +
                 "orgNames search filter: " + sfilter);
         }
 
         return searchSubOrganizationNames(dn, sfilter, numOfEntries,
-            sortResults, ascendingOrder, true);
+                sortResults, ascendingOrder, true);
     }
-    
+
+    private SMSAuditor newAuditor(SSOToken token, String dn, Map initialState) {
+        if (!AMSetupServlet.isCurrentConfigurationValid()) {
+            return null;
+        }
+        String objectId = dn;
+        String realm = SMSAuditor.getRealmFromDN(dn);
+
+        if (initialState == null) {
+            initialState = new HashMap();
+        }
+
+        return auditorFactory.create(token, realm, objectId, initialState);
+    }
+
+    /**
+     * Read the specified value using an admin token
+     * @param dn The distinguished name
+     * @return The map if the read was successful, null otherwise
+     */
+    private Map readCurrentState(String dn) {
+        try {
+            return read(AccessController.doPrivileged(AdminTokenAction.getInstance()), dn);
+        } catch (SMSException | SSOException e) {
+            return null;
+        }
+    }
+
     public void shutdown() {
     }
 }

@@ -276,7 +276,7 @@ public class AuthXMLHandler implements RequestHandler {
         LoginState loginState = AuthUtils.getLoginState(authContext);
 
         auditor.setMethod(getMethodName(requestType));
-        auditor.setAuthenticationId(getAuthenticationId(loginState));
+        auditor.setUserId(getAuthenticationId(loginState));
         auditor.setTrackingId(getContextId(loginState));
         auditor.setRealm(orgName);
         auditor.auditAccessAttempt();
@@ -737,7 +737,7 @@ public class AuthXMLHandler implements RequestHandler {
             }
         }
 
-        auditor.setAuthenticationId(getAuthenticationId(loginState));
+        auditor.setUserId(getAuthenticationId(loginState));
         auditor.setTrackingId(getContextId(loginState));
 
         return authResponse;

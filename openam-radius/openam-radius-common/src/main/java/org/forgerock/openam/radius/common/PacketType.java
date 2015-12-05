@@ -21,7 +21,6 @@ import java.util.Map;
 /**
  * The packet types in RADIUS rfc 2865 and 2866.
  * <p/>
- * Created by markboyd on 6/18/14.
  */
 public enum PacketType {
 

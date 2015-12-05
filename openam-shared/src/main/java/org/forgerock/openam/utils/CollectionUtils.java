@@ -35,16 +35,14 @@ import java.util.Set;
 
 /**
  * A simple utility class to simplify interactions with collections.
- *
- * @author Peter Major
  */
-public class CollectionUtils {
+public final class CollectionUtils {
 
     private CollectionUtils() {
     }
 
     /**
-     * From the original Set of Strings, remove any entries that are blank
+     * From the original Set of Strings, remove any entries that are blank.
      * @param originalSet The Set of Strings to check
      * @return A copy of the original Set less any blank String entries.
      */
@@ -244,6 +242,16 @@ public class CollectionUtils {
         return newSet;
     }
 
+    /**
+     * Retrieves the first item from a collection.
+     *
+     * @param collection The collection.
+     * @param <T> The type of the collection.
+     * @return The first instance of the collection else null if not present.
+     */
+    public static <T> T getFirstItem(final Collection<T> collection) {
+        return getFirstItem(collection, null);
+    }
 
     /**
      * Retrieves the first item from a collections.
@@ -270,8 +278,9 @@ public class CollectionUtils {
      * Compares any two arbitrary objects - including collections, for equality. It also handles either of the objects
      * being null without issue.
      *
-     * @param valA - the first object to be compared.
-     * @param valB - the second object to tbe compared.
+     * @param valA The first object to be compared.
+     * @param valB The second object to tbe compared.
+     * @param <T> The type of the objects being compared.
      * @return true if the parameter values are the same, false if different.
      */
     public static <T> boolean genericCompare(T valA, T valB) {
@@ -285,7 +294,8 @@ public class CollectionUtils {
      * @param valB - the second map of set of strings to be compared.
      * @return true if the parameter values are the same, false if different.
      */
-    public static boolean compareCaseInsensitiveMapOfSetOfStrings(Map<String, Set<String>> valA, Map<String, Set<String>> valB) {
+    public static boolean compareCaseInsensitiveMapOfSetOfStrings(Map<String, Set<String>> valA,
+            Map<String, Set<String>> valB) {
         if (valA == valB) {
             return true;
         }
@@ -316,8 +326,7 @@ public class CollectionUtils {
                 continue;
             }
 
-            for (String valAValueString : valAValues)
-            {
+            for (String valAValueString : valAValues) {
                 if (valAValueString == null) {
                     boolean bFoundNull = false;
                     for (String nullTestInValBString : valBValues) {
@@ -334,7 +343,7 @@ public class CollectionUtils {
                     continue;
                 }
 
-                boolean bFound=false;
+                boolean bFound = false;
                 for (String valBValueString : valBValues) {
                     bFound = StringUtils.compareCaseInsensitiveString(valAValueString, valBValueString);
                     if (bFound) {
@@ -474,6 +483,8 @@ public class CollectionUtils {
     /**
      * Sort the given Map by comparing it's values.
      * @param map The map to sort.
+     * @param <K> The key type.
+     * @param <V> The value type.
      * @return The given map sorted and presented in a {@code LinkedHashMap} to guarantee iteration order.
      */
     public static <K, V extends Comparable<? super V>> Map<K, V> sortMapByValue(Map<K, V> map) {

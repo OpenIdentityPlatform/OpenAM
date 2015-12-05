@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -26,7 +26,6 @@
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
-
 package com.sun.identity.saml2.profile;
 
 import java.io.ByteArrayInputStream;
@@ -40,6 +39,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -398,15 +399,15 @@ public class LogoutUtil {
 
         SOAPMessage resMsg = null;
         try {
-            resMsg = SAML2Utils.sendSOAPMessage(sloRequestXMLString, sloURL,
-                true);
+            resMsg = SOAPCommunicator.getInstance().sendSOAPMessage(sloRequestXMLString, sloURL,
+                    true);
         } catch (SOAPException se) {
             debug.error("Unable to send SOAPMessage to IDP ", se);
             throw new SAML2Exception(se.getMessage());
         }
         
         // get the LogoutResponse element from SOAP message
-        Element respElem = SAML2Utils.getSamlpElement(resMsg, "LogoutResponse");
+        Element respElem = SOAPCommunicator.getInstance().getSamlpElement(resMsg, "LogoutResponse");
         LogoutResponse sloResponse = ProtocolFactory.getInstance()
                 .createLogoutResponse(respElem);
 
@@ -515,12 +516,12 @@ public class LogoutUtil {
         }
 
         try {
-            SOAPMessage resMsg = SAML2Utils.sendSOAPMessage(
-                logoutReq.toXMLString(true,true), remoteLogoutURL, true);
+            SOAPMessage resMsg = SOAPCommunicator.getInstance().sendSOAPMessage(
+                    logoutReq.toXMLString(true, true), remoteLogoutURL, true);
 
             // get the LogoutResponse element from SOAP message
-            Element respElem = SAML2Utils.getSamlpElement(resMsg,
-                                                          "LogoutResponse");
+            Element respElem = SOAPCommunicator.getInstance().getSamlpElement(resMsg,
+                    "LogoutResponse");
             return ProtocolFactory.getInstance().createLogoutResponse(respElem);
         } catch (Exception ex) {
             if (debug.messageEnabled()) {
@@ -885,23 +886,17 @@ public class LogoutUtil {
         }
 
         boolean valid = false;
-        X509Certificate signingCert = null;
+        Set<X509Certificate> signingCerts;
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
-            SPSSODescriptorElement spSSODesc =
-                metaManager.getSPSSODescriptor(realm, remoteEntity);
-            signingCert = 
-                KeyUtil.getVerificationCert(spSSODesc, remoteEntity,
-                SAML2Constants.SP_ROLE);
+            SPSSODescriptorElement spSSODesc = metaManager.getSPSSODescriptor(realm, remoteEntity);
+            signingCerts = KeyUtil.getVerificationCerts(spSSODesc, remoteEntity, SAML2Constants.SP_ROLE);
         } else {
-            IDPSSODescriptorElement idpSSODesc = 
-                 metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            signingCert = 
-                KeyUtil.getVerificationCert(idpSSODesc, remoteEntity,
-                SAML2Constants.IDP_ROLE);
+            IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(realm, remoteEntity);
+            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, remoteEntity, SAML2Constants.IDP_ROLE);
         }
 
-        if (signingCert != null) {
-            valid = sloRequest.isSignatureValid(signingCert);
+        if (!signingCerts.isEmpty()) {
+            valid = sloRequest.isSignatureValid(signingCerts);
                 if (debug.messageEnabled()) {
                 debug.message(method + "Signature is : " + valid);
             }
@@ -1016,38 +1011,30 @@ public class LogoutUtil {
             }
             return true;
         }
-        
-        boolean valid = false;
-        X509Certificate signingCert = null;
+
+        Set<X509Certificate> signingCerts;
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
-            SPSSODescriptorElement spSSODesc =
-                metaManager.getSPSSODescriptor(realm, remoteEntity);
-            signingCert = 
-                KeyUtil.getVerificationCert(spSSODesc, remoteEntity,
-                SAML2Constants.SP_ROLE);
+            SPSSODescriptorElement spSSODesc = metaManager.getSPSSODescriptor(realm, remoteEntity);
+            signingCerts = KeyUtil.getVerificationCerts(spSSODesc, remoteEntity, SAML2Constants.SP_ROLE);
         } else {
-            IDPSSODescriptorElement idpSSODesc = 
-                     metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            signingCert = 
-                KeyUtil.getVerificationCert(idpSSODesc, remoteEntity,
-                SAML2Constants.IDP_ROLE);
+            IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(realm, remoteEntity);
+            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, remoteEntity, SAML2Constants.IDP_ROLE);
         }
         
-        if (signingCert != null) {
-            valid = sloResponse.isSignatureValid(signingCert);
-                if (debug.messageEnabled()) {
+        if (!signingCerts.isEmpty()) {
+            boolean valid = sloResponse.isSignatureValid(signingCerts);
+            if (debug.messageEnabled()) {
                 debug.message(method + "Signature is : " + valid);
-                }
+            }
+            return valid;
         } else {
-                debug.error("Incorrect configuration for Signing Certificate.");
+            debug.error("Incorrect configuration for Signing Certificate.");
             throw new SAML2Exception(
                     SAML2Utils.bundle.getString("metaDataError"));
         }
-        
-        return valid;
     }
 
-    static void setNameIDForSLORequest(LogoutRequest request, 
+    public static void setNameIDForSLORequest(LogoutRequest request,
                           NameID nameID, String realm, String hostEntity,
                           String hostEntityRole, String remoteEntity)
         throws SAML2Exception, SessionException {
@@ -1115,8 +1102,7 @@ public class LogoutUtil {
                           String hostEntityRole)
         throws SAML2Exception {
         String method = "getNameIDFromSLORequest: ";
-        String alias = null;
-        
+
         boolean needDecryptIt = 
             SAML2Utils.getWantNameIDEncrypted(realm,hostEntity,hostEntityRole);
         
@@ -1127,20 +1113,15 @@ public class LogoutUtil {
             return request.getNameID();
         }
         
-        alias = SAML2Utils.getEncryptionCertAlias(realm, hostEntity, 
-                            hostEntityRole);
-
         if (debug.messageEnabled()) {
             debug.message(method + "realm is : "+ realm);
             debug.message(method + "hostEntity is : " + hostEntity);
             debug.message(method + "Host Entity role is : " + hostEntityRole);
-            debug.message(method + "Cert Alias is : " + alias);
         }
         
-        PrivateKey privateKey = keyProvider.getPrivateKey(alias);
         EncryptedID encryptedID = request.getEncryptedID();
   
-        return encryptedID.decrypt(privateKey);
+        return encryptedID.decrypt(KeyUtil.getDecryptionKeys(realm, hostEntity, hostEntityRole));
     }    
 
     public static void sendSLOResponse(HttpServletResponse response,

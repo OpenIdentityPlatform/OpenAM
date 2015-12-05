@@ -1,0 +1,67 @@
+.am-panel-card{
+    margin-bottom: 30px;
+
+    a:hover, a:focus{
+        text-decoration:none;
+    }
+
+    .card-menu {
+        float:right;
+    }
+
+    .card-body {
+        clear:both;
+        text-align: center;
+        padding: 24px 15px;
+
+        .card-name {
+            font-size: 18px;
+            line-height: 1.2;
+            margin: 10px 0 0;
+            text-overflow: ellipsis;
+            overflow: hidden;
+
+            &.card-name-sm {
+                font-weight: 300;
+                font-size: 16px;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+        }
+
+        .card-subtext {
+            .ellipsis;
+
+            div, p{
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+        }
+
+        &.card-body-with-menu {
+            padding-top: 0;
+        }
+    }
+
+    .card-footer {
+        padding: 10px 15px;
+        text-align: center;
+    }
+
+    .card-icon-circle {
+
+        margin: 0 auto;
+        .icon-circle(120px);
+
+        &.card-icon-circle-sm {
+            .icon-circle(60px);
+        }
+    }
+
+    &:hover {
+        transition: all 0.3s ease-in-out;
+        .card-icon-circle {
+            transition: all 0.3s ease-in-out;
+        }
+    }
+}

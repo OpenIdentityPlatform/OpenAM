@@ -32,6 +32,7 @@ package com.sun.identity.saml2.servlet;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.profile.NameIDMapping;
 import com.sun.identity.saml2.protocol.NameIDMappingRequest;
@@ -87,17 +88,9 @@ public class NameIDMappingServiceSOAP extends HttpServlet {
                     idpMetaAlias + ", idpEntityID = " + idpEntityID);
             }
 
-            // Get all the headers from the HTTP request
-            MimeHeaders headers = SAML2Utils.getHeaders(req);
-            // Get the body of the HTTP request
-            InputStream is = req.getInputStream();
-            // Now internalize the contents of a HTTP request
-            // and create a SOAPMessage
-            SOAPMessage msg =
-                MessageFactory.newInstance().createMessage(headers, is);
-
-            Element reqElem = SAML2Utils.getSamlpElement(msg,
-                SAML2Constants.NAME_ID_MAPPING_REQUEST);
+            SOAPMessage msg = SOAPCommunicator.getInstance().getSOAPMessage(req);
+            Element reqElem = SOAPCommunicator.getInstance().getSamlpElement(msg,
+                    SAML2Constants.NAME_ID_MAPPING_REQUEST);
 
             NameIDMappingRequest nimRequest = ProtocolFactory.getInstance()
                 .createNameIDMappingRequest(reqElem);
@@ -106,8 +99,8 @@ public class NameIDMappingServiceSOAP extends HttpServlet {
                 NameIDMapping.processNameIDMappingRequest(nimRequest, realm,
                idpEntityID);
 
-            SOAPMessage reply = SAML2Utils.createSOAPMessage(
-                nimResponse.toXMLString(true, true), false);
+            SOAPMessage reply = SOAPCommunicator.getInstance().createSOAPMessage(
+                    nimResponse.toXMLString(true, true), false);
 
             if (reply != null) {    
                 //  Need to call saveChanges because we're

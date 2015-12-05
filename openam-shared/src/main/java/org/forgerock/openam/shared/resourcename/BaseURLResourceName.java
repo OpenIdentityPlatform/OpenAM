@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2006-2009 Sun Microsystems Inc.
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.shared.resourcename;
@@ -36,11 +36,24 @@ import java.util.regex.Pattern;
  */
 public abstract class BaseURLResourceName<T, E extends Exception> extends BasePrefixResourceName<T, E> {
 
+    /**
+     * Constructs a new BaseURLResourceName instance.
+     *
+     * @param debug The debug instance.
+     * @param exactMatch The object to return on an exact match.
+     * @param noMatch The object to return on no match.
+     * @param subResourceMatch The object to return on a sub-resource match.
+     * @param superResourceMatch The object to return on a super-resource match.
+     * @param wildcardMatch The object to return on a wildcard match.
+     */
     protected BaseURLResourceName(Debug debug, T exactMatch, T noMatch, T subResourceMatch, T superResourceMatch,
             T wildcardMatch) {
         super(debug, exactMatch, noMatch, subResourceMatch, superResourceMatch, wildcardMatch);
     }
 
+    /**
+     * Query parameter comparator.
+     */
     protected static Comparator<String> comparator = new QueryParameterComparator();
 
     private static final String QUERY_PARAMETER_DELIMITER = "&";
@@ -79,7 +92,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
         if (schemelessTarget.contains(SCHEME_DELIMITER) && schemelessRequest.contains(SCHEME_DELIMITER)) {
             schemelessTarget = removeSchemeEnsureSlash(schemelessTarget);
             schemelessRequest = removeSchemeEnsureSlash(schemelessRequest);
-        } else {//urls should be canonicalised before reaching here
+        } else { //urls should be canonicalised before reaching here
             return super.compare(requestResource, targetResource, wildcardCompare);
         }
 
@@ -189,7 +202,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     private T wildcardResponseCombiner(T... matches) {
         boolean wildcard = false;
 
-        for(T match : matches) {
+        for (T match : matches) {
             if (wildcardMatch.equals(match)) {
                 wildcard = true;
             } else if (!exactMatch.equals(match)) {
@@ -205,7 +218,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     }
 
     /**
-     * Recursive-component step
+     * Recursive-component step.
      */
     private T compareBeforeBreakpoint(String resource, String target, String breakPoint) {
 
@@ -228,7 +241,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     }
 
     /**
-     * Recursive-component step
+     * Recursive-component step.
      */
     private T compareAfterBreakpoint(String resource, String target, String breakPoint) {
 
@@ -333,7 +346,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
 
             // If no port has been specified set a default port value based on the protocol.
             // Should the protocol contain a wildcard, set the port to be a wildcard also.
-            if ( port.length() == 0) {
+            if (port.length() == 0) {
                 if (proto.equals(DEFAULT_WEB_PROTOCOL)) {
                     port = DEFAULT_PORT;
                 } else if (proto.equals(SECURE_WEB_PROTOCOL)) {
@@ -370,7 +383,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
             int indexAmp = query.indexOf(QUERY_PARAMETER_DELIMITER);
             if (indexAmp != -1) {
                 // there are more than query parameters in the url
-                String suffix= urlPath.substring(indexQuery + query.length());
+                String suffix = urlPath.substring(indexQuery + query.length());
                 ArrayList al = new ArrayList();
                 StringTokenizer st = new StringTokenizer(query, QUERY_PARAMETER_DELIMITER);
                 while (st.hasMoreTokens()) {
@@ -382,10 +395,10 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
                 int size = al.size();
                 // reconstruct the url in canonicalized form
                 for (int i = 0; i < size; i++) {
-                    if (i < (size-1)) {
+                    if (i < (size - 1)) {
                         sb.append((String) al.get(i)).append(QUERY_PARAMETER_DELIMITER);
                     } else {
-                        sb.append((String)al.get(i));
+                        sb.append((String) al.get(i));
                     }
                 }
                 sb.append(suffix);
@@ -427,7 +440,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
             try {
                 Integer.parseInt(portString);
             } catch (Exception e) {
-                String objs[] = { port };
+                String[] objs = { port };
                 throw constructResourceInvalidException(objs);
             }
         }
@@ -444,6 +457,8 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
      */
     private static final class QueryParameterComparator implements Comparator<String> {
         /**
+         * Compares query parameters.
+         *
          * @param s1 a url query parameter to be compared
          * @param s2 a url query parameter to be compared
          * @return -1 if s1 < s2; 0 if s1 = s2; 1 if s1 > s2

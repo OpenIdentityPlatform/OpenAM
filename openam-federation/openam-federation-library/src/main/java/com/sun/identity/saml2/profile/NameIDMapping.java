@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,8 @@
  *
  * $Id: NameIDMapping.java,v 1.6 2009/11/20 21:41:16 exu Exp $
  *
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
-
-/*
- * Portions Copyrighted 2013 ForgeRock, Inc.
- */
-
 package com.sun.identity.saml2.profile;
 
 import java.security.PrivateKey;
@@ -38,9 +34,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
+import com.sun.identity.saml2.common.SOAPCommunicator;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import org.w3c.dom.Element;
 
 import com.sun.identity.plugin.session.SessionException;
@@ -346,16 +345,16 @@ public class NameIDMapping {
         
         SOAPMessage resMsg = null;
         try {
-            resMsg = SAML2Utils.sendSOAPMessage(nimRequestXMLString, nimURL,
-                true);
+            resMsg = SOAPCommunicator.getInstance().sendSOAPMessage(nimRequestXMLString, nimURL,
+                    true);
         } catch (SOAPException se) {
             SAML2Utils.debug.error("NameIDMapping.doNIMBySOAP: ", se);
             throw new SAML2Exception(SAML2Utils.bundle.getString(
                 "invalidSOAPMessge"));
         }
 
-        Element nimRespElem = SAML2Utils.getSamlpElement(resMsg,
-            SAML2Constants.NAME_ID_MAPPING_RESPONSE);
+        Element nimRespElem = SOAPCommunicator.getInstance().getSamlpElement(resMsg,
+                SAML2Constants.NAME_ID_MAPPING_RESPONSE);
         NameIDMappingResponse nimResponse = 
              pf.createNameIDMappingResponse(nimRespElem);
         
@@ -523,27 +522,6 @@ public class NameIDMapping {
         }
     }
 
-    private static boolean verifyNIMRequest(NameIDMappingRequest nimRequest, 
-        String realm, String spEntityID) throws SAML2Exception {
-
-        SPSSODescriptorElement spSSODesc =
-            metaManager.getSPSSODescriptor(realm, spEntityID);
-        X509Certificate signingCert = KeyUtil.getVerificationCert(spSSODesc,
-            spEntityID, SAML2Constants.SP_ROLE);
-
-        if (signingCert != null) {
-            boolean valid = nimRequest.isSignatureValid(signingCert);
-            if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("NameIDMapping:verifyNIMRequest: " +
-                "Signature is : " + valid);
-            }
-            return valid;
-        } else {
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("missingSigningCertAlias"));
-        }
-    }
-
     static void signNIMResponse(NameIDMappingResponse nimResponse,
         String realm, String idpEntityID, boolean includeCert)
         throws SAML2Exception {
@@ -589,40 +567,28 @@ public class NameIDMapping {
 
         IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(
             realm, idpEntityID);
-        X509Certificate signingCert = KeyUtil.getVerificationCert(idpSSODesc,
-            idpEntityID, SAML2Constants.IDP_ROLE);
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, idpEntityID,
+                SAML2Constants.IDP_ROLE);
         
-        if (signingCert != null) {
-            boolean valid = nimResponse.isSignatureValid(signingCert);
+        if (!signingCerts.isEmpty()) {
+            boolean valid = nimResponse.isSignatureValid(signingCerts);
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message("NameIDMapping.verifyNIMResponse: " +
                     "Signature is : " + valid);
             }
             return valid;
         } else {
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("missingSigningCertAlias"));
+            throw new SAML2Exception(SAML2Utils.bundle.getString("missingSigningCertAlias"));
         }
     }
 
-    private static NameID getNameID(NameIDMappingRequest nimRequest,
-        String realm, String idpEntityID){
-
+    private static NameID getNameID(NameIDMappingRequest nimRequest, String realm, String idpEntityID) {
         NameID nameID = nimRequest.getNameID();
         if (nameID == null) {
-            String alias = SAML2Utils.getSigningCertAlias(realm, idpEntityID, SAML2Constants.IDP_ROLE);
-            String encryptedKeyPass =
-                    SAML2Utils.getSigningCertEncryptedKeyPass(realm, idpEntityID, SAML2Constants.IDP_ROLE);
-            PrivateKey signingKey;
-            if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
-                signingKey = keyProvider.getPrivateKey(alias);
-            } else {
-                signingKey = keyProvider.getPrivateKey(alias, encryptedKeyPass);
-            }
-
             EncryptedID encryptedID = nimRequest.getEncryptedID();
             try {
-                nameID = encryptedID.decrypt(signingKey);
+                final IDPSSOConfigElement idpSsoConfig = metaManager.getIDPSSOConfig(realm, idpEntityID);
+                nameID = encryptedID.decrypt(KeyUtil.getDecryptionKeys(idpSsoConfig));
             } catch (SAML2Exception ex) {
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("NameIDMapping.getNameID:", ex);

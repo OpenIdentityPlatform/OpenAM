@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS
+ * Copyright 2013-2015 ForgeRock AS
  */
 
 package com.sun.identity.authentication.share;
@@ -19,10 +19,11 @@ package com.sun.identity.authentication.share;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
-
+import java.io.IOException;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.forgerock.openam.authentication.RedirectException;
 
 /**
  * A Callback Handler for RedirectCallbacks, so that multiple places in OpenAM can re-use the same code.
@@ -30,6 +31,8 @@ import java.io.IOException;
 public class RedirectCallbackHandler {
 
     private static final Debug debug = Debug.getInstance("amAuthentication");
+
+    private static final String FORWARDING_PLACE = "/postRedirect.jsp";
 
     /**
      * Handles RedirectCallbacks by forwarding the response to the url in the callback.
@@ -64,7 +67,7 @@ public class RedirectCallbackHandler {
             RedirectCallback redirectCallback, String loginURL) throws IOException {
 
         setRedirectCallbackCookie(request, response, redirectCallback, loginURL);
-        
+
         String qString = AuthClientUtils.getQueryStrFromParameters(redirectCallback.getRedirectData());
 
         StringBuilder redirectUrl = new StringBuilder(redirectCallback.getRedirectUrl());
@@ -82,7 +85,23 @@ public class RedirectCallbackHandler {
             // prepend deployment URI
             response.sendRedirect(AuthClientUtils.getServiceURI() + rUrl);
         } else {
-            response.sendRedirect(rUrl);
+            if (redirectCallback.getMethod().equalsIgnoreCase("post")) {
+
+                request.setAttribute("postData", redirectCallback.getRedirectData());
+                request.setAttribute("postURL", redirectCallback.getRedirectUrl());
+
+                //forward post
+                try {
+                    request.getRequestDispatcher(FORWARDING_PLACE).forward(request, response);
+                } catch (ServletException e) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("Could not set RedirectBackUrlCookie!" + e.toString());
+                    }
+                    throw new RedirectException("Could not forward request.", e);
+                }
+            } else {
+                response.sendRedirect(rUrl);
+            }
         }
     }
 }

@@ -1,0 +1,55 @@
+<!--
+  ~ The contents of this file are subject to the terms of the Common Development and
+  ~ Distribution License (the License). You may not use this file except in compliance with the
+  ~ License.
+  ~
+  ~ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  ~ specific language governing permission and limitations under the License.
+  ~
+  ~ When distributing Covered Software, include this CDDL Header Notice in each file and include
+  ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
+  ~ information: "Portions copyright [year] [name of copyright owner]".
+  ~
+  ~ Copyright 2015 ForgeRock AS.
+  -->
+
+<form class="form" id="userQuery" aria-labelledby="userQueryDescription">
+    <input type="hidden" aria-hidden="true" name="queryFilter" data-validator="required" />
+
+    <p id="userQueryDescription">{{t 'common.user.userQuery.title'}}</p>
+
+    <div id="filterContainer" class="filter-group filter-or">
+
+        <label class="separator" id="mainEnterPrompt"><span>{{t 'common.user.userQuery.mainEnterPrompt'}}{{t 'common.user.username'}}</span></label>
+
+        <div class="form-group" aria-labelledby="mainEnterPrompt">
+            <label class="sr-only" for="input-uid"></label>
+            <input type="text" placeholder="{{t 'common.user.username'}}" id="input-uid" name="uid" class="form-control filter-value input-lg" />
+        </div>
+
+        <label class="separator" id="optionalEnterPrompt"><span>{{t 'common.user.userQuery.optionalEnterPrompt'}}{{t 'common.user.emailAddress'}}</span></label>
+
+        <div class="form-group" aria-labelledby="optionalEnterPrompt">
+            <label class="sr-only" for="input-mail">{{t 'common.user.emailAddress'}}</label>
+            <input type="email" placeholder="{{t 'common.user.emailAddress'}}" id="input-mail" name="mail" class="form-control filter-value input-lg" />
+        </div>
+
+        <label class="separator" id="orAllEnterPrompt"><span>{{t 'common.user.userQuery.orAllEnterPrompt'}}</span></label>
+
+        <div class="filter-group filter-and" aria-labelledby="orAllEnterPrompt">
+            <div class="form-group">
+                <label class="sr-only" for="input-givenName">{{t 'common.user.givenName'}}</label>
+                <input type="text" placeholder="{{t 'common.user.givenName'}}" id="input-givenName" name="givenName" class="form-control filter-value input-lg" />
+            </div>
+
+            <div class="form-group">
+                <label class="sr-only" for="input-sn">{{t 'common.user.sn'}}</label>
+                <input type="text" placeholder="{{t 'common.user.sn'}}" id="input-sn" name="sn" class="form-control filter-value input-lg" />
+            </div>
+        </div>
+
+    </div>
+
+    <input type="submit" class="btn btn-lg btn-primary btn-block btn-uppercase" value="{{t 'common.form.submit'}}" />
+</form>

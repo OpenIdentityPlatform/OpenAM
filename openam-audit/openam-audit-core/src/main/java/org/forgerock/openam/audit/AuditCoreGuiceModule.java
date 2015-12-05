@@ -16,8 +16,12 @@
 package org.forgerock.openam.audit;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.audit.servlet.Auditor;
+import org.forgerock.openam.audit.servlet.AuditorFactory;
+import org.forgerock.util.time.TimeService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Audit Core classes.
@@ -28,6 +32,10 @@ public class AuditCoreGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(AuditServiceProvider.class).to(AuditServiceProviderImpl.class);
+        bind(AuditEventPublisher.class).to(AuditEventPublisherImpl.class);
+        bind(TimeService.class).toInstance(TimeService.SYSTEM);
+
+        install(new FactoryModuleBuilder().implement(Auditor.class, Auditor.class).build(AuditorFactory.class));
 
         // Initial binding for a Map of Component to AbstractHttpAccessAuditFilter
         // which other Guice modules will populate.

@@ -49,10 +49,11 @@ import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.http.util.Uris;
 
 public class RealmPropertiesViewBean
     extends RealmPropertiesBase
@@ -116,12 +117,8 @@ public class RealmPropertiesViewBean
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
             String redirectRealm = getRedirectRealm(this);
-            try {
-                redirectToXui(getRequestContext().getRequest(), redirectRealm,
-                        MessageFormat.format("realms/{0}/dashboard", URLEncoder.encode(redirectRealm, "UTF-8")));
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException("UTF-8 encoding not supported", e);
-            }
+            redirectToXui(getRequestContext().getRequest(), redirectRealm,
+                MessageFormat.format("realms/{0}/dashboard", Uris.urlEncodePathElement(redirectRealm)));
             return;
         }
 

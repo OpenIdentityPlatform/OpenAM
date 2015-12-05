@@ -1,6 +1,4 @@
 /*
- * Copyright 2014 ForgeRock, AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.license;
@@ -103,7 +103,10 @@ public class LicenseTest {
         license.accept();
 
         // When
-        try { license.reject(); } catch (LicenseRejectedException _) {}
+        try {
+            license.reject();
+        } catch (LicenseRejectedException ignored) {
+        }
 
         // Then: last action should win
         assertFalse(license.isAccepted());
@@ -115,10 +118,10 @@ public class LicenseTest {
         License license = new License("...", "...");
 
         // When
-        try { license.reject(); }
-
-        // Then
-        catch (LicenseRejectedException ex) {
+        try {
+            license.reject();
+        } catch (LicenseRejectedException ex) {
+            // Then
             assertEquals(ex.getRejectedLicense(), license);
             throw ex;
         }
@@ -134,7 +137,9 @@ public class LicenseTest {
         // When
         Iterable<String> lines = license.lines();
         StringBuilder sb = new StringBuilder();
-        for (String line : lines) { sb.append(line).append('\n'); }
+        for (String line : lines) {
+            sb.append(line).append('\n');
+        }
 
         // Then
         assertEquals(sb.toString(), licenseText);

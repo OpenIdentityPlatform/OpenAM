@@ -64,6 +64,23 @@ public final class RealmUtils {
     }
 
     /**
+     * Returns parent realm from a given fully qualified realm.
+     *
+     * @param path Fully qualified realm.
+     * @return parent realm.
+     */
+    public static boolean isParentRealm(String parentPath, String path) {
+        parentPath = normalizeRealm(parentPath).toLowerCase();
+        path = normalizeRealm(path).toLowerCase();
+
+        if (path.startsWith(parentPath)) {
+            path = path.substring(parentPath.length());
+            return path.startsWith("/");
+        }
+        return false;
+    }
+
+    /**
      * Returns child realm from a given fully qualified realm.
      *
      * @param path Fully qualified realm.
@@ -95,6 +112,31 @@ public final class RealmUtils {
             }
         }
         return path.trim();
+    }
+
+    /**
+     * Converts a realm to a valid form
+     * @param realm Raw realm
+     * @return Cleaned realm
+     */
+    public static String cleanRealm(String realm) {
+        if (!realm.startsWith("/")) {
+            realm = "/" + realm;
+        }
+        if (realm.length() > 1 && realm.endsWith("/")) {
+            realm = realm.substring(0, realm.length() - 1);
+        }
+        return realm;
+    }
+
+    /**
+     * Takes two realm and concatenates them together
+     * @param parentRealm The base realm
+     * @param subrealm The subrealm to concatenate
+     * @return The concatenated realm
+     */
+    public static String concatenateRealmPath(String parentRealm, String subrealm) {
+        return parentRealm.equals("/") ? subrealm : parentRealm + subrealm;
     }
 
     /**

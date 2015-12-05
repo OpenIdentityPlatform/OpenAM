@@ -25,8 +25,9 @@
  * $Id: UMChangeUserPasswordModelImpl.java,v 1.3 2009/09/28 18:59:56 babysunil Exp $
  *
  */
-/**
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+
+/*
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.console.user.model;
 
@@ -42,6 +43,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import org.forgerock.openam.ldap.LDAPConstants;
 
 /* - LOG COMPLETE - */
 
@@ -147,6 +149,11 @@ public class UMChangeUserPasswordModelImpl
                 strError};
             logEvent("IDM_EXCEPTION_MODIFY_IDENTITY_ATTRIBUTE_VALUE",
                 paramsEx);
+
+            if (e.getErrorCode().equals(LDAPConstants.CONSTRAINT_VIOLATED_ERROR)) {
+                throw new AMConsoleException(e.getConstraintViolationDetails());
+            }
+
             throw new AMConsoleException(strError);
         }
     }

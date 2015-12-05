@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
             };
         },
 
-        validate: function (attrs, options) {
+        validate: function (attrs) {
             if (attrs.name.trim() === "") {
                 return "errorNoName";
             }

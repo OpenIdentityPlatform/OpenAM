@@ -33,7 +33,9 @@ define("config/ThemeConfiguration", {
                     // The title attribute used on <img> tags.
                     title: "ForgeRock",
                     // The alt attribute used on <img> tags.
-                    alt: "ForgeRock"
+                    alt: "ForgeRock",
+                    // The width of the logo as a CSS length.
+                    width: "202px"
                 },
                 // This logo is displayed on login pages.
                 loginLogo: {
@@ -60,7 +62,7 @@ define("config/ThemeConfiguration", {
         "fr-dark-theme": {
             // An ordered list of URLs to stylesheets that will be applied to every page.
             stylesheets: [
-                "themes/dark/css/bootstrap-3.3.5-custom.css",
+                "themes/dark/css/bootstrap.min.css",
                 "css/structure.css",
                 "themes/dark/css/theme-dark.css"
             ],

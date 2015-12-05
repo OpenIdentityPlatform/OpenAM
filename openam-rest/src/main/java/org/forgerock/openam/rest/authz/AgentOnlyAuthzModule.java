@@ -15,47 +15,35 @@
  */
 package org.forgerock.openam.rest.authz;
 
-import static org.forgerock.json.resource.ResourceException.*;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.authz.filter.api.AuthorizationResult;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.authz.filter.api.AuthorizationResult;
-import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.services.context.Context;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.net.HttpURLConnection;
 
 /**
  * Authorization module that only grants access to agents (e.g. web agent, J2EE agent, SOAP STS).
  *
  * @since 13.0.0
  */
-public class AgentOnlyAuthzModule implements CrestAuthorizationModule {
+public class AgentOnlyAuthzModule extends SSOTokenAuthzModule {
 
     public static final String NAME = "AgentOnlyFilter";
 
     protected final AgentIdentity agentIdentity;
-    protected final Debug debug;
 
     @Inject
     public AgentOnlyAuthzModule(AgentIdentity agentIdentity, @Named("frRest") Debug debug) {
+        super(debug);
         this.agentIdentity = agentIdentity;
-        this.debug = debug;
     }
 
     @Override
@@ -64,62 +52,14 @@ public class AgentOnlyAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context context, CreateRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeRead(Context context, ReadRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeUpdate(Context context, UpdateRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeDelete(Context context, DeleteRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizePatch(Context context, PatchRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeAction(Context context, ActionRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeQuery(Context context, QueryRequest request) {
-        return authorize(context);
-    }
-
-    private Promise<AuthorizationResult, ResourceException> authorize(Context context) {
-        SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
-        String userId;
-        try {
-            SSOToken token = tokenContext.getCallerSSOToken();
-            userId = token.getPrincipal().getName();
-            if (agentIdentity.isAgent(token)) {
-                if (debug.messageEnabled()) {
-                    debug.message("AgentOnlyAuthzModule :: User, " + userId + " accepted as Agent user.");
-                }
-                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
-            } else {
-                if (debug.warningEnabled()) {
-                    debug.warning("AgentUserOnlyAuthzModule :: Denied access to " + userId);
-                }
-                return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not an Agent."));
-            }
-        } catch (SSOException e) {
-            if (debug.messageEnabled()) {
-                debug.message("AgentOnlyAuthzModule :: Unable to authorize as Agent user using SSO Token.", e);
-            }
-            return getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e).asPromise();
+    protected Promise<AuthorizationResult, ResourceException> validateToken(Context context, SSOToken token) throws SSOException {
+        String userId = token.getPrincipal().getName();
+        if (agentIdentity.isAgent(token)) {
+            debug.message("AgentOnlyAuthzModule :: User, {} accepted as Agent user", userId);
+            return Promises.newResultPromise(AuthorizationResult.accessPermitted());
+        } else {
+            debug.warning("AgentUserOnlyAuthzModule :: Denied access to {}", userId);
+            return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not an Agent."));
         }
     }
 }

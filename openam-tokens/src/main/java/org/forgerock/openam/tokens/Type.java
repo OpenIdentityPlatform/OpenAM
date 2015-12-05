@@ -27,5 +27,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Type {
-    public TokenType value();
+    /**
+     * The Token type.
+     */
+    TokenType value();
 }

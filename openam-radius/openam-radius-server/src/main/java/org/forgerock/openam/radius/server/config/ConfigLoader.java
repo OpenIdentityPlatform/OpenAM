@@ -55,10 +55,9 @@ public class ConfigLoader {
     private final ServiceConfigManager serviceConfigManager;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param serviceConfigManager
-     *            - Service config manager from which RADIUS Server config may be loaded.
+     * @param serviceConfigManager - Service config manager from which RADIUS Server config may be loaded.
      */
     @Inject
     public ConfigLoader(@Named("RadiusServer") ServiceConfigManager serviceConfigManager) {
@@ -72,8 +71,6 @@ public class ConfigLoader {
      *
      * @return an object containing the configuration parameters for the radius service, or null if the config can't be
      *         loaded.
-     * @param serviceConfigManager
-     *            the config manager used to load the configuration settings.
      */
     public RadiusServiceConfig loadConfig() {
         try {

@@ -23,11 +23,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import org.forgerock.openam.radius.server.config.RadiusServiceConfig;
 import org.forgerock.openam.radius.server.config.ThreadPoolConfig;
-import org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import com.sun.identity.shared.debug.Debug;
@@ -40,39 +41,43 @@ public class RequestListenerFactory {
     private static final Debug logger = Debug.getInstance(RadiusServerConstants.RADIUS_SERVER_LOGGER);
 
     /**
-     * Registrar service to be used by the created RadiusRequestListeners
-     */
-    private final RadiusServerEventRegistrar eventRegistrar;
-
-    /**
-     * The executor service factory that should be used to create the ExecutorService used by the created
+     * The executor service factory that should be used to create the ExecutorService used by the created.
      * <code>RadiusRequestListener</code>s
      */
     private final ExecutorServiceFactory executorServiceFactory;
 
+    /**
+     * The event bus to be used by the Request Listener.
+     */
+    private final EventBus eventBus;
 
     /**
-     * Constructor
+     * A factory that a <code>RadiusRequestHandler</code> may use to create <code>AccessRequestHandler</code> instances.
+     */
+    private AccessRequestHandlerFactory accessRequestHandlerFactory;
+
+    /**
+     * Constructor.
      *
-     * @param eventRegistrar
-     *            - An object that should be notified of system events, so that they may be tracked across the system.
-     * @param serviceFactory
-     *            - a factory from which a ThreadPoolExecutor may be obtained.
+     * @param serviceFactory - a factory from which a ThreadPoolExecutor may be obtained.
+     * @param eventBus is used to publish or register for notifications of RADIUS server events.
+     * @param accessRequestHandlerFactory may be used to obtain access request handlers.
      */
     @Inject
-    public RequestListenerFactory(RadiusServerEventRegistrar eventRegistrar, ExecutorServiceFactory serviceFactory) {
-        this.eventRegistrar = eventRegistrar;
+    public RequestListenerFactory(ExecutorServiceFactory serviceFactory,
+            @Named("RadiusEventBus") EventBus eventBus,
+            AccessRequestHandlerFactory accessRequestHandlerFactory) {
         this.executorServiceFactory = serviceFactory;
+        this.eventBus = eventBus;
+        this.accessRequestHandlerFactory = accessRequestHandlerFactory;
     }
 
     /**
-     * Factory method to obtain a new RadiusRequestListener
+     * Factory method to obtain a new RadiusRequestListener.
      *
-     * @param serviceConfig
-     *            - the configuration of the RADIUS service.
+     * @param serviceConfig - the configuration of the RADIUS service.
      * @return a <code>RadiusRquestListener</code>
-     * @throws RadiusLifecycleException
-     *             - if a RquestListener can not be created.
+     * @throws RadiusLifecycleException - if a RquestListener can not be created.
      */
     public RadiusRequestListener getRadiusRequestListener(RadiusServiceConfig serviceConfig)
             throws RadiusLifecycleException {
@@ -84,7 +89,7 @@ public class RequestListenerFactory {
         final ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(poolConfig.getQueueSize());
         final ExecutorService executorService = executorServiceFactory.createThreadPool(coreSize, maxSize, idleTimeout,
                 TimeUnit.SECONDS, queue);
-        return new RadiusRequestListener(serviceConfig, eventRegistrar, executorService);
+        return new RadiusRequestListener(serviceConfig, executorService, eventBus, accessRequestHandlerFactory);
     }
 
 

@@ -38,6 +38,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import com.sun.identity.saml2.common.SAML2InvalidNameIDPolicyException;
 import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -404,7 +405,6 @@ public class IDPSSOUtil {
             throw new SAML2Exception(
                     SAML2Utils.bundle.getString("UnableTofindBinding"));
         }
-
 
         String affiliationID = request.getParameter(
                 SAML2Constants.AFFILIATION_ID);
@@ -1330,7 +1330,7 @@ public class IDPSSOUtil {
      * @return the <code>IDPAuthnContextMapper</code>
      * @throws SAML2Exception if the operation is not successful
      */
-    static IDPAuthnContextMapper getIDPAuthnContextMapper(
+    public static IDPAuthnContextMapper getIDPAuthnContextMapper(
             String realm, String idpEntityID)
             throws SAML2Exception {
         String classMethod = "IDPSSOUtil.getIDPAuthnContextMapper: ";
@@ -1379,7 +1379,7 @@ public class IDPSSOUtil {
      * @return the <code>IDPECPSessionMapper</code>
      * @throws SAML2Exception if the operation is not successful
      */
-    static IDPECPSessionMapper getIDPECPSessionMapper(String realm,
+    public static IDPECPSessionMapper getIDPECPSessionMapper(String realm,
                                                       String idpEntityID) throws SAML2Exception {
 
         String idpECPSessionMapperName = null;
@@ -2173,12 +2173,12 @@ public class IDPSSOUtil {
         String body = res.toXMLString(true, true);
 
         try {
-            SOAPMessage reply = SAML2Utils.createSOAPMessage(header, body,
+            SOAPMessage reply = SOAPCommunicator.getInstance().createSOAPMessage(header, body,
                     false);
 
             String[] logdata = {idpEntityID, realm, acsURL, ""};
             if (LogUtil.isAccessLoggable(Level.FINE)) {
-                logdata[3] = SAML2Utils.soapMessageToString(reply);
+                logdata[3] = SOAPCommunicator.getInstance().soapMessageToString(reply);
             }
             LogUtil.access(Level.INFO, LogUtil.SEND_ECP_RESPONSE, logdata,
                     null);
@@ -2910,7 +2910,7 @@ public class IDPSSOUtil {
      * @return the <code>SAML2IdenityProviderAdapter</code>
      * @throws SAML2Exception if the operation is not successful
      */
-    static SAML2IdentityProviderAdapter getIDPAdapterClass(String realm, String idpEntityID)
+    public static SAML2IdentityProviderAdapter getIDPAdapterClass(String realm, String idpEntityID)
             throws SAML2Exception {
         return SAML2Utils.getIDPAdapterClass(realm, idpEntityID);
     }
@@ -3011,7 +3011,7 @@ public class IDPSSOUtil {
      * @param session The Session object of the authenticated user.
      * @return true If the session was initiated in the same realm as the session's realm.
      */
-    static boolean isValidSessionInRealm(String realm, Object session) {
+    public static boolean isValidSessionInRealm(String realm, Object session) {
         String classMethod = "IDPSSOUtil.isValidSessionInRealm: ";
         boolean isValidSessionInRealm = false;
         try {

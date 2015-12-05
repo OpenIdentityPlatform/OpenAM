@@ -27,13 +27,17 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc.
+ * Portions Copyrighted 2010-2015 ForgeRock Inc.
  */
 
 package com.sun.identity.authentication.jaas;
 
+import static com.sun.identity.authentication.config.AMAuthConfigUtils.getControlFlagAsString;
+import static org.forgerock.openam.audit.AuditConstants.LOGIN_MODULE_CONTROL_FLAG;
+
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.audit.context.AuditRequestContext;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -144,9 +148,9 @@ public class LoginContext {
         invoke(LOGOUT_METHOD);
     }
 
-//    public ModuleInfo[] getModuleStack() {
-//        return moduleStack;
-//    }
+    public ModuleInfo[] getModuleStack() {
+        return moduleStack;
+    }
 
     public Subject getSubject() {
         if (!loginSucceeded && !subjectProvided)
@@ -168,6 +172,7 @@ public class LoginContext {
 
             ModuleInfo info = moduleStack[i];
             LoginModuleControlFlag controlFlag = info.entry.getControlFlag();
+            AuditRequestContext.putProperty(LOGIN_MODULE_CONTROL_FLAG, getControlFlagAsString(controlFlag));
 
             try {
 
@@ -295,6 +300,8 @@ public class LoginContext {
                         throw requiredExceptionHolder.getException();
                     }
                 }
+            } finally {
+                AuditRequestContext.removeProperty(LOGIN_MODULE_CONTROL_FLAG);
             }
         }
 
@@ -347,20 +354,19 @@ public class LoginContext {
 
     /**
      * LoginModule information -
-     *      incapsulates Configuration info and actual module instances.
+     *      encapsulates Configuration info and actual module instances.
      */
-//    public static class ModuleInfo {
-    private static class ModuleInfo {
-        AppConfigurationEntry entry;
-        Object module;
+    static class ModuleInfo {
+        private AppConfigurationEntry entry;
+        private Object module;
 
         ModuleInfo(AppConfigurationEntry newEntry, Object newModule) {
             this.entry = newEntry;
             this.module = newModule;
         }
 
-//        public Object getModule() {
-//            return module;
-//        }
+        public Object getModule() {
+            return module;
+        }
     }
 }

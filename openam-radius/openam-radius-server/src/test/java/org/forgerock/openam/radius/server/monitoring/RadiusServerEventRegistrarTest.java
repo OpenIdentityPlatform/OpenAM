@@ -15,63 +15,110 @@
  */
 package org.forgerock.openam.radius.server.monitoring;
 
+import static org.assertj.core.api.Assertions.*;
+
+import org.forgerock.guava.common.eventbus.EventBus;
 import org.testng.annotations.Test;
 
+/**
+ * Test methods for the <code>RadiusServerEventRegistrar</code> class.
+ *
+ * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar
+ */
 public class RadiusServerEventRegistrarTest {
 
+    /**
+     * Test the constructor.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#RadiusServerEventRegistrar
+     */
     @Test(enabled = true)
-  public void RadiusServerEventRegistrar() {
-        final RadiusServerEventRegistrar eventRegistrar = new RadiusServerEventRegistrar();
-        System.out.println("Registered name is " + eventRegistrar.getRegiseredName());
-  }
+    public void testRadiusServerEventRegistrar() {
+        // Given
+        EventBus eventBus = new EventBus();
+        // When
+        final RadiusServerEventRegistrator eventRegistrar = new RadiusServerEventRegistrar(eventBus);
+        // Then
+        assertThat(eventRegistrar).isNotNull();
+    }
 
-    @Test(enabled = false)
-  public void authRequestAccepted() {
-    throw new RuntimeException("Test not implemented");
-  }
+    /**
+     * Test the following method;.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#authRequestAccepted
+     */
+    @Test(enabled = true)
+    public void authRequestAccepted() {
+        // Given
+        EventBus eventBus = new EventBus();
+        final RadiusServerEventRegistrar eventRegistrar = new RadiusServerEventRegistrar(eventBus);
+        // When
+        eventRegistrar.authRequestAccepted();
+        // Then
+        assertThat(eventRegistrar.getNumberOfAuthRequestsAccepted()).isEqualTo(1);
+    }
 
-    @Test(enabled = false)
-  public void authRequestRejected() {
-    throw new RuntimeException("Test not implemented");
-  }
+    /**
+     * Test the following method.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#authRequestRejected
+     */
+    @Test(enabled = true)
+    public void authRequestRejected() {
+        // Given
+        EventBus eventBus = new EventBus();
+        final RadiusServerEventRegistrar eventRegistrar = new RadiusServerEventRegistrar(eventBus);
+        // When
+        eventRegistrar.authRequestRejected();
+        // Then
+        assertThat(eventRegistrar.getNumberOfAuthRequestsRejected()).isEqualTo(1);
+    }
 
-    @Test(enabled = false)
-  public void getNumberOfAcceptedPackets() {
-    throw new RuntimeException("Test not implemented");
-  }
+    /**
+     * Test the following method.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#packetAccepted
+     */
+    @Test(enabled = true)
+    public void packetAccepted() {
+        // Given
+        EventBus eventBus = new EventBus();
+        final RadiusServerEventRegistrar eventRegistrar = new RadiusServerEventRegistrar(eventBus);
+        // When
+        eventRegistrar.packetAccepted();
+        // Then
+        assertThat(eventRegistrar.getNumberOfAcceptedPackets()).isEqualTo(1);
+    }
 
-    @Test(enabled = false)
-  public void getNumberOfAuthRequestsAccepted() {
-    throw new RuntimeException("Test not implemented");
-  }
+    /**
+     * Test the following method.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#packetProcessed
+     */
+    @Test(enabled = true)
+    public void packetProcessed() {
+        // Given
+        EventBus eventBus = new EventBus();
+        final RadiusServerEventRegistrar eventRegistrar = new RadiusServerEventRegistrar(eventBus);
+        // When
+        eventRegistrar.packetProcessed();
+        // Then
+        assertThat(eventRegistrar.getNumberOfPacketsProcessed()).isEqualTo(1);
+    }
 
-    @Test(enabled = false)
-  public void getNumberOfAuthRequestsRejected() {
-    throw new RuntimeException("Test not implemented");
-  }
-
-    @Test(enabled = false)
-  public void getNumberOfPacketsProcessed() {
-    throw new RuntimeException("Test not implemented");
-  }
-
-    @Test(enabled = false)
-  public void getNumberOfPacketsRecieved() {
-    throw new RuntimeException("Test not implemented");
-  }
-
-    @Test(enabled = false)
-  public void packetAccepted() {
-    throw new RuntimeException("Test not implemented");
-  }
-
-    @Test(enabled = false)
-  public void packetProcessed() {
-    throw new RuntimeException("Test not implemented");
-  }
-
-    @Test(enabled = false)
-  public void packetReceived() {
-    throw new RuntimeException("Test not implemented");
-  }
+    /**
+     * Test the following method.
+     *
+     * @see org.forgerock.openam.radius.server.monitoring.RadiusServerEventRegistrar#packetReceived
+     */
+    @Test(enabled = true)
+    public void packetReceived() {
+        // Given
+        EventBus eventBus = new EventBus();
+        final RadiusServerEventRegistrar eventRegistrar = new RadiusServerEventRegistrar(eventBus);
+        // When
+        eventRegistrar.packetReceived();
+        // Then
+        assertThat(eventRegistrar.getNumberOfPacketsRecieved()).isEqualTo(1);
+    }
 }

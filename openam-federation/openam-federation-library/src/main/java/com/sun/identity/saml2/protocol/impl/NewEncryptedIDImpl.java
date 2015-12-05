@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,12 @@
  *
  * $Id: NewEncryptedIDImpl.java,v 1.2 2008/06/25 05:48:00 qcheng Exp $
  *
- * Portions copyright 2014 ForgeRock AS.
- *
+ * Portions copyright 2014-2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.protocol.impl;
 
-import java.security.Key;
+import java.security.PrivateKey;
+import java.util.Set;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -56,8 +54,7 @@ import com.sun.identity.saml2.xmlenc.EncManager;
  * </pre>
  */
 
-public class NewEncryptedIDImpl extends EncryptedElementImpl 
-     implements NewEncryptedID {
+public class NewEncryptedIDImpl extends EncryptedElementImpl implements NewEncryptedID {
     public final String elementName = "NewEncryptedID";
     private NewID newID = null;
 
@@ -120,17 +117,9 @@ public class NewEncryptedIDImpl extends EncryptedElementImpl
         this.xmlString = xmlString;
     }
 
-    /**
-     * Returns an instance of <code>NewID</code> object.
-     *
-     * @param recipientPrivateKey Private key of the recipient used to
-     *                            decrypt the secret key
-     * @return <code>NewID</code> object.
-     * @throws SAML2Exception if error occurs.
-     */
-    public NewID decrypt(Key recipientPrivateKey)
-    throws SAML2Exception {
-        Element el = EncManager.getEncInstance().decrypt(xmlString, recipientPrivateKey);
+    @Override
+    public NewID decrypt(Set<PrivateKey> privateKeys) throws SAML2Exception {
+        Element el = EncManager.getEncInstance().decrypt(xmlString, privateKeys);
         SAML2SDKUtils.decodeXMLToDebugLog("NewEncryptedIDImpl.decrypt: ", el);
         return ProtocolFactory.getInstance().createNewID(el);
     }

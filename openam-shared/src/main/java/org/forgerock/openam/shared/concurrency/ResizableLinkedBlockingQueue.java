@@ -35,7 +35,8 @@ public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
     private final ResizableSemaphore availablePlaces;
 
     /**
-     * {@inheritdoc}
+     * Creates a {@code ResizableLinkedBlockingQueue} with a capacity of
+     * {@link Integer#MAX_VALUE}.
      */
     public ResizableLinkedBlockingQueue() {
         super();
@@ -44,7 +45,14 @@ public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
     }
 
     /**
-     * {@inheritdoc}
+     * Creates a {@code ResizableLinkedBlockingQueue} with a capacity of
+     * {@link Integer#MAX_VALUE}, initially containing the elements of the
+     * given collection,
+     * added in traversal order of the collection's iterator.
+     *
+     * @param c the collection of elements to initially contain
+     * @throws NullPointerException if the specified collection or any
+     *         of its elements are null
      */
     public ResizableLinkedBlockingQueue(Collection<? extends E> c) {
         super(c);
@@ -53,7 +61,12 @@ public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
     }
 
     /**
-     * {@inheritdoc}
+     * Creates a {@code ResizableLinkedBlockingQueue} with the given number of
+     * permits.
+     *
+     * @param initialCapacity the initial number of permits available.
+     *        This value may be negative, in which case releases
+     *        must occur before any acquires will be granted.
      */
     public ResizableLinkedBlockingQueue(int initialCapacity) {
         super();
@@ -97,9 +110,6 @@ public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
         return queueSize;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public boolean offer(E e) {
         Reject.ifNull(e, "Element to offer cannot be null.");
@@ -122,9 +132,6 @@ public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
         return returnValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
         Reject.ifNull(e, "Element to offer cannot be null.");
@@ -147,9 +154,6 @@ public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
         return returnValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public E poll() {
         E returnValue = super.poll();
@@ -159,9 +163,6 @@ public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
         return returnValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
         E resultValue = super.poll(timeout, unit);
@@ -172,26 +173,17 @@ public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
         return resultValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public void put(E e) throws InterruptedException {
         availablePlaces.acquire();
         super.put(e);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public int remainingCapacity() {
         return availablePlaces.availablePermits();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public boolean remove(Object o) {
         if (super.remove(o)) {
@@ -202,9 +194,6 @@ public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public E take() throws InterruptedException {
         E result = super.take();

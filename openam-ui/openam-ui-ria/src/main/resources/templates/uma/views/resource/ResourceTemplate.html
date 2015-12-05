@@ -1,5 +1,5 @@
 <header class="page-header page-header-no-border clearfix">
-    <span id="umaShareImage" class="header-icon pull-left fa fa-file-image-o">
+    <span id="umaShareImage" class="header-icon pull-left fa" aria-hidden="true">
         {{#if icon}}
             <img title="{{name}}" src="{{icon}}" />
         {{else}}
@@ -22,7 +22,7 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    <li class="disabled" id="unshare"><a href="#"><i class="fa fa-ban"></i> {{t "uma.resources.show.revoke"}}</a></li>
+                    <li class="disabled" id="unshare"><a href="#" aria-disabled="true" role="button"><i class="fa fa-ban"></i> {{t "uma.resources.show.revoke"}}</a></li>
                 </ul>
             </div>
         </div>
@@ -38,11 +38,11 @@
     <div id="labels">
         <select multiple class="selectize pull-left"></select>
     </div>
-    <button id="editLabels" class="btn btn-link"><i class="fa fa-pencil"></i></button>
+    <button id="editLabels" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> {{t "uma.resources.show.editLabels"}}</button>
 </div>
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <div id="backgridContainer" class="backgrid-container"></div>
+        <div class="table-container"></div>
     </div>
 </div>

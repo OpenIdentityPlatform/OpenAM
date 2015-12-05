@@ -177,11 +177,13 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
     }
 
     private void checkCodeVerifier(AuthorizationCode authorizationCode, String codeVerifier) throws
-            InvalidGrantException {
+            InvalidGrantException, InvalidRequestException {
         final String codeChallenge = authorizationCode.getCodeChallenge();
         final String codeChallengeMethod = authorizationCode.getCodeChallengeMethod();
 
-        if (OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)) {
+        if (OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_PLAIN.equals(codeChallengeMethod)) {
+            checkCodeChallenge(codeChallenge, codeVerifier);
+        } else if (OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)){
             String encodedCodeVerifier = null;
             try {
                 encodedCodeVerifier = Base64url.encode(
@@ -192,8 +194,7 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
                 throw new InvalidGrantException();
             }
         } else {
-            //if not SHA256 assume no encoding
-            checkCodeChallenge(codeChallenge, codeVerifier);
+            throw new InvalidRequestException("Invalid code challenge method specified.");
         }
     }
 

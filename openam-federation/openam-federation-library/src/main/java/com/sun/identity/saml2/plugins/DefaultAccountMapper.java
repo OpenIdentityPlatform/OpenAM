@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,17 +24,13 @@
  *
  * $Id: DefaultAccountMapper.java,v 1.4 2008/06/25 05:47:50 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.plugins;
 
 import java.util.ResourceBundle;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.security.PrivateKey;
 
@@ -48,8 +44,6 @@ import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.common.NameIDInfoKey;
-import com.sun.identity.saml2.common.AccountUtils;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
@@ -132,11 +126,12 @@ public class DefaultAccountMapper {
         EncryptedID encryptedID = manageNameIDRequest.getEncryptedID();
 
         if (encryptedID != null) {
-            String alias = SAML2Utils.getEncryptionCertAlias(realm, 
-        		    hostEntityID, role); 
-            PrivateKey privateKey = keyProvider.getPrivateKey(alias);
-            
-            nameID = encryptedID.decrypt(privateKey);
+            try {
+                final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(getSSOConfig(realm, hostEntityID));
+                nameID = encryptedID.decrypt(decryptionKeys);
+            } catch (SAML2MetaException sme) {
+                debug.error("Unable to retrieve SAML entity config for entity: " + hostEntityID, sme);
+            }
         } else {
            nameID = manageNameIDRequest.getNameID();
         }
@@ -178,13 +173,7 @@ public class DefaultAccountMapper {
         }
 
 	try {
-            BaseConfigType config = null;
-
-            if(role.equals(IDP)) {
-               config = metaManager.getIDPSSOConfig(realm, entityID);
-            } else {
-               config = metaManager.getSPSSOConfig(realm, entityID);
-            }
+            BaseConfigType config = getSSOConfig(realm, entityID);
             Map attributes  = SAML2MetaUtils.getAttributes(config);
 
             if(attributes == null || attributes.isEmpty()) {
@@ -216,4 +205,11 @@ public class DefaultAccountMapper {
         return null;
     }
 
+    protected final BaseConfigType getSSOConfig(String realm, String entityID) throws SAML2MetaException {
+        if (IDP.equals(role)) {
+            return metaManager.getIDPSSOConfig(realm, entityID);
+        } else {
+            return metaManager.getSPSSOConfig(realm, entityID);
+        }
+    }
 }

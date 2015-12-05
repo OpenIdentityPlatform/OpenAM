@@ -19,9 +19,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListView"
-], function ($, _, AbstractView, UIUtils, StripedList) {
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function ($, _, AbstractView, UIUtils) {
     var PolicyActionsView = AbstractView.extend({
         element: "#actions",
         template: "templates/admin/views/realms/authorization/policies/PolicyActionsTemplate.html",

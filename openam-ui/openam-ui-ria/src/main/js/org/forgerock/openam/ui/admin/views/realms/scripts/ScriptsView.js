@@ -20,8 +20,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "underscore",
     "backbone",
     "backbone.paginator",
-    "backgrid",
     "backgrid-filter",
+    "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeableSelectAllCell",
     "org/forgerock/commons/ui/common/components/Messages",
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, ThemeablePaginator, ThemeableSelectAllCell,
+], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, ThemeableSelectAllCell,
              Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script,
              SMSGlobalDelegate) {
 
@@ -156,7 +156,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             this.parentRender(function () {
                 this.renderToolbar();
 
-                this.$el.find(".backgrid-container").append(grid.render().el);
+                this.$el.find(".table-container").append(grid.render().el);
                 this.$el.find(".panel-body").append(paginator.render().el);
 
                 $.when(this.contextSchemaPromise, this.languageSchemaPromise).done(function (contSchema, langSchema) {
@@ -174,7 +174,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             });
         },
 
-        deleteRecords: function (e) {
+        deleteRecords: function () {
             var self = this,
                 i = 0,
                 item,
@@ -184,13 +184,13 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
 
                     self.renderToolbar();
                 },
-                onSuccess = function (model, response, options) {
+                onSuccess = function () {
                     onDestroy();
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
-                onError = function (model, response, options) {
+                onError = function (model, response) {
                     onDestroy();
-                    Messages.messages.addMessage({ message: response.responseJSON.message, type: "error" });
+                    Messages.addMessage({ response: response, type: Messages.TYPE_DANGER });
                 };
 
             for (; i < this.data.selectedUUIDs.length; i++) {
@@ -223,7 +223,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             });
         },
 
-        addNewScript: function (e) {
+        addNewScript: function () {
             Router.routeTo(Router.configuration.routes.realmsScriptEdit, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true

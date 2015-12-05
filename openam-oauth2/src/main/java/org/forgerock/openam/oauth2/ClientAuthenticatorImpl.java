@@ -37,7 +37,8 @@ import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
+import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -57,29 +58,31 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
     private final OAuth2AuditLogger auditLogger;
     private final RealmNormaliser realmNormaliser;
     private final ClientCredentialsReader clientCredentialsReader;
+    private final ClientAuthenticationFailureFactory failureFactory;
 
     /**
      * Constructs a new ClientAuthenticatorImpl.
-     *
      * @param clientRegistrationStore An instance of the ClientRegistrationStore.
      * @param auditLogger An instance of the OAuth2AuditLogger.
      * @param realmNormaliser An instance of the RealmNormaliser.
      * @param clientCredentialsReader An instance of the ClientCredentialsReader.
+     * @param failureFactory
      */
     @Inject
     public ClientAuthenticatorImpl(ClientRegistrationStore clientRegistrationStore, OAuth2AuditLogger auditLogger,
-            RealmNormaliser realmNormaliser, ClientCredentialsReader clientCredentialsReader) {
+                                   RealmNormaliser realmNormaliser, ClientCredentialsReader clientCredentialsReader, ClientAuthenticationFailureFactory failureFactory) {
         this.clientRegistrationStore = clientRegistrationStore;
         this.auditLogger = auditLogger;
         this.realmNormaliser = realmNormaliser;
         this.clientCredentialsReader = clientCredentialsReader;
+        this.failureFactory = failureFactory;
     }
 
     /**
      * {@inheritDoc}
      */
     public ClientRegistration authenticate(OAuth2Request request, String endpoint) throws InvalidClientException,
-            InvalidRequestException, ClientAuthenticationFailedException, NotFoundException {
+            InvalidRequestException, NotFoundException {
 
         final ClientCredentials clientCredentials =
                 clientCredentialsReader.extractCredentials(request, endpoint);
@@ -97,19 +100,14 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
             }
 
             if (!clientCredentials.isAuthenticated() &&
-                    !authenticate(clientCredentials.getClientId(), clientCredentials.getClientSecret(), realm)) {
+                    !authenticate(request, clientCredentials.getClientId(), clientCredentials.getClientSecret(), realm)) {
                 logger.error("ClientVerifierImpl::Unable to verify password for: " + clientCredentials.getClientId());
-                throw new InvalidClientException("Client authentication failed");
+                throw failureFactory.getException(request, "Client authentication failed");
             }
 
             authenticated = true;
 
             return clientRegistration;
-        } catch (InvalidClientException e) {
-            if (clientCredentials.usesBasicAuth()) {
-                throw new ClientAuthenticationFailedException("Client authentication failed", "Basic", realm);
-            }
-            throw e;
         } finally {
             if (auditLogger.isAuditLogEnabled()) {
                 if (authenticated) {
@@ -133,7 +131,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
      * @throws InvalidClientException If the authentication configured for the client is not completed by the
      *          specified client credentials.
      */
-    private boolean authenticate(String clientId, char[] clientSecret, String realm) throws InvalidClientException {
+    private boolean authenticate(OAuth2Request request, String clientId, char[] clientSecret, String realm) throws InvalidClientException {
 
         try {
             AuthContext lc = new AuthContext(realm);
@@ -156,7 +154,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
                 // there's missing requirements not filled by this
                 if (missing.size() > 0) {
                     lc.logout();
-                    throw new InvalidClientException("Missing requirements");
+                    throw failureFactory.getException(request, "Missing requirements");
                 }
                 lc.submitRequirements(callbacks);
             }
@@ -166,11 +164,11 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
                 lc.logout();
                 return true;
             } else {
-                throw new InvalidClientException("Client authentication failed");
+                throw failureFactory.getException(request, "Client authentication failed");
             }
         } catch (AuthLoginException le) {
             logger.error("ClientVerifierImpl::authContext AuthException", le);
-            throw new InvalidClientException("Client authentication failed");
+            throw failureFactory.getException(request, "Client authentication failed");
         }
     }
 }

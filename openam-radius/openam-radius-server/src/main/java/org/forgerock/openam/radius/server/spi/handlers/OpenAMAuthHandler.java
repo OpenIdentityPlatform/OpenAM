@@ -17,11 +17,10 @@ package org.forgerock.openam.radius.server.spi.handlers;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Named;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ChoiceCallback;
 import javax.security.auth.callback.ConfirmationCallback;
@@ -29,26 +28,24 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
 import org.forgerock.guava.common.base.Strings;
+import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.openam.radius.common.AccessAccept;
 import org.forgerock.openam.radius.common.AccessChallenge;
 import org.forgerock.openam.radius.common.AccessReject;
-import org.forgerock.openam.radius.common.AccessRequest;
-import org.forgerock.openam.radius.common.Attribute;
-import org.forgerock.openam.radius.common.AttributeSet;
 import org.forgerock.openam.radius.common.ReplyMessageAttribute;
 import org.forgerock.openam.radius.common.StateAttribute;
 import org.forgerock.openam.radius.common.UserNameAttribute;
 import org.forgerock.openam.radius.common.UserPasswordAttribute;
-import org.forgerock.openam.radius.server.RadiusAuthResult;
-import org.forgerock.openam.radius.server.RadiusAuthResultStatus;
 import org.forgerock.openam.radius.server.RadiusProcessingException;
-import org.forgerock.openam.radius.server.RadiusResponseHandler;
+import org.forgerock.openam.radius.server.RadiusRequest;
+import org.forgerock.openam.radius.server.RadiusRequestContext;
+import org.forgerock.openam.radius.server.RadiusResponse;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
+import org.forgerock.openam.radius.server.events.AuthRequestReceivedEvent;
 import org.forgerock.openam.radius.server.spi.AccessRequestHandler;
 import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolder;
 import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolderCache;
 import org.forgerock.openam.radius.server.spi.handlers.amhandler.OpenAMAuthFactory;
-import org.forgerock.openam.radius.server.spi.handlers.amhandler.ContextHolder.AuthPhase;
 
 import com.google.inject.Inject;
 import com.sun.identity.authentication.AuthContext;
@@ -148,13 +145,6 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      */
     private static final String AUTH_CHAIN_KEY = "chain";
 
-    private static Integer desiredCacheSize;
-
-    /**
-     * The result of the auth request being handled.
-     */
-    private volatile RadiusAuthResult authResult;
-
     /**
      * The realm containing the authentication chain through which we will be authenticating.
      */
@@ -170,44 +160,34 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      */
     private final OpenAMAuthFactory amAuthFactory;
 
+    /**
+     * The radius event bus that will be used to notify interested parties of events as they occur.
+     */
+    private EventBus eventBus;
 
     /**
      * Constructor.
      *
-     * @param amAuthFactory
-     *            - a factory that provides OpenAM auth entities such as AuthContexts.
-     * @param contextHolderCache
-     *            - the cache to be used to hold ContextHolder objects that persist state in the server (here) when
-     *            control is with the client, e.g. when the client is providing user input to meet a challenge request.
+     * @param amAuthFactory - a factory that provides OpenAM auth entities such as AuthContexts.
+     * @param contextHolderCache - the cache to be used to hold ContextHolder objects that persist state in the server
+     *            (here) when control is with the client, e.g. when the client is providing user input to meet a
+     *            challenge request.
+     * @param eventBus - the Radius event bus that will be used to notify interested parties of
+     *            <code>org.forgerock.openam.radius.server.events</code> as they occur.
      */
     @Inject
-    public OpenAMAuthHandler(OpenAMAuthFactory amAuthFactory, ContextHolderCache contextHolderCache) {
+    public OpenAMAuthHandler(OpenAMAuthFactory amAuthFactory, ContextHolderCache contextHolderCache,
+            @Named("RadiusEventBus") EventBus eventBus) {
         this.amAuthFactory = amAuthFactory;
         this.contextCache = contextHolderCache;
-
+        this.eventBus = eventBus;
     }
 
     @Override
     public void init(Properties config) {
         realm = getConfigProperty(REALM_KEY, config, true);
         authChain = getConfigProperty(AUTH_CHAIN_KEY, config, true);
-    }
 
-    /**
-     * Gets the specified property or throws an IllegalStateException if the property is not found or is empty.
-     *
-     * @return
-     */
-    private static String getConfigProperty(String propName, Properties config, boolean required) {
-        final String value = config.getProperty(propName);
-
-        if (required && Strings.isNullOrEmpty(value)) {
-            throw new IllegalStateException("Configuration property '" + propName
-                    + "' not found in handler configuration. "
-                    + "It must be added to the Configuration Properties for this class in the Radius Client's "
-                    + "configuration.");
-        }
-        return value;
     }
 
     /**
@@ -228,18 +208,24 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      *
      * @param request
      *            the access request
-     * @param respHandler
-     *            - the response handler.
+     * @param response
+     *            - the response to be sent to the client.
+     * @param context
+     *            - provides methods that the handler can use to obtain information about the context in which the
+     *            request was made, for example the name and IP address of the client from which the request was
+     *            received.
      * @return
      * @throws RadiusProcessingException
      *             - when the response can not be sent.
      */
     @Override
-    public RadiusAuthResult handle(AccessRequest request, RadiusResponseHandler respHandler)
+    public void handle(RadiusRequest request, RadiusResponse response, RadiusRequestContext context)
             throws RadiusProcessingException {
+        LOG.message("Entering OpenAMAuthHandler.handle");
 
-        final Map<Class, Attribute> reqAttsMap = loadAttsMap(request);
-        final StateAttribute state = (StateAttribute) reqAttsMap.get(StateAttribute.class);
+        response.setRealm(realm);
+
+        final StateAttribute state = (StateAttribute) request.getAttribute(StateAttribute.class);
         ContextHolder holder = null;
 
         if (state != null) {
@@ -249,66 +235,88 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
 
         // always get password attribute regardless of whether starting or returning more input since user input is
         // always sent via the password field.
-        final UserPasswordAttribute credAtt = (UserPasswordAttribute) reqAttsMap.get(UserPasswordAttribute.class);
+        final UserPasswordAttribute credAtt = (UserPasswordAttribute) request.getAttribute(UserPasswordAttribute.class);
         String credential = null;
 
         try {
-            credential = respHandler.extractPassword(credAtt);
+            credential = credAtt.extractPassword(context.getRequestAuthenticator(), context.getClientSecret());
         } catch (final IOException e) {
             LOG.error("Unable to extract credential field from RADIUS request. Denying Access.", e);
-            rejectAccessAndTerminateProcess(respHandler, holder);
-            return getRadiusAuthResultResponse(holder);
+            rejectAccessAndTerminateProcess(response, holder);
+            LOG.message("Leaving OpenAMAuthHandler.handle();");
+            return;
         }
 
         if (holder == null) {
-            holder = startAuthProcess(respHandler, reqAttsMap, credential);
-            if (holder.getAuthPhase() == ContextHolder.AuthPhase.TERMINATED) {
+            holder = this.contextCache.createCachedContextHolder();
+            request.setContextHolderKey(holder.getCacheKey());
+            eventBus.post(new AuthRequestReceivedEvent(request, response, context));
+
+            final UserNameAttribute usrAtt = (UserNameAttribute) request.getAttribute(UserNameAttribute.class);
+
+            holder = startAuthProcess(holder, response, usrAtt, credential);
+            if (holder == null || holder.getAuthPhase() == ContextHolder.AuthPhase.TERMINATED) {
                 // oops. something happened and reject message was already sent. so drop out here.
-                return getRadiusAuthResultResponse(holder);
+                LOG.message("Leaving OpenAMAuthHandler.handle(); Auth phase is TERMINATED.");
+                return;
             }
+        } else {
+            request.setContextHolderKey(holder.getCacheKey());
+            eventBus.post(new AuthRequestReceivedEvent(request, response, context));
         }
 
-        gatherUserInput(respHandler, holder, credential, state);
+        gatherUserInput(response, holder, credential, state);
 
         if (holder.getAuthPhase() == ContextHolder.AuthPhase.FINALIZING) {
-            finalizeAuthProcess(respHandler, holder);
+            finalizeAuthProcess(response, holder);
         }
-        return getRadiusAuthResultResponse(holder);
+
+        LOG.message("Leaving OpenAMAuthHandler.handle();");
+        return;
     }
 
     /**
+     * Gets the specified property or throws an IllegalStateException if the property is not found or is empty.
+     *
      * @return
      */
-    private RadiusAuthResult getRadiusAuthResultResponse(ContextHolder holder) {
-        final RadiusAuthResultStatus response = RadiusAuthResultStatus.getResponse(holder.getAuthContext()
-                .getStatus());
-        return new RadiusAuthResult(response);
+    private static String getConfigProperty(String propName, Properties config, boolean required) {
+        final String value = config.getProperty(propName);
+
+        if (required && Strings.isNullOrEmpty(value)) {
+            throw new IllegalStateException("Configuration property '" + propName
+                    + "' not found in handler configuration. "
+                    + "It must be added to the Configuration Properties for this class in the Radius Client's "
+                    + "configuration.");
+        }
+        return value;
     }
 
     /**
      * Evaluates if they successfully authenticated or failed and sends an AccessAllow or AccessReject accordingly.
      *
-     * @param respHandler
+     * @param response
+     *            the response that will be sent to the client.
      * @param holder
+     *            holds the context for this request.
      * @throws RadiusProcessingException
      */
-    private void finalizeAuthProcess(RadiusResponseHandler respHandler, ContextHolder holder)
+    private void finalizeAuthProcess(RadiusResponse response, ContextHolder holder)
             throws RadiusProcessingException {
+        LOG.message("Entering OpenAMAuthHandler.finalizeAuthProcess()");
         final AuthContext.Status status = holder.getAuthContext().getStatus();
-        // cLog.warning("--- ac.getStatus() = " + status);
 
         if (status.equals(AuthContext.Status.SUCCESS)) {
             // they made it. Let them in.
-            // cLog.warning("Successfully authenticated. Granting Access.");
-            allowAccessAndTerminateProcess(respHandler, holder);
+            allowAccessAndTerminateProcess(response, holder);
             return;
         }
-        // else, deny access
-        // cLog.warning("Failed authentication. Denying Access.");
-        rejectAccessAndTerminateProcess(respHandler, holder);
+
+        rejectAccessAndTerminateProcess(response, holder);
     }
 
-    private void gatherUserInput(RadiusResponseHandler respHandler, ContextHolder holder, String answer,
+    private void gatherUserInput(RadiusResponse response, ContextHolder holder,
+            String answer,
             StateAttribute state) {
         LOG.message("Entering gatherUserInput();");
 
@@ -320,7 +328,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             if (holder.getCallbacks() == null) {
                 LOG.message("--- callbacks == null in gatherUserInput");
                 // either just starting process or just finished submitting a set of callback input values
-                if (!isNextCallbackSetAvailable(respHandler, holder)) {
+                if (!isNextCallbackSetAvailable(response, holder)) {
                     // no further input from user needed or error occurred
                     if (holder.getAuthPhase() == ContextHolder.AuthPhase.TERMINATED) {
                         return;
@@ -333,7 +341,9 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             } else {
                 LOG.warning("--- callbacks[" + holder.getCallbacks().length + "] in gatherUserInput - ");
                 // we are gathering for current set.
-                final boolean injected = injectAnswerForCallback(respHandler, holder, answer); // answers always come through
+                final boolean injected = injectAnswerForCallback(response, holder, answer); // answers
+                                                                                                         // always come
+                                                                                                         // through
                 // the request's password field
 
                 if (!injected) {
@@ -353,12 +363,12 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
                     holder.getAuthContext().submitRequirements(callbacks);
                 } catch (final Throwable t) {
                     LOG.error("Exception thrown while submitting callbacks. Rejecting access.", t);
-                    rejectAccessAndTerminateProcess(respHandler, holder);
+                    rejectAccessAndTerminateProcess(response, holder);
                     return;
                 }
                 holder.setCallbacks(null);
             } else {
-                final ReplyMessageAttribute msg = getNextCallbackReplyMsg(respHandler, holder);
+                final ReplyMessageAttribute msg = getNextCallbackReplyMsg(response, holder);
 
                 if (msg == null) {
                     return; // failed to inject and already sent a reject msg so stop processing at this point.
@@ -372,21 +382,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
                 challenge.addAttribute(state);
                 challenge.addAttribute(msg);
 
-                try {
-                    respHandler.send(challenge);
-                } catch (final RadiusProcessingException e) {
-                    switch (e.getNature()) {
-                    case CATASTROPHIC:
-                        LOG.error("Catestrophic failure while sending RADIUS response.", e);
-
-                        break;
-                    case TEMPORARY_FAILURE:
-                        break;
-                    default:
-                        break;
-
-                    }
-                }
+                response.setResponsePacket(challenge);
                 return; // exit out and await response to challenge response
             }
         }
@@ -403,7 +399,8 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      * @param holder
      * @return
      */
-    private boolean isNextCallbackSetAvailable(RadiusResponseHandler context, ContextHolder holder) {
+    private boolean isNextCallbackSetAvailable(RadiusResponse response,
+            ContextHolder holder) {
         final boolean moreCallbacksAvailable = holder.getAuthContext().hasMoreRequirements();
 
         if (!moreCallbacksAvailable) {
@@ -445,7 +442,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             holder.setMillisExpiryPoint(System.currentTimeMillis() + holder.getMillisExpiryForCurrentCallbacks());
         } else {
             LOG.error("Callback at index 0 is not of type PagePropertiesCallback!!!");
-            rejectAccessAndTerminateProcess(context, holder);
+            rejectAccessAndTerminateProcess(response, holder);
             return false;
         }
 
@@ -468,7 +465,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
                     + (httpCbIncurred ? HttpCallback.class.getSimpleName() : RedirectCallback.class.getSimpleName())
                     + " used by module " + holder.getChainModuleIndex() + " with name " + holder.getModuleName()
                     + " in chain '" + this.authChain + "'. Denying Access.");
-            rejectAccessAndTerminateProcess(context, holder);
+            rejectAccessAndTerminateProcess(response, holder);
             return false;
         }
         return true;
@@ -483,12 +480,9 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      * @param holder
      *            - the context holder for this radius server
      */
-    private void rejectAccessAndTerminateProcess(RadiusResponseHandler respHandler, ContextHolder holder) {
-        try {
-            respHandler.send(new AccessReject());
-        } catch (final RadiusProcessingException e) {
-            LOG.warning("Failed to send AccessReject response while cleaning after previous errors.", e);
-        }
+    private void rejectAccessAndTerminateProcess(RadiusResponse response, ContextHolder holder) {
+        response.setResponsePacket(new AccessReject());
+        response.setUniversalId(holder.getUniversalId());
         terminateAuthnProcess(holder);
     }
 
@@ -499,9 +493,10 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      * @param holder
      * @throws RadiusProcessingException
      */
-    private void allowAccessAndTerminateProcess(RadiusResponseHandler respHandler, ContextHolder holder)
+    private void allowAccessAndTerminateProcess(RadiusResponse response, ContextHolder holder)
             throws RadiusProcessingException {
-        respHandler.send(new AccessAccept());
+        response.setResponsePacket(new AccessAccept());
+        response.setUniversalId(holder.getUniversalId());
         terminateAuthnProcess(holder);
     }
 
@@ -534,7 +529,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      * @param holder
      * @param answer
      */
-    private boolean injectAnswerForCallback(RadiusResponseHandler respHandler, ContextHolder holder, String answer) {
+    private boolean injectAnswerForCallback(RadiusResponse response, ContextHolder holder, String answer) {
         final Callback[] callbacks = holder.getCallbacks();
         if (callbacks == null) {
             return false;
@@ -569,7 +564,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
 
                     for (final String ans : answers) {
                         if (!"".equals(ans)) {
-                            final int idx = parseInt(ans, answer, maxIdx, holder, cb, respHandler);
+                            final int idx = parseInt(response, ans, answer, maxIdx, holder, cb);
                             if (idx == -1) {
                                 // failed parsing and sent reject message so return.
                                 // cLog.warning("--- ChoiceCallback failed parsing mult");
@@ -587,7 +582,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
 
                 }
             } else {
-                final int idx = parseInt(answer, answer, maxIdx, holder, cb, respHandler);
+                final int idx = parseInt(response, answer, answer, maxIdx, holder, cb);
                 if (idx == -1) {
                     // failed parsing and send reject message so return.
                     // cLog.warning("--- ChoiceCallback failed parsing");
@@ -606,7 +601,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
                 // cLog.warning("--- set ConfirmationCallback=default(" + cc.getDefaultOption() + ")");
                 return true;
             }
-            final int idx = parseInt(answer, answer, maxIdx, holder, cb, respHandler);
+            final int idx = parseInt(response, answer, answer, maxIdx, holder, cb);
             if (idx == -1) {
                 // failed parsing and send reject message so return.
                 // cLog.warning("--- ConfirmationCallback failed parsing");
@@ -617,7 +612,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
         } else {
             LOG.error("Unrecognized callback type '" + cb.getClass().getSimpleName()
                     + "' while processing challenge response. Unable to submit answer. Denying Access.");
-            rejectAccessAndTerminateProcess(respHandler, holder);
+            rejectAccessAndTerminateProcess(response, holder);
             return false;
         }
         // reset the timeout since we just received confirmation that the user is still there.
@@ -630,6 +625,8 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      * terminating authentication, logging a suitable message, and sending the access reject response if the string is
      * not a valid number or is out of range.
      *
+     * @param response
+     *            the response to the radius request.
      * @param intVal
      * @param answer
      * @param maxIdx
@@ -638,8 +635,8 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      * @param respHandler
      * @return
      */
-    private int parseInt(String intVal, String answer, int maxIdx, ContextHolder holder, Callback cb,
-            RadiusResponseHandler respHandler) {
+    private int parseInt(RadiusResponse response, String intVal, String answer, int maxIdx, ContextHolder holder,
+            Callback cb) {
         int idx = -1;
         try {
             idx = Integer.parseInt(intVal);
@@ -650,7 +647,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
                     + holder.getChainModuleIndex()
                     + (holder.getModuleName() != null ? " with name " + holder.getModuleName() : "")
                     + " of authentication chain " + authChain + " in realm " + realm + ". Denying Access.");
-            rejectAccessAndTerminateProcess(respHandler, holder);
+            rejectAccessAndTerminateProcess(response, holder);
             return idx;
         }
         if (idx < 0 || idx > maxIdx) {
@@ -661,7 +658,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
                     + (holder.getModuleName() != null ? " with name " + holder.getModuleName() : "")
                     + " of authentication chain " + authChain + " in realm " + realm + ". Must be from 0 to " + maxIdx
                     + ". Denying Access.");
-            rejectAccessAndTerminateProcess(respHandler, holder);
+            rejectAccessAndTerminateProcess(response, holder);
             return -1;
         }
         return idx;
@@ -674,23 +671,22 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      * callbacks. Returns true if authentication was started and user requirements beyond username and password can now
      * be solicited or false if starting failed and a reject message has already been generated.
      *
-     * @param respHandler
+     * @param response
+     *            the response object for the radius request
      * @param reqAttsMap
      * @param credential
      */
-    private ContextHolder startAuthProcess(RadiusResponseHandler respHandler, Map<Class, Attribute> reqAttsMap,
+    private ContextHolder startAuthProcess(ContextHolder holder, RadiusResponse response, UserNameAttribute usrAtt,
             String credential) {
-        final ContextHolder holder = this.contextCache.createCachedContextHolder();
-
-        // starting a fresh authentication attempt. That means username and password were passed along.
-        final UserNameAttribute usrAtt = (UserNameAttribute) reqAttsMap.get(UserNameAttribute.class);
+        LOG.message("Entering OpenAMAuthHandler.startAuthProcess");
 
         // now create an authContext and trigger loading of whatever authN modules will be used
         try {
             holder.setAuthContext(amAuthFactory.getAuthContext(realm));
         } catch (final AuthLoginException e) {
             LOG.error("Unable to start create " + AuthContext.class.getName() + ". Denying Access.", e);
-            rejectAccessAndTerminateProcess(respHandler, holder);
+            rejectAccessAndTerminateProcess(response, holder);
+            LOG.message("Leaving OpenAMAuthHandler.startAuthProcess");
             return holder;
         }
 
@@ -698,17 +694,19 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             holder.getAuthContext().login(AuthContext.IndexType.SERVICE, authChain);
         } catch (final AuthLoginException e) {
             LOG.error("Unable to start login process. Denying Access.", e);
-            rejectAccessAndTerminateProcess(respHandler, holder);
+            rejectAccessAndTerminateProcess(response, holder);
+            LOG.message("Leaving OpenAMAuthHandler.startAuthProcess");
             return holder;
         }
 
-        if (!isNextCallbackSetAvailable(respHandler, holder)) {
+        if (!isNextCallbackSetAvailable(response, holder)) {
             // couldn't get the callbacks or failure occurred. If failure didn't occur then we need to fail out here
             // since we must have callbacks when starting up the authn process to handle username and password.
             if (holder.getAuthPhase() != ContextHolder.AuthPhase.TERMINATED) {
                 LOG.error("Unable to start login process. No callbacks available. Denying Access.");
-                rejectAccessAndTerminateProcess(respHandler, holder);
+                rejectAccessAndTerminateProcess(response, holder);
             }
+            LOG.message("Leaving OpenAMAuthHandler.startAuthProcess");
             return holder;
         }
 
@@ -749,10 +747,11 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
                     + " in authentication chain '" + this.authChain
                     + "' does not support Username and Password callbacks. Denying Access.";
             LOG.error(msg);
-            rejectAccessAndTerminateProcess(respHandler, holder);
+            rejectAccessAndTerminateProcess(response, holder);
         }
         // if we get here then we successfully started the authN process
         holder.setAuthPhase(ContextHolder.AuthPhase.GATHERING_INPUT);
+        LOG.message("Leaving OpenAMAuthHandler.startAuthProcess");
         return holder;
     }
 
@@ -765,7 +764,8 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      * @param holder
      * @return
      */
-    private ReplyMessageAttribute getNextCallbackReplyMsg(RadiusResponseHandler respHandler, ContextHolder holder) {
+    private ReplyMessageAttribute getNextCallbackReplyMsg(RadiusResponse response,
+            ContextHolder holder) {
         LOG.message("Entering getNextCallbackReplyMsg()");
         ReplyMessageAttribute msg = null;
         final Callback[] callbacks = holder.getCallbacks();
@@ -843,23 +843,10 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             LOG.error("Radius can not support " + cb.getClass().getSimpleName() + " used by module "
                     + holder.getChainModuleIndex() + " with name " + holder.getModuleName() + " in chain '"
                     + this.authChain + "'. Denying Access.");
-            rejectAccessAndTerminateProcess(respHandler, holder);
+            rejectAccessAndTerminateProcess(response, holder);
         }
         LOG.message("Entering getNextCallbackReplyMsg() returning '" + msg + "'");
         return msg;
     }
 
-    private Map<Class, Attribute> loadAttsMap(AccessRequest request) {
-        final Map<Class, Attribute> map = new HashMap<Class, Attribute>();
-        final AttributeSet atts = request.getAttributeSet();
-
-        for (int i = 0; i < atts.size(); i++) {
-            final Attribute att = atts.getAttributeAt(i);
-            // warning: this is lossy for atts that support duplicates like proxyState. but we aren't using those
-            // for authentication but only need State, UserName, and UserPassword. So we are good.
-            map.put(att.getClass(), att);
-        }
-
-        return map;
-    }
 }

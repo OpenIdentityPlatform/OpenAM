@@ -26,7 +26,6 @@
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
-
 package com.sun.identity.saml2.common;
 
 import com.sun.identity.cot.COTConstants;
@@ -952,7 +951,18 @@ public interface SAML2Constants {
          "com.sun.identity.saml.xmlsig.transformAlg";
     public String XMLSIG_ALGORITHM =
          "com.sun.identity.saml.xmlsig.xmlSigAlgorithm";
-    
+    /**
+     * Property name for the global default query signature algorithm for RSA keys.
+     */
+    public String QUERY_SIGNATURE_ALGORITHM_RSA = "org.forgerock.openam.saml2.query.signature.alg.rsa";
+    /**
+     * Property name for the global default query signature algorithm for DSA keys.
+     */
+    public String QUERY_SIGNATURE_ALGORITHM_DSA = "org.forgerock.openam.saml2.query.signature.alg.dsa";
+    /**
+     * Property name for the global default query signature algorithm for EC keys.
+     */
+    public String QUERY_SIGNATURE_ALGORITHM_EC = "org.forgerock.openam.saml2.query.signature.alg.ec";
     public String DSA = "DSA";
     public String RSA = "RSA";      
 
@@ -1613,15 +1623,25 @@ public interface SAML2Constants {
      * Flag to indicate that we do not want to write the federation info in the IdP's local User Data Store. This flag
      * is set in the local IdP extended metadata configuration.
      */
-    public static final String IDP_DISABLE_NAMEID_PERSISTENCE = "idpDisableNameIDPersistence";
+    String IDP_DISABLE_NAMEID_PERSISTENCE = "idpDisableNameIDPersistence";
 
     /**
      * Property to determine whether SAML SP Decryption Debug mode has been enabled.
      */
-    static final String SAML_DECRYPTION_DEBUG_MODE = "openam.saml.decryption.debug.mode";
+    String SAML_DECRYPTION_DEBUG_MODE = "openam.saml.decryption.debug.mode";
 
     /**
      * Property name used to store the remote IdP's SAML response as an attribute of the HttpServletRequest.
      */
     String SAML_PROXY_IDP_RESPONSE_KEY = "openam.saml.idpproxy.idp.response";
-} 
+
+    /**
+     * property name used to store whether or not saml single logout in enabled.
+     */
+    String SINGLE_LOGOUT = "openam.saml.singlelogout.enabled";
+
+    /**
+     * Default Value for the SAML2 Server Port
+     */
+    int DEFAULT_SERVER_PORT = 18080;
+}

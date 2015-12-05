@@ -24,6 +24,7 @@ import javax.inject.Singleton;
  * Guice-injectable singleton to allow access to the current realm's RestSecurity
  * instance. Useful for caching.
  */
+@Deprecated
 @Singleton
 public class RestSecurityProvider {
 

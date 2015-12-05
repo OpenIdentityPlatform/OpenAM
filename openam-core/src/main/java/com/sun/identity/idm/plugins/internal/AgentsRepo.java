@@ -74,10 +74,12 @@ import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceAlreadyExistsException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchemaManager;
+
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CrestQuery;
 
@@ -294,6 +296,9 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                     throw IdRepoDuplicateObjectException.identityOfTypeAlreadyExists(agentName, type.getName());
                 }
             }
+        } catch (ServiceAlreadyExistsException saee) {
+            debug.error("AgentsRepo.create():Unable to create agents ", saee);
+            throw IdRepoDuplicateObjectException.identityOfTypeAlreadyExists(agentName, type.getName());
         } catch (SMSException smse) {
             debug.error("AgentsRepo.create():Unable to create agents ", smse);
             Object args[] = { NAME };
@@ -1332,7 +1337,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             pSet.add(oauth2Attribute);
             Map ansMap = new HashMap();
             String userPwd = null;
-            ansMap = getAttributes(adminToken, IdType.AGENTONLY,
+            ansMap = getAttributes(adminToken, IdType.AGENT,
                 userid, pSet);
             Set userPwdSet = (Set) ansMap.get("userpassword");
             if ((userPwdSet != null) && (!userPwdSet.isEmpty())) {

@@ -15,29 +15,39 @@
  */
 package org.forgerock.openam.audit.configuration;
 
-import static com.iplanet.am.util.SystemProperties.CONFIG_PATH;
-import static com.sun.identity.shared.Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR;
+import static com.sun.identity.shared.Constants.AM_AUTH_COOKIE_NAME;
+import static com.sun.identity.shared.Constants.AM_COOKIE_NAME;
 import static com.sun.identity.shared.datastruct.CollectionHelper.*;
-import static com.sun.identity.sm.SMSUtils.serviceExists;
+import static com.sun.identity.sm.SMSUtils.*;
 import static java.util.Collections.*;
-import static org.forgerock.openam.audit.AuditConstants.EventHandlerType.CSV;
+import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.audit.AuditConstants.SERVICE_NAME;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
-import org.forgerock.audit.events.handlers.csv.CSVAuditEventHandlerConfiguration;
+import org.forgerock.audit.events.EventTopicsMetaData;
+import org.forgerock.audit.events.EventTopicsMetaDataBuilder;
+import org.forgerock.audit.filter.FilterPolicy;
+import org.forgerock.openam.audit.AMAuditService;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.RealmUtils;
 
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.AccessController;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +64,16 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
 
     private final Debug debug = Debug.getInstance("amAudit");
     private final List<AuditServiceConfigurationListener> listeners = new CopyOnWriteArrayList<>();
+    private final EventTopicsMetaData eventTopicsMetaData;
 
     private volatile boolean initialised = false;
+
+    /**
+     * Construct an instance of AuditServiceConfigurationProviderImpl.
+     */
+    public AuditServiceConfigurationProviderImpl() {
+        this.eventTopicsMetaData = getEventTopicsMetaData();
+    }
 
     @Override
     public void setupComplete() {
@@ -76,6 +94,20 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
     @Override
     public void addConfigurationListener(AuditServiceConfigurationListener listener) {
         listeners.add(listener);
+
+        // If setup has already completed, let the listener know of the current state
+        if (initialised) {
+            listener.globalConfigurationChanged();
+
+            for (String realm : getRealmNames()) {
+                ServiceConfig config = getAuditRealmConfiguration(realm);
+                if (serviceExists(config)) {
+                    listener.realmConfigurationChanged(realm);
+                } else {
+                    listener.realmConfigurationRemoved(realm);
+                }
+            }
+        }
     }
 
     @Override
@@ -111,13 +143,29 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
     }
 
     @Override
-    public Set<AuditEventHandlerConfigurationWrapper> getDefaultEventHandlerConfigurations() {
+    public Set<AuditEventHandlerConfiguration> getDefaultEventHandlerConfigurations() {
         return getEventHandlerConfigurations(getAuditGlobalConfiguration());
     }
 
     @Override
-    public Set<AuditEventHandlerConfigurationWrapper> getRealmEventHandlerConfigurations(String realm) {
+    public Set<AuditEventHandlerConfiguration> getRealmEventHandlerConfigurations(String realm) {
         return getEventHandlerConfigurations(getAuditRealmConfiguration(realm));
+    }
+
+    @Override
+    public EventTopicsMetaData getEventTopicsMetaData() {
+        EventTopicsMetaDataBuilder builder = EventTopicsMetaDataBuilder.coreTopicSchemas();
+
+        String path = "/org/forgerock/openam/audit/events-config.json";
+        try {
+            InputStream is = AMAuditService.class.getResourceAsStream(path);
+            String contents = IOUtils.readStream(is);
+            builder.withCoreTopicSchemaExtensions(JsonValueBuilder.toJsonValue(contents.replaceAll("\\s", "")));
+        } catch (IOException e) {
+            debug.error("Unable to read Audit event configuration file {}", path, e);
+        }
+
+        return builder.build();
     }
 
     private void notifyDefaultConfigurationListeners() {
@@ -163,55 +211,61 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
         } else {
             attributes = config.getAttributes();
         }
-        return new AMAuditServiceConfiguration(
+
+        // We have a system property which says whether to audit AM_ACCESS_ATTEMPT.  If false (i.e. we do NOT
+        // want to audit this event name, we blacklist the event name.  This is so in the future we will be able
+        // to blacklist any or all event names to get better control over the amount of stuff that is audited.
+        //
+        Set<String> blacklistedEventNames = new HashSet<>();
+        if (!SystemProperties.getAsBoolean(Constants.AUDIT_AM_ACCESS_ATTEMPT_ENABLED)) {
+            blacklistedEventNames.add(EventName.AM_ACCESS_ATTEMPT.toString());
+        }
+
+        AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration(
                 getBooleanMapAttr(attributes, "auditEnabled", false),
                 getBooleanMapAttr(attributes, "suppressAuditFailure", true),
-                getBooleanMapAttr(attributes, "resolveHostNameEnabled", false));
+                getBooleanMapAttr(attributes, "resolveHostNameEnabled", false),
+                blacklistedEventNames);
+
+        Set<String> filterPolicies = new HashSet<>();
+        for (String policy : attributes.get("fieldFilterPolicy")) {
+            if (isNotEmpty(policy)) {
+                policy = policy.replaceAll("%AM_COOKIE_NAME%", SystemProperties.get(AM_COOKIE_NAME));
+                policy = policy.replaceAll("%AM_AUTH_COOKIE_NAME%", SystemProperties.get(AM_AUTH_COOKIE_NAME));
+                filterPolicies.add(policy);
+            }
+        }
+        Map<String, FilterPolicy> filterPolicyMap = new HashMap<>();
+        FilterPolicy fieldFP = new FilterPolicy();
+        fieldFP.setExcludeIf(filterPolicies);
+        filterPolicyMap.put("field", fieldFP);
+        configuration.setFilterPolicies(filterPolicyMap);
+
+        return configuration;
     }
 
-    private Set<AuditEventHandlerConfigurationWrapper> getEventHandlerConfigurations(ServiceConfig serviceConfig) {
+    private Set<AuditEventHandlerConfiguration> getEventHandlerConfigurations(ServiceConfig serviceConfig) {
         if (!serviceExists(serviceConfig)) {
             return emptySet();
         }
 
-        Set<AuditEventHandlerConfigurationWrapper> eventHandlerConfigurations = new HashSet<>();
+        Set<AuditEventHandlerConfiguration> eventHandlerConfigurations = new HashSet<>();
         try {
             Set<String> handlerNames = serviceConfig.getSubConfigNames();
             for (String handlerName : handlerNames) {
-                AuditEventHandlerConfigurationWrapper eventHandlerConfiguration =
-                        getEventHandlerConfiguration(serviceConfig.getSubConfig(handlerName));
-                if (eventHandlerConfiguration != null) {
-                    eventHandlerConfigurations.add(eventHandlerConfiguration);
-                }
+                @SuppressWarnings("unchecked")
+                Map<String, Set<String>> attributes = serviceConfig.getSubConfig(handlerName).getAttributes();
+                AuditEventHandlerConfiguration config = AuditEventHandlerConfiguration.builder()
+                        .withName(handlerName)
+                        .withAttributes(attributes)
+                        .withEventTopicsMetaData(eventTopicsMetaData).build();
+                eventHandlerConfigurations.add(config);
             }
         } catch (SSOException | SMSException e) {
             debug.error("Error accessing service {}. No audit event handlers will be registered.", SERVICE_NAME, e);
         }
 
         return eventHandlerConfigurations;
-    }
-
-    private AuditEventHandlerConfigurationWrapper getEventHandlerConfiguration(ServiceConfig eventHandlerConfig) {
-        @SuppressWarnings("unchecked")
-        Map<String, Set<String>> attributes = eventHandlerConfig.getAttributes();
-        boolean handlerEnabled = getBooleanMapAttr(attributes, "enabled", false);
-
-        if (handlerEnabled && CSV.name().equalsIgnoreCase(eventHandlerConfig.getSchemaID())) {
-            return getCsvEventHandlerConfiguration(eventHandlerConfig.getName(), attributes);
-        }
-
-        return null;
-    }
-
-    private AuditEventHandlerConfigurationWrapper getCsvEventHandlerConfiguration(
-            String name, Map<String, Set<String>> attributes) {
-
-        CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
-        String location = getMapAttr(attributes, "location");
-        csvHandlerConfiguration.setLogDirectory(location.replaceAll("%BASE_DIR%", SystemProperties.get(CONFIG_PATH))
-                .replaceAll("%SERVER_URI%", SystemProperties.get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
-
-        return new AuditEventHandlerConfigurationWrapper(csvHandlerConfiguration, CSV, name, attributes.get("topics"));
     }
 
     private ServiceConfig getAuditGlobalConfiguration() {

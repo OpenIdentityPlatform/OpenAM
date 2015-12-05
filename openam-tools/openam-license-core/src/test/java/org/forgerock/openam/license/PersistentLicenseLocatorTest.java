@@ -1,6 +1,4 @@
 /*
- * Copyright 2014 ForgeRock, AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.license;
@@ -19,9 +19,9 @@ package org.forgerock.openam.license;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.Date;
 
+import static java.util.Arrays.asList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -66,7 +66,7 @@ public class PersistentLicenseLocatorTest {
     @Test
     public void shouldReturnEqualLicenseSet() {
         // Given
-        LicenseSet originalLicenses = new LicenseSet(Arrays.asList(new License("aaa", "aaa"), new License("bbb", "bbb")));
+        LicenseSet originalLicenses = new LicenseSet(asList(new License("aaa", "aaa"), new License("bbb", "bbb")));
         given(mockLocator.getRequiredLicenses()).willReturn(originalLicenses);
 
         // When
@@ -82,7 +82,7 @@ public class PersistentLicenseLocatorTest {
         // Given
         License one = new License("aaa", "aaa");
         License two = new License("bbb", "bbb");
-        LicenseSet originalLicenses = new LicenseSet(Arrays.asList(one, two));
+        LicenseSet originalLicenses = new LicenseSet(asList(one, two));
         given(mockLocator.getRequiredLicenses()).willReturn(originalLicenses);
 
         // When
@@ -90,7 +90,8 @@ public class PersistentLicenseLocatorTest {
         result.acceptAll();
 
         // Then
-        one.accept(); two.accept(); // Copies will be accepted and this is significant for equals() check
+        one.accept();
+        two.accept(); // Copies will be accepted and this is significant for equals() check
         verify(mockLog).logLicenseAccepted(eq(one), eq(USER), any(Date.class));
         verify(mockLog).logLicenseAccepted(eq(two), eq(USER), any(Date.class));
     }
@@ -99,7 +100,7 @@ public class PersistentLicenseLocatorTest {
     public void shouldCheckLogForAcceptance() {
         // Given
         License l = new License("aaa", "aaa");
-        LicenseSet originalLicense = new LicenseSet(Arrays.asList(l));
+        LicenseSet originalLicense = new LicenseSet(asList(l));
         given(mockLocator.getRequiredLicenses()).willReturn(originalLicense);
         given(mockLog.isLicenseAccepted(l, USER)).willReturn(true);
 

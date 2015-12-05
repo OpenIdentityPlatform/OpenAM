@@ -97,7 +97,7 @@ public class ResourceSetServiceTest {
         boolean augmentWithPolicy = false;
         ResourceSetDescription resourceSetDescription = mock(ResourceSetDescription.class);
 
-        given(resourceSetStore.read(resourceSetId)).willReturn(resourceSetDescription);
+        given(resourceSetStore.read(resourceSetId, resourceOwnerId)).willReturn(resourceSetDescription);
 
         //When
         ResourceSetDescription resourceSet = service.getResourceSet(context, realm, resourceSetId, resourceOwnerId,
@@ -123,7 +123,7 @@ public class ResourceSetServiceTest {
         Promise<UmaPolicy, ResourceException> policyPromise = Promises.newResultPromise(policy);
         JsonValue policyJson = mock(JsonValue.class);
 
-        given(resourceSetStore.read(resourceSetId)).willReturn(resourceSetDescription);
+        given(resourceSetStore.read(resourceSetId, resourceOwnerId)).willReturn(resourceSetDescription);
         given(policyService.readPolicy(context, resourceSetId)).willReturn(policyPromise);
         given(policy.asJson()).willReturn(policyJson);
 
@@ -347,7 +347,7 @@ public class ResourceSetServiceTest {
                 .willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
-        given(resourceSetStore.read("RS_ID_THREE")).willReturn(resourceSetThree);
+        given(resourceSetStore.read("RS_ID_THREE", resourceOwnerId)).willReturn(resourceSetThree);
 
         mockPolicyEvaluator("RS_CLIENT_ID");
 
@@ -411,7 +411,7 @@ public class ResourceSetServiceTest {
 
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
-        given(resourceSetStore.read("RS_ID_THREE")).willReturn(resourceSetThree);
+        given(resourceSetStore.read("RS_ID_THREE", resourceOwnerId)).willReturn(resourceSetThree);
 
         //When
         Collection<ResourceSetDescription> resourceSets = service.getResourceSets(context, realm, query, resourceOwnerId,
@@ -479,8 +479,8 @@ public class ResourceSetServiceTest {
                 .willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
-        given(resourceSetStore.read("RS_ID_ONE")).willReturn(resourceSetOne);
-        given(resourceSetStore.read("RS_ID_THREE")).willReturn(resourceSetThree);
+        given(resourceSetStore.read("RS_ID_ONE", resourceOwnerId)).willReturn(resourceSetOne);
+        given(resourceSetStore.read("RS_ID_THREE", resourceOwnerId)).willReturn(resourceSetThree);
         given(policyService.readPolicy(context, "RS_ID_ONE")).willReturn(policyOnePromise);
         given(policyService.readPolicy(context, "RS_ID_TWO")).willReturn(policyTwoPromise);
 
@@ -554,7 +554,7 @@ public class ResourceSetServiceTest {
                 .willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
-        given(resourceSetStore.read("RS_ID_THREE")).willReturn(resourceSetThree);
+        given(resourceSetStore.read("RS_ID_THREE", resourceOwnerId)).willReturn(resourceSetThree);
 
         mockPolicyEvaluator("RS_CLIENT_ID");
 

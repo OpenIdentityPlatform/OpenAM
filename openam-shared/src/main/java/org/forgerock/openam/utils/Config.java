@@ -11,13 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
 
 /**
  * Simple interface class for lazily retrieving configuration objects.
+ *
+ * @param <T> the enclosed type.
  *
  * @since 12.0.0
  */

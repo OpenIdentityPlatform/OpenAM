@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OpenSSOLogger.java,v 1.1 2009/10/22 21:03:33 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -48,18 +50,18 @@ import javax.security.auth.Subject;
 public class OpenSSOLogger {
     public enum LogLevel {ERROR, MESSAGE};
     public enum Message {
-        APPLICATION_ATTEMPT_SAVE,
-        APPLICATION_SUCCEEDED_SAVE,
-        APPLICATION_ATTEMPT_REMOVE,
-        APPLICATION_SUCCEEDED_REMOVE,
-        APPLICATION_FAILED_SAVE,
-        APPLICATION_FAILED_REMOVE,
-        RESOURCE_TYPE_ATTEMPT_SAVE,
-        RESOURCE_TYPE_SUCCEEDED_SAVE,
-        RESOURCE_TYPE_ATTEMPT_REMOVE,
-        RESOURCE_TYPE_SUCCEEDED_REMOVE,
-        RESOURCE_TYPE_FAILED_SAVE,
-        RESOURCE_TYPE_FAILED_REMOVE
+        ATTEMPT_SAVE_APPLICATION,
+        SUCCEEDED_SAVE_APPLICATION,
+        ATTEMPT_REMOVE_APPLICATION,
+        SUCCEEDED_REMOVE_APPLICATION,
+        FAILED_SAVE_APPLICATION,
+        FAILED_REMOVE_APPLICATION,
+        ATTEMPT_SAVE_RESOURCE_TYPE,
+        SUCCEEDED_SAVE_RESOURCE_TYPE,
+        ATTEMPT_REMOVE_RESOURCE_TYPE,
+        SUCCEEDED_REMOVE_RESOURCE_TYPE,
+        FAILED_SAVE_RESOURCE_TYPE,
+        FAILED_REMOVE_RESOURCE_TYPE
     };
     private static final String LOG_MSG_XML = "Entitlement";
     private static final String LOG_NAME = "entitlement";

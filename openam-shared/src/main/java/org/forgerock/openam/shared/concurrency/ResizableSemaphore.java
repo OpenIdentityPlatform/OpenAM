@@ -26,14 +26,27 @@ import java.util.concurrent.Semaphore;
 public class ResizableSemaphore extends Semaphore {
 
     /**
-     * {@inheritdoc}
+     * Creates a {@code ResizableSemaphore} with the given number of
+     * permits and the given fairness setting.
+     *
+     * @param permits the initial number of permits available.
+     *        This value may be negative, in which case releases
+     *        must occur before any acquires will be granted.
+     * @param fair {@code true} if this semaphore will guarantee
+     *        first-in first-out granting of permits under contention,
+     *        else {@code false}
      */
     public ResizableSemaphore(int permits, boolean fair) {
         super(permits, fair);
     }
 
     /**
-     * {@inheritdoc}
+     * Creates a {@code ResizableSemaphore} with the given number of
+     * permits and nonfair fairness setting.
+     *
+     * @param permits the initial number of permits available.
+     *        This value may be negative, in which case releases
+     *        must occur before any acquires will be granted.
      */
     public ResizableSemaphore(int permits) {
         super(permits);
@@ -43,7 +56,7 @@ public class ResizableSemaphore extends Semaphore {
      * Overridden method to stop it being protected.
      * Decrease the number of available permits by the amount in the supplied argument.
      *
-     * {@inheritdoc}
+     * @param reduction {@inheritdoc}
      */
     @Override
     protected void reducePermits(int reduction) {

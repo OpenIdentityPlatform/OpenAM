@@ -16,6 +16,13 @@
 
 package org.forgerock.openam.core.rest;
 
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
+import static org.forgerock.openam.rest.RestUtils.isAdmin;
+import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.Attribute;
@@ -25,9 +32,8 @@ import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -54,24 +60,18 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
-import static org.forgerock.openam.rest.RestUtils.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.util.promise.Promises.*;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -81,40 +81,64 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
     private final String objectType;
     private final IdentityServicesImpl identityServices;
     private final IdentityResourceV2 identityResourceV2;
+    private final Set<String> patchableAttributes;
 
     private static Debug logger = Debug.getInstance("frRest");
 
-    private static final String FIELD_PASSWORD = "userPassword";
-
     /**
-     * Creates a backend
+     * Constructs a new identity resource.
+     *
+     * @param objectType
+     *         the object type (whether user, group or agent)
+     * @param mailServerLoader
+     *         the mail service provider
+     * @param identityServices
+     *         the identity service
+     * @param coreWrapper
+     *         core utility API
+     * @param restSecurityProvider
+     *         self service config provider
+     * @param baseURLProviderFactory
+     *         URL provider factory
+     * @param patchableAttributes
+     *         set of acceptable patchable attributes
      */
     public IdentityResourceV3(String objectType, MailServerLoader mailServerLoader,
-                              IdentityServicesImpl identityServices,
-                              CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
-                              BaseURLProviderFactory baseURLProviderFactory) {
-        this(objectType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
-                                                                                        baseURLProviderFactory);
-    }
-
-    // Constructor used for testing...
-    IdentityResourceV3(String objectType, ServiceConfigManager serviceConfigManager, ServiceConfig serviceConfig,
-                       MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
-                       RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
-
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
+            ConsoleConfigHandler configHandler, BaseURLProviderFactory baseURLProviderFactory, Set<String> patchableAttributes,
+            Set<UiRolePredicate> uiRolePredicates) {
         this.identityResourceV2 = new IdentityResourceV2(objectType, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, baseURLProviderFactory);
+                restSecurityProvider, configHandler, baseURLProviderFactory, uiRolePredicates);
         this.objectType = objectType;
         this.identityServices = identityServices;
+        this.patchableAttributes = patchableAttributes;
     }
 
     /**
-     * {@inheritDoc}
+     * Version 3 of this endpoint cannot remove these actions as this version is invoked by default.
+     * Instead we log messages to remind the user that these actions will disappear from here, although they
+     * will be retained by Version 2.
      */
     @Override
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
 
+        final String action = request.getAction();
+        if ("register".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        } else if ("confirm".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        } else if ("anonymousCreate".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        } else if ("forgotPassword".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        } else if ("forgotPasswordReset".equalsIgnoreCase(action)) {
+            logAsDeprecated(action);
+        }
         return identityResourceV2.actionCollection(context, request);
+    }
+
+    private void logAsDeprecated(String action) {
+        logger.warning("The action '" + action + "' in the 'users' endpoint is deprecated in version 3.0");
     }
 
     /**
@@ -133,6 +157,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(final Context context,
             final CreateRequest request) {
+
         return identityResourceV2.createInstance(context, request);
     }
 
@@ -201,7 +226,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
             }
 
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-            logger.message("UserIdentityResourceV3.queryCollection :: QUERY performed on realm "
+            logger.message("IdentityResourceV3.queryCollection :: QUERY performed on realm "
                     + realm
                     + " by "
                     + principalName);
@@ -217,10 +242,10 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
             }
 
         } catch (ResourceException resourceException) {
-            logger.warning("UserIdentityResourceV3.queryCollection caught ResourceException", resourceException);
+            logger.warning("IdentityResourceV3.queryCollection caught ResourceException", resourceException);
             return resourceException.asPromise();
         } catch (Exception exception) {
-            logger.error("UserIdentityResourceV3.queryCollection caught exception", exception);
+            logger.error("IdentityResourceV3.queryCollection caught exception", exception);
             return new InternalServerErrorException(exception.getMessage(), exception).asPromise();
         }
 
@@ -253,8 +278,6 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                 return new ForbiddenException("Only admin can patch user values").asPromise();
             }
 
-            final Set<String> patchableFieldNames = new HashSet<>(Collections.singletonList(FIELD_PASSWORD));
-
             SSOToken ssoToken = getSSOToken(RestUtils.getToken().getTokenID().toString());
             IdentityServicesImpl identityServices = getIdentityServices();
 
@@ -268,7 +291,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
 
             if (existingAttributeMap.containsKey(IdentityRestUtils.UNIVERSAL_ID)) {
                 Set<String> values = existingAttributeMap.get(IdentityRestUtils.UNIVERSAL_ID);
-                if (isNotEmpty(values) && !identityResourceV2.isUserActive(values.iterator().next())) {
+                if (isNotEmpty(values) && !isUserActive(values.iterator().next())) {
                     return new ForbiddenException("User "
                             + resourceId
                             + " is not active: Request is forbidden").asPromise();
@@ -280,19 +303,17 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                 switch (patchOperation.getOperation()) {
                     case PatchOperation.OPERATION_REPLACE: {
                         String name = getFieldName(patchOperation.getField());
-                        String value = patchOperation.getValue().asString();
 
-                        if (!patchableFieldNames.contains(name)) {
+                        if (!patchableAttributes.contains(name)) {
                             return new BadRequestException("For the object type "
-                                    + identityResourceV2.USER_TYPE
+                                    + IdentityRestUtils.USER_TYPE
                                     + ", field \""
                                     + name
                                     + "\" cannot be altered by PATCH").asPromise();
                         }
 
-                        Set<String> newSet = new HashSet<>();
-                        newSet.add(value);
-                        newAttributeMap.put(name, newSet);
+                        JsonValue value = patchOperation.getValue();
+                        newAttributeMap.put(name, identityAttributeJsonToSet(value));
                         updateNeeded = true;
                         break;
                     }
@@ -317,28 +338,28 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                     identityDetailsToJsonValue(identityDetails)));
 
         } catch (final ObjectNotFound notFound) {
-            logger.error("UserIdentityResourceV3.patchInstance cannot find resource " + resourceId, notFound);
+            logger.error("IdentityResourceV3.patchInstance cannot find resource " + resourceId, notFound);
             return new NotFoundException("Resource cannot be found.", notFound).asPromise();
         } catch (final TokenExpired tokenExpired) {
-            logger.error("UserIdentityResourceV3.patchInstance, token expired", tokenExpired);
+            logger.error("IdentityResourceV3.patchInstance, token expired", tokenExpired);
             return new PermanentException(401, "Unauthorized", null).asPromise();
         } catch (final AccessDenied accessDenied) {
-            logger.error("UserIdentityResourceV3.patchInstance, access denied", accessDenied);
+            logger.error("IdentityResourceV3.patchInstance, access denied", accessDenied);
             return new ForbiddenException(accessDenied.getMessage(), accessDenied).asPromise();
         } catch (final GeneralFailure generalFailure) {
-            logger.error("UserIdentityResourceV3.patchInstance, general failure " + generalFailure.getMessage());
+            logger.error("IdentityResourceV3.patchInstance, general failure " + generalFailure.getMessage());
             return new BadRequestException(generalFailure.getMessage(), generalFailure).asPromise();
         } catch (ForbiddenException fex) {
-            logger.warning("UserIdentityResourceV3.patchInstance, insufficient privileges.", fex);
+            logger.warning("IdentityResourceV3.patchInstance, insufficient privileges.", fex);
             return fex.asPromise();
         } catch (NotFoundException notFound) {
-            logger.warning("UserIdentityResourceV3.patchInstance " + resourceId + " not found", notFound);
+            logger.warning("IdentityResourceV3.patchInstance " + resourceId + " not found", notFound);
             return new NotFoundException("Resource " + resourceId + " cannot be found.", notFound).asPromise();
         } catch (ResourceException resourceException) {
-            logger.warning("UserIdentityResourceV3.patchInstance caught ResourceException", resourceException);
+            logger.warning("IdentityResourceV3.patchInstance caught ResourceException", resourceException);
             return resourceException.asPromise();
         } catch (Exception exception) {
-            logger.error("UserIdentityResourceV3.patchInstance caught exception", exception);
+            logger.error("IdentityResourceV3.patchInstance caught exception", exception);
             return new InternalServerErrorException(exception.getMessage(), exception).asPromise();
         }
     }

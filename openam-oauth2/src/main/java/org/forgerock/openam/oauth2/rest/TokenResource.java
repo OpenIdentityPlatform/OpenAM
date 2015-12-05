@@ -62,6 +62,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -340,14 +341,25 @@ public class TokenResource implements CollectionResourceProvider {
                 queryString = id;
             }
 
-            String[] constraints = queryString.split("\\,");
+            String[] constraints = queryString.split(",");
+            boolean userNamePresent = false;
             for (String constraint : constraints) {
                 String[] params = constraint.split("=");
                 if (params.length == 2) {
+                    if (OAuthTokenField.USER_NAME.getOAuthField().equals(params[0])) {
+                        userNamePresent = true;
+                    }
                     query.add(QueryFilter.equalTo(getOAuth2TokenField(params[0]), params[1]));
                 }
             }
 
+            if (adminUserId.equals(uid)) {
+                if (!userNamePresent) {
+                    return new BadRequestException("userName field MUST be set in _queryId").asPromise();
+                }
+            } else if (userNamePresent) {
+                return new BadRequestException("userName field MUST NOT be set in _queryId").asPromise();
+            }
             response = tokenStore.query(QueryFilter.and(query));
             return handleResponse(handler, response, context);
 

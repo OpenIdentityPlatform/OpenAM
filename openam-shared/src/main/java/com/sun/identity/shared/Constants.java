@@ -1375,4 +1375,14 @@ public interface Constants {
      * Property that defines whether XUI's Reverse Proxy support should be enabled or not.
      */
     public static final String XUI_REVERSE_PROXY_SUPPORT = "org.forgerock.openam.xui.reverseproxy.support";
+
+    /**
+     * Sets the maximum file upload size - if not set the default will be 750k.
+     */
+    public static final String MAX_FILE_UPLOAD_SIZE = "org.forgerock.openam.console.max.file.upload.size";
+
+    /**
+     * Property that allows the AM_ACCESS_ATTEMPT event name to be audited.
+     */
+    public static final String AUDIT_AM_ACCESS_ATTEMPT_ENABLED = "org.forgerock.openam.audit.access.attempt.enabled";
 }

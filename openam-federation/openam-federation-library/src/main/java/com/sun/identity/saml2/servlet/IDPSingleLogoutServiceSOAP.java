@@ -33,6 +33,7 @@ package com.sun.identity.saml2.servlet;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.profile.LogoutUtil;
 import com.sun.identity.saml2.profile.IDPProxyUtil;
@@ -46,7 +47,7 @@ import com.sun.identity.saml.common.SAMLUtils;
 import java.io.OutputStream;
 import java.io.InputStream;
 import java.io.IOException;
-import java.util.List; 
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -94,14 +95,8 @@ public class IDPSingleLogoutServiceSOAP extends HttpServlet {
                     req.getRequestURI() +", idpMetaAlias=" + idpMetaAlias
                     + ", idpEntityID=" + idpEntityID);
             }
-            // Get all the headers from the HTTP request
-            MimeHeaders headers = SAML2Utils.getHeaders(req);
-            // Get the body of the HTTP request
-            InputStream is = req.getInputStream();
-            // Now internalize the contents of a HTTP request
-            // and create a SOAPMessage
-            SOAPMessage msg =
-                MessageFactory.newInstance().createMessage(headers, is);
+
+            SOAPMessage msg = SOAPCommunicator.getInstance().getSOAPMessage(req);
             Map aMap = IDPProxyUtil.getSessionPartners(msg);
             List partners = (List) aMap.get(SAML2Constants.PARTNERS); 
             SOAPMessage reply = null;
@@ -109,8 +104,8 @@ public class IDPSingleLogoutServiceSOAP extends HttpServlet {
             if (reply != null) {    
                 // IDP Proxy case
                 if (partners != null &&  (!partners.isEmpty())) {
-                    Element reqElem = SAML2Utils.getSamlpElement(msg,
-                        "LogoutRequest");
+                    Element reqElem = SOAPCommunicator.getInstance().getSamlpElement(msg,
+                            "LogoutRequest");
                     LogoutRequest logoutReq =
                         ProtocolFactory.getInstance().createLogoutRequest(
                         reqElem);
@@ -175,16 +170,16 @@ public class IDPSingleLogoutServiceSOAP extends HttpServlet {
         // get LogoutRequest element from SOAP message
         LogoutRequest logoutReq = null;
         try {
-            Element reqElem = SAML2Utils.getSamlpElement(message, 
-                "LogoutRequest");
+            Element reqElem = SOAPCommunicator.getInstance().getSamlpElement(message,
+                    "LogoutRequest");
             logoutReq = 
                 ProtocolFactory.getInstance().createLogoutRequest(reqElem);
             // delay the signature until this server finds the session
         } catch (SAML2Exception se) {
             SAML2Utils.debug.error("IDPSingleLogoutServiceSOAP.onMessage: " + 
                 "unable to get LogoutRequest from message", se);
-            return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT, 
-                "errorLogoutRequest", se.getMessage());
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                    "errorLogoutRequest", se.getMessage());
         }
 
         // TODO decrypt LogoutRequest if any
@@ -193,8 +188,8 @@ public class IDPSingleLogoutServiceSOAP extends HttpServlet {
         if (logoutReq == null) {
             SAML2Utils.debug.error("IDPSingleLogoutServiceSOAP.onMessage: " + 
                 "LogoutRequest is null");
-            return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT, 
-                "nullLogoutRequest", null);
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                    "nullLogoutRequest", null);
         }
 
         LogoutResponse loRes = null;
@@ -206,31 +201,31 @@ public class IDPSingleLogoutServiceSOAP extends HttpServlet {
                     SAML2Constants.IDP_ROLE, logoutReq.getIssuer().getValue());
         } catch (SAML2Exception e) {
             SAML2Utils.debug.error("IDPSingleLogoutServiceSOAP.onMessage;", e);
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT,
-                "errorLogoutResponse", e.getMessage());
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "errorLogoutResponse", e.getMessage());
         }
 
         if (loRes == null) {
             SAML2Utils.debug.error("IDPSingleLogoutServiceSOAP.onMessage: " + 
                 "LogoutResponse is null");
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT,
-                "errorLogoutResponse", null);
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "errorLogoutResponse", null);
         }
 
         SOAPMessage msg = null; 
         try {
-            msg = SAML2Utils.createSOAPMessage(loRes.toXMLString(true, true),
-                false);
+            msg = SOAPCommunicator.getInstance().createSOAPMessage(loRes.toXMLString(true, true),
+                    false);
         } catch (SAML2Exception se) {
             SAML2Utils.debug.error("IDPSingleLogoutServiceSOAP.onMessage: " +
                 "Unable to create SOAP message:", se);
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT,
-                "errorLogoutResponseSOAP", se.getMessage());
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "errorLogoutResponseSOAP", se.getMessage());
         } catch (SOAPException ex) {
             SAML2Utils.debug.error("IDPSingleLogoutServiceSOAP.onMessage: " +
                 "Unable to create SOAP message:", ex);
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT,
-                "errorLogoutResponseSOAP", ex.getMessage());
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
+                    "errorLogoutResponseSOAP", ex.getMessage());
         }
         return msg;
     }

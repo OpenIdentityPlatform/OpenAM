@@ -14,8 +14,6 @@
  * Portions copyright 2015 ForgeRock AS.
  */
 
-
-
 define("org/forgerock/openam/ui/user/UserModel", [
     "jquery",
     "underscore",
@@ -33,16 +31,18 @@ define("org/forgerock/openam/ui/user/UserModel", [
 
             sync: function (method, model, options) {
                 var clearPassword = _.bind(function () {
-                    delete this.currentPassword;
-                    this.unset("password");
-                    return this;
-                }, this);
+                        delete this.currentPassword;
+                        this.unset("password");
+                        return this;
+                    }, this),
+                    currentPassword;
 
                 if (method === "update" || method === "patch") {
                     if (_.has(this.changed, "password")) {
                         // password changes have to occur via a special rest call
                         return ServiceInvoker.restCall({
                             url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id + "?_action=changePassword"),
+                            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             type: "POST",
                             data: JSON.stringify({
                                 username: this.get("id"),
@@ -53,15 +53,24 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     } else {
                         // overridden implementation for AM, due to the failures which would result
                         // if unchanged attributes are included along with the request
+                        currentPassword = this.currentPassword;
+                        delete this.currentPassword;
                         return ServiceInvoker.restCall(_.extend(
                             {
                                 "type": "PUT",
                                 "data": JSON.stringify(
-                                    _.pick(this.toJSON(), ["givenName","sn","mail","postalAddress","telephoneNumber"])
+                                    _.chain(this.toJSON())
+                                        .pick(["givenName", "sn", "mail", "postalAddress", "telephoneNumber"])
+                                        .mapValues(function (val) {
+                                            return val || [];
+                                        })
+                                        .value()
                                 ),
                                 "url": RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
                                 "headers": {
-                                    "If-Match": this.getMVCCRev()
+                                    "If-Match": this.getMVCCRev(),
+                                    "Accept-API-Version": "protocol=1.0,resource=2.0",
+                                    "currentpassword": currentPassword
                                 }
                             },
                             options
@@ -72,6 +81,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     return ServiceInvoker.restCall(_.extend(
                         {
                             "url" : RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                            "headers": { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             "type": "GET"
                         },
                         options
@@ -86,21 +96,25 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     });
                 }
             },
-            parse: function (response, options) {
+            parse: function (response) {
                 var user = {};
 
                 delete response.userPassword;
 
                 // many keys in response have single-element arrays for each property;
                 // translate these into a simpler map object, when possible
+                // kbaInfo property though needs to stay as an array
                 _.each(_.keys(response), function (property) {
-                    if (_.isArray(response[property]) && response[property].length === 1) {
+                    if (_.isArray(response[property]) && response[property].length === 1 &&
+                        property !== "kbaInfo") {
                         user[property] = response[property][0];
                     } else {
                         user[property] = response[property];
                     }
                 });
 
+                // When we parse response the first time, amadmin don't have uid
+                user.id = user.uid || user.username;
                 if (!_.has(user, "roles")) {
                     this.uiroles = [];
                 } else if (_.isString(user.roles)) {
@@ -115,9 +129,10 @@ define("org/forgerock/openam/ui/user/UserModel", [
 
                 return user;
             },
-            getProfile: function (headers) {
+            getProfile: function () {
                 return ServiceInvoker.restCall({
                     url: RealmHelper.decorateURIWithRealm(baseUrl + "?_action=idFromSession"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                     type: "POST",
                     errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
                 }).then(
@@ -128,7 +143,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
 
                         // keep track of the current realm as a future default value, following logout:
                         Router.configuration.routes.login.defaults[0] = data.realm;
-                        this.set("id",data.id);
+                        this.set("id", data.id);
                         return this.fetch().then(_.bind(function () {
                             return this;
                         }, this));

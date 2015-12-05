@@ -24,13 +24,16 @@
  *
  * $Id: Subject.java,v 1.2 2008/06/25 05:47:41 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.assertion;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.sun.identity.saml2.assertion.impl.SubjectImpl;
 import com.sun.identity.saml2.common.SAML2Exception;
+import java.util.List;
 
 /** 
  * The <code>Subject</code> specifies the principal that is the subject
@@ -39,6 +42,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *
  * @supported.all.api
  */
+@JsonDeserialize(as=SubjectImpl.class)
 public interface Subject {
 
     /**

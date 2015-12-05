@@ -33,12 +33,24 @@ import org.forgerock.json.JsonValue;
  */
 public class RedirectUrlValidator<T> {
 
+    /**
+     * Go to url query parameter name.
+     */
     public final static String GOTO = "goto";
+
+    /**
+     * Go to on fail query parameter name.
+     */
     public final static String GOTO_ON_FAIL = "gotoOnFail";
 
     private static final Debug DEBUG = Debug.getInstance("patternMatching");
     private final ValidDomainExtractor<T> domainExtractor;
 
+    /**
+     * Constructs a new RedirectUrlValidator instance.
+     *
+     * @param domainExtractor A ValidDomainExtractor instance.
+     */
     public RedirectUrlValidator(final ValidDomainExtractor<T> domainExtractor) {
         this.domainExtractor = domainExtractor;
     }
@@ -141,7 +153,13 @@ public class RedirectUrlValidator<T> {
 
         String encoded = request.getParameter("encoded");
         if (Boolean.parseBoolean(encoded)) {
-            return Base64.decodeAsUTF8String(value);
+            String decodedParameterValue = Base64.decodeAsUTF8String(value);
+            if (decodedParameterValue == null && DEBUG.warningEnabled()) {
+                DEBUG.warning("As parameter 'encoded' is true, parameter ['{}']='{}' should be base64 encoded",
+                            paramName, value);
+            }
+            return decodedParameterValue;
+
         } else {
             return value;
         }

@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.shared.concurrency;
 
 import java.lang.ref.Reference;
@@ -39,6 +40,9 @@ public class LockFactory<K> {
 
     private final Map<Key<K>, Reference<Lock>> lockCache;
 
+    /**
+     * Constructs a new LockFactory instance.
+     */
     public LockFactory() {
         lockCache = new WeakHashMap<Key<K>, Reference<Lock>>();
     }
@@ -106,7 +110,7 @@ public class LockFactory<K> {
                 return false;
             }
 
-            final Key<?> key = (Key<?>)o;
+            final Key<?> key = (Key<?>) o;
             return value == null ? key.value == null : value.equals(key.value);
         }
 

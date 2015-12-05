@@ -16,8 +16,18 @@
 
 package org.forgerock.openam.sts.soap.audit;
 
+import static org.forgerock.openam.audit.AuditConstants.Component.STS;
+
 import com.google.inject.Key;
+
+import org.forgerock.audit.AuditException;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.servlet.AuditableHttpServletResponse;
+import org.forgerock.openam.audit.servlet.Auditor;
+import org.forgerock.openam.audit.servlet.AuditorFactory;
 import org.forgerock.openam.sts.soap.config.SoapSTSInjectorHolder;
+import org.slf4j.Logger;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -36,11 +46,13 @@ import java.io.IOException;
  */
 public final class AuditAccessFilter implements Filter {
 
+    private Logger logger;
     private AuditorFactory auditorFactory;
     private AuditEventPublisher auditEventPublisher;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        logger = SoapSTSInjectorHolder.getInstance(Key.get(Logger.class));
         auditorFactory = SoapSTSInjectorHolder.getInstance(Key.get(AuditorFactory.class));
         auditEventPublisher = SoapSTSInjectorHolder.getInstance(Key.get(AuditEventPublisher.class));
     }
@@ -49,14 +61,19 @@ public final class AuditAccessFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        AuditableHttpServletResponse auditableResponse = new AuditableHttpServletResponse((HttpServletResponse) response);
-        Auditor auditor = auditorFactory.create((HttpServletRequest) request, auditableResponse);
+        AuditableHttpServletResponse auditableResponse =
+                new AuditableHttpServletResponse((HttpServletResponse) response);
+        Auditor auditor = auditorFactory.create((HttpServletRequest) request, auditableResponse, STS);
 
-        auditEventPublisher.publish(auditor.auditAccessAttempt());
         try {
-            chain.doFilter(request, auditableResponse);
-        } finally {
-            auditEventPublisher.publish(auditor.auditAccessOutcome());
+            auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessAttempt());
+            try {
+                chain.doFilter(request, auditableResponse);
+            } finally {
+                auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessOutcome());
+            }
+        } catch (AuditException e) {
+            logger.error("Failed to publish audit event: {}", e.getMessage(), e);
         }
     }
 

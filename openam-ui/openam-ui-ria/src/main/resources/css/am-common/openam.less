@@ -36,10 +36,6 @@
     float:right;
 }
 
- .dropdown-menu>li>a {
-     padding: 3px 10px;
- }
-
  .dropdown-menu li .fa {
      width:20px;
      text-align: center;
@@ -68,19 +64,13 @@
     }
 }
 
-#login-base, .bootstrap-dialog.loginDialog {
-
+#login-base, .bootstrap-dialog.login-dialog {
     .btn-group-justified {
         padding-top: 5px;
     }
 
     .btn-block+.btn-block {
         margin-top: 15px;
-    }
-
-    label.choice-callback{
-        padding-right: 10px;
-        font-weight: normal;
     }
 
      .btn-default.active {
@@ -94,7 +84,12 @@
 
 
 
-.bootstrap-dialog.loginDialog {
+.bootstrap-dialog.login-dialog {
+    form.form {
+        width: 100%;
+        margin: 0;
+    }
+
     .container {
         width: auto;
     }
@@ -221,9 +216,4 @@ body, .modal-open {
     &:hover, &:focus {
       color: @base-theme-color;
     }
-}
-
-#loginContent > .dropdown > a {
-    //Required because the user icon adds extra height to the navbar
-    margin-bottom: -10px;
 }

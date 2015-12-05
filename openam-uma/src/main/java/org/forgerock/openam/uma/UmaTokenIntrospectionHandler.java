@@ -79,8 +79,8 @@ public class UmaTokenIntrospectionHandler implements TokenIntrospectionHandler {
         JsonValue permissions = new JsonValue(array());
         for (Permission p : token.getPermissions()) {
             JsonValue permission = json(object(
-                    field(UmaConstants.Introspection.RESOURCE_SET_ID, p.getResourceSetId()),
-                    field(UmaConstants.Introspection.SCOPES, p.getScopes())));
+                    field(UmaConstants.RESOURCE_SET_ID, p.getResourceSetId()),
+                    field(UmaConstants.SCOPES, p.getScopes())));
             if (p.getExpiryTime() != null) {
                 permission.add(OAuth2Constants.JWTTokenParams.EXP, p.getExpiryTime());
             }

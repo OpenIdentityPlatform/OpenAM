@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions Copyrighted [year] [name of copyright owner]".
+
+  Copyright 2012-2015 ForgeRock AS.
+-->
+<!DOCTYPE suppressions PUBLIC
+        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<suppressions>
+    <!--
+      This Checkstyle suppressions file contains suppressions for any checks
+      that we don't want to enforce.
+    -->
+
+    <!--
+      Suppress all checks on generated source files.
+    -->
+    <suppress checks=".*"                          files="/generated-sources/" />
+
+    <!--
+      Suppress all checks on legacy code in com.iplanet and com.sun.identity.
+    -->
+    <suppress checks=".*"                          files="/src/main/java/com/iplanet/" />
+    <suppress checks=".*"                          files="/src/test/java/com/iplanet/" />
+    <suppress checks=".*"                          files="/src/main/java/com/sun/identity/" />
+    <suppress checks=".*"                          files="/src/test/java/com/sun/identity/" />
+
+    <!--
+      Suppress all checks on legacy resources in openam-shared.
+    -->
+    <suppress checks=".*"                          files="/src/main/resources/amUtilMsgs.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/de_DE/amUtilMsgs_de.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/es_ES/amUtilMsgs_es.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/fr_FR/amUtilMsgs_fr.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/ja_JP/amUtilMsgs_ja.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/ko_KR/amUtilMsgs_ko.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/zh_CN/amUtilMsgs_zh.properties" />
+    <suppress checks=".*"                          files="/src/main/resources/zh_TW/amUtilMsgs_zh_TW.properties" />
+
+    <!--
+      Suppress certain checks on unit tests.
+    -->
+
+    <!-- check-src-default.xml -->
+    <suppress checks="JavadocPackage"              files="/src/test/java/" />
+    <suppress checks="JavadocType"                 files="/src/test/java/" />
+    <suppress checks="JavadocMethod"               files="/src/test/java/" />
+    <suppress checks="JavadocVariable"             files="/src/test/java/" />
+    <suppress checks="JavadocStyle"                files="/src/test/java/" />
+    <!--
+      <suppress checks="ModifierOrder"               files="/src/test/java/" />
+      <suppress checks="RedundantModifier"           files="/src/test/java/" />
+    -->
+    <suppress checks="RedundantThrows"             files="/src/test/java/" />
+    <suppress checks="FinalClass"                  files="/src/test/java/" />
+    <suppress checks="HideUtilityClassConstructor" files="/src/test/java/" />
+    <suppress checks="InterfaceIsType"             files="/src/test/java/" />
+    <suppress checks="VisibilityModifier"          files="/src/test/java/" />
+
+    <!-- check-src-extra-warnings.xml -->
+    <suppress checks="Translation"                 files="/src/test/java/" />
+    <suppress checks="FileLength"                  files="/src/test/java/" />
+    <suppress checks="MethodLength"                files="/src/test/java/" />
+    <suppress checks="ParameterNumber"             files="/src/test/java/" />
+    <suppress checks="MissingSwitchDefault"        files="/src/test/java/" />
+    <suppress checks="DesignForExtension"          files="/src/test/java/" />
+    <suppress checks="TodoComment"                 files="/src/test/java/" />
+
+</suppressions>

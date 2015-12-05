@@ -20,7 +20,6 @@ package org.forgerock.openam.radius.server;
 
 import java.util.Properties;
 
-import org.forgerock.openam.radius.common.AccessRequest;
 import org.forgerock.openam.radius.server.spi.AccessRequestHandler;
 
 /**
@@ -36,11 +35,13 @@ public class CatastrophicHandler implements AccessRequestHandler {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.forgerock.openam.radius.server.spi.AccessRequestHandler#handle(org.forgerock.openam.radius.common.AccessRequest, org.forgerock.openam.radius.server.RadiusResponseHandler)
+    /*
+     * (non-Javadoc)
+     * @see org.forgerock.openam.radius.server.spi.AccessRequestHandler#handle
+     * (org.forgerock.openam.radius.common.AccessRequest, org.forgerock.openam.radius.server.RadiusResponseHandler)
      */
     @Override
-    public RadiusAuthResult handle(AccessRequest request, RadiusResponseHandler context)
+    public void handle(RadiusRequest request, RadiusResponse response, RadiusRequestContext context)
             throws RadiusProcessingException {
         throw new RadiusProcessingException(RadiusProcessingExceptionNature.CATASTROPHIC, "Test catestrophic.");
     }

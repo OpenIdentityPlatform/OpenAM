@@ -28,17 +28,6 @@
  */
 package com.sun.identity.idsvcs.opensso;
 
-import java.net.MalformedURLException;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -76,8 +65,17 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
+import java.net.MalformedURLException;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.ForbiddenException;
@@ -86,11 +84,11 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.errors.IdentityServicesExceptionMappingHandler;
+import org.forgerock.openam.ldap.LDAPConstants;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
-import org.forgerock.util.query.QueryFilter;
 
 /**
  * Web Service to provide security based on authentication and authorization support.
@@ -332,6 +330,11 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             }
         } catch (IdRepoException ex) {
             debug.error("IdentityServicesImpl:update", ex);
+
+            if (LDAPConstants.CONSTRAINT_VIOLATED_ERROR.equals(ex.getErrorCode())) {
+                throw new InternalServerErrorException(ex.getConstraintViolationDetails());
+            }
+
             throw convertToResourceException(idServicesErrorHandler.handleError(ex));
         } catch (SSOException ex) {
             debug.error("IdentityServicesImpl:update", ex);

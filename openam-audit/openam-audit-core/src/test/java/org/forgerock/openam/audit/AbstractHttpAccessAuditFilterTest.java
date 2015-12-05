@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
 import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.SESSION;
+import static org.forgerock.openam.audit.AuditConstants.EventName;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_ATTEMPT;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_OUTCOME;
 import static org.forgerock.openam.audit.AuditConstants.USER_ID;
@@ -201,13 +202,21 @@ public class AbstractHttpAccessAuditFilterTest {
     }
 
     private void disableAccessTopicAuditing() {
-        given(eventPublisher.isAuditing(eq(realm), anyString())).willReturn(true);
-        given(eventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)).willReturn(false);
+        given(eventPublisher
+                .isAuditing(eq(realm), anyString(), any(EventName.class)))
+                .willReturn(true);
+        given(eventPublisher
+                .isAuditing(eq(realm), eq(AuditConstants.ACCESS_TOPIC), any(EventName.class)))
+                .willReturn(false);
     }
 
     private void enableAccessTopicAuditing() {
-        given(eventPublisher.isAuditing(eq(realm), anyString())).willReturn(false);
-        given(eventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC)).willReturn(true);
+        given(eventPublisher
+                .isAuditing(eq(realm), anyString(), any(EventName.class)))
+                .willReturn(false);
+        given(eventPublisher
+                .isAuditing(eq(realm), eq(AuditConstants.ACCESS_TOPIC), any(EventName.class)))
+                .willReturn(true);
     }
 
     private Handler mockHandler(Context context, Request request, Status status) {
@@ -225,14 +234,14 @@ public class AbstractHttpAccessAuditFilterTest {
     private void verifyAccessSuccessAuditEvent(JsonValue auditEvent) {
         verifyAccessAuditEvent(auditEvent);
         assertThat(auditEvent).stringAt("eventName").isEqualTo(AM_ACCESS_OUTCOME.toString());
-        assertThat(auditEvent).stringAt("response/status").isEqualTo("SUCCESS");
+        assertThat(auditEvent).stringAt("response/status").isEqualTo("SUCCESSFUL");
         assertThat(auditEvent).longAt("response/elapsedTime").isNotNull();
     }
 
     private void verifyAccessFailedAuditEvent(JsonValue auditEvent) {
         verifyAccessAuditEvent(auditEvent);
         assertThat(auditEvent).stringAt("eventName").isEqualTo(AM_ACCESS_OUTCOME.toString());
-        assertThat(auditEvent).stringAt("response/status").isEqualTo("FAILURE");
+        assertThat(auditEvent).stringAt("response/status").isEqualTo("FAILED");
         assertThat(auditEvent).longAt("response/elapsedTime").isNotNull();
         assertThat(auditEvent).stringAt("response/detail/reason").isNotNull();
     }
@@ -241,15 +250,15 @@ public class AbstractHttpAccessAuditFilterTest {
         assertThat(auditEvent).stringAt("timestamp").isNotNull();
         assertThat(auditEvent).stringAt("transactionId").isNotNull();
         assertThat(auditEvent).stringAt("component").isEqualTo(AUTHENTICATION.toString());
-        assertThat(auditEvent).stringAt("authentication/id").isEqualTo("USER_ID");
+        assertThat(auditEvent).stringAt("userId").isEqualTo("USER_ID");
         assertThat(auditEvent).hasArray("trackingIds").contains("value");
         assertThat(auditEvent).stringAt("client/host").isEqualTo("");
         assertThat(auditEvent).stringAt("client/ip").isEqualTo("REMOTE_ADDRESS");
         assertThat(auditEvent).integerAt("client/port").isEqualTo(9000);
-        assertThat(auditEvent).stringAt("http/method").isEqualTo("GET");
-        assertThat(auditEvent).stringAt("http/path").isEqualTo("http://example.com:8080");
-        assertThat(auditEvent).stringAt("http/queryString").isEqualTo("query=value");
-        assertThat(auditEvent).hasArray("http/headers/" + ContentTypeHeader.NAME).contains("CONTENT_TYPE");
+        assertThat(auditEvent).stringAt("http/request/method").isEqualTo("GET");
+        assertThat(auditEvent).stringAt("http/request/path").isEqualTo("http://example.com:8080");
+        assertThat(auditEvent).hasArray("http/request/queryParameters/query").contains("value");
+        assertThat(auditEvent).hasArray("http/request/headers/" + ContentTypeHeader.NAME).contains("CONTENT_TYPE");
     }
 
     private class MockAccessAuditFilter extends AbstractHttpAccessAuditFilter {

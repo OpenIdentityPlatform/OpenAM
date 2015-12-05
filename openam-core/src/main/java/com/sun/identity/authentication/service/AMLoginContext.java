@@ -29,11 +29,14 @@
  */
 package com.sun.identity.authentication.service;
 
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.*;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext.IndexType;
+import com.sun.identity.authentication.audit.AuthenticationProcessEventAuditor;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.config.AMAuthLevelManager;
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
@@ -59,6 +62,8 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.DNMapper;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason;
 import org.forgerock.openam.utils.StringUtils;
 
 import javax.security.auth.Subject;
@@ -126,6 +131,7 @@ public class AMLoginContext {
     private Thread jaasThread = null;
     private AppConfigurationEntry[] entries = null;
     private Callback[] recdCallback;
+    private final AuthenticationProcessEventAuditor auditor;
 
     private static SsoServerAuthSvcImpl authImpl;
     private static Configuration defaultConfig = null;
@@ -141,8 +147,6 @@ public class AMLoginContext {
      * the bundle reference in the class
      */
     private ResourceBundle bundle;
-
-//    private AuthenticationAuditor authenticationAuditor;
 
     static {
         // set the auth configuration programmatically.
@@ -201,6 +205,7 @@ public class AMLoginContext {
         this.authContext = authContext;
         loginStatus = new LoginStatus();
         loginStatus.setStatus(LoginStatus.AUTH_IN_PROGRESS);
+        auditor = InjectorHolder.getInstance(AuthenticationProcessEventAuditor.class);
         bundle = ad.bundle; //default value for bundle until we find out
         //user login locale from LoginState object
     }
@@ -362,6 +367,8 @@ public class AMLoginContext {
             internalAuthError = true;
             loginStatus.setStatus(LoginStatus.AUTH_FAILED);
             loginState.logFailed(bundle.getString("noConfig"), "NOCONFIG");
+            auditor.auditLoginFailure(loginState, NO_CONFIG);
+
             if (MonitoringUtil.isRunning()) {
                 if (authImpl == null) {
                     authImpl = Agent.getAuthSvcMBean();
@@ -429,6 +436,7 @@ public class AMLoginContext {
             }
             setErrorMsgAndTemplate();
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
+            auditor.auditLoginFailure(loginState);
             internalAuthError = true;
             loginStatus.setStatus(LoginStatus.AUTH_FAILED);
             if (MonitoringUtil.isRunning()) {
@@ -447,6 +455,7 @@ public class AMLoginContext {
             }
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
+            auditor.auditLoginFailure(loginState);
             setErrorMsgAndTemplate();
             loginStatus.setStatus(LoginStatus.AUTH_FAILED);
             internalAuthError = true;
@@ -467,6 +476,7 @@ public class AMLoginContext {
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             setErrorMsgAndTemplate();
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
+            auditor.auditLoginFailure(loginState);
             internalAuthError = true;
             loginStatus.setStatus(LoginStatus.AUTH_FAILED);
             if (MonitoringUtil.isRunning()) {
@@ -483,6 +493,7 @@ public class AMLoginContext {
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             setErrorMsgAndTemplate();
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
+            auditor.auditLoginFailure(loginState);
             internalAuthError = true;
             if (MonitoringUtil.isRunning()) {
                 if (authImpl == null) {
@@ -543,6 +554,7 @@ public class AMLoginContext {
         Thread thread = Thread.currentThread();
         String logFailedMessage = bundle.getString("loginFailed");
         String logFailedError = null;
+        AuthenticationFailureReason failureReason = null;
         AMAccountLockout amAccountLockout;
         boolean loginSuccess = false;
         try {
@@ -563,6 +575,7 @@ public class AMLoginContext {
                 }
                 logFailedMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_MODULE_DENIED, AuthUtils.ERROR_MESSAGE);
                 logFailedError = "MODULEDENIED";
+                failureReason = MODULE_DENIED;
                 throw new AuthException(AMAuthErrorCode.AUTH_MODULE_DENIED, null);
             }
 
@@ -580,6 +593,7 @@ public class AMLoginContext {
                 debug.error("Profile not found ");
                 logFailedMessage = bundle.getString("noUserProfile");
                 logFailedError = "NOUSERPROFILE";
+                failureReason = NO_USER_PROFILE;
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_PROFILE_ERROR);
                 isFailed = true;
             } else {
@@ -589,6 +603,7 @@ public class AMLoginContext {
                     debug.message("User locked out!!");
                     logFailedMessage = bundle.getString("lockOut");
                     logFailedError = "LOCKEDOUT";
+                    failureReason = LOCKED_OUT;
                     loginState.setErrorCode(AMAuthErrorCode.AUTH_USER_LOCKED);
                     isFailed = true;
                 } else {
@@ -600,6 +615,7 @@ public class AMLoginContext {
                         debug.message("Account expired!!");
                         logFailedMessage = bundle.getString("accountExpired");
                         logFailedError = "ACCOUNTEXPIRED";
+                        failureReason = ACCOUNT_EXPIRED;
                         loginState.setErrorCode(AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED);
                         isFailed = true;
                     } else {
@@ -620,6 +636,7 @@ public class AMLoginContext {
                         boolean sessionActivated = loginState.activateSession(subject, authContext, lcInSession);
                         if (sessionActivated) {
                             loginState.logSuccess();
+                            auditor.auditLoginSuccess(loginState);
                             if (amAccountLockout.isLockoutEnabled()) {
                                 amAccountLockout.resetPasswdLockout(loginState.getUserDN(), true);
                             }
@@ -630,6 +647,7 @@ public class AMLoginContext {
                             logFailedMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED,
                                     AuthUtils.ERROR_MESSAGE);
                             logFailedError = "MAXSESSIONREACHED";
+                            failureReason = MAX_SESSION_REACHED;
                             throw new AuthException(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED, null);
                         }
                     }
@@ -659,12 +677,14 @@ public class AMLoginContext {
 
             logFailedMessage = bundle.getString("invalidPasswd");
             logFailedError = "INVALIDPASSWORD";
+            failureReason = INVALID_PASSWORD;
             if (accountLocked) {
                 if (failedUserId != null) {
                     loginState.logFailed(failedUserId, "LOCKEDOUT");
                 } else {
                     loginState.logFailed("LOCKEDOUT");
                 }
+                auditor.auditLoginFailure(loginState, LOCKED_OUT);
             }
 
             loginState.setErrorCode(AMAuthErrorCode.AUTH_LOGIN_FAILED);
@@ -700,6 +720,7 @@ public class AMLoginContext {
                 }
                 logFailedMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_MODULE_DENIED, AuthUtils.ERROR_MESSAGE);
                 logFailedError = "MODULEDENIED";
+                failureReason = MODULE_DENIED;
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_MODULE_DENIED);
             } else if (AMAuthErrorCode.AUTH_TIMEOUT.equals(le.getMessage())) {
                 debug.message("LOGINFAILED Error Timed Out....");
@@ -715,6 +736,7 @@ public class AMLoginContext {
             if (loginState.isTimedOut()) {
                 logFailedMessage = bundle.getString("loginTimeout");
                 logFailedError = "LOGINTIMEOUT";
+                failureReason = LOGIN_TIMEOUT;
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_TIMEOUT);
             } else if (ISAuthConstants.EXCEED_RETRY_LIMIT.equals(le.getErrorCode())) {
                 loginState.setErrorMessage(exceedRetryLimit);
@@ -748,69 +770,6 @@ public class AMLoginContext {
         }
         debug.message("Came to before if Failed loop");
 
-        //-------------------------------------- Not sure this one is used...
-
-//        authenticationAuditor = InjectorHolder.getInstance(AuthenticationAuditor.class);
-//
-//        CoreWrapper cw = new CoreWrapper();
-//        String realmName = cw.convertOrgNameToRealmName(loginState.getOrgDN());
-//        String ip = loginState.getClient();
-//
-//        LoginContext.ModuleInfo[] moduleStack = jaasLoginContext.getModuleStack();
-//        for (LoginContext.ModuleInfo moduleInfo : moduleStack) {
-//            Object module = moduleInfo.getModule();
-//            try {
-//                module.getClass().asSubclass(AMLoginModule.class);
-//
-//                AMLoginModule amLoginModule = (AMLoginModule) module;
-//
-//                String moduleName = amLoginModule.getModuleName();
-//                String moduleClass = amLoginModule.getModuleClass();
-//                int authLevel = amLoginModule.getAuthLevel();
-//
-//                String description;
-//                String modulePassOrFailMessage =
-//                        "Authentication module named " + moduleName +
-//                        " of class " + moduleClass;
-//                int state = amLoginModule.getCurrentState();
-//                if (state != ISAuthConstants.LOGIN_SUCCEED) {
-//                    modulePassOrFailMessage += " failed.";
-//                    description = "FAILURE";
-//                } else {
-//                    modulePassOrFailMessage += " succeeded.";
-//                    description = "SUCCESS";
-//                }
-//
-//                Map<String, String> info = new HashMap<>();
-//                if (StringUtils.isNotEmpty(ip)) {
-//                    info.put("ipAddress", ip);
-//                }
-//                String authLevelAsString = String.valueOf(authLevel);
-//                info.put("authLevel", authLevelAsString);
-//
-//                long time = Calendar.getInstance().getTimeInMillis();
-//
-//                AMAuthenticationAuditEventBuilder builder = authenticationAuditor.authenticationEvent();
-//                builder.eventName(modulePassOrFailMessage)
-//                        .transactionId(AuditRequestContext.getTransactionIdValue())
-//                        .realm(realmName)
-//                        .time(time)
-//                        .entries(moduleName, description, info);
-//
-//                try {
-//                    authenticationAuditor.publish(builder.toEvent());
-//                } catch (AuditException e) {
-//                    //Do nothing
-//                    int i = 0;
-//                }
-//            } catch (ClassCastException cce) {
-//                //Do nothing
-//                int i = 0;
-//            }
-//        }
-
-        //--------------------------------------
-
         if (isFailed) {
             if (MonitoringUtil.isRunning()) {
                 if (authImpl == null) {
@@ -831,6 +790,7 @@ public class AMLoginContext {
                 loginState.setFailureModuleList(getFailureModuleList(orgDN));
             }
             loginState.logFailed(logFailedMessage, logFailedError);
+            auditor.auditLoginFailure(loginState, failureReason);
             setErrorMsgAndTemplate();
             loginStatus.setStatus(LoginStatus.AUTH_FAILED);
             if (indexType == IndexType.USER) {
@@ -886,6 +846,7 @@ public class AMLoginContext {
                 }
             }
             loginState.logLogout();
+            auditor.auditLogout(getSSOToken());
             loginState.postProcess(indexType, indexName, LoginState.PostProcessEvent.LOGOUT);
             destroySession();
             loginStatus.setStatus(LoginStatus.AUTH_COMPLETED);
@@ -1350,6 +1311,7 @@ public class AMLoginContext {
 
         if (numberOfModules <= 0) {
             loginState.logFailed(bundle.getString("noConfig"), "NOCONFIG");
+            auditor.auditLoginFailure(loginState, NO_CONFIG);
             throw new AuthException(AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND, null);
         } else if (numberOfModules == 1) {
             this.indexType = IndexType.MODULE_INSTANCE;
@@ -1397,6 +1359,7 @@ public class AMLoginContext {
         if (numberOfModules <= 0) {
 
             loginState.logFailed(bundle.getString("noConfig"));
+            auditor.auditLoginFailure(loginState, NO_CONFIG);
             throw new AuthException(AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND, null);
 
         } else if (numberOfModules == 1) {
@@ -1570,6 +1533,7 @@ public class AMLoginContext {
     String getTimedOutTemplate() {
         loginState.setErrorCode(AMAuthErrorCode.AUTH_TIMEOUT);
         loginState.logFailed(bundle.getString("loginTimeout"), "LOGINTIMEOUT");
+        auditor.auditLoginFailure(loginState, LOGIN_TIMEOUT);
         loginState.setErrorMessage(AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_TIMEOUT, AuthUtils.ERROR_MESSAGE));
         return AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_TIMEOUT, AuthUtils.ERROR_TEMPLATE);
     }
@@ -1822,6 +1786,7 @@ public class AMLoginContext {
                 // no modules configured
                 loginState.setErrorCode(ae.getErrorCode());
                 loginState.logFailed(ae.getMessage());
+                auditor.auditLoginFailure(loginState);
                 setErrorMsgAndTemplate();
                 loginStatus.setStatus(LoginStatus.AUTH_FAILED);
                 throw new AuthLoginException(ae);
@@ -1846,6 +1811,7 @@ public class AMLoginContext {
                 // no modules configured
                 loginState.setErrorCode(ae.getErrorCode());
                 loginState.logFailed(ae.getMessage());
+                auditor.auditLoginFailure(loginState);
                 setErrorMsgAndTemplate();
                 loginStatus.setStatus(LoginStatus.AUTH_FAILED);
                 throw new AuthLoginException(ae);
@@ -1868,6 +1834,7 @@ public class AMLoginContext {
             if ((!userValid) && (!ignoreProfile)) {
                 debug.message("User is not active");
                 loginState.logFailed(bundle.getString("userInactive"), "USERINACTIVE");
+                auditor.auditLoginFailure(loginState, USER_INACTIVE);
                 /* The user based authentication errors should not be different
                  * for users who exist and who don't, which can lead to
                  * possibility of enumerating existing users.
@@ -1899,6 +1866,7 @@ public class AMLoginContext {
                 debug.message("Module denied!!");
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_MODULE_DENIED);
                 loginState.logFailed(bundle.getString("moduleDenied"), "MODULEDENIED");
+                auditor.auditLoginFailure(loginState, MODULE_DENIED);
                 setErrorMsgAndTemplate();
                 loginStatus.setStatus(LoginStatus.AUTH_FAILED);
                 throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_MODULE_DENIED, null);
@@ -1942,6 +1910,7 @@ public class AMLoginContext {
         loginState.setErrorCode(errorCode);
         setErrorMsgAndTemplate();
         loginState.logFailed(bundle.getString(resString));
+        auditor.auditLoginFailure(loginState);
         loginStatus.setStatus(LoginStatus.AUTH_FAILED);
     }
 

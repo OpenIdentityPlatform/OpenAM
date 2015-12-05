@@ -24,10 +24,12 @@
  *
  * $Id: UpdateMetadataKeyInfo.java,v 1.5 2009/10/29 00:03:50 exu Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.federation.cli;
+
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
 import com.sun.identity.cli.AuthenticatedCommand;
 import com.sun.identity.cli.CLIException;
@@ -48,7 +50,11 @@ import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 import com.sun.identity.wsfederation.meta.WSFederationMetaSecurityUtils;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import org.apache.xml.security.encryption.XMLCipher;
+
 import java.text.MessageFormat;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 
 /**
@@ -61,15 +67,15 @@ public class UpdateMetadataKeyInfo extends AuthenticatedCommand {
     private String realm;
     private String entityID;
     private boolean sign;
-    private String spSigningAlias;
-    private String idpSigningAlias;
+    private List<String> spSigningAliases;
+    private List<String> idpSigningAliases;
     private String attrqSigningAlias;
     private String attraSigningAlias;
     private String authnaSigningAlias;
     private String pepSigningAlias;
     private String pdpSigningAlias;
-    private String spEncryptionAlias;
-    private String idpEncryptionAlias;
+    private List<String> spEncryptionAliases;
+    private List<String> idpEncryptionAliases;
     private String attrqEncryptionAlias;
     private String attraEncryptionAlias;
     private String authnaEncryptionAlias;
@@ -97,14 +103,10 @@ public class UpdateMetadataKeyInfo extends AuthenticatedCommand {
 
         realm = getStringOptionValue(FedCLIConstants.ARGUMENT_REALM, "/");
         entityID = getStringOptionValue(FedCLIConstants.ARGUMENT_ENTITY_ID);
-        spSigningAlias = 
-            getStringOptionValue(FedCLIConstants.ARGUMENT_SP_S_CERT_ALIAS);
-        idpSigningAlias = 
-            getStringOptionValue(FedCLIConstants.ARGUMENT_IDP_S_CERT_ALIAS);
-        spEncryptionAlias = 
-            getStringOptionValue(FedCLIConstants.ARGUMENT_SP_E_CERT_ALIAS);
-        idpEncryptionAlias = 
-            getStringOptionValue(FedCLIConstants.ARGUMENT_IDP_E_CERT_ALIAS);
+        spSigningAliases = rc.getOption(FedCLIConstants.ARGUMENT_SP_S_CERT_ALIAS);
+        idpSigningAliases = rc.getOption(FedCLIConstants.ARGUMENT_IDP_S_CERT_ALIAS);
+        spEncryptionAliases = rc.getOption(FedCLIConstants.ARGUMENT_SP_E_CERT_ALIAS);
+        idpEncryptionAliases = rc.getOption(FedCLIConstants.ARGUMENT_IDP_E_CERT_ALIAS);
         /* TODO : handle other alias
         attrqSigningAlias = 
             getStringOptionValue(FedCLIConstants.ARGUMENT_ATTRQ_S_CERT_ALIAS);
@@ -129,14 +131,14 @@ public class UpdateMetadataKeyInfo extends AuthenticatedCommand {
         */
 
         validateOptions();
-        normalizeOptions();
 
         String webURL = getCommandManager().getWebEnabledURL();
         isWebBase = (webURL != null) && (webURL.trim().length() > 0);
 
         String spec = FederationManager.getIDFFSubCommandSpecification(rc);
-        String[] params = {realm, entityID, spSigningAlias, idpSigningAlias,
-            spEncryptionAlias, idpEncryptionAlias, spec};
+
+        String[] params = {realm, entityID, Objects.toString(spSigningAliases), Objects.toString(idpSigningAliases),
+                Objects.toString(spEncryptionAliases), Objects.toString(idpEncryptionAliases), spec};
         writeLog(LogWriter.LOG_ACCESS, Level.INFO,
             "ATTEMPT_UPDATE_ENTITY_KEYINFO", params);
 
@@ -160,36 +162,19 @@ public class UpdateMetadataKeyInfo extends AuthenticatedCommand {
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
         } catch (CLIException e) {
-            String[] args = {realm, entityID, spSigningAlias, idpSigningAlias,
-                spEncryptionAlias, idpEncryptionAlias, spec, e.getMessage()};
+            String[] args = {realm, entityID, Objects.toString(spSigningAliases), Objects.toString(idpSigningAliases),
+                    Objects.toString(spEncryptionAliases), Objects.toString(idpEncryptionAliases), spec, e.getMessage()};
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_UPDATE_ENTITY_KEYINFO", args);
             throw e;
         }
     }
 
-    private void validateOptions()
-    throws CLIException {
-        if ((idpSigningAlias == null) && (spSigningAlias == null) && 
-           (idpEncryptionAlias == null) && (spEncryptionAlias == null)) {
-            throw new CLIException(getResourceString(
-                "update-meta-keyinfo-exception-alias-null"),
-                ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        }
-    }
-
-    private void normalizeOptions() {
-        if (idpSigningAlias == null) {
-            idpSigningAlias = "";
-        }
-        if (idpEncryptionAlias == null) {
-            idpEncryptionAlias = "";
-        }
-        if (spSigningAlias == null) {
-            spSigningAlias = "";
-        }
-        if (spEncryptionAlias == null) {
-            spEncryptionAlias = "";
+    private void validateOptions() throws CLIException {
+        if (isEmpty(idpSigningAliases) && isEmpty(spSigningAliases) && isEmpty(idpEncryptionAliases)
+                && isEmpty(spEncryptionAliases)) {
+            throw new CLIException(getResourceString("update-meta-keyinfo-exception-alias-null"),
+                    ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
     }
 
@@ -204,43 +189,43 @@ public class UpdateMetadataKeyInfo extends AuthenticatedCommand {
                     "update-meta-keyinfo-exception-entity-not-exist"),
                     objs2), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
-            if (!spSigningAlias.equals("")) {
-                if (spSigningAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(spSigningAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(spSigningAliases))) {
                     SAML2MetaSecurityUtils.updateProviderKeyInfo(
                         realm, entityID, null, true, false, null, 0);
                 } else {
                     SAML2MetaSecurityUtils.updateProviderKeyInfo(
-                        realm, entityID, spSigningAlias, true, false, null, 0);
+                        realm, entityID, new LinkedHashSet<>(spSigningAliases), true, false, null, 0);
                 }
             } 
-            if (!idpSigningAlias.equals("")) {
-                if (idpSigningAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(idpSigningAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(idpSigningAliases))) {
                     SAML2MetaSecurityUtils.updateProviderKeyInfo(
                         realm, entityID, null, true, true, null, 0);
                 } else {
                     SAML2MetaSecurityUtils.updateProviderKeyInfo(
-                        realm, entityID, idpSigningAlias, true, true, null, 0);
+                        realm, entityID, new LinkedHashSet<>(idpSigningAliases), true, true, null, 0);
                 }
             }
-            if (!spEncryptionAlias.equals("")) {
-                if (spEncryptionAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(spEncryptionAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(spEncryptionAliases))) {
                     SAML2MetaSecurityUtils.updateProviderKeyInfo(realm,
                         entityID, null, false, false, 
                         XMLCipher.AES_128, 128);
                 } else {
                     SAML2MetaSecurityUtils.updateProviderKeyInfo(realm,
-                        entityID, spEncryptionAlias, false, false,
+                        entityID, new LinkedHashSet<>(spEncryptionAliases), false, false,
                         XMLCipher.AES_128, 128);
                 }
             }
-            if (!idpEncryptionAlias.equals("")) {
-                if (idpEncryptionAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(idpEncryptionAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(idpEncryptionAliases))) {
                     SAML2MetaSecurityUtils.updateProviderKeyInfo(realm,
                         entityID, null, false, true,
                         XMLCipher.AES_128, 128);
                 } else {
                     SAML2MetaSecurityUtils.updateProviderKeyInfo(realm,
-                        entityID, idpEncryptionAlias, false, true,
+                        entityID, new LinkedHashSet<>(idpEncryptionAliases), false, true,
                         XMLCipher.AES_128, 128);
                 }
             }
@@ -267,43 +252,43 @@ public class UpdateMetadataKeyInfo extends AuthenticatedCommand {
                     "update-meta-keyinfo-exception-entity-not-exist"),
                     objs2), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
-            if (!spSigningAlias.equals("")) {
-                if (spSigningAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(spSigningAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(spSigningAliases))) {
                     IDFFMetaSecurityUtils.updateProviderKeyInfo(
                         realm, entityID, null, true, false, null, 0);
                 } else {
                     IDFFMetaSecurityUtils.updateProviderKeyInfo(
-                        realm, entityID, spSigningAlias, true, false, null, 0);
+                        realm, entityID, getFirstItem(spSigningAliases), true, false, null, 0);
                 }
             } 
-            if (!idpSigningAlias.equals("")) {
-                if (idpSigningAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(idpSigningAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(idpSigningAliases))) {
                     IDFFMetaSecurityUtils.updateProviderKeyInfo(
                         realm, entityID, null, true, true, null, 0);
                 } else {
                     IDFFMetaSecurityUtils.updateProviderKeyInfo(
-                        realm, entityID, idpSigningAlias, true, true, null, 0);
+                        realm, entityID, getFirstItem(idpSigningAliases), true, true, null, 0);
                 }
             }
-            if (!spEncryptionAlias.equals("")) {
-                if (spEncryptionAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(spEncryptionAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(spEncryptionAliases))) {
                     IDFFMetaSecurityUtils.updateProviderKeyInfo(realm,
                         entityID, null, false, false, 
                         XMLCipher.AES_128, 128);
                 } else {
                     IDFFMetaSecurityUtils.updateProviderKeyInfo(realm,
-                        entityID, spEncryptionAlias, false, false,
+                        entityID, getFirstItem(spEncryptionAliases), false, false,
                         XMLCipher.AES_128, 128);
                 }
             }
-            if (!idpEncryptionAlias.equals("")) {
-                if (idpEncryptionAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(idpEncryptionAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(idpEncryptionAliases))) {
                     IDFFMetaSecurityUtils.updateProviderKeyInfo(realm,
                         entityID, null, false, true,
                         XMLCipher.AES_128, 128);
                 } else {
                     IDFFMetaSecurityUtils.updateProviderKeyInfo(realm,
-                        entityID, idpEncryptionAlias, false, true,
+                        entityID, getFirstItem(idpEncryptionAliases), false, true,
                         XMLCipher.AES_128, 128);
                 }
             }
@@ -331,31 +316,31 @@ public class UpdateMetadataKeyInfo extends AuthenticatedCommand {
                     "update-meta-keyinfo-exception-entity-not-exist"),
                     objs2), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
-            if (!spSigningAlias.equals("")) {
-                if (spSigningAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(spSigningAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(spSigningAliases))) {
                     WSFederationMetaSecurityUtils.updateProviderKeyInfo(
                         realm, entityID, null, false);
                 } else {
                     WSFederationMetaSecurityUtils.updateProviderKeyInfo(
-                        realm, entityID, spSigningAlias, false);
+                        realm, entityID, getFirstItem(spSigningAliases), false);
                 }
             } 
-            if (!idpSigningAlias.equals("")) {
-                if (idpSigningAlias.equals(NULL_ALIAS)) {
+            if (!isEmpty(idpSigningAliases)) {
+                if (NULL_ALIAS.equals(getFirstItem(idpSigningAliases))) {
                     WSFederationMetaSecurityUtils.updateProviderKeyInfo(
                         realm, entityID, null, true);
                 } else {
                     WSFederationMetaSecurityUtils.updateProviderKeyInfo(
-                        realm, entityID, idpSigningAlias, true);
+                        realm, entityID, getFirstItem(idpSigningAliases), true);
                 }
             }
-            if (!spEncryptionAlias.equals("")) {    
+            if (!isEmpty(spEncryptionAliases)) {
                 Object[] objs2 = {entityID, realm};
                 throw new CLIException(MessageFormat.format(getResourceString(
                     "update-meta-keyinfo-exception-invalid-option"),
                     objs2), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
-            if (!idpEncryptionAlias.equals("")) {
+            if (!isEmpty(idpEncryptionAliases)) {
                 Object[] objs2 = {entityID, realm};
                 throw new CLIException(MessageFormat.format(getResourceString(
                     "update-meta-keyinfo-exception-invalid-option"),

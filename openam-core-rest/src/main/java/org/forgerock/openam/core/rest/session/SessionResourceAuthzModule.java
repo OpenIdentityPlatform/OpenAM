@@ -16,31 +16,28 @@
 
 package org.forgerock.openam.core.rest.session;
 
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.shared.debug.Debug;
+import com.iplanet.sso.SSOTokenManager;
 import javax.inject.Inject;
-import javax.inject.Named;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.services.context.Context;
-import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
-import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
 /**
  * Authorization module specifically designed for the Sessions Resource endpoint. This allows anonymous access
- * to the Sessions Endpoint for the ACTIONS of 'logout' and 'validate'. All other endpoint requests are
- * pushed up to the {@link AdminOnlyAuthzModule}.
+ * to the Sessions Endpoint for the ACTIONS of 'logout' and 'validate'. All other endpoint requests are denied.
  */
-public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
+public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
 
     public final static String NAME = "SessionResourceFilter";
 
     @Inject
-    public SessionResourceAuthzModule(Config<SessionService> sessionService, @Named("frRest") Debug debug) {
-        super(sessionService, debug);
+    public SessionResourceAuthzModule(SSOTokenManager ssoTokenManager) {
+        super("tokenId", ssoTokenManager,
+                SessionResource.DELETE_PROPERTY_ACTION_ID, SessionResource.GET_PROPERTY_ACTION_ID,
+                SessionResource.GET_PROPERTY_NAMES_ACTION_ID, SessionResource.SET_PROPERTY_ACTION_ID);
     }
 
     @Override
@@ -49,28 +46,21 @@ public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
     }
 
     /**
-     * Lets through requests known to {@link SessionResource}.... otherwise it defers to
-     * {@link AdminOnlyAuthzModule}.
+     * Lets through requests known to {@link SessionResource}.
      */
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeAction(Context context, ActionRequest request) {
 
         if (actionCanBeInvokedByNonAdmin(request.getAction())) {
-            if (debug.messageEnabled()) {
-                debug.message("SessionResourceAuthzModule :: " + request.getAction() +
-                        " action request authorized by module.");
-            }
             return Promises.newResultPromise(AuthorizationResult.accessPermitted());
         }
 
-        if (debug.messageEnabled()) {
-            debug.message("SessionResourceAuthzModule :: Request forwarded to AdminOnlyAuthzModule.");
-        }
-        return super.authorize(context);
+        return super.authorizeAction(context, request);
     }
 
     private boolean actionCanBeInvokedByNonAdmin(String actionId) {
         return SessionResource.VALIDATE_ACTION_ID.equalsIgnoreCase(actionId) ||
                 SessionResource.LOGOUT_ACTION_ID.equalsIgnoreCase(actionId);
     }
+
 }

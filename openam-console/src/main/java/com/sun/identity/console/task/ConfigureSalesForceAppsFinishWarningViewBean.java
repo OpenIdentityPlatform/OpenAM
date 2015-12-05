@@ -30,7 +30,6 @@
 package com.sun.identity.console.task;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.view.event.ChildContentDisplayEvent;
@@ -42,6 +41,8 @@ import com.sun.identity.console.task.model.TaskModel;
 import com.sun.identity.console.task.model.TaskModelImpl;
 import com.sun.web.ui.view.alert.CCAlert;
 import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.http.util.Uris;
 
 /**
  * Create Warning for salesforce UI.
@@ -80,11 +81,7 @@ public class ConfigureSalesForceAppsFinishWarningViewBean
         String redirectUrl;
         if (XuiRedirectHelper.isXuiAdminConsoleEnabled()) {
             String realm = RequestManager.getRequestContext().getRequest().getParameter("realm");
-            try {
-                redirectUrl = "../XUI#realms/" + URLEncoder.encode(realm, "UTF-8") + "/dashboard";
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException("UTF-8 not supported", e);
-            }
+            redirectUrl = "../XUI#realms/" + Uris.urlEncodePathElement(realm) + "/dashboard";
         } else {
             redirectUrl = "../task/Home";
         }

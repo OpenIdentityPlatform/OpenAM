@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,12 @@
  *
  * $Id: FMEncProvider.java,v 1.5 2008/06/25 05:48:03 qcheng Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.xmlenc;
 
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -45,7 +45,9 @@ import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 
+import java.security.PrivateKey;
 import java.util.Hashtable;
+import java.util.Set;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -372,22 +374,8 @@ public final class FMEncProvider implements EncProvider {
 	return resultDoc.getDocumentElement();
     }
 
-    /**
-     * Returns the secret key that encrypts encrypted data and is encrypted
-     * with recipient's public key in the XML document.
-     * @param xmlString String representing an XML document with encrypted
-     *     secret key.
-     * @param recipientPrivateKey Private key used to decrypt the secret key
-     * @return the secret key.
-     * @exception SAML2Exception if there is an error during the decryption
-     *     process
-     */
-    public SecretKey getSecretKey(
-        String xmlString,
-        Key recipientPrivateKey)
-
-	throws SAML2Exception {
-
+    @Override
+    public SecretKey getSecretKey(String xmlString, Set<PrivateKey> privateKeys) throws SAML2Exception {
 	String classMethod = "FMEncProvider.getSecretKey: ";
         if (SAML2SDKUtils.debug.messageEnabled()) {
             SAML2SDKUtils.debug.message(classMethod + "Entering ...");
@@ -395,7 +383,7 @@ public final class FMEncProvider implements EncProvider {
 
         if (xmlString == null ||
 	    xmlString.length() == 0 ||
-	    recipientPrivateKey == null) {
+	    privateKeys == null) {
 	    throw new SAML2Exception(
 		SAML2SDKUtils.bundle.getString("nullInput"));
         }
@@ -479,73 +467,31 @@ public final class FMEncProvider implements EncProvider {
 		SAML2SDKUtils.bundle.getString(
 		    "failedLoadingEncryptedKey"));
 	}
-        Document decryptedDoc = null;
-	if ((encryptedKey != null) && (encryptedData != null)) {
-	    XMLCipher keyCipher = null;
-	    try {
-		keyCipher = XMLCipher.getInstance();
-	    } catch (XMLEncryptionException xe5) {
-		SAML2SDKUtils.debug.error(
-		    classMethod +
-		    "Failed to get a cipher instance "+
-		    "for decrypting secret key.",
-		    xe5);
-		throw new SAML2Exception(
-		    SAML2SDKUtils.bundle.getString("noCipher"));
-	    }
-	    try {
-		keyCipher.init(XMLCipher.UNWRAP_MODE, recipientPrivateKey);
-	    } catch (XMLEncryptionException xe6) {
-		SAML2SDKUtils.debug.error(
-		    classMethod +
-		    "Failed to initialize cipher in unwrap mode "+
-		    "with private key",
-		    xe6);
-		throw new SAML2Exception(
-		    SAML2SDKUtils.bundle.getString(
-			"noCipherForUnwrap"));
-	    }
+        if ((encryptedKey != null) && (encryptedData != null)) {
+            XMLCipher keyCipher;
+            try {
+                keyCipher = XMLCipher.getInstance();
+            } catch (XMLEncryptionException xe5) {
+                SAML2SDKUtils.debug.error(classMethod + "Failed to get a cipher instance for decrypting secret key.",
+                        xe5);
+                throw new SAML2Exception(SAML2SDKUtils.bundle.getString("noCipher"));
+            }
 
-	    try {
-		return (SecretKey)keyCipher.decryptKey(encryptedKey,
+            return (SecretKey) getEncryptionKey(keyCipher, privateKeys, encryptedKey,
                     encryptedData.getEncryptionMethod().getAlgorithm());
-	    } catch (XMLEncryptionException xe7) {
-		SAML2SDKUtils.debug.error(
-		    classMethod +
-		    "Failed to decrypt the secret key", xe7);
-		throw new SAML2Exception(
-		    SAML2SDKUtils.bundle.getString(
-			"failedDecryptingSecretKey"));
-	    }
         }
+
         return null;
     }
 
-    /**
-     * Decrypts an XML document that contains encrypted data.
-     * @param xmlString String representing an XML document with encrypted
-     *                  data.
-     * @param recipientPrivateKey Private key used to decrypt the secret key
-     * @return org.w3c.dom.Element Decrypted XML document. For example, if
-     *                             the input document's root element is
-     *                             EncryptedID, then the return element will
-     *                             be NameID
-     * @exception SAML2Exception if there is an error during the decryption
-     *                           process
-     */
-    public Element decrypt(
-        String xmlString,
-        Key recipientPrivateKey)
-	
-	throws SAML2Exception {
+    @Override
+    public Element decrypt(String xmlString, Set<PrivateKey> privateKeys) throws SAML2Exception {
 
 	String classMethod = "FMEncProvider.decrypt: ";
         if (SAML2SDKUtils.debug.messageEnabled()) {
             SAML2SDKUtils.debug.message(classMethod + "Entering ...");
         }
-        if (xmlString == null ||
-	    xmlString.length() == 0 ||
-	    recipientPrivateKey == null) {
+        if (StringUtils.isEmpty(xmlString) || CollectionUtils.isEmpty(privateKeys)) {
 	    throw new SAML2Exception(
 		SAML2SDKUtils.bundle.getString("nullInput"));
         }
@@ -642,32 +588,10 @@ public final class FMEncProvider implements EncProvider {
 		throw new SAML2Exception(
 		    SAML2SDKUtils.bundle.getString("noCipher"));
 	    }
-	    try {
-		keyCipher.init(XMLCipher.UNWRAP_MODE, recipientPrivateKey);
-	    } catch (XMLEncryptionException xe6) {
-		SAML2SDKUtils.debug.error(
-		    classMethod +
-		    "Failed to initialize cipher in unwrap mode "+
-		    "with private key",
-		    xe6);
-		throw new SAML2Exception(
-		    SAML2SDKUtils.bundle.getString(
-			"noCipherForUnwrap"));
-	    }
-	    Key encryptionKey = null;
-	    try {
-		// TODO: not sure about the algorithm here
-		encryptionKey = keyCipher.decryptKey(
-		    encryptedKey, 
-		    encryptedData.getEncryptionMethod().getAlgorithm());
-	    } catch (XMLEncryptionException xe7) {
-		SAML2SDKUtils.debug.error(
-		    classMethod +
-		    "Failed to decrypt the secret key", xe7);
-		throw new SAML2Exception(
-		    SAML2SDKUtils.bundle.getString(
-			"failedDecryptingSecretKey"));
-	    } 
+
+	    Key encryptionKey = getEncryptionKey(keyCipher, privateKeys, encryptedKey,
+                encryptedData.getEncryptionMethod().getAlgorithm());
+
 	    cipher = null;
 	    try {
 		cipher = XMLCipher.getInstance();
@@ -755,5 +679,32 @@ public final class FMEncProvider implements EncProvider {
         }
         
         return (keygen != null) ? keygen.generateKey() : null;
+    }
+
+    private Key getEncryptionKey(XMLCipher cipher, Set<PrivateKey> privateKeys, EncryptedKey encryptedKey,
+            String algorithm) throws SAML2Exception {
+        final String classMethod = "FMEncProvider.getEncryptionKey";
+        String firstErrorCode = null;
+        for (Key privateKey : privateKeys) {
+            try {
+                cipher.init(XMLCipher.UNWRAP_MODE, privateKey);
+            } catch (XMLEncryptionException xee) {
+                SAML2SDKUtils.debug.warning(classMethod + "Failed to initialize cipher in unwrap mode with private key",
+                        xee);
+                if (firstErrorCode == null) {
+                    firstErrorCode = "noCipherForUnwrap";
+                }
+                continue;
+            }
+            try {
+                return cipher.decryptKey(encryptedKey, algorithm);
+            } catch (XMLEncryptionException xee) {
+                SAML2SDKUtils.debug.error(classMethod + "Failed to decrypt the secret key", xee);
+                if (firstErrorCode == null) {
+                    firstErrorCode = "failedDecryptingSecretKey";
+                }
+            }
+        }
+        throw new SAML2Exception(SAML2SDKUtils.bundle.getString(firstErrorCode));
     }
 }

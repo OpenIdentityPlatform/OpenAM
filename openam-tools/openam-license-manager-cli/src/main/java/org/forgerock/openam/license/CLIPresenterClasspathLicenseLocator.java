@@ -11,25 +11,36 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
+
 package org.forgerock.openam.license;
 
 import java.nio.charset.Charset;
 
+/**
+ * Loads required licenses from the classpath with well-known names for presentation on a CLI.
+ *
+ * @see ClassLoader#getSystemResourceAsStream(String)
+ * @since 12.0.0
+ */
 public class CLIPresenterClasspathLicenseLocator extends ClasspathLicenseLocator {
 
     final static String[] LICENSES = { "license.txt" };
 
     /**
-     * No args constructor to be called via Guice
+     * No args constructor to be called via Guice.
      */
     public CLIPresenterClasspathLicenseLocator() {
         this(Thread.currentThread().getContextClassLoader(), Charset.forName("UTF-8"));
     }
 
     /**
-     * {@inheritDoc}
+     * Constructs a CLI presenter classpath license locator with the given classloader, charset
+     * and list of license files to load.
+     *
+     * @param classLoader the classloader to use for locating licenses on the classpath.
+     * @param charset the charset to use for decoding license files.
      */
     public CLIPresenterClasspathLicenseLocator(ClassLoader classLoader, Charset charset) {
         super(classLoader, charset, LICENSES);

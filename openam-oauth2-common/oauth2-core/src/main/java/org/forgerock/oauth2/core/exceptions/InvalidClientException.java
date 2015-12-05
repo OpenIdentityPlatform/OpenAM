@@ -26,7 +26,7 @@ public class InvalidClientException extends OAuth2Exception {
     /**
      * Constructs a new InvalidClientException, with the default message.
      */
-    public InvalidClientException() {
+    InvalidClientException() {
         this("The client identifier provided is invalid, the client failed to authenticate, the client did not include "
                 + "its credentials, provided multiple client credentials, or used unsupported credentials type.");
     }
@@ -36,7 +36,11 @@ public class InvalidClientException extends OAuth2Exception {
      *
      * @param message The reason for the exception.
      */
-    public InvalidClientException(final String message) {
-        super(400, "invalid_client", message);
+    InvalidClientException(final String message) {
+        this(400, "invalid_client", message);
+    }
+
+    protected InvalidClientException(final int statusCode, final String title, final String message) {
+        super(statusCode, title, message);
     }
 }
