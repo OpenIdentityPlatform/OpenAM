@@ -57,9 +57,10 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         tokenStore = mock(TokenStore.class);
         tokenInvalidator = mock(TokenInvalidator.class);
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
+        GrantTypeAccessTokenGenerator accessTokenGenerator = new GrantTypeAccessTokenGenerator(tokenStore);
 
         grantTypeHandler = new AuthorizationCodeGrantTypeHandler(requestValidators, clientAuthenticator, tokenStore,
-                tokenInvalidator, providerSettingsFactory);
+                tokenInvalidator, providerSettingsFactory, accessTokenGenerator);
 
         providerSettings = mock(OAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);

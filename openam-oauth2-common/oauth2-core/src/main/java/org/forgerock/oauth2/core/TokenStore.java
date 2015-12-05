@@ -191,6 +191,7 @@ public interface TokenStore {
     /**
      * Creates a new device code token.
      * @param scope The scope of the requested access token.
+     * @param resourceOwner The resource owner ID.
      * @param clientId The client ID.
      * @param nonce The nonce for the ID token.
      * @param responseType The response type string.
@@ -208,7 +209,7 @@ public interface TokenStore {
      * @throws ServerException If there was an error in constructing the code.
      * @throws NotFoundException If the realm does not have an OAuth2Provider configured.
      */
-    DeviceCode createDeviceCode(Set<String> scope, String clientId, String nonce, String responseType,
+    DeviceCode createDeviceCode(Set<String> scope, ResourceOwner resourceOwner, String clientId, String nonce, String responseType,
             String state, String acrValues, String prompt, String uiLocales, String loginHint,
             Integer maxAge, String claims, OAuth2Request request, String codeChallenge, String codeChallengeMethod)
             throws ServerException, NotFoundException;

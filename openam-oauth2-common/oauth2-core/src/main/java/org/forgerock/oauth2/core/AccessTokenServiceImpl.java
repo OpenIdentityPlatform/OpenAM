@@ -26,6 +26,8 @@ import java.util.TreeSet;
 
 import javax.inject.Inject;
 
+import org.forgerock.oauth2.core.exceptions.AuthorizationDeclinedException;
+import org.forgerock.oauth2.core.exceptions.AuthorizationPendingException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -78,7 +80,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
      */
     public AccessToken requestAccessToken(OAuth2Request request) throws RedirectUriMismatchException,
             InvalidClientException, InvalidRequestException, InvalidCodeException,
-            InvalidGrantException, ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException {
+            InvalidGrantException, ServerException, UnauthorizedClientException, InvalidScopeException,
+            NotFoundException, AuthorizationPendingException, ExpiredTokenException, AuthorizationDeclinedException, BadRequestException {
         final String grantType = request.getParameter(GRANT_TYPE);
         final GrantTypeHandler grantTypeHandler = grantTypeHandlers.get(grantType);
         if (grantTypeHandler == null) {

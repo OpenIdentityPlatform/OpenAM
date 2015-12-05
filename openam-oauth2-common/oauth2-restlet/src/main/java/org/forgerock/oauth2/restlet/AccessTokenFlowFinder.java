@@ -19,6 +19,7 @@ package org.forgerock.oauth2.restlet;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.oauth2.core.DeviceCodeGrantTypeHandler;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.restlet.Request;
 import org.restlet.resource.Finder;
@@ -43,6 +44,7 @@ public class AccessTokenFlowFinder extends OAuth2FlowFinder {
         endpointClasses.put(REFRESH_TOKEN, wrap(RefreshTokenResource.class));
         endpointClasses.put(CLIENT_CREDENTIALS, wrap(TokenEndpointResource.class));
         endpointClasses.put(PASSWORD, wrap(TokenEndpointResource.class));
+        endpointClasses.put(DEVICE_CODE, wrap(TokenEndpointResource.class));
         endpointClasses.put(JWT_BEARER, wrap(TokenEndpointResource.class));
         endpointClasses.put(SAML2_BEARER, wrap(TokenEndpointResource.class));
         return endpointClasses;

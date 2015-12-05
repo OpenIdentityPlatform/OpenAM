@@ -52,6 +52,7 @@ import org.forgerock.oauth2.core.ClientCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.ClientCredentialsRequestValidator;
 import org.forgerock.oauth2.core.ClientCredentialsRequestValidatorImpl;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.DeviceCodeGrantTypeHandler;
 import org.forgerock.oauth2.core.GrantTypeHandler;
 import org.forgerock.oauth2.core.JwtBearerGrantTypeHandler;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -214,6 +215,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         grantTypeHandlers.addBinding(CLIENT_CREDENTIALS).to(ClientCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding(PASSWORD).to(PasswordCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding(AUTHORIZATION_CODE).to(AuthorizationCodeGrantTypeHandler.class);
+        grantTypeHandlers.addBinding(DEVICE_CODE).to(DeviceCodeGrantTypeHandler.class);
         grantTypeHandlers.addBinding(JWT_BEARER).to(JwtBearerGrantTypeHandler.class);
         grantTypeHandlers.addBinding(OAuth2Constants.TokenEndpoint.SAML2_BEARER).to(Saml2GrantTypeHandler.class);
 

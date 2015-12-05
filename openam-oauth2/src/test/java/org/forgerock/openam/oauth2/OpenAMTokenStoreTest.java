@@ -40,6 +40,7 @@ import org.forgerock.oauth2.core.DeviceCode;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -213,10 +214,12 @@ public class OpenAMTokenStoreTest {
         final RestletOAuth2Request oauth2Request = new RestletOAuth2Request(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "MY_REALM")));
         given(realmNormaliser.normalise("MY_REALM")).willReturn("MY_REALM");
+        ResourceOwner resourceOwner = mock(ResourceOwner.class);
+        given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");
 
         // When
-        DeviceCode code = openAMtokenStore.createDeviceCode(asSet("one", "two"), "CLIENT ID", "NONCE", "RESPONSE TYPE",
-                "STATE", "ACR VALUES", "PROMPT", "UI LOCALES", "LOGIN HINT", 55, "CLAIMS",
+        DeviceCode code = openAMtokenStore.createDeviceCode(asSet("one", "two"), resourceOwner, "CLIENT ID", "NONCE",
+                "RESPONSE TYPE", "STATE", "ACR VALUES", "PROMPT", "UI LOCALES", "LOGIN HINT", 55, "CLAIMS",
                 oauth2Request, "CODE CHALLENGE", "CODE METHOD");
 
         // Then

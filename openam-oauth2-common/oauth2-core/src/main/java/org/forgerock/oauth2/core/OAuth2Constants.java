@@ -324,6 +324,8 @@ public class OAuth2Constants {
         public static final String SAML2_BEARER = "urn:ietf:params:oauth:grant-type:saml2-bearer";
 
         public static final String JWT_BEARER = "urn:ietf:params:oauth:grant-type:jwt-bearer";
+
+        public static final String DEVICE_CODE = "http://oauth.net/grant_type/device/1.0";
     }
 
     /**

@@ -99,6 +99,7 @@ public class DeviceCodeResource extends ServerResource {
             final String maxAge = request.getParameter(MAX_AGE);
             DeviceCode code = tokenStore.createDeviceCode(
                     OAuth2Utils.split(scope, " "),
+                    null,
                     clientId,
                     request.<String>getParameter(NONCE),
                     request.<String>getParameter(RESPONSE_TYPE),

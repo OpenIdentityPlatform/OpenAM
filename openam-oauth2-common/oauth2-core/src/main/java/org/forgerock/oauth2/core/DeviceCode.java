@@ -51,14 +51,15 @@ public class DeviceCode extends JsonValue implements Token {
         }
     }
 
-    public DeviceCode(String deviceCode, String userCode, String clientId, String nonce, String responseType,
-            String state, String acrValues, String prompt, String uiLocales, String loginHint,
+    public DeviceCode(String deviceCode, String userCode, String resourceOwnerId, String clientId, String nonce,
+            String responseType, String state, String acrValues, String prompt, String uiLocales, String loginHint,
             Integer maxAge, String claims, long expiryTime, Set<String> scope, String realm, String codeChallenge,
             String codeChallengeMethod) {
         super(object());
         setStringProperty(TOKEN_NAME, OAuth2Constants.DeviceCode.DEVICE_CODE);
         setStringProperty(OAuth2Constants.CoreTokenParams.ID, deviceCode);
         setStringProperty(OAuth2Constants.DeviceCode.USER_CODE, userCode);
+        setStringProperty(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
         setStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
         setStringProperty(OAuth2Constants.JWTTokenParams.NONCE, nonce);
         setStringProperty(OAuth2Constants.Params.RESPONSE_TYPE, responseType);
@@ -90,6 +91,22 @@ public class DeviceCode extends JsonValue implements Token {
      */
     public String getUserCode() {
         return getStringProperty(OAuth2Constants.DeviceCode.USER_CODE);
+    }
+
+    /**
+     * Gets the Resource Owner ID parameter.
+     * @return The Resource Owner ID.
+     */
+    public String getResourceOwnerId() {
+        return getStringProperty(OAuth2Constants.CoreTokenParams.USERNAME);
+    }
+
+    /**
+     * Sets the Resource Owner ID parameter.
+     * @param resourceOwnerId The Resource Owner ID.
+     */
+    public void setResourceOwnerId(String resourceOwnerId) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
     }
 
     /**
@@ -190,22 +207,6 @@ public class DeviceCode extends JsonValue implements Token {
     }
 
     /**
-     * Sets the tokens that have been issued for this Device Code.
-     */
-    public void setTokens(Map<String, String> tokens) {
-        this.put("tokens", tokens);
-        this.put(ISSUED, stringToSet("true"));
-    }
-
-    /**
-     * Gets the tokens that have been issued for the device.
-     * @return The tokens.
-     */
-    public Map<String, String> getTokens() {
-        return (Map<String, String>) this.get("tokens").getObject();
-    }
-
-    /**
      * Updates the last poll time of this device code.
      */
     public void poll() {
@@ -296,7 +297,7 @@ public class DeviceCode extends JsonValue implements Token {
         return null;
     }
 
-    private String getStringProperty(String key) {
+    protected String getStringProperty(String key) {
         final Set<String> value = getParameter(key);
         if (CollectionUtils.isNotEmpty(value)) {
             return value.iterator().next();
@@ -310,4 +311,11 @@ public class DeviceCode extends JsonValue implements Token {
         }
     }
 
+    public void setAuthorized(boolean authorized) {
+        setStringProperty("AUTHORIZED", Boolean.toString(authorized));
+    }
+
+    public boolean isAuthorized() {
+        return Boolean.valueOf(getStringProperty("AUTHORIZED"));
+    }
 }
