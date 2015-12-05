@@ -152,11 +152,11 @@ public class QueryResponsePresentationTest {
         QueryRequest sortedRequest = makeSortedQueryRequest("^name");
 
         List<ResourceResponse> responseList = new ArrayList<>();
-        responseList.add(Responses.newResourceResponse(null, null, JsonValueBuilder.jsonValue()
+        responseList.add(Responses.newResourceResponse("a", null, JsonValueBuilder.jsonValue()
                 .put("name", Collections.singletonMap("key2", "value2"))
                 .put("place", "a").build()
         ));
-        responseList.add(Responses.newResourceResponse(null, null, JsonValueBuilder.jsonValue()
+        responseList.add(Responses.newResourceResponse("z", null, JsonValueBuilder.jsonValue()
                 .put("name", Collections.singletonMap("key1", "value1"))
                 .put("place", "z").build()
         ));
