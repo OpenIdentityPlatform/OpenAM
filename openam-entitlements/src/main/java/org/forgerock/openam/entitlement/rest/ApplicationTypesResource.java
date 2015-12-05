@@ -31,7 +31,6 @@ import java.util.Set;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.services.context.Context;
-import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -63,9 +62,6 @@ import org.forgerock.util.promise.Promise;
  * endpoint only supports the READ and QUERY operations.
  */
 public class ApplicationTypesResource extends SubjectAwareResource {
-
-    static final JsonPointer JSON_POINTER_TO_NAME = new JsonPointer(ApplicationType.FIELD_NAME);
-
 
     private final ApplicationTypeManagerWrapper typeManager;
     private final Debug debug;

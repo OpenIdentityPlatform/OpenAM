@@ -28,7 +28,6 @@ import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.LogicalCondition;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.services.context.Context;
-import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -72,8 +71,6 @@ public class ConditionTypesResource implements CollectionResourceProvider {
     private final static String JSON_OBJ_TITLE = "title";
     private final static String JSON_OBJ_CONFIG = "config";
     private final static String JSON_OBJ_LOGICAL = "logical";
-
-    private final JsonPointer JSON_POINTER_TO_TITLE = new JsonPointer(JSON_OBJ_TITLE);
 
     private final static ObjectMapper mapper = new ObjectMapper().registerModule(new JsonEntitlementConditionModule() {
         @Override

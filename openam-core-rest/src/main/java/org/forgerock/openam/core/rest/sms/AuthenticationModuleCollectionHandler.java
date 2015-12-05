@@ -22,7 +22,10 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.AccessController;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
