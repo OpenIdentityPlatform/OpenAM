@@ -26,7 +26,6 @@ import org.forgerock.audit.events.handlers.AuditEventHandler;
 import org.forgerock.audit.handlers.csv.CsvAuditEventHandler;
 import org.forgerock.audit.handlers.csv.CsvAuditEventHandlerConfiguration;
 import org.forgerock.audit.providers.DefaultKeyStoreHandlerProvider;
-import org.forgerock.audit.providers.DefaultSecureStorageProvider;
 import org.forgerock.openam.audit.AuditEventHandlerFactory;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
 import org.forgerock.openam.utils.StringUtils;
