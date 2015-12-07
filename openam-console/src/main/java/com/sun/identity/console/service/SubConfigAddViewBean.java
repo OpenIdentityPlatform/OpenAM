@@ -38,6 +38,7 @@ import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.AMPostViewBean;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMServiceProfile;
+import com.sun.identity.console.base.DynamicRequestViewBean;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
@@ -48,13 +49,16 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCDropDownMenu;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
+
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 public class SubConfigAddViewBean
-    extends AMPrimaryMastHeadViewBean
+    extends DynamicRequestViewBean
 {
     public static final String DEFAULT_DISPLAY_URL =
         "/console/service/SubConfigAdd.jsp";
@@ -240,4 +244,27 @@ public class SubConfigAddViewBean
         return false;
     }
 
+    @Override
+    protected void handleDynamicLinkRequest(String url) {
+        submitCycle = true;
+        try {
+            getRequestContext().getResponse().sendRedirect(url);
+        } catch (IOException e) {
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+            forwardTo();
+        }
+    }
+
+    @Override
+    protected Map<String, Set<String>> getAttributeValueMap() {
+        try {
+            SubConfigModel model = (SubConfigModel)getModel();
+            AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
+            String schemaName = (String)getPageSessionAttribute(AMServiceProfile.PG_SESSION_SUB_SCHEMA_NAME);
+            return ps.getAttributeValues(model.getAttributeNames(schemaName));
+        } catch (AMConsoleException | ModelControlException e) {
+            debug.error("Could not retrieve attribute values", e);
+        }
+        return Collections.emptyMap();
+    }
 }

@@ -1,8 +1,8 @@
 <%--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
+
    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
-  
+
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
    (the License). You may not use this file except in
@@ -40,6 +40,8 @@
     locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>
 
 <cc:header name="hdrCommon" pageTitle="webconsole.title" bundleID="amConsole" copyrightYear="2004" fireDisplayEvents="true">
+
+<script language="javascript" src="../console/js/am.js"></script>
 
 <cc:form name="SubConfigAdd" method="post" defaultCommandChild="/button1">
 <script language="javascript">
