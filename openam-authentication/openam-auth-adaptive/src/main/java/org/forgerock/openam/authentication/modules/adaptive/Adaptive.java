@@ -67,7 +67,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.security.Principal;
 import java.text.DateFormat;
@@ -1248,7 +1247,11 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         s = CollectionHelper.getMapAttr(m, i);
         if (s != null) {
-            retVal = Integer.parseInt(s);
+            try {
+                retVal = Integer.parseInt(s);
+            } catch (NumberFormatException e) {
+                debug.message("{}.getOptionAsInteger() : The value of '{}' is not parsable integer: '{}'", ADAPTIVE, i, s);
+            }
         }
         return retVal;
     }
