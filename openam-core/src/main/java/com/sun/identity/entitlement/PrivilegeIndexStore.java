@@ -32,11 +32,12 @@ package com.sun.identity.entitlement;
 import com.sun.identity.entitlement.util.SearchFilter;
 import org.forgerock.openam.entitlement.PolicyConstants;
 
+import javax.security.auth.Subject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 /**
  * Privilege Index Store is responsible to storing privilege in
@@ -258,4 +259,28 @@ public abstract class PrivilegeIndexStore {
     public abstract boolean hasPrivilgesWithApplication(
         String realm,
         String applName) throws EntitlementException;
+
+    /**
+     * Finds all policies within the passed realm.
+     *
+     * @return list of matching policies
+     *
+     * @throws EntitlementException
+     *         should some error occur
+     */
+    public abstract List<Privilege> findAllPolicies() throws EntitlementException;
+
+    /**
+     * Finds all policies within the passed realm and application.
+     *
+     * @param application
+     *         the application
+     *
+     * @return list of matching policies
+     *
+     * @throws EntitlementException
+     *         should some error occur
+     */
+    public abstract List<Privilege> findAllPoliciesByApplication(String application) throws EntitlementException;
+
 }

@@ -32,7 +32,6 @@ package com.sun.identity.entitlement.opensso;
 import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
-import com.sun.identity.entitlement.ReferredApplicationManager;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.utils.IOUtils;
 
@@ -102,7 +101,6 @@ public class NotificationServlet extends HttpServlet {
 
     private void handleReferralPrivilegeAdded(HttpServletRequest req) {
         String realm = req.getParameter(ATTR_REALM_NAME);
-        ReferredApplicationManager.getInstance().clearCache();
         // Get an instance as required otherwise it can cause issues on container restart.
         DataStore.getInstance().clearIndexCount(realm, true);
     }
@@ -130,7 +128,6 @@ public class NotificationServlet extends HttpServlet {
     private void handleReferralPrivilegeDeleted(HttpServletRequest req) {
         String referralName = req.getParameter(ATTR_NAME);
         String realm = req.getParameter(ATTR_REALM_NAME);
-        ReferredApplicationManager.getInstance().clearCache();
 
         PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
                 PolicyConstants.SUPER_ADMIN_SUBJECT, realm);

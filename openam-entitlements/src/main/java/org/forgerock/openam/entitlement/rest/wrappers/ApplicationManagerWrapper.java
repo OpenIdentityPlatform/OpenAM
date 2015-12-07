@@ -20,8 +20,8 @@ import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.util.SearchFilter;
 
-import java.util.Set;
 import javax.security.auth.Subject;
+import java.util.Set;
 
 /**
  * Simple wrapper for the ApplicationManager class.
@@ -114,6 +114,16 @@ public class ApplicationManagerWrapper {
     public Set<String> search(Subject subject, String realm, Set<SearchFilter> searchFilters)
             throws EntitlementException {
         return ApplicationManager.search(subject, realm, searchFilters);
+    }
+
+    /**
+     * Clears the cached applications.
+     *
+     * @param realm
+     *         realm to clear
+     */
+    public void clearCache(String realm) {
+        ApplicationManager.clearCache(realm);
     }
 
 }

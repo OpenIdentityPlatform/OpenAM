@@ -273,7 +273,7 @@ public abstract class EntitlementConfiguration {
     protected Subject getAdminSubject() {
         return adminSubject;
     }
-    
+
     /**
      * Returns <code>true</code> if the system stores privileges in
      * XACML format and supports exporting privileges in XACML format

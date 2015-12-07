@@ -29,6 +29,8 @@ import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.openam.entitlement.rest.PolicyStore;
 import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
+import org.forgerock.openam.entitlement.service.DefaultPrivilegeManagerFactory;
+import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.RDN;
@@ -77,7 +79,8 @@ public class UmaAuditFilter implements SMSAuditFilter {
     }
 
     private PrivilegePolicyStoreProvider getPrivilegePolicyStoreProvider() {
-        return new PrivilegePolicyStoreProvider(
+        PrivilegeManagerFactory factory = new DefaultPrivilegeManagerFactory();
+        return new PrivilegePolicyStoreProvider(factory,
                 Collections.<String, QueryAttribute>emptyMap());
     }
 

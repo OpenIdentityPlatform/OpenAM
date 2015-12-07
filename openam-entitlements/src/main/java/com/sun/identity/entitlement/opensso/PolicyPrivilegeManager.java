@@ -58,6 +58,7 @@ import java.security.Principal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
@@ -180,6 +181,28 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
             throw new EntitlementException(102, ssoe);
         }
         return privilege;
+    }
+
+    @Override
+    public List<Privilege> findAllPolicies() throws EntitlementException {
+        PrivilegeIndexStore indexStore = PrivilegeIndexStore.getInstance(getAdminSubject(), getRealm());
+
+        if (indexStore == null) {
+            throw new NullPointerException("Policy index store not initialised");
+        }
+
+        return indexStore.findAllPolicies();
+    }
+
+    @Override
+    public List<Privilege> findAllPoliciesByApplication(String application) throws EntitlementException {
+        PrivilegeIndexStore indexStore = PrivilegeIndexStore.getInstance(getAdminSubject(), getRealm());
+
+        if (indexStore == null) {
+            throw new NullPointerException("Policy index store not initialised");
+        }
+
+        return indexStore.findAllPoliciesByApplication(application);
     }
 
     /**

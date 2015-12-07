@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.entitlement.rest;
 
-import com.sun.identity.entitlement.PrivilegeManager;
+import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.services.context.Context;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
 import org.forgerock.openam.rest.RealmContext;
@@ -45,21 +45,12 @@ public final class PrivilegePolicyStoreProvider implements PolicyStoreProvider {
      * @param factory a non-null privilege manager factory.
      * @param queryAttributes the set of query attributes to allow in queries.
      */
+    @Inject
     public PrivilegePolicyStoreProvider(PrivilegeManagerFactory factory,
-                                        Map<String, QueryAttribute> queryAttributes) {
+            @Named(POLICY_QUERY_ATTRIBUTES) Map<String, QueryAttribute> queryAttributes) {
         Reject.ifNull(factory, queryAttributes);
         this.factory = factory;
         this.queryAttributes = queryAttributes;
-    }
-
-    /**
-     * Constructs a policy store provider that looks up privilege managers using the standard
-     * {@link PrivilegeManager#getInstance(String, javax.security.auth.Subject)} method. Uses the given query
-     * attribute definitions.
-     */
-    @Inject
-    public PrivilegePolicyStoreProvider(@Named(POLICY_QUERY_ATTRIBUTES) Map<String, QueryAttribute> queryAttributes) {
-        this(new DefaultPrivilegeManagerFactory(), queryAttributes);
     }
 
     @Override
@@ -75,27 +66,7 @@ public final class PrivilegePolicyStoreProvider implements PolicyStoreProvider {
             realm = "/";
         }
 
-        return new PrivilegePolicyStore(factory.getPrivilegeManager(realm, adminSubject), queryAttributes);
+        return new PrivilegePolicyStore(factory.get(realm, adminSubject), queryAttributes);
     }
 
-    /**
-     * Abstract factory for getting hold of actual privilege manager instances.
-     */
-    public interface PrivilegeManagerFactory {
-        /**
-         * Gets a privilege manager for the given realm and admin subject.
-         *
-         * @param realm the realm to manage privileges for.
-         * @param adminSubject the subject to use to perform management actions.
-         * @return an appropriate privilege manager.
-         */
-        PrivilegeManager getPrivilegeManager(String realm, Subject adminSubject);
-    }
-
-    private static class DefaultPrivilegeManagerFactory implements PrivilegeManagerFactory {
-        @Override
-        public PrivilegeManager getPrivilegeManager(String realm, Subject adminSubject) {
-            return PrivilegeManager.getInstance(realm, adminSubject);
-        }
-    }
 }

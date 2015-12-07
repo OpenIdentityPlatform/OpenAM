@@ -32,7 +32,6 @@ import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
-import org.apache.bcel.generic.I2F;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -325,6 +324,29 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     public Set<String> searchNames(Set<SearchFilter> filter) throws EntitlementException {
         return searchNames(filter, 0, 0);
     }
+
+    /**
+     * Finds all policies within the realm.
+     *
+     * @return list of matching policies
+     *
+     * @throws EntitlementException
+     *         should some error occur
+     */
+    public abstract List<Privilege> findAllPolicies() throws EntitlementException;
+
+    /**
+     * Finds all policies within the realm and passed application.
+     *
+     * @param application
+     *         the application
+     *
+     * @return list of matching policies
+     *
+     * @throws EntitlementException
+     *         should some error occur
+     */
+    public abstract List<Privilege> findAllPoliciesByApplication(String application) throws EntitlementException;
 
     /**
      * Returns realm name.

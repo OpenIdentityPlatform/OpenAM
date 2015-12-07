@@ -42,7 +42,6 @@ import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
 import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.ReferredApplicationManager;
 import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.SequentialThreadPool;
@@ -71,6 +70,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -809,6 +809,16 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         }
     }
 
+    @Override
+    public List<Privilege> findAllPolicies() throws EntitlementException {
+        return dataStore.findPoliciesByRealm(getRealm());
+    }
+
+    @Override
+    public List<Privilege> findAllPoliciesByApplication(String application) throws EntitlementException {
+        return dataStore.findPoliciesByRealmAndApplication(getRealm(), application);
+    }
+
     private Set<String> getParentRealms(String realm) throws SMSException {
         Set<String> results = new HashSet<String>();
         SSOToken adminToken = SubjectUtils.getSSOToken(superAdminSubject);
@@ -986,7 +996,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                 // Realm has been deleted, clear the indexCaches &
                 indexCaches.remove(orgName);
                 referralIndexCaches.remove(orgName);
-                ReferredApplicationManager.getInstance().clearCache();
+                ApplicationManager.clearCache(DNMapper.orgNameToDN(orgName));
             }
         }
     }

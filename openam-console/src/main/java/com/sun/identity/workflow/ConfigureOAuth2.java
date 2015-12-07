@@ -55,6 +55,8 @@ import org.forgerock.openam.entitlement.rest.PolicyStore;
 import org.forgerock.openam.entitlement.rest.PolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
+import org.forgerock.openam.entitlement.service.DefaultPrivilegeManagerFactory;
+import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.IdTokenResponseTypeHandler;
@@ -194,7 +196,8 @@ public class ConfigureOAuth2 extends Task {
     private final PolicyStoreProvider storeProvider;
 
     public ConfigureOAuth2(){
-        storeProvider = new PrivilegePolicyStoreProvider(Collections.<String, QueryAttribute>emptyMap());
+        PrivilegeManagerFactory factory = new DefaultPrivilegeManagerFactory();
+        storeProvider = new PrivilegePolicyStoreProvider(factory, Collections.<String, QueryAttribute>emptyMap());
     }
 
     public String execute(Locale locale, Map params) throws WorkflowException {

@@ -83,7 +83,7 @@ import com.sun.identity.sm.ServiceConfigManager;
  *
  * @author Peter Major
  */
-@UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
+@UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.RemoveReferralsStep")
 public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
 
     private static final String ENTITLEMENT_INDEX_FILTER = "(&(sunserviceID=indexes)(sunxmlKeyValue=pathindex=*)"

@@ -85,9 +85,6 @@ public class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivi
         PolicyDataStore pdb = PolicyDataStore.getInstance();
         pdb.addReferral(adminSubject, realm, referral);
 
-        for (String r : referral.getRealms()) {
-            ReferredApplicationManager.getInstance().clearCache(r);
-        }
         notifyPrivilegeChanged(null, referral);
     }
 
@@ -127,9 +124,6 @@ public class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivi
         ReferralPrivilege referral = findByName(name);
 
         if (referral != null) {
-            for (String r : referral.getRealms()) {
-                ReferredApplicationManager.getInstance().clearCache(r);
-            }
             PolicyDataStore pdb = PolicyDataStore.getInstance();
             pdb.removeReferral(adminSubject, realm, referral);
             notifyPrivilegeChanged(null, referral);
@@ -161,9 +155,6 @@ public class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivi
         pdb.removeReferral(adminSubject, realm, referral);
         pdb.addReferral(adminSubject, realm, referral);
 
-        for (String r : referral.getRealms()) {
-            ReferredApplicationManager.getInstance().clearCache(r);
-        }
         notifyPrivilegeChanged(orig, referral);
     }
 

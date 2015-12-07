@@ -50,8 +50,7 @@ import com.sun.identity.entitlement.opensso.SubjectUtils;
  *
  * @since 12.0.0
  */
-@UpgradeStepInfo(dependsOn = {"org.forgerock.openam.upgrade.steps.ResavePoliciesStep",
-        "org.forgerock.openam.upgrade.steps.UpgradeEntitlementsStep"})
+@UpgradeStepInfo(dependsOn = {"org.forgerock.openam.upgrade.steps.RemoveReferralsStep"})
 public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep {
 
     private static final String ENTITLEMENT_DATA = "%ENTITLEMENT_DATA%";
@@ -101,7 +100,7 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
                 PrivilegeManager privilegeManager = getPrivilegeManager(realm);
                 List<Privilege> privileges;
                 try {
-                    privileges = privilegeManager.search(null);
+                    privileges = privilegeManager.findAllPolicies();
                 } catch (EntitlementException e) {
                     continue;
                 }

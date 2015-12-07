@@ -197,15 +197,6 @@ public final class ApplicationManager {
         try {
             appls = ec.getApplications();
             applications.put(realm, appls);
-
-            ReferredApplicationManager mgr = ReferredApplicationManager.getInstance();
-            Set<ReferredApplication> referredApplications = mgr.getReferredApplications(realm);
-
-            if (!"/".equals(realm) && (referredApplications == null || referredApplications.isEmpty())) {
-                DEBUG.warning("No referred applications for sub-realm: " + realm);
-            }
-
-            appls.addAll(referredApplications);
             return appls;
         } finally {
             readWriteLock.writeLock().unlock();
@@ -359,10 +350,6 @@ public final class ApplicationManager {
             throw new EntitlementException(326);
         }
 
-        if (isReferredApplication(realm, application)) {
-            throw new EntitlementException(228);
-        }
-
         if (CollectionUtils.isNotEmpty(application.getResourceTypeUuids())) {
             Set<String> resourceTypeIds = application.getResourceTypeUuids();
 
@@ -444,20 +431,6 @@ public final class ApplicationManager {
     }
 
 
-    private static boolean isReferredApplication(
-        String realm,
-        Application application) throws EntitlementException {
-        Set<ReferredApplication> referredAppls =
-            ReferredApplicationManager.getInstance().getReferredApplications(
-            realm);
-        for (ReferredApplication ra : referredAppls) {
-            if (ra.getName().equals(application.getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private static boolean hasAccessToApplication(
         String realm,
         Subject adminSubject,
@@ -510,75 +483,6 @@ public final class ApplicationManager {
                 break;
             }
         }
-    }
-
-    /**
-     * Refers resources to another realm.
-     *
-     * @param adminSubject Admin Subject who has the rights to access
-     *        configuration datastore.
-     * @param parentRealm Parent realm name.
-     * @param referRealm Referred realm name.
-     * @param applicationName Application name.
-     * @param resources Referred resources.
-     * @throws EntitlementException if resources cannot be referred.
-     */
-    public static void referApplication(
-        Subject adminSubject,
-        String parentRealm,
-        String referRealm,
-        String applicationName,
-        Set<String> resources
-    ) throws EntitlementException {
-        boolean allowed = (adminSubject == PolicyConstants.SUPER_ADMIN_SUBJECT);
-        if (!allowed) {
-            // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
-            allowed = hasAccessToApplication(parentRealm, PolicyConstants.SUPER_ADMIN_SUBJECT,
-                applicationName, ApplicationPrivilege.Action.MODIFY);
-        }
-
-        if (!allowed) {
-            throw new EntitlementException(326);
-        }
-
-        Application appl = getApplication(PolicyConstants.SUPER_ADMIN_SUBJECT,
-            parentRealm, applicationName);
-        if (appl == null) {
-            Object[] params = {parentRealm, referRealm, applicationName};
-            throw new EntitlementException(280, params);
-        }
-
-        ReferredApplicationManager.getInstance().clearCache(referRealm);
-    }
-
-    /**
-     * Derefers resources from a realm.
-     *
-     * @param adminSubject Admin Subject who has the rights to access
-     *        configuration datastore.
-     * @param referRealm Referred realm name,
-     * @param applicationName Application name.
-     * @param resources Resources to be dereferred.
-     * @throws EntitlementException if resources cannot be dereferred.
-     */
-    public static void dereferApplication(
-        Subject adminSubject,
-        String referRealm,
-        String applicationName,
-        Set<String> resources
-    ) throws EntitlementException {
-        boolean allowed = (adminSubject == PolicyConstants.SUPER_ADMIN_SUBJECT);
-        if (!allowed) {
-            // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
-            allowed = hasAccessToApplication(referRealm, PolicyConstants.SUPER_ADMIN_SUBJECT,
-                applicationName, ApplicationPrivilege.Action.MODIFY);
-        }
-
-        if (!allowed) {
-            throw new EntitlementException(326);
-        }
-
-        ReferredApplicationManager.getInstance().clearCache(referRealm);
     }
 
     /**

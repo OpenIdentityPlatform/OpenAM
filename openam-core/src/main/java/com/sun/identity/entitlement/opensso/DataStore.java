@@ -28,18 +28,7 @@
  */
 package com.sun.identity.entitlement.opensso;
 
-import javax.naming.NamingException;
-import javax.security.auth.Subject;
-import java.security.AccessController;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import static java.util.Collections.emptySet;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -48,7 +37,6 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.ReferredApplicationManager;
 import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.SubjectAttributesManager;
@@ -67,6 +55,21 @@ import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import javax.naming.NamingException;
+import javax.security.auth.Subject;
+import java.security.AccessController;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class *talks* to SMS to get the configuration information.
@@ -94,7 +97,7 @@ public class DataStore {
     private static final String NO_FILTER = "(objectClass=*)";
     private static final int NO_LIMIT = 0;
     private static final boolean NOT_SORTED = false;
-    private static final Set<String> NO_EXCLUSIONS = Collections.emptySet();
+    private static final Set<String> NO_EXCLUSIONS = emptySet();
 
     private static final String SUBJECT_FILTER_TEMPLATE =
         "(" + SMSEntry.ATTR_XML_KEYVAL + "=" + SUBJECT_INDEX_KEY + "={0})";
@@ -659,7 +662,6 @@ public class DataStore {
                 params.put(NotificationServlet.ATTR_NAME, name);
                 params.put(NotificationServlet.ATTR_REALM_NAME, realm);
 
-                ReferredApplicationManager.getInstance().clearCache();
                 Notifier.submit(NotificationServlet.REFERRAL_DELETED,
                     params);
             }
@@ -734,7 +736,7 @@ public class DataStore {
                 return LDAPUtils.collectNonIdenticalValues(baseDN,
                         SMSEntry.search(token, baseDNString, filter, numOfEntries, 0, sortResults, ascendingOrder));
             } else {
-                return Collections.emptySet();
+                return emptySet();
             }
         } catch (SMSException | NamingException ex) {
             throw new EntitlementException(EntitlementException.UNABLE_SEARCH_PRIVILEGES, ex);
@@ -921,6 +923,39 @@ public class DataStore {
         return results;
     }
 
+    List<Privilege> findPoliciesByRealm(String realm) throws EntitlementException {
+        return findPolicies(realm, "(sunserviceID=indexes)");
+    }
+
+    List<Privilege> findPoliciesByRealmAndApplication(String realm, String application) throws EntitlementException {
+        return findPolicies(realm, String.format("(&(sunserviceID=indexes)(ou=application=%s))", application));
+    }
+
+    private List<Privilege> findPolicies(String realm, String ldapFilter) throws EntitlementException {
+        List<Privilege> results = new ArrayList<>();
+
+        String baseDN = getSearchBaseDN(realm, null);
+        SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+
+        if (SMSEntry.checkIfEntryExists(baseDN, token)) {
+            try {
+                @SuppressWarnings("unchecked")
+                Iterator<SMSDataEntry> iterator = SMSEntry
+                        .search(token, baseDN, ldapFilter, NO_LIMIT, NO_LIMIT, NOT_SORTED, NOT_SORTED, emptySet());
+
+                while (iterator.hasNext()) {
+                    SMSDataEntry entry = iterator.next();
+                    String policyJson = entry.getAttributeValue(SERIALIZABLE_INDEX_KEY);
+                    results.add(Privilege.getInstance(new JSONObject(policyJson)));
+                }
+            } catch (JSONException | SMSException e) {
+                throw new EntitlementException(EntitlementException.UNABLE_SEARCH_PRIVILEGES, e);
+            }
+        }
+
+        return results;
+    }
+
     /**
      * Returns a set of referral privilege that satifies the resource and
      * subject indexes.
@@ -1091,7 +1126,7 @@ public class DataStore {
                 return LDAPUtils.collectNonIdenticalValues(baseDN,
                         SMSEntry.search(adminToken, baseDNString, filter, 0, 0, false, false));
             }
-            return Collections.emptySet();
+            return emptySet();
         } catch (SMSException | NamingException ex) {
             throw new EntitlementException(215, ex);
         }

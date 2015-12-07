@@ -18,6 +18,7 @@ package org.forgerock.openam.entitlement.rest;
 
 import com.sun.identity.entitlement.PrivilegeManager;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
+import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.testng.annotations.BeforeMethod;
@@ -38,12 +39,12 @@ public class PrivilegePolicyStoreProviderTest {
     private static final Map<String, QueryAttribute> ATTRIBUTE_MAP = new HashMap<String, QueryAttribute>();
 
     private PrivilegePolicyStoreProvider testProvider;
-    private PrivilegePolicyStoreProvider.PrivilegeManagerFactory mockFactory;
+    private PrivilegeManagerFactory mockFactory;
 
 
     @BeforeMethod
     public void setupMocks() {
-        mockFactory = mock(PrivilegePolicyStoreProvider.PrivilegeManagerFactory.class);
+        mockFactory = mock(PrivilegeManagerFactory.class);
         testProvider = new PrivilegePolicyStoreProvider(mockFactory, ATTRIBUTE_MAP);
     }
 
@@ -57,13 +58,13 @@ public class PrivilegePolicyStoreProviderTest {
         RealmContext context = new RealmContext(subjectContext);
         context.setSubRealm(realm, realm);
         PrivilegeManager manager = mock(PrivilegeManager.class);
-        given(mockFactory.getPrivilegeManager(realm, subject)).willReturn(manager);
+        given(mockFactory.get(realm, subject)).willReturn(manager);
 
         // When
         PolicyStore store = testProvider.getPolicyStore(context);
 
         // Then
-        verify(mockFactory).getPrivilegeManager(realm, subject);
+        verify(mockFactory).get(realm, subject);
         assertThat(store).isNotNull().isInstanceOf(PrivilegePolicyStore.class);
     }
 

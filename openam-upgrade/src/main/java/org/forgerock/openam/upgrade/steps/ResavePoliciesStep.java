@@ -45,7 +45,7 @@ import org.forgerock.openam.upgrade.VersionUtils;
  * regenerate the entitlement indexes (the entitlement index entries do not contain the original resourceName with the
  * trailing slash), this upgrade step has been introduced to manually resave the policies.
  */
-@UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
+@UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.RemoveReferralsStep")
 public class ResavePoliciesStep extends AbstractUpgradeStep {
 
     private static final String POLICY_DATA = "%POLICY_DATA%";

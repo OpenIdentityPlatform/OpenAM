@@ -19,12 +19,6 @@ package org.forgerock.openam.entitlement.guice;
 import static org.forgerock.openam.entitlement.rest.query.AttributeType.STRING;
 import static org.forgerock.openam.entitlement.rest.query.AttributeType.TIMESTAMP;
 
-import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.Provider;
@@ -41,16 +35,24 @@ import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.entitlement.rest.ApplicationsResource;
 import org.forgerock.openam.entitlement.rest.EntitlementEvaluatorFactory;
-import org.forgerock.openam.entitlement.rest.XacmlRouterProvider;
 import org.forgerock.openam.entitlement.rest.EntitlementsExceptionMappingHandler;
 import org.forgerock.openam.entitlement.rest.JsonPolicyParser;
 import org.forgerock.openam.entitlement.rest.PolicyEvaluatorFactory;
 import org.forgerock.openam.entitlement.rest.PolicyParser;
 import org.forgerock.openam.entitlement.rest.PolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
+import org.forgerock.openam.entitlement.rest.XacmlRouterProvider;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
+import org.forgerock.openam.entitlement.service.DefaultPrivilegeManagerFactory;
+import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.restlet.routing.Router;
+
+import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Guice module for binding entitlement REST endpoints.
@@ -68,6 +70,7 @@ public class EntitlementRestGuiceModule extends AbstractModule {
 
         // PolicyResource configuration
         bind(PrivilegeManager.class).to(PolicyPrivilegeManager.class);
+        bind(PrivilegeManagerFactory.class).to(DefaultPrivilegeManagerFactory.class);
         bind(new TypeLiteral<ExceptionMappingHandler<EntitlementException, ResourceException>>() {})
                 .to(EntitlementsExceptionMappingHandler.class);
         bind(PolicyParser.class).to(JsonPolicyParser.class);

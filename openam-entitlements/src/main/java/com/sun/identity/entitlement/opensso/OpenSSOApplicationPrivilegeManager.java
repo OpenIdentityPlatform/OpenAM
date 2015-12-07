@@ -61,8 +61,6 @@ import com.sun.identity.entitlement.OrSubject;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.ReferredApplication;
-import com.sun.identity.entitlement.ReferredApplicationManager;
 import com.sun.identity.entitlement.RegExResourceName;
 import com.sun.identity.entitlement.ResourceMatch;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
@@ -768,9 +766,6 @@ public class OpenSSOApplicationPrivilegeManager extends
         ApplicationPrivilege.Action action
     ) throws EntitlementException {
         if (action.equals(ApplicationPrivilege.Action.READ)) {
-            if (isReferredApplication(app)) {
-                return true;
-            }
             if (isPolicyAdmin()) {
                 return true;
             }
@@ -778,25 +773,8 @@ public class OpenSSOApplicationPrivilegeManager extends
             Permission permission = getPermissionObject(action);
             return permission.hasPermission(app);
         } else {
-            if (isReferredApplication(app)) {
-                return false;
-            }
             return isPolicyAdmin();
         }
-    }
-
-    private boolean isReferredApplication(Application app)
-        throws EntitlementException {
-        Set<ReferredApplication> appls =
-            ReferredApplicationManager.getInstance().getReferredApplications(
-            realm);
-        String name = app.getName();
-        for (ReferredApplication a : appls) {
-            if (a.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
