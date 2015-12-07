@@ -45,7 +45,7 @@ import org.forgerock.json.resource.Resources;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
 import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
+import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
 import org.forgerock.openam.core.rest.UiRolePredicate;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
@@ -57,7 +57,7 @@ import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.rest.UmaIdRepoCreationListener;
 import org.forgerock.openam.uma.rest.UmaPolicyEvaluatorFactory;
 import org.forgerock.openam.uma.rest.UmaPolicyServiceImpl;
-import org.forgerock.openam.uma.rest.UmaResourceSetRegistrationListener;
+import org.forgerock.openam.uma.rest.UmaResourceSetRegistrationHook;
 import org.forgerock.openam.uma.rest.UmaRouterProvider;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.RootContext;
@@ -77,8 +77,8 @@ public class UmaGuiceModule extends AbstractModule {
         Multibinder.newSetBinder(binder(), IdRepoCreationListener.class)
                 .addBinding().to(UmaIdRepoCreationListener.class);
 
-        Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class)
-                .addBinding().to(UmaResourceSetRegistrationListener.class);
+        Multibinder.newSetBinder(binder(), ResourceSetRegistrationHook.class)
+                .addBinding().to(UmaResourceSetRegistrationHook.class);
 
         install(new FactoryModuleBuilder()
                 .implement(UmaTokenStore.class, UmaTokenStore.class)

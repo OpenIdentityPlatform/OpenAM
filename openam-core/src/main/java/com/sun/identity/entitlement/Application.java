@@ -370,7 +370,7 @@ public class Application implements Cloneable {
     /**
      * Retrieves the resource type UUIDs associated with the application.
      *
-     * @return the set of associated resource type UUIDs
+     * @return The set of associated resource type UUIDs.
      */
     public Set<String> getResourceTypeUuids() {
         return resourceTypeUuids;
@@ -379,19 +379,36 @@ public class Application implements Cloneable {
     /**
      * Adds the passed set of resource type UUIDs to the application.
      *
-     * @param resourceTypeUuids
-     *         the set of resource type UUIDs
+     * @param resourceTypeUuids The set of resource type UUIDs.
      */
     public void addAllResourceTypeUuids(final Set<String> resourceTypeUuids) {
         this.resourceTypeUuids.addAll(resourceTypeUuids);
     }
 
     /**
+     * Adds the passed resource type UUID to the application.
+     *
+     * @param resourceTypeUuid The resource type UUID.
+     */
+    public void addResourceTypeUuid(final String resourceTypeUuid) {
+        this.resourceTypeUuids.add(resourceTypeUuid);
+    }
+
+    /**
+     * Removes the passed resource type UUID from the application.
+     *
+     * @param resourceTypeUuid The resource type UUID.
+     */
+    public void removeResourceTypeUuid(final String resourceTypeUuid) {
+        this.resourceTypeUuids.remove(resourceTypeUuid);
+    }
+
+    /**
      * Returns search indexes for a given resource.
      *
-     * @param resource resource to generate the indexes.
+     * @param resource Resource to generate the indexes.
      * @param realm Current realm to be searched.
-     * @return search indexes.
+     * @return Search indexes.
      * @throws EntitlementException When an error occurs in the entitlements framework.
      */
     public ResourceSearchIndexes getResourceSearchIndex(

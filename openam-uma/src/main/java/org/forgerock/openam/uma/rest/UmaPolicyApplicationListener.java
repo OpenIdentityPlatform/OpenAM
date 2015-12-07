@@ -18,9 +18,6 @@ package org.forgerock.openam.uma.rest;
 
 import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,31 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationType;
-import com.sun.identity.entitlement.DenyOverride;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdEventListener;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.SMSException;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
 
-import org.forgerock.guava.common.base.Supplier;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.context.AbstractContext;
-import org.forgerock.services.context.RootContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -72,16 +48,36 @@ import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeManagerWrap
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.resource.SubjectContext;
+import org.forgerock.openam.rest.resource.AdminSubjectContext;
+import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.util.AsyncFunction;
-import org.forgerock.util.Reject;
 import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationType;
+import com.sun.identity.entitlement.DenyOverride;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdEventListener;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
 
 /**
  * Listens for changes to UMA Resource Server (OAuth2 Agent) to create or delete its policy
@@ -297,7 +293,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private void deletePolicies(String realm, String resourceServerId) {
         RealmContext realmContext = new RealmContext(new RootContext());
         realmContext.setDnsAlias("/", realm);
-        final Context context = new AdminSubjectContext(realmContext);
+        final Context context = new AdminSubjectContext(logger, sessionCache, realmContext);
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo(new JsonPointer("applicationName"), resourceServerId));
         final List<ResourceResponse> resources = new ArrayList<>();
@@ -336,21 +332,5 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         for (ResourceSetDescription resourceSet : results) {
             resourceSetStore.delete(resourceSet.getId(), resourceSet.getResourceOwnerId());
         }
-    }
-
-    /**
-     * SubjectContext implementation which contains an admin token.
-     */
-    private final class AdminSubjectContext extends SSOTokenContext {
-
-        private AdminSubjectContext(Context parent) {
-            super(logger, sessionCache, parent, new Supplier<SSOToken>() {
-                @Override
-                public SSOToken get() {
-                    return AccessController.doPrivileged(AdminTokenAction.getInstance());
-                }
-            });
-        }
-
     }
 }

@@ -35,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.identity.entitlement.EntitlementException;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
@@ -49,7 +51,7 @@ import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
-import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
+import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.extensions.ResourceRegistrationFilter;
@@ -89,7 +91,7 @@ public class ResourceSetRegistrationEndpointTest {
 
     private ResourceSetStore store;
     private ResourceSetDescriptionValidator validator;
-    private ResourceSetRegistrationListener listener;
+    private ResourceSetRegistrationHook hook;
     private ResourceSetLabelRegistration labelRegistration;
     private ResourceRegistrationFilter resourceRegistrationFilter;
 
@@ -102,9 +104,9 @@ public class ResourceSetRegistrationEndpointTest {
         store = mock(ResourceSetStore.class);
         validator = mock(ResourceSetDescriptionValidator.class);
         OAuth2RequestFactory<Request> requestFactory = mock(OAuth2RequestFactory.class);
-        Set<ResourceSetRegistrationListener> listeners = new HashSet<ResourceSetRegistrationListener>();
-        listener = mock(ResourceSetRegistrationListener.class);
-        listeners.add(listener);
+        Set<ResourceSetRegistrationHook> hooks = new HashSet<ResourceSetRegistrationHook>();
+        hook = mock(ResourceSetRegistrationHook.class);
+        hooks.add(hook);
         labelRegistration = mock(ResourceSetLabelRegistration.class);
         ExtensionFilterManager extensionFilterManager = mock(ExtensionFilterManager.class);
         resourceRegistrationFilter = mock(ResourceRegistrationFilter.class);
@@ -121,7 +123,7 @@ public class ResourceSetRegistrationEndpointTest {
         UmaLabelsStore umaLabelsStore = mock(UmaLabelsStore.class);
 
         endpoint = spy(new ResourceSetRegistrationEndpoint(providerSettingsFactory, validator, requestFactory,
-                listeners, labelRegistration, extensionFilterManager, exceptionHandler, umaLabelsStore));
+                hooks, labelRegistration, extensionFilterManager, exceptionHandler, umaLabelsStore));
 
         Request request = mock(Request.class);
         ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC);
@@ -231,7 +233,7 @@ public class ResourceSetRegistrationEndpointTest {
         Map<String, Object> responseBody = (Map<String, Object>) new ObjectMapper()
                 .readValue(response.getText(), Map.class);
         assertThat(responseBody).containsKey("_id");
-        verify(listener).resourceSetCreated(anyString(), Matchers.<ResourceSetDescription>anyObject());
+        verify(hook).resourceSetCreated(anyString(), Matchers.<ResourceSetDescription>anyObject());
         verify(labelRegistration).updateLabelsForNewResourceSet(any(ResourceSetDescription.class));
     }
 

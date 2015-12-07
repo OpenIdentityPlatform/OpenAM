@@ -84,7 +84,7 @@ import org.forgerock.oauth2.restlet.RestletOAuth2RequestFactory;
 import org.forgerock.oauth2.restlet.RestletQueryParameterAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationExceptionFilter;
-import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
+import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
@@ -237,7 +237,7 @@ public class OAuth2GuiceModule extends AbstractModule {
                 .addBinding().to(OAuth2TokenIntrospectionHandler.class);
         bind(TokenIntrospectionService.class).to(TokenIntrospectionServiceImpl.class);
 
-        Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class);
+        Multibinder.newSetBinder(binder(), ResourceSetRegistrationHook.class);
 
         bind(OpenIDConnectURLValidator.class).toInstance(OpenIDConnectURLValidator.getInstance());
         install(new LabelsGuiceModule());

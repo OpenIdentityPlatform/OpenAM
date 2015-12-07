@@ -16,20 +16,31 @@
 
 package org.forgerock.oauth2.restlet.resources;
 
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.restlet.Context;
+
+import com.sun.identity.entitlement.EntitlementException;
 
 /**
- * Listener for registration events of Resource Sets.
+ * Hook for registration events of Resource Sets.
  *
  * @since 13.0.0
  */
-public interface ResourceSetRegistrationListener {
+public interface ResourceSetRegistrationHook {
 
     /**
-     * Fired when a Resource Set description was sucessfully registered.
+     * Fired after a Resource Set description is successfully created.
      *
      * @param realm The realm the Resource Set was created in.
      * @param resourceSet The Resource Set description.
      */
-    void resourceSetCreated(String realm, ResourceSetDescription resourceSet);
+    void resourceSetCreated(String realm, ResourceSetDescription resourceSet) throws ServerException;
+
+    /**
+     * Fired before a Resource Set description is about to be deleted.
+     * @param realm The realm the Resource Set will be deleted in.
+     * @param resourceSet The Resource Set description.
+     */
+    void resourceSetDeleted(String realm, ResourceSetDescription resourceSet) throws ServerException;
 }

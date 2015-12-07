@@ -17,12 +17,12 @@
 package org.forgerock.openam.oauth2.resources;
 
 import javax.inject.Inject;
+import javax.security.auth.Subject;
 
-import java.util.ArrayList;
+import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,13 +40,19 @@ import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
-import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
+import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.extensions.ResourceRegistrationFilter;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
+import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.services.context.AbstractContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RootContext;
+import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.restlet.Request;
@@ -63,6 +69,14 @@ import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.security.AdminTokenAction;
+
 /**
  * Restlet endpoint for OAuth2 resource servers to register resource set that should be protected.
  *
@@ -78,7 +92,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ResourceSetDescriptionValidator validator;
     private final OAuth2RequestFactory<Request> requestFactory;
-    private final Set<ResourceSetRegistrationListener> listeners;
+    private final Set<ResourceSetRegistrationHook> hooks;
     private final ResourceSetLabelRegistration labelRegistration;
     private final ExtensionFilterManager extensionFilterManager;
     private final ExceptionHandler exceptionHandler;
@@ -89,7 +103,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
      * @param providerSettingsFactory An instance of the {@link OAuth2ProviderSettingsFactory}.
      * @param validator An instance of the {@link ResourceSetDescriptionValidator}.
      * @param requestFactory An instance of the OAuth2RequestFactory.
-     * @param listeners A {@code Set} of {@code ResourceSetRegistrationListener}s.
+     * @param hooks A {@code Set} of {@code ResourceSetRegistrationHook}s.
      * @param labelRegistration An instance of the {@code ResourceSetLabelRegistration}.
      * @param extensionFilterManager An instance of the {@code ExtensionFilterManager}.
      * @param exceptionHandler An instance of the {@code ExceptionHandler}.
@@ -98,12 +112,12 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
     @Inject
     public ResourceSetRegistrationEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
             ResourceSetDescriptionValidator validator, OAuth2RequestFactory<Request> requestFactory,
-            Set<ResourceSetRegistrationListener> listeners, ResourceSetLabelRegistration labelRegistration,
+            Set<ResourceSetRegistrationHook> hooks, ResourceSetLabelRegistration labelRegistration,
             ExtensionFilterManager extensionFilterManager, ExceptionHandler exceptionHandler, UmaLabelsStore umaLabelsStore) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.validator = validator;
         this.requestFactory = requestFactory;
-        this.listeners = listeners;
+        this.hooks = hooks;
         this.labelRegistration = labelRegistration;
         this.extensionFilterManager = extensionFilterManager;
         this.exceptionHandler = exceptionHandler;
@@ -153,7 +167,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
             filter.beforeResourceRegistration(resourceSetDescription);
         }
         store.create(oAuth2Request, resourceSetDescription);
-        if(labels.isNotNull()) {
+        if (labels.isNotNull()) {
             resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels.asSet());
         }
         labelRegistration.updateLabelsForNewResourceSet(resourceSetDescription);
@@ -161,10 +175,11 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
             filter.afterResourceRegistration(resourceSetDescription);
         }
 
-        for (ResourceSetRegistrationListener listener : listeners) {
-            listener.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
+        for (ResourceSetRegistrationHook hook : hooks) {
+            hook.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
         }
         getResponse().setStatus(Status.SUCCESS_CREATED);
+
         return createJsonResponse(resourceSetDescription, false, true);
     }
 
@@ -268,8 +283,15 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         }
 
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        labelRegistration.updateLabelsForDeletedResourceSet(store.read(getResourceSetId(), getResourceOwnerId()));
+        ResourceSetDescription resourceSetDescription = store.read(getResourceSetId(), getResourceOwnerId());
+        OAuth2Request oAuth2Request = requestFactory.create(getRequest());
+
+        for (ResourceSetRegistrationHook hook : hooks) {
+            hook.resourceSetDeleted(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
+        }
+        labelRegistration.updateLabelsForDeletedResourceSet(resourceSetDescription);
         store.delete(getResourceSetId(), getResourceOwnerId());
+
         return createEmptyResponse();
     }
 
