@@ -243,6 +243,7 @@ public class OAuth extends AMLoginModule {
                         "GET",
                         rc.getStatusParameter(),
                         rc.getRedirectBackUrlCookieName());
+                rcNew.setTrackingCookie(true);
                 replaceCallback(2, 0, rcNew);
                 return GET_OAUTH_TOKEN_STATE;
             }

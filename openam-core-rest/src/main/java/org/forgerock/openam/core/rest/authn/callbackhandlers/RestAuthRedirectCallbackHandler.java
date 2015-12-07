@@ -16,15 +16,14 @@
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
+import static org.forgerock.json.JsonValue.*;
+
 import com.sun.identity.authentication.spi.RedirectCallback;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static org.forgerock.json.JsonValue.*;
 
 /**
  * Defines methods to handle a RedirectCallback.
@@ -68,7 +67,8 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
 
         JsonValue callbacksJson = json(array(
                 createOutputField("redirectUrl", callback.getRedirectUrl()),
-                createOutputField("redirectMethod", callback.getMethod())));
+                createOutputField("redirectMethod", callback.getMethod()),
+                createOutputField("trackingCookie", callback.getTrackingCookie())));
 
         JsonValue jsonValue = json(object(
                 field("type", CALLBACK_NAME),

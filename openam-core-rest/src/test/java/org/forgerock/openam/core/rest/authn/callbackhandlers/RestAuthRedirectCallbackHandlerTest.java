@@ -91,13 +91,15 @@ public class RestAuthRedirectCallbackHandlerTest {
         //Then
         assertThat(json.asMap()).hasSize(2);
         assertThat(json.get("type").asString()).isEqualTo("RedirectCallback");
-        assertThat(json.get("output").asList()).hasSize(3);
+        assertThat(json.get("output").asList()).hasSize(4);
         assertThat(json.get("output").get(0).get("name").asString()).isEqualTo("redirectUrl");
         assertThat(json.get("output").get(0).get("value").asString()).isEqualTo("REDIRECT_URL");
         assertThat(json.get("output").get(1).get("name").asString()).isEqualTo("redirectMethod");
         assertThat(json.get("output").get(1).get("value").asString()).isEqualTo("REDIRECT_METHOD");
-        assertThat(json.get("output").get(2).get("name").asString()).isEqualTo("redirectData");
-        assertThat(json.get("output").get(2).get("value").asMap()).hasSize(0);
+        assertThat(json.get("output").get(2).get("name").asString()).isEqualTo("trackingCookie");
+        assertThat(json.get("output").get(2).get("value").asBoolean()).isEqualTo(false);
+        assertThat(json.get("output").get(3).get("name").asString()).isEqualTo("redirectData");
+        assertThat(json.get("output").get(3).get("value").asMap()).hasSize(0);
     }
 
     @Test
@@ -131,12 +133,14 @@ public class RestAuthRedirectCallbackHandlerTest {
 
         // Then
         assertThat(parsed).stringAt("/type").isEqualTo("RedirectCallback");
-        assertThat(parsed).hasArray("/output").hasSize(3);
+        assertThat(parsed).hasArray("/output").hasSize(4);
         assertThat(parsed).hasObject("/output/0").containsExactly(entry("name", "redirectUrl"),
                 entry("value", "REDIRECT_URL"));
         assertThat(parsed).hasObject("/output/1").containsExactly(entry("name", "redirectMethod"),
                 entry("value", "REDIRECT_METHOD"));
-        assertThat(parsed).hasObject("/output/2").containsExactly(entry("name", "redirectData"),
+        assertThat(parsed).hasObject("/output/2").containsExactly(entry("name", "trackingCookie"),
+                entry("value", false));
+        assertThat(parsed).hasObject("/output/3").containsExactly(entry("name", "redirectData"),
                 entry("value", redirectData));
     }
 }

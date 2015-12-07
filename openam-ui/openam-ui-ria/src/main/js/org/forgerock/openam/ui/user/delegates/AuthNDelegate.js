@@ -94,12 +94,19 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     };
 
     obj.handleRequirements = function (requirements) {
+        //callbackTracking allows us to determine if we're expecting to return having gone away
+        function callbackTracking (callback) {
+            return callback.type === "RedirectCallback" && _.find(callback.output, {
+                name: "trackingCookie",
+                value: true
+            });
+        }
+
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
             Configuration.globalData.auth.currentStage = requirementList.length;
 
-            if (!CookieHelper.getCookie("authId") && _.findWhere(requirements.callbacks,
-                { type: "RedirectCallback" })) {
+            if (!CookieHelper.getCookie("authId") && _.find(requirements.callbacks, callbackTracking)) {
                 CookieHelper.setCookie(
                     "authId",
                     requirements.authId, "", "/",

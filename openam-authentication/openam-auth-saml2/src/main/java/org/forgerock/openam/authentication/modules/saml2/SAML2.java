@@ -381,6 +381,7 @@ public class SAML2 extends AMLoginModule {
 
         final RedirectCallback rcNew = new RedirectCallback(ssoURL, postData, "POST",
                 redirectCallback.getStatusParameter(), redirectCallback.getRedirectBackUrlCookieName());
+        rcNew.setTrackingCookie(true);
         replaceCallback(REDIRECT, REDIRECT_CALLBACK, rcNew);
     }
 
@@ -393,11 +394,9 @@ public class SAML2 extends AMLoginModule {
                 redirectCallback.getStatusParameter(), redirectCallback.getRedirectBackUrlCookieName());
 
         Map<String, String> redirectData = rcNew.getRedirectData();
-        if (null == redirectData) {
-            redirectData = new HashMap<>();
-        }
 
         rcNew.setRedirectData(redirectData);
+        rcNew.setTrackingCookie(true);
         replaceCallback(REDIRECT, REDIRECT_CALLBACK, rcNew);
     }
 

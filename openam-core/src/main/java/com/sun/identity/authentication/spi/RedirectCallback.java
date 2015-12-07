@@ -45,6 +45,7 @@ public class RedirectCallback implements Callback, java.io.Serializable {
     private Map<String, String> redirectData = new HashMap<>();
     private String method = "get";
     private String status = null;
+    private boolean trackingCookie = false;
     private String statusParameter = "AM_AUTH_SUCCESS_PARAM";
     private String redirectBackUrlCookie = "AM_REDIRECT_BACK_SERVER_URL";
     
@@ -207,7 +208,25 @@ public class RedirectCallback implements Callback, java.io.Serializable {
     public void setRedirectBackUrlCookieName(String redirectBackUrlCookie) {
         this.redirectBackUrlCookie = redirectBackUrlCookie;
     }
-    
+
+    /**
+     * Whether the XUI should execute this immediately, or expect we'll be returned from it --
+     * necessary to be set if this redirect is expected to be returned from.
+     * @param enableCookie if a cookie should store the current authId position.
+     */
+    public void setTrackingCookie(boolean enableCookie) {
+        this.trackingCookie = enableCookie;
+    }
+
+    /**
+     * Gets the value of this RedirectCallback's trackingCookie, indicating whether we should
+     * store information about the current authId in a cookie via the XUI.
+     * @return true if we should store, false otherwise.
+     */
+    public boolean getTrackingCookie() {
+        return trackingCookie;
+    }
+
     /**
      * Returns the redirectBackUrlCookie name to be set as the OpenAM
      * server URL when redirecting to external web site.

@@ -20,6 +20,8 @@ import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,7 +89,13 @@ public class RedirectCallbackHandler {
         } else {
             if (redirectCallback.getMethod().equalsIgnoreCase("post")) {
 
-                request.setAttribute("postData", redirectCallback.getRedirectData());
+                Map<String, String> dataMap = redirectCallback.getRedirectData();
+
+                if (dataMap == null) {
+                    dataMap = new HashMap<>();
+                }
+
+                request.setAttribute("postData", dataMap);
                 request.setAttribute("postURL", redirectCallback.getRedirectUrl());
 
                 //forward post
