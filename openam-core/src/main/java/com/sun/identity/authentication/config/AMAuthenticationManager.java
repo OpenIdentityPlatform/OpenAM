@@ -437,7 +437,10 @@ public class AMAuthenticationManager {
             service = scm.getOrganizationConfig(realm, null);
                     
             if (service != null) {
-                if (authName.equals(type)) {
+                if (authName.equals(type)
+                        // Must check if there is a sub-config with the auth
+                        // type as the name otherwise it will not be returned.
+                        && service.getSubConfig(authName) == null) {
                     orgAttrs = service.getAttributesWithoutDefaults();
                 } else {
                     service = service.getSubConfig(authName);
