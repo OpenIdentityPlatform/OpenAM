@@ -30,7 +30,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.servlet.Auditor;
+import org.forgerock.openam.audit.servlet.AuditorFactory;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
@@ -149,6 +152,9 @@ public class SoapSTSModule extends PrivateModule {
         expose(PrincipalFromSession.class);
 
         bind(AuditEventPublisher.class).to(SoapSTSAuditEventPublisher.class);
+        expose(AuditEventPublisher.class);
+        install(new FactoryModuleBuilder().implement(Auditor.class, Auditor.class).build(AuditorFactory.class));
+        expose(AuditorFactory.class);
 
         bind(TimeService.class).toInstance(TimeService.SYSTEM);
         expose(TimeService.class);
