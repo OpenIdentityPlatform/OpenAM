@@ -347,6 +347,8 @@ public class DirectoryContentUpgrader {
                 SearchResultEntry result = conn.readEntry(indexDN, INDEX_TYPE_ATTR);
                 String indexType = result.getAttribute(INDEX_TYPE_ATTR).firstValueAsString();
                 return !"ordering".equalsIgnoreCase(indexType);
+            } catch (EntryNotFoundException e) {
+                return true;
             } catch (LdapException e) {
                 throw new UpgradeException(e);
             } catch (NoSuchElementException e) {

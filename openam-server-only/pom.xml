@@ -361,7 +361,8 @@
                         <webResource>
                             <directory>${project.build.directory}/repackage-opendj/opendj/lib</directory>
                             <includes>
-                                <include>opendj-je-backend-changelog.jar</include>
+                                <include>opendj-je-backend.jar</include>
+                                <include>quicksetup.jar</include>
                             </includes>
                             <targetPath>WEB-INF/lib</targetPath>
                             <filtering>false</filtering>

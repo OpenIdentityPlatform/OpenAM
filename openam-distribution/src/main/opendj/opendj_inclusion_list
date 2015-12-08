@@ -140,6 +140,7 @@ lib/opendj-cli.jar
 lib/opendj-config.jar
 lib/opendj-core.jar
 lib/opendj-grizzly.jar
+lib/opendj-je-backend.jar
 lib/opendj-je-backend-changelog.jar
 lib/opendj-rest2ldap.jar
 lib/opendj-server.jar

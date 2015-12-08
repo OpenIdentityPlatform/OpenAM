@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,32 +20,36 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import static java.nio.file.Files.copy;
+
+import com.sun.identity.setup.AMSetupUtils;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.debug.Debug;
+
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
+import javax.annotation.Nonnull;
 import javax.servlet.ServletContext;
 
+import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.DN;
@@ -57,13 +61,10 @@ import org.forgerock.opendj.ldif.EntryReader;
 import org.forgerock.opendj.ldif.LDIF;
 import org.forgerock.opendj.ldif.LDIFEntryReader;
 import org.forgerock.opendj.ldif.LDIFEntryWriter;
+import org.forgerock.util.annotations.VisibleForTesting;
 import org.opends.server.core.LockFileManager;
 import org.opends.server.tools.RebuildIndex;
 import org.opends.server.util.TimeThread;
-
-import com.sun.identity.setup.AMSetupUtils;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Upgrade tool for upgrading the embedded instance of OpenDS to OpenDJ.
@@ -90,25 +91,22 @@ import com.sun.identity.shared.debug.Debug;
  */
 public final class OpenDJUpgrader {
     private static final String ZIP_FILE = "/WEB-INF/template/opendj/opendj.zip";
+    private static final OpenDJVersion DJ_245_VERSION = OpenDJVersion.valueOf("2.4.5.7743");
+    private static final OpenDJVersion DJ_246_VERSION = OpenDJVersion.valueOf("2.4.6.8102");
 
-    private static final void closeIfNotNull(final Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (final Exception ignored) {
-                // Do nothing.
-            }
-        }
-    }
+    /**
+     * List of system properties that need to be set to the DJ installation root before running the DJ upgrade tasks.
+     */
+    private static final List<String> INSTALL_ROOT_PROPERTIES = Arrays.asList("INSTALL_ROOT",
+            "org.opends.server.ServerRoot", "org.opends.quicksetup.Root");
+
 
     private final String installRoot;
     private final File upgradeMarker;
-    private final NavigableSet<Integer> versionHistory;
-    private final int currentVersion;
-    private final int newVersion;
+    private final OpenDJVersion currentVersion;
+    private final OpenDJVersion newVersion;
     private final ServletContext servletCtx;
-    private final int dj245Version = 7743;
-    private final int dj246Version = 8102;
+
 
     /**
      * Creates a new OpenDJ upgrader.
@@ -125,13 +123,27 @@ public final class OpenDJUpgrader {
         // Determine the current version. Note that if the upgrade marker exists
         // then that implies that OpenDS was only partially upgraded.
         this.newVersion = readNewVersion();
-        this.versionHistory = getVersionHistory();
-        if (upgradeMarker.exists() && versionHistory.last() == newVersion) {
+        OpenDJVersion currentVersion = readCurrentVersion();
+        if (upgradeMarker.exists() && newVersion.equals(currentVersion)) {
             // Previous upgrade has not completed, so the last version is not
             // accurate.
-            this.currentVersion = versionHistory.lower(newVersion);
+            this.currentVersion = readVersionFromFile(upgradeMarker);
         } else {
-            this.currentVersion = versionHistory.last();
+            this.currentVersion = currentVersion;
+        }
+    }
+
+    private OpenDJVersion readCurrentVersion() {
+        return readVersionFromFile(new File(installRoot, "config/buildinfo"));
+    }
+
+    private OpenDJVersion readVersionFromFile(final File file) {
+        try {
+            String version = IOUtils.readStream(new FileInputStream(file)).trim();
+            return OpenDJVersion.valueOf(version);
+        } catch (IOException e) {
+            error("Unable to read OpenDJ version from file: " + file, e);
+            return OpenDJVersion.UNKNOWN;
         }
     }
 
@@ -143,7 +155,7 @@ public final class OpenDJUpgrader {
      * @return {@code true} if an upgrade should be performed.
      */
     public boolean isUpgradeRequired() {
-        return newVersion > currentVersion;
+        return newVersion.isMoreRecentThan(currentVersion);
     }
 
     /**
@@ -160,11 +172,14 @@ public final class OpenDJUpgrader {
         }
 
         // Create a marker file which will be removed only on completion.
-        upgradeMarker.createNewFile();
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(upgradeMarker))) {
+            out.write(currentVersion.toString());
+            out.write('\n');
+        }
 
         // Check DS version if it is less than 2.4.5
         // then use the old method to upgrade
-        if (currentVersion < dj245Version) {
+        if (currentVersion.isOlderThan(DJ_245_VERSION)) {
 
             // First back up customized configuration files.
             backupFile("config/config.ldif");
@@ -180,12 +195,12 @@ public final class OpenDJUpgrader {
 
             // check if this is OpenAM10.10/OpenDJ 2.4.6 and if so
             // delete the cts-add schema.  See AME-932
-            if (currentVersion == dj246Version) {
+            if (currentVersion.equals(DJ_246_VERSION)) {
                 try {
                     File badSchema = new File(installRoot + File.separator + "config"
                             + File.separator + "schema" + File.separator + "cts-add-schema.ldif");
-                    badSchema.delete();
-                } catch (Exception e) {
+                    delete(badSchema);
+                } catch (RuntimeException e) {
                     // do nothing here, we don't care if the file
                     // doesn't exist
                 }
@@ -196,7 +211,7 @@ public final class OpenDJUpgrader {
                 //adding the backport compatible cts schema file
                 File moveTo = new File(installRoot+ File.separator + "config"+ File.separator +
                         "schema" + File.separator + "99-cts-add-schema-backport.ldif");
-                copy(goodSchema, moveTo);
+                copy(goodSchema.toPath(), moveTo.toPath());
             }
 
 
@@ -206,7 +221,7 @@ public final class OpenDJUpgrader {
 
             if (ret == 0) {
                 message("Upgrade completed successfully");
-                upgradeMarker.delete();
+                delete(upgradeMarker);
 
                 // Attempt to release the server lock, OpenDJ does not do this after an upgrade
                 // Work around for OPENDJ-1078
@@ -238,7 +253,7 @@ public final class OpenDJUpgrader {
 
         // Log completion an remove marker.
         message("Upgrade completed successfully");
-        upgradeMarker.delete();
+        delete(upgradeMarker);
     }
 
     private int callDJUpgradeMechanism() {
@@ -251,14 +266,13 @@ public final class OpenDJUpgrader {
                 "--no-prompt"
         };
         // put system properties out in the env so DJ knows where it's at
-
-        System.setProperty("INSTALL_ROOT", installRoot);
-        System.setProperty("org.opends.server.ServerRoot", installRoot);
+        for (String property : INSTALL_ROOT_PROPERTIES) {
+            System.setProperty(property, installRoot);
+        }
         return org.opends.server.tools.upgrade.UpgradeCli.main(args, true, System.out, System.err);
     }
 
-    private void backupFile(final String fileName)
-            throws IOException {
+    private void backupFile(final String fileName) throws IOException {
         message("Backing up file " + fileName + "...");
         final File currentFile = new File(installRoot, fileName);
         final File backupFile = getBackupFileName(fileName);
@@ -267,7 +281,7 @@ public final class OpenDJUpgrader {
             message("skipped (already backed up)");
         } else {
             try {
-                copy(currentFile, backupFile);
+                copy(currentFile.toPath(), backupFile.toPath());
                 message("done");
             } catch (final IOException ioe) {
                 // File may not exist - benign.
@@ -289,14 +303,13 @@ public final class OpenDJUpgrader {
         }
     }
 
-    private void restoreFile(final String fileName)
-            throws IOException {
+    private void restoreFile(final String fileName) throws IOException {
         message("Restoring file " + fileName + "...");
         final File currentFile = new File(installRoot, fileName);
         final File backupFile = getBackupFileName(fileName);
 
         try {
-            copy(backupFile, currentFile);
+            copy(backupFile.toPath(), currentFile.toPath());
             message("done");
         } catch (final IOException ioe) {
             // File may not exist - benign.
@@ -305,33 +318,12 @@ public final class OpenDJUpgrader {
         }
     }
 
-    private final void copy(final File from, final File to)
-            throws IOException {
-        FileInputStream is = null;
-        FileOutputStream os = null;
-
-        try {
-            is = new FileInputStream(from);
-            os = new FileOutputStream(to);
-            copy(is, os);
-        } finally {
-            closeIfNotNull(os);
-            closeIfNotNull(is);
-        }
-    }
-
-    private List<DN> findBaseDNs()
-            throws IOException {
+    private List<DN> findBaseDNs() throws IOException {
         final List<DN> baseDNs = new LinkedList<DN>();
-        final SearchRequest request = Requests.newSearchRequest(
-                "cn=backends,cn=config", SearchScope.WHOLE_SUBTREE,
+        final SearchRequest request = Requests.newSearchRequest("cn=backends,cn=config", SearchScope.WHOLE_SUBTREE,
                 "(objectclass=ds-cfg-backend)", "ds-cfg-base-dn");
-        FileInputStream is = null;
-        LDIFEntryReader reader = null;
 
-        try {
-            is = new FileInputStream(installRoot + "/config/config.ldif");
-            reader = new LDIFEntryReader(is);
+        try (LDIFEntryReader reader = new LDIFEntryReader(new FileInputStream(installRoot + "/config/config.ldif"))) {
             final EntryReader filteredReader = LDIF.search(reader, request);
 
             while (filteredReader.hasNext()) {
@@ -344,35 +336,19 @@ public final class OpenDJUpgrader {
                     }
                 }
             }
-        } finally {
-            closeIfNotNull(reader);
-            closeIfNotNull(is);
         }
 
         return baseDNs;
     }
 
-    private void copy(final InputStream from, final OutputStream to)
-            throws IOException {
-        final BufferedInputStream bis = new BufferedInputStream(from);
-        final BufferedOutputStream bos = new BufferedOutputStream(to);
-
-        for (int b = bis.read(); b != -1; b = bis.read()) {
-            bos.write(b);
-        }
-
-        bos.flush();
-    }
-
-
 
     private boolean checkUpgradePreconditions() {
-        if (currentVersion == 0) {
+        if (OpenDJVersion.UNKNOWN.equals(currentVersion)) {
             error("Upgrade failed: unable to determine the current OpenDS/OpenDJ version");
             return false;
         }
 
-        if (newVersion == 0) {
+        if (OpenDJVersion.UNKNOWN.equals(newVersion)) {
             error("Upgrade failed: unable to determine the new OpenDJ version");
             return false;
         }
@@ -384,60 +360,24 @@ public final class OpenDJUpgrader {
 
         // Upgrade is required.
         if (upgradeMarker.exists()) {
-            error("Upgrade required: continuing incomplete upgrade from "
-              + currentVersion + " to " + newVersion);
+            error("Upgrade required: continuing incomplete upgrade from " + currentVersion + " to " + newVersion);
         } else {
-            error("Upgrade required: upgrading from " + currentVersion + " to "
-              + newVersion);
+            error("Upgrade required: upgrading from " + currentVersion + " to " + newVersion);
         }
         
         return true;
     }
 
-    private NavigableSet<Integer> getVersionHistory() {
-        final File upgradeDirName = new File(installRoot, "config/upgrade");
-        final String pattern = "schema.ldif.";
-        final NavigableSet<Integer> versions = new TreeSet<Integer>();
 
-        // Always include 0 in order to avoid checking for empty/null.
-        versions.add(0);
-
-        if (upgradeDirName.exists() && upgradeDirName.isDirectory()) {
-            final String[] configFiles = upgradeDirName.list(new FilenameFilter() {
-                public boolean accept(final File dir, final String name) {
-                    return name.startsWith(pattern);
-                }
-            });
-
-            for (final String configFile : configFiles) {
-                if (configFile.length() > 0) {
-                    final String version = configFile.substring(pattern.length());
-              
-                    try {
-                        versions.add(Integer.parseInt(version));
-                    } catch (final NumberFormatException nfe) {
-                        // TODO: log something?
-                    }
-                }
-            }
-        }
-
-        return versions;
-    }
-
-    private void message(final String msg) {
+    private static void message(final String msg) {
         Debug.getInstance(SetupConstants.DEBUG_NAME).message(msg);
     }
-    
-    private void message(final String msg, final Throwable th) {
-        Debug.getInstance(SetupConstants.DEBUG_NAME).message(msg, th);
-    }
-    
-    private void error(final String msg) {
+
+    private static void error(final String msg) {
         Debug.getInstance(SetupConstants.DEBUG_NAME).error(msg);
     }
     
-    private void error(final String msg, final Throwable th) {
+    private static void error(final String msg, final Throwable th) {
         Debug.getInstance(SetupConstants.DEBUG_NAME).error(msg, th);
     }
 
@@ -447,32 +387,20 @@ public final class OpenDJUpgrader {
         return backupFile;
     }
 
-    private void patchConfiguration()
-            throws IOException {
+    private void patchConfiguration() throws IOException {
         message("Patching configuration config/config.ldif...");
-        InputStream defaultCurrentConfig = null;
-        InputStream defaultNewConfig = null;
-        InputStream currentConfig = null;
-        OutputStream newCurrentConfig = null;
 
-        try {
-            defaultCurrentConfig = new FileInputStream(installRoot + "/"
-                    + "config/upgrade/config.ldif." + currentVersion);
-            defaultNewConfig = new FileInputStream(installRoot + "/"
-                    + "config/upgrade/config.ldif." + newVersion);
-            currentConfig = new FileInputStream(
-                    getBackupFileName("config/config.ldif"));
-            newCurrentConfig = new FileOutputStream(installRoot + "/"
-                    + "config/config.ldif");
+        try (InputStream defaultCurrentConfig = new FileInputStream(installRoot + "/config/upgrade/config.ldif."
+                + currentVersion);
+            InputStream defaultNewConfig = new FileInputStream(installRoot + "/config/upgrade/config.ldif."
+                    + newVersion);
+            InputStream currentConfig = new FileInputStream(getBackupFileName("config/config.ldif"));
+            OutputStream newCurrentConfig = new FileOutputStream(installRoot + "/config/config.ldif")) {
 
-            final LDIFEntryReader defaultCurrentConfigReader = new LDIFEntryReader(
-                    defaultCurrentConfig);
-            final LDIFEntryReader defaultNewConfigReader = new LDIFEntryReader(
-                    defaultNewConfig);
-            final LDIFEntryReader currentConfigReader = new LDIFEntryReader(
-                    currentConfig);
-            final LDIFEntryWriter newConfigWriter = new LDIFEntryWriter(
-                    newCurrentConfig);
+            final LDIFEntryReader defaultCurrentConfigReader = new LDIFEntryReader(defaultCurrentConfig);
+            final LDIFEntryReader defaultNewConfigReader = new LDIFEntryReader(defaultNewConfig);
+            final LDIFEntryReader currentConfigReader = new LDIFEntryReader(currentConfig);
+            final LDIFEntryWriter newConfigWriter = new LDIFEntryWriter(newCurrentConfig);
 
             LDIF.copyTo(
                     LDIF.patch(currentConfigReader,
@@ -483,61 +411,37 @@ public final class OpenDJUpgrader {
         } catch (final IOException ioe) {
             message("failed: " + ioe.getMessage());
             throw ioe;
-        } finally {
-            closeIfNotNull(newCurrentConfig);
-            closeIfNotNull(currentConfig);
-            closeIfNotNull(defaultNewConfig);
-            closeIfNotNull(defaultCurrentConfig);
         }
     }
 
-    private int readNewVersion() {
-        final String pattern = "template/config/upgrade/schema.ldif.";
+    private OpenDJVersion readNewVersion() {
+        final String buildinfo = "template/config/buildinfo";
 
-        InputStream is = null;
-        ZipInputStream zis = null;
-        
-        try {
-            is = AMSetupUtils.getResourceAsStream(servletCtx, ZIP_FILE);
-            zis = new ZipInputStream(is);
-            
+        try (ZipInputStream zis = new ZipInputStream(AMSetupUtils.getResourceAsStream(servletCtx, ZIP_FILE))) {
+
             for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
                 final String fileName = zipEntry.getName();
-            
-                if (fileName.startsWith(pattern)) {
-                    final String version = fileName.substring(pattern.length());
-              
-                    try {
-                        return Integer.parseInt(version);
-                    } catch (final NumberFormatException nfe) {
-                        // TODO: log something?
-                    }
+
+                if (fileName.equals(buildinfo)) {
+                    String version = IOUtils.readStream(zis);
+                    return OpenDJVersion.valueOf(version);
                 }
             
                 zis.closeEntry();
             }
         } catch (final IOException ioe) {
-            // TODO: log something?
-            return 0;
-        } finally {
-            closeIfNotNull(zis);
-            closeIfNotNull(is);
+            error("Error reading DJ version number", ioe);
+            return OpenDJVersion.UNKNOWN;
         }
 
         // TODO: No version found, log something?
-        return 0;
+        return OpenDJVersion.UNKNOWN;
     }
 
-    private void unpackZipFile(boolean oldStructure)
-    throws IOException {
+    private void unpackZipFile(boolean oldStructure) throws IOException {
         message("Unzipping " + ZIP_FILE + "...");
-        InputStream is = null;
-        ZipInputStream zis = null;
-        FileOutputStream fos = null;
-        
-        try {
-            is = AMSetupUtils.getResourceAsStream(servletCtx, ZIP_FILE);
-            zis = new ZipInputStream(is);
+
+        try (ZipInputStream zis = new ZipInputStream(AMSetupUtils.getResourceAsStream(servletCtx, ZIP_FILE))) {
 
             for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
                 File outputFileName;
@@ -554,9 +458,9 @@ public final class OpenDJUpgrader {
                     outputFileName.mkdir();
                 } else {
                     // Copy the file.
-                    fos = new FileOutputStream(outputFileName);
-                    copy(zis, fos);
-                    fos.close();
+                    try (FileOutputStream fos = new FileOutputStream(outputFileName)) {
+                        IOUtils.copyStream(zis, fos);
+                    }
 
                     // Set permissions.
                     if (zipEntry.getName().endsWith(".sh") || zipEntry.getName().startsWith("bin")) {
@@ -571,15 +475,10 @@ public final class OpenDJUpgrader {
         } catch (final IOException ioe) {
             error("failed: ", ioe);
             throw ioe;
-        } finally {
-            closeIfNotNull(fos);
-            closeIfNotNull(zis);
-            closeIfNotNull(is);
         }
     }
 
-    private void rebuildAllIndexes(final DN baseDN)
-            throws Exception {
+    private void rebuildAllIndexes(final DN baseDN) throws Exception {
         // @formatter:off
         final String[] args = {
                 "--configClass", "org.opends.server.extensions.ConfigFileHandler",
@@ -611,6 +510,102 @@ public final class OpenDJUpgrader {
             throw ex;
         } finally {
             TimeThread.stop();
+        }
+    }
+
+    /**
+     * Attempts to delete the given file and logs a message if it is not successful.
+     *
+     * @param fileToDelete the file to delete.
+     */
+    private static void delete(File fileToDelete) {
+        if (!fileToDelete.delete()) {
+            message("Unable to delete file: " + fileToDelete.getPath());
+        }
+    }
+
+    /**
+     * Represents OpenDJ version information extracted from the installation directory or zip file buildinfo.
+     */
+    @VisibleForTesting
+    static class OpenDJVersion implements Comparable<OpenDJVersion> {
+        static final OpenDJVersion UNKNOWN = new OpenDJVersion(-1, -1, -1, null);
+
+        private final int major;
+        private final int minor;
+        private final int patch;
+        private final String build;
+
+        private OpenDJVersion(final int major, final int minor, final int patch, final String build) {
+            this.major = major;
+            this.minor = minor;
+            this.patch = patch;
+            this.build = build;
+        }
+
+        /**
+         * Parses a version string of the form {@literal "major.minor.patch.build"} where major, minor and patch are
+         * expected to be integers, and build is expected to be an arbitrary string (a Git commit hash in DJ 3.0, an
+         * SVN revision number in DJ 2). No attempt is made to accept version strings that deviate from this format.
+         *
+         * @param version the version string.
+         * @return the parsed version string or {@link #UNKNOWN} if the version string is invalid.
+         */
+        static OpenDJVersion valueOf(String version) {
+            try {
+                final String[] parts = version.split("\\.");
+                final int major = Integer.parseInt(parts[0]);
+                final int minor = Integer.parseInt(parts[1]);
+                final int patch = Integer.parseInt(parts[2]);
+                final String build = parts[3].trim();
+
+                return new OpenDJVersion(major, minor, patch, build);
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
+                error("Invalid OpenDJ version string: " + version);
+                return UNKNOWN;
+            }
+        }
+
+        @Override
+        public int compareTo(final @Nonnull OpenDJVersion that) {
+            int result = compare(this.major, that.major);
+            if (result == 0) {
+                result = compare(this.minor, that.minor);
+            }
+            if (result == 0) {
+                result = compare(this.patch, that.patch);
+            }
+            if (result == 0) {
+                result = Objects.compare(this.build, that.build, String.CASE_INSENSITIVE_ORDER);
+            }
+            return result;
+        }
+
+        public boolean isMoreRecentThan(OpenDJVersion that) {
+            return this.compareTo(that) > 0;
+        }
+
+        public boolean isOlderThan(OpenDJVersion that) {
+            return this.compareTo(that) < 0;
+        }
+
+        private int compare(int a, int b) {
+            return Integer.valueOf(a).compareTo(b);
+        }
+
+        @Override
+        public boolean equals(final Object that) {
+            return this == that || that instanceof OpenDJVersion && this.compareTo(((OpenDJVersion) that)) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(major, minor, patch, build);
+        }
+
+        @Override
+        public String toString() {
+            return String.format(Locale.ENGLISH, "%d.%d.%d.%s", major, minor, patch, build);
         }
     }
 }
