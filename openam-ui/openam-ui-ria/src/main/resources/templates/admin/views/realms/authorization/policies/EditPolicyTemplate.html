@@ -42,26 +42,26 @@
 
         <div role="tabpanel" class="tab-pane active" id="resourcesTab">
             <p class="panel-description">{{t "console.authorization.policies.edit.resourcesDescription"}}</p>
+            <div class="form-horizontal">
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 control-label" for="resTypesSelection">
+                        {{t "console.authorization.common.resourceType"}}
+                    </label>
 
-            <div class="form-group clearfix">
-                <label class="col-sm-2 control-label" for="resTypesSelection">
-                    {{t "console.authorization.common.resourceType"}}
-                </label>
+                    <div class="col-sm-9">
+                        <select class="selectize" id="resTypesSelection">
+                            {{#each options.availableResourceTypes}}
+                                <option {{#equals uuid ../entity.resourceTypeUuid}}selected{{/equals}} value="{{uuid}}">{{name}}</option>
+                            {{/each}}
+                        </select>
 
-                <div class="col-sm-9">
-                    <select class="selectize" id="resTypesSelection">
-                        {{#each options.availableResourceTypes}}
-                            <option {{#equals uuid ../entity.resourceTypeUuid}}selected{{/equals}} value="{{uuid}}">{{name}}</option>
-                        {{/each}}
-                    </select>
-
-                    <span class="input-helper-text">
-                        {{t "console.authorization.policies.edit.selectResourceTypeHelper"}}
-                    </span>
+                        <span class="input-helper-text">
+                            {{t "console.authorization.policies.edit.selectResourceTypeHelper"}}
+                        </span>
+                    </div>
                 </div>
             </div>
-
-            <div id="editResources" class="clearfix"></div>
+            <div id="editResources" class="form-horizontal clearfix"></div>
         </div>
 
         <div role="tabpanel" class="tab-pane" id="actionsTab">

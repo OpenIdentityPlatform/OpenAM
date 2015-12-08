@@ -1,38 +1,36 @@
 <div class="form-group">
-    <div class="row">
-        <label class="col-sm-2 control-label">
-            {{t "console.authorization.common.resources"}}
-        </label>
+    <label class="col-sm-2 control-label">
+        {{t "console.authorization.common.resources"}}
+    </label>
 
-        <div class="col-sm-9 ">
-            <div class="list-table created-items" id="createdResources">
-                <ul class="list-group">
-                    {{#if entity.resources}}
-                    {{#each entity.resources}}
-                    <li data-resource="{{this}}" class="{{#equals this ../../options.invalidResource}} text-danger {{/equals}}
-                            {{#equals this ../../options.justAdded}} text-success {{/equals}} list-group-item">{{this}}
-                        <span tabindex="0" class="fa fa-close pull-right"></span>
-                    </li>
-                    {{/each}}
-                    {{/if}}
+    <div class="col-sm-9 ">
+        <div class="list-table created-items" id="createdResources">
+            <ul class="list-group">
+                {{#if entity.resources}}
+                {{#each entity.resources}}
+                <li data-resource="{{this}}" class="{{#equals this ../../options.invalidResource}} text-danger {{/equals}}
+                        {{#equals this ../../options.justAdded}} text-success {{/equals}} list-group-item">{{this}}
+                    <span tabindex="0" class="fa fa-close pull-right"></span>
+                </li>
+                {{/each}}
+                {{/if}}
 
-                    <li class="list-group-item editing form-inline {{#if entity.resources}} hidden {{/if}}">
-                        <select class="selectize">
-                            <option disabled selected value="">{{t "console.authorization.policies.edit.selectResourcePattern"}}</option>
-                            {{#each options.availablePatterns}}
-                            <option value="{{this}}">{{this}}</option>
-                            {{/each}}
-                        </select>
+                <li class="list-group-item editing form-inline {{#if entity.resources}} hidden {{/if}}">
+                    <select class="selectize">
+                        <option disabled selected value="">{{t "console.authorization.policies.edit.selectResourcePattern"}}</option>
+                        {{#each options.availablePatterns}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
 
-                        <div id="populateResource" class="clearfix"></div>
-                    </li>
-                </ul>
-            </div>
-            <div class="add-item-inline {{#unless entity.resources}} hidden {{/unless}}">
-                <button type="button" class="btn btn-default" id="addResourceEditBtn">
-                    <i class="fa fa-plus"></i> Add Resource
-                </button>
-            </div>
+                    <div id="populateResource" class="clearfix"></div>
+                </li>
+            </ul>
+        </div>
+        <div class="add-item-inline {{#unless entity.resources}} hidden {{/unless}}">
+            <button type="button" class="btn btn-default" id="addResourceEditBtn">
+                <i class="fa fa-plus"></i> Add Resource
+            </button>
         </div>
     </div>
 </div>
