@@ -76,7 +76,7 @@ public class OpenAMRefreshToken extends RefreshToken {
      *
      * @param claims Requested claims
      */
-    protected void setClaims(String claims) {
+    public void setClaims(String claims) {
         setStringProperty(OAuth2Constants.Custom.CLAIMS, claims);
     }
 

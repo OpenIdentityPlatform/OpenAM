@@ -87,7 +87,7 @@ public class DeviceCodeGrantTypeHandlerTest {
                 anySetOf(String.class), any(RefreshToken.class), anyString(), anyString(), any(OAuth2Request.class)))
                 .thenReturn(accessToken);
         when(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
-                any(OAuth2Request.class))).thenReturn(refreshToken);
+                any(OAuth2Request.class), anyString())).thenReturn(refreshToken);
 
         ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
         InvalidClientException expectedResult = mock(InvalidClientException.class);
@@ -132,7 +132,8 @@ public class DeviceCodeGrantTypeHandlerTest {
         // Then
         verify(tokenStore).createAccessToken(DEVICE_CODE, BEARER, null, "RESOURCE_OWNER_ID", "CLIENT_ID", null, scope,
                 refreshToken, null, "CLAIMS", request);
-        verify(tokenStore).createRefreshToken(DEVICE_CODE, "CLIENT_ID", "RESOURCE_OWNER_ID", null, scope, request);
+        verify(tokenStore).createRefreshToken(DEVICE_CODE, "CLIENT_ID", "RESOURCE_OWNER_ID", null, scope, request,
+                "CLAIMS");
         verify(accessToken).addExtraData(eq(REFRESH_TOKEN), anyString());
     }
 

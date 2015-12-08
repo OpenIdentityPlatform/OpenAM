@@ -141,11 +141,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         RefreshToken newRefreshToken = null;
         if (providerSettings.issueRefreshTokensOnRefreshingToken()) {
             newRefreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
-                    refreshToken.getResourceOwnerId(), refreshToken.getRedirectUri(), refreshToken.getScope(), request);
-
-            if (validatedClaims != null) {
-                newRefreshToken.setStringProperty(OAuth2Constants.Custom.CLAIMS, validatedClaims);
-            }
+                    refreshToken.getResourceOwnerId(), refreshToken.getRedirectUri(), refreshToken.getScope(), request,
+                    validatedClaims);
 
             tokenStore.deleteRefreshToken(refreshToken.getTokenId());
         }

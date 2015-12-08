@@ -67,6 +67,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.openidconnect.OpenIdConnectToken;
@@ -508,13 +509,17 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         return accessToken;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
             String redirectUri, Set<String> scope, OAuth2Request request)
             throws ServerException, NotFoundException {
+        return createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope, request, null);
+    }
 
+    @Override
+    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims)
+            throws ServerException, NotFoundException {
         final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
         logger.message("Create refresh token");
@@ -549,9 +554,13 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             acr = currentRefreshToken.getAuthenticationContextClassReference();
         }
 
-        RefreshToken refreshToken = new OpenAMRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
+        OpenAMRefreshToken refreshToken = new OpenAMRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
                 expiryTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType,
                 realm, authModules, acr, auditId);
+
+        if (!StringUtils.isBlank(validatedClaims)) {
+            refreshToken.setClaims(validatedClaims);
+        }
 
         try {
             tokenStore.create(refreshToken);
@@ -631,18 +640,6 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         } catch (CoreTokenException e) {
             logger.error("DefaultOAuthTokenStoreImpl::Unable to update access token "
                     + accessToken.getTokenId(), e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not update token in CTS", null);
-        }
-    }
-
-    @Override
-    public void updateRefreshToken(RefreshToken refreshToken) {
-        try {
-            tokenStore.update(refreshToken);
-        } catch (CoreTokenException e) {
-            logger.error("DefaultOAuthTokenStoreImpl::Unable to update refresh token "
-                    + refreshToken.getTokenId(), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not update token in CTS", null);
         }

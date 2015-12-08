@@ -41,13 +41,7 @@ public class GrantTypeAccessTokenGenerator {
         RefreshToken refreshToken = null;
         if (providerSettings.issueRefreshTokens()) {
             refreshToken = tokenStore.createRefreshToken(grantType, clientId,
-                    resourceOwnerId, redirectUri, scope, request);
-
-            if (!StringUtils.isBlank(validatedClaims)) {
-                refreshToken.setStringProperty(OAuth2Constants.Custom.CLAIMS, validatedClaims);
-            }
-
-            tokenStore.updateRefreshToken(refreshToken);
+                    resourceOwnerId, redirectUri, scope, request, validatedClaims);
         }
 
         AccessToken accessToken = tokenStore.createAccessToken(grantType, OAuth2Constants.Bearer.BEARER,

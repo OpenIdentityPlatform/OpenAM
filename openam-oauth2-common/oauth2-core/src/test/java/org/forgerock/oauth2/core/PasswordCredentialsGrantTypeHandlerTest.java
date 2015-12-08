@@ -134,7 +134,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
                 eq(request))).willReturn(validatedScope);
         given(providerSettings.issueRefreshTokens()).willReturn(true);
         given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
-                eq(request))).willReturn(refreshToken);
+                eq(request), isNull(String.class))).willReturn(refreshToken);
         given(refreshToken.getTokenId()).willReturn("REFRESH_TOKEN_ID");
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
