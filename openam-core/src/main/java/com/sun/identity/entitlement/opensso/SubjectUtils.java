@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,14 @@
  *
  * $Id: SubjectUtils.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.internal.server.AuthSPrincipal;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
@@ -64,6 +65,20 @@ public class SubjectUtils {
                 privateCred);
         } catch (SSOException ex) {
             PolicyConstants.DEBUG.error("SubjectUtils.createSubject", ex);
+            return null;
+        }
+    }
+
+    /**
+     * Create the subject from the SSOToken ID.
+     * @param tokenId The SSO Token ID.
+     * @return The Subject for the underlying principal.
+     */
+    public static Subject createSubject(String tokenId) {
+        try {
+            SSOToken ssoToken = SSOTokenManager.getInstance().createSSOToken(tokenId);
+            return createSubject(ssoToken);
+        } catch (SSOException e) {
             return null;
         }
     }

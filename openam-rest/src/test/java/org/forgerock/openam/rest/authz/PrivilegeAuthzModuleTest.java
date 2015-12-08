@@ -132,10 +132,14 @@ public class PrivilegeAuthzModuleTest {
 
         given(session.getClientDomain()).willReturn("/abc");
         given(token.getTokenID()).willReturn(tokenID);
-        given(coreWrapper.convertOrgNameToRealmName(anyString())).willReturn("/abc");
+        given(coreWrapper.convertOrgNameToRealmName("realmdn")).willReturn("/abc");
         given(sessionCache.getSession(any(SessionID.class))).willReturn(session);
 
         module = new PrivilegeAuthzModule(evaluator, definitions, factory, sessionCache, coreWrapper);
+
+        Session session = mock(Session.class);
+        given(subjectContext.getCallerSession()).willReturn(session);
+        given(session.getClientDomain()).willReturn("realmdn");
     }
 
     @Test

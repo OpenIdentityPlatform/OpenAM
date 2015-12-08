@@ -511,10 +511,6 @@ public class ReferralsResourceV1 extends RealmAwareResource {
             if (debug.warningEnabled()) {
                 debug.error("ReferralsResource :: Querying for realm-information failed. ", e);
             }
-        } catch (SSOException e) {
-            if (debug.warningEnabled()) {
-                debug.error("ReferralsResource :: User SSOToken not valid for querying subrealms. ", e);
-            }
         }
 
         return false;

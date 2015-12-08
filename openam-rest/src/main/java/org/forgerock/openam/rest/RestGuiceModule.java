@@ -25,6 +25,7 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
@@ -44,6 +45,7 @@ import org.forgerock.json.resource.Router;
 import org.forgerock.openam.audit.HttpAccessAuditFilterFactory;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +103,10 @@ public class RestGuiceModule extends AbstractModule {
 
         bind(Key.get(RequestHandler.class, Names.named("CrestRealmHandler")))
                 .to(Key.get(Router.class, Names.named("CrestRealmRouter")));
+
+        install(new FactoryModuleBuilder()
+                .implement(SSOTokenContext.class, SSOTokenContext.class)
+                .build(SSOTokenContext.Factory.class));
     }
 
     @Provides

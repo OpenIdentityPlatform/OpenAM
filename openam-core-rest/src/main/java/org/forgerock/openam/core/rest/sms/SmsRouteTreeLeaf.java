@@ -16,11 +16,14 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import java.util.Collections;
+import java.util.Map;
 
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.json.resource.Filter;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
+import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 
 /**
  * Represents a leaf of {@code Router} tree. A leaf tree node should handle routes that a service
@@ -36,13 +39,18 @@ class SmsRouteTreeLeaf extends SmsRouteTree {
     /**
      * Creates a {@code SmsRouteTreeLeaf} instance.
      *
+     * @param authzModules Authorization modules for specific endpoints.
+     * @param defaultAuthzModule Default auth modules to use for other endpoints.
      * @param router The {@code Router} instance.
      * @param handlesFunction A {@code Function} that determines whether this router should handle
      *                        the route.
      * @param filter The filter to wrap around all routes.
+     * @param path The path of this leaf.
      */
-    SmsRouteTreeLeaf(Router router, Function<String, Boolean> handlesFunction, Filter filter) {
-        super(false, router, Collections.<SmsRouteTree>emptySet(), filter);
+    SmsRouteTreeLeaf(Map<MatchingResourcePath, CrestAuthorizationModule> authzModules,
+            CrestAuthorizationModule defaultAuthzModule, Router router,
+            Function<String, Boolean> handlesFunction, Filter filter, ResourcePath path) {
+        super(authzModules, defaultAuthzModule, false, router, filter, path);
         this.handlesFunction = handlesFunction;
     }
 

@@ -19,9 +19,11 @@ package org.forgerock.openam.entitlement.rest;
 import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
 
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
+import org.forgerock.openam.rest.RealmContextFilter;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule;
 import org.forgerock.openam.rest.fluent.PoliciesAuditFilter;
 
 /**
@@ -62,28 +64,29 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
                 .authorizeWith(PrivilegeAuthzModule.class)
                 .toCollection(SubjectAttributesResourceV1.class);
 
-        rootRouter.route("applicationtypes")
-                .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
-                .toCollection(ApplicationTypesResource.class);
-
         realmRouter.route("resourcetypes")
                 .auditAs(POLICY)
                 .authorizeWith(PrivilegeAuthzModule.class)
                 .toCollection(ResourceTypesResource.class);
+
+        rootRouter.route("applicationtypes")
+                .auditAs(POLICY)
+                .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
+                .toCollection(ApplicationTypesResource.class);
+
         rootRouter.route("decisioncombiners")
                 .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
                 .toCollection(DecisionCombinersResource.class);
 
         rootRouter.route("conditiontypes")
                 .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
                 .toCollection(ConditionTypesResource.class);
 
         rootRouter.route("subjecttypes")
                 .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
                 .toCollection(SubjectTypesResource.class);
     }
 }

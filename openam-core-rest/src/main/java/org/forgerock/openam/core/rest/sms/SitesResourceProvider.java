@@ -35,6 +35,7 @@ import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.guava.common.collect.Sets;
+import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -85,9 +86,9 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     @Override
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         switch (request.getAction()) {
-            case SmsResourceProvider.TEMPLATE:
+            case RestConstants.TEMPLATE:
                 return newResultPromise(newActionResponse(json(object())));
-            case SmsResourceProvider.SCHEMA:
+            case RestConstants.SCHEMA:
                 ResourceBundle i18n = ResourceBundle.getBundle("amConsole");
                 return newResultPromise(newActionResponse(json(object(field(TYPE, OBJECT_TYPE), field(PROPERTIES, object(
                         field(SITE_ID, object(

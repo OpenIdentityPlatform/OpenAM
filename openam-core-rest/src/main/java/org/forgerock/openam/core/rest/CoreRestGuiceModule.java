@@ -22,6 +22,7 @@ import static org.forgerock.http.routing.RouteMatchers.*;
 import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.http.routing.Version.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
+import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.resourcePath;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -52,6 +53,7 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.routing.RouteMatchers;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
 import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.audit.HttpAccessAuditFilterFactory;
@@ -75,9 +77,13 @@ import org.forgerock.openam.core.rest.sms.SmsSingletonProvider;
 import org.forgerock.openam.core.rest.sms.SmsSingletonProviderFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
+import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.openam.http.annotations.Endpoints;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.AnyPrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
@@ -130,6 +136,16 @@ public class CoreRestGuiceModule extends AbstractModule {
         userUiRolePredicates.addBinding().to(SelfServiceUserUiRolePredicate.class);
         userUiRolePredicates.addBinding().to(GlobalAdminUiRolePredicate.class);
         userUiRolePredicates.addBinding().to(RealmAdminUiRolePredicate.class);
+
+        MapBinder<MatchingResourcePath, CrestAuthorizationModule> smsGlobalAuthzModuleBinder =
+                MapBinder.newMapBinder(binder(), MatchingResourcePath.class, CrestAuthorizationModule.class);
+        smsGlobalAuthzModuleBinder.addBinding(resourcePath("realms")).to(AnyPrivilegeAuthzModule.class);
+        smsGlobalAuthzModuleBinder.addBinding(resourcePath("authentication/modules/*"))
+                .to(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class);
+        smsGlobalAuthzModuleBinder.addBinding(resourcePath("services/scripting"))
+                .to(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class);
+        smsGlobalAuthzModuleBinder.addBinding(resourcePath("services/scripting/contexts"))
+                .to(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class);
     }
 
     @Provides

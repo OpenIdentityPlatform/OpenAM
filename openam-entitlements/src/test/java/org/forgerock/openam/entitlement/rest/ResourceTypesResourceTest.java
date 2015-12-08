@@ -136,7 +136,7 @@ public class ResourceTypesResourceTest {
 
         Context securityContext = new SecurityContext(httpContext, null, null);
 
-        Context subjectContext = new SSOTokenContext(securityContext) {
+        Context subjectContext = new SSOTokenContext(mock(Debug.class), null, securityContext) {
             @Override
             public Subject getCallerSubject() {
                 return callerSubject;

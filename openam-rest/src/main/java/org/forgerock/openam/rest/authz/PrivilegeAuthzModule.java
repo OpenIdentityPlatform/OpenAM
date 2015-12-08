@@ -47,6 +47,7 @@ import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
+import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
@@ -67,7 +68,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
 
     private static final PrivilegeDefinition MODIFY = PrivilegeDefinition
             .getInstance("modify", PrivilegeDefinition.Action.MODIFY);
-    private static final PrivilegeDefinition READ = PrivilegeDefinition
+    static final PrivilegeDefinition READ = PrivilegeDefinition
             .getInstance("read", PrivilegeDefinition.Action.READ);
 
     private static final ActionToStringMapper ACTION_TO_STRING_MAPPER = new ActionToStringMapper();
@@ -160,7 +161,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
      *
      * @return the authorisation result
      */
-    private Promise<AuthorizationResult, ResourceException> evaluate(final Context context,
+    protected Promise<AuthorizationResult, ResourceException> evaluate(final Context context,
                                                                      final PrivilegeDefinition definition) {
 
         // If no realm is specified default to the root realm.
@@ -173,31 +174,42 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
         final Set<String> actions = transformSet(definition.getActions(), ACTION_TO_STRING_MAPPER);
 
         try {
-            final SessionID sessionID = new SessionID(subjectContext.getCallerSSOToken().getTokenID().toString());
+            Session callerSession = subjectContext.getCallerSession();
+            if (callerSession == null) {
+                // you don't have a session so return access denied
+                return Promises.newResultPromise(AuthorizationResult.accessDenied("No session for request."));
+            }
             final String loggedInRealm =
-                    coreWrapper.convertOrgNameToRealmName(sessionCache.getSession(sessionID).getClientDomain());
+                    coreWrapper.convertOrgNameToRealmName(callerSession.getClientDomain());
 
             final DelegationPermission permissionRequest = permissionFactory.newInstance(
                     loggedInRealm, REST, VERSION, routerContext.getMatchedUri(),
                     definition.getCommonVerb(), actions, Collections.<String, String>emptyMap());
 
-            boolean isLoggedIntoRealmOrParentRealm = (realm.equalsIgnoreCase(loggedInRealm)
-                    || RealmUtils.isParentRealm(loggedInRealm, realm));
-
             if (evaluator.isAllowed(subjectContext.getCallerSSOToken(), permissionRequest,
-                    Collections.<String, Set<String>>emptyMap()) && isLoggedIntoRealmOrParentRealm) {
-
+                    Collections.<String, Set<String>>emptyMap()) && loggedIntoValidRealm(realm, loggedInRealm)) {
                 // Authorisation has been approved.
                 return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             }
         } catch (DelegationException dE) {
             return new InternalServerErrorException("Attempt to authorise the user has failed", dE).asPromise();
-        } catch (SSOException | SessionException e) {
+        } catch (SSOException e) {
             //you don't have a user so return access denied
             return Promises.newResultPromise(AuthorizationResult.accessDenied("No user supplied in request."));
         }
 
         return Promises.newResultPromise(AuthorizationResult.accessDenied("The user has insufficient privileges"));
+    }
+
+    /**
+     * Check to see if the realm logged into is valid for getting access to the realm requested.
+     * @param requestedRealm The realm requested.
+     * @param loggedInRealm The realm logged in to.
+     * @return
+     */
+    protected boolean loggedIntoValidRealm(String requestedRealm, String loggedInRealm) {
+        return requestedRealm.equalsIgnoreCase(loggedInRealm)
+                || RealmUtils.isParentRealm(loggedInRealm, requestedRealm);
     }
 
 

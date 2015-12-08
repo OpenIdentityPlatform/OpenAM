@@ -121,42 +121,35 @@ public final class DashboardResource implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
+        SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
+        SSOToken token = tokenContext.getCallerSSOToken();
 
-        try {
-            SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
-            SSOToken token = tokenContext.getCallerSSOToken();
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
-            final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+        JsonValue val = new JsonValue(new HashMap<String, Object>());
 
-            JsonValue val = new JsonValue(new HashMap<String, Object>());
-
-            if (resourceId.equals("defined")) {
-                if (debug.messageEnabled()) {
-                    debug.message("DashboardResource :: READ by " + principalName +
-                            ": Locating definitions from DashboardService.");
-                }
-                val = Dashboard.getDefinitions(token);
-            } else if (resourceId.equals("available")) {
-                if (debug.messageEnabled()) {
-                    debug.message("DashboardResource :: READ by " + principalName +
-                        ": Locating allowed apps from DashboardService.");
-                }
-                val = Dashboard.getAllowedDashboard(token);
-            } else if (resourceId.equals("assigned")) {
-                if (debug.messageEnabled()) {
-                    debug.message("DashboardResource :: READ by " + principalName +
-                            ": Locating assigned apps from DashboardService.");
-                }
-                val = Dashboard.getAssignedDashboard(token);
+        if (resourceId.equals("defined")) {
+            if (debug.messageEnabled()) {
+                debug.message("DashboardResource :: READ by " + principalName +
+                        ": Locating definitions from DashboardService.");
             }
-
-            ResourceResponse resource = newResourceResponse("0", String.valueOf(System.currentTimeMillis()), val);
-            return newResultPromise(resource);
-        } catch (SSOException ex) {
-            debug.error("DashboardResource :: READ : SSOToken was not found.");
-            return new PermanentException(401, "Unauthorized", null).asPromise();
+            val = Dashboard.getDefinitions(token);
+        } else if (resourceId.equals("available")) {
+            if (debug.messageEnabled()) {
+                debug.message("DashboardResource :: READ by " + principalName +
+                    ": Locating allowed apps from DashboardService.");
+            }
+            val = Dashboard.getAllowedDashboard(token);
+        } else if (resourceId.equals("assigned")) {
+            if (debug.messageEnabled()) {
+                debug.message("DashboardResource :: READ by " + principalName +
+                        ": Locating assigned apps from DashboardService.");
+            }
+            val = Dashboard.getAssignedDashboard(token);
         }
 
+        ResourceResponse resource = newResourceResponse("0", String.valueOf(val.getObject().hashCode()), val);
+        return newResultPromise(resource);
     }
 
     /**

@@ -47,9 +47,13 @@ import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.guice.core.GuiceModuleLoader;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
@@ -78,9 +82,14 @@ import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.forgerock.openam.http.HttpGuiceModule;
 import org.forgerock.openam.http.annotations.Get;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.RequestAuditContext;
@@ -96,6 +105,7 @@ import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.net.URI;
@@ -197,6 +207,10 @@ public class RestRouterIT extends GuiceTestCase {
         binder.bind(RestRealmValidator.class).toInstance(realmValidator);
 
         binder.bind(new TypeLiteral<PrivilegedAction<SSOToken>>() {}).toInstance(ssoTokenAction);
+
+        binder.bind(SessionCache.class).toInstance(mock(SessionCache.class));
+        binder.bind(Debug.class).annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
+                .toInstance(mock(Debug.class));
     }
 
     @Override
@@ -218,7 +232,7 @@ public class RestRouterIT extends GuiceTestCase {
     public void shouldReadCrestEndpointOnRootHandler() throws Exception {
 
         //Given
-        Context context = mockContext();
+        Context context = mockRequiredContexts();
         Request request = newRequest("GET", "/json/config");
 
         auditingOff();
@@ -248,7 +262,7 @@ public class RestRouterIT extends GuiceTestCase {
     public void shouldReadCrestEndpointOnRealmHandlerWithRootRealm() throws Exception {
 
         //Given
-        Context context = mockContext();
+        Context context = mockRequiredContexts();
         Request request = newRequest("GET", "/json/users/demo");
 
         auditingOff();
@@ -266,7 +280,7 @@ public class RestRouterIT extends GuiceTestCase {
     public void shouldReadCrestEndpointOnRealmHandlerWithSubRealm() throws Exception {
 
         //Given
-        Context context = mockContext();
+        Context context = mockRequiredContexts();
         Request request = newRequest("GET", "/json/subrealm/users/demo");
 
         auditingOff();
@@ -285,7 +299,7 @@ public class RestRouterIT extends GuiceTestCase {
     public void shouldReadChfEndpointOnRealmHandlerWithRootRealm() throws Exception {
 
         //Given
-        Context context = mockContext();
+        Context context = mockRequiredContexts();
         Request request = newRequest("GET", "/json/authenticate");
 
         //When
@@ -366,7 +380,25 @@ public class RestRouterIT extends GuiceTestCase {
         final HttpContext httpContext = new HttpContext(json(object(
                 field(HttpContext.ATTR_HEADERS, Collections.singletonMap("Accept-Language", Arrays.asList("en"))),
                 field(HttpContext.ATTR_PARAMETERS, Collections.emptyMap()))), null);
-        return new SecurityContext(mockContext(httpContext), null, null);
+        SecurityContext securityContext = new SecurityContext(mockContext(httpContext), null, null);
+        return new SSOTokenContext(mock(Debug.class), null, securityContext) {
+            @Override
+            public Subject getCallerSubject() {
+                return new Subject();
+            }
+
+            @Override
+            public SSOToken getCallerSSOToken() {
+                SSOToken token = mock(SSOToken.class);
+                try {
+                    given(token.getProperty(Constants.AM_CTX_ID)).willReturn("TRACKING_ID");
+                    given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("USER_ID");
+                } catch (SSOException e) {
+                    // won't happen - it's a mock
+                }
+                return token;
+            }
+        };
     }
 
     private Request newRequest(String method, String uri) throws URISyntaxException {

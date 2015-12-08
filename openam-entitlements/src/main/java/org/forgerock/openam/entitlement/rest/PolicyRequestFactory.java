@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.entitlement.rest;
 
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.services.context.Context;
@@ -27,6 +28,8 @@ import org.forgerock.util.Reject;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 /**
  * Factory used for creating policy requests.
  *
@@ -36,7 +39,8 @@ public class PolicyRequestFactory {
 
     private final Map<PolicyAction, RequestBuilder<?>> builders;
 
-    public PolicyRequestFactory() {
+    @Inject
+    public PolicyRequestFactory(final SSOTokenManager tokenManager) {
         builders = new HashMap<PolicyAction, RequestBuilder<?>>();
         // Add batch policy request builder.
         builders.put(PolicyAction.EVALUATE, new RequestBuilder<BatchPolicyRequest>() {
@@ -44,7 +48,7 @@ public class PolicyRequestFactory {
             @Override
             public BatchPolicyRequest buildRequest(final Context context,
                                                    final ActionRequest request) throws EntitlementException {
-                return BatchPolicyRequest.getBatchPolicyRequest(context, request);
+                return BatchPolicyRequest.getBatchPolicyRequest(context, request, tokenManager);
             }
 
         });
@@ -54,7 +58,7 @@ public class PolicyRequestFactory {
             @Override
             public TreePolicyRequest buildRequest(final Context context,
                                                   final ActionRequest request) throws EntitlementException {
-                return TreePolicyRequest.getTreePolicyRequest(context, request);
+                return TreePolicyRequest.getTreePolicyRequest(context, request, tokenManager);
             }
 
         });

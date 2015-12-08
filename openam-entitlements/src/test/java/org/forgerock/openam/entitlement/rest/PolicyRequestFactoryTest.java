@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
@@ -60,7 +61,7 @@ public class PolicyRequestFactoryTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         restSubject = new Subject();
-        factory = new PolicyRequestFactory();
+        factory = new PolicyRequestFactory(mock(SSOTokenManager.class));
     }
 
     @Test

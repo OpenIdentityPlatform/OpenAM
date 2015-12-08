@@ -39,6 +39,8 @@ import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
+
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
@@ -221,7 +223,7 @@ public class SessionResourceTest {
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
 
         given(request.getAction()).willReturn(VALIDATE_ACTION_ID);
-        given(tokenContext.getCallerSSOToken(ssoTokenManager)).willReturn(ssoToken);
+        given(tokenContext.getCallerSSOToken()).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken)).willReturn(true);
         given(ssoToken.getTokenID()).willReturn(ssoTokenId);
         given(ssoTokenId.toString()).willReturn("SSO_TOKEN_ID");
@@ -243,7 +245,7 @@ public class SessionResourceTest {
         final AttributesContext attrContext = new AttributesContext(new SessionContext(new RootContext(), mock(Session.class)));
         final AdviceContext adviceContext = new AdviceContext(attrContext, Collections.<String>emptySet());
         final SecurityContext securityContext = new SecurityContext(adviceContext, null, null);
-        final Context context = ClientContext.newInternalClientContext(new SSOTokenContext(securityContext));
+        final Context context = ClientContext.newInternalClientContext(new SSOTokenContext(mock(Debug.class), null, securityContext));
         final ActionRequest request = mock(ActionRequest.class);
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
 

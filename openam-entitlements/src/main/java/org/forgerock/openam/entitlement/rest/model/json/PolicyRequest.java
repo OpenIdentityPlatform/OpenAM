@@ -16,10 +16,15 @@
 
 package org.forgerock.openam.entitlement.rest.model.json;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.JwtPrincipal;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.exceptions.JwtReconstructionException;
@@ -121,6 +126,7 @@ public abstract class PolicyRequest {
         private final String application;
         private final String realm;
         private final Map<String, Set<String>> environment;
+        private final SSOTokenManager tokenManager;
 
         /**
          * Standard builder constructor.
@@ -129,13 +135,15 @@ public abstract class PolicyRequest {
          *         non-null context
          * @param request
          *         non-null request
-         *
+         * @param tokenManager
+         *         The token manager instance.
          * @throws EntitlementException
          *         should the request construction fail
          */
-        PolicyRequestBuilder(final Context context, final ActionRequest request) throws EntitlementException {
+        PolicyRequestBuilder(final Context context, final ActionRequest request, SSOTokenManager tokenManager) throws EntitlementException {
             Reject.ifNull(context, request);
 
+            this.tokenManager = tokenManager;
             final SubjectContext subjectContext = context.asContext(SubjectContext.class);
             final RealmContext realmContext = context.asContext(RealmContext.class);
             Reject.ifNull(subjectContext, realmContext);
@@ -145,7 +153,7 @@ public abstract class PolicyRequest {
             final JsonValue jsonValue = request.getContent();
             Reject.ifNull(jsonValue);
 
-            policySubject = getPolicySubject(subjectContext, jsonValue, restSubject);
+            policySubject = getPolicySubject(jsonValue, restSubject);
             application = getApplication(jsonValue);
             realm = getRealm(realmContext);
             environment = getEnvironment(jsonValue);
@@ -174,13 +182,12 @@ public abstract class PolicyRequest {
          * The latter two options must include a {@code sub} claim containing the name of the subject. If multiple
          * principals are specified, there is no guarantee about the order they will appear in the subject.
          *
-         * @param context the subject context in which the request is being processed.
          * @param value the request JSON body.
          * @param defaultSubject the default subject to use if the request does not specify one.
          * @return the subject to use in evaluating the request.
          * @throws EntitlementException if a subject is present in the request but invalid.
          */
-        private Subject getPolicySubject(final SubjectContext context, final JsonValue value,
+        private Subject getPolicySubject(final JsonValue value,
                                          final Subject defaultSubject) throws EntitlementException {
             final JsonValue subject = value.get(SUBJECT);
             if (subject.isNull()) {
@@ -191,7 +198,13 @@ public abstract class PolicyRequest {
                 Subject policySubject = new Subject();
 
                 if (subject.isDefined("ssoToken")) {
-                    policySubject = context.getSubject(subject.get("ssoToken").asString());
+                    try {
+                        String tokenId = subject.get("ssoToken").asString();
+                        SSOToken ssoToken = tokenManager.createSSOToken(tokenId);
+                        policySubject = SubjectUtils.createSubject(ssoToken);
+                    } catch (SSOException e) {
+                        policySubject = null;
+                    }
                 }
 
                 if (subject.isDefined("jwt")) {

@@ -58,27 +58,19 @@ public class ServerContextUtils {
      * @param context from which to pull the SSO Token
      */
     public static SSOToken getTokenFromContext(Context context, Debug debug) {
-
-        SSOToken userToken = null;
-
-        if (!context.containsContext(SSOTokenContext.class)) {
-            if (!context.containsContext(SecurityContext.class)) {
+        if (context.containsContext(SSOTokenContext.class)) {
+            return context.asContext(SSOTokenContext.class).getCallerSSOToken();
+        } else if (context.containsContext(SecurityContext.class)) {
+            try {
+                return SSOTokenContext.getSsoToken(context);
+            } catch (SSOException e) {
+                debug.message("Unable to retrieve caller's SSOToken from context.", e);
+                return null;
+            }
+        } else {
                 debug.message("No security context found from which caller's SSOToken could be retrieved.");
                 return null;
-            } else {
-                context = new SSOTokenContext(context);
-            }
         }
-
-        SSOTokenContext ssoTokenContext = context.asContext(SSOTokenContext.class);
-
-        try {
-            userToken = ssoTokenContext.getCallerSSOToken();
-        } catch (SSOException e) {
-            debug.message("Unable to retrieve caller's SSOToken from context.", e);
-        }
-
-        return userToken;
     }
 
     /**

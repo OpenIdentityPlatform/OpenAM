@@ -46,6 +46,10 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
+
+import org.forgerock.guava.common.base.Supplier;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.session.SessionCache;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.AbstractContext;
 import org.forgerock.services.context.RootContext;
@@ -94,27 +98,29 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private final ApplicationTypeManagerWrapper applicationTypeManagerWrapper;
     private final RequestHandler policyResource;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
+    private final SessionCache sessionCache;
 
     /**
      * Creates an instance of the {@code UmaPolicyApplicationListener}.
-     *
      * @param idRepoFactory An instance of the {@code AMIdentityRepositoryFactory}.
      * @param applicationManager An instance of the {@code ApplicationManagerWrapper}.
      * @param applicationTypeManagerWrapper An instance of the {@code ApplicationTypeManagerWrapper}.
      * @param policyResource An instance of the policy backend {@code PromisedRequestHandler}.
      * @param resourceSetStoreFactory An instance of the {@code ResourceSetStoreFactory}.
+     * @param sessionCache The cache of session instances.
      */
     @Inject
     public UmaPolicyApplicationListener(final AMIdentityRepositoryFactory idRepoFactory,
             ApplicationManagerWrapper applicationManager,
             ApplicationTypeManagerWrapper applicationTypeManagerWrapper,
             @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) RequestHandler policyResource,
-            ResourceSetStoreFactory resourceSetStoreFactory) {
+            ResourceSetStoreFactory resourceSetStoreFactory, SessionCache sessionCache) {
         this.idRepoFactory = idRepoFactory;
         this.applicationManager = applicationManager;
         this.applicationTypeManagerWrapper = applicationTypeManagerWrapper;
         this.policyResource = policyResource;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
+        this.sessionCache = sessionCache;
     }
 
     /**
@@ -335,41 +341,16 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     /**
      * SubjectContext implementation which contains an admin token.
      */
-    private static final class AdminSubjectContext extends AbstractContext implements SubjectContext {
-
-        private final SSOToken adminToken;
+    private final class AdminSubjectContext extends SSOTokenContext {
 
         private AdminSubjectContext(Context parent) {
-            super(parent, "subjectContext");
-            this.adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            super(logger, sessionCache, parent, new Supplier<SSOToken>() {
+                @Override
+                public SSOToken get() {
+                    return AccessController.doPrivileged(AdminTokenAction.getInstance());
+                }
+            });
         }
 
-        @Override
-        public Subject getCallerSubject() {
-            return SubjectUtils.createSubject(adminToken);
-        }
-
-        @Override
-        public Subject getSubject(String tokenId) {
-            try {
-                return SubjectUtils.createSubject(getSSOToken(tokenId));
-            } catch (SSOException ssoE) {
-                return null;
-            }
-        }
-
-        @Override
-        public SSOToken getCallerSSOToken() throws SSOException {
-            return adminToken;
-        }
-
-        private SSOToken getSSOToken(String tokenId) throws SSOException {
-            return getSSOToken(tokenId, SSOTokenManager.getInstance());
-        }
-
-        private SSOToken getSSOToken(String tokenId, SSOTokenManager tokenManager) throws SSOException {
-            Reject.ifNull(tokenManager, "A valid SSO token manager is required");
-            return tokenManager.createSSOToken(tokenId);
-        }
     }
 }

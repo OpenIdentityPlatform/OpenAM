@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.entitlement.rest.model.json;
 
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
@@ -59,9 +60,9 @@ public final class TreePolicyRequest extends PolicyRequest {
 
         private final String resource;
 
-        private TreePolicyRequestBuilder(final Context context,
-                                         final ActionRequest request) throws EntitlementException {
-            super(context, request);
+        private TreePolicyRequestBuilder(final Context context, final ActionRequest request,
+                SSOTokenManager tokenManager) throws EntitlementException {
+            super(context, request, tokenManager);
             final JsonValue jsonValue = request.getContent();
             Reject.ifNull(jsonValue);
             resource = getResource(jsonValue);
@@ -93,14 +94,15 @@ public final class TreePolicyRequest extends PolicyRequest {
      * @param request
      *         the request
      *
+     * @param tokenManager An SSOTokenManager instance.
      * @return a tree policy request
      *
      * @throws EntitlementException
      *         should creating a tree policy request fail
      */
     public static TreePolicyRequest getTreePolicyRequest(final Context context,
-                                                         final ActionRequest request) throws EntitlementException {
-        return new TreePolicyRequestBuilder(context, request).build();
+            final ActionRequest request, SSOTokenManager tokenManager) throws EntitlementException {
+        return new TreePolicyRequestBuilder(context, request, tokenManager).build();
     }
 
 

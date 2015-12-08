@@ -16,16 +16,17 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static org.forgerock.json.resource.Router.uriTemplate;
+import static org.forgerock.authz.filter.crest.AuthorizationFilters.createAuthorizationFilter;
+import static org.forgerock.json.resource.ResourcePath.resourcePath;
+import static org.forgerock.json.resource.Router.*;
+import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.match;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Function;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -41,11 +42,14 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.Router.UriTemplate;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -62,17 +66,15 @@ class SmsRouteTree implements RequestHandler {
      * @param subTreeBuilders The sub trees.
      * @return A {@code SmsRouteTree}.
      */
-    static SmsRouteTree tree(SmsRouteTreeBuilder... subTreeBuilders) {
+    static SmsRouteTree tree(Map<MatchingResourcePath, CrestAuthorizationModule> authModules,
+            CrestAuthorizationModule defaultAuthModule,
+            SmsRouteTreeBuilder... subTreeBuilders) {
         Router router = new Router();
-        return createRouteTree(true, router, Arrays.asList(subTreeBuilders));
-    }
-
-    private static SmsRouteTree createRouteTree(boolean isRoot, Router router, Collection<SmsRouteTreeBuilder> subTreeBuilders) {
-        Set<SmsRouteTree> subTrees = new HashSet<SmsRouteTree>();
+        SmsRouteTree tree = new SmsRouteTree(authModules, defaultAuthModule, true, router, null, ResourcePath.empty());
         for (SmsRouteTreeBuilder subTreeBuilder : subTreeBuilders) {
-            subTrees.add(subTreeBuilder.build(router));
+            tree.addSubTree(subTreeBuilder.build(tree));
         }
-        return new SmsRouteTree(isRoot, router, subTrees, null);
+        return tree;
     }
 
     /**
@@ -83,7 +85,7 @@ class SmsRouteTree implements RequestHandler {
      * @return A {@code SmsRouteTreeBuilder}.
      */
     static SmsRouteTreeBuilder branch(String uriTemplate, SmsRouteTreeBuilder... subTreeBuilders) {
-        return new SmsRouteTreeBuilder(new Router(), uriTemplate, subTreeBuilders);
+        return new SmsRouteTreeBuilder(uriTemplate, subTreeBuilders);
     }
 
     /**
@@ -97,7 +99,7 @@ class SmsRouteTree implements RequestHandler {
      */
     static SmsRouteTreeBuilder branch(String uriTemplate, Function<String, Boolean> handlesFunction,
             SmsRouteTreeBuilder... subTreeBuilders) {
-        return new SmsRouteTreeBuilder(new Router(), uriTemplate, handlesFunction, subTreeBuilders);
+        return new SmsRouteTreeBuilder(uriTemplate, handlesFunction, subTreeBuilders);
     }
 
     /**
@@ -109,31 +111,44 @@ class SmsRouteTree implements RequestHandler {
      * @return A {@code SmsRouteTreeBuilder}.
      */
     static SmsRouteTreeBuilder leaf(String uriTemplate, Function<String, Boolean> handlesFunction) {
-        return new SmsRouteTreeLeafBuilder(new Router(), uriTemplate, handlesFunction);
+        return new SmsRouteTreeLeafBuilder(uriTemplate, handlesFunction);
     }
 
     static SmsRouteTreeBuilder filter(String uriTemplate, Function<String, Boolean> handlesFunction, Filter filter) {
-        return new SmsRouteTreeLeafBuilder(new Router(), uriTemplate, handlesFunction, filter);
+        return new SmsRouteTreeLeafBuilder(uriTemplate, handlesFunction, filter);
     }
 
+    final Map<MatchingResourcePath, CrestAuthorizationModule> authzModules;
+    final CrestAuthorizationModule defaultAuthzModule;
+    final Router router;
+    final ResourcePath path;
     private final boolean isRoot;
-    private final Router router;
     private final Set<SmsRouteTree> subTrees;
     private final Filter filter;
 
     /**
      * Creates a {@code SmsRouteTree} instance.
-     *
+     * @param authzModules Authz modules to use for specific matching resource paths.
+     * @param defaultAuthzModule Auth module to use if no matching resouce path exists in {@code authzModules}.
      * @param isRoot {@code true} if this {@code SmsRouteTree} is the root of the tree.
      * @param router The {@code Router} instance.
-     * @param subTrees Sub trees of this tree node.
      * @param filter The filter to wrap around all routes.
+     * @param path The path of this tree element.
      */
-    SmsRouteTree(boolean isRoot, Router router, Set<SmsRouteTree> subTrees, Filter filter) {
+    SmsRouteTree(Map<MatchingResourcePath, CrestAuthorizationModule> authzModules,
+            CrestAuthorizationModule defaultAuthzModule, boolean isRoot, Router router, Filter filter,
+            ResourcePath path) {
+        this.authzModules = authzModules;
+        this.defaultAuthzModule = defaultAuthzModule;
         this.isRoot = isRoot;
         this.router = router;
-        this.subTrees = subTrees;
+        this.path = path;
+        this.subTrees = new HashSet<>();
         this.filter = filter;
+    }
+
+    final void addSubTree(SmsRouteTree subTree) {
+        this.subTrees.add(subTree);
     }
 
     /**
@@ -166,13 +181,21 @@ class SmsRouteTree implements RequestHandler {
      * @return An opaque handle for the route which may be used for removing the route later.
      */
     final RouteMatcher<Request> addRoute(RoutingMode mode, String uriTemplate, RequestHandler handler) {
-        RequestHandler routeHandler;
-        if (filter == null) {
-            routeHandler = handler;
-        } else {
-            routeHandler = new FilterChain(handler, filter);
+        return addRoute(false, mode, uriTemplate, handler);
+    }
+
+    final RouteMatcher<Request> addRoute(boolean internal, RoutingMode mode, String uriTemplate,
+            RequestHandler handler) {
+        CrestAuthorizationModule authzModule = authzModules.get(match(concat(path, uriTemplate)));
+        if (authzModule != null || !internal) {
+            handler = createAuthorizationFilter(handler, authzModule == null ? defaultAuthzModule : authzModule);
         }
-        return router.addRoute(mode, uriTemplate(uriTemplate), routeHandler);
+
+        if (filter != null) {
+            handler = new FilterChain(handler, filter);
+        }
+
+        return router.addRoute(mode, uriTemplate(uriTemplate), handler);
     }
 
     /**
@@ -222,66 +245,12 @@ class SmsRouteTree implements RequestHandler {
         return router.handleUpdate(context, request);
     }
 
-    /**
-     * Builder for creating {@code SmsRouteTree} instances.
-     *
-     * @since 13.0.0
-     */
-    static class SmsRouteTreeBuilder {
-
-        private final Router router;
-        private final UriTemplate uriTemplate;
-        private final Set<SmsRouteTreeBuilder> subTreeBuilders;
-
-        private SmsRouteTreeBuilder(Router router, String uriTemplate, SmsRouteTreeBuilder... subTreeBuilders) {
-            this.router = router;
-            this.uriTemplate = uriTemplate(uriTemplate);
-            this.subTreeBuilders = new HashSet<>(Arrays.asList(subTreeBuilders));
+    static ResourcePath concat(ResourcePath parent, String child) {
+        if (StringUtils.isEmpty(child)) {
+            return parent;
         }
-
-        public SmsRouteTreeBuilder(Router router, String uriTemplate, Function<String, Boolean> handlesFunction,
-                SmsRouteTreeBuilder... subTreeBuilders) {
-            this(router, uriTemplate, subTreeBuilders);
-            this.subTreeBuilders.add(new SmsRouteTreeLeafBuilder(router, null, handlesFunction));
-        }
-
-        SmsRouteTree build(Router parent) {
-            parent.addRoute(RoutingMode.STARTS_WITH, uriTemplate, router);
-            return createRouteTree(false, router, subTreeBuilders);
-        }
+        ResourcePath childPath = resourcePath(child);
+        return parent.concat(childPath);
     }
 
-    /**
-     * Builder for creating {@code SmsRouteTreeLeaf} instances.
-     *
-     * @since 13.0.0
-     */
-    static final class SmsRouteTreeLeafBuilder extends SmsRouteTreeBuilder {
-
-        private final Router router;
-        private final String uriTemplate;
-        private final Function<String, Boolean> handlesFunction;
-        private final Filter filter;
-
-        private SmsRouteTreeLeafBuilder(Router router, String uriTemplate, Function<String, Boolean> handlesFunction) {
-            this(router, uriTemplate, handlesFunction, null);
-        }
-
-        private SmsRouteTreeLeafBuilder(Router router, String uriTemplate, Function<String, Boolean> handlesFunction,
-                Filter filter) {
-            super(router, uriTemplate);
-            this.router = router;
-            this.uriTemplate = uriTemplate;
-            this.handlesFunction = handlesFunction;
-            this.filter = filter;
-        }
-
-        @Override
-        SmsRouteTree build(Router parent) {
-            if (StringUtils.isNotEmpty(uriTemplate)) {
-                parent.addRoute(RoutingMode.STARTS_WITH, uriTemplate(uriTemplate), router);
-            }
-            return new SmsRouteTreeLeaf(router, handlesFunction, filter);
-        }
-    }
 }

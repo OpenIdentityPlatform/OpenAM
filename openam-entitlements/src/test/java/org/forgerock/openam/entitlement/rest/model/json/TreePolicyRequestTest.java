@@ -16,12 +16,12 @@
 
 package org.forgerock.openam.entitlement.rest.model.json;
 
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
-import org.forgerock.openam.entitlement.rest.model.json.TreePolicyRequest;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;
@@ -48,6 +48,8 @@ public class TreePolicyRequestTest {
     private SubjectContext subjectContext;
     @Mock
     private ActionRequest actionRequest;
+    @Mock
+    private SSOTokenManager tokenManager;
 
     private Subject restSubject;
 
@@ -68,7 +70,7 @@ public class TreePolicyRequestTest {
 
         // When...
         Context context = buildContextStructure("/abc");
-        TreePolicyRequest request = TreePolicyRequest.getTreePolicyRequest(context, actionRequest);
+        TreePolicyRequest request = TreePolicyRequest.getTreePolicyRequest(context, actionRequest, tokenManager);
 
         // Then...
         assertThat(request).isNotNull();
@@ -88,7 +90,7 @@ public class TreePolicyRequestTest {
 
         // When...
         Context context = buildContextStructure("/abc");
-        TreePolicyRequest.getTreePolicyRequest(context, actionRequest);
+        TreePolicyRequest.getTreePolicyRequest(context, actionRequest, tokenManager);
     }
 
     @Test(expectedExceptions = EntitlementException.class)
@@ -100,7 +102,7 @@ public class TreePolicyRequestTest {
 
         // When...
         Context context = buildContextStructure("/abc");
-        TreePolicyRequest.getTreePolicyRequest(context, actionRequest);
+        TreePolicyRequest.getTreePolicyRequest(context, actionRequest, tokenManager);
     }
 
     private Context buildContextStructure(final String realm) {

@@ -17,6 +17,7 @@ package org.forgerock.openam.rest.fluent;
 
 import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
 import static org.forgerock.openam.rest.fluent.JsonUtils.jsonFromFile;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import javax.security.auth.Subject;
@@ -33,6 +34,11 @@ import org.forgerock.services.context.RequestAuditContext;
 import org.forgerock.services.context.SecurityContext;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 public class AuditTestUtils {
 
@@ -53,10 +59,22 @@ public class AuditTestUtils {
                 AbstractAuditFilterTest.class.getClassLoader());
         final Subject callerSubject = new Subject();
         final Context securityContext = new SecurityContext(httpContext, null, null);
-        final Context subjectContext = new SSOTokenContext(securityContext) {
+        final Context subjectContext = new SSOTokenContext(mock(Debug.class), null, securityContext) {
             @Override
             public Subject getCallerSubject() {
                 return callerSubject;
+            }
+
+            @Override
+            public SSOToken getCallerSSOToken() {
+                SSOToken token = mock(SSOToken.class);
+                try {
+                    given(token.getProperty(Constants.AM_CTX_ID)).willReturn("TRACKING_ID");
+                    given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("USER_ID");
+                } catch (SSOException e) {
+                    // won't happen - it's a mock
+                }
+                return token;
             }
         };
         final Context clientContext = ClientContext.newInternalClientContext(subjectContext);

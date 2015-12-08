@@ -31,9 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.JwtPrincipal;
+import com.sun.identity.shared.Constants;
+
 import org.fest.assertions.Condition;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
@@ -64,31 +68,30 @@ public class PolicyRequestTest {
     private SubjectContext subjectContext;
     @Mock
     private ActionRequest actionRequest;
+    @Mock
+    private SSOTokenManager tokenManager;
 
     private Subject restSubject;
-    private Subject policySubject;
 
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         restSubject = new Subject();
-        policySubject = new Subject();
-        policySubject.getPrincipals().add(mock(Principal.class));
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullContext() throws EntitlementException {
-        MockRequest.getRequest(null, actionRequest);
+        getRequest(null, actionRequest);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullRequest() throws EntitlementException {
         Context context = buildContextStructure("/abc");
-        MockRequest.getRequest(context, null);
+        getRequest(context, null);
     }
 
     @Test
-    public void shouldConstructPolicyRequest() throws EntitlementException {
+    public void shouldConstructPolicyRequest() throws Exception {
         // Given...
         Map<String, List<String>> env = new HashMap<String, List<String>>();
         env.put("test", Arrays.asList("123", "456"));
@@ -100,23 +103,24 @@ public class PolicyRequestTest {
 
         given(actionRequest.getContent()).willReturn(json(properties));
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
-        given(subjectContext.getSubject("some-value")).willReturn(policySubject);
+        SSOToken token = mock(SSOToken.class);
+        given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("Fred");
+            given(tokenManager.createSSOToken(anyString())).willReturn(token);
 
         // When...
         Context context = buildContextStructure("/abc");
-        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
+        PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
         assertThat(request).isNotNull();
         assertThat(request.getRestSubject()).isEqualTo(restSubject);
-        assertThat(request.getPolicySubject()).isEqualTo(policySubject);
+        assertThat(request.getPolicySubject().getPrincipals().iterator().next().getName()).isEqualTo("Fred");
         assertThat(request.getRealm()).isEqualTo("/abc");
         assertThat(request.getApplication()).isEqualTo("some-application");
         assertThat(request.getEnvironment()).is(new EnvMapCondition(env));
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest).getContent();
-        verify(subjectContext).getSubject("some-value");
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
 
@@ -127,7 +131,7 @@ public class PolicyRequestTest {
 
         // When...
         Context context = buildContextStructure("/abc");
-        MockRequest.getRequest(context, actionRequest);
+        getRequest(context, actionRequest);
     }
 
     @Test(expectedExceptions = EntitlementException.class)
@@ -139,11 +143,10 @@ public class PolicyRequestTest {
         properties.put("subject", "some-value");
 
         given(actionRequest.getContent()).willReturn(json(properties));
-        given(subjectContext.getSubject("some-value")).willReturn(null);
 
         // When...
         Context context = buildContextStructure("/abc");
-        MockRequest.getRequest(context, actionRequest);
+        getRequest(context, actionRequest);
     }
 
     @Test
@@ -156,7 +159,7 @@ public class PolicyRequestTest {
 
         // When...
         Context context = buildContextStructure("/abc");
-        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
+        PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
         assertThat(request).isNotNull();
@@ -178,7 +181,7 @@ public class PolicyRequestTest {
 
         // When
         Context context = buildContextStructure("/abc");
-        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
+        PolicyRequest request = getRequest(context, actionRequest);
 
         // Then
         Subject policySubject = request.getPolicySubject();
@@ -198,7 +201,7 @@ public class PolicyRequestTest {
 
         // When
         Context context = buildContextStructure("/abc");
-        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
+        PolicyRequest request = getRequest(context, actionRequest);
 
         // Then
         Subject policySubject = request.getPolicySubject();
@@ -231,7 +234,7 @@ public class PolicyRequestTest {
 
         // When...
         Context context = buildContextStructure("/abc");
-        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
+        PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
         assertThat(request).isNotNull();
@@ -252,7 +255,7 @@ public class PolicyRequestTest {
 
         // When...
         Context context = buildContextStructure("");
-        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
+        PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
         assertThat(request).isNotNull();
@@ -273,7 +276,7 @@ public class PolicyRequestTest {
 
         // When...
         Context context = buildContextStructure("");
-        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
+        PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
         assertThat(request).isNotNull();
@@ -368,7 +371,7 @@ public class PolicyRequestTest {
     /**
      * Concrete mock implementation of {@link PolicyRequest} for the aid of testing.
      */
-    private static final class MockRequest extends PolicyRequest {
+    private final class MockRequest extends PolicyRequest {
 
         private MockRequest(MockBuilder builder) {
             super(builder);
@@ -379,22 +382,22 @@ public class PolicyRequestTest {
             throw new UnsupportedOperationException("Not required for this test");
         }
 
-        private static final class MockBuilder extends PolicyRequestBuilder<PolicyRequest> {
+    }
 
-            MockBuilder(Context context, ActionRequest request) throws EntitlementException {
-                super(context, request);
-            }
+    private final class MockBuilder extends PolicyRequest.PolicyRequestBuilder<PolicyRequest> {
 
-            @Override
-            PolicyRequest build() {
-                return new MockRequest(this);
-            }
+        MockBuilder(Context context, ActionRequest request) throws EntitlementException {
+            super(context, request, tokenManager);
         }
 
-        public static PolicyRequest getRequest(Context context, ActionRequest request) throws EntitlementException {
-            return new MockBuilder(context, request).build();
+        @Override
+        PolicyRequest build() {
+            return new MockRequest(this);
         }
+    }
 
+    public PolicyRequest getRequest(Context context, ActionRequest request) throws EntitlementException {
+        return new MockBuilder(context, request).build();
     }
 
 }

@@ -57,6 +57,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.RealmNormaliser;
@@ -149,10 +150,10 @@ public class SmsRealmProvider implements RequestHandler {
     @Override
     public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         switch (request.getAction()) {
-            case SmsResourceProvider.TEMPLATE:
+            case RestConstants.TEMPLATE:
                 return newResultPromise(newActionResponse(json(object(
                         field(PATH_ATTRIBUTE_NAME, "/"), field(ACTIVE_ATTRIBUTE_NAME, true)))));
-            case SmsResourceProvider.SCHEMA:
+            case RestConstants.SCHEMA:
                 return newResultPromise(newActionResponse(getSchema()));
             default:
             return new NotSupportedException("Action not supported: " + request.getAction()).asPromise();

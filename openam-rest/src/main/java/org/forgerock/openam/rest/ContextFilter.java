@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.rest;
 
+import javax.inject.Inject;
+
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.ActionRequest;
@@ -41,6 +43,13 @@ import org.forgerock.util.promise.Promise;
  * @since 13.0.0
  */
 public class ContextFilter implements Filter {
+
+    private final SSOTokenContext.Factory ssoTokenContextFactory;
+
+    @Inject
+    public ContextFilter(SSOTokenContext.Factory ssoTokenContextFactory) {
+        this.ssoTokenContextFactory = ssoTokenContextFactory;
+    }
 
     @Override
     public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
@@ -91,7 +100,7 @@ public class ContextFilter implements Filter {
 
     private Context addSSOTokenContext(Context context) {
         if (!context.containsContext(SSOTokenContext.class)) {
-            return new SSOTokenContext(context);
+            return ssoTokenContextFactory.create(context);
         } else {
             return context;
         }

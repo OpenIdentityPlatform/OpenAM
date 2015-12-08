@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.core.rest.sms;
 
+import static java.util.Collections.emptyMap;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.openam.core.rest.sms.SmsRouteTree.*;
@@ -54,10 +55,15 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.collect.Maps;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
+import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.services.context.Context;
@@ -192,7 +198,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             AuthenticationModuleTypeHandler authenticationModuleTypeHandler,
             SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter,
             RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
-            RealmNormaliser realmNormaliser)
+            RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
+            PrivilegeAuthzModule privilegeAuthzModule)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
@@ -209,7 +216,10 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.realmContextFilter = realmContextFilter;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
-        routeTree = tree(
+        Map<MatchingResourcePath, CrestAuthorizationModule> authzModules = type.equals(SchemaType.GLOBAL)
+                ? globalAuthzModules
+                : Collections.<MatchingResourcePath, CrestAuthorizationModule>emptyMap();
+        routeTree = tree(authzModules, privilegeAuthzModule,
                 branch("/authentication", AUTHENTICATION_HANDLES_FUNCTION,
                         leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION),
                         filter("/chains", AUTHENTICATION_CHAINS_HANDLES_FUNCTION, authenticationChainsFilter)),
@@ -581,7 +591,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             RequestHandler handler, List<Pattern> ignoredRoutes, SmsRouteTree routeTree) {
         for (Pattern ignored : ignoredRoutes) {
             if (ignored.matcher(path).matches()) {
-                return Collections.emptyMap();
+                return emptyMap();
             }
         }
         SmsRouteTree tree = routeTree == null ? this.routeTree.handles(schema.getServiceName()) : routeTree;

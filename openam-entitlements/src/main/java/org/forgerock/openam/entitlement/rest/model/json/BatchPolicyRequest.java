@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.entitlement.rest.model.json;
 
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
@@ -60,9 +61,9 @@ public final class BatchPolicyRequest extends PolicyRequest {
 
         private final Set<String> resources;
 
-        private BatchPolicyRequestBuilder(final Context context,
-                                          final ActionRequest request) throws EntitlementException {
-            super(context, request);
+        private BatchPolicyRequestBuilder(final Context context, final ActionRequest request,
+                SSOTokenManager tokenManager) throws EntitlementException {
+            super(context, request, tokenManager);
             final JsonValue jsonValue = request.getContent();
             Reject.ifNull(jsonValue);
             resources = getResources(jsonValue);
@@ -99,9 +100,9 @@ public final class BatchPolicyRequest extends PolicyRequest {
      * @throws EntitlementException
      *         should creating a batch policy request fail
      */
-    public static BatchPolicyRequest getBatchPolicyRequest(final Context context,
-                                                           final ActionRequest request) throws EntitlementException {
-        return new BatchPolicyRequestBuilder(context, request).build();
+    public static BatchPolicyRequest getBatchPolicyRequest(final Context context, final ActionRequest request,
+            SSOTokenManager tokenManager) throws EntitlementException {
+        return new BatchPolicyRequestBuilder(context, request, tokenManager).build();
     }
 
 }

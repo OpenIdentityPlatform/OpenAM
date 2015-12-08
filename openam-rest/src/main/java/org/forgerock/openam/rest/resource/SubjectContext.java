@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.rest.resource;
 
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.services.context.Context;
@@ -37,24 +39,21 @@ public interface SubjectContext extends Context {
     Subject getCallerSubject();
 
     /**
-     * Given a token Id returns the subject representation.
-     * If the token Id is null or invalid, a null subject will be returned.
-     *
-     * @param tokenId
-     *         a valid token Id
-     *
-     * @return the corresponding subject, or null if the token Id is invalid
-     */
-    Subject getSubject(String tokenId);
-
-    /**
      * Returns the authenticated subjects sso token associated with this request.
      *
-     * @return the SSO token associated with this request
-     *
-     * @throws SSOException
-     *         should an error occur retrieving the token
+     * @return the {@link SSOToken} associated with this request
      */
-    SSOToken getCallerSSOToken() throws SSOException;
+    SSOToken getCallerSSOToken();
 
+    /**
+     * Returns the session ID created from the token ID.
+     * @return The {@link SessionID} instance.
+     */
+    SessionID getCallerSessionID();
+
+    /**
+     * Returns the session created from the session ID.
+     * @return The {@link Session} instance.
+     */
+    Session getCallerSession();
 }

@@ -48,6 +48,7 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
@@ -91,8 +92,6 @@ abstract class SmsResourceProvider {
     }
 
     public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = Arrays.asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);
-    static final String TEMPLATE = "template";
-    static final String SCHEMA = "schema";
     protected final String serviceName;
     protected final String serviceVersion;
     protected final List<ServiceSchema> subSchemaPath;
@@ -219,9 +218,9 @@ abstract class SmsResourceProvider {
     }
 
     protected Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        if (request.getAction().equals(TEMPLATE)) {
+        if (request.getAction().equals(RestConstants.TEMPLATE)) {
             return newResultPromise(newActionResponse(converter.toJson(schema.getAttributeDefaults())));
-        } else if (SCHEMA.equals(request.getAction())) {
+        } else if (RestConstants.SCHEMA.equals(request.getAction())) {
             return newResultPromise(newActionResponse(createSchema(context)));
         } else {
             return new NotSupportedException("Action not supported: " + request.getAction()).asPromise();

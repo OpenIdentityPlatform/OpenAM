@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.entitlement.rest.model.json;
 
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -49,6 +50,8 @@ public class BatchPolicyRequestTest {
     private SubjectContext subjectContext;
     @Mock
     private ActionRequest actionRequest;
+    @Mock
+    private SSOTokenManager tokenManager;
 
     private Subject restSubject;
 
@@ -67,7 +70,7 @@ public class BatchPolicyRequestTest {
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
 
         Context context = buildContextStructure("/abc");
-        BatchPolicyRequest request = BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest);
+        BatchPolicyRequest request = BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest, tokenManager);
 
         assertThat(request).isNotNull();
         assertThat(request.getResources()).containsOnly("/resource/a", "/resource/b");
@@ -86,7 +89,7 @@ public class BatchPolicyRequestTest {
 
         // Given...
         Context context = buildContextStructure("/abc");
-        BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest);
+        BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest, tokenManager);
     }
 
     @Test(expectedExceptions = EntitlementException.class)
@@ -98,7 +101,7 @@ public class BatchPolicyRequestTest {
 
         // Given...
         Context context = buildContextStructure("/abc");
-        BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest);
+        BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest, tokenManager);
     }
 
     private Context buildContextStructure(final String realm) {

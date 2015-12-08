@@ -56,7 +56,7 @@ public class AdminOnlyAuthzModule extends SSOTokenAuthzModule {
     @Override
     protected Promise<AuthorizationResult, ResourceException> validateToken(Context context, SSOToken token) throws SSOException, ResourceException {
         String userId = getUserId(token);
-        if (isSuperUser(userId)) {
+        if (userId != null && isSuperUser(userId)) {
             debug.message("AdminOnlyAuthZModule :: User, {} accepted as Administrator.", userId);
             return Promises.newResultPromise(AuthorizationResult.accessPermitted());
         } else {
@@ -66,7 +66,7 @@ public class AdminOnlyAuthzModule extends SSOTokenAuthzModule {
     }
 
     protected static String getUserId(SSOToken token) throws SSOException {
-        return token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
+        return token == null ? null : token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
     }
 
     protected boolean isSuperUser(String userId) {

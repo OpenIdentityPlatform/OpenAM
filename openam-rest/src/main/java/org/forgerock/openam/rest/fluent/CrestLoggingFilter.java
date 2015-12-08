@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.ActionRequest;
@@ -187,21 +188,18 @@ public class CrestLoggingFilter implements Filter {
      * Pushes off to our logging subsystem.
      */
     private void logAccess(String resource, String operation, Context context) {
-
-        if (!context.containsContext(SSOTokenContext.class)) {
-            context = new SSOTokenContext(context);
-        }
-
-        SSOTokenContext ssoTokenContext = context.asContext(SSOTokenContext.class);
-
         try {
-            restLog.auditAccessMessage(resource, operation, ssoTokenContext.getCallerSSOToken());
+            SSOToken token = SSOTokenContext.getSsoToken(context);
+            restLog.auditAccessMessage(resource, operation, token);
+            if (token == null) {
+                debug.message("CrestLoggingFilter :: no token from context, logging user as 'null'");
+            }
         } catch (SSOException e) {
             if (debug.warningEnabled()) {
                 debug.warning("CrestLoggingFilter :: " +
                         "Error retrieving SSO Token from provided context, forced to log user as 'null'.", e);
-                restLog.auditAccessMessage(resource, operation, null);
             }
+            restLog.auditAccessMessage(resource, operation, null);
         }
 
         restLog.debugOperationAttemptAsPrincipal(resource, operation, context, null, debug);

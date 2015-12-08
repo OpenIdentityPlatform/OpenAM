@@ -17,11 +17,17 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.resource.ResourcePath.resourcePath;
+
+import java.util.Collections;
 
 import javax.annotation.Nullable;
 
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Function;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
+import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -41,7 +47,8 @@ public class SmsRouteTreeLeafTest {
             }
         };
 
-        routeTree = new SmsRouteTreeLeaf(router, handlesFunction, null);
+        routeTree = new SmsRouteTreeLeaf(Collections.<MatchingResourcePath, CrestAuthorizationModule>emptyMap(), null,
+                router, handlesFunction, null, resourcePath(""));
     }
 
     @DataProvider(name = "handlesFunction")
