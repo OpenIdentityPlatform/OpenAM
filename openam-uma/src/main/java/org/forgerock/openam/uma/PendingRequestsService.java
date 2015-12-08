@@ -29,11 +29,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.services.context.Context;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -43,10 +44,10 @@ import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
 
 /**
@@ -65,6 +66,7 @@ public class PendingRequestsService {
     private final PendingRequestEmailTemplate pendingRequestEmailTemplate;
     private final UmaPolicyService policyService;
     private final BaseURLProviderFactory baseURLProviderFactory;
+    private final CoreWrapper coreWrapper;
 
     /**
      * Constructs a new {@code PendingRequestsService} instance.
@@ -76,13 +78,14 @@ public class PendingRequestsService {
      * @param pendingRequestEmailTemplate An instance of the {@code PendingRequestEmailTemplate}.
      * @param policyService An instance of the {@code UmaPolicyService}.
      * @param baseURLProviderFactory An instance of the {@code BaseUrlProviderFactory}.
+     * @param coreWrapper An instance of the {@code CoreWrapper}.
      */
     @Inject
     public PendingRequestsService(@DataLayer(ConnectionType.UMA_PENDING_REQUESTS) TokenDataStore store,
             UmaAuditLogger auditLogger, UmaProviderSettingsFactory settingsFactory,
             UmaEmailService emailService,
             PendingRequestEmailTemplate pendingRequestEmailTemplate, UmaPolicyService policyService,
-            BaseURLProviderFactory baseURLProviderFactory) {
+            BaseURLProviderFactory baseURLProviderFactory, CoreWrapper coreWrapper) {
         this.store = store;
         this.auditLogger = auditLogger;
         this.settingsFactory = settingsFactory;
@@ -90,6 +93,7 @@ public class PendingRequestsService {
         this.pendingRequestEmailTemplate = pendingRequestEmailTemplate;
         this.policyService = policyService;
         this.baseURLProviderFactory = baseURLProviderFactory;
+        this.coreWrapper = coreWrapper;
     }
 
     /**
@@ -231,9 +235,10 @@ public class PendingRequestsService {
                         }
                     }
                     store.delete(id);
+
+                    AMIdentity resourceOwner = coreWrapper.getIdentity(request.getResourceOwnerId(), realm);
                     auditLogger.log(request.getResourceSetId(), request.getResourceSetName(),
-                            request.getResourceOwnerId(), UmaAuditType.REQUEST_APPROVED,
-                            request.getRequestingPartyId());
+                            resourceOwner, UmaAuditType.REQUEST_APPROVED, request.getRequestingPartyId());
 
                     return newResultPromise(null);
                 } catch (NotFoundException e) {
@@ -317,7 +322,8 @@ public class PendingRequestsService {
         try {
             UmaPendingRequest request = store.read(id);
             store.delete(id);
-            auditLogger.log(request.getResourceSetId(), request.getResourceSetName(), request.getResourceOwnerId(),
+            AMIdentity resourceOwner = coreWrapper.getIdentity(request.getResourceOwnerId(), realm);
+            auditLogger.log(request.getResourceSetId(), request.getResourceSetName(), resourceOwner,
                     UmaAuditType.REQUEST_DENIED, request.getRequestingPartyId());
         } catch (NotFoundException e) {
             throw new org.forgerock.json.resource.NotFoundException("Pending request, " + id + ", not found", e);

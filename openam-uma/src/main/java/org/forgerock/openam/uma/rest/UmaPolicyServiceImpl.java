@@ -41,7 +41,6 @@ import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -363,9 +362,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         public Promise<UmaPolicy, ResourceException> apply(List<ResourceResponse> value) {
             try {
                 UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value);
-                String userId = getLoggedInUserId(context);
-                auditLogger.get().log(resourceSet.getId(), resourceSet.getName(), userId,
-                        UmaAuditType.POLICY_CREATED, userId);
+                AMIdentity resourceOwner = getLoggedInUser(context);
+                auditLogger.get().log(resourceSet.getId(), resourceSet.getName(), resourceOwner,
+                        UmaAuditType.POLICY_CREATED, resourceOwner.getUniversalId());
                 return newResultPromise(umaPolicy);
             } catch (ResourceException e) {
                 return e.asPromise();
@@ -537,8 +536,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             return when(promises).thenAsync(new AsyncFunction<List<ResourceResponse>, UmaPolicy, ResourceException>() {
                 @Override
                 public Promise<UmaPolicy, ResourceException> apply(List<ResourceResponse> value) throws ResourceException {
-                    String userId = getLoggedInUserId(context);
-                    auditLogger.get().log(resourceSetId, resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
+                    AMIdentity resourceOwner = getLoggedInUser(context);
+                    auditLogger.get().log(resourceSetId, resourceSet.getName(), resourceOwner, UmaAuditType.POLICY_UPDATED, userId);
                     resolveUIDToUsername(updatedUmaPolicy.asJson());
                     return newResultPromise(updatedUmaPolicy);
                 }
@@ -890,6 +889,15 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             SSOToken token = subjectContext.getCallerSSOToken();
             return token.getPrincipal().getName();
         } catch (SSOException e) {
+            throw new InternalServerErrorException(e);
+        }
+    }
+
+    private AMIdentity getLoggedInUser(Context context) throws InternalServerErrorException {
+        try {
+            SubjectContext subjectContext = context.asContext(SubjectContext.class);
+            return new AMIdentity(subjectContext.getCallerSSOToken());
+        } catch (SSOException | IdRepoException e) {
             throw new InternalServerErrorException(e);
         }
     }

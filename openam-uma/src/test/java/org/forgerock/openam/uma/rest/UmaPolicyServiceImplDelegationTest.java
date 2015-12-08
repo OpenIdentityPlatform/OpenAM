@@ -42,6 +42,7 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 
+import com.sun.identity.shared.Constants;
 import org.assertj.core.api.Assertions;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.services.context.Context;
@@ -113,7 +114,8 @@ public class UmaPolicyServiceImplDelegationTest {
     @Mock
     UmaSettings umaSettings;
 
-    private String loggedInUser;
+    private AMIdentity loggedInUser;
+    private String loggedInUserId;
     private String loggedInRealm;
     private String userInUri;
     private Set<JsonValue> createdPolicies;
@@ -151,6 +153,7 @@ public class UmaPolicyServiceImplDelegationTest {
     @AfterMethod
     public void tearDown() {
         loggedInUser = null;
+        loggedInUserId = null;
         loggedInRealm = null;
         userInUri = null;
         createdPolicies = null;
@@ -160,7 +163,7 @@ public class UmaPolicyServiceImplDelegationTest {
     public void aliceShouldBeAbleToCreatePolicyForResource() throws Exception {
 
         //Given
-        userIsLoggedIn("alice", "REALM");
+        AMIdentity loggedInUser = userIsLoggedIn("alice", "REALM");
         accessingUriForUser("alice");
         String resourceSetId = registerResourceSet("alice");
         JsonValue policy = policyToCreate(resourceSetId);
@@ -173,14 +176,14 @@ public class UmaPolicyServiceImplDelegationTest {
         promise.getOrThrow();
         assertThat(promise).succeeded();
         verifyPolicyIsCreatedForLoggedInUser();
-        verifyAuditLogCreatedForLoggedInUser(resourceSetId);
+        verifyAuditLogCreatedForLoggedInUser(resourceSetId, loggedInUser);
     }
 
     @Test
     public void bobShouldBeAbleToCreatePolicyForResourceSharedByAlice() throws Exception {
 
         //Given
-        userIsLoggedIn("bob", "REALM");
+        AMIdentity loggedInUser = userIsLoggedIn("bob", "REALM");
         accessingUriForUser("bob");
         String resourceSetId = registerResourceSet("alice");
         createPolicyFor("bob", resourceSetId, "SCOPE_A", "SCOPE_B");
@@ -194,7 +197,7 @@ public class UmaPolicyServiceImplDelegationTest {
         //Then
         assertThat(promise).succeeded();
         verifyPolicyIsCreatedForLoggedInUser();
-        verifyAuditLogCreatedForLoggedInUser(resourceSetId);
+        verifyAuditLogCreatedForLoggedInUser(resourceSetId, loggedInUser);
     }
 
     @Test
@@ -313,16 +316,17 @@ public class UmaPolicyServiceImplDelegationTest {
 
     //Set up helper methods
 
-    private void userIsLoggedIn(String username, String realm) {
-        loggedInUser = username;
+    private AMIdentity userIsLoggedIn(String username, String realm) {
+        loggedInUserId = username;
         loggedInRealm = realm;
-        setupIdentityForUser(loggedInUser, loggedInRealm);
+        return setupIdentityForUser(username, loggedInRealm);
     }
 
-    private void setupIdentityForUser(String username, String realm) {
-        AMIdentity identity = mock(AMIdentity.class);
-        given(identity.getUniversalId()).willReturn("uid=" + username + ",ou=" + realm + ",dc=forgerock,dc=org");
-        given(coreServicesWrapper.getIdentity(username, realm)).willReturn(identity);
+    private AMIdentity setupIdentityForUser(String username, String realm) {
+        AMIdentity loggedInUser = mock(AMIdentity.class);
+        given(loggedInUser.getUniversalId()).willReturn("id=" + username + ",ou=" + realm + ",dc=forgerock,dc=org");
+        given(coreServicesWrapper.getIdentity(username, realm)).willReturn(loggedInUser);
+        return loggedInUser;
     }
 
     private void accessingUriForUser(String username) {
@@ -450,8 +454,9 @@ public class UmaPolicyServiceImplDelegationTest {
         SSOToken ssoToken = mock(SSOToken.class);
         Principal principal = mock(Principal.class);
         given(subjectContext.getCallerSSOToken()).willReturn(ssoToken);
+        given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("id=" + loggedInUserId + ",ou=REALM,dc=forgerock,dc=org");
         given(ssoToken.getPrincipal()).willReturn(principal);
-        given(principal.getName()).willReturn(loggedInUser);
+        given(principal.getName()).willReturn(loggedInUserId);
         return ClientContext.newInternalClientContext(new RealmContext(subjectContext));
     }
 
@@ -475,11 +480,13 @@ public class UmaPolicyServiceImplDelegationTest {
         verify(policyResourceDelegate, never()).createPolicies(any(Context.class), anySetOf(JsonValue.class));
     }
 
-    private void verifyAuditLogCreatedForLoggedInUser(String resourceSetId) {
-        verify(auditLogger).log(eq(resourceSetId), anyString(), eq(loggedInUser), eq(UmaAuditType.POLICY_CREATED), eq(loggedInUser));
+    private void verifyAuditLogCreatedForLoggedInUser(String resourceSetId, AMIdentity loggedInUser) {
+        ArgumentCaptor<AMIdentity> loggedInUserCaptor = ArgumentCaptor.forClass(AMIdentity.class);
+        verify(auditLogger).log(eq(resourceSetId), anyString(), loggedInUserCaptor.capture(), eq(UmaAuditType.POLICY_CREATED), eq("id=" + loggedInUserId + ",ou=REALM,dc=forgerock,dc=org"));
+        Assertions.assertThat(loggedInUserCaptor.getValue().getUniversalId()).isEqualTo(loggedInUser.getUniversalId());
     }
 
     private void verifyAuditLogNotCreatedForLoggedInUser(String resourceSetId) {
-        verify(auditLogger, never()).log(eq(resourceSetId), anyString(), eq(loggedInUser), eq(UmaAuditType.POLICY_CREATED), eq(loggedInUser));
+        verify(auditLogger, never()).log(eq(resourceSetId), anyString(), eq(loggedInUser), eq(UmaAuditType.POLICY_CREATED), eq("id=" + loggedInUserId + ",ou=REALM,dc=forgerock,dc=org"));
     }
 }

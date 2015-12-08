@@ -115,6 +115,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         final OAuth2Request oauth2Request = requestFactory.create(getRequest());
         OAuth2ProviderSettings oauth2ProviderSettings = oauth2ProviderSettingsFactory.get(oauth2Request);
         final UmaTokenStore umaTokenStore = umaProviderSettings.getUmaTokenStore();
+        String realm = oauth2Request.getParameter("realm");
 
         JsonValue requestBody = json(toMap(entity));
 
@@ -125,30 +126,31 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         final Request request = getRequest();
         final String resourceOwnerId = getResourceOwnerId(oauth2ProviderSettings, resourceSetId);
 
+        AMIdentity resourceOwner = createIdentity(resourceOwnerId, realm);
         String requestingPartyId = null;
         try {
             requestingPartyId = getRequestingPartyId(umaProviderSettings, oauth2ProviderSettings, requestBody);
         } finally {
-            auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.REQUEST, request,
+            auditLogger.log(resourceSetId, resourceOwner, UmaAuditType.REQUEST, request,
                     requestingPartyId == null ? getAuthorisationApiToken().getResourceOwnerId() : requestingPartyId);
         }
 
         if (isEntitled(umaProviderSettings, oauth2ProviderSettings, permissionTicket, requestingPartyId)) {
             getResponse().setStatus(new Status(200));
-            auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.GRANTED, request, requestingPartyId);
+            auditLogger.log(resourceSetId, resourceOwner, UmaAuditType.GRANTED, request, requestingPartyId);
             return createJsonRpt(umaTokenStore, permissionTicket);
         } else {
             try {
                 if (verifyPendingRequestDoesNotAlreadyExist(resourceSetId, resourceOwnerId, permissionTicket.getRealm(),
                         requestingPartyId, permissionTicket.getScopes())) {
-                    auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.DENIED, request, requestingPartyId);
+                    auditLogger.log(resourceSetId, resourceOwner, UmaAuditType.DENIED, request, requestingPartyId);
                     throw new UmaException(403, UmaConstants.NOT_AUTHORISED_ERROR_CODE,
                             "The client is not authorised to access the requested resource set");
                 } else {
                     pendingRequestsService.createPendingRequest(ServletUtils.getRequest(getRequest()), resourceSetId,
                             auditLogger.getResourceName(resourceSetId, request), resourceOwnerId, requestingPartyId,
                             permissionTicket.getRealm(), permissionTicket.getScopes());
-                    auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.REQUEST_SUBMITTED, request,
+                    auditLogger.log(resourceSetId, resourceOwner, UmaAuditType.REQUEST_SUBMITTED, request,
                             requestingPartyId);
                 }
             } catch (org.forgerock.openam.sm.datalayer.store.ServerException e) {

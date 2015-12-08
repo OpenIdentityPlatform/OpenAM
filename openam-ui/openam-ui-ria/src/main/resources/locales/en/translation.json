@@ -639,11 +639,13 @@
             "grid": {
                 "header": ["User", "Resource", "Action", "When"],
                 "types": {
-                    "authorisation_denied": "Denied authorisation",
-                    "authorisation_granted": "Granted authorisation",
                     "authorisation_requested": "Requested authorisation",
-                    "policy_created": "Created policy",
-                    "policy_updated": "Updated policy"
+                    "authorisation_request_approved": "Granted authorisation",
+                    "authorisation_request_denied": "Denied authorisation",
+                    "authorisation_granted": "Granted authorisation",
+                    "authorisation_denied": "Denied authorisation",
+                    "policy_created": "Shared",
+                    "policy_updated": "Updated share"
                 }
             }
         },

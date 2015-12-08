@@ -42,6 +42,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import com.sun.identity.shared.Constants;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.uma.extensions.ResourceDelegationFilter;
 import org.forgerock.services.context.Context;
@@ -164,6 +165,7 @@ public class UmaPolicyServiceImplTest {
         SSOToken ssoToken = mock(SSOToken.class);
         Principal principal = mock(Principal.class);
         given(subjectContext.getCallerSSOToken()).willReturn(ssoToken);
+        given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("id=" + userShortName + ",ou=REALM,dc=forgerock,dc=org");
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn(userShortName);
         return ClientContext.newInternalClientContext(new RealmContext(subjectContext));

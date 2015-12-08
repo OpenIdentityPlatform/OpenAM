@@ -52,6 +52,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -133,6 +134,9 @@ public class AuthorizationRequestEndpointTest {
     @SuppressWarnings("unchecked")
     public void setup() throws ServerException, InvalidGrantException, NotFoundException, EntitlementException, JSONException {
         requestFactory = mock(OAuth2RequestFactory.class);
+        OAuth2Request oAuth2Request = mock(OAuth2Request.class);
+        given(requestFactory.create(any(Request.class))).willReturn(oAuth2Request);
+        given(oAuth2Request.getParameter("realm")).willReturn("REALM");
         accessToken = mock(AccessToken.class);
 
         oauth2TokenStore = mock(TokenStore.class);
@@ -439,7 +443,7 @@ public class AuthorizationRequestEndpointTest {
         } catch (UmaException e) {
             verify(pendingRequestsService).createPendingRequest(any(HttpServletRequest.class), eq("RESOURCE_SET_ID"),
                     anyString(), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
-            verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.REQUEST_SUBMITTED),
+            verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), any(AMIdentity.class), eq(UmaAuditType.REQUEST_SUBMITTED),
                     any(Request.class), anyString());
             assertThat(e.getStatusCode()).isEqualTo(403);
             assertThat(e.getError()).isEqualTo("request_submitted");
@@ -471,7 +475,7 @@ public class AuthorizationRequestEndpointTest {
         } catch (UmaException e) {
             verify(pendingRequestsService).createPendingRequest(any(HttpServletRequest.class), eq("RESOURCE_SET_ID"),
                     anyString(), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
-            verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.REQUEST_SUBMITTED),
+            verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), any(AMIdentity.class), eq(UmaAuditType.REQUEST_SUBMITTED),
                     any(Request.class), anyString());
             assertThat(e.getStatusCode()).isEqualTo(403);
             assertThat(e.getError()).isEqualTo("request_submitted");
@@ -503,7 +507,7 @@ public class AuthorizationRequestEndpointTest {
         } catch (UmaException e) {
             verify(pendingRequestsService, never()).createPendingRequest(any(HttpServletRequest.class),
                     eq("RESOURCE_SET_ID"), anyString(), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
-            verify(umaAuditLogger, never()).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.REQUEST_SUBMITTED),
+            verify(umaAuditLogger, never()).log(eq("RESOURCE_SET_ID"), any(AMIdentity.class), eq(UmaAuditType.REQUEST_SUBMITTED),
                     any(Request.class), anyString());
             assertThat(e.getStatusCode()).isEqualTo(403);
             assertThat(e.getError()).isEqualTo("request_submitted");

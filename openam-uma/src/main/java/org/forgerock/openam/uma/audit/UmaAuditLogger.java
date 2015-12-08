@@ -62,10 +62,10 @@ public class UmaAuditLogger {
         this.oauth2ProviderSettingsFactory = oauth2ProviderSettingsFactory;
     }
 
-    public void log(String resourceSetId, String resourceOwnerId, UmaAuditType message, Request request,
+    public void log(String resourceSetId, AMIdentity resourceOwner, UmaAuditType message, Request request,
             String requestingPartyId) {
         try {
-            log(resourceSetId, getResourceName(resourceSetId, request), resourceOwnerId, message, requestingPartyId);
+            log(resourceSetId, getResourceName(resourceSetId, request), resourceOwner, message, requestingPartyId);
         } catch (UmaException e) {
             logger.warning("Error writing to UMA audit log", e);
         } catch (NotFoundException e) {
@@ -75,12 +75,12 @@ public class UmaAuditLogger {
         }
     }
 
-    public void log(String resourceSetId, String resourceSetName, String resourceOwnerId, UmaAuditType message,
+    public void log(String resourceSetId, String resourceSetName, AMIdentity resourceOwner, UmaAuditType message,
             String requestingPartyId) {
         final UmaAuditEntry umaAuditEntry;
         try {
-            umaAuditEntry = new UmaAuditEntry(resourceSetId, resourceSetName, resourceOwnerId, message.toString(),
-                    requestingPartyId);
+            umaAuditEntry = new UmaAuditEntry(resourceSetId, resourceSetName, resourceOwner.getUniversalId(),
+                    message.toString(), requestingPartyId);
             delegate.create(umaAuditEntry);
         } catch (ServerException e) {
             logger.warning("Error writing to UMA audit log", e);

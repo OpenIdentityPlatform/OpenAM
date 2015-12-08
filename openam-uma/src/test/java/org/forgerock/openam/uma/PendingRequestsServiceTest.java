@@ -33,7 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Set;
 
+import com.sun.identity.idm.AMIdentity;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
@@ -80,6 +82,8 @@ public class PendingRequestsServiceTest {
     private UmaPolicyService policyService;
     @Mock
     private BaseURLProvider baseUrlProvider;
+    @Mock
+    private AMIdentity resourceOwnerIdentity;
 
     @SuppressWarnings("unchecked")
     @BeforeMethod
@@ -89,9 +93,11 @@ public class PendingRequestsServiceTest {
         given(settingsFactory.get(anyString())).willReturn(settings);
         BaseURLProviderFactory baseUrlProviderFactory = mock(BaseURLProviderFactory.class);
         given(baseUrlProviderFactory.get(anyString())).willReturn(baseUrlProvider);
+        CoreWrapper coreWrapper = mock(CoreWrapper.class);
+        given(coreWrapper.getIdentity(RESOURCE_OWNER_ID, REALM)).willReturn(resourceOwnerIdentity);
 
         service = new PendingRequestsService(store, auditLogger, settingsFactory, emailService,
-                pendingRequestEmailTemplate, policyService, baseUrlProviderFactory);
+                pendingRequestEmailTemplate, policyService, baseUrlProviderFactory, coreWrapper);
     }
 
     @Test
@@ -199,7 +205,7 @@ public class PendingRequestsServiceTest {
         assertThat(policy).stringAt("permissions/0/subject").isEqualTo(REQUESTING_PARTY_ID);
         assertThat(policy).hasArray("permissions/0/scopes").containsOnly(SCOPE);
         verify(store).delete(PENDING_REQUEST_ID);
-        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, resourceOwnerIdentity,
                 UmaAuditType.REQUEST_APPROVED, REQUESTING_PARTY_ID);
     }
 
@@ -225,7 +231,7 @@ public class PendingRequestsServiceTest {
         assertThat(policy).stringAt("permissions/0/subject").isEqualTo(REQUESTING_PARTY_ID);
         assertThat(policy).hasArray("permissions/0/scopes").containsOnly("SCOPE_A", "SCOPE_B");
         verify(store).delete(PENDING_REQUEST_ID);
-        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, resourceOwnerIdentity,
                 UmaAuditType.REQUEST_APPROVED, REQUESTING_PARTY_ID);
     }
 
@@ -254,7 +260,7 @@ public class PendingRequestsServiceTest {
         assertThat(policy).stringAt("permissions/1/subject").isEqualTo(REQUESTING_PARTY_ID);
         assertThat(policy).hasArray("permissions/1/scopes").containsOnly(SCOPE);
         verify(store).delete(PENDING_REQUEST_ID);
-        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, resourceOwnerIdentity,
                 UmaAuditType.REQUEST_APPROVED, REQUESTING_PARTY_ID);
     }
 
@@ -278,7 +284,7 @@ public class PendingRequestsServiceTest {
         verify(emailService).email(REALM, REQUESTING_PARTY_ID, "APPROVAL_SUBJECT",
                 "APPROVAL_BODY " + RESOURCE_OWNER_ID + " " + RESOURCE_SET_NAME + " " + SCOPE);
         verify(store).delete(PENDING_REQUEST_ID);
-        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, resourceOwnerIdentity,
                 UmaAuditType.REQUEST_APPROVED, REQUESTING_PARTY_ID);
     }
 
@@ -294,7 +300,7 @@ public class PendingRequestsServiceTest {
 
         //Then
         verify(store).delete(PENDING_REQUEST_ID);
-        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, resourceOwnerIdentity,
                 UmaAuditType.REQUEST_DENIED, REQUESTING_PARTY_ID);
     }
 
