@@ -117,7 +117,7 @@ public class SAML2PostAuthenticationPlugin implements AMPostAuthProcessInterface
             if (data == null && SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                 data = (SAML2ResponseData) SAML2FailoverUtils.retrieveSAML2Token(cacheKey);
             }
-            
+
             if (data == null) {
                 throw new SAML2Exception("Unable to retrieve response map from data cache.");
             }
