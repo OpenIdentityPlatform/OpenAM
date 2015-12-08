@@ -18,13 +18,13 @@
     <div class="form-group">
         <label class="sr-only" for="input-password">{{t 'common.user.password'}}</label>
         <input type="password" placeholder="{{t 'common.user.password'}}" id="input-password" name="user.userPassword" class="form-control input-lg"
-            data-validation-dependents="passwordConfirm" data-validator-event="keyup"
+            data-validation-dependents="input-confirmPassword" data-validator-event="keyup"
             data-validator="required minLength" minLength="8"/>
     </div>
 
     <div class="form-group">
         <label class="sr-only" for="input-confirmPassword">{{t 'common.user.confirmPassword'}}</label>
-        <input type="password" placeholder="{{t 'common.user.confirmPassword'}}" id="input-confirmPassword" class="form-control input-lg" data-validator="passwordConfirm" data-validator-event="keyup" required />
+        <input type="password" placeholder="{{t 'common.user.confirmPassword'}}" id="input-confirmPassword" class="form-control input-lg" data-validator="passwordConfirm" passwordField="input-password" data-validator-event="keyup" required />
     </div>
 
     <input type="hidden" id="input-inetUserStatus" name="user.inetUserStatus" value="Active" aria-hidden="true" />

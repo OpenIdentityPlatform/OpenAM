@@ -35,7 +35,8 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label" for="input-password">{{t "common.user.password"}}</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="password" id="input-password" name="password" value="" data-validation-dependents="passwordConfirm" data-validator-event="keyup" placeholder="{{t 'common.form.passwordPlaceholder'}}" />
+                            <input class="form-control" type="password" id="input-password" name="password" value="" placeholder="{{t 'common.form.passwordPlaceholder'}}"
+                                data-validator="required minLength" minLength="8" data-validation-dependents="input-confirmPassword" data-validator-event="keyup" />
                             <div role="status" class="validation-message"></div>
                             <span class="form-control-feedback"><i class='fa validation-icon'></i></span>
                         </div>
@@ -43,7 +44,8 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label" for="input-confirmPassword">{{t 'common.user.confirmPassword'}}</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="password" id="input-confirmPassword" value="" data-validator="passwordConfirm" data-validator-event="keyup" placeholder="{{t 'common.form.passwordPlaceholder'}}" />
+                            <input class="form-control" type="password" id="input-confirmPassword" value="" placeholder="{{t 'common.form.passwordPlaceholder'}}"
+                                data-validator="passwordConfirm" data-validator-event="keyup" passwordField="input-password" />
                             <div role="status" class="validation-message"></div>
                             <span class="form-control-feedback"><i class='fa validation-icon'></i></span>
                         </div>

@@ -3,14 +3,14 @@
     <div class="form-group">
         <label class="sr-only" for="input-userPassword">{{t 'common.user.password'}}</label>
         <input type="password" placeholder="{{t 'common.user.password'}}" id="input-userPassword" name="password" class="form-control input-lg"
-            data-validation-dependents="passwordConfirm" data-validator-event="keyup"
-            data-validator="required minLength atLeastXNumbers atLeastXCapitalLetters" minLength="8" atLeastXNumbers="1" atLeastXCapitalLetters="1" />
+            data-validation-dependents="input-confirmPassword" data-validator-event="keyup"
+            data-validator="required minLength" minLength="8" />
         <span class="error form-control-feedback"><i class='fa validation-icon'></i></span>
     </div>
 
     <div class="form-group">
         <label class="sr-only" for="input-confirmPassword">{{t 'common.user.confirmPassword'}}</label>
-        <input type="password" placeholder="{{t 'common.user.confirmPassword'}}" id="input-confirmPassword" class="form-control input-lg" data-validator="passwordConfirm" data-validator-event="keyup" required />
+        <input type="password" placeholder="{{t 'common.user.confirmPassword'}}" id="input-confirmPassword" class="form-control input-lg" data-validator="passwordConfirm" passwordField="input-password" data-validator-event="keyup" required />
         <span class="error form-control-feedback"><i class='fa validation-icon'></i></span>
     </div>
 
