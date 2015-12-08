@@ -338,6 +338,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     <AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration"
                         type="list"
                         syntax="string"
+                        i18nKey="a110"
                         resourceName="accountMapperConfiguration">
                         <DefaultValues>
                             <Value>id=facebook-id</Value>
