@@ -32,8 +32,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
             "keyup .editing input": "addItem",
             "click .editing button": "addItem",
             "keyup .editing button": "addItem",
-            "click .fa-close ": "deleteItem",
-            "keyup .fa-close ": "deleteItem"
+            "click span[data-delete]": "deleteItem",
+            "keyup span[data-delete]": "deleteItem"
         },
 
         baseRender: function (data, tpl, el, callback) {

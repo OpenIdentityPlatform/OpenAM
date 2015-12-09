@@ -33,8 +33,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             "keyup .radio-inline": "toggleRadio",
             "click .editing button": "addItem",
             "keyup .editing button": "addItem",
-            "click .fa-close ": "deleteItem",
-            "keyup .fa-close ": "deleteItem"
+            "click button[data-delete]": "deleteItem",
+            "keyup button[data-delete]": "deleteItem"
         },
         render: function (data, el, callback) {
             var self = this;

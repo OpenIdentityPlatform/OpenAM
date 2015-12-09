@@ -10,7 +10,7 @@
                 {{#each entity.resources}}
                 <li data-resource="{{this}}" class="{{#equals this ../../options.invalidResource}} text-danger {{/equals}}
                         {{#equals this ../../options.justAdded}} text-success {{/equals}} list-group-item">{{this}}
-                    <span tabindex="0" class="fa fa-close pull-right"></span>
+                    <span tabindex="0" data-delete class="fa fa-close pull-right"></span>
                 </li>
                 {{/each}}
                 {{/if}}

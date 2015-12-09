@@ -29,8 +29,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
             "click .radio-inline": "changePermission",
             "change .editing select": "selectAction",
             "click .add-item": "addAction",
-            "click .fa-close ": "deleteItem",
-            "keyup .fa-close ": "deleteItem"
+            "click button[data-delete]": "deleteItem",
+            "keyup button[data-delete]": "deleteItem"
         },
 
         render: function (data, callback) {

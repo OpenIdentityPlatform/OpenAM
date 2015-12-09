@@ -34,8 +34,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
             "click #addResource": "addResource",
             "keyup #addResource": "addResource",
             "keyup #resourceBuilder input": "addResource",
-            "click .fa-close": "deleteResource",
-            "keyup .fa-close": "deleteResource",
+            "click span[data-delete]": "deleteResource",
+            "keyup span[data-delete]": "deleteResource",
             "click #removePendingResource": "removePendingResource",
             "click #addResourceEditBtn" : "showEditingResources"
         },
