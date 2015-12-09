@@ -925,6 +925,9 @@ Copyright: Copyright 2004-2013 QOS.ch
 Version: slf4j-jdk14-1.7.5.jar
 Copyright: Copyright 2004-2007 QOS.ch
 
+Version: log4j-over-slf4j-1.7.5.jar
+Copyright: Copyright 2004-2013 QOS.ch
+
 Version: text.js
 Copyright: Copyright (c) 2010-2014, The Dojo Foundation
 
