@@ -409,7 +409,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         // sorting is not implemented
         // Get the sub entries
         try {
-            SearchRequest request = Requests.newSearchRequest(dn, SearchScope.SINGLE_LEVEL, "(objectclass=*)",
+            SearchRequest request = Requests.newSearchRequest(dn, SearchScope.SINGLE_LEVEL, filter,
                     orgUnitAttr.toArray(new String[orgUnitAttr.size()]));
             InternalSearchOperation iso = icConn.processSearch(request);
 
