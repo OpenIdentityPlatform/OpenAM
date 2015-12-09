@@ -29,7 +29,6 @@ import org.forgerock.audit.providers.DefaultKeyStoreHandlerProvider;
 import org.forgerock.audit.handlers.csv.CsvAuditEventHandlerConfiguration.EventBufferingConfiguration;
 import org.forgerock.openam.audit.AuditEventHandlerFactory;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
-import org.forgerock.openam.utils.StringUtils;
 
 import javax.inject.Singleton;
 import java.util.ArrayList;
@@ -67,31 +66,43 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
     }
 
     private void setFileRotationPolicies(CsvAuditEventHandlerConfiguration csvHandlerConfiguration,
-            Map<String, Set<String>> attributes) {
-        boolean enabled = getBooleanMapAttr(attributes, "rotationEnabled", false);
+            Map<String, Set<String>> attributes) throws AuditException {
+        boolean enabled = getBooleanMapAttr(attributes, "rotationEnabled", true);
         csvHandlerConfiguration.getFileRotation().setRotationEnabled(enabled);
-        String maxFileSizeAttribute = getMapAttr(attributes, "rotationMaxFileSize");
-        if (StringUtils.isNotEmpty(maxFileSizeAttribute)) {
-            long maxFileSize = Long.parseLong(maxFileSizeAttribute);
-            csvHandlerConfiguration.getFileRotation().setMaxFileSize(maxFileSize);
-        }
-        String filePrefix = getMapAttr(attributes, "rotationFilePrefix");
+        long maxFileSize = getLongMapAttr(attributes, "rotationMaxFileSize", 100000000L, DEBUG);
+        csvHandlerConfiguration.getFileRotation().setMaxFileSize(maxFileSize);
+        String filePrefix = getMapAttr(attributes, "rotationFilePrefix", "");
         csvHandlerConfiguration.getFileRotation().setRotationFilePrefix(filePrefix);
-        String fileSuffix = getMapAttr(attributes, "rotationFileSuffix");
+        String fileSuffix = getMapAttr(attributes, "rotationFileSuffix", "-MM.dd.yy-kk.mm");
         csvHandlerConfiguration.getFileRotation().setRotationFileSuffix(fileSuffix);
-        String interval = getMapAttr(attributes, "rotationInterval");
+        String interval = getMapAttr(attributes, "rotationInterval", "-1");
+        try {
+            Long intervalAsLong = Long.valueOf(interval);
+            if (intervalAsLong <= 0) {
+                //If interval is 0 or a negative value, then this indicates that the feature is disabled. Change
+                //it to a value indicating disablement.
+                interval = "disabled";
+            } else {
+                //If interval is a positive number, add seconds to the end as the time unit.
+                interval = interval + " seconds";
+            }
+        } catch (NumberFormatException nfe) {
+            throw new AuditException("Attribute 'rotationInterval' is invalid: " + interval);
+        }
         csvHandlerConfiguration.getFileRotation().setRotationInterval(interval);
         List<String> times = new ArrayList<>();
         Set<String> rotationTimesAttribute = attributes.get("rotationTimes");
         if (rotationTimesAttribute != null && !rotationTimesAttribute.isEmpty()) {
-            times.addAll(rotationTimesAttribute);
+            for (String rotationTime : rotationTimesAttribute) {
+                times.add(rotationTime + " seconds");
+            }
             csvHandlerConfiguration.getFileRotation().setRotationTimes(times);
         }
     }
 
     private void setFileRetentionPolicies(CsvAuditEventHandlerConfiguration csvHandlerConfiguration,
             Map<String, Set<String>> attributes) {
-        int maxNumberOfHistoryFiles = getIntMapAttr(attributes, "retentionMaxNumberOfHistoryFiles", -1, DEBUG);
+        int maxNumberOfHistoryFiles = getIntMapAttr(attributes, "retentionMaxNumberOfHistoryFiles", 1, DEBUG);
         csvHandlerConfiguration.getFileRetention().setMaxNumberOfHistoryFiles(maxNumberOfHistoryFiles);
         long maxDiskSpaceToUse = getLongMapAttr(attributes, "retentionMaxDiskSpaceToUse", -1L, DEBUG);
         csvHandlerConfiguration.getFileRetention().setMaxDiskSpaceToUse(maxDiskSpaceToUse);

@@ -112,7 +112,7 @@
                     <AttributeSchema name="rotationInterval" type="single"
                                      i18nKey="audit.handlers.file.rotationInterval">
                         <DefaultValues>
-                            <Value>disabled</Value>
+                            <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationTimes" type="list" syntax="string"
@@ -120,7 +120,7 @@
                     <AttributeSchema name="retentionMaxNumberOfHistoryFiles" type="single"
                                      i18nKey="audit.handlers.file.maxNumberOfHistoryFiles">
                         <DefaultValues>
-                            <Value>-1</Value>
+                            <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="retentionMaxDiskSpaceToUse" type="single"
@@ -514,7 +514,7 @@
                     <AttributeSchema name="rotationInterval" type="single"
                                      i18nKey="audit.handlers.file.rotationInterval">
                         <DefaultValues>
-                            <Value>disabled</Value>
+                            <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationTimes" type="list" syntax="string"
@@ -522,7 +522,7 @@
                     <AttributeSchema name="retentionMaxNumberOfHistoryFiles" type="single"
                                      i18nKey="audit.handlers.file.maxNumberOfHistoryFiles">
                         <DefaultValues>
-                            <Value>-1</Value>
+                            <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="retentionMaxDiskSpaceToUse" type="single"
