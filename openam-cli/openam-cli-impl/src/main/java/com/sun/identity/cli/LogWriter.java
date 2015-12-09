@@ -69,11 +69,14 @@ import com.sun.identity.log.messageid.LogMessageID;
 import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Writes audit log entries.
  */
 public class LogWriter {
+
+    private static final Debug DEBUG = Debug.getInstance("amCLI");
 
     private static final String LOG_MSG_XML = "CLI";
 
@@ -86,8 +89,8 @@ public class LogWriter {
      * Error Log Type.
      */
     public final static int LOG_ERROR = 1;
-
     private static final List<String> IGNORED_LOG_FIELDS = Arrays.asList("error message", "realm", "user id");
+
     private static final Map<String, String> NORMALIZED_FIELD_NAMES = new ImmutableMap.Builder<String, String>()
             .put("name of realm", "realm")
             .put("realm where entity resides", "realm")
@@ -152,6 +155,10 @@ public class LogWriter {
             LogMessageProvider msgProvider, SSOToken adminSSOToken) throws Exception {
         String operation = msgid.substring(msgid.indexOf('_') + 1);
         LogMessageID logMessageID = msgProvider.getAllHashMessageIDs().get(msgid);
+        if (logMessageID == null) {
+            DEBUG.error("Attempted audit logging for unknown message ID {}", msgid);
+            return;
+        }
         List<String> fields = logMessageID.getDataColumns();
 
         AMAuditEventBuilder builder;

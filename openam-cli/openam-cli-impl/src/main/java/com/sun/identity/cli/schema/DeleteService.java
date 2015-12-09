@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,10 @@
  *
  * $Id: DeleteService.java,v 1.6 2008/09/03 22:04:43 veiming Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.cli.schema;
-
 
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.sso.SSOException;
@@ -97,7 +94,7 @@ public class DeleteService extends AuthenticatedCommand {
                 outputWriter.printlnMessage(
                     getResourceString("service-deleted"));
                 writeLog(LogWriter.LOG_ACCESS, Level.INFO,
-                    "SUCCEED_DELETE_SERVICE", param);
+                    "SUCCESS_DELETE_SERVICE", param);
             } catch (CLIException e) {
                 bError = true;
                 if (continueFlag) {

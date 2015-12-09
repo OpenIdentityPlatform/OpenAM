@@ -24,6 +24,7 @@
  *
  * $Id: UpdateService.java,v 1.5 2008/06/25 05:42:19 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.schema;
@@ -268,7 +269,7 @@ public class UpdateService extends AuthenticatedCommand {
                     "ATTEMPT_DELETE_SERVICE", param);
                 deleteService(rc, ssm, name, adminSSOToken);
                 writeLog(LogWriter.LOG_ACCESS, Level.INFO,
-                    "SUCCEED_DELETE_SERVICE", param);
+                    "SUCCESS_DELETE_SERVICE", param);
             } catch (CLIException e) {
                 if (continueFlag) {
                     if (isVerbose()) {
