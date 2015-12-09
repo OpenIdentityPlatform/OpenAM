@@ -392,13 +392,14 @@
                 "answerQuestions": "Answer the security questions below to retrieve your username."
             },
             "kba" : {
-                "description": "Select security question(s) below. These questions will help us verify your identity if you forget your password.",
-                "provideAnother": "Add another question",
+                "description": "Select __numberOfQuestions__ or more security questions below. These questions will help us verify your identity if you forget your password.",
+                "provideAnother": "Add a question",
                 "selectQuestion": "Select a security question",
                 "provideYourOwn": "Provide your own",
                 "customQuestion": "Custom Security Question",
                 "answer": "Security Answer",
-                "securityQuestions": "Security Questions"
+                "securityQuestions": "Security Questions",
+                "insufficientNumberOfQuestions": "The number of questions does not match the required minimum. Provide more questions to continue registration."
             },
             "returnToLoginPage": "Return to Login Page",
             "userIdValidation" : "Enter the username or email address associated with your account. We will send you an email with a link that will allow you to reset your password.",
