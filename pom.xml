@@ -1408,9 +1408,9 @@
             </dependency>
 
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${log4j.version}</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
 
             <dependency>
@@ -1509,6 +1509,12 @@
                 <groupId>org.forgerock.opendj</groupId>
                 <artifactId>opendj-server-legacy</artifactId>
                 <version>${opendj.server.legacy}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-jdk14</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Legacy External Libraries for OpenAM -->
