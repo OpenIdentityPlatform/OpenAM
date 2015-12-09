@@ -16,17 +16,14 @@
 
 package com.sun.identity.console.task.model;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.forgerock.openam.utils.StringUtils;
-
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Default implementation of the OAuth2 profiles model.
@@ -41,9 +38,6 @@ public class OAuth2ModelImpl extends AMModelBase implements OAuth2Model {
     public OAuth2ModelImpl(final HttpServletRequest req, final Map map) {
         super(req, map);
         this.type = req.getParameter("type");
-        if (StringUtils.isEmpty(type)) {
-            throw new IllegalArgumentException("type parameter is required");
-        }
     }
 
     @Override
@@ -55,11 +49,17 @@ public class OAuth2ModelImpl extends AMModelBase implements OAuth2Model {
 
     @Override
     public String getDisplayName() {
+        if (StringUtils.isEmpty(type)) {
+            throw new IllegalStateException("type parameter is required");
+        }
         return getLocalizedString(NAME_PREFIX + type);
     }
 
     @Override
     public String getLocalizedHelpMessage() {
+        if (StringUtils.isEmpty(type)) {
+            throw new IllegalStateException("type parameter is required");
+        }
         return getLocalizedString(HELP_PREFIX + type);
     }
 
