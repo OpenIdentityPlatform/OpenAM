@@ -194,16 +194,13 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
         },
         renderSelectizeCell: function () {
             var promise = $.Deferred(),
-                self = this,
-                options = this.model.get("scopes").toJSON(),
                 SelectizeCell;
 
             UIUtils.fillTemplateWithData(this.selectizeTemplate, {}, function (template) {
                 SelectizeCell = Backgrid.Cell.extend({
                     className: "selectize-cell",
                     render: function () {
-                        var items = self.model.get("scopes").pluck("name"),
-                            select;
+                        var select;
 
                         this.$el.html(template);
                         select = this.$el.find("select").selectize({
@@ -214,10 +211,9 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                             persist: false,
                             labelField: "name",
                             valueField: "id",
-                            items: items,
-                            options: options
+                            items: this.model.get("scopes").pluck("name"),
+                            options: this.model.get("scopes").toJSON()
                         })[0];
-
                         select.selectize.disable();
 
                         /* This an extention of the original positionDropdown method within Selectize. The override is
