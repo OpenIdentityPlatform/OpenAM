@@ -1284,8 +1284,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
-    protected ResourceResponse buildResourceResponse(String resourceId, Context context, IdentityDetails identityDetails) {
-    	return newResourceResponse(resourceId, "0", addRoleInformation(context, resourceId, identityDetailsToJsonValue(identityDetails)));
+    protected ResourceResponse buildResourceResponse(String resourceId, Context context,
+            IdentityDetails identityDetails) {
+        JsonValue content = addRoleInformation(context, resourceId, identityDetailsToJsonValue(identityDetails));
+        return newResourceResponse(resourceId, String.valueOf(content.getObject().hashCode()), content);
     }
     
     /*
