@@ -173,6 +173,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                                 resolve());
 
                             $.when.apply($, promises).done(function () {
+                                FormHelper.setActiveTab(self);
+
                                 if (self.renderCallback) {
                                     self.renderCallback();
                                 }
@@ -249,6 +251,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 activeTabProperties;
 
             this.updateFields();
+            this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
 
             if (this.newEntity) {
                 _.extend(this.model.attributes, this.data.entity);

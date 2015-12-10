@@ -14,15 +14,16 @@
  * Copyright 2015 ForgeRock AS.
  */
 
+/**
+ * @module org/forgerock/openam/ui/admin/utils/FormHelper
+ */
 define("org/forgerock/openam/ui/admin/utils/FormHelper", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/components/Messages"
 ], function ($, _, BootstrapDialog, Messages) {
-    /**
-     * @exports org/forgerock/openam/ui/admin/utils/FormHelper
-     */
+
     var obj = {};
 
     /**
@@ -101,6 +102,19 @@ define("org/forgerock/openam/ui/admin/utils/FormHelper", [
                 }
             }
         });
+    };
+
+    /**
+     * Sets active tab whose ID indicated in the variable view.activeTabId.
+     * @param  {Object} view Backbone view with tabs
+     * @param  {string} view.activeTabId ID tab which you want to make active
+     * @example
+     * FormHelper.setActiveTab(self);
+     */
+    obj.setActiveTab = function (view) {
+        if (view && view.activeTabId) {
+            view.$el.find(".nav-tabs a[href='" + view.activeTabId + "']").tab("show");
+        }
     };
 
     return obj;

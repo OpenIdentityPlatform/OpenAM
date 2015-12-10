@@ -105,6 +105,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 self.actionsList.render(data, "#resTypeActions", resolve());
 
                 $.when.apply($, promises).done(function () {
+                    FormHelper.setActiveTab(self);
                     if (self.renderCallback) { self.renderCallback(); }
                 });
             });
@@ -167,6 +168,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 activeTabProperties;
 
             this.updateFields();
+            this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
 
             if (this.newEntity) {
                 _.extend(this.model.attributes, this.data.entity);

@@ -113,6 +113,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                                 function (tpl) {
                                     self.$el.find("#policySetSettings").append(tpl);
                                     self.populateResourceTypes();
+                                    FormHelper.setActiveTab(self);
 
                                     if (self.renderCallback) {
                                         self.renderCallback();
@@ -205,6 +206,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                 nonModifiedAttributes = _.clone(this.model.attributes);
 
             this.updateFields();
+            this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
 
             _.extend(this.model.attributes, this.data.entity);
             savePromise = this.model.save();
