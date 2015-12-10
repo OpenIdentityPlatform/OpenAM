@@ -126,6 +126,7 @@ public class OpenAMTokenStoreTest {
                 field("tokenName", Collections.singleton("access_token")),
                 field("realm", Collections.singleton("/otherrealm"))));
         given(tokenStore.read("TOKEN_ID")).willReturn(token);
+        given(realmNormaliser.normalise("/otherrealm")).willReturn("/otherrealm");
         ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
         given(request.getAttributes()).willReturn(attributes);
         attributes.put("realm", "/testrealm");
