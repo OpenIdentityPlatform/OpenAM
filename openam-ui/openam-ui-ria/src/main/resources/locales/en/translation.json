@@ -689,7 +689,7 @@
                 "privileges": "Privileges",
                 "authz": {
                     "authz": "Authorization",
-                    "policies": "Policies",
+                    "policies": "Policy Sets",
                     "resourceTypes": "Resource Types"
                 },
                 "subjects": "Subjects",
@@ -942,7 +942,6 @@
                     "addNew": "New Policy Set",
                     "importPolicies": "Import Policies",
                     "exportPolicies": "Export Policies",
-                    "title": "Policies",
                     "grid": ["Name"]
                 }
             },
