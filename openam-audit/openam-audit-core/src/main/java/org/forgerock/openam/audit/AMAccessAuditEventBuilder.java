@@ -78,12 +78,10 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
     public final AMAccessAuditEventBuilder forHttpServletRequest(HttpServletRequest request) {
         client(
                 getClientIPAddress(request),
-                request.getRemotePort(),
-                isReverseDnsLookupEnabled() ? request.getRemoteHost() : "");
+                request.getRemotePort());
         server(
                 request.getLocalAddr(),
-                request.getLocalPort(),
-                request.getLocalName());
+                request.getLocalPort());
         httpRequest(
                 request.isSecure(),
                 request.getMethod(),
@@ -104,8 +102,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         ClientContext clientInfo = context.asContext(ClientContext.class);
         client(
                 getClientIPAddress(context, request),
-                clientInfo.getRemotePort(),
-                isReverseDnsLookupEnabled() ? clientInfo.getRemoteHost() : "");
+                clientInfo.getRemotePort());
         MutableUri uri = request.getUri();
         String uriScheme = request.getUri().getScheme();
         if (StringUtils.isNotEmpty(uriScheme)) {

@@ -5,12 +5,10 @@
   "transactionId": "ad1f26e3-1ced-418d-b6ec-c8488411a625",
   "userId": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
   "client": {
-    "host": null,
     "ip": "172.16.101.7",
     "port": 62375
   },
   "server": {
-    "host": null,
     "ip": "216.58.208.36",
     "port": 80
   },

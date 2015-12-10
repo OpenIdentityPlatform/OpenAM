@@ -194,7 +194,6 @@ public class AbstractHttpAccessAuditFilterTest {
                         .certificates()
                         .userAgent("USER_AGENT")
                         .remoteAddress("REMOTE_ADDRESS")
-                        .remoteHost("REMOTE_HOST")
                         .remotePort(9000)
                         .remoteUser("REMOTE_USER")
                         .build(),
@@ -252,7 +251,6 @@ public class AbstractHttpAccessAuditFilterTest {
         assertThat(auditEvent).stringAt("component").isEqualTo(AUTHENTICATION.toString());
         assertThat(auditEvent).stringAt("userId").isEqualTo("USER_ID");
         assertThat(auditEvent).hasArray("trackingIds").contains("value");
-        assertThat(auditEvent).stringAt("client/host").isEqualTo("");
         assertThat(auditEvent).stringAt("client/ip").isEqualTo("REMOTE_ADDRESS");
         assertThat(auditEvent).integerAt("client/port").isEqualTo(9000);
         assertThat(auditEvent).stringAt("http/request/method").isEqualTo("GET");
