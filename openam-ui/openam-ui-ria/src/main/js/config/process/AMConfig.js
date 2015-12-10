@@ -276,16 +276,22 @@ define("config/process/AMConfig", [
             }
             Configuration.globalData.authorizationFailurePending = true;
 
+            function sessionTimeout () {
+                if (Configuration.loggedUser.hasRole("ui-self-service-user")) {
+                    // Users get redirected to session expired page
+                    return RouteTo.sessionExpired();
+                } else {
+                    // Admins get login dialog box
+                    return RouteTo.loginDialog();
+                }
+            }
+
             if (!loggedIn) {
                 // 401 no session
                 return RouteTo.logout();
             } else if (_.get(event, "error.status") === 401) {
-                if (Configuration.loggedUser.hasRole("ui-self-service-user")) {
-                    return RouteTo.sessionExpired();
-                } else {
-                    // 401 session timeout
-                    return RouteTo.loginDialog();
-                }
+                // 401 session timeout
+                return sessionTimeout();
             } else if (_.get(event, "fromRouter")) {
                 // 403 route change
                 return RouteTo.forbiddenPage();
