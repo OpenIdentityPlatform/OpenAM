@@ -147,7 +147,7 @@ public class StatelessSessionFactory {
 
         String jwt = getJwtSessionMapper().asJwt(info);
         SessionID sessionID = SessionID.generateSessionID(sessionServerConfig, info.getClientDomain(), jwt);
-        cache.cache(info, sessionID.toString());
+        cache.cache(info, jwt);
 
         return new StatelessSession(sessionID, info);
     }
