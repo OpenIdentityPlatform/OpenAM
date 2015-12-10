@@ -24,35 +24,33 @@
 
 
 define("org/forgerock/openam/ui/user/login/RESTLogoutView", [
+    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function (AbstractView, Router, Configuration, Constants, EventManager, LoginHelper) {
+], function ($, AbstractView, Configuration, Constants, EventManager, LoginHelper) {
 
     var LogoutView = AbstractView.extend({
-        template: "templates/openam/RESTLogoutTemplate.html",
+        template: "templates/openam/ReturnToLoginTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
-        events: {
-            "click #gotoLogin": "gotoLoginViewClick"
-        },
         render: function (args, callback) {
-            this.parentRender(callback);
-        },
-        gotoLoginViewClick: function (e) {
-            e.preventDefault();
-            var urlParams = "";
+
+            var params;
+
             if (Configuration.globalData.auth.fullLoginURL) {
-                urlParams = LoginHelper.filterUrlParams(LoginHelper.getLoginUrlParams());
+                params = LoginHelper.filterUrlParams(LoginHelper.getLoginUrlParams());
             }
 
             Configuration.setProperty("loggedUser", null);
             delete Configuration.gotoURL;
             EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
-            Router.navigate(Router.getLink(Router.configuration.routes.login) + urlParams, { trigger: true });
+
+            this.data.fragment = params;
+            this.data.title = $.t("templates.user.RestLogoutTemplate.loggedOut");
+            this.parentRender(callback);
         }
     });
 
