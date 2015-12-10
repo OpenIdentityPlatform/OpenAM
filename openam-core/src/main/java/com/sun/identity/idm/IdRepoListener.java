@@ -38,6 +38,7 @@ import java.util.Set;
 
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.PersistentSearchChangeType;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -169,7 +170,7 @@ public final class IdRepoListener {
             cacheChecked = true;
         }
         
-        if (name.length() > 0) {
+        if (StringUtils.isNotEmpty(name)) {
             String[] changed = getChangedIds(name, idType, cMap);
             for (int i = 0; i < changed.length; i++) {
 
@@ -189,6 +190,8 @@ public final class IdRepoListener {
                     }
                 }
             }
+        } else if (debug.warningEnabled()) {
+            debug.warning("objectChanged called with an empty name");
         }
     }
 
