@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,55 +24,41 @@
  *
  * $Id: AuthServiceListener.java,v 1.4 2008/11/10 22:56:55 veiming Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.authentication.service;
 
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
-import com.sun.identity.sm.ServiceNotFoundException;
-import com.sun.identity.sm.SMSException;
 
 /**
  * This class is a cache and Listener for Authentication 
  * Configuration Service.
  */
 public class AuthServiceListener implements ServiceListener{
-    static Debug debug = Debug.getInstance("amAuth");
+    private static final String AUTHCONFIG_SERVICE = "iPlanetAMAuthConfiguration";
+    private static Map<String, Map> serviceAttributeCache = new HashMap<>();
+    private static Debug debug = Debug.getInstance("amAuth");
+    private static AuthServiceListener serviceListener = new AuthServiceListener();
 
-    protected static final String AUTHCONFIG_SERVICE = 
-        "iPlanetAMAuthConfiguration";
-    private static Map serviceAttributeCache = new HashMap();
-    private static AuthServiceListener serviceListener = new 
-        AuthServiceListener();
     static {
-        SSOToken ssot = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
+        SSOToken ssot = AccessController.doPrivileged(AdminTokenAction.getInstance());
         try {
-            ServiceConfigManager scm = new ServiceConfigManager(
-                AUTHCONFIG_SERVICE, ssot);
+            ServiceConfigManager scm = new ServiceConfigManager(AUTHCONFIG_SERVICE, ssot);
             scm.addListener(serviceListener);
             debug.message("AuthServiceListener: Listener added.");
-        } catch (ServiceNotFoundException exp) {
-            debug.error("AuthServiceListener: Can not register"
-                + " Listener", exp);
-        } catch (SMSException smsExp) {
-            debug.error("AuthServiceListener: Can not register"
-                + " Listener", smsExp);
-        } catch (SSOException ssoExp) {
-            debug.error("AuthServiceListener: Can not register"
-                + " Listener", ssoExp);
+        } catch (SSOException | SMSException exp) {
+            debug.error("AuthServiceListener: Can not register Listener", exp);
         }
     }
     
@@ -91,15 +77,15 @@ public class AuthServiceListener implements ServiceListener{
      *            auth configuration service name.
      * @return service attributes.
      */
-    public static Map getServiceAttributeCache(String orgDN, String 
-        serviceName) {
-        Map retVal = (Map) serviceAttributeCache.get(serviceName+","+orgDN);
-        if (debug.messageEnabled()) {
-     	    debug.message("AuthServiceListener." +
-                "getServiceAttributeCache(): Returning from cache = " + retVal
-                + ", orgDN=" + orgDN);
-        }
+    public static Map getServiceAttributeCache(String orgDN, String serviceName) {
+        Map retVal = serviceAttributeCache.get(key(serviceName, orgDN));
+        debug.message("AuthServiceListener.getServiceAttributeCache(): Returning from cache={}, orgDN={}", retVal,
+                orgDN);
         return retVal;
+    }
+
+    private static String key(String serviceName, String orgDN) {
+        return serviceName.toLowerCase() + "," + orgDN.toLowerCase();
     }
     
     /**
@@ -112,77 +98,41 @@ public class AuthServiceListener implements ServiceListener{
      * @param serviceAttributes
      *            auth service attributes.
      */
-    public static void setServiceAttributeCache(String orgDN, String 
-        serviceName, Map serviceAttributes) {
-        serviceAttributeCache.put(serviceName+","+orgDN, serviceAttributes);
-        if (debug.messageEnabled()) {
-     	    debug.message("AuthServiceListener." +
-                "setServiceAttributeCache(): Cache after add= " 
-                + serviceAttributeCache + ", orgDN=" + orgDN);
-        }
+    public static void setServiceAttributeCache(String orgDN, String serviceName, Map serviceAttributes) {
+        serviceAttributeCache.put(key(serviceName, orgDN), serviceAttributes);
+        debug.message("AuthServiceListener.setServiceAttributeCache(): Cache after add={}, orgDN={}",
+                serviceAttributeCache, orgDN);
     }
 
-    /**
-     * This method will be invoked when a service's global configuration data
-     * has been changed. It is a no-op for this implementation. 
-     *
-     * @param serviceName
-     *		  name of the service.
-     * @param version
-     *		  version of the service.
-     * @param groupName
-     *		  name of the configuration grouping.
-     * @param serviceComponent
-     *		  name of the service components that changed.
-     * @param type
-     *		  change type, i.e., ADDED, REMOVED or MODIFIED.
-     */   
-    public void globalConfigChanged(String serviceName, String version, String
-        groupName, String serviceComponent, int type) {
+    @Override
+    public void globalConfigChanged(String serviceName, String version, String groupName, String component, int type) {
     }
 
-    /**
-     * This method will be invoked when a service's schema has been changed. 
-     * It is a no-op for this implementation.
-     *
-     * @param serviceName
-     *		  name of the service
-     * @param version
-     *		  version of the service
-     */
+    @Override
     public void schemaChanged(String serviceName, String version)  {
     }
     
     /**
-     * This method will be invoked when a service's organization 
-     * configuration data has been changed. It removes the invalid charecters
-     * cache if service configuration is modified or removed. 
+     * This method will be invoked when a service's organization configuration data has been changed.
+     * It removes the invalid attributes from the cache cache if service configuration is modified or
+     * removed.
      *
-     * @param serviceName
-     *		  name of the service.
-     * @param version
-     *		  version of the service.
-     * @param orgName
-     *            Name of the organization.
-     * @param goupName
-     *		  name of the configuration grouping.
-     * @param serviceComponent
-     *		  name of the service components that changed.
-     * @param type
-     *		  change type, i.e., ADDED, REMOVED or MODIFIED.
+     * @param serviceName Name of the service.
+     * @param version Version of the service.
+     * @param orgName Name of the organization.
+     * @param goupName Name of the configuration grouping.
+     * @param serviceComponent Name of the service components that changed.
+     * @param type Change type, i.e., ADDED, REMOVED or MODIFIED.
      */
-    public void organizationConfigChanged(String serviceName, String version, 
-        String orgName, String goupName, String serviceComponent, int type) {
-        if (debug.messageEnabled()) {
-            debug.message("AuthServiceListener."
-            + "organizationConfigChanged : Config changed for Org="
-            + orgName + "Service = "+serviceName+ " Change type = "+ type);
-        }
+    public void organizationConfigChanged(String serviceName, String version, String orgName, String goupName,
+            String serviceComponent, int type) {
+        debug.message("AuthServiceListener.organizationConfigChanged : Config changed for Org={}, Service={}, " +
+                "Chagne type={}", orgName, serviceName, type);
         if (type != ADDED) {
             int componentSlash = serviceComponent.lastIndexOf('/');
             if (componentSlash != -1) {
                 String componentName = serviceComponent.substring(componentSlash + 1);
-                serviceAttributeCache.remove(componentName + "," + orgName);
+                serviceAttributeCache.remove(key(componentName, orgName));
             }
         }
     }
