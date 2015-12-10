@@ -1126,7 +1126,11 @@ public class LoginState {
                 DEBUG.message("activateSession - userDN is : " + userDN);
             }
 
-            setSuccessLoginURL(indexType, indexName);
+            if (indexType != null || indexName != null) {
+                setSuccessLoginURL(indexType, indexName);
+            } else {
+                setSuccessLoginURL(AuthContext.IndexType.SERVICE, getAuthConfigName(indexType, indexName));
+            }
 
             final boolean isSessionActivated = getSessionActivator().activateSession(this, AuthD.getSessionService(),
                     session, subject, loginContext);
