@@ -598,7 +598,10 @@
                             <Value>ConditionTypesResourceRead</Value>
                             <Value>DecisionCombinersResourceRead</Value>
                             <Value>SubjectAttributesResourceRead</Value>
-                            <Value>SessionPropertiesResourceModify</Value>
+                            <Value>SessionPropertiesGetProperty</Value>
+                            <Value>SessionPropertiesSetProperty</Value>
+                            <Value>SessionPropertiesDeleteProperty</Value>
+                            <Value>SessionPropertiesGetPropertyNames</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="defaultSubjectInLegacyMode" />
