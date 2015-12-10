@@ -155,6 +155,30 @@
                             <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="securityEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.csv.security.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="securityFilename" type="single"
+                                     i18nKey="audit.handlers.csv.security.filename">
+                        <DefaultValues>
+                            <Value>%BASE_DIR%/%SERVER_URI%/Logger.jks</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="securityPassword" type="single" syntax="password"
+                                     i18nKey="audit.handlers.csv.security.password"/>
+                    <AttributeSchema name="securitySignatureInterval" type="single"
+                                     i18nKey="audit.handlers.csv.security.signatureInterval">
+                        <DefaultValues>
+                            <Value>900</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
@@ -555,6 +579,30 @@
                         </BooleanValues>
                         <DefaultValues>
                             <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="securityEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.csv.security.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="securityFilename" type="single"
+                                     i18nKey="audit.handlers.csv.security.filename">
+                        <DefaultValues>
+                            <Value>%BASE_DIR%/%SERVER_URI%/Logger.jks</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="securityPassword" type="single" syntax="password"
+                                     i18nKey="audit.handlers.csv.security.password"/>
+                    <AttributeSchema name="securitySignatureInterval" type="single"
+                                     i18nKey="audit.handlers.csv.security.signatureInterval">
+                        <DefaultValues>
+                            <Value>900</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">

@@ -25,10 +25,12 @@ import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
 import org.forgerock.audit.handlers.csv.CsvAuditEventHandler;
 import org.forgerock.audit.handlers.csv.CsvAuditEventHandlerConfiguration;
+import org.forgerock.audit.handlers.csv.CsvAuditEventHandlerConfiguration.CsvSecurity;
 import org.forgerock.audit.providers.DefaultKeyStoreHandlerProvider;
 import org.forgerock.audit.handlers.csv.CsvAuditEventHandlerConfiguration.EventBufferingConfiguration;
 import org.forgerock.openam.audit.AuditEventHandlerFactory;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
+import org.forgerock.openam.utils.StringUtils;
 
 import javax.inject.Singleton;
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
         setFileRotationPolicies(csvHandlerConfiguration, attributes);
         setFileRetentionPolicies(csvHandlerConfiguration, attributes);
         csvHandlerConfiguration.setBufferingConfiguration(getBufferingConfiguration(attributes));
+        csvHandlerConfiguration.setSecurity(getCsvSecurity(attributes));
 
         return new CsvAuditEventHandler(csvHandlerConfiguration, configuration.getEventTopicsMetaData(),
                 new DefaultKeyStoreHandlerProvider());
@@ -115,5 +118,18 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
         bufferingConfiguration.setEnabled(getBooleanMapAttr(attributes, "bufferingEnabled", true));
         bufferingConfiguration.setAutoFlush(getBooleanMapAttr(attributes, "bufferingAutoFlush", false));
         return bufferingConfiguration;
+    }
+
+    private CsvSecurity getCsvSecurity(Map<String, Set<String>> attributes) {
+        CsvSecurity csvSecurity = new CsvSecurity();
+        csvSecurity.setEnabled(getBooleanMapAttr(attributes, "securityEnabled", false));
+        String filename = getMapAttr(attributes, "securityFilename");
+        if (StringUtils.isNotEmpty(filename)) {
+            csvSecurity.setFilename(filename.replaceAll("%BASE_DIR%", SystemProperties.get(CONFIG_PATH))
+                    .replaceAll("%SERVER_URI%", SystemProperties.get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR)));
+        }
+        csvSecurity.setPassword(getMapAttr(attributes, "securityPassword"));
+        csvSecurity.setSignatureInterval(getMapAttr(attributes, "securitySignatureInterval", "900") + " seconds");
+        return csvSecurity;
     }
 }
