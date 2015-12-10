@@ -1,0 +1,13 @@
+bin/create-rc-script
+bat/windows-service.bat
+lib/launcher_administrator.exe
+lib/opendj_service.exe
+QuickSetup.app/
+Uninstall.app/
+README
+setup
+setup.bat
+uninstall
+uninstall.bat
+upgrade
+upgrade.bat
