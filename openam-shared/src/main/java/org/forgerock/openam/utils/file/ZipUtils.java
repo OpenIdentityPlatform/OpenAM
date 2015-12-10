@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.utils.file;
@@ -20,6 +21,7 @@ package org.forgerock.openam.utils.file;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -59,7 +61,7 @@ public final class ZipUtils {
 
         final Path targetZip = Paths.get(outputZip);
         final Path sourceDir = Paths.get(srcFolder);
-        final URI uri = new URI("jar", "file:" + targetZip, null);
+        final URI uri = new URI("jar", URLDecoder.decode(targetZip.toUri().toString(), "UTF-8"), null);
         final List<String> files = new ArrayList<>();
 
         try (FileSystem zipfs = FileSystems.newFileSystem(uri, singletonMap("create", "true"))) {

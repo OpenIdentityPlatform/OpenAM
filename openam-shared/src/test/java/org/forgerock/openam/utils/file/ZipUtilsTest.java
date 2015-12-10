@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.utils.file;
@@ -31,13 +32,13 @@ import java.nio.file.Path;
 public class ZipUtilsTest {
 
     @Test
-    public void tryZippingAFolder() throws IOException, URISyntaxException {
+    public void tryZippingAFolderWithSpace() throws IOException, URISyntaxException {
 
-        String testFolder =  File.separator + "zipUtils" + File.separator + "FakeFolder";
+        String testFolder =  File.separator + "zipUtils" + File.separator + "Fake Folder";
         testFolder = ZipUtilsTest.class.getResource(testFolder).toURI().getPath();
         Path zipTempFolder = Files.createTempDirectory("tmp");
 
-        String outputZip = zipTempFolder + File.separator + "FakeFolder.zip";
+        String outputZip = zipTempFolder + File.separator + "Fake Folder.zip";
 
         ZipUtils.generateZip(testFolder, outputZip);
         File f = new File(outputZip);

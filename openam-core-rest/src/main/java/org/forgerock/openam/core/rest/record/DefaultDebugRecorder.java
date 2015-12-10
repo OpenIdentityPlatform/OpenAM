@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.core.rest.record;
 
@@ -398,6 +399,8 @@ public class DefaultDebugRecorder implements DebugRecorder {
         } catch (IOException e) {
             debug.warning("Issue '{}' can't be archived due to an IO issue.", record, e);
             throw new RecordException("Issue '" + record + "' can't be archived due to an IO issue.", e);
+        } catch (Exception e) {
+            debug.warning("Record '{}' can't be archived", record.getFolderPath(), e);
         }
 
         if (record.getRecordProperties().isZipEnabled()) {
