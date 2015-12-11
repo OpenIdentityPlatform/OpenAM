@@ -58,13 +58,15 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
      * @param tokenStore An instance of the TokenStore.
      * @param tokenInvalidator An instance of the TokenInvalidator.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param urisFactory An instance of the OAuthUrisFactory.
      * @param accessTokenGenerator An instance of the GrantTypeAccessTokenGenerator.
      */
     @Inject
     public AuthorizationCodeGrantTypeHandler(List<AuthorizationCodeRequestValidator> requestValidators,
             ClientAuthenticator clientAuthenticator, TokenStore tokenStore, TokenInvalidator tokenInvalidator,
-            OAuth2ProviderSettingsFactory providerSettingsFactory, GrantTypeAccessTokenGenerator accessTokenGenerator) {
-        super(providerSettingsFactory, clientAuthenticator);
+            OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory urisFactory,
+            GrantTypeAccessTokenGenerator accessTokenGenerator) {
+        super(providerSettingsFactory, urisFactory, clientAuthenticator);
         this.requestValidators = requestValidators;
         this.tokenStore = tokenStore;
         this.tokenInvalidator = tokenInvalidator;

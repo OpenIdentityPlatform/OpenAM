@@ -18,20 +18,11 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.oauth2.core.Utils.joinScope;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Hash;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
-
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.AccessController;
@@ -48,9 +39,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.forgerock.guice.core.InjectorHolder;
@@ -65,7 +64,6 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
 import org.forgerock.oauth2.core.ScopeValidator;
@@ -102,8 +100,7 @@ import org.restlet.ext.servlet.ServletUtils;
 public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements OAuth2ProviderSettings {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
-    private final RealmInfo realmInfo;
-    private final String deploymentUrl;
+    private final String realm;
     private final ResourceSetStore resourceSetStore;
     private final CookieExtractor cookieExtractor;
     private ScopeValidator scopeValidator;
@@ -112,16 +109,14 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     /**
      * Constructs a new OpenAMOAuth2ProviderSettings.
      *
-     * @param realmInfo The realm.
-     * @param baseDeploymentUri The base deployment url.
+     * @param realm The realm.
      * @param resourceSetStore An instance of the ResourceSetStore for the current realm.
      * @param cookieExtractor An instance of the CookieExtractor.
      */
-    public OpenAMOAuth2ProviderSettings(RealmInfo realmInfo, String baseDeploymentUri, ResourceSetStore resourceSetStore,
+    public OpenAMOAuth2ProviderSettings(String realm, ResourceSetStore resourceSetStore,
             CookieExtractor cookieExtractor) {
         super(OAuth2ProviderService.NAME, OAuth2ProviderService.VERSION);
-        this.realmInfo = realmInfo;
-        this.deploymentUrl = baseDeploymentUri;
+        this.realm = realm;
         this.resourceSetStore = resourceSetStore;
         this.cookieExtractor = cookieExtractor;
         addServiceListener();
@@ -134,7 +129,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                     OAuth2ProviderService.NAME, OAuth2ProviderService.VERSION);
             if (serviceConfigManager.addListener(new OAuth2ProviderSettingsChangeListener()) == null) {
                 logger.error("Could not add listener to ServiceConfigManager instance. OAuth2 provider service " +
-                        "changes will not be dynamically updated for realm " + realmInfo.getAbsoluteRealm());
+                        "changes will not be dynamically updated for realm " + realm);
             }
         } catch (Exception e) {
             String message = "OAuth2Utils::Unable to construct ServiceConfigManager: " + e;
@@ -165,7 +160,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
     private Set<String> getSettingStrings(String key) throws ServerException {
         try {
-            return getSetting(realmInfo.getAbsoluteRealm(), key);
+            return getSetting(realm, key);
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -181,7 +176,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     public Map<String, ResponseTypeHandler> getAllowedResponseTypes() throws UnsupportedResponseTypeException,
             ServerException {
         try {
-            Set<String> responseTypeSet = getSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.RESPONSE_TYPE_LIST);
+            Set<String> responseTypeSet = getSetting(realm, OAuth2ProviderService.RESPONSE_TYPE_LIST);
             if (responseTypeSet == null || responseTypeSet.isEmpty()) {
                 return Collections.emptyMap();
             }
@@ -189,7 +184,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             for (String responseType : responseTypeSet){
                 String[] parts = responseType.split("\\|");
                 if (parts.length != 2){
-                    logger.error("Response type wrong format for realm: " + realmInfo.getAbsoluteRealm());
+                    logger.error("Response type wrong format for realm: " + realm);
                     continue;
                 }
                 responseTypes.put(parts[0], wrap(parts[0], parts[1]));
@@ -219,7 +214,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             if (ResponseType.class.isAssignableFrom(responseTypeHandlerClass)) {
                 ResponseType responseType = InjectorHolder.getInstance(responseTypeHandlerClass
                         .asSubclass(ResponseType.class));
-                return new LegacyResponseTypeHandler(responseType, realmInfo.getAbsoluteRealm(), getSSOCookieName(), cookieExtractor);
+                return new LegacyResponseTypeHandler(responseType, realm, getSSOCookieName(), cookieExtractor);
             }
 
             return InjectorHolder.getInstance(responseTypeHandlerClass.asSubclass(ResponseTypeHandler.class));
@@ -237,7 +232,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
         String consentAttribute = null;
         try {
-            consentAttribute = getStringSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
+            consentAttribute = getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
             if (consentAttribute != null) {
                 AMIdentity id = ((OpenAMResourceOwner) resourceOwner).getIdentity();
                 if (id != null) {
@@ -245,7 +240,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                     if (attributeSet != null) {
                         if (logger.messageEnabled()) {
                             logger.message("Existing saved consent value for resourceOwner: " + resourceOwner.getId() +
-                                   " in attribute:" + consentAttribute + " in realm:" + realmInfo.getAbsoluteRealm() + " is:" + attributeSet);
+                                   " in attribute:" + consentAttribute + " in realm:" + realm + " is:" + attributeSet);
                         }
                         //check the values of the attribute set vs the scope and client requested
                         //attribute set is in the form of client_id|scope1 scope2 scope3
@@ -271,16 +266,16 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                     } else {
                         if (logger.messageEnabled()) {
                             logger.message("No existing saved consent value for resourceOwner: " + resourceOwner.getId()
-                                    + " in attribute:" + consentAttribute + " in realm:" + realmInfo.getAbsoluteRealm());
+                                    + " in attribute:" + consentAttribute + " in realm:" + realm);
                         }
                     }
                 }
             } else {
-                logger.error("No saved consent attribute defined in realm:" + realmInfo.getAbsoluteRealm());
+                logger.error("No saved consent attribute defined in realm:" + realm);
             }
         } catch (Exception e) {
             logger.error("There was a problem getting the saved consent from the attribute: "
-                    + consentAttribute + " for realm:" + realmInfo.getAbsoluteRealm(), e);
+                    + consentAttribute + " for realm:" + realm, e);
         }
 
         return false;
@@ -479,7 +474,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
         String consentAttribute = null;
         try {
-            consentAttribute = getStringSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
+            consentAttribute = getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
             if (consentAttribute != null) {
                 AMIdentity id = ((OpenAMResourceOwner) resourceOwner).getIdentity();
                 //get the current set of consents and add our new consent to it if they exist.
@@ -495,7 +490,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
                 if (logger.messageEnabled()) {
                     logger.message("Saving consents:" + consents + " for resourceOwner: " + resourceOwner.getId()
-                            + " in attribute:" + consentAttribute + " in realm:" + realmInfo.getAbsoluteRealm());
+                            + " in attribute:" + consentAttribute + " in realm:" + realm);
                 }
                 //update the user profile with our new consent settings
                 Map<String, Set<String>> attrs = new HashMap<String, Set<String>>(1);
@@ -503,11 +498,11 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                 id.setAttributes(attrs);
                 id.store();
             } else {
-                logger.error("Cannot save consent as no saved consent attribute defined in realm:" + realmInfo.getAbsoluteRealm());
+                logger.error("Cannot save consent as no saved consent attribute defined in realm:" + realm);
             }
         } catch (Exception e) {
             logger.error("There was a problem saving the consent into the attribute: "
-                    + consentAttribute + " for realm:" + realmInfo.getAbsoluteRealm(), e);
+                    + consentAttribute + " for realm:" + realm, e);
         }
     }
 
@@ -516,7 +511,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      */
     public boolean issueRefreshTokens() throws ServerException {
         try {
-            return getBooleanSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.ISSUE_REFRESH_TOKEN);
+            return getBooleanSetting(realm, OAuth2ProviderService.ISSUE_REFRESH_TOKEN);
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -531,7 +526,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      */
     public boolean issueRefreshTokensOnRefreshingToken() throws ServerException {
         try {
-            return getBooleanSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN);
+            return getBooleanSetting(realm, OAuth2ProviderService.ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN);
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -574,7 +569,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      */
     public KeyPair getServerKeyPair() throws ServerException {
         try {
-            return getServerKeyPair(realmInfo.getAbsoluteRealm());
+            return getServerKeyPair(realm);
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -628,7 +623,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         Set<String> claims = new HashSet<>();
         try {
             synchronized (attributeCache) {
-                for (String claim : getSetting(realmInfo.getAbsoluteRealm(), key)) {
+                for (String claim : getSetting(realm, key)) {
                     int pipe = claim.indexOf('|');
                     if (pipe > -1) {
                         claims.add(claim.substring(0, pipe));
@@ -668,64 +663,10 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         return "3.0";
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getIssuer() throws ServerException {
-        return getOAuth2BaseUrl();
-    }
-
-    private String getOAuth2BaseUrl() {
-        return getBaseUrl("/oauth2");
-    }
-
-    private String getBaseUrl(String context) {
-        String uri = deploymentUrl + context + realmInfo.getAbsoluteRealm();
-        if (uri.endsWith("/")) {
-            uri = uri.substring(0, uri.length() - 1);
-        }
-        return uri;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getAuthorizationEndpoint() {
-        return getOAuth2BaseUrl() + "/authorize";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getTokenEndpoint() {
-        return getOAuth2BaseUrl() + "/" + OAuth2Constants.Params.ACCESS_TOKEN;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getIntrospectionEndpoint() {
-        return getOAuth2BaseUrl() + "/introspect";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getResourceSetRegistrationPolicyEndpoint(String resourceSetId) {
-        return deploymentUrl + "/XUI/?realm=" + realmInfo.getAbsoluteRealm() + "#uma/share/" + resourceSetId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getResourceSetRegistrationEndpoint() {
-        return getOAuth2BaseUrl() + "/resource_set";
-    }
-
     @Override
     public boolean getClaimsParameterSupported() throws ServerException {
         try {
-            return getBooleanSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.CLAIMS_PARAMETER_SUPPORTED);
+            return getBooleanSetting(realm, OAuth2ProviderService.CLAIMS_PARAMETER_SUPPORTED);
         } catch (SSOException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -798,7 +739,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     @Override
     public boolean isCodeVerifierRequired() throws ServerException {
         try {
-            return getBooleanSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.CODE_VERIFIER);
+            return getBooleanSetting(realm, OAuth2ProviderService.CODE_VERIFIER);
         } catch (SSOException | SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -808,7 +749,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     @Override
     public boolean isAlwaysAddClaimsToToken() throws ServerException {
         try {
-            return getBooleanSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.ALWAYS_ADD_CLAIMS_TO_TOKEN);
+            return getBooleanSetting(realm, OAuth2ProviderService.ALWAYS_ADD_CLAIMS_TO_TOKEN);
         } catch (SSOException | SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -827,39 +768,6 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         return resourceSetStore;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getUserInfoEndpoint() {
-        return getOAuth2BaseUrl() + "/userinfo";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getCheckSessionEndpoint() {
-        return getOAuth2BaseUrl() + "/connect/checkSession";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getEndSessionEndpoint() {
-        return getOAuth2BaseUrl() + "/connect/endSession";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getJWKSUri() throws ServerException {
-        String userDefinedJWKUri = getStringSettingValue(OAuth2ProviderService.JKWS_URI);
-        if (userDefinedJWKUri != null && !userDefinedJWKUri.isEmpty()) {
-            return userDefinedJWKUri;
-        }
-
-        return getOAuth2BaseUrl() + "/connect/jwk_uri";
-    }
-
     public JsonValue getJWKSet() throws ServerException {
         synchronized (jwks) {
             if (jwks.isEmpty()) {
@@ -873,7 +781,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     private Map<String, Object> createRSAJWK(RSAPublicKey key, KeyUse use, String alg) throws ServerException {
         String alias = null;
         try {
-            alias = getStringSetting(realmInfo.getAbsoluteRealm(), OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
+            alias = getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
         } catch (SSOException | SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -903,13 +811,6 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     /**
      * {@inheritDoc}
      */
-    public String getClientRegistrationEndpoint() {
-        return getOAuth2BaseUrl() + "/connect/register";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public Set<String> getSupportedSubjectTypes() throws ServerException {
         return getSettingStrings(OAuth2ProviderService.SUBJECT_TYPES_SUPPORTED);
     }
@@ -917,7 +818,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     @Override
     public boolean isOpenDynamicClientRegistrationAllowed() throws ServerException {
         try {
-            return getBooleanSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.OPEN_DYNAMIC_REGISTRATION_ALLOWED);
+            return getBooleanSetting(realm, OAuth2ProviderService.OPEN_DYNAMIC_REGISTRATION_ALLOWED);
         } catch (SSOException e) {
             logger.message(e.getMessage());
             throw new ServerException(e);
@@ -930,7 +831,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     @Override
     public boolean isRegistrationAccessTokenGenerationEnabled() throws ServerException {
         try {
-            return getBooleanSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.GENERATE_REGISTRATION_ACCESS_TOKENS);
+            return getBooleanSetting(realm, OAuth2ProviderService.GENERATE_REGISTRATION_ACCESS_TOKENS);
         } catch (SSOException e) {
             logger.message(e.getMessage());
             throw new ServerException(e);
@@ -943,7 +844,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     @Override
     public Map<String, AuthenticationMethod> getAcrMapping() throws ServerException {
         try {
-            final Map<String, String> map = getMapSetting(realmInfo.getAbsoluteRealm(),
+            final Map<String, String> map = getMapSetting(realm,
                     OAuth2ProviderService.ACR_VALUE_MAPPING);
             final Map<String, AuthenticationMethod> methods = new HashMap<String, AuthenticationMethod>(map.size());
             for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -967,7 +868,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
     private String getStringSettingValue(String key) throws ServerException {
         try {
-            return getStringSetting(realmInfo.getAbsoluteRealm(), key);
+            return getStringSetting(realm, key);
         } catch (SSOException | SMSException e) {
             logger.message("Could not get value of " + key, e);
             throw new ServerException(e);
@@ -976,7 +877,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
 
     private long getLongSettingValue(String key) throws ServerException {
         try {
-            return getLongSetting(realmInfo.getAbsoluteRealm(), key);
+            return getLongSetting(realm, key);
         } catch (SSOException | SMSException e) {
             logger.error("Could not get value of " + key, e);
             throw new ServerException(e);
@@ -986,7 +887,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     @Override
     public Map<String, String> getAMRAuthModuleMappings() throws ServerException {
         try {
-            return getMapSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.AMR_VALUE_MAPPING);
+            return getMapSetting(realm, OAuth2ProviderService.AMR_VALUE_MAPPING);
         } catch (SSOException e) {
             logger.message(e.getMessage());
             throw new ServerException(e);
@@ -999,7 +900,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     @Override
     public boolean exists() {
         try {
-            return hasConfig(realmInfo.getAbsoluteRealm());
+            return hasConfig(realm);
         } catch (Exception e) {
             logger.message("Could not access realm config", e);
             return false;
@@ -1009,7 +910,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     @Override
     public Template getCustomLoginUrlTemplate() throws ServerException {
         try {
-            String loginUrlTemplateString = getStringSetting(realmInfo.getAbsoluteRealm(), OAuth2ProviderService.RESOURCE_OWNER_CUSTOM_LOGIN_URL_TEMPLATE);
+            String loginUrlTemplateString = getStringSetting(realm, OAuth2ProviderService.RESOURCE_OWNER_CUSTOM_LOGIN_URL_TEMPLATE);
             if (loginUrlTemplateString != null) {
                 loginUrlTemplate = new Template("customLoginUrlTemplate", new StringReader(loginUrlTemplateString),
                         new Configuration());
@@ -1024,6 +925,11 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     @Override
     public String getVerificationUrl() throws ServerException {
         return getStringSettingValue(OAuth2ProviderService.DEVICE_VERIFICATION_URL);
+    }
+
+    @Override
+    public String getJWKSUri() throws ServerException {
+        return getStringSettingValue(OAuth2ProviderService.JKWS_URI);
     }
 
     @Override
@@ -1061,7 +967,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                 String serviceComponent, int type) {
             if (currentRealmTargetedByOrganizationUpdate(serviceName, version, orgName, type)) {
                 if (logger.messageEnabled()) {
-                    logger.message("Updating OAuth service configuration state for realm " + realmInfo.getAbsoluteRealm());
+                    logger.message("Updating OAuth service configuration state for realm " + realm);
                 }
                 synchronized (attributeCache) {
                     attributeCache.clear();
@@ -1071,10 +977,10 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             } else {
                 if (logger.messageEnabled()) {
                     logger.message("Got service update message, but update did not target OAuth2Provider in " +
-                            realmInfo.getAbsoluteRealm() + " realm. ServiceName: " + serviceName + " version: " + version + " orgName: " +
+                            realm + " realm. ServiceName: " + serviceName + " version: " + version + " orgName: " +
                             orgName + " groupName: " + groupName + " serviceComponent: " + serviceComponent +
                             " type (modified=4, delete=2, add=1): " + type + " realm as DN: "
-                            + DNMapper.orgNameToDN(realmInfo.getAbsoluteRealm()));
+                            + DNMapper.orgNameToDN(realm));
                 }
             }
         }
@@ -1088,7 +994,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             return OAuth2ProviderService.NAME.equals(serviceName) &&
                     OAuth2ProviderService.VERSION.equals(version) &&
                     (orgName != null) &&
-                    orgName.equals(DNMapper.orgNameToDN(realmInfo.getAbsoluteRealm()));
+                    orgName.equals(DNMapper.orgNameToDN(realm));
         }
     }
 }

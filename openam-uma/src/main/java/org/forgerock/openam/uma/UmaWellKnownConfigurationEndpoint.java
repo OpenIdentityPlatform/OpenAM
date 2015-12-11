@@ -25,6 +25,7 @@ import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.core.RealmInfo;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -37,18 +38,20 @@ import org.restlet.resource.ServerResource;
  */
 public class UmaWellKnownConfigurationEndpoint extends ServerResource {
 
-    private final UmaProviderSettingsFactory providerSettingsFactory;
+    private final UmaUrisFactory urisFactory;
     private final UmaExceptionHandler exceptionHandler;
+    private final UmaProviderSettingsFactory providerSettingsFactory;
 
     /**
      * Constructs a new instance of a UmaWellKnownConfigurationEndpoint.
      *
-     * @param providerSettingsFactory An instance of the UmaProviderSettingFactory.
+     * @param urisFactory An instance of the UmaProviderSettingFactory.
      * @param exceptionHandler An instance of the UmaExceptionHandler.
      */
     @Inject
-    public UmaWellKnownConfigurationEndpoint(UmaProviderSettingsFactory providerSettingsFactory,
-            UmaExceptionHandler exceptionHandler) {
+    public UmaWellKnownConfigurationEndpoint(UmaUrisFactory urisFactory,
+            UmaProviderSettingsFactory providerSettingsFactory, UmaExceptionHandler exceptionHandler) {
+        this.urisFactory = urisFactory;
         this.providerSettingsFactory = providerSettingsFactory;
         this.exceptionHandler = exceptionHandler;
     }
@@ -63,22 +66,23 @@ public class UmaWellKnownConfigurationEndpoint extends ServerResource {
     @Get
     public Representation getConfiguration() throws NotFoundException, ServerException {
 
+        UmaUris umaUris = urisFactory.get(getRequest());
         UmaProviderSettings providerSettings = providerSettingsFactory.get(getRequest());
 
         JsonValue configuration = json(object(
                 field("version", providerSettings.getVersion()),
-                field("issuer", providerSettings.getIssuer()),
+                field("issuer", umaUris.getIssuer()),
                 field("pat_profiles_supported", providerSettings.getSupportedPATProfiles()),
                 field("aat_profiles_supported", providerSettings.getSupportedAATProfiles()),
                 field("rpt_profiles_supported", providerSettings.getSupportedRPTProfiles()),
                 field("pat_grant_types_supported", providerSettings.getSupportedPATGrantTypes()),
                 field("aat_grant_types_supported", providerSettings.getSupportedAATGrantTypes()),
-                field("token_endpoint", providerSettings.getTokenEndpoint()),
-                field("authorization_endpoint", providerSettings.getAuthorizationEndpoint()),
-                field("introspection_endpoint", providerSettings.getTokenIntrospectionEndpoint()),
-                field("resource_set_registration_endpoint", providerSettings.getResourceSetRegistrationEndpoint()),
-                field("permission_registration_endpoint", providerSettings.getPermissionRegistrationEndpoint()),
-                field("rpt_endpoint", providerSettings.getRPTEndpoint())));
+                field("token_endpoint", umaUris.getTokenEndpoint()),
+                field("authorization_endpoint", umaUris.getAuthorizationEndpoint()),
+                field("introspection_endpoint", umaUris.getTokenIntrospectionEndpoint()),
+                field("resource_set_registration_endpoint", umaUris.getResourceSetRegistrationEndpoint()),
+                field("permission_registration_endpoint", umaUris.getPermissionRegistrationEndpoint()),
+                field("rpt_endpoint", umaUris.getRPTEndpoint())));
 
         Set<String> supportedClaimTokenProfiles = providerSettings.getSupportedClaimTokenProfiles();
         if (supportedClaimTokenProfiles != null && !supportedClaimTokenProfiles.isEmpty()) {
@@ -88,11 +92,11 @@ public class UmaWellKnownConfigurationEndpoint extends ServerResource {
         if (supportedUmaProfiles != null && !supportedUmaProfiles.isEmpty()) {
             configuration.add("uma_profiles_supported", supportedUmaProfiles);
         }
-        URI dynamicClientEndpoint = providerSettings.getDynamicClientEndpoint();
+        URI dynamicClientEndpoint = umaUris.getDynamicClientEndpoint();
         if (dynamicClientEndpoint != null) {
             configuration.add("dynamic_client_endpoint", dynamicClientEndpoint);
         }
-        URI requestingPartyClaimsEndpoint = providerSettings.getRequestingPartyClaimsEndpoint();
+        URI requestingPartyClaimsEndpoint = umaUris.getRequestingPartyClaimsEndpoint();
         if (requestingPartyClaimsEndpoint != null) {
             configuration.add("requesting_party_claims_endpoint", requestingPartyClaimsEndpoint.toString());
         }

@@ -335,7 +335,8 @@ public class PendingRequestsService {
     private boolean isEmailResourceOwnerOnPendingRequestCreationEnabled(String realm) throws ServerException {
         try {
             return settingsFactory.get(realm).isEmailResourceOwnerOnPendingRequestCreationEnabled();
-        } catch (org.forgerock.oauth2.core.exceptions.ServerException e) {
+        } catch (org.forgerock.oauth2.core.exceptions.ServerException |
+                org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new ServerException("Failed to read UMA Provider settings", e);
         }
     }
@@ -343,7 +344,8 @@ public class PendingRequestsService {
     private boolean isEmailRequestingPartyOnPendingRequestApprovalEnabled(String realm) throws ServerException {
         try {
             return settingsFactory.get(realm).isEmailRequestingPartyOnPendingRequestApprovalEnabled();
-        } catch (org.forgerock.oauth2.core.exceptions.ServerException e) {
+        } catch (org.forgerock.oauth2.core.exceptions.ServerException |
+                org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new ServerException("Failed to read UMA Provider settings", e);
         }
     }

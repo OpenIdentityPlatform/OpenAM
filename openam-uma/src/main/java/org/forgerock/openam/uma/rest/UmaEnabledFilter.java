@@ -59,8 +59,8 @@ public class UmaEnabledFilter implements Filter {
 
     private Promise<Void, ResourceException> enabled(Context serverContext) {
         try {
-            RealmInfo realmInfo = RealmContext.asRealmInfo(serverContext);
-            UmaProviderSettings settings = umaProviderSettingsFactory.get(serverContext, realmInfo);
+            String realm = RealmContext.getRealm(serverContext);
+            UmaProviderSettings settings = umaProviderSettingsFactory.get(realm);
             if (settings.isEnabled()) {
                 return newResultPromise(null);
             }

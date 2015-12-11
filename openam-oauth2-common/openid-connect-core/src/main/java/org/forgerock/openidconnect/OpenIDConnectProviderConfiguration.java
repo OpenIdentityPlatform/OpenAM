@@ -19,6 +19,8 @@ package org.forgerock.openidconnect;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -41,15 +43,19 @@ import java.util.Set;
 public class OpenIDConnectProviderConfiguration {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final OAuth2UrisFactory urisFactory;
 
     /**
      * Constructs a new OpenIDConnectProviderConfiguration.
      *
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param urisFactory An instance of OAuth2UrisFactory.
      */
     @Inject
-    public OpenIDConnectProviderConfiguration(OAuth2ProviderSettingsFactory providerSettingsFactory) {
+    public OpenIDConnectProviderConfiguration(OAuth2ProviderSettingsFactory providerSettingsFactory,
+            OAuth2UrisFactory urisFactory) {
         this.providerSettingsFactory = providerSettingsFactory;
+        this.urisFactory = urisFactory;
     }
 
     /**
@@ -64,6 +70,7 @@ public class OpenIDConnectProviderConfiguration {
     public JsonValue getConfiguration(OAuth2Request request) throws OAuth2Exception {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final OAuth2Uris uris = urisFactory.get(request);
 
         if (!providerSettings.exists() || providerSettings.getSupportedScopes() == null ||
                 !providerSettings.getSupportedScopes().contains("openid")) {
@@ -72,14 +79,14 @@ public class OpenIDConnectProviderConfiguration {
 
         final Map<String, Object> configuration = new HashMap<>();
         configuration.put("version", providerSettings.getOpenIDConnectVersion());
-        configuration.put("issuer", providerSettings.getIssuer());
-        configuration.put("authorization_endpoint", providerSettings.getAuthorizationEndpoint());
-        configuration.put("token_endpoint", providerSettings.getTokenEndpoint());
-        configuration.put("userinfo_endpoint", providerSettings.getUserInfoEndpoint());
-        configuration.put("check_session_iframe", providerSettings.getCheckSessionEndpoint());
-        configuration.put("end_session_endpoint", providerSettings.getEndSessionEndpoint());
+        configuration.put("issuer", uris.getIssuer());
+        configuration.put("authorization_endpoint", uris.getAuthorizationEndpoint());
+        configuration.put("token_endpoint", uris.getTokenEndpoint());
+        configuration.put("userinfo_endpoint", uris.getUserInfoEndpoint());
+        configuration.put("check_session_iframe", uris.getCheckSessionEndpoint());
+        configuration.put("end_session_endpoint", uris.getEndSessionEndpoint());
         configuration.put("jwks_uri", providerSettings.getJWKSUri());
-        configuration.put("registration_endpoint", providerSettings.getClientRegistrationEndpoint());
+        configuration.put("registration_endpoint", uris.getClientRegistrationEndpoint());
         configuration.put("claims_supported", providerSettings.getSupportedClaims());
         configuration.put("scopes_supported", providerSettings.getSupportedScopes());
         configuration.put("response_types_supported",

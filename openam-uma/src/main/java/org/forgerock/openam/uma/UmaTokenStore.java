@@ -27,6 +27,7 @@ import com.google.inject.assistedinject.Assisted;
 
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
@@ -58,7 +59,7 @@ public class UmaTokenStore {
         this.settingsFactory = settingsFactory;
     }
 
-    RequestingPartyToken createRPT(PermissionTicket permissionTicket) throws ServerException {
+    RequestingPartyToken createRPT(PermissionTicket permissionTicket) throws ServerException, NotFoundException {
         UmaProviderSettings settings = settingsFactory.get(realm);
         Permission permission = new Permission(permissionTicket.getResourceSetId(), permissionTicket.getScopes());
         RequestingPartyToken rpt = new RequestingPartyToken(null, permissionTicket.getResourceServerClientId(),
@@ -74,7 +75,7 @@ public class UmaTokenStore {
     }
 
     PermissionTicket createPermissionTicket(String resourceSetId, Set<String> scopes, String clientId)
-            throws ServerException {
+            throws ServerException, NotFoundException {
         UmaProviderSettings settings = settingsFactory.get(realm);
         PermissionTicket permissionTicket = new PermissionTicket(null, resourceSetId, scopes, clientId);
         permissionTicket.setRealm(realm);

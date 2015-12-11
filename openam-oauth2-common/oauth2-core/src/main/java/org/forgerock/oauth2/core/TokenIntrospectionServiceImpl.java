@@ -37,15 +37,15 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 public class TokenIntrospectionServiceImpl implements TokenIntrospectionService {
 
     private final ClientAuthenticator clientAuthenticator;
-    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final Set<TokenIntrospectionHandler> handlers;
+    private final OAuth2UrisFactory urisFactory;
 
     @Inject
     public TokenIntrospectionServiceImpl(ClientAuthenticator clientAuthenticator,
-            OAuth2ProviderSettingsFactory providerSettingsFactory, Set<TokenIntrospectionHandler> handlers) {
+            Set<TokenIntrospectionHandler> handlers, OAuth2UrisFactory urisFactory) {
         this.clientAuthenticator = clientAuthenticator;
-        this.providerSettingsFactory = providerSettingsFactory;
-        this.handlers = new TreeSet<TokenIntrospectionHandler>(new Comparator<TokenIntrospectionHandler>() {
+        this.urisFactory = urisFactory;
+        this.handlers = new TreeSet<>(new Comparator<TokenIntrospectionHandler>() {
             @Override
             public int compare(TokenIntrospectionHandler t1, TokenIntrospectionHandler t2) {
                 int priorityOrder = t2.priority().compareTo(t1.priority());
@@ -61,9 +61,8 @@ public class TokenIntrospectionServiceImpl implements TokenIntrospectionService 
     @Override
     public JsonValue introspect(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
             NotFoundException, ServerException {
-        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
-                providerSettings.getIntrospectionEndpoint());
+                urisFactory.get(request).getIntrospectionEndpoint());
         String tokenType = request.getParameter(TOKEN_TYPE_HINT);
         String tokenId = request.getParameter(TOKEN);
 

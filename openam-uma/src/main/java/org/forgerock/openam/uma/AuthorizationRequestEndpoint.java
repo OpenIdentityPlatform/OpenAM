@@ -42,6 +42,8 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
@@ -82,6 +84,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
 
     private static final String UNABLE_TO_RETRIEVE_TICKET_MESSAGE = "Unable to retrieve Permission Ticket";
     private final OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory;
+    private final OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory;
 
     private final UmaAuditLogger auditLogger;
     private final PendingRequestsService pendingRequestsService;
@@ -95,13 +98,15 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     @Inject
     public AuthorizationRequestEndpoint(UmaProviderSettingsFactory umaProviderSettingsFactory,
             TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
-            OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, UmaAuditLogger auditLogger,
-            PendingRequestsService pendingRequestsService, Map<String, ClaimGatherer> claimGatherers,
-            ExtensionFilterManager extensionFilterManager, UmaExceptionHandler exceptionHandler) {
+            OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory,
+            UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,
+            Map<String, ClaimGatherer> claimGatherers, ExtensionFilterManager extensionFilterManager,
+            UmaExceptionHandler exceptionHandler) {
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
         this.requestFactory = requestFactory;
         this.oauth2TokenStore = oauth2TokenStore;
         this.oauth2ProviderSettingsFactory = oauth2ProviderSettingsFactory;
+        this.oAuth2UrisFactory = oAuth2UrisFactory;
         this.auditLogger = auditLogger;
         this.pendingRequestsService = pendingRequestsService;
         this.claimGatherers = claimGatherers;
@@ -115,6 +120,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         UmaProviderSettings umaProviderSettings = umaProviderSettingsFactory.get(this.getRequest());
         final OAuth2Request oauth2Request = requestFactory.create(getRequest());
         OAuth2ProviderSettings oauth2ProviderSettings = oauth2ProviderSettingsFactory.get(oauth2Request);
+        OAuth2Uris oAuth2Uris = oAuth2UrisFactory.get(oauth2Request);
         final UmaTokenStore umaTokenStore = umaProviderSettings.getUmaTokenStore();
         String realm = oauth2Request.getParameter("realm");
 
@@ -130,7 +136,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         AMIdentity resourceOwner = createIdentity(resourceOwnerId, realm);
         String requestingPartyId = null;
         try {
-            requestingPartyId = getRequestingPartyId(umaProviderSettings, oauth2ProviderSettings, requestBody);
+            requestingPartyId = getRequestingPartyId(umaProviderSettings, oAuth2Uris, requestBody);
         } finally {
             auditLogger.log(resourceSetId, resourceOwner, UmaAuditType.REQUEST, request,
                     requestingPartyId == null ? getAuthorisationApiToken().getResourceOwnerId() : requestingPartyId);
@@ -203,8 +209,8 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         exceptionHandler.handleException(getResponse(), throwable);
     }
 
-    private String getRequestingPartyId(UmaProviderSettings umaProviderSettings,
-            OAuth2ProviderSettings oauth2ProviderSettings, JsonValue requestBody)
+    private String getRequestingPartyId(UmaProviderSettings umaProviderSettings, OAuth2Uris oAuth2Uris,
+            JsonValue requestBody)
             throws ServerException, NotFoundException, UmaException {
         if (requestBody.isDefined("claim_tokens")) {
             for (JsonValue claimToken : requestBody.get("claim_tokens")) {
@@ -222,17 +228,17 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         }
         // Cannot rely on AAT for requesting party if trust elevation is required
         if (umaProviderSettings.isTrustElevationRequired()) {
-            throw newNeedInfoException(oauth2ProviderSettings);
+            throw newNeedInfoException(oAuth2Uris);
         }
         // Default to using AAT
         return getAuthorisationApiToken().getResourceOwnerId();
     }
 
-    private UmaException newNeedInfoException(OAuth2ProviderSettings providerSettings)
+    private UmaException newNeedInfoException(OAuth2Uris oAuth2Uris)
             throws NotFoundException, ServerException {
         List<Object> requiredClaims = new ArrayList<>();
         for (ClaimGatherer claimGatherer : claimGatherers.values()) {
-            requiredClaims.add(claimGatherer.getRequiredClaimsDetails(providerSettings.getIssuer()).getObject());
+            requiredClaims.add(claimGatherer.getRequiredClaimsDetails(oAuth2Uris.getIssuer()).getObject());
         }
         JsonValue requestingPartyClaims = json(object(
                 field("requesting_party_claims", requiredClaims)));
@@ -346,7 +352,8 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         return IdUtils.getIdentity(username, realm);
     }
 
-    private Representation createJsonRpt(UmaTokenStore umaTokenStore, PermissionTicket permissionTicket) throws ServerException {
+    private Representation createJsonRpt(UmaTokenStore umaTokenStore, PermissionTicket permissionTicket)
+            throws ServerException, NotFoundException {
         RequestingPartyToken rpt = umaTokenStore.createRPT(permissionTicket);
         Map<String, Object> response = new HashMap<>();
         response.put("rpt", rpt.getId());

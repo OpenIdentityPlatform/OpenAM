@@ -25,7 +25,6 @@ import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
 import org.forgerock.openam.rest.service.RouterContextResource;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
@@ -59,7 +58,7 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
      * @param request The OAuth2 request.
      * @return The data model.
      */
-    protected Map<String, Object> getDataModel(ResourceOwnerConsentRequired consentRequired, final OAuth2Request request) {
+    protected Map<String, Object> getDataModel(ResourceOwnerConsentRequired consentRequired, OAuth2Request request) {
         String displayName = consentRequired.getClientName();
         String displayDescription = consentRequired.getClientDescription();
         String userDisplayName = consentRequired.getUserDisplayName();

@@ -46,12 +46,15 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -105,11 +108,13 @@ public class AuthorizationRequestEndpointTest {
         public AuthorizationRequestEndpoint2(UmaProviderSettingsFactory umaProviderSettingsFactory,
                 TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
                 OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
+                OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory,
                 UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,
                 Map<String, ClaimGatherer> claimGatherers, ExtensionFilterManager extensionFilterManager,
                 UmaExceptionHandler exceptionHandler) {
             super(umaProviderSettingsFactory, oauth2TokenStore, requestFactory, oAuth2ProviderSettingsFactory,
-                    auditLogger, pendingRequestsService, claimGatherers, extensionFilterManager, exceptionHandler);
+                    oAuth2UrisFactory, auditLogger, pendingRequestsService, claimGatherers, extensionFilterManager,
+                    exceptionHandler);
         }
 
         @Override
@@ -176,7 +181,11 @@ public class AuthorizationRequestEndpointTest {
         OAuth2ProviderSettings oauth2ProviderSettings = mock(OAuth2ProviderSettings.class);
         given(oauth2ProviderSettingsFactory.get(any(OAuth2Request.class))).willReturn(oauth2ProviderSettings);
         given(oauth2ProviderSettings.getResourceSetStore()).willReturn(resourceSetStore);
-        given(oauth2ProviderSettings.getIssuer()).willReturn("ISSUER");
+
+        OAuth2UrisFactory<RealmInfo> oauth2UrisFactory = mock(OAuth2UrisFactory.class);
+        OAuth2Uris oauth2Uris = mock(OAuth2Uris.class);
+        given(oauth2UrisFactory.get(any(OAuth2Request.class))).willReturn(oauth2Uris);
+        given(oauth2Uris.getIssuer()).willReturn("ISSUER");
 
         pendingRequestsService = mock(PendingRequestsService.class);
 
@@ -192,8 +201,8 @@ public class AuthorizationRequestEndpointTest {
         UmaExceptionHandler exceptionHandler = mock(UmaExceptionHandler.class);
 
         endpoint = spy(new AuthorizationRequestEndpoint2(umaProviderSettingsFactory, oauth2TokenStore,
-                requestFactory, oauth2ProviderSettingsFactory, umaAuditLogger, pendingRequestsService, claimGatherers,
-                extensionFilterManager, exceptionHandler));
+                requestFactory, oauth2ProviderSettingsFactory, oauth2UrisFactory, umaAuditLogger,
+                pendingRequestsService, claimGatherers, extensionFilterManager, exceptionHandler));
         request = mock(Request.class);
         given(endpoint.getRequest()).willReturn(request);
 

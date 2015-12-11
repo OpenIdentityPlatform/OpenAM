@@ -57,6 +57,8 @@ public class DeviceCodeGrantTypeHandlerTest {
     @Mock
     private OAuth2ProviderSettings providerSettings;
     @Mock
+    private OAuth2Uris oAuth2Uris;
+    @Mock
     private OAuth2Request request;
     @Mock
     private AccessToken accessToken;
@@ -78,6 +80,9 @@ public class DeviceCodeGrantTypeHandlerTest {
             }
         });
 
+        OAuth2UrisFactory oAuth2UrisFactory = mock(OAuth2UrisFactory.class);
+        when(oAuth2UrisFactory.get(request)).thenReturn(oAuth2Uris);
+
         ClientAuthenticator clientAuthenticator = mock(ClientAuthenticator.class);
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         when(clientAuthenticator.authenticate(eq(request), anyString())).thenReturn(clientRegistration);
@@ -97,7 +102,7 @@ public class DeviceCodeGrantTypeHandlerTest {
         when(failureFactory.getException(any(OAuth2Request.class), anyString())).thenReturn(expectedResult);
 
         grantTypeHandler = new DeviceCodeGrantTypeHandler(providerSettingsFactory, clientAuthenticator, tokenStore,
-                clientRegistrationStore, failureFactory, accessTokenGenerator);
+                clientRegistrationStore, failureFactory, oAuth2UrisFactory, accessTokenGenerator);
     }
 
     @Test

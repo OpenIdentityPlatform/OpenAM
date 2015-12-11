@@ -66,16 +66,16 @@ public class UmaEnabledFilterTest {
     @BeforeClass
     public static void setupFactories() throws Exception {
         notYetConfiguredFactory = mock(UmaProviderSettingsFactory.class);
-        given(notYetConfiguredFactory.get(any(Context.class), any(RealmInfo.class)))
+        given(notYetConfiguredFactory.get(anyString()))
                 .willThrow(NotFoundException.class);
         UmaProviderSettings notEnabled = mock(UmaProviderSettings.class);
         given(notEnabled.isEnabled()).willReturn(false);
         notEnabledFactory = mock(UmaProviderSettingsFactory.class);
-        given(notEnabledFactory.get(any(Context.class), any(RealmInfo.class))).willReturn(notEnabled);
+        given(notEnabledFactory.get(anyString())).willReturn(notEnabled);
         UmaProviderSettings enabled = mock(UmaProviderSettings.class);
         given(enabled.isEnabled()).willReturn(true);
         enabledFactory = mock(UmaProviderSettingsFactory.class);
-        given(enabledFactory.get(any(Context.class), any(RealmInfo.class))).willReturn(enabled);
+        given(enabledFactory.get(anyString())).willReturn(enabled);
     }
 
     @BeforeMethod

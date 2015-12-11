@@ -46,6 +46,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
     private ClientCredentialsRequestValidator requestValidator;
     private TokenStore tokenStore;
     private OAuth2ProviderSettings providerSettings;
+    private OAuth2Uris uris;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -58,11 +59,15 @@ public class ClientCredentialsGrantTypeHandlerTest {
         tokenStore = mock(TokenStore.class);
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
 
+        OAuth2UrisFactory urisFactory = mock(OAuth2UrisFactory.class);
         grantTypeHandler = new ClientCredentialsGrantTypeHandler(clientAuthenticator, requestValidators, tokenStore,
-                providerSettingsFactory);
+                urisFactory, providerSettingsFactory);
 
         providerSettings = mock(OAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+
+        uris = mock(OAuth2Uris.class);
+        given(urisFactory.get(any(OAuth2Request.class))).willReturn(uris);
     }
 
     @Test
@@ -74,7 +79,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
         Set<String> validatedScope = new HashSet<String>();
         AccessToken accessToken = mock(AccessToken.class);
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Endpoint");
         given(clientAuthenticator.authenticate(request, "Endpoint")).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class),
@@ -102,7 +107,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
         Set<String> validatedScope = Collections.singleton("SCOPE");
         AccessToken accessToken = mock(AccessToken.class);
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Endpoint");
         given(clientAuthenticator.authenticate(request, "Endpoint")).willReturn(clientRegistration);
         given(providerSettings.validateAccessTokenScope(Matchers.<ClientRegistration>anyObject(),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);

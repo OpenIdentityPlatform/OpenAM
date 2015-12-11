@@ -56,23 +56,25 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     private final ClientAuthenticator clientAuthenticator;
     private final TokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final OAuth2UrisFactory urisFactory;
 
     /**
      * Constructs a new AccessTokenServiceImpl.
-     *
      * @param grantTypeHandlers A {@code Map} of the grant type handlers.
      * @param clientAuthenticator An instance of the ClientAuthenticator.
      * @param tokenStore An instance of the TokenStore.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param urisFactory An instance of the OAuth2UrisFactory.
      */
     @Inject
     public AccessTokenServiceImpl(Map<String, GrantTypeHandler> grantTypeHandlers,
             final ClientAuthenticator clientAuthenticator, final TokenStore tokenStore,
-            final OAuth2ProviderSettingsFactory providerSettingsFactory) {
+            final OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory urisFactory) {
         this.grantTypeHandlers = grantTypeHandlers;
         this.clientAuthenticator = clientAuthenticator;
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
+        this.urisFactory = urisFactory;
     }
 
     /**
@@ -100,8 +102,9 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         Reject.ifTrue(isEmpty(request.<String>getParameter(REFRESH_TOKEN)), "Missing parameter, 'refresh_token'");
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final OAuth2Uris uris = urisFactory.get(request);
         final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
-                providerSettings.getTokenEndpoint());
+                uris.getTokenEndpoint());
 
         final String tokenId = request.getParameter(REFRESH_TOKEN);
         final RefreshToken refreshToken = tokenStore.readRefreshToken(request, tokenId);

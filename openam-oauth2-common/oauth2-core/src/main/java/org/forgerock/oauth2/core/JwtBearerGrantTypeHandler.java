@@ -46,8 +46,8 @@ public class JwtBearerGrantTypeHandler extends GrantTypeHandler {
 
     @Inject
     public JwtBearerGrantTypeHandler(ClientAuthenticator clientAuthenticator, TokenStore tokenStore,
-            OAuth2ProviderSettingsFactory providerSettingsFactory) {
-        super(providerSettingsFactory, clientAuthenticator);
+            OAuth2UrisFactory urisFactory, OAuth2ProviderSettingsFactory providerSettingsFactory) {
+        super(providerSettingsFactory, urisFactory, clientAuthenticator);
         this.tokenStore = tokenStore;
     }
 

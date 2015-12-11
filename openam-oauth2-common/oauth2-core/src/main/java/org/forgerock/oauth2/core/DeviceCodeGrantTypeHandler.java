@@ -57,8 +57,8 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
     public DeviceCodeGrantTypeHandler(OAuth2ProviderSettingsFactory providerSettingsFactory,
             ClientAuthenticator clientAuthenticator, TokenStore tokenStore,
             ClientRegistrationStore clientRegistrationStore, ClientAuthenticationFailureFactory failureFactory,
-            GrantTypeAccessTokenGenerator accessTokenGenerator) {
-        super(providerSettingsFactory, clientAuthenticator);
+            OAuth2UrisFactory urisFactory, GrantTypeAccessTokenGenerator accessTokenGenerator) {
+        super(providerSettingsFactory, urisFactory, clientAuthenticator);
         this.tokenStore = tokenStore;
         this.clientRegistrationStore = clientRegistrationStore;
         this.failureFactory = failureFactory;

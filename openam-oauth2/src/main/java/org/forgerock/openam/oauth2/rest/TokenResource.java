@@ -503,7 +503,7 @@ public class TokenResource implements CollectionResourceProvider {
         OAuth2ProviderSettings oAuth2ProviderSettings;
         final String realm = getAttributeValue(token, "realm");
         try {
-            oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(context, new RealmInfo(realm));
+            oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm);
         } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new NotFoundException(e.getMessage());
         }

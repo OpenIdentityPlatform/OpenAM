@@ -33,14 +33,13 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
     private static final Joiner SCOPE_JOINER = Joiner.on(' ');
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final TokenStore tokenStore;
+    private final OAuth2UrisFactory urisFactory;
 
     @Inject
-    public OAuth2TokenIntrospectionHandler(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            TokenStore tokenStore) {
-        this.providerSettingsFactory = providerSettingsFactory;
+    public OAuth2TokenIntrospectionHandler(TokenStore tokenStore, OAuth2UrisFactory urisFactory) {
         this.tokenStore = tokenStore;
+        this.urisFactory = urisFactory;
     }
 
     @Override
@@ -48,10 +47,9 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
         IntrospectableToken token = getIntrospectableToken(request, tokenType, tokenId);
 
         if (token != null && !token.isExpired()) {
-            OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
             if (token.getClientId().equals(clientId) &&
                     token.getRealm().equals(request.<String>getParameter(OAuth2Constants.Params.REALM))) {
-                return renderOAuth2Token(providerSettings, token);
+                return renderOAuth2Token(request, token);
             } else {
                 logger.warn("Token {} didn't belong to client {}", request.getParameter(TOKEN), clientId);
             }
@@ -62,12 +60,13 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
     /**
      * Render the OAuth 2.0 as a JsonValue according to the specification for introspection of OAuth 2.0 tokens.
      * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-introspection-04">OAuth 2.0 Token Introspection</a>
-     * @param providerSettings The OAuth 2 provider that is connecting.
+     * @param request The request.
      * @param token The token.
      * @return A JSON representation of the token attributes.
      * @throws ServerException
      */
-    private JsonValue renderOAuth2Token(OAuth2ProviderSettings providerSettings, IntrospectableToken token) throws ServerException {
+    private JsonValue renderOAuth2Token(OAuth2Request request, IntrospectableToken token)
+            throws ServerException, NotFoundException {
         return json(object(
                 field(ACTIVE, true),
                 field(OAuth2Constants.Params.SCOPE, SCOPE_JOINER.join(token.getScope())),
@@ -77,7 +76,7 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
                 field(OAuth2Constants.JWTTokenParams.EXP, token.getExpiryTime() == -1 ? null : (token.getExpiryTime
                         () - System.currentTimeMillis()) / 1000),
                 field(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId()),
-                field(OAuth2Constants.JWTTokenParams.ISS, providerSettings.getIssuer())
+                field(OAuth2Constants.JWTTokenParams.ISS, urisFactory.get(request).getIssuer())
         ));
     }
 

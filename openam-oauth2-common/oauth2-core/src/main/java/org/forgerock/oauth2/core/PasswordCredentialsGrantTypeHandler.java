@@ -59,8 +59,9 @@ public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
     public PasswordCredentialsGrantTypeHandler(ClientAuthenticator clientAuthenticator,
             List<PasswordCredentialsRequestValidator> requestValidators,
             ResourceOwnerAuthenticator resourceOwnerAuthenticator,
-            OAuth2ProviderSettingsFactory providerSettingsFactory, TokenStore tokenStore) {
-        super(providerSettingsFactory, clientAuthenticator);
+            OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory urisFactory,
+            TokenStore tokenStore) {
+        super(providerSettingsFactory, urisFactory, clientAuthenticator);
         this.requestValidators = requestValidators;
         this.resourceOwnerAuthenticator = resourceOwnerAuthenticator;
         this.tokenStore = tokenStore;

@@ -26,8 +26,11 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.core.RealmInfo;
 import org.mockito.Matchers;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -40,49 +43,56 @@ public class UmaWellKnownConfigurationEndpointTest {
     private UmaWellKnownConfigurationEndpoint endpoint;
 
     private UmaProviderSettingsFactory providerSettingsFactory;
+    private UmaUrisFactory umaUrisFactory;
     private Response response;
+    private UmaUris umaUris;
+    private UmaProviderSettings providerSettings;
 
     @BeforeMethod
-    public void setup() {
+    public void setup() throws Exception {
 
+        umaUrisFactory = mock(UmaUrisFactory.class);
         providerSettingsFactory = mock(UmaProviderSettingsFactory.class);
 
         UmaExceptionHandler exceptionHandler = mock(UmaExceptionHandler.class);
 
-        endpoint = new UmaWellKnownConfigurationEndpoint(providerSettingsFactory, exceptionHandler);
+        endpoint = new UmaWellKnownConfigurationEndpoint(umaUrisFactory, providerSettingsFactory, exceptionHandler);
 
         response = mock(Response.class);
         endpoint.setResponse(response);
+
+        umaUris = mock(UmaUris.class);
+        providerSettings = mock(UmaProviderSettings.class);
+        given(umaUrisFactory.get(Matchers.<Request>anyObject())).willReturn(umaUris);
+        given(providerSettingsFactory.get(Matchers.<Request>anyObject())).willReturn(providerSettings);
     }
 
     private UmaProviderSettings setupProviderSettings() throws NotFoundException, ServerException {
-        UmaProviderSettings providerSettings = mock(UmaProviderSettings.class);
-        given(providerSettingsFactory.get(Matchers.<Request>anyObject())).willReturn(providerSettings);
-
         given(providerSettings.getVersion()).willReturn("VERSION");
-        given(providerSettings.getIssuer()).willReturn(URI.create("ISSUER"));
+        given(umaUris.getIssuer()).willReturn(URI.create("ISSUER"));
         given(providerSettings.getSupportedPATProfiles()).willReturn(Collections.singleton("PAT_PROFILE"));
         given(providerSettings.getSupportedAATProfiles()).willReturn(Collections.singleton("AAT_PROFILE"));
         given(providerSettings.getSupportedRPTProfiles()).willReturn(Collections.singleton("RPT_PROFILE"));
         given(providerSettings.getSupportedPATGrantTypes()).willReturn(Collections.singleton("PAT_GRANT_TYPE"));
         given(providerSettings.getSupportedAATGrantTypes()).willReturn(Collections.singleton("AAT_GRANT_TYPE"));
-        given(providerSettings.getTokenEndpoint()).willReturn(URI.create("TOKEN_ENDPOINT"));
-        given(providerSettings.getAuthorizationEndpoint()).willReturn(URI.create("AUTHORIZATION_ENDPOINT"));
-        given(providerSettings.getTokenIntrospectionEndpoint()).willReturn(URI.create("TOKEN_INTROSPECTION_ENDPOINT"));
-        given(providerSettings.getResourceSetRegistrationEndpoint()).willReturn(URI.create("RESOURCE_SET_REGISTRATION_ENDPOINT"));
-        given(providerSettings.getPermissionRegistrationEndpoint()).willReturn(URI.create("PERMISSION_REGISTRATION_ENDPOINT"));
-        given(providerSettings.getRPTEndpoint()).willReturn(URI.create("RPT_ENDPOINT"));
+        given(umaUris.getTokenEndpoint()).willReturn(URI.create("TOKEN_ENDPOINT"));
+        given(umaUris.getAuthorizationEndpoint()).willReturn(URI.create("AUTHORIZATION_ENDPOINT"));
+        given(umaUris.getTokenIntrospectionEndpoint()).willReturn(URI.create("TOKEN_INTROSPECTION_ENDPOINT"));
+        given(umaUris.getResourceSetRegistrationEndpoint()).willReturn(URI.create("RESOURCE_SET_REGISTRATION_ENDPOINT"));
+        given(umaUris.getPermissionRegistrationEndpoint()).willReturn(URI.create("PERMISSION_REGISTRATION_ENDPOINT"));
+        given(umaUris.getRPTEndpoint()).willReturn(URI.create("RPT_ENDPOINT"));
 
         return providerSettings;
     }
 
     private UmaProviderSettings setupProviderSettingsWithOptionalConfiguration() throws NotFoundException, ServerException {
-        UmaProviderSettings providerSettings = setupProviderSettings();
+        setupProviderSettings();
+        given(umaUrisFactory.get(Matchers.<Request>anyObject())).willReturn(umaUris);
         given(providerSettings.getSupportedClaimTokenProfiles())
                 .willReturn(Collections.singleton("CLAIM_TOKEN_PROFILE"));
         given(providerSettings.getSupportedUmaProfiles()).willReturn(Collections.singleton(URI.create("UMA_PROFILE")));
-        given(providerSettings.getDynamicClientEndpoint()).willReturn(URI.create("DYNAMIC_CLIENT_ENDPOINT"));
-        given(providerSettings.getRequestingPartyClaimsEndpoint()).willReturn(URI.create("REQUESTING_PARTY_CLAIMS_ENDPOINT"));
+        given(umaUris.getDynamicClientEndpoint()).willReturn(URI.create("DYNAMIC_CLIENT_ENDPOINT"));
+        given(umaUris.getRequestingPartyClaimsEndpoint()).willReturn(URI.create("REQUESTING_PARTY_CLAIMS_ENDPOINT"));
         return providerSettings;
     }
 

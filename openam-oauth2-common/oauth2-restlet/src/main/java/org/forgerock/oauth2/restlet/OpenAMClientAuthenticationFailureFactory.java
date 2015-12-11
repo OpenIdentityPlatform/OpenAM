@@ -16,17 +16,16 @@
 
 package org.forgerock.oauth2.restlet;
 
-import javax.inject.Inject;
-
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.restlet.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 /**
  * A ClientAuthenticationFailureFactory which includes implementations of methods suitable for handling the OpenAM

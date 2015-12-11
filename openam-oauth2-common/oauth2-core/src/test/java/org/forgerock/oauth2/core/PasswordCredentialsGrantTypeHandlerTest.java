@@ -42,6 +42,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
     private ResourceOwnerAuthenticator resourceOwnerAuthenticator;
     private OAuth2ProviderSettings providerSettings;
     private TokenStore tokenStore;
+    private OAuth2Uris uris;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -55,11 +56,15 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         tokenStore = mock(TokenStore.class);
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
 
+        OAuth2UrisFactory urisFactory = mock(OAuth2UrisFactory.class);
         grantTypeHandler = new PasswordCredentialsGrantTypeHandler(clientAuthenticator, requestValidators,
-                resourceOwnerAuthenticator, providerSettingsFactory, tokenStore);
+                resourceOwnerAuthenticator, providerSettingsFactory, urisFactory, tokenStore);
 
         providerSettings = mock(OAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+
+        uris = mock(OAuth2Uris.class);
+        given(urisFactory.get(any(OAuth2Request.class))).willReturn(uris);
     }
 
     @Test
@@ -72,7 +77,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         Set<String> validatedScope = new HashSet<String>();
         AccessToken accessToken = mock(AccessToken.class);
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(resourceOwnerAuthenticator.authenticate(request, false)).willReturn(resourceOwner);
@@ -103,7 +108,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         ResourceOwner resourceOwner = null;
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(resourceOwnerAuthenticator.authenticate(request, false)).willReturn(resourceOwner);
 
@@ -125,7 +130,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         RefreshToken refreshToken = mock(RefreshToken.class);
         AccessToken accessToken = mock(AccessToken.class);
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(resourceOwnerAuthenticator.authenticate(request, false)).willReturn(resourceOwner);
@@ -161,7 +166,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         Set<String> validatedScope = Collections.singleton("SCOPE");
         AccessToken accessToken = mock(AccessToken.class);
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(resourceOwnerAuthenticator.authenticate(request, false)).willReturn(resourceOwner);

@@ -46,6 +46,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     private TokenStore tokenStore;
     private TokenInvalidator tokenInvalidator;
     private OAuth2ProviderSettings providerSettings;
+    private OAuth2Uris uris;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -59,11 +60,15 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         GrantTypeAccessTokenGenerator accessTokenGenerator = new GrantTypeAccessTokenGenerator(tokenStore);
 
+        OAuth2UrisFactory urisFactory = mock(OAuth2UrisFactory.class);
         grantTypeHandler = new AuthorizationCodeGrantTypeHandler(requestValidators, clientAuthenticator, tokenStore,
-                tokenInvalidator, providerSettingsFactory, accessTokenGenerator);
+                tokenInvalidator, providerSettingsFactory, urisFactory, accessTokenGenerator);
 
         providerSettings = mock(OAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+
+        uris = mock(OAuth2Uris.class);
+        given(urisFactory.get(any(OAuth2Request.class))).willReturn(uris);
     }
 
     @Test (expectedExceptions = InvalidRequestException.class)
@@ -75,7 +80,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = null;
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
 
@@ -96,7 +101,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(true);
@@ -122,7 +127,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
         given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
@@ -145,7 +150,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
         given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
@@ -170,7 +175,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
         given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
@@ -199,7 +204,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         AccessToken accessToken = mock(AccessToken.class);
         Set<String> validatedScope = new HashSet<String>();
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
         given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
@@ -242,7 +247,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         AccessToken accessToken = mock(AccessToken.class);
         Set<String> validatedScope = new HashSet<String>();
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
         given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
@@ -283,7 +288,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         AccessToken accessToken = mock(AccessToken.class);
         Set<String> validatedScope = Collections.singleton("SCOPE");
 
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
         given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);

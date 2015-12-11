@@ -286,56 +286,6 @@ public interface OAuth2ProviderSettings {
     String getOpenIDConnectVersion();
 
     /**
-     * Gets the identifier of this issuer.
-     *
-     * @return The issuer.
-     */
-    String getIssuer() throws ServerException;
-
-    /**
-     * Gets the URI for the OAuth2 authorize endpoint.
-     *
-     * @return The OAuth2 authorize endpoint.
-     */
-    String getAuthorizationEndpoint();
-
-    /**
-     * Gets the URI for the OAuth2 token endpoint.
-     *
-     * @return The OAuth2 token endpoint.
-     */
-    String getTokenEndpoint();
-
-    /**
-     * Gets the URI for the OpenID Connect user info endpoint.
-     *
-     * @return The OpenID Connect user info endpoint.
-     */
-    String getUserInfoEndpoint();
-
-    /**
-     * Gets the URI for the OpenID Connect check session endpoint.
-     *
-     * @return The OpenID Connect check session endpoint.
-     */
-    String getCheckSessionEndpoint();
-
-    /**
-     * Gets the URI for the OpenID Connect end session endpoint.
-     *
-     * @return The OpenID Connect end session endpoint.
-     */
-    String getEndSessionEndpoint();
-
-    /**
-     * Gets the JSON Web Key Set URI.
-     *
-     * @return The JWKS URI.
-     * @throws ServerException If any internal server error occurs.
-     */
-    String getJWKSUri() throws ServerException;
-
-    /**
      * Gets the JWK Set for this OAuth2 Authorization /OpenID Provider.
      *
      * @return The JWK Set of signing and encryption keys.
@@ -355,14 +305,6 @@ public interface OAuth2ProviderSettings {
      * @return The modified attribute timestamp attribute name.
      */
     String getModifiedTimestampAttributeName() throws ServerException;
-
-    /**
-     * Gets the OpenID Connect client registration endpoint.
-     *
-     * @return The OpenID Connect client registration endpoint.
-     */
-    String getClientRegistrationEndpoint();
-
     /**
      * Gets the subject types supported by the OAuth2 provider.
      *
@@ -413,26 +355,6 @@ public interface OAuth2ProviderSettings {
     boolean exists();
 
     /**
-     * Returns the default URL for this provider's token introspection endpoint.
-     * @return The URL.
-     */
-    String getIntrospectionEndpoint();
-
-    /**
-     * Returns the default URL for this provider's Resource Set Registration policy endpoint.
-     *
-     * @return The URL.
-     */
-    String getResourceSetRegistrationPolicyEndpoint(String resourceSetId);
-
-    /**
-     * Returns the default URL for this provider's Resource Set Registration endpoint.
-     *
-     * @return The URL.
-     */
-    String getResourceSetRegistrationEndpoint();
-
-    /**
      * Returns the ResourceSetStore instance for the realm.
      *
      * @return The ResourceSetStore instance.
@@ -478,6 +400,14 @@ public interface OAuth2ProviderSettings {
      * The attribute that can be used to obtain a UI-displayable name for a user's AMIdentity.
      */
     String getUserDisplayNameAttribute() throws ServerException;
+
+    /**
+     * Gets the JSON Web Key Set URI.
+     *
+     * @return The JWKS URI.
+     * @throws ServerException If any internal server error occurs.
+     */
+    String getJWKSUri() throws ServerException;
 
     /**
      * Gets the custom login url template which will create the url to redirect resource owners to for authentication.

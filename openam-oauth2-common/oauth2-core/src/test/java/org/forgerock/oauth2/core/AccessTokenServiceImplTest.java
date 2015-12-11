@@ -47,6 +47,7 @@ public class AccessTokenServiceImplTest {
     private ClientAuthenticator clientAuthenticator;
     private TokenStore tokenStore;
     private OAuth2ProviderSettings providerSettings;
+    private OAuth2Uris uris;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -57,12 +58,16 @@ public class AccessTokenServiceImplTest {
         clientAuthenticator = mock(ClientAuthenticator.class);
         tokenStore = mock(TokenStore.class);
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
+        OAuth2UrisFactory urisFactory = mock(OAuth2UrisFactory.class);
 
         accessTokenService = new AccessTokenServiceImpl(grantTypeHandlers, clientAuthenticator, tokenStore,
-                providerSettingsFactory);
+                providerSettingsFactory, urisFactory);
 
         providerSettings = mock(OAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+
+        uris = mock(OAuth2Uris.class);
+        given(urisFactory.get(any(OAuth2Request.class))).willReturn(uris);
     }
 
     @Test
@@ -132,7 +137,7 @@ public class AccessTokenServiceImplTest {
         RefreshToken refreshToken = null;
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
 
@@ -152,7 +157,7 @@ public class AccessTokenServiceImplTest {
         RefreshToken refreshToken = mock(RefreshToken.class);
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
@@ -174,7 +179,7 @@ public class AccessTokenServiceImplTest {
         RefreshToken refreshToken = mock(RefreshToken.class);
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
@@ -199,7 +204,7 @@ public class AccessTokenServiceImplTest {
         AccessToken accessToken = mock(AccessToken.class);
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
@@ -231,7 +236,7 @@ public class AccessTokenServiceImplTest {
         AccessToken accessToken = mock(AccessToken.class);
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
@@ -268,7 +273,7 @@ public class AccessTokenServiceImplTest {
         String newRefreshTokenId = "NEW_REFRESH_TOKEN_ID";
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");

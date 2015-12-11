@@ -19,9 +19,7 @@ package org.forgerock.openam.uma;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.json;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -43,9 +41,12 @@ import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.core.RealmInfo;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -56,6 +57,8 @@ public class IdTokenClaimGathererTest {
 
     @Mock
     private OAuth2ProviderSettings oAuth2ProviderSettings;
+    @Mock
+    private OAuth2Uris oAuth2Uris;
     @Mock
     private ClientRegistration clientRegistration;
     @Mock
@@ -75,9 +78,10 @@ public class IdTokenClaimGathererTest {
     public void setup() throws Exception {
         initMocks(this);
         OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory = mockOAuth2ProviderSettings();
+        OAuth2UrisFactory<RealmInfo> oauth2UrisFactory = mockOAuth2Uris();
         ClientRegistrationStore clientRegistrationStore = mockClientRegistrationStore();
-        claimGatherer = spy(new IdTokenClaimGatherer(oAuth2ProviderSettingsFactory, clientRegistrationStore,
-                jwtReconstruction, signingManager));
+        claimGatherer = spy(new IdTokenClaimGatherer(oAuth2ProviderSettingsFactory, oauth2UrisFactory,
+                clientRegistrationStore, jwtReconstruction, signingManager));
         given(jwtReconstruction.reconstructJwt(anyString(), eq(SignedJwt.class))).willReturn(idToken);
         given(idToken.getHeader()).willReturn(jwsHeader);
         given(idToken.getClaimsSet()).willReturn(claimsSet);
@@ -90,6 +94,15 @@ public class IdTokenClaimGathererTest {
         KeyPair keyPair = new KeyPair(publicKey, null);
         given(oAuth2ProviderSettings.getServerKeyPair()).willReturn(keyPair);
         return oAuth2ProviderSettingsFactory;
+    }
+
+    private OAuth2UrisFactory<RealmInfo> mockOAuth2Uris() throws NotFoundException, ServerException {
+        OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory = mock(OAuth2UrisFactory.class);
+        given(oAuth2UrisFactory.get(oAuth2Request)).willReturn(oAuth2Uris);
+        PublicKey publicKey = mock(PublicKey.class);
+        KeyPair keyPair = new KeyPair(publicKey, null);
+        given(oAuth2ProviderSettings.getServerKeyPair()).willReturn(keyPair);
+        return oAuth2UrisFactory;
     }
 
     private ClientRegistrationStore mockClientRegistrationStore() throws InvalidClientException, NotFoundException {
@@ -177,7 +190,7 @@ public class IdTokenClaimGathererTest {
 
     private void setIdTokenAndOAuth2ProviderIssuers(String oAuth2ProviderIssuer) {
         try {
-            given(oAuth2ProviderSettings.getIssuer()).willReturn(oAuth2ProviderIssuer);
+            given(oAuth2Uris.getIssuer()).willReturn(oAuth2ProviderIssuer);
         } catch (ServerException ignored) {
         }
     }

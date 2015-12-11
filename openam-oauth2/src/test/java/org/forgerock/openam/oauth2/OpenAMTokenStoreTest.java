@@ -40,6 +40,7 @@ import org.forgerock.oauth2.core.DeviceCode;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -47,6 +48,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.restlet.RestletOAuth2Request;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.guice.OAuth2GuiceModule;
 import org.forgerock.openam.utils.RealmNormaliser;
@@ -62,6 +64,7 @@ public class OpenAMTokenStoreTest {
 
     private OAuthTokenStore tokenStore;
     private OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory;
     private OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private RealmNormaliser realmNormaliser;
     private SSOTokenManager ssoTokenManager;
@@ -76,6 +79,7 @@ public class OpenAMTokenStoreTest {
 
         tokenStore = mock(OAuthTokenStore.class);
         providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
+        oAuth2UrisFactory = mock(OAuth2UrisFactory.class);
         clientRegistrationStore = mock(OpenIdConnectClientRegistrationStore.class);
         realmNormaliser = mock(RealmNormaliser.class);
         ssoTokenManager = mock(SSOTokenManager.class);
@@ -92,8 +96,9 @@ public class OpenAMTokenStoreTest {
         when(failureFactory.getException(anyString())).thenReturn(expectedResult);
         when(failureFactory.getException(any(OAuth2Request.class), anyString())).thenReturn(expectedResult);
 
-        openAMtokenStore = new OpenAMTokenStore(tokenStore, providerSettingsFactory, clientRegistrationStore,
-                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory);
+        openAMtokenStore = new OpenAMTokenStore(tokenStore, providerSettingsFactory, oAuth2UrisFactory,
+                clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug,
+                new SecureRandom(), failureFactory);
     }
 
     @Test
@@ -185,8 +190,8 @@ public class OpenAMTokenStoreTest {
     public void realmAgnosticTokenStoreShouldIgnoreRealmMismatch() throws Exception {
         //Given
         OpenAMTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticTokenStore(tokenStore,
-                providerSettingsFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor,
-                auditLogger, debug, new SecureRandom(), failureFactory);
+                providerSettingsFactory, oAuth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
+                cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory);
         JsonValue token = json(object(
                 field("tokenName", Collections.singleton("access_token")),
                 field("realm", Collections.singleton("/otherrealm"))));

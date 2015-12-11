@@ -48,12 +48,13 @@ public class ClientCredentialsGrantTypeHandler extends GrantTypeHandler {
      * @param requestValidators A {@code List} of ClientCredentialsRequestValidators.
      * @param tokenStore An instance of the TokenStore.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param urisFactory An instance of the OAuthUrisFactory.
      */
     @Inject
     public ClientCredentialsGrantTypeHandler(ClientAuthenticator clientAuthenticator,
             List<ClientCredentialsRequestValidator> requestValidators, TokenStore tokenStore,
-            OAuth2ProviderSettingsFactory providerSettingsFactory) {
-        super(providerSettingsFactory, clientAuthenticator);
+            OAuth2UrisFactory urisFactory,OAuth2ProviderSettingsFactory providerSettingsFactory) {
+        super(providerSettingsFactory, urisFactory, clientAuthenticator);
         this.requestValidators = requestValidators;
         this.tokenStore = tokenStore;
     }

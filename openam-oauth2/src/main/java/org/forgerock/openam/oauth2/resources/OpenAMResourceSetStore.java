@@ -24,12 +24,15 @@ import com.google.inject.assistedinject.Assisted;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.ResourceSetFilter;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
@@ -47,6 +50,7 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final String realm;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final OAuth2UrisFactory<RealmInfo> oauth2UrisFactory;
     private final TokenDataStore<ResourceSetDescription> delegate;
     private final TokenIdGenerator idGenerator;
 
@@ -55,12 +59,15 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
      *
      * @param realm The realm this ResourceSetStore is in.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param oauth2UrisFactory An instance of the OAuth2UrisFactory.
      */
     @Inject
     public OpenAMResourceSetStore(@Assisted String realm, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            TokenIdGenerator idGenerator, @DataLayer(ConnectionType.RESOURCE_SETS) TokenDataStore delegate) {
+            OAuth2UrisFactory<RealmInfo> oauth2UrisFactory, TokenIdGenerator idGenerator,
+            @DataLayer(ConnectionType.RESOURCE_SETS) TokenDataStore delegate) {
         this.realm = realm;
         this.providerSettingsFactory = providerSettingsFactory;
+        this.oauth2UrisFactory = oauth2UrisFactory;
         this.delegate = delegate;
         this.idGenerator = idGenerator;
     }
@@ -69,7 +76,7 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     public void create(OAuth2Request request, ResourceSetDescription resourceSetDescription) throws ServerException,
             BadRequestException, NotFoundException {
         resourceSetDescription.setId(idGenerator.generateTokenId(null));
-        String policyEndpoint = providerSettingsFactory.get(request)
+        String policyEndpoint = oauth2UrisFactory.get(request)
                 .getResourceSetRegistrationPolicyEndpoint(resourceSetDescription.getId());
         resourceSetDescription.setPolicyUri(policyEndpoint);
         resourceSetDescription.setRealm(realm);

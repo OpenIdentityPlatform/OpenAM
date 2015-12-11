@@ -34,6 +34,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
@@ -71,8 +72,8 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
 
     @Inject
     public Saml2GrantTypeHandler(ClientRegistrationStore clientRegistrationStore, TokenStore tokenStore,
-            OAuth2ProviderSettingsFactory providerSettingsFactory) {
-        super(null, null);
+            OAuth2UrisFactory urisFactory, OAuth2ProviderSettingsFactory providerSettingsFactory) {
+        super(null, urisFactory, null);
         this.clientRegistrationStore = clientRegistrationStore;
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;

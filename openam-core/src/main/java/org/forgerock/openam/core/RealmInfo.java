@@ -1,12 +1,34 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015 ForgeRock AS.
+ */
+
 package org.forgerock.openam.core;
 
 import static org.forgerock.openam.utils.RealmUtils.cleanRealm;
 import static org.forgerock.openam.utils.RealmUtils.concatenateRealmPath;
+import static org.forgerock.util.Reject.checkNotNull;
+
+import java.util.Objects;
 
 import org.forgerock.util.Reject;
 
 /**
+ * Encapsulates information about the realm that a request is for.
  *
+ * <p>Keeps track of the absolute realm, the portion of the realm that was derived from the
+ * request URI and the override realm specified as a request query parameter.</p>
  */
 public class RealmInfo {
 
@@ -15,14 +37,13 @@ public class RealmInfo {
     private String overrideRealm;
 
     public RealmInfo(String absoluteRealm, String realmSubPath, String overrideRealm) {
-        Reject.ifNull(absoluteRealm);
-        this.absoluteRealm = absoluteRealm;
-        this.realmSubPath = realmSubPath;
+        this.absoluteRealm = checkNotNull(absoluteRealm);
+        this.realmSubPath = checkNotNull(realmSubPath);
         this.overrideRealm = overrideRealm;
     }
 
     public RealmInfo(String absoluteRealm) {
-        this(absoluteRealm, null, null);
+        this(absoluteRealm, "", null);
     }
 
     public String getAbsoluteRealm() {
@@ -33,6 +54,25 @@ public class RealmInfo {
         return realmSubPath;
     }
 
+    /**
+     * Sets the given absolute realm and returns a new {@code RealmInfo} instance, without
+     * modifying this instance.
+     *
+     * @param absoluteRealm The absolute realm.
+     * @return A new {@code RealmInfo} instance.
+     */
+    public RealmInfo withAbsoluteRealm(String absoluteRealm) {
+        absoluteRealm = cleanRealm(absoluteRealm);
+        return new RealmInfo(absoluteRealm, realmSubPath, overrideRealm);
+    }
+
+    /**
+     * Appends the given realm sub path to the absolute realm and existing realm sub path and
+     * returns a new {@code RealmInfo} instance, without modifying this instance.
+     *
+     * @param realmSubPath The realm sub path.
+     * @return A new {@code RealmInfo} instance.
+     */
     public RealmInfo appendUriRealm(String realmSubPath) {
         Reject.ifNull(realmSubPath);
         return new RealmInfo(
@@ -41,7 +81,13 @@ public class RealmInfo {
                 overrideRealm);
     }
 
-    //TODO ensure document immutablility
+    /**
+     * Sets the given override realm and returns a new {@code RealmInfo} instance, without
+     * modifying this instance.
+     *
+     * @param overrideRealm The realm override.
+     * @return A new {@code RealmInfo} instance.
+     */
     public RealmInfo withOverrideRealm(String overrideRealm) {
         overrideRealm = cleanRealm(overrideRealm);
         return new RealmInfo(overrideRealm, realmSubPath, overrideRealm);
@@ -49,28 +95,22 @@ public class RealmInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         RealmInfo realmInfo = (RealmInfo) o;
 
-        if (!absoluteRealm.equals(realmInfo.absoluteRealm)) return false;
-        if (realmSubPath != null ? !realmSubPath.equals(realmInfo.realmSubPath) : realmInfo.realmSubPath != null)
-            return false;
-        return overrideRealm != null ? overrideRealm.equals(realmInfo.overrideRealm) : realmInfo.overrideRealm == null;
-
+        return Objects.equals(absoluteRealm, realmInfo.absoluteRealm)
+                && Objects.equals(realmInfo, realmInfo.realmSubPath)
+                && Objects.equals(overrideRealm, realmInfo.overrideRealm);
     }
 
     @Override
     public int hashCode() {
-        int result = absoluteRealm.hashCode();
-        result = 31 * result + (realmSubPath != null ? realmSubPath.hashCode() : 0);
-        result = 31 * result + (overrideRealm != null ? overrideRealm.hashCode() : 0);
-        return result;
-    }
-
-    public RealmInfo withAbsoluteRealm(String absoluteRealm) {
-        absoluteRealm = cleanRealm(absoluteRealm);
-        return new RealmInfo(absoluteRealm, realmSubPath, overrideRealm);
+        return Objects.hash(absoluteRealm, realmSubPath, overrideRealm);
     }
 }

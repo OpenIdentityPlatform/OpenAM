@@ -28,6 +28,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -134,6 +135,7 @@ public class RestletRealmRouterTest {
 
         if ("uri".equalsIgnoreCase(realmLocation)) {
             //set up uri
+            setUpServerName(request, adminToken, "/");
             setUpUri(request, realm);
         }
 
@@ -176,8 +178,8 @@ public class RestletRealmRouterTest {
         router.doHandle(next, request, response);
 
         //Then
-        assertThat(request.getAttributes()).containsEntry("realm", "REALM");
-        verify(httpRequest).setAttribute("realm", "REALM");
+        assertThat(request.getAttributes()).containsEntry("realm", "/REALM");
+        verify(httpRequest).setAttribute("realm", "/REALM");
     }
 
     private Request setUpRequest(HttpServletRequest httpRequest, SSOToken adminToken) {
@@ -208,6 +210,7 @@ public class RestletRealmRouterTest {
 
         given(coreWrapper.getOrganization(adminToken, "HOST_DOMAIN")).willReturn("REALM_HOST_DN");
         given(coreWrapper.convertOrgNameToRealmName("REALM_HOST_DN")).willReturn(realm.equals("/") ? realm : "/" + realm);
+        request.getAttributes().put(RestletRealmRouter.REALM_INFO, new RealmInfo("/"));
     }
 
     private void setUpQueryString(Request request, String realm) {

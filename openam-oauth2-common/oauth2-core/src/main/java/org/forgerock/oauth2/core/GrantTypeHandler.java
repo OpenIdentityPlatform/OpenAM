@@ -20,7 +20,6 @@ import org.forgerock.oauth2.core.exceptions.AuthorizationDeclinedException;
 import org.forgerock.oauth2.core.exceptions.AuthorizationPendingException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -39,11 +38,13 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 public abstract class GrantTypeHandler {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final OAuth2UrisFactory urisFactory;
     private final ClientAuthenticator clientAuthenticator;
 
     protected GrantTypeHandler(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            ClientAuthenticator clientAuthenticator) {
+            OAuth2UrisFactory urisFactory, ClientAuthenticator clientAuthenticator) {
         this.providerSettingsFactory = providerSettingsFactory;
+        this.urisFactory = urisFactory;
         this.clientAuthenticator = clientAuthenticator;
     }
 
@@ -75,10 +76,10 @@ public abstract class GrantTypeHandler {
             InvalidCodeException, ServerException, UnauthorizedClientException, InvalidScopeException,
             NotFoundException, ExpiredTokenException, AuthorizationPendingException, AuthorizationDeclinedException,
             BadRequestException {
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final OAuth2Uris uris = urisFactory.get(request);
         final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
-                providerSettings.getTokenEndpoint());
-        return handle(request, clientRegistration, providerSettings);
+                uris.getTokenEndpoint());
+        return handle(request, clientRegistration, providerSettingsFactory.get(request));
     }
 
     protected abstract AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,

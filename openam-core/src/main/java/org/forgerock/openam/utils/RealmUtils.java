@@ -120,6 +120,9 @@ public final class RealmUtils {
      * @return Cleaned realm
      */
     public static String cleanRealm(String realm) {
+        if (realm == null) {
+            return "/";
+        }
         if (!realm.startsWith("/")) {
             realm = "/" + realm;
         }
@@ -136,7 +139,18 @@ public final class RealmUtils {
      * @return The concatenated realm
      */
     public static String concatenateRealmPath(String parentRealm, String subrealm) {
-        return parentRealm.equals("/") ? subrealm == null ? parentRealm : subrealm : subrealm == null ? parentRealm : parentRealm + subrealm;
+        String realm;
+        if (subrealm == null) {
+            realm = parentRealm;
+        } else {
+            subrealm = cleanRealm(subrealm);
+            if (parentRealm == null || parentRealm.equals("/")) {
+                realm = subrealm;
+            } else {
+                realm = parentRealm + subrealm;
+            }
+        }
+        return cleanRealm(realm);
     }
 
     /**

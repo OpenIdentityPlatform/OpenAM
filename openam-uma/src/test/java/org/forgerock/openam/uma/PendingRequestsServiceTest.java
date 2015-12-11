@@ -86,7 +86,7 @@ public class PendingRequestsServiceTest {
 
     @SuppressWarnings("unchecked")
     @BeforeMethod
-    public void setup() {
+    public void setup() throws Exception {
         initMocks(this);
         UmaProviderSettingsFactory settingsFactory = mock(UmaProviderSettingsFactory.class);
         given(settingsFactory.get(anyString())).willReturn(settings);

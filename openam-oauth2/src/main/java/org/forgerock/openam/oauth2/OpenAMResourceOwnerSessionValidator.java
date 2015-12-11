@@ -18,8 +18,8 @@ package org.forgerock.openam.oauth2;
 
 import static com.sun.identity.shared.DateUtils.stringToDate;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.DeviceCode.USER_CODE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.DeviceCode.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.FRAGMENT;
 import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.QUERY;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
@@ -56,6 +56,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.IntrospectableToken;
@@ -69,8 +70,8 @@ import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
+import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;

@@ -73,7 +73,7 @@ public class ResourceSetServiceTest {
     private UmaProviderSettings umaProviderSettings;
 
     @BeforeMethod
-    public void setup() {
+    public void setup() throws Exception {
         ResourceSetStoreFactory resourceSetStoreFactory = mock(ResourceSetStoreFactory.class);
         resourceSetStore = mock(ResourceSetStore.class);
         policyService = mock(UmaPolicyService.class);

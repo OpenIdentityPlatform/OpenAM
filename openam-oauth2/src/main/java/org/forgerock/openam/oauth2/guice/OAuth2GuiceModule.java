@@ -22,6 +22,9 @@ import static org.forgerock.oauth2.core.TokenStore.REALM_AGNOSTIC_TOKEN_STORE;
 import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,11 +33,15 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import com.google.inject.Key;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverServiceImpl;
@@ -61,6 +68,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.OAuth2TokenIntrospectionHandler;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.PasswordCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidator;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidatorImpl;
@@ -97,6 +105,7 @@ import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMClientDAO;
 import org.forgerock.openam.oauth2.OpenAMClientRegistrationStore;
 import org.forgerock.openam.oauth2.OpenAMOAuth2ProviderSettingsFactory;
+import org.forgerock.openam.oauth2.OpenAMOAuth2UrisFactory;
 import org.forgerock.openam.oauth2.OpenAMResourceOwnerAuthenticator;
 import org.forgerock.openam.oauth2.OpenAMResourceOwnerSessionValidator;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
@@ -137,16 +146,6 @@ import org.forgerock.openidconnect.restlet.LoginHintHook;
 import org.restlet.Request;
 import org.restlet.Restlet;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.debug.Debug;
-
 /**
  * Guice module for OAuth2/OpenId Connect provider bindings.
  *
@@ -166,7 +165,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(ClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OpenIdConnectClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OAuth2ProviderSettingsFactory.class).to(OpenAMOAuth2ProviderSettingsFactory.class);
-        bind(Key.get(new TypeLiteral<OAuth2ProviderSettingsFactory<RealmInfo>>() {})).to(OpenAMOAuth2ProviderSettingsFactory.class);
+        bind(OAuth2ProviderSettingsFactory.class).to(OpenAMOAuth2ProviderSettingsFactory.class);
         bind(ResourceOwnerSessionValidator.class).to(OpenAMResourceOwnerSessionValidator.class);
         bind(ClientAuthenticator.class).to(ClientAuthenticatorImpl.class);
         bind(TokenStore.class).to(OpenAMTokenStore.class);
@@ -244,6 +243,9 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         bind(OpenIDConnectURLValidator.class).toInstance(OpenIDConnectURLValidator.getInstance());
         install(new LabelsGuiceModule());
+
+        bind(OAuth2UrisFactory.class).to(OpenAMOAuth2UrisFactory.class);
+        bind(new TypeLiteral<OAuth2UrisFactory<RealmInfo>>() {}).to(OpenAMOAuth2UrisFactory.class);
     }
 
     @Provides
@@ -297,13 +299,14 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Named(REALM_AGNOSTIC_TOKEN_STORE)
     @Singleton
     TokenStore getRealmAgnosticTokenStore(OAuthTokenStore oauthTokenStore,
-            OAuth2ProviderSettingsFactory providerSettingsFactory,
+            OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory<RealmInfo> oauth2UrisFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
             @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug, SecureRandom secureRandom,
             ClientAuthenticationFailureFactory failureFactory) {
-        return new RealmAgnosticTokenStore(oauthTokenStore, providerSettingsFactory, clientRegistrationStore,
-                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug, secureRandom, failureFactory);
+        return new RealmAgnosticTokenStore(oauthTokenStore, providerSettingsFactory, oauth2UrisFactory,
+                clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug,
+                secureRandom, failureFactory);
     }
 
     @Inject
@@ -350,12 +353,12 @@ public class OAuth2GuiceModule extends AbstractModule {
     public static class RealmAgnosticTokenStore extends OpenAMTokenStore {
 
         public RealmAgnosticTokenStore(OAuthTokenStore tokenStore,
-                OAuth2ProviderSettingsFactory providerSettingsFactory,
+                OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory<RealmInfo> oauth2UrisFactory,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
                 SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
                 Debug debug, SecureRandom secureRandom, ClientAuthenticationFailureFactory failureFactory) {
-            super(tokenStore, providerSettingsFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
-                    cookieExtractor, auditLogger, debug, secureRandom, failureFactory);
+            super(tokenStore, providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser,
+                    ssoTokenManager, cookieExtractor, auditLogger, debug, secureRandom, failureFactory);
         }
 
         @Override

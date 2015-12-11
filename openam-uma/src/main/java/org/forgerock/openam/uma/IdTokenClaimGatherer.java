@@ -34,9 +34,12 @@ import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.core.RealmInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,15 +57,17 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
 
     private final Logger logger = LoggerFactory.getLogger("UmaProvider");
     private final OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory;
+    private final OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory;
     private final ClientRegistrationStore clientRegistrationStore;
     private final JwtReconstruction jwtReconstruction;
     private final SigningManager signingManager;
 
     @Inject
     public IdTokenClaimGatherer(OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory,
-            ClientRegistrationStore clientRegistrationStore, JwtReconstruction jwtReconstruction,
-            SigningManager signingManager) {
+            OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory, ClientRegistrationStore clientRegistrationStore,
+            JwtReconstruction jwtReconstruction, SigningManager signingManager) {
         this.oauth2ProviderSettingsFactory = oauth2ProviderSettingsFactory;
+        this.oAuth2UrisFactory = oAuth2UrisFactory;
         this.clientRegistrationStore = clientRegistrationStore;
         this.jwtReconstruction = jwtReconstruction;
         this.signingManager = signingManager;
@@ -76,13 +81,14 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
             SignedJwt idToken = jwtReconstruction.reconstructJwt(claimToken.asString(), SignedJwt.class);
 
             OAuth2ProviderSettings oAuth2ProviderSettings = oauth2ProviderSettingsFactory.get(oAuth2Request);
+            OAuth2Uris oAuth2Uris = oAuth2UrisFactory.get(oAuth2Request);
             byte[] clientSecret = clientRegistrationStore.get(authorizationApiToken.getClientId(), oAuth2Request)
                     .getClientSecret().getBytes(Utils.CHARSET);
             KeyPair keyPair = oAuth2ProviderSettings.getServerKeyPair();
 
-            if (!idToken.getClaimsSet().getIssuer().equals(oAuth2ProviderSettings.getIssuer())) {
+            if (!idToken.getClaimsSet().getIssuer().equals(oAuth2Uris.getIssuer())) {
                 logger.warn("Issuer of id token, {0}, does not match issuer of authorization server, {1}.",
-                        idToken.getClaimsSet().getIssuer(), oAuth2ProviderSettings.getIssuer());
+                        idToken.getClaimsSet().getIssuer(), oAuth2Uris.getIssuer());
                 return null;
             }
 

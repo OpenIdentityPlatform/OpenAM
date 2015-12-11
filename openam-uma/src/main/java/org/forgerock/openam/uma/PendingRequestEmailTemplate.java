@@ -40,6 +40,7 @@ import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.OpenAMSettings;
@@ -129,7 +130,7 @@ public class PendingRequestEmailTemplate {
             if (defaultLocale != null) {
                 return Locale.forLanguageTag(defaultLocale);
             }
-        } catch (SSOException | IdRepoException | ServerException | SMSException e) {
+        } catch (SSOException | IdRepoException | ServerException | SMSException | NotFoundException e) {
             debug.warning("Failed to get locale for user, " + username + ", in realm, " + realm, e);
         }
         return Locale.ROOT;

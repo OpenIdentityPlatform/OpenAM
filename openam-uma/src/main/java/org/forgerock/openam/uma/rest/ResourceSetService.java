@@ -18,8 +18,6 @@ package org.forgerock.openam.uma.rest;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Requests.newQueryRequest;
-import static org.forgerock.util.query.QueryFilter.and;
-import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import javax.inject.Inject;
 import javax.security.auth.Subject;
@@ -38,10 +36,6 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.idm.AMIdentity;
-
-import org.forgerock.openam.entitlement.rest.model.json.ResourceSet;
-import org.forgerock.openam.uma.ResourceSetSharedFilter;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryRequest;
@@ -55,9 +49,11 @@ import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.rest.AggregateQuery;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.uma.ResourceSetSharedFilter;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.uma.UmaProviderSettingsFactory;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
@@ -138,7 +134,7 @@ public class ResourceSetService {
                         try {
                             String realm = context.asContext(RealmContext.class).getResolvedRealm();
                             Subject subject = createSubject(resourceOwnerId, realm);
-                            Evaluator evaluator = umaProviderSettingsFactory.get(realm).getPolicyEvaluator(subject);
+                            Evaluator evaluator = umaProviderSettingsFactory.get(RealmContext.getRealm(context)).getPolicyEvaluator(subject);
 
                             for (UmaPolicy sharedPolicy : result.getSecond()) {
                                 if (!sharedResourceSets.contains(sharedPolicy.getResourceSet())) {
@@ -154,6 +150,8 @@ public class ResourceSetService {
                             return Promises.newResultPromise(sharedResourceSets);
                         } catch (EntitlementException e) {
                             return new InternalServerErrorException(e).asPromise();
+                        } catch (NotFoundException e) {
+                            return new org.forgerock.json.resource.NotFoundException(e).asPromise();
                         }
                     }
                 });
@@ -191,8 +189,8 @@ public class ResourceSetService {
             if (!entitlements.isEmpty()) {
                 return true;
             }
-        } catch (EntitlementException e) {
-            e.printStackTrace();
+        } catch (EntitlementException | NotFoundException e) {
+            e.printStackTrace(); //TODO fix
         }
         return false;
     }

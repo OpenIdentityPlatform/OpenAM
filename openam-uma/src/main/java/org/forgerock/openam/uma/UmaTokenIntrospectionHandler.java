@@ -38,10 +38,13 @@ public class UmaTokenIntrospectionHandler implements TokenIntrospectionHandler {
 
     private final Logger logger = LoggerFactory.getLogger("UmaProvider");
     private final UmaProviderSettingsFactory providerSettingsFactory;
+    private final UmaUrisFactory umaUrisFactory;
 
     @Inject
-    public UmaTokenIntrospectionHandler(UmaProviderSettingsFactory providerSettingsFactory) {
+    public UmaTokenIntrospectionHandler(UmaProviderSettingsFactory providerSettingsFactory,
+            UmaUrisFactory umaUrisFactory) {
         this.providerSettingsFactory = providerSettingsFactory;
+        this.umaUrisFactory = umaUrisFactory;
     }
 
     @Override
@@ -49,11 +52,12 @@ public class UmaTokenIntrospectionHandler implements TokenIntrospectionHandler {
             throws ServerException {
         try {
             UmaProviderSettings providerSettings = providerSettingsFactory.get(request.<Request>getRequest());
+            UmaUris umaUris = umaUrisFactory.get(request.<Request>getRequest());
             if (tokenType == null || RPT_TYPE.equals(tokenType)) {
                 RequestingPartyToken token = providerSettings.getUmaTokenStore().readRPT(tokenId);
                 if (token != null && token.getResourceServerClientId().equals(clientId) &&
                         token.getRealm().equals(request.<String>getParameter(OAuth2Constants.Params.REALM))) {
-                    return renderRPT(providerSettings, token);
+                    return renderRPT(umaUris, token);
                 } else {
                     logger.warn("Token {} was requested by client {} but wasn't intended for it",
                             request.getParameter(TOKEN), clientId);
@@ -70,12 +74,12 @@ public class UmaTokenIntrospectionHandler implements TokenIntrospectionHandler {
      * Render the RPT as a JsonValue according to the specification for introspection of RPTs.
      * @see <a href="https://docs.kantarainitiative.org/uma/draft-uma-core.html#uma-bearer-token-profile">UMA
      * specification - RPT Profile: Bearer</a>
-     * @param providerSettings The provider that is connecting.
+     * @param umaUris A UMA Uris instance.
      * @param token The RPT.
      * @return A JSON representation of the token attributes.
      * @throws org.forgerock.oauth2.core.exceptions.ServerException
      */
-    private JsonValue renderRPT(UmaProviderSettings providerSettings, RequestingPartyToken token) throws ServerException {
+    private JsonValue renderRPT(UmaUris umaUris, RequestingPartyToken token) throws ServerException {
         JsonValue permissions = new JsonValue(array());
         for (Permission p : token.getPermissions()) {
             JsonValue permission = json(object(
@@ -89,7 +93,7 @@ public class UmaTokenIntrospectionHandler implements TokenIntrospectionHandler {
         return json(object(
                 field(ACTIVE, true),
                 field(OAuth2Constants.JWTTokenParams.EXP, token.getExpiryTime() / 1000),
-                field(OAuth2Constants.JWTTokenParams.ISS, providerSettings.getIssuer()),
+                field(OAuth2Constants.JWTTokenParams.ISS, umaUris.getIssuer()),
                 field(TOKEN_TYPE, RPT_TYPE),
                 field(UmaConstants.Introspection.PERMISSIONS, permissions.getObject())
         ));

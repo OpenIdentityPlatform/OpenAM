@@ -54,6 +54,8 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
@@ -63,6 +65,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
@@ -92,6 +95,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     private final OAuth2AuditLogger auditLogger;
     private final OAuthTokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final OAuth2UrisFactory<RealmInfo> oauth2UrisFactory;
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private final RealmNormaliser realmNormaliser;
     private final SSOTokenManager ssoTokenManager;
@@ -118,12 +122,14 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      */
     @Inject
     public OpenAMTokenStore(OAuthTokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
+            OAuth2UrisFactory<RealmInfo> oauth2UrisFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
             @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger, SecureRandom secureRandom,
             ClientAuthenticationFailureFactory failureFactory) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
+        this.oauth2UrisFactory = oauth2UrisFactory;
         this.clientRegistrationStore = clientRegistrationStore;
         this.realmNormaliser = realmNormaliser;
         this.ssoTokenManager = ssoTokenManager;
@@ -228,6 +234,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             throws ServerException, InvalidClientException, NotFoundException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        OAuth2Uris oAuth2Uris = oauth2UrisFactory.get(request);
 
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
@@ -238,7 +245,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
-        final String iss = providerSettings.getIssuer();
+        final String iss = oAuth2Uris.getIssuer();
 
         final List<String> amr = getAMRFromAuthModules(request, providerSettings);
 

@@ -102,7 +102,7 @@ public class RestletRealmRouter extends Router {
                 SSOToken adminToken = coreWrapper.getAdminToken();
                 //Need to strip off leading '/' from realm otherwise just generates a DN based of the realm value, which is wrong
                 if (realmInfo.getAbsoluteRealm().startsWith("/")) {
-                    realm = realmInfo.getAbsoluteRealm().substring(1);
+                    realm = realm.substring(1);
                 }
                 String orgDN = coreWrapper.getOrganization(adminToken, realm);
                 realmInfo = realmInfo.withAbsoluteRealm(coreWrapper.convertOrgNameToRealmName(orgDN));
@@ -126,7 +126,7 @@ public class RestletRealmRouter extends Router {
         String subrealm = (String) request.getAttributes().get("subrealm");
         if (subrealm != null && !subrealm.isEmpty()) {
             if (realmInfo == null) {
-                throw new IllegalStateException("This should never happen!");//TODO message
+                throw new IllegalStateException("RealmInfo is null! Has not been set from server name");
             } else {
                 return realmInfo.appendUriRealm(subrealm);
             }
@@ -147,7 +147,7 @@ public class RestletRealmRouter extends Router {
         try {
             SSOToken adminToken = coreWrapper.getAdminToken();
             String orgDN = coreWrapper.getOrganization(adminToken, serverName);
-            return new RealmInfo(coreWrapper.convertOrgNameToRealmName(orgDN), null, null);
+            return new RealmInfo(coreWrapper.convertOrgNameToRealmName(orgDN));
         } catch (IdRepoException | SSOException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
         }
