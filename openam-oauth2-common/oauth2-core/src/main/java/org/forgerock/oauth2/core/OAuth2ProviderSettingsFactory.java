@@ -28,8 +28,9 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
  * multiple OAuth2 providers.
  *
  * @since 12.0.0
+ * //TODO doc the T
  */
-public interface OAuth2ProviderSettingsFactory {
+public interface OAuth2ProviderSettingsFactory<T> {
 
     /**
      * Gets a OAuth2ProviderSettings instance.
@@ -42,18 +43,20 @@ public interface OAuth2ProviderSettingsFactory {
     /**
      * Gets the instance of the OAuth2ProviderSettings.
      *
-     * @param realm The realm.
+     * @param realmInfo The realm information.
      * @param req The request that can be used to obtain the base deployment url.
      * @return The OAuth2ProviderSettings instance.
      */
-    OAuth2ProviderSettings get(String realm, HttpServletRequest req) throws NotFoundException;
+    OAuth2ProviderSettings get(T realmInfo, HttpServletRequest req) throws NotFoundException;
 
     /**
      * Gets the instance of the OAuth2ProviderSettings.
      *
-     * @param realm The realm.
      * @param context The context that can be used to obtain the base deployment url.
      * @return The OAuth2ProviderSettings instance.
      */
-    OAuth2ProviderSettings get(String realm, Context context) throws NotFoundException;
+    OAuth2ProviderSettings get(Context context) throws NotFoundException;
+
+    //TODO
+    OAuth2ProviderSettings get(Context context, T overrideRealmInfo) throws NotFoundException;
 }

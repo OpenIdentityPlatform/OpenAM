@@ -34,8 +34,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
-import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.services.context.Context;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -60,7 +60,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
     private final RealmNormaliser realmNormaliser;
     private final PEMDecoder pemDecoder;
     private final OpenIdResolverService resolverService;
-    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final OAuth2ProviderSettingsFactory<RealmInfo> providerSettingsFactory;
     private final ClientAuthenticationFailureFactory failureFactory;
 
     /**
@@ -72,7 +72,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
     @Inject
     public OpenAMClientRegistrationStore(RealmNormaliser realmNormaliser, PEMDecoder pemDecoder,
             @Named(OAuth2Constants.Custom.JWK_RESOLVER) OpenIdResolverService resolverService,
-            OAuth2ProviderSettingsFactory providerSettingsFactory, ClientAuthenticationFailureFactory failureFactory) {
+            OAuth2ProviderSettingsFactory<RealmInfo> providerSettingsFactory, ClientAuthenticationFailureFactory failureFactory) {
         this.realmNormaliser = realmNormaliser;
         this.pemDecoder = pemDecoder;
         this.resolverService = resolverService;
@@ -99,7 +99,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
 
         final String normalisedRealm = realmNormaliser.normalise(realm);
         return new OpenAMClientRegistration(getIdentity(clientId, normalisedRealm), pemDecoder, resolverService,
-                providerSettingsFactory.get(normalisedRealm, context), failureFactory);
+                providerSettingsFactory.get(context, new RealmInfo(normalisedRealm)), failureFactory);
     }
 
     private AMIdentity getIdentity(String uName, String realm) throws InvalidClientException {

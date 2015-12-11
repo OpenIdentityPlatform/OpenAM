@@ -20,25 +20,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.*;
+import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.Collections;
 import java.util.Set;
 
 import com.sun.identity.idm.AMIdentity;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.services.baseurl.BaseURLProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -47,6 +45,7 @@ import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;

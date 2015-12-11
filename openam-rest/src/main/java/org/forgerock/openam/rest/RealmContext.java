@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest;
 
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.AbstractContext;
 import org.forgerock.openam.utils.StringUtils;
@@ -211,4 +212,11 @@ public class RealmContext extends AbstractContext {
         return realm;
     }
 
+    public static RealmInfo asRealmInfo(Context context) {
+        if (!context.containsContext(RealmContext.class)) {
+            throw new IllegalArgumentException("");//TODO create private static root realm context
+        }
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        return new RealmInfo(realmContext.getResolvedRealm(), realmContext.relativeRealmPath.getFirst(), realmContext.overrideRealm);
+    }
 }

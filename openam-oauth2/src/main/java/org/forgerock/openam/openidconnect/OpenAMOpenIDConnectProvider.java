@@ -16,7 +16,11 @@
 
 package org.forgerock.openam.openidconnect;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -32,10 +36,6 @@ import org.forgerock.openam.oauth2.IdentityManager;
 import org.forgerock.openidconnect.OpenIDConnectProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * Provider for OpenId Connect for managing OpenId Connect sessions.

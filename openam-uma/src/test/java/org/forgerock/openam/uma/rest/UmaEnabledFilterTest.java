@@ -16,25 +16,19 @@
 
 package org.forgerock.openam.uma.rest;
 
-import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
-import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
-import static org.mockito.BDDMockito.*;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
-import org.forgerock.services.context.Context;
-import org.forgerock.services.context.RootContext;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -47,10 +41,13 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.uma.UmaProviderSettings;
 import org.forgerock.openam.uma.UmaProviderSettingsFactory;
-import org.forgerock.openam.uma.rest.UmaEnabledFilter;
+import org.forgerock.services.context.ClientContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.util.promise.Promise;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeClass;
@@ -69,16 +66,16 @@ public class UmaEnabledFilterTest {
     @BeforeClass
     public static void setupFactories() throws Exception {
         notYetConfiguredFactory = mock(UmaProviderSettingsFactory.class);
-        given(notYetConfiguredFactory.get(any(Context.class), anyString()))
+        given(notYetConfiguredFactory.get(any(Context.class), any(RealmInfo.class)))
                 .willThrow(NotFoundException.class);
         UmaProviderSettings notEnabled = mock(UmaProviderSettings.class);
         given(notEnabled.isEnabled()).willReturn(false);
         notEnabledFactory = mock(UmaProviderSettingsFactory.class);
-        given(notEnabledFactory.get(any(Context.class), anyString())).willReturn(notEnabled);
+        given(notEnabledFactory.get(any(Context.class), any(RealmInfo.class))).willReturn(notEnabled);
         UmaProviderSettings enabled = mock(UmaProviderSettings.class);
         given(enabled.isEnabled()).willReturn(true);
         enabledFactory = mock(UmaProviderSettingsFactory.class);
-        given(enabledFactory.get(any(Context.class), anyString())).willReturn(enabled);
+        given(enabledFactory.get(any(Context.class), any(RealmInfo.class))).willReturn(enabled);
     }
 
     @BeforeMethod

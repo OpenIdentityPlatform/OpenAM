@@ -41,6 +41,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResourceOwnerAuthenticator;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;

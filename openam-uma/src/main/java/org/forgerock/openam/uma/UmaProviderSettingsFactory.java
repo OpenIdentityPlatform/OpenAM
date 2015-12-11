@@ -27,8 +27,6 @@ import com.google.inject.Singleton;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.shared.debug.Debug;
-
-import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -36,8 +34,10 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.restlet.RestletOAuth2Request;
+import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
-import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.services.context.Context;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 
@@ -52,25 +52,20 @@ import org.restlet.ext.servlet.ServletUtils;
 @Singleton
 public class UmaProviderSettingsFactory {
 
-    private final Map<String, UmaProviderSettingsImpl> providerSettingsMap =
-            new HashMap<String, UmaProviderSettingsImpl>();
-    private final RealmNormaliser realmNormaliser;
-    private final OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
+    private final Map<RealmInfo, UmaProviderSettingsImpl> providerSettingsMap = new HashMap<>();
+    private final OAuth2ProviderSettingsFactory<RealmInfo> oAuth2ProviderSettingsFactory;
     private final UmaTokenStoreFactory tokenStoreFactory;
     private final BaseURLProviderFactory baseURLProviderFactory;
 
     /**
      * Contructs a new UmaProviderSettingsFactory.
      *
-     * @param realmNormaliser An instance of the RealmNormaliser.
      * @param oAuth2ProviderSettingsFactory An instance of the OAuth2ProviderSettingFactory.
      * @param tokenStoreFactory An instance of the UmaTokenStoreFactory.
      */
     @Inject
-    UmaProviderSettingsFactory(RealmNormaliser realmNormaliser,
-            OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, UmaTokenStoreFactory tokenStoreFactory,
-            BaseURLProviderFactory baseURLProviderFactory) {
-        this.realmNormaliser = realmNormaliser;
+    UmaProviderSettingsFactory(OAuth2ProviderSettingsFactory<RealmInfo> oAuth2ProviderSettingsFactory,
+            UmaTokenStoreFactory tokenStoreFactory, BaseURLProviderFactory baseURLProviderFactory) {
         this.oAuth2ProviderSettingsFactory = oAuth2ProviderSettingsFactory;
         this.tokenStoreFactory = tokenStoreFactory;
         this.baseURLProviderFactory = baseURLProviderFactory;
@@ -101,8 +96,8 @@ public class UmaProviderSettingsFactory {
     }
 
     public UmaProviderSettings get(OAuth2Request request) throws NotFoundException {
-        String realm = request.getParameter("realm");
-        return get(ServletUtils.getRequest(request.<Request>getRequest()), realmNormaliser.normalise(realm));
+        RealmInfo realmInfo = request.getParameter(RestletRealmRouter.REALM_INFO);
+        return get(ServletUtils.getRequest(request.<Request>getRequest()), realmInfo);
     }
 
     /**
@@ -111,16 +106,16 @@ public class UmaProviderSettingsFactory {
      * <p>Cache each provider settings on the realm it was created for.</p>
      *
      * @param request The request instance from which the base URL can be deduced.
-     * @param realm The realm.
+     * @param realmInfo The realm.
      * @return The OAuth2ProviderSettings instance.
      */
-    public UmaProviderSettings get(HttpServletRequest request, String realm) throws NotFoundException {
+    public UmaProviderSettings get(HttpServletRequest request, RealmInfo realmInfo) throws NotFoundException {
         synchronized (providerSettingsMap) {
-            UmaProviderSettingsImpl providerSettings = providerSettingsMap.get(realm);
+            UmaProviderSettingsImpl providerSettings = providerSettingsMap.get(realmInfo);
             if (providerSettings == null) {
-                OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm, request);
-                String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(request);
-                providerSettings = getUmaProviderSettings(realm, oAuth2ProviderSettings, baseUrlPattern);
+                OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realmInfo, request);
+                String baseUrlPattern = baseURLProviderFactory.get(realmInfo.getAbsoluteRealm()).getURL(request);
+                providerSettings = getUmaProviderSettings(realmInfo, oAuth2ProviderSettings, baseUrlPattern);
             }
             return providerSettings;
         }
@@ -132,41 +127,42 @@ public class UmaProviderSettingsFactory {
      * <p>Cache each provider settings on the realm it was created for.</p>
      *
      * @param context The context instance from which the base URL can be deduced.
-     * @param realm The realm.
+     * @param realmInfo The realm.
      * @return The OAuth2ProviderSettings instance.
      */
-    public UmaProviderSettings get(Context context, String realm) throws NotFoundException {
+    public UmaProviderSettings get(Context context, RealmInfo realmInfo) throws NotFoundException {
         synchronized (providerSettingsMap) {
-            UmaProviderSettingsImpl providerSettings = providerSettingsMap.get(realm);
+            UmaProviderSettingsImpl providerSettings = providerSettingsMap.get(realmInfo);
             if (providerSettings == null) {
-                OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm, context);
-                String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(context.asContext(HttpContext.class));
-                providerSettings = getUmaProviderSettings(realm, oAuth2ProviderSettings, baseUrlPattern);
+                OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(context, realmInfo);
+                String baseUrlPattern = baseURLProviderFactory.get(realmInfo.getAbsoluteRealm()).getURL(context.asContext(HttpContext.class));
+                providerSettings = getUmaProviderSettings(realmInfo, oAuth2ProviderSettings, baseUrlPattern);
             }
             return providerSettings;
         }
     }
 
-    private UmaProviderSettingsImpl getUmaProviderSettings(String realm, OAuth2ProviderSettings oAuth2ProviderSettings, String baseUrlPattern) throws NotFoundException {
-        UmaProviderSettingsImpl providerSettings;UmaTokenStore tokenStore = tokenStoreFactory.create(realm);
-        providerSettings = new UmaProviderSettingsImpl(realm, baseUrlPattern, tokenStore,
+    private UmaProviderSettingsImpl getUmaProviderSettings(RealmInfo realmInfo,
+            OAuth2ProviderSettings oAuth2ProviderSettings, String baseUrlPattern) throws NotFoundException {
+        UmaProviderSettingsImpl providerSettings;UmaTokenStore tokenStore = tokenStoreFactory.create(realmInfo.getAbsoluteRealm());
+        providerSettings = new UmaProviderSettingsImpl(realmInfo, baseUrlPattern, tokenStore,
                 oAuth2ProviderSettings);
-        providerSettingsMap.put(realm, providerSettings);
+        providerSettingsMap.put(realmInfo, providerSettings);
         return providerSettings;
     }
 
     static final class UmaProviderSettingsImpl extends UmaSettingsImpl implements UmaProviderSettings {
 
         private final Debug logger = Debug.getInstance("UmaProvider");
-        private final String realm;
+        private final RealmInfo realmInfo;
         private final String deploymentUrl;
         private final UmaTokenStore tokenStore;
         private final OAuth2ProviderSettings oAuth2ProviderSettings;
 
-        UmaProviderSettingsImpl(String realm, String contextDeploymentUri,
+        UmaProviderSettingsImpl(RealmInfo realmInfo, String contextDeploymentUri,
                 UmaTokenStore tokenStore, OAuth2ProviderSettings oAuth2ProviderSettings) throws NotFoundException {
-            super(realm);
-            this.realm = realm;
+            super(realmInfo.getAbsoluteRealm());
+            this.realmInfo = realmInfo;
             this.deploymentUrl = contextDeploymentUri;
             this.tokenStore = tokenStore;
             this.oAuth2ProviderSettings = oAuth2ProviderSettings;
@@ -175,7 +171,7 @@ public class UmaProviderSettingsFactory {
         @Override
         public boolean isEnabled() {
             try {
-                return hasConfig(realm);
+                return hasConfig(realmInfo.getAbsoluteRealm());
             } catch (Exception e) {
                 logger.message("Could not access realm config", e);
                 return false;
@@ -192,7 +188,7 @@ public class UmaProviderSettingsFactory {
         }
 
         private String getBaseUrl(String context) {
-            String uri = deploymentUrl + context + realm;
+            String uri = deploymentUrl + context + realmInfo.getAbsoluteRealm();
             if (uri.endsWith("/")) {
                 uri = uri.substring(0, uri.length() - 1);
             }

@@ -23,6 +23,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -42,8 +43,8 @@ import org.restlet.routing.TemplateRoute;
  */
 public class RestletRealmRouter extends Router {
 
-    // Keyword for Realm Attribute
     public static final String REALM = "realm";
+    public static final String REALM_INFO = "realmInfo";
     public static final String REALM_URL = "realmUrl";
 
     private final RestRealmValidator realmValidator;
@@ -81,36 +82,54 @@ public class RestletRealmRouter extends Router {
      */
     @Override
     protected void doHandle(Restlet next, Request request, Response response) {
-        String realm = getRealmFromURI(request);
+        RealmInfo realmInfo = getRealmFromURI(request);
 
-        if (realm == null) {
-            realm = getRealmFromServerName(request);
+        if (realmInfo == null) {
+            realmInfo = getRealmFromServerName(request);
         }
-
         if (next != delegateRoute) {
             String overrideRealm = getRealmFromQueryString(request);
             if (overrideRealm != null) {
-                realm = overrideRealm;
+                realmInfo = realmInfo.withOverrideRealm(overrideRealm);
             }
             request.getAttributes().put(REALM_URL, request.getResourceRef().getBaseRef().toString());
         }
 
-        request.getAttributes().put(REALM, realm);
-        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
-        httpRequest.setAttribute(REALM, realm);
-        request.getAttributes().remove("subrealm");
-
         // Check that the path references an existing realm
-        validateRealm(request, realm);
+        if (!realmValidator.isRealm(realmInfo.getAbsoluteRealm())) {
+            String realm = realmInfo.getAbsoluteRealm();
+            try {
+                SSOToken adminToken = coreWrapper.getAdminToken();
+                //Need to strip off leading '/' from realm otherwise just generates a DN based of the realm value, which is wrong
+                if (realmInfo.getAbsoluteRealm().startsWith("/")) {
+                    realm = realmInfo.getAbsoluteRealm().substring(1);
+                }
+                String orgDN = coreWrapper.getOrganization(adminToken, realm);
+                realmInfo = realmInfo.withAbsoluteRealm(coreWrapper.convertOrgNameToRealmName(orgDN));
+            } catch (IdRepoException | SSOException e) {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid realm, " + realm);
+            }
+        }
+
+        request.getAttributes().put(REALM, realmInfo.getAbsoluteRealm());
+        request.getAttributes().put(REALM_INFO, realmInfo);
+        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
+        httpRequest.setAttribute(REALM, realmInfo.getAbsoluteRealm());
+        httpRequest.setAttribute(REALM_INFO, realmInfo);
+        request.getAttributes().remove("subrealm");
 
         super.doHandle(next, request, response);
     }
 
-    private String getRealmFromURI(Request request) {
-        String realm = (String) request.getAttributes().get(REALM);
+    private RealmInfo getRealmFromURI(Request request) {
+        RealmInfo realmInfo = (RealmInfo) request.getAttributes().get(REALM_INFO);
         String subrealm = (String) request.getAttributes().get("subrealm");
         if (subrealm != null && !subrealm.isEmpty()) {
-            return realm.equals("/") ? realm + subrealm : realm + "/" + subrealm;
+            if (realmInfo == null) {
+                throw new IllegalStateException("This should never happen!");//TODO message
+            } else {
+                return realmInfo.appendUriRealm(subrealm);
+            }
         }
         return null;
     }
@@ -123,43 +142,14 @@ public class RestletRealmRouter extends Router {
         return realm;
     }
 
-    private String getRealmFromServerName(Request request) {
+    private RealmInfo getRealmFromServerName(Request request) {
         String serverName = request.getHostRef().getHostDomain();
         try {
             SSOToken adminToken = coreWrapper.getAdminToken();
             String orgDN = coreWrapper.getOrganization(adminToken, serverName);
-            return coreWrapper.convertOrgNameToRealmName(orgDN);
-        } catch (IdRepoException e) {
+            return new RealmInfo(coreWrapper.convertOrgNameToRealmName(orgDN), null, null);
+        } catch (IdRepoException | SSOException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
-        } catch (SSOException e) {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
-        }
-    }
-
-    private void validateRealm(Request request, String realm) {
-        //if ("/.well-known".equals(realm)) {
-            //return;
-        //}
-
-        if (!realmValidator.isRealm(realm)) {
-            try {
-                SSOToken adminToken = coreWrapper.getAdminToken();
-                //Need to strip off leading '/' from realm otherwise just generates a DN based of the realm value, which is wrong
-                if (realm.startsWith("/")) {
-                    realm = realm.substring(1);
-                }
-                String orgDN = coreWrapper.getOrganization(adminToken, realm);
-                realm = coreWrapper.convertOrgNameToRealmName(orgDN);
-                request.getAttributes().put(REALM, realm);
-                HttpServletRequest httpRequest = ServletUtils.getRequest(request);
-                httpRequest.setAttribute(REALM, realm);
-                return;
-            } catch (IdRepoException e) {
-                //Empty catch, fall through to throw exception
-            } catch (SSOException e) {
-                //Empty catch, fall through to throw exception
-            }
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid realm, " + realm);
         }
     }
 

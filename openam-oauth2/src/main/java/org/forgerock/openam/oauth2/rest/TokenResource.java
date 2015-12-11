@@ -63,6 +63,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -502,7 +503,7 @@ public class TokenResource implements CollectionResourceProvider {
         OAuth2ProviderSettings oAuth2ProviderSettings;
         final String realm = getAttributeValue(token, "realm");
         try {
-            oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm, context);
+            oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(context, new RealmInfo(realm));
         } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new NotFoundException(e.getMessage());
         }

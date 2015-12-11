@@ -17,9 +17,6 @@
 package org.forgerock.openam.oauth2.resources;
 
 import javax.inject.Inject;
-import javax.security.auth.Subject;
-
-import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,13 +43,7 @@ import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.extensions.ResourceRegistrationFilter;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
-import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.utils.JsonValueBuilder;
-import org.forgerock.services.context.AbstractContext;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.context.RootContext;
-import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.restlet.Request;
@@ -68,14 +59,6 @@ import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.security.AdminTokenAction;
 
 /**
  * Restlet endpoint for OAuth2 resource servers to register resource set that should be protected.

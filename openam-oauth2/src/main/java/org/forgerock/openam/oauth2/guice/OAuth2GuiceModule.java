@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.google.inject.Key;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverServiceImpl;
@@ -85,6 +86,7 @@ import org.forgerock.oauth2.restlet.RestletQueryParameterAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationExceptionFilter;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
@@ -164,6 +166,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(ClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OpenIdConnectClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OAuth2ProviderSettingsFactory.class).to(OpenAMOAuth2ProviderSettingsFactory.class);
+        bind(Key.get(new TypeLiteral<OAuth2ProviderSettingsFactory<RealmInfo>>() {})).to(OpenAMOAuth2ProviderSettingsFactory.class);
         bind(ResourceOwnerSessionValidator.class).to(OpenAMResourceOwnerSessionValidator.class);
         bind(ClientAuthenticator.class).to(ClientAuthenticatorImpl.class);
         bind(TokenStore.class).to(OpenAMTokenStore.class);

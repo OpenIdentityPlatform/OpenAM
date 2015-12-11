@@ -17,8 +17,8 @@
 package org.forgerock.oauth2.restlet;
 
 import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
-import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;

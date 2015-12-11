@@ -43,6 +43,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.utils.CollectionUtils;

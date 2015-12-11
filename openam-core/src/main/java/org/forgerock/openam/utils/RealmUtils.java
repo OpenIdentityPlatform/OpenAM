@@ -136,7 +136,7 @@ public final class RealmUtils {
      * @return The concatenated realm
      */
     public static String concatenateRealmPath(String parentRealm, String subrealm) {
-        return parentRealm.equals("/") ? subrealm : parentRealm + subrealm;
+        return parentRealm.equals("/") ? subrealm == null ? parentRealm : subrealm : subrealm == null ? parentRealm : parentRealm + subrealm;
     }
 
     /**

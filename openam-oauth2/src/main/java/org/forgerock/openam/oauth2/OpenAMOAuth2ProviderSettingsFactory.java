@@ -15,28 +15,12 @@
  */
 package org.forgerock.openam.oauth2;
 
-import java.security.AccessController;
-import java.util.HashMap;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
-
-import org.forgerock.services.context.Context;
-import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
-import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
-import org.forgerock.openam.utils.RealmNormaliser;
-import org.forgerock.util.Reject;
-import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
+import java.security.AccessController;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
@@ -44,7 +28,24 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
-
+import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
+import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.service.RestletRealmRouter;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.Reject;
+import org.restlet.Request;
+import org.restlet.ext.servlet.ServletUtils;
 
 /**
  * A factory for creating/retrieving OpenAMOAuth2ProviderSettings instances.
@@ -52,10 +53,10 @@ import com.sun.identity.sm.ServiceListener;
  * @since 12.0.0
  */
 @Singleton
-public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettingsFactory, ServiceListener {
+public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettingsFactory<RealmInfo>, ServiceListener {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
-    private final Map<String, OAuth2ProviderSettings> providerSettingsMap = new HashMap<String, OAuth2ProviderSettings>();
+    private final Map<RealmInfo, OAuth2ProviderSettings> providerSettingsMap = new HashMap<>();
     private final RealmNormaliser realmNormaliser;
     private final CookieExtractor cookieExtractor;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
@@ -99,19 +100,22 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      */
     public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
         final OpenAMAccessToken accessToken = (OpenAMAccessToken) request.getToken(AccessToken.class);
-
-        final String realm = accessToken != null ? accessToken.getRealm() :
-                realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
+        final RealmInfo realmInfo;
+        if (accessToken != null) {
+            realmInfo = new RealmInfo(accessToken.getRealm(), null, null);
+        } else {
+            realmInfo = request.getParameter(RestletRealmRouter.REALM_INFO);
+        }
         final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
-        return get(realm, req);
+        return get(realmInfo, req);
     }
 
     /**
      * Cache each provider settings on the realm it was created for.
      * {@inheritDoc}
      */
-    public OAuth2ProviderSettings get(String realm) throws NotFoundException {
-        OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
+    public OAuth2ProviderSettings get(RealmInfo realmInfo) throws NotFoundException {
+        OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realmInfo);
         if (providerSettings == null) {
             throw new IllegalStateException("Realm provider settings have not yet been constructed.");
         }
@@ -122,32 +126,41 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      * Cache each provider settings on the realm it was created for.
      * {@inheritDoc}
      */
-    public OAuth2ProviderSettings get(String realm, HttpServletRequest req) throws NotFoundException {
-        Reject.ifNull(realm, "Realm cannot be null");
+    public OAuth2ProviderSettings get(RealmInfo realmInfo, HttpServletRequest req) throws NotFoundException {
+        Reject.ifNull(realmInfo, "Realm cannot be null");
         Reject.ifNull(req, "Request cannot be null");
-        String baseDeploymentUri = baseURLProviderFactory.get(realm).getURL(req);
-        return getProviderSettings(realm, baseDeploymentUri);
+        String baseDeploymentUri = baseURLProviderFactory.get(realmInfo.getAbsoluteRealm()).getURL(req);
+        return getProviderSettings(realmInfo, baseDeploymentUri);
     }
 
     @Override
-    public OAuth2ProviderSettings get(String realm, Context context) throws NotFoundException {
-        Reject.ifNull(realm, "Realm cannot be null");
+    public OAuth2ProviderSettings get(Context context) throws NotFoundException {
+        Reject.ifFalse(context.containsContext(RealmContext.class), "Must contain a RealmContext cannot be null");
         Reject.ifNull(context, "Context cannot be null");
+        String realm = RealmContext.getRealm(context);
+        RealmInfo realmInfo = RealmContext.asRealmInfo(context);
         String baseDeploymentUri = baseURLProviderFactory.get(realm).getURL(context.asContext(HttpContext.class));
-        return getProviderSettings(realm, baseDeploymentUri);
+        return getProviderSettings(realmInfo, baseDeploymentUri);
     }
 
-    private OAuth2ProviderSettings getProviderSettings(String realm, String baseDeploymentUri) throws NotFoundException {
+    @Override
+    public OAuth2ProviderSettings get(Context context, RealmInfo overrideRealmInfo) throws NotFoundException {
+        Reject.ifNull(context, "Context cannot be null");
+        String baseDeploymentUri = baseURLProviderFactory.get(overrideRealmInfo.getAbsoluteRealm()).getURL(context.asContext(HttpContext.class));
+        return getProviderSettings(overrideRealmInfo, baseDeploymentUri);
+    }
+
+    private OAuth2ProviderSettings getProviderSettings(RealmInfo realmInfo, String baseDeploymentUri) throws NotFoundException {
         synchronized (providerSettingsMap) {
-            OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
+            OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realmInfo);
             if (providerSettings == null) {
-                ResourceSetStore resourceSetStore = resourceSetStoreFactory.create(realm);
-                providerSettings = new OpenAMOAuth2ProviderSettings(realm, baseDeploymentUri, resourceSetStore,
+                ResourceSetStore resourceSetStore = resourceSetStoreFactory.create(realmInfo.getAbsoluteRealm());
+                providerSettings = new OpenAMOAuth2ProviderSettings(realmInfo, baseDeploymentUri, resourceSetStore,
                         cookieExtractor);
                 if (providerSettings.exists()) {
-                    providerSettingsMap.put(realm, providerSettings);
+                    providerSettingsMap.put(realmInfo, providerSettings);
                 } else {
-                    throw new NotFoundException("No OpenID Connect provider for realm " + realm);
+                    throw new NotFoundException("No OpenID Connect provider for realm " + realmInfo.getAbsoluteRealm());
                 }
             }
             return providerSettings;
