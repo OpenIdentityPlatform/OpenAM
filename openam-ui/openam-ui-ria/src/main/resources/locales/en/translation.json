@@ -507,6 +507,9 @@
         }
     },
     "openam" : {
+        "dashboard": {
+            "title": "Dashboard"
+        },
         "apps" : {
             "header" : "My Applications",
             "noneFound": "You have no applications assigned to you"
