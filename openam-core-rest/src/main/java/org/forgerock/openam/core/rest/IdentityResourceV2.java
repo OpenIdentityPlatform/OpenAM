@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -69,7 +68,6 @@ import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
-import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -238,7 +236,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
             // build resource
             result.put("id", amIdentity.getName());
-            result.put("realm", getRelativeRealm(context, amIdentity));
+            result.put("realm", getRelativeRealmFromSession(context, amIdentity));
             result.put("dn", amIdentity.getUniversalId());
             result.put("successURL", ssotok.getProperty(ISAuthConstants.SUCCESS_URL,false));
             result.put("fullLoginURL", ssotok.getProperty(ISAuthConstants.FULL_LOGIN_URL,false));
@@ -256,29 +254,20 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         }
     }
 
-    private String getRelativeRealm(Context context, AMIdentity amIdentity) {
+    private String getRelativeRealmFromSession(Context context, AMIdentity amIdentity) {
         RealmContext realmContext = context.asContext(RealmContext.class);
 
-        String relativeRealm = realmContext.getRelativeRealm();
-
-        /*
-        Check the scenario when a user with an active session is redirected back to the XUI without the relative realm
-        in the URI path. The XUI will fail to get the users profile unless we can determine what is the relative realm
-        based from the users realm and the base realm from the realm context.
-         */
-        if ("/".equals(relativeRealm)) {
-            String userRealm = com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm());
-            String baseRealm = realmContext.getBaseRealm();
-            if (userRealm.startsWith(baseRealm)) {
-                String realm = userRealm.substring(baseRealm.length());
-                if (!realm.startsWith("/")) {
-                    realm = "/" + realm;
-                }
-                return realm;
+        String sessionRealm = com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm());
+        String baseRealm = realmContext.getDnsAliasRealm();
+        if (sessionRealm.startsWith(baseRealm)) {
+            String realm = sessionRealm.substring(baseRealm.length());
+            if (!realm.startsWith("/")) {
+                realm = "/" + realm;
             }
+            return realm;
         }
 
-        return relativeRealm;
+        return sessionRealm;
     }
 
     /**

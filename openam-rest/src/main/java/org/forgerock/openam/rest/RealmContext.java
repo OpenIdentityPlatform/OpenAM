@@ -155,6 +155,18 @@ public class RealmContext extends AbstractContext {
     }
 
     /**
+     * Gets the realm associated with the dns alias. If none exists, return the root realm.
+     *
+     * @return an absolute path-style realm.
+     */
+    public String getDnsAliasRealm() {
+        if (dnsAliasRealm != null) {
+            return dnsAliasRealm.getSecond();
+        }
+        return "/";
+    }
+
+    /**
      * Gets the full rebased realm, including the DNS realm and the URI realm.
      *
      * @return The full rebased realm.

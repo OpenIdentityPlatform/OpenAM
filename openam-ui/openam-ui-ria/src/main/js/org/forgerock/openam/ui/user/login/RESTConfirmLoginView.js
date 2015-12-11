@@ -64,8 +64,8 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
             var tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
             sessionDelegate.logout(tokenCookie).then(function () {
                 restLoginHelper.removeSessionCookie();
-                var realm = (conf.globalData.auth.passedInRealm) ? conf.globalData.auth.passedInRealm
-                                                                 : conf.globalData.auth.subRealm;
+                var realm = (conf.globalData.auth.passedInRealm != null) ? conf.globalData.auth.passedInRealm
+                                                                         : conf.globalData.auth.subRealm;
                 location.href = "#login/" + realm + restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
             });
             return false;
