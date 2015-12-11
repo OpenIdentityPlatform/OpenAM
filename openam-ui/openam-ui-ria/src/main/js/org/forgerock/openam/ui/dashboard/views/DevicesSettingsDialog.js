@@ -40,7 +40,7 @@ define("org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog", [
                 label: $.t("common.form.save"),
                 cssClass: "btn-primary",
                 action: function (dialog) {
-                    authSkip = dialog.$modalBody.find("#authenticationSkip").is(":checked");
+                    authSkip = !dialog.$modalBody.find("#oathStatus").is(":checked");
                     DeviceManagementDelegate.setDevicesOathSkippable(authSkip).then(function () {
                         dialog.close();
                     });
@@ -49,7 +49,7 @@ define("org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog", [
             ],
             onshown: function (dialog) {
                 $.when(authSkip).then(function (skip) {
-                    return UIUtils.compileTemplate(template, { skipped: skip });
+                    return UIUtils.compileTemplate(template, { authNeeded: !skip });
                 }).then(function (tpl) {
                     dialog.$modalBody.append(tpl);
                 });
