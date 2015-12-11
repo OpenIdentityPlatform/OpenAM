@@ -59,7 +59,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      * @return this builder for method chaining.
      */
     public AMAccessAuditEventBuilder component(Component value) {
-        putComponent(jsonValue, value.toString());
+        putComponent(jsonValue, value == null ? null : value.toString());
         return this;
     }
 

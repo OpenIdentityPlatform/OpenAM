@@ -17,6 +17,7 @@ package org.forgerock.openam.audit;
 
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.audit.JsonUtils.*;
@@ -70,6 +71,19 @@ public class AMAccessAuditEventBuilderTest {
                 .toEvent();
 
         assertJsonValue(accessEvent.getValue(), "/access-event.json");
+    }
+
+    @Test
+    public void canHandleNullComponent() {
+        AuditEvent accessEvent = new AMAccessAuditEventBuilder()
+                .timestamp(1436389263629L)
+                .eventName(EventName.AM_ACCESS_ATTEMPT)
+                .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
+                .realm(null)
+                .component(null)
+                .toEvent();
+
+        assertThat(accessEvent).isNotNull();
     }
 
     private Map<String, List<String>> getQueryParameters() {

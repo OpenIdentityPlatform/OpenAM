@@ -53,7 +53,7 @@ public final class AMAuditEventBuilderUtils {
      * @param value String "component" value.
      */
     static void putComponent(JsonValue jsonValue, String value) {
-        jsonValue.put(COMPONENT, value == null ? "" : value);
+        jsonValue.put(COMPONENT, value);
     }
 
     /**
@@ -62,7 +62,7 @@ public final class AMAuditEventBuilderUtils {
      * @param value String "realm" value.
      */
     static void putRealm(JsonValue jsonValue, String value) {
-        jsonValue.put(EVENT_REALM, value == null ? "" : value);
+        jsonValue.put(EVENT_REALM, value);
     }
 
     /**
