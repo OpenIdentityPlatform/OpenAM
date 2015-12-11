@@ -130,6 +130,8 @@ public final class IdentityRestUtils {
                         kbaChildren.add(kbaValue.getObject());
                     }
                     result.put(USER_KBA_ATTRIBUTE, kbaChildren);
+                } else if ("userPassword".equals(entry.getKey())) {
+                    continue;
                 } else {
                     result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
                 }
