@@ -334,6 +334,9 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             if (LDAPConstants.CONSTRAINT_VIOLATED_ERROR.equals(ex.getErrorCode())) {
                 throw new InternalServerErrorException(ex.getConstraintViolationDetails());
             }
+            if (LDAPConstants.LDAP_INVALID_SYNTAX.equals(ex.getLDAPErrorCode())) {
+                throw new BadRequestException("Unrecognized or invalid syntax for an attribute.");
+            }
 
             throw convertToResourceException(idServicesErrorHandler.handleError(ex));
         } catch (SSOException ex) {

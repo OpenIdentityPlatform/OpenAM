@@ -46,11 +46,7 @@ public class IdRepoAttributeValidatorImpl implements IdRepoAttributeValidator {
     private int minPasswordLength = 0;
     private static Debug debug = Debug.getInstance("amIdm");
 
-    /**
-     * Initialization paramters as configred for a given plugin.
-     * 
-     * @param configParams configuration parameters
-     */
+    @Override
     public void initialize(Map<String, Set<String>> configParams) {
         if ((configParams == null) || configParams.isEmpty()) {
             return;
@@ -77,15 +73,7 @@ public class IdRepoAttributeValidatorImpl implements IdRepoAttributeValidator {
         }
     }
 
-    /**
-     * Validates attributes for create or modify operation. 
-     *
-     * @param attrMap attributes map to be validated.
-     * @param idOp operaton which is ethier <code>IdOperation.CREATE</code> or
-     *     <code>IdOperation.EDIT</code>
-     * @throws IdRepoException If attributes can't be validated or there are
-     *     repository related error conditions.
-     */
+    @Override
     public void validateAttributes(Map<String, Set<String>> attrMap,
         IdOperation idOp) throws IdRepoException {
 

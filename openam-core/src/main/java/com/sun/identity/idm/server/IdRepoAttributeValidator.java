@@ -39,22 +39,22 @@ import com.sun.identity.idm.IdRepoException;
 public interface IdRepoAttributeValidator {
 
     /**
-     * Initialization paramters as configred for a given plugin.
+     * Initialization parameters as configured for a given plugin.
      * 
      * @param configParams configuration parameters
      */
-    public void initialize(Map<String, Set<String>> configParams);
+    void initialize(Map<String, Set<String>> configParams);
 
     /**
      * Validates attributes for create or modify operation. 
      *
      * @param attrMap attributes map to be validated.
-     * @param idOp operaton which is ethier <code>IdOperation.CREATE</code> or
+     * @param idOp operation which is either <code>IdOperation.CREATE</code> or
      *     <code>IdOperation.EDIT</code>
      * @throws IdRepoException If attributes can't be validated or there are
      *     repository related error conditions.
      */
-    public void validateAttributes(Map<String, Set<String>> attrMap,
+    void validateAttributes(Map<String, Set<String>> attrMap,
         IdOperation idOp) throws IdRepoException;
 
 }

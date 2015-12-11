@@ -234,6 +234,9 @@ public final class LDAPConstants {
     /** Constraint violated error. */
     public static final String CONSTRAINT_VIOLATED_ERROR = "313";
 
+    /** Unrecognized or invalid syntax for an attribute. */
+    public static final String 	LDAP_INVALID_SYNTAX = "21";
+
     private LDAPConstants() {
     }
 }
