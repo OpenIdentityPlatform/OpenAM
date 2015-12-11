@@ -1,9 +1,22 @@
 {{> headers/_Title title="console.authorization.common.policySets" }}
 
-<div class="btn-toolbar page-toolbar" id="gridToolbar" role="toolbar" aria-label="toolbar"></div>
-
-<div class="panel panel-default">
-    <div class="panel-body">
-        <div class="table-container"></div>
+{{#if hasResourceTypes}}
+    <div class="btn-toolbar page-toolbar" id="gridToolbar" role="toolbar" aria-label="toolbar"></div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="table-container"></div>
+        </div>
     </div>
-</div>
+{{else}}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="call-to-action-block">
+
+                <h3>{{t "console.authorization.resourceTypes.edit.noResourceTypesMessage"}}</h3>
+                <button type="button" data-add-resource class="btn btn-primary">
+                    <i class="fa fa-plus"></i> {{t "console.authorization.resourceTypes.edit.addNewResourceType"}}
+                </button>
+            </div>
+        </div>
+    </div>
+{{/if}}

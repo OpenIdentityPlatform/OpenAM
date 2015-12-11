@@ -44,118 +44,127 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
             "click #addNewPolicySet": "addNewPolicySet",
             "click #importPolicies": "startImportPolicies",
             "click #exportPolicies": "exportPolicies",
+            "click [data-add-resource]" : "addResource",
             "change [name=upload]": "readImportFile"
         },
         render: function (args, callback) {
-            var self = this,
-                PolicySets,
-                columns,
-                grid,
-                paginator,
-                ClickableRow;
-
             this.realmPath = args[0];
-            this.data.selectedItems = [];
+            PoliciesDelegate.listResourceTypes().then(_.bind(function (resourceTypes) {
+                if (resourceTypes.resultCount < 1) {
+                    this.data.hasResourceTypes = false;
+                    this.parentRender(this.renderToolbar);
+                } else {
+                    var self = this,
+                        PolicySets,
+                        columns,
+                        grid,
+                        paginator,
+                        ClickableRow;
 
-            PolicySets = Backbone.PageableCollection.extend({
-                url: URLHelper.substitute("__api__/applications"),
-                model: PolicySetModel,
-                state: BackgridUtils.getState(),
-                queryParams: BackgridUtils.getQueryParams({
-                    filterName: "eq"
-                }),
-                parseState: BackgridUtils.parseState,
-                parseRecords: BackgridUtils.parseRecords,
-                sync: function (method, model, options) {
-                    options.beforeSend = function (xhr) {
-                        xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");
-                    };
-                    return BackgridUtils.sync(method, model, options);
-                }
-            });
+                    this.data.selectedItems = [];
+                    this.data.hasResourceTypes = true;
 
-            ClickableRow = BackgridUtils.ClickableRow.extend({
-                callback: function (e) {
-                    var $target = $(e.target);
-
-                    if ($target.parents().hasClass("fr-col-btn-2")) {
-                        return;
-                    }
-
-                    self.editRecord(e, this.model.id, Router.configuration.routes.realmsPolicySetEdit);
-                }
-            });
-
-            columns = [
-                {
-                    name: "name",
-                    label: $.t("console.authorization.policySets.list.grid.0"),
-                    cell: BackgridUtils.TemplateCell.extend({
-                        iconClass: "fa-folder",
-                        template: "templates/admin/backgrid/cell/IconAndNameCell.html",
-                        rendered: function () {
-                            this.$el.find("i.fa").addClass(this.iconClass);
+                    PolicySets = Backbone.PageableCollection.extend({
+                        url: URLHelper.substitute("__api__/applications"),
+                        model: PolicySetModel,
+                        state: BackgridUtils.getState(),
+                        queryParams: BackgridUtils.getQueryParams({
+                            filterName: "eq"
+                        }),
+                        parseState: BackgridUtils.parseState,
+                        parseRecords: BackgridUtils.parseRecords,
+                        sync: function (method, model, options) {
+                            options.beforeSend = function (xhr) {
+                                xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");
+                            };
+                            return BackgridUtils.sync(method, model, options);
                         }
-                    }),
-                    headerCell: BackgridUtils.FilterHeaderCell,
-                    sortType: "toggle",
-                    editable: false
-                },
-                {
-                    name: "",
-                    cell: BackgridUtils.TemplateCell.extend({
-                        className: "fr-col-btn-2",
-                        template: "templates/admin/backgrid/cell/RowActionsCell.html",
-                        events: {
-                            "click .edit-row-item": "editItem",
-                            "click .delete-row-item": "deleteItem"
-                        },
-                        editItem: function (e) {
-                            self.editRecord(e, this.model.id, Router.configuration.routes.realmsPolicySetEdit);
-                        },
-                        deleteItem: function (e) {
-                            self.deleteRecord(e, this.model.id);
-                        }
-                    }),
-                    sortable: false,
-                    editable: false
-                }
-            ];
-
-            this.data.items = new PolicySets();
-
-            grid = new Backgrid.Grid({
-                columns: columns,
-                row: ClickableRow,
-                collection: self.data.items,
-                className: "backgrid table table-hover",
-                emptyText: $.t("console.common.noResults")
-            });
-
-            paginator = new Backgrid.Extension.ThemeablePaginator({
-                collection: self.data.items,
-                windowSize: 3
-            });
-
-            this.bindDefaultHandlers();
-
-            this.parentRender(function () {
-                this.renderToolbar();
-
-                this.$el.find(".table-container").append(grid.render().el);
-                this.$el.find(".panel-body").append(paginator.render().el);
-
-                this.data.items.fetch({ reset: true }).done(function () {
-                    if (callback) {
-                        callback();
-                    }
-                }).fail(function () {
-                    Router.routeTo(Router.configuration.routes.realms, {
-                        args: [],
-                        trigger: true
                     });
-                });
-            });
+
+                    ClickableRow = BackgridUtils.ClickableRow.extend({
+                        callback: function (e) {
+                            var $target = $(e.target);
+
+                            if ($target.parents().hasClass("fr-col-btn-2")) {
+                                return;
+                            }
+
+                            self.editRecord(e, this.model.id, Router.configuration.routes.realmsPolicySetEdit);
+                        }
+                    });
+
+                    columns = [
+                        {
+                            name: "name",
+                            label: $.t("console.authorization.policySets.list.grid.0"),
+                            cell: BackgridUtils.TemplateCell.extend({
+                                iconClass: "fa-folder",
+                                template: "templates/admin/backgrid/cell/IconAndNameCell.html",
+                                rendered: function () {
+                                    this.$el.find("i.fa").addClass(this.iconClass);
+                                }
+                            }),
+                            headerCell: BackgridUtils.FilterHeaderCell,
+                            sortType: "toggle",
+                            editable: false
+                        },
+                        {
+                            name: "",
+                            cell: BackgridUtils.TemplateCell.extend({
+                                className: "fr-col-btn-2",
+                                template: "templates/admin/backgrid/cell/RowActionsCell.html",
+                                events: {
+                                    "click .edit-row-item": "editItem",
+                                    "click .delete-row-item": "deleteItem"
+                                },
+                                editItem: function (e) {
+                                    self.editRecord(e, this.model.id, Router.configuration.routes.realmsPolicySetEdit);
+                                },
+                                deleteItem: function (e) {
+                                    self.deleteRecord(e, this.model.id);
+                                }
+                            }),
+                            sortable: false,
+                            editable: false
+                        }
+                    ];
+
+                    this.data.items = new PolicySets();
+
+                    grid = new Backgrid.Grid({
+                        columns: columns,
+                        row: ClickableRow,
+                        collection: self.data.items,
+                        className: "backgrid table table-hover",
+                        emptyText: $.t("console.common.noResults")
+                    });
+
+                    paginator = new Backgrid.Extension.ThemeablePaginator({
+                        collection: self.data.items,
+                        windowSize: 3
+                    });
+
+                    this.bindDefaultHandlers();
+
+                    this.parentRender(function () {
+                        this.renderToolbar();
+
+                        this.$el.find(".table-container").append(grid.render().el);
+                        this.$el.find(".panel-body").append(paginator.render().el);
+
+                        this.data.items.fetch({ reset: true }).done(function () {
+                            if (callback) {
+                                callback();
+                            }
+                        }).fail(function () {
+                            Router.routeTo(Router.configuration.routes.realms, {
+                                args: [],
+                                trigger: true
+                            });
+                        });
+                    });
+                }
+            }, this));
         },
 
         startImportPolicies: function () {
@@ -198,6 +207,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
             var realm = this.realmPath === "/" ? "" : RealmHelper.encodeRealm(this.realmPath);
             this.$el.find("#exportPolicies").attr("href",
                 Constants.host + "/" + Constants.context + "/xacml" + realm + "/policies");
+        },
+
+        addResource: function () {
+            Router.routeTo(Router.configuration.routes.realmsResourceTypeNew, {
+                args: [encodeURIComponent(this.realmPath)],
+                trigger: true
+            });
         },
 
         addNewPolicySet: function () {

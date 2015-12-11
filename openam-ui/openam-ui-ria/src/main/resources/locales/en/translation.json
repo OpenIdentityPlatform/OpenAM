@@ -1135,7 +1135,9 @@
                     "patternsDescription" : "Define resource patterns that policies using this resource type can expand upon.",
                     "specifyPatterns" : "Specify Patterns",
                     "addPattern": "Add Pattern",
-                    "addNewPatternPlaceholder": "Add a new pattern..."
+                    "addNewPatternPlaceholder": "Add a new pattern...",
+                    "noResourceTypesMessage" : "You must add a Resource Type to create a Policy Set.",
+                    "addNewResourceType" : "Add a Resource Type"
                 }
             }
         }
