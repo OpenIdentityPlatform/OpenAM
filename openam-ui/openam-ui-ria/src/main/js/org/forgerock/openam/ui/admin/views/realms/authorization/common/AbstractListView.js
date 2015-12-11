@@ -37,25 +37,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
             var self = this,
                 item = self.data.items.get(id),
                 onSuccess = function () {
-                    self.data.items.fetch({ reset: true });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
                     if (callback) {
                         callback();
                     }
-                },
-                onError = function (model, response) {
-                    self.data.items.fetch({ reset: true });
-                    Messages.addMessage({
-                        response: response,
-                        type: Messages.TYPE_DANGER
-                    });
                 };
 
             item.destroy({
                 success: onSuccess,
-                error: onError,
                 wait: true
+            }).always(function () {
+                self.data.items.fetch({ reset: true });
             });
         },
 
