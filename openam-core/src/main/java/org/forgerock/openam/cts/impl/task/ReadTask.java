@@ -11,13 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.task;
 
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
+
 import org.forgerock.openam.cts.impl.LDAPAdapter;
 import org.forgerock.openam.cts.impl.queue.ResultHandler;
 import org.forgerock.opendj.ldap.Connection;
@@ -28,17 +27,16 @@ import java.text.MessageFormat;
 /**
  * Performs a Read against the LDAP persistence layer.
  */
-public class ReadTask implements Task {
+public class ReadTask extends AbstractTask {
     private final String tokenId;
-    private final ResultHandler<Token> handler;
 
     /**
      * @param tokenId The Token ID to read.
      * @param handler The ResultHandler to update with the result.
      */
     public ReadTask(String tokenId, ResultHandler<Token> handler) {
+        super(handler);
         this.tokenId = tokenId;
-        this.handler = handler;
     }
 
     /**
@@ -50,18 +48,12 @@ public class ReadTask implements Task {
      *
      * @param connection Non null connection.
      * @param ldapAdapter Non null for LDAP operations.
-     * @throws CoreTokenException If there was an error whilst performing the read.
+     * @throws ErrorResultException If there was an error whilst performing the read.
      */
     @Override
-    public void execute(Connection connection, LDAPAdapter ldapAdapter) throws CoreTokenException {
-        try {
-            Token token = ldapAdapter.read(connection, tokenId);
-            handler.processResults(token);
-        } catch (ErrorResultException e) {
-            LDAPOperationFailedException error = new LDAPOperationFailedException(e.getResult());
-            handler.processError(error);
-            throw error;
-        }
+    public void performTask(Connection connection, LDAPAdapter ldapAdapter) throws ErrorResultException {
+        Token token = ldapAdapter.read(connection, tokenId);
+        handler.processResults(token);
     }
 
     @Override

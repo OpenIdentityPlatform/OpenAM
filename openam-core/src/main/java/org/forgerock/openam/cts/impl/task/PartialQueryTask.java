@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.task;
 
@@ -37,8 +37,7 @@ import java.util.Collection;
  *
  * @see QueryTask
  */
-public class PartialQueryTask implements Task {
-    private final ResultHandler<Collection<PartialToken>> handler;
+public class PartialQueryTask extends AbstractTask {
     private final TokenFilter tokenFilter;
     private final QueryFactory factory;
     private final FilterConversion conversion;
@@ -51,9 +50,9 @@ public class PartialQueryTask implements Task {
      */
     public PartialQueryTask(QueryFactory factory, FilterConversion conversion,
                             TokenFilter tokenFilter, ResultHandler<Collection<PartialToken>> handler) {
+        super(handler);
         this.factory = factory;
         this.conversion = conversion;
-        this.handler = handler;
         this.tokenFilter = tokenFilter;
     }
 
@@ -65,21 +64,20 @@ public class PartialQueryTask implements Task {
      * @throws IllegalArgumentException If the TokenFilter did not define any return fields.
      */
     @Override
-    public void execute(Connection connection, LDAPAdapter ldapAdapter) throws CoreTokenException {
+    public void performTask(Connection connection, LDAPAdapter ldapAdapter) throws CoreTokenException {
+
         Reject.ifTrue(tokenFilter.getReturnFields().isEmpty());
 
         Filter ldapFilter = conversion.convert(tokenFilter);
         // Perform the query.
-        try {
-            handler.processResults(factory.createInstance()
-                    .withFilter(ldapFilter)
-                    .returnTheseAttributes(tokenFilter.getReturnFields())
-                    .executeAttributeQuery(connection));
-        } catch (CoreTokenException e) {
-            handler.processError(e);
-            throw e;
-        }
+
+        handler.processResults(factory.createInstance()
+                .withFilter(ldapFilter)
+                .returnTheseAttributes(tokenFilter.getReturnFields())
+                .executeAttributeQuery(connection));
+
     }
+
 
     @Override
     public String toString() {

@@ -11,13 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.task;
 
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
 import org.forgerock.openam.cts.impl.LDAPAdapter;
 import org.forgerock.openam.cts.impl.queue.ResultHandler;
 import org.forgerock.opendj.ldap.Connection;
@@ -28,17 +27,16 @@ import java.text.MessageFormat;
 /**
  * Responsible for updating the LDAP persistence with the provided Token.
  */
-public class UpdateTask implements Task {
+public class UpdateTask extends AbstractTask {
     private final Token token;
-    private final ResultHandler<Token> handler;
 
     /**
      * @param token Non null Token to update.
      * @param handler Non null handler to notify.
      */
     public UpdateTask(Token token, ResultHandler<Token> handler) {
+        super(handler);
         this.token = token;
-        this.handler = handler;
     }
 
     /**
@@ -50,22 +48,19 @@ public class UpdateTask implements Task {
      * @param connection Non null Connection.
      * @param ldapAdapter Non null for LDAP operations.
      * @throws CoreTokenException If there was an error of any kind.
+     * @throws ErrorResultException If there was an error of any kind.
      */
     @Override
-    public void execute(Connection connection, LDAPAdapter ldapAdapter) throws CoreTokenException {
-        try {
-            Token previous = ldapAdapter.read(connection, token.getTokenId());
-            if (previous == null) {
-                ldapAdapter.create(connection, token);
-            } else {
-                ldapAdapter.update(connection, previous, token);
-            }
-            handler.processResults(token);
-        } catch (ErrorResultException e) {
-            LDAPOperationFailedException error = new LDAPOperationFailedException(e.getResult());
-            handler.processError(error);
-            throw error;
+    public void performTask(Connection connection, LDAPAdapter ldapAdapter)
+            throws CoreTokenException, ErrorResultException {
+
+        Token previous = ldapAdapter.read(connection, token.getTokenId());
+        if (previous == null) {
+            ldapAdapter.create(connection, token);
+        } else {
+            ldapAdapter.update(connection, previous, token);
         }
+        handler.processResults(token);
     }
 
     @Override

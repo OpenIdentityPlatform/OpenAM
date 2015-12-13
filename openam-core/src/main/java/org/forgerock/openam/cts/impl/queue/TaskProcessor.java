@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.queue;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
 import org.forgerock.openam.cts.impl.LDAPAdapter;
 import org.forgerock.openam.cts.impl.task.Task;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
@@ -99,15 +100,19 @@ public class TaskProcessor implements Runnable {
 
                 if (connection == null || !connection.isValid() || connection.isClosed()) {
                     close(connection);
-                    connection = connectionFactory.getConnection();
+                    try {
+                        connection = connectionFactory.getConnection();
+                    } catch (ErrorResultException e) {
+                        error("acquiring connection", e);
+                        task.processError(new LDAPOperationFailedException(e.getResult()));
+                        continue;
+                    }
                     debug("acquired connection");
                 }
 
                 task.execute(connection, adapter);
             } catch (CoreTokenException e) {
                 error("processing task", e);
-            } catch (ErrorResultException e) {
-                error("acquiring connection", e);
             } catch (InterruptedException e) {
                 error("interrupt detected", e);
                 Thread.currentThread().interrupt();

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.task;
 
@@ -28,11 +28,19 @@ import org.forgerock.opendj.ldap.Connection;
  */
 public interface Task {
     /**
-     * Perform the task.
+     * Execute the task.
      *
      * @param connection LDAP Connection to use.
      * @param ldapAdapter LDAP utility functions to perform the task with.
      * @throws CoreTokenException If there was a problem processing the task.
      */
-   void execute(Connection connection, LDAPAdapter ldapAdapter) throws CoreTokenException;
+    void execute(Connection connection, LDAPAdapter ldapAdapter) throws CoreTokenException;
+
+    /**
+     * Set the task error
+     * Use for setting the error response without executing the task.
+     * if the task can't be executed, this method is called.
+     * @param error the problem that happened before processing the task
+     */
+    void processError(CoreTokenException error);
 }

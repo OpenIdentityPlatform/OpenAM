@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.task;
 
@@ -34,10 +34,9 @@ import java.util.Collection;
  *
  * @see PartialQueryTask
  */
-public class QueryTask implements Task {
+public class QueryTask extends AbstractTask {
     private final FilterConversion conversion;
     private final TokenFilter tokenFilter;
-    private final ResultHandler<Collection<Token>> handler;
     private final QueryFactory factory;
 
     /**
@@ -48,9 +47,9 @@ public class QueryTask implements Task {
      */
     public QueryTask(QueryFactory factory, FilterConversion conversion,
                      TokenFilter tokenFilter, ResultHandler<Collection<Token>> handler) {
+        super(handler);
         this.conversion = conversion;
         this.tokenFilter = tokenFilter;
-        this.handler = handler;
         this.factory = factory;
     }
 
@@ -69,20 +68,17 @@ public class QueryTask implements Task {
      * @throws IllegalArgumentException If the TokenFilter provided defined any return fields.
      */
     @Override
-    public void execute(Connection connection, LDAPAdapter ldapAdapter) throws CoreTokenException {
+    public void performTask(Connection connection, LDAPAdapter ldapAdapter) throws CoreTokenException {
+
         Reject.ifFalse(tokenFilter.getReturnFields().isEmpty());
 
         Filter ldapFilter = conversion.convert(tokenFilter);
-        // Perform the query.
-        try {
-            // Process Query and return Collection<Tokens>
-            handler.processResults(factory.createInstance()
-                    .withFilter(ldapFilter)
-                    .execute(connection));
-        } catch (CoreTokenException e) {
-            handler.processError(e);
-            throw e;
-        }
+
+        // Process Query and return Collection<Tokens>
+        handler.processResults(factory.createInstance()
+                .withFilter(ldapFilter)
+                .execute(connection));
+
     }
 
     @Override
