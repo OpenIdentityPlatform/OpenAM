@@ -58,6 +58,7 @@
                     <include>amSession.properties</include>
                     <include>debugconfig.properties</include>
                     <include>famSTS.properties</include>
+                    <include>debugfiles.properties</include>
                     <include>fmConfigurationService.properties</include>
                     <include>fmLibertySecurity.properties</include>
                     <include>fmSessionProvider.properties</include>
@@ -129,6 +130,7 @@
                                 <include>amNaming.properties</include>
                                 <include>amPolicy.properties</include>
                                 <include>amProfile.properties</include>
+                                <include>debugfiles.properties</include>
                                 <include>amSDK.properties</include>
                                 <include>amSSOProvider.properties</include>
                                 <include>amSecurity.properties</include>
