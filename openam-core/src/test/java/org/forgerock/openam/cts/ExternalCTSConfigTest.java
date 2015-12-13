@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts;
 
@@ -54,8 +54,11 @@ public class ExternalCTSConfigTest extends PowerMockTestCase {
         // When
         config.update();
         // Then
-        PowerMockito.verifyStatic(times(5));
+        PowerMockito.verifyStatic(times(4));
         SystemProperties.get(anyString());
+
+        PowerMockito.verifyStatic();
+        SystemProperties.get(anyString(), anyString());
 
         PowerMockito.verifyStatic();
         SystemProperties.getAsBoolean(anyString(), anyBoolean());

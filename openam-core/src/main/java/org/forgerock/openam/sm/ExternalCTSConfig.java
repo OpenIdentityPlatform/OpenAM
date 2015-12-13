@@ -1,4 +1,3 @@
-
 /*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -12,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm;
 
@@ -128,7 +127,8 @@ public class ExternalCTSConfig implements ConnectionConfig {
      * @return A positive number if valid, or -1.
      */
     public int getMaxConnections() {
-        return parseNumber(maxConnections.get());
+        Integer value = parseNumber(maxConnections.get());
+        return null == value ? INVALID : value;
     }
 
     /**
@@ -164,7 +164,8 @@ public class ExternalCTSConfig implements ConnectionConfig {
         hosts.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_HOSTNAME));
         username.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_USERNAME));
         password.set(AMPasswordUtil.decrypt(SystemProperties.get(CoreTokenConstants.CTS_STORE_PASSWORD)));
-        maxConnections.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS));
+        maxConnections.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS,
+                CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS_DEFAULT));
         sslMode.set(SystemProperties.getAsBoolean(CoreTokenConstants.CTS_STORE_SSL_ENABLED, false));
 
         String heartbeatStr = SystemProperties.get(Constants.LDAP_HEARTBEAT);
