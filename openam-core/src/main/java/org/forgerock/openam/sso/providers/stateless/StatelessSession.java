@@ -63,4 +63,15 @@ public class StatelessSession extends Session {
     public String getStableStorageID() {
         return stableId;
     }
+
+    /*
+     * Only a value of true will cause Session#isTimedOut to refresh the session, where timeout calculations should be performed.
+     * Because StatelessSession state is immutable and encapsulated in the jwt, Session#update is called from the StatelessSession ctor, which updates
+     * Session#latestRefreshTime, which will prevent Session#maxCachingTimeReached from ever returning true. StatelessSessions
+     * are not maintained in any state table, and thus are not cached, and are trivially refreshed from jwt state, justifying a return value of true.
+     */
+    @Override
+    public boolean maxCachingTimeReached() {
+        return true;
+    }
 }

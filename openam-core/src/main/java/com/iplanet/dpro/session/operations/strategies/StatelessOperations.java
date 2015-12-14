@@ -18,6 +18,7 @@ package com.iplanet.dpro.session.operations.strategies;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionTimedOutException;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -50,7 +51,11 @@ public class StatelessOperations implements SessionOperations {
 
     @Override
     public SessionInfo refresh(final Session session, final boolean reset) throws SessionException {
-        return statelessSessionFactory.getSessionInfo(session.getID());
+        final SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
+        if (sessionInfo.getExpiryTime() < System.currentTimeMillis()) {
+            throw new SessionTimedOutException("Stateless session corresponding to client " + sessionInfo.getClientID() + " timed out.");
+        }
+        return sessionInfo;
     }
 
     @Override

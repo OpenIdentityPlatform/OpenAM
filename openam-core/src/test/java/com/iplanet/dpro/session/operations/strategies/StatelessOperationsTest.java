@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.SessionTimedOutException;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import org.forgerock.openam.session.blacklist.SessionBlacklist;
@@ -69,6 +70,7 @@ public class StatelessOperationsTest {
     public void shouldRefreshFromStatelessSessionFactory() throws Exception {
         // Given
         SessionInfo info = new SessionInfo();
+        info.setExpiryTime(System.currentTimeMillis() + (1000 * 60 * 10));
         given(mockSessionFactory.getSessionInfo(sid)).willReturn(info);
 
         // When
@@ -77,6 +79,18 @@ public class StatelessOperationsTest {
         // Then
         verify(mockSessionFactory).getSessionInfo(sid);
         assertThat(result).isSameAs(info);
+    }
+
+    @Test(expectedExceptions = SessionTimedOutException.class)
+    public void refreshShouldTimeoutFromStatelessSessionFactory() throws Exception {
+        // Given
+        SessionInfo info = new SessionInfo();
+        given(mockSessionFactory.getSessionInfo(sid)).willReturn(info);
+
+        // When
+        SessionInfo result = statelessOperations.refresh(mockSession, false);
+
+        // Then exception should be thrown, as session is timed-out
     }
 
     @Test

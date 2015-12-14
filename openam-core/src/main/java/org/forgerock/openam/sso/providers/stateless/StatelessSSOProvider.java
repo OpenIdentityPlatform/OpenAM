@@ -58,8 +58,18 @@ public class StatelessSSOProvider implements SSOProvider {
             throw new SSOException(e);
         }
 
-        StatelessSSOToken ssoToken = new StatelessSSOToken(session);
-        return isValidToken(ssoToken, false) ? ssoToken : null;
+        final StatelessSSOToken ssoToken = new StatelessSSOToken(session);
+        if (isValidToken(ssoToken, false)) {
+            return ssoToken;
+        } else {
+            Principal principal = null;
+            try {
+                principal = ssoToken.getPrincipal();
+            } catch (SSOException e) {
+                debug.warning("Could not obtain token principal for invalid token: " + e.getMessage(), e);
+            }
+            throw new SSOException("Token for principal " + (principal != null ? principal.getName() : null) + " invalid.");
+        }
     }
 
     @Override
