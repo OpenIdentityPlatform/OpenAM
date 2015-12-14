@@ -52,15 +52,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.AdviceContext;
-import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.*;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.RealmContext;
@@ -546,7 +538,8 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldSetWhitelistedProperty() throws SSOException, DelegationException {
+    public void shouldSetWhitelistedProperty() throws SSOException, DelegationException,
+            ExecutionException, InterruptedException {
         //given
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
@@ -566,6 +559,7 @@ public class SessionResourceTest {
         //then
         verify(ssoToken).setProperty(eq("one"), eq("testOne"));
         assertThat(promise).succeeded();
+        assertTrue(promise.get().getJsonContent().get("success").asBoolean().equals(true));
     }
 
     @Test
@@ -636,6 +630,124 @@ public class SessionResourceTest {
     }
 
     @Test
+    public void shouldReturnFailureWhenSetPropertySessionException() throws SSOException,
+            ExecutionException, InterruptedException, DelegationException {
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+
+        JsonValue jsonContent = json(object(field("one", "testOne")));
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(SET_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(jsonContent);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class)))
+                .willThrow(new SSOException("Error"));
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).succeeded();
+        assertTrue(promise.get().getJsonContent().get("success").asBoolean().equals(false));
+    }
+
+    @Test
+    public void shouldReturnInternalErrorWhenSetPropertyFailsWithDelegationException() throws SSOException,
+            ExecutionException, InterruptedException, DelegationException {
+
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        JsonValue jsonContent = json(object(field("one", "testOne")));
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(resourceId)).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(SET_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(jsonContent);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class)))
+                .willThrow(new DelegationException("Error"));
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).failedWithException().isInstanceOf(InternalServerErrorException.class);
+    }
+
+    @Test
+    public void shouldReturnInternalErrorWhenGetPropertyFailsWithDelegationException() throws SSOException, DelegationException {
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+
+        final JsonValue content = json(object(field("properties", array("one"))));
+
+        given(request.getContent()).willReturn(content);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(resourceId)).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(GET_PROPERTY_ACTION_ID);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class)))
+                .willThrow(new DelegationException("Error"));
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).failedWithException().isInstanceOf(InternalServerErrorException.class);
+    }
+
+    @Test
+    public void shouldReturnFailureWhenDeletePropertySessionException() throws SSOException,
+            ExecutionException, InterruptedException, DelegationException {
+
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final JsonValue content = json(object(field("properties", array("one"))));
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(resourceId)).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(content);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class)))
+                .willThrow(new SSOException("Error"));
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).succeeded();
+        assertTrue(promise.get().getJsonContent().get("success").asBoolean().equals(false));
+    }
+
+    @Test
+    public void shouldReturnInternalErrorWhenDeletePropertyFailsWithDelegationException() throws SSOException,
+            ExecutionException, InterruptedException, DelegationException {
+
+        //given
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final JsonValue content = json(object(field("properties", array("one"))));
+
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(resourceId)).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
+        given(request.getContent()).willReturn(content);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class)))
+                .willThrow(new DelegationException("Error"));
+
+        //when
+        Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
+
+        //then
+        assertThat(promise).failedWithException().isInstanceOf(InternalServerErrorException.class);
+    }
+
+    @Test
     public void shouldFailToDeleteNonWhitelistedProperty() throws SSOException, DelegationException {
 
         //given
@@ -643,7 +755,7 @@ public class SessionResourceTest {
         final ActionRequest request = mock(ActionRequest.class);
         final JsonValue content = json(object(field("properties", array("invalid"))));
 
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(resourceId)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(content);
@@ -668,7 +780,7 @@ public class SessionResourceTest {
 
         final JsonValue content = json(object());
 
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(resourceId)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(content);
