@@ -133,5 +133,9 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-audit-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-audit-configuration</artifactId>
+        </dependency>
     </dependencies>
 </project>

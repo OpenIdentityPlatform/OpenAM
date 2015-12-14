@@ -206,15 +206,17 @@ public class LogWriter {
         AMAccessAuditEventBuilder accessEventBuilder = new AMAccessAuditEventBuilder();
         String realm = null;
         JsonValue requestData = json(object());
-        for (int i = 0; i < msgdata.length; i++) {
-            String fieldName = fields.get(i).toLowerCase();
-            if (NORMALIZED_FIELD_NAMES.containsKey(fieldName)) {
-                fieldName = NORMALIZED_FIELD_NAMES.get(fieldName);
-            }
-            if (!IGNORED_LOG_FIELDS.contains(fieldName)) {
-                requestData.put(fieldName, msgdata[i]);
-            } else if (fieldName.equals("realm")) {
-                realm = msgdata[i];
+        if (msgdata != null) {
+            for (int i = 0; i < msgdata.length; i++) {
+                String fieldName = fields.get(i).toLowerCase();
+                if (NORMALIZED_FIELD_NAMES.containsKey(fieldName)) {
+                    fieldName = NORMALIZED_FIELD_NAMES.get(fieldName);
+                }
+                if (!IGNORED_LOG_FIELDS.contains(fieldName)) {
+                    requestData.put(fieldName, msgdata[i]);
+                } else if (fieldName.equals("realm")) {
+                    realm = msgdata[i];
+                }
             }
         }
         accessEventBuilder.request("ssoadm", operation, requestData);
