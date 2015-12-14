@@ -24,9 +24,34 @@
  *
  * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS
+ * Portions Copyrighted 2010-2016 ForgeRock AS
  */
 package com.sun.identity.idsvcs.opensso;
+
+import java.net.MalformedURLException;
+import java.rmi.RemoteException;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.errors.IdentityResourceExceptionMappingHandler;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -85,35 +110,16 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.SMSException;
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Web Service to provide security based on authentication and authorization
  * support.
  */
-public class IdentityServicesImpl
-    implements com.sun.identity.idsvcs.IdentityServicesImpl
-{
-    // Debug
+public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentityServicesImpl {
+
+    private static final IdentityResourceExceptionMappingHandler RESOURCE_MAPPING_HANDLER =
+            InjectorHolder.getInstance(IdentityResourceExceptionMappingHandler.class);
+
     private static Debug debug = Debug.getInstance("amIdentityServices");
 
     private static Pattern RESOURCE_PATTERN =

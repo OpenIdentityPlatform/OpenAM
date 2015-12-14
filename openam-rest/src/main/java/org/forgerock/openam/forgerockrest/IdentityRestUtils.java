@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -22,16 +22,22 @@ import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.errors.IdentityResourceExceptionMappingHandler;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 
 public final class IdentityRestUtils {
 
     private static final Debug debug = Debug.getInstance("frRest");
+
+    private static final IdentityResourceExceptionMappingHandler RESOURCE_MAPPING_HANDLER =
+            InjectorHolder.getInstance(IdentityResourceExceptionMappingHandler.class);
 
     private IdentityRestUtils() {
     }
@@ -47,13 +53,7 @@ public final class IdentityRestUtils {
                     + "the password for user: " + username, ssoe);
             throw new PermanentException(401, "An error occurred while trying to change the password", ssoe);
         } catch (IdRepoException ire) {
-            if (IdRepoBundle.ACCESS_DENIED.equals(ire.getErrorCode())) {
-                throw new ForbiddenException("The user is not authorized to change the password");
-            } else {
-                debug.warning("IdentityRestUtils.changePassword() :: IdRepoException occurred while "
-                        + "changing the password for user: " + username, ire);
-                throw new InternalServerErrorException("An error occurred while trying to change the password", ire);
-            }
+            throw RESOURCE_MAPPING_HANDLER.handleError(ire);
         }
     }
 }

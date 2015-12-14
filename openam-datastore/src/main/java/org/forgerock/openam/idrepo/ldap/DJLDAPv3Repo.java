@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -32,6 +32,7 @@ import com.sun.identity.idm.IdRepoFatalException;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdRepoUnsupportedOpException;
 import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.PasswordPolicyException;
 import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.idm.common.IdRepoUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -429,7 +430,11 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             conn.modify(modifyRequest);
         } catch (ErrorResultException ere) {
             DEBUG.error("An error occurred while trying to change password for identity: " + name, ere);
-            handleErrorResult(ere);
+            try {
+                handleErrorResult(ere);
+            } catch (IdRepoException e) {
+                throw new PasswordPolicyException(e);
+            }
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -2456,12 +2461,18 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
     private void handleErrorResult(ErrorResultException ere) throws IdRepoException {
         ResultCode resultCode = ere.getResult().getResultCode();
         if (ResultCode.CONSTRAINT_VIOLATION.equals(resultCode)) {
-            throw new IdRepoFatalException(IdRepoBundle.BUNDLE_NAME, "313",
+            throw new IdRepoFatalException(IdRepoBundle.BUNDLE_NAME, "313", ResultCode.CONSTRAINT_VIOLATION.intValue(),
                     new Object[]{CLASS_NAME, resultCode.intValue(), ere.getResult().getDiagnosticMessage()});
         } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
-            throw new IdentityNotFoundException(resultCode, "220", CLASS_NAME, ere.getResult().getDiagnosticMessage());
+            throw new IdentityNotFoundException(IdRepoBundle.BUNDLE_NAME, "220", ResultCode.NO_SUCH_OBJECT.intValue(),
+                    new Object[]{CLASS_NAME, ere.getResult().getDiagnosticMessage()});
+        } else if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
+            DEBUG.warning("Size limit exceeded.", ere);
+        } else if (resultCode.equals(ResultCode.TIME_LIMIT_EXCEEDED)) {
+            DEBUG.warning("Time limit exceeded.", ere);
         } else {
-            throw newIdRepoException(resultCode, "306", CLASS_NAME, resultCode.intValue());
+            throw newIdRepoException(resultCode, "306",
+                    CLASS_NAME, resultCode.intValue());
         }
     }
 
