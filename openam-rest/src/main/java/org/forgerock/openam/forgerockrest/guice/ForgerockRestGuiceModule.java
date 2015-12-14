@@ -72,18 +72,22 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Provides
     @Singleton
     public Map<String, PrivilegeDefinition> getPrivilegeDefinitions() {
-        final Map<String, PrivilegeDefinition> definitions = new HashMap<String, PrivilegeDefinition>();
+        final Map<String, PrivilegeDefinition> definitions = new HashMap<>();
 
         final PrivilegeDefinition evaluateDefinition = PrivilegeDefinition
                 .getInstance("evaluate", PrivilegeDefinition.Action.READ);
         definitions.put("evaluate", evaluateDefinition);
         definitions.put("evaluateTree", evaluateDefinition);
-        definitions.put("schema", PrivilegeDefinition
-                .getInstance("schema", PrivilegeDefinition.Action.READ));
-        definitions.put("validate", PrivilegeDefinition
-                .getInstance("validate", PrivilegeDefinition.Action.READ));
-        definitions.put("template", PrivilegeDefinition
-                .getInstance("template", PrivilegeDefinition.Action.READ));
+        definitions.put("copy",
+                PrivilegeDefinition.getInstance("modify", PrivilegeDefinition.Action.MODIFY));
+        definitions.put("move",
+                PrivilegeDefinition.getInstance("modify", PrivilegeDefinition.Action.MODIFY));
+        definitions.put("schema",
+                PrivilegeDefinition.getInstance("schema", PrivilegeDefinition.Action.READ));
+        definitions.put("validate",
+                PrivilegeDefinition.getInstance("validate", PrivilegeDefinition.Action.READ));
+        definitions.put("template",
+                PrivilegeDefinition.getInstance("template", PrivilegeDefinition.Action.READ));
 
         definitions.put("getPropertyNames",
                 PrivilegeDefinition.getInstance("getPropertyNames", PrivilegeDefinition.Action.READ));

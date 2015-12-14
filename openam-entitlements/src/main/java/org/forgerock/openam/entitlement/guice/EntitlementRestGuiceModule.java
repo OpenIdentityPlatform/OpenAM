@@ -31,6 +31,7 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.entitlement.rest.ApplicationsResource;
@@ -39,6 +40,7 @@ import org.forgerock.openam.entitlement.rest.EntitlementsExceptionMappingHandler
 import org.forgerock.openam.entitlement.rest.JsonPolicyParser;
 import org.forgerock.openam.entitlement.rest.PolicyEvaluatorFactory;
 import org.forgerock.openam.entitlement.rest.PolicyParser;
+import org.forgerock.openam.entitlement.rest.PolicyResource;
 import org.forgerock.openam.entitlement.rest.PolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.XacmlRouterProvider;
@@ -105,6 +107,8 @@ public class EntitlementRestGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(ApplicationsResource.APPLICATION_QUERY_ATTRIBUTES))
                 .toProvider(ApplicationQueryAttributesMapProvider.class)
                 .asEagerSingleton();
+
+        bind(CollectionResourceProvider.class).annotatedWith(Names.named("PolicyResource")).to(PolicyResource.class);
     }
 
     /**

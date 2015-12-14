@@ -25,13 +25,13 @@ import java.util.EnumSet;
  */
 public enum PolicyAction {
 
-    EVALUATE("evaluate"), TREE_EVALUATE("evaluateTree"), UNKNOWN("unknown");
+    EVALUATE("evaluate"), TREE_EVALUATE("evaluateTree"), UNKNOWN("unknown"), COPY("copy"), MOVE("move");
 
     private static final EnumSet<PolicyAction> EVALUATE_ACTIONS = EnumSet.of(EVALUATE, TREE_EVALUATE);
 
     private final String actionName;
 
-    private PolicyAction(final String actionName) {
+    PolicyAction(final String actionName) {
         this.actionName = actionName;
     }
 
