@@ -317,8 +317,11 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
         String shallowestRealm = "/";
 
         for (String realm : realms) {
-            if (countMatches(realm, "/") < segmentCount) {
+            int currentCount = countMatches(realm, "/");
+
+            if (currentCount < segmentCount) {
                 shallowestRealm = realm;
+                segmentCount = currentCount;
             }
         }
 
