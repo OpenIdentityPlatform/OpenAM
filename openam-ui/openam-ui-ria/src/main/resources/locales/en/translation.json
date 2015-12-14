@@ -340,7 +340,7 @@
                 "atLeastOneNumber" : "At least one number",
                 "atLeast8Characters" : "At least 8 characters",
                 "cannotMatchLogin" : "Cannot match login",
-                "confirmationMatchesPassword" : "Confirmation must match password",
+                "confirmationMatchesPassword" : "Passwords must match",
                 "usernameExists" : "Username already exists",
                 "emailAddressAlreadyExists" : "Email address already exists",
                 "onlyAlphabeticCharacters" : "Only alphabetic characters",
