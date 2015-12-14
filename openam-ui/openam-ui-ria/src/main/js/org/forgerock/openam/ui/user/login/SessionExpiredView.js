@@ -35,6 +35,7 @@ define("org/forgerock/openam/ui/user/login/SessionExpiredView", [
                 params = LoginHelper.filterUrlParams(LoginHelper.getLoginUrlParams());
             }
 
+            LoginHelper.removeSessionCookie();
             Configuration.setProperty("loggedUser", null);
             delete Configuration.gotoURL;
             EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
