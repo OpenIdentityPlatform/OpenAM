@@ -166,7 +166,7 @@ public abstract class AjaxPage extends Page {
     protected Connection getConnection(String host, int port, String bindDN, char[] bindPwd, int timeout, boolean isSSl)
             throws GeneralSecurityException, LdapException {
         Options ldapOptions = Options.defaultOptions()
-                .set(CONNECT_TIMEOUT, new Duration((long)timeout, TimeUnit.MILLISECONDS))
+                .set(CONNECT_TIMEOUT, new Duration((long)timeout, TimeUnit.SECONDS))
                 .set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(bindDN, bindPwd));
 
         if (isSSl) {
