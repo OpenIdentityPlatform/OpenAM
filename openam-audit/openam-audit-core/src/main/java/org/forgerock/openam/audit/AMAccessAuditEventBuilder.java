@@ -19,7 +19,6 @@ import static java.util.Collections.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
-import static org.forgerock.openam.utils.ClientUtils.*;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -30,6 +29,8 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.http.MutableUri;
 import org.forgerock.http.protocol.Form;
@@ -37,10 +38,12 @@ import org.forgerock.http.protocol.Header;
 import org.forgerock.http.protocol.Headers;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
+import org.forgerock.openam.utils.ClientUtils.*;
 
 import com.iplanet.sso.SSOToken;
 
@@ -76,18 +79,17 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      * @return this builder
      */
     public final AMAccessAuditEventBuilder forHttpServletRequest(HttpServletRequest request) {
-        client(
-                getClientIPAddress(request),
-                request.getRemotePort());
-        server(
-                request.getLocalAddr(),
-                request.getLocalPort());
-        httpRequest(
-                request.isSecure(),
-                request.getMethod(),
-                request.getRequestURL().toString(),
-                getQueryParametersAsMap(request),
-                getHeadersAsMap(request));
+        String clientIpAddress = ClientUtils.getClientIPAddress(request);
+        String ipAddrHeader = SystemPropertiesManager.get(Constants.CLIENT_IP_ADDR_HEADER);
+        if (ipAddressHeaderPropertyIsSet(ipAddrHeader) && requestHasIpAddressHeader(request, ipAddrHeader)) {
+            client(clientIpAddress);
+        } else {
+            client(clientIpAddress, request.getRemotePort());
+        }
+
+        server(request.getLocalAddr(), request.getLocalPort());
+        httpRequest(request.isSecure(), request.getMethod(), request.getRequestURL().toString(),
+                getQueryParametersAsMap(request), getHeadersAsMap(request));
         return this;
     }
 
@@ -99,22 +101,24 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      * @return this builder
      */
     public final AMAccessAuditEventBuilder forRequest(Request request, Context context) {
-        ClientContext clientInfo = context.asContext(ClientContext.class);
-        client(
-                getClientIPAddress(context, request),
-                clientInfo.getRemotePort());
+        String clientIpAddress = ClientUtils.getClientIPAddress(context, request);
+        String ipAddrHeader = SystemPropertiesManager.get(Constants.CLIENT_IP_ADDR_HEADER);
+        if (ipAddressHeaderPropertyIsSet(ipAddrHeader) && requestHasIpAddressHeader(request, ipAddrHeader)) {
+            client(clientIpAddress);
+        } else {
+            ClientContext clientContext = context.asContext(ClientContext.class);
+            client(clientIpAddress, clientContext.getRemotePort());
+        }
+
         MutableUri uri = request.getUri();
         String uriScheme = request.getUri().getScheme();
         if (StringUtils.isNotEmpty(uriScheme)) {
             uriScheme = uriScheme.toLowerCase();
         }
         boolean isSecure = "https".equals(uriScheme);
-        httpRequest(
-                isSecure,
-                request.getMethod(),
+        httpRequest(isSecure, request.getMethod(),
                 uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + uri.getPath(),
-                getQueryParametersAsMap(request.getForm()),
-                getHeadersAsMap(request.getHeaders()));
+                getQueryParametersAsMap(request.getForm()), getHeadersAsMap(request.getHeaders()));
         return this;
     }
 
@@ -219,5 +223,19 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         Map<String, List<String>> queryParameters = new LinkedHashMap<>();
         queryParameters.putAll(form);
         return queryParameters;
+    }
+
+    private boolean ipAddressHeaderPropertyIsSet(String ipAddrHeader) {
+        return StringUtils.isNotBlank(ipAddrHeader);
+    }
+
+    private boolean requestHasIpAddressHeader(HttpServletRequest request, String ipAddrHeader) {
+        String result = request.getHeader(ipAddrHeader);
+        return StringUtils.isNotBlank(result);
+    }
+
+    private boolean requestHasIpAddressHeader(Request request, String ipAddrHeader) {
+        String result = request.getHeaders().getFirst(ipAddrHeader);
+        return StringUtils.isNotBlank(result);
     }
 }
