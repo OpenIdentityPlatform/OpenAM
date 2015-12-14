@@ -179,16 +179,6 @@
                 "changeSecurityData" : "Change Password",
                 "changeSiteIdentification" : "Change Site Identification"
             },
-            "UserRegistrationTemplate" : {
-                "registerYourAccount" : "Register your account",
-                "logIn" : "Log in",
-                "haveAccoutQuestion" : "Already have an account?",
-                "agreeToTerms" : "I agree to the %sterms of use%s",
-                "emailSubject" : "OpenAM Registration",
-                "emailMessage" : "Please go to the link below to continue the registration process:",
-                "emailSent" : "We have sent you an e-mail, please follow the link in the e-mail to complete the registration process.",
-                "registrationComplete" : "Registration complete"
-            },
             "RestLogoutTemplate" : {
                 "loggedOut" : "You have been logged out."
             },
