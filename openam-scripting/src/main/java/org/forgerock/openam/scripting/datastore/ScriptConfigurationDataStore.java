@@ -15,10 +15,10 @@
  */
 package org.forgerock.openam.scripting.datastore;
 
-import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
+import static com.sun.identity.shared.datastruct.CollectionHelper.*;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
-import static org.forgerock.openam.scripting.ScriptException.createAndLogError;
+import static org.forgerock.openam.scripting.ScriptException.*;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -27,19 +27,26 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.datastruct.ValueNotFoundException;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSDataEntry;
+import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.sm.ServiceConfigQueryFilterVisitor;
-import org.forgerock.util.query.QueryFilter;
+import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
+import org.forgerock.openam.sm.ServiceConfigQueryFilterVisitor;
 import org.forgerock.util.Reject;
+import org.forgerock.util.query.QueryFilter;
 import org.slf4j.Logger;
 
 import javax.security.auth.Subject;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -92,8 +99,19 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore {
 
     @Override
     public void delete(String uuid) throws ScriptException {
-        if (containsGlobalUuid(uuid)) {
-            throw new ScriptException(DELETING_DEFAULT_SCRIPT, uuid);
+        ScriptConfiguration scriptConfig = get(uuid);
+        if (containsGlobalUuid(uuid) || isDefaultScript(scriptConfig)) {
+            throw new ScriptException(DELETING_DEFAULT_SCRIPT, scriptConfig.getName());
+        }
+        int usageCount = getUsageCount(scriptConfig);
+        if (usageCount > 0) {
+            ScriptContext scriptContext = scriptConfig.getContext();
+            if (usageCount == 1) {
+                throw new ScriptException(DELETING_SCRIPT_IN_USE_SINGULAR, scriptConfig.getName());
+            }
+            throw new ScriptException(DELETING_SCRIPT_IN_USE_PLURAL,
+                    scriptConfig.getName(),
+                    Integer.toString(usageCount));
         }
         try {
             getSubOrgConfig().removeSubConfig(uuid);
@@ -318,7 +336,7 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore {
      * @throws SMSException If the sub configuration could not be read.
      * @throws SSOException If the Admin token could not be found.
      */
-    private ServiceConfig getSubOrgConfig()throws SMSException, SSOException {
+    private ServiceConfig getSubOrgConfig() throws SMSException, SSOException {
         final ServiceConfig config = getOrgConfig().getSubConfig(SCRIPT_CONFIGURATIONS);
         if (config == null) {
             throw new SMSException("Configuration '" + SCRIPT_CONFIGURATIONS + "' in organization '" + SERVICE_NAME +
@@ -333,14 +351,13 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore {
      * @throws SMSException If the sub configuration could not be read.
      * @throws SSOException If the Admin token could not be found.
      */
-    ServiceConfig getSubGlobalConfig()throws SMSException, SSOException {
+    ServiceConfig getSubGlobalConfig() throws SMSException, SSOException {
         final ServiceConfig config = getGlobalConfig().getSubConfig("globalScripts");
         if (config == null) {
             throw new SMSException("Global Configuration for '" + SERVICE_NAME + "' could not be retrieved.");
         }
         return config;
     }
-
 
     /**
      * Returns an admin SSO token for administrative actions.
@@ -353,5 +370,173 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore {
             throw new SSOException("Could not find Admin token.");
         }
         return token;
+    }
+
+    /**
+     * Determine how many times the specified script is used.  Zero is a valid answer.
+     * If the uuid is invalid, you will get an exception.
+     *
+     * @param script The script configuration.
+     * @return the context in which the script is used (Policy, Client Side Auth, etc.) and the usage count
+     * @throws ScriptException if passed an invalid UUID
+     */
+    private int getUsageCount(ScriptConfiguration script) throws ScriptException {
+
+        try {
+            switch (script.getContext()) {
+                case AUTHENTICATION_CLIENT_SIDE:
+                    return clientSideAuthenticationUsageCount(script.getId());
+                case AUTHENTICATION_SERVER_SIDE:
+                    return serverSideAuthenticationUsageCount(script.getId());
+                case OIDC_CLAIMS:
+                    return oidcClaimsUsageCount(script.getId());
+                case POLICY_CONDITION:
+                    return policyConditionUsageCount(script.getId());
+                default:
+                    throw new IllegalArgumentException(MessageFormat.format("unknown script context {} in script {}",
+                            script.getContext(),
+                            script.getName()));
+            }
+        } catch (SSOException | SMSException e) {
+            logger.error("getUsageCount failed with exception with script {} id {}",
+                    script.getName(),
+                    script.getId(),
+                    e);
+            return 0; // assume not used
+        }
+    }
+
+    private int getUsageCount(String dn, String search) throws SSOException, SMSException {
+        final SSOToken token = SubjectUtils.getSSOToken(subject);
+
+        try {
+            return SMSEntry.search(token, dn, search, 0, 0, false, false).size();
+        } catch (SMSException ignored) {
+            // We get this exception if the LDAP entry we are searching for doesn't exist.
+            // This can happen when we're looking for data under iPlanetAMAuthDeviceIdMatchService and we don't have
+            // any device id match scripts.
+        }
+        return 0;
+    }
+
+    /**
+     * Return true if the specifed script is a default script, false otherwise.
+     *
+     * @param scriptConfig the script config
+     * @return true if a default script, false otherwise.
+     */
+    private boolean isDefaultScript(ScriptConfiguration scriptConfig) {
+        try {
+            int usageCount = getUsageCount(getScriptingServiceGlobalConfig(),
+                    getDefaultScriptSearchString(scriptConfig.getId()));
+            return usageCount > 0;
+        } catch (SSOException | SMSException e) {
+            logger.error("isDefaultScript caught exception with script {} UUID {}",
+                    scriptConfig.getName(),
+                    scriptConfig.getId(),
+                    e);
+            return false; // assume it is not a default script
+        }
+    }
+
+    /**
+     * Count how many times the script identified by the specified uuid is used in client side authentication.
+     * @param uuid The specified uuid.
+     * @return the count of how many times the script is used in client side authentication
+     * @throws SMSException If the LDAP node could not be read.
+     * @throws SSOException If the Admin token could not be found.
+     */
+    private int clientSideAuthenticationUsageCount(String uuid) throws SSOException, SMSException {
+        return getUsageCount(getScriptedServiceBaseDN(), getClientSideScriptedAuthSearchString(uuid))
+                + getUsageCount(getDeviceIdMatchServiceBaseDN(), getClientSideScriptedAuthSearchString(uuid));
+    }
+
+    /**
+     * Count how many times the script identified by the specified uuid is used in server side authentication.
+     * @param uuid The specified uuid.
+     * @return the count of how many times the script is used in server side authentication
+     * @throws SMSException If the LDAP node could not be read.
+     * @throws SSOException If the Admin token could not be found.
+     */
+    private int serverSideAuthenticationUsageCount(String uuid) throws SSOException, SMSException {
+        return getUsageCount(getScriptedServiceBaseDN(), getServerSideScriptedAuthSearchString(uuid))
+                + getUsageCount(getDeviceIdMatchServiceBaseDN(), getServerSideScriptedAuthSearchString(uuid));
+    }
+
+    /**
+     * Count how many times the script identified by the specified uuid is used in OIDC claims.
+     * @param uuid The specified uuid.
+     * @return the count of how many times the script is used in OIDC Claims
+     * @throws SMSException If the LDAP node could not be read.
+     * @throws SSOException If the Admin token could not be found.
+     */
+    private int oidcClaimsUsageCount(String uuid) throws SSOException, SMSException {
+
+        SMSEntry smsEntry = new SMSEntry(getToken(), getOAuth2ProviderBaseDN());
+        Map<String, Set<String>> attributes = smsEntry.getAttributes();
+
+        try {
+            Set<String> sunKeyValues = getMapSetThrows(attributes, "sunKeyValue");
+            if (sunKeyValues.contains("forgerock-oauth2-provider-oidc-claims-extension-script=" + uuid)) {
+                return 1;
+            }
+        } catch (ValueNotFoundException ignored) {
+        }
+
+        return 0;
+    }
+
+    /**
+     * Count how many times the script identified by the specified uuid is used in policy evaluation.  This is done
+     * via an LDAP search for a policy which has the script's UUID encoded in the "serializable" field.
+     *
+     * @param uuid The specified uuid.
+     * @return The count of the number of times the script is used in policy evaluation
+     * @throws SMSException If the LDAP node could not be read.
+     * @throws SSOException If the Admin token could not be found.
+     */
+    private int policyConditionUsageCount(String uuid) throws SSOException, SMSException {
+        return getUsageCount(getPolicyBaseDN(), getPolicySearchString(uuid));
+    }
+
+    private String getScriptingServiceGlobalConfig() {
+        return "ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,"
+                + DNMapper.orgNameToDN(realm);
+    }
+
+    private String getOAuth2ProviderBaseDN() {
+        return "ou=default,ou=OrganizationConfig,ou=1.0,ou=OAuth2Provider,ou=services,"
+                + DNMapper.orgNameToDN(realm);
+    }
+
+    private String getScriptedServiceBaseDN() {
+        return "ou=default,ou=OrganizationConfig,ou=1.0,ou=iPlanetAMAuthScriptedService,ou=services,"
+                + DNMapper.orgNameToDN(realm);
+    }
+
+    private String getDeviceIdMatchServiceBaseDN() {
+        return "ou=default,ou=OrganizationConfig,ou=1.0,ou=iPlanetAMAuthDeviceIdMatchService,ou=services,"
+                + DNMapper.orgNameToDN(realm);
+    }
+
+    private String getPolicyBaseDN() {
+        return "ou=default,ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,"
+                + DNMapper.orgNameToDN(realm);
+    }
+
+    private String getDefaultScriptSearchString(String uuid) {
+        return "(&(sunserviceID=scriptContext)(sunKeyValue=defaultScript=" + uuid + "))";
+    }
+
+    private String getClientSideScriptedAuthSearchString(String uuid) {
+        return "(&(sunserviceID=serverconfig)(sunKeyValue=iplanet-am-auth-scripted-client-script=" + uuid + "))";
+    }
+
+    private String getServerSideScriptedAuthSearchString(String uuid) {
+        return "(&(sunserviceID=serverconfig)(sunKeyValue=iplanet-am-auth-scripted-server-script=" + uuid + "))";
+    }
+
+    private String getPolicySearchString(String uuid) {
+        return "(&(sunserviceID=indexes)(sunKeyValue=serializable*" + uuid + "*))";
     }
 }

@@ -116,7 +116,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
     static LinkedHashSet<String> orgAttr;
     static InternalClientConnection icConn;
     static LinkedHashSet<String> smsAttributes;
-    static final String SMS_EMBEDDED_LDAP_OBJECT_SEARCH_LIMIT = 
+    static final String SMS_EMBEDDED_LDAP_OBJECT_SEARCH_LIMIT =
         "com.sun.identity.sm.sms_embedded_ldap_object_search_limit";
     private ConfigAuditorFactory auditorFactory;
 
@@ -173,7 +173,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         }
         initialized = true;
     }
-    
+
     private void initializeNotification() {
         if (!initializedNotification) {
             // If cache is enabled, register for notification to maintian
@@ -197,8 +197,8 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
             debug.error("SMSEmbeddedLdapObject.read: Null or Empty DN=" + dn);
             throw new SMSException("", "sms-NO_SUCH_OBJECT");
         }
-        
-       
+
+
         if (!LDAPUtils.isDN(dn)) {
             debug.warning("SMSEmbeddedLdapObject: Invalid DN=" + dn);
             String[] args = {dn};
@@ -245,7 +245,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
             } else {
                 if (debug.warningEnabled()) {
                     debug.warning("SMSEmbeddedLdapObject.read: " +
-                       "Error in accessing entry DN: " + dn + 
+                       "Error in accessing entry DN: " + dn +
                        ", error code = " + resultCode);
                 }
                 throw new SMSException("", "sms-entry-cannot-access");
@@ -350,7 +350,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         // is no next suborg, delete that.
         Set subOrgNames = searchSubOrgNames(token, dn, "*", 0, false, false,
                 false);
-        
+
         for (Iterator so = subOrgNames.iterator(); so.hasNext(); ) {
             String subOrg = (String) so.next();
             if (debug.messageEnabled()) {
@@ -386,7 +386,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         if (filter == null) {
             filter = "*";
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("SMSEmbeddedLdapObject: SubEntries search: " + dn);
         }
@@ -472,7 +472,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
             debug.message("SMSEmbeddedLdapObject: schemaSubEntries search: " +
                 dn);
         }
-        
+
         // Construct the filter
         String[] objs = { filter, sidFilter };
         String sfilter = MessageFormat.format(
@@ -487,7 +487,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
     }
 
     public Iterator<SMSDataEntry> search(SSOToken token, String startDN, String filter,
-        int numOfEntries, int timeLimit, boolean sortResults, 
+        int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder, Set excludes)
         throws SSOException, SMSException {
 
@@ -506,8 +506,8 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                 debug.warning("SMSEmbeddedLdapObject.searchEx: Unable to " +
                     "search. startDN = " + startDN + ", filter = " +
                     filter + ", resultCode = " + resultCode);
-                throw new SMSException("", "sms-error-in-searching");
             }
+            throw new SMSException("", "sms-error-in-searching");
         }
 
         LinkedList searchResult = iso.getSearchEntries();
@@ -523,7 +523,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder) throws SSOException, SMSException {
         if (debug.messageEnabled()) {
-            debug.message("SMSEmbeddedLdapObject.search: startDN = " + 
+            debug.message("SMSEmbeddedLdapObject.search: startDN = " +
                 startDN + ", filter: " + filter);
         }
 
@@ -670,7 +670,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         throws SMSException {
         LDAPEventManager.addObjectChangeListener(changeListener);
     }
-    
+
      public void deregisterCallbackHandler(String id) {
          LDAPEventManager.removeObjectChangeListener();
      }
@@ -726,7 +726,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                 }
             }
         } catch (NamingException nne) {
-            throw (new SMSException(nne, 
+            throw (new SMSException(nne,
                 "sms-cannot-copy-fromModItemToModSet"));
         }
         return (modList);
@@ -869,7 +869,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
          * (sunxmlkeyvalue=ATTR_NAME=VALUE1))
          * (|(sunxmlkeyvalue=SERVICE_NAME-ATTR_NAME=VALUE2)
          * (sunxmlkeyvalue=ATTR_NAME=VALUE2))(...))
-         * 
+         *
          */
 
         StringBuilder sb = new StringBuilder();

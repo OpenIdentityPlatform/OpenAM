@@ -156,6 +156,11 @@ public class SmsJsonConverter {
                 validAttributes = schema.validateAttributes(attributeValuePairs, realm);
             }
         } catch (SMSException e) {
+            debug.error("schema validation threw an exception while validating the attributes: realm="
+                    + realm
+                    + " attributes: "
+                    + attributeValuePairs,
+                    e);
             throw new JsonException("Unable to validate attributes", e);
         }
 

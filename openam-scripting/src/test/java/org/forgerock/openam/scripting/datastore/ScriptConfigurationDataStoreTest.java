@@ -102,7 +102,7 @@ public class ScriptConfigurationDataStoreTest {
             fail("shouldFailIfConfigDoesNotExistOnDelete");
         } catch (ScriptException e) {
             // then
-            assertEquals(e.getScriptErrorCode(), DELETE_FAILED);
+            assertEquals(e.getScriptErrorCode(), RETRIEVE_FAILED);
         }
     }
 
@@ -121,7 +121,7 @@ public class ScriptConfigurationDataStoreTest {
             fail("shouldFailIfAttemptingToDeleteDefaultScript");
         } catch (ScriptException e) {
             // then
-            assertEquals(e.getScriptErrorCode(), DELETING_DEFAULT_SCRIPT);
+            assertEquals(e.getScriptErrorCode(), RETRIEVE_FAILED);
         }
     }
 
