@@ -24,7 +24,7 @@
  *
  * $Id: IdRepoAttributeValidatorImpl.java,v 1.1 2009/11/10 01:48:01 hengming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.idm.server;
 
@@ -32,9 +32,8 @@ import java.util.Map;
 import java.util.Set;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.IdOperation;
-import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoErrorCode;
-import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.PasswordPolicyException;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -78,7 +77,7 @@ public class IdRepoAttributeValidatorImpl implements IdRepoAttributeValidator {
 
     @Override
     public void validateAttributes(Map<String, Set<String>> attrMap,
-        IdOperation idOp) throws IdRepoException {
+        IdOperation idOp) throws PasswordPolicyException {
 
         if (minPasswordLength == 0) {
             return;
@@ -87,23 +86,20 @@ public class IdRepoAttributeValidatorImpl implements IdRepoAttributeValidator {
         attrMap = new CaseInsensitiveHashMap(attrMap);
 
         if (!attrMap.containsKey(ATTR_USER_PASSWORD)) {
-            if (idOp.equals(IdOperation.CREATE)) {
+            if (IdOperation.CREATE.equals(idOp)) {
                 Object[] args = { "" + minPasswordLength };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH,
-                    args);
+                throw new PasswordPolicyException(IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH, args);
             }
         } else {
             Set<String> values = attrMap.get(ATTR_USER_PASSWORD);
-            if ((values == null) || (values.isEmpty())) {
+            if (values == null || values.isEmpty()) {
                 Object[] args = { "" + minPasswordLength };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH,
-                    args);
+                throw new PasswordPolicyException(IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH, args);
             } else {
                 String password = values.iterator().next();
                 if (password.length() < minPasswordLength) {
                     Object[] args = { "" + minPasswordLength };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH,
-                        args);
+                    throw new PasswordPolicyException(IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH, args);
                 }
             }
         }

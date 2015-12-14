@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.idm;
 
@@ -62,6 +62,7 @@ public class IdRepoErrorCode {
     public static final String PERMISSION_DENIED_SETTING_ATTRIBUTES = "231";
     public static final String UNABLE_SYNC_URL_ACCESS_AGENT = "232";
     public static final String NO_SPACE_IDENTITY_NAMES = "233";
+    public static final String OLD_PASSWORD_INCORRECT = "234";
 
     // Plugin related error messages
     public static final String NO_PLUGINS_CONFIGURED = "301";

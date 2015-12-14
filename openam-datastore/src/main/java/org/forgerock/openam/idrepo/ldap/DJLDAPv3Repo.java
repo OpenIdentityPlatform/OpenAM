@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -37,6 +37,7 @@ import com.sun.identity.idm.IdRepoFatalException;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdRepoUnsupportedOpException;
 import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.PasswordPolicyException;
 import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.idm.common.IdRepoUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -437,7 +438,11 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             conn.modify(modifyRequest);
         } catch (LdapException ere) {
             DEBUG.error("An error occurred while trying to change password for identity: " + name, ere);
-            handleErrorResult(ere);
+            try {
+                handleErrorResult(ere);
+            } catch (IdRepoException e) {
+                throw new PasswordPolicyException(e);
+            }
         } finally {
             IOUtils.closeIfNotNull(conn);
         }

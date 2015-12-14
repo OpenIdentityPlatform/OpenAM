@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest;
 
@@ -22,25 +22,22 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.openam.ldap.LDAPConstants;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.errors.IdentityResourceExceptionMappingHandler;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.selfservice.core.SelfServiceContext;
 import org.forgerock.services.context.Context;
@@ -72,6 +69,9 @@ public final class IdentityRestUtils {
     private static final List<String> PASSWORD_ATTRIBUTES = Arrays.asList("userpassword", "unicodepwd");
     private static final Debug debug = Debug.getInstance("frRest");
 
+    private static final IdentityResourceExceptionMappingHandler RESOURCE_MAPPING_HANDLER =
+            InjectorHolder.getInstance(IdentityResourceExceptionMappingHandler.class);
+
     private IdentityRestUtils() {
     }
 
@@ -86,17 +86,7 @@ public final class IdentityRestUtils {
                     + "the password for user: " + username, ssoe);
             throw new PermanentException(401, "An error occurred while trying to change the password", ssoe);
         } catch (IdRepoException ire) {
-            if (IdRepoErrorCode.ACCESS_DENIED.equals(ire.getErrorCode())) {
-                throw new ForbiddenException("The user is not authorized to change the password");
-            } else if (LDAPConstants.LDAP_INVALID_CREDENTIALS.equals(ire.getLDAPErrorCode())){
-                throw ResourceException.newResourceException(401, "Invalid user credentials.");
-            } else if (LDAPConstants.LDAP_TYPE_OR_VALUE_EXISTS.equals(ire.getLDAPErrorCode())){
-                throw new ForbiddenException("Cannot update a password to the same value.");
-            } else {
-                debug.warning("IdentityRestUtils.changePassword() :: IdRepoException occurred while "
-                        + "changing the password for user: " + username, ire);
-                throw new InternalServerErrorException("An error occurred while trying to change the password", ire);
-            }
+            throw RESOURCE_MAPPING_HANDLER.handleError(ire);
         }
     }
 
@@ -164,7 +154,7 @@ public final class IdentityRestUtils {
      * are no illegal values in the incoming JSON
      *
      * @param context The context
-     * @param request The request
+     * @param jsonValue The request
      * @param objectType The type of object we're creating, user, group, etc.
      * @param validUserAttributes The set of valid user attributes
      * @throws BadRequestException If any attribute is found in the JSON representation of the user object containing

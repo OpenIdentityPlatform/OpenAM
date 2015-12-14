@@ -40,6 +40,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ConflictException;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.errors.ExceptionMappingHandler;
+import org.forgerock.openam.errors.IdentityResourceExceptionMappingHandler;
+import org.forgerock.openam.errors.IdentityServicesExceptionMappingHandler;
+import org.forgerock.openam.ldap.LDAPConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -77,20 +93,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.ConflictException;
-import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.errors.ExceptionMappingHandler;
-import org.forgerock.openam.errors.IdentityServicesExceptionMappingHandler;
-import org.forgerock.openam.ldap.LDAPConstants;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.utils.CrestQuery;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.Reject;
 
 /**
  * Web Service to provide security based on authentication and authorization support.
@@ -101,6 +103,9 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
 
     private final ExceptionMappingHandler<IdRepoException, IdServicesException> idServicesErrorHandler =
             InjectorHolder.getInstance(IdentityServicesExceptionMappingHandler.class);
+
+    private static final IdentityResourceExceptionMappingHandler RESOURCE_MAPPING_HANDLER =
+            InjectorHolder.getInstance(IdentityResourceExceptionMappingHandler.class);
 
     private static Debug debug = Debug.getInstance("amIdentityServices");
 
@@ -344,7 +349,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
                 throw new BadRequestException(ex);
             }
 
-            throw convertToResourceException(idServicesErrorHandler.handleError(ex));
+            throw RESOURCE_MAPPING_HANDLER.handleError(ex);
         } catch (SSOException ex) {
             debug.error("IdentityServicesImpl:update", ex);
             throw new BadRequestException(ex.getMessage());
@@ -409,7 +414,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             }
         } catch (IdRepoException ex) {
             debug.error("IdentityServicesImpl:delete", ex);
-            throw convertToResourceException(idServicesErrorHandler.handleError(ex));
+            throw RESOURCE_MAPPING_HANDLER.handleError(ex);
         } catch (SSOException ex) {
             debug.error("IdentityServicesImpl:delete", ex);
             throw new BadRequestException(ex.getMessage());
@@ -518,16 +523,6 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
         } catch (ObjectNotFound e) {
             debug.error("IdentityServicesImpl.searchIdentities", e);
             throw new NotFoundException(e.getMessage());
-        }
-    }
-
-    private ResourceException convertToResourceException(IdServicesException exception) {
-        if (exception.getClass().isAssignableFrom(ObjectNotFound.class)) {
-            return new NotFoundException(exception.getMessage());
-        } else if (exception.getClass().isAssignableFrom(AccessDenied.class)) {
-            return new ForbiddenException(exception.getMessage());
-        } else {
-            return new InternalServerErrorException(exception.getMessage());
         }
     }
 
