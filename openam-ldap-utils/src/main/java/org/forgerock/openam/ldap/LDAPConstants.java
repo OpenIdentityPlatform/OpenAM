@@ -240,6 +240,9 @@ public final class LDAPConstants {
     /** Unrecognized or invalid syntax for an attribute. */
     public static final String LDAP_INVALID_SYNTAX = "21";
 
+    /** An attribute is already set to the requested value. */
+    public static final String LDAP_TYPE_OR_VALUE_EXISTS = "20";
+
     /** Invalid credentials used for bind. */
     public static final String LDAP_INVALID_CREDENTIALS = "49";
 

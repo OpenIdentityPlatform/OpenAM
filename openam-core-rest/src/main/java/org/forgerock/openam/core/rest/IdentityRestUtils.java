@@ -88,6 +88,8 @@ public final class IdentityRestUtils {
                 throw new ForbiddenException("The user is not authorized to change the password");
             } else if (LDAPConstants.LDAP_INVALID_CREDENTIALS.equals(ire.getLDAPErrorCode())){
                 throw ResourceException.newResourceException(401, "Invalid user credentials.");
+            } else if (LDAPConstants.LDAP_TYPE_OR_VALUE_EXISTS.equals(ire.getLDAPErrorCode())){
+                throw new ForbiddenException("Cannot update a password to the same value.");
             } else {
                 debug.warning("IdentityRestUtils.changePassword() :: IdRepoException occurred while "
                         + "changing the password for user: " + username, ire);
