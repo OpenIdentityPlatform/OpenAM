@@ -244,6 +244,18 @@
             <destName>amverifyarchive.bat.template</destName>
             <filtered>true</filtered>
         </file>
+        <file>
+            <source>${project.basedir}/../src/main/amserver/scripts/log/verifyarchive</source>
+            <outputDirectory>template/unix/bin</outputDirectory>
+            <destName>verifyarchive.template</destName>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${project.basedir}/../src/main/amserver/scripts/log/verifyarchive.bat</source>
+            <outputDirectory>template/windows/bin</outputDirectory>
+            <destName>verifyarchive.bat.template</destName>
+            <filtered>true</filtered>
+        </file>
     </files>
 </assembly>
 
