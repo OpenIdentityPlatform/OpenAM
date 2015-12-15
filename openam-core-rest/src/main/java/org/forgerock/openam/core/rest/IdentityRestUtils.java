@@ -36,6 +36,8 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.ldap.LDAPConstants;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -84,6 +86,8 @@ public final class IdentityRestUtils {
         } catch (IdRepoException ire) {
             if (IdRepoBundle.ACCESS_DENIED.equals(ire.getErrorCode())) {
                 throw new ForbiddenException("The user is not authorized to change the password");
+            } else if (LDAPConstants.LDAP_INVALID_CREDENTIALS.equals(ire.getLDAPErrorCode())){
+                throw ResourceException.newResourceException(401, "Invalid user credentials.");
             } else {
                 debug.warning("IdentityRestUtils.changePassword() :: IdRepoException occurred while "
                         + "changing the password for user: " + username, ire);
