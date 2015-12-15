@@ -19,7 +19,9 @@ package org.forgerock.openam.uma;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.oauth2.core.ResourceSetFilter;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.uma.rest.ResourceSetService;
 
@@ -50,13 +52,17 @@ public class ResourceSetSharedFilter implements ResourceSetFilter {
     }
 
     @Override
-    public Set<ResourceSetDescription> filter(Set<ResourceSetDescription> values) {
+    public Set<ResourceSetDescription> filter(Set<ResourceSetDescription> values) throws ServerException {
         Set<ResourceSetDescription> results = new HashSet<>();
-        for(ResourceSetDescription resourceSetDescription: values) {
-            if(userId.equals(resourceSetDescription.getResourceOwnerId())
-                    || resourceSetService.isSharedWith(resourceSetDescription, userId, realm)) {
-               results.add(resourceSetDescription);
+        try {
+            for (ResourceSetDescription resourceSetDescription : values) {
+                if (userId.equals(resourceSetDescription.getResourceOwnerId())
+                        || resourceSetService.isSharedWith(resourceSetDescription, userId, realm)) {
+                    results.add(resourceSetDescription);
+                }
             }
+        } catch (InternalServerErrorException isee) {
+            throw new ServerException(isee);
         }
         return results;
     }

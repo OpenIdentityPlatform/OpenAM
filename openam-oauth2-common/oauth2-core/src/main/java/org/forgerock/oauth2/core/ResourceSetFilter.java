@@ -18,6 +18,7 @@ package org.forgerock.oauth2.core;
 
 import java.util.Set;
 
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 
 /**
@@ -31,5 +32,5 @@ public interface ResourceSetFilter {
      * @param values The set to filter.
      * @return The set with the filter applied.
      */
-    Set<ResourceSetDescription> filter(Set<ResourceSetDescription> values);
+    Set<ResourceSetDescription> filter(Set<ResourceSetDescription> values) throws ServerException;
 }

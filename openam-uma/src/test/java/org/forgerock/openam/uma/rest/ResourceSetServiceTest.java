@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 import javax.security.auth.Subject;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -288,7 +289,7 @@ public class ResourceSetServiceTest {
 
     private void mockPolicyEvaluator(String clientId) throws EntitlementException {
         Evaluator policyEvaluator = mock(Evaluator.class);
-        given(umaProviderSettings.getPolicyEvaluator(any(Subject.class))).willReturn(policyEvaluator);
+        given(umaProviderSettings.getPolicyEvaluator(any(Subject.class), anyString())).willReturn(policyEvaluator);
         given(policyEvaluator.evaluate(any(String.class), any(Subject.class), any(String.class), anyMap(),
                 any(Boolean.class))).willReturn(Collections.<Entitlement>emptyList());
         given(umaProviderSettings.getPolicyEvaluator(any(Subject.class), eq(clientId.toLowerCase())))
@@ -478,12 +479,17 @@ public class ResourceSetServiceTest {
         given(policyService.readPolicy(context, "RS_ID_ONE")).willReturn(policyOnePromise);
         given(policyService.readPolicy(context, "RS_ID_TWO")).willReturn(policyTwoPromise);
 
+
+        Entitlement entitlement = new Entitlement();
+        Map<String, Boolean> actionValues = new HashMap();
+        actionValues.put("actionValueKey", true);
+        entitlement.setActionValues(actionValues);
         Evaluator evaluator = mock(Evaluator.class);
-        given(umaProviderSettings.getPolicyEvaluator(any(Subject.class))).willReturn(evaluator);
+        given(umaProviderSettings.getPolicyEvaluator(any(Subject.class), anyString())).willReturn(evaluator);
         given(evaluator.evaluate(eq(realm), any(Subject.class), eq("RS_ONE"), isNull(Map.class), eq(false)))
-                .willReturn(singletonList(new Entitlement()));
+                .willReturn(singletonList(entitlement));
         given(evaluator.evaluate(eq(realm), any(Subject.class), eq("RS_TWO"), isNull(Map.class), eq(false)))
-                .willReturn(singletonList(new Entitlement()));
+                .willReturn(singletonList(entitlement));
         given(evaluator.evaluate(eq(realm), any(Subject.class), eq("RS_THREE"), isNull(Map.class), eq(false)))
                 .willReturn(Collections.<Entitlement>emptyList());
 

@@ -131,28 +131,20 @@ public class ResourceSetService {
                     public Promise<Set<ResourceSetDescription>, ResourceException> apply(
                             final Pair<QueryResponse, Collection<UmaPolicy>> result) {
                         final Set<ResourceSetDescription> sharedResourceSets = new HashSet<>();
-                        try {
-                            String realm = context.asContext(RealmContext.class).getResolvedRealm();
-                            Subject subject = createSubject(resourceOwnerId, realm);
-                            Evaluator evaluator = umaProviderSettingsFactory.get(RealmContext.getRealm(context)).getPolicyEvaluator(subject);
 
+                        String realm = RealmContext.getRealm(context);
+                        try {
                             for (UmaPolicy sharedPolicy : result.getSecond()) {
                                 if (!sharedResourceSets.contains(sharedPolicy.getResourceSet())) {
-                                    String sharedResourceName = sharedPolicy.getResourceSet().getName();
-                                    List<Entitlement> entitlements = evaluator.evaluate(realm, subject,
-                                            sharedResourceName, null, false);
-
-                                    if (!entitlements.isEmpty()) {
+                                    if (isSharedWith(sharedPolicy.getResourceSet(), resourceOwnerId, realm)) {
                                         sharedResourceSets.add(sharedPolicy.getResourceSet());
                                     }
                                 }
                             }
-                            return Promises.newResultPromise(sharedResourceSets);
-                        } catch (EntitlementException e) {
-                            return new InternalServerErrorException(e).asPromise();
-                        } catch (NotFoundException e) {
-                            return new org.forgerock.json.resource.NotFoundException(e).asPromise();
+                        } catch (InternalServerErrorException isee) {
+                            return isee.asPromise();
                         }
+                        return Promises.newResultPromise(sharedResourceSets);
                     }
                 });
     }
@@ -178,19 +170,21 @@ public class ResourceSetService {
      * @param realm The realm to check in.
      * @return @code{true} if the user can access that ResourceSet.
      */
-    public boolean isSharedWith(ResourceSetDescription resourceSet, String resourceUserId, String realm) {
+    public boolean isSharedWith(ResourceSetDescription resourceSet, String resourceUserId, String realm)
+            throws InternalServerErrorException{
         Subject subject = createSubject(resourceUserId, realm);
         try {
-            Evaluator evaluator = umaProviderSettingsFactory.get(realm).getPolicyEvaluator(subject);
-            String sharedResourceName = resourceSet.getName();
+            Evaluator evaluator = umaProviderSettingsFactory.get(realm).getPolicyEvaluator(subject,
+                    resourceSet.getClientId().toLowerCase());
+            String sharedResourceName = "uma://" + resourceSet.getId();
             List<Entitlement> entitlements = evaluator.evaluate(realm, subject,
                     sharedResourceName, null, false);
 
-            if (!entitlements.isEmpty()) {
+            if (!entitlements.isEmpty() && !entitlements.iterator().next().getActionValues().isEmpty()) {
                 return true;
             }
         } catch (EntitlementException | NotFoundException e) {
-            e.printStackTrace(); //TODO fix
+            throw new InternalServerErrorException(e);
         }
         return false;
     }
