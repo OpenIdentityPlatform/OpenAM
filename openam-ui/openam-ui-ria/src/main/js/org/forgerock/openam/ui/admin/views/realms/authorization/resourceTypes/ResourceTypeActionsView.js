@@ -107,7 +107,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 this.data.actions.push(pending);
                 this.updateEntity();
                 this.renderActionsTable(function () {
-                    self.$el.find(".editing input[type=text]").focus();
+                    self.$el.find(".editing input[type=text]").val("").focus();
                 });
             }
         },
