@@ -43,14 +43,20 @@
             <label class="col-sm-2 control-label">{{t "console.scripts.edit.language"}}</label>
 
             <div class="col-sm-9">
-                {{#each languages}}
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="language" id="{{id}}" value="{{id}}" data-field="language"
-                            {{#equals ../entity.language id}} checked {{/equals}}> {{name}}
-                    </label>
-                </div>
-                {{/each}}
+                {{#if languages.[1]}}
+                    {{#each languages}}
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="language" id="{{id}}" value="{{id}}" data-field="language"
+                                {{#equals ../entity.language id}} checked {{/equals}}> {{name}}
+                        </label>
+                    </div>
+                    {{/each}}
+                {{else}}
+                    {{#each languages}}
+                    <input class="form-control" value="{{name}}" readonly />
+                    {{/each}}
+                {{/if}}
             </div>
         </div>
 

@@ -260,13 +260,13 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
         validateScript: function () {
             var scriptText = this.scriptEditor.getValue(),
-                language = this.$el.find("input[name=language]:checked"),
+                language = this.data.entity.language,
                 script,
                 self = this;
 
             script = {
                 script: Base64.encodeUTF8(scriptText),
-                language: language.val()
+                language: language
             };
 
             ScriptsDelegate.validateScript(script).done(function (result) {
@@ -383,13 +383,21 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
             if (selectedContext.defaultScript === "[Empty]") {
                 this.data.entity.script = "";
-                this.data.entity.language = "";
+                if (this.data.languages.length === 1) {
+                    this.data.entity.language = this.data.languages[0].id;
+                } else {
+                    this.data.entity.language = "";
+                }
                 promise.resolve();
             } else {
                 defaultScript = new Script({ _id: selectedContext.defaultScript });
                 this.listenTo(defaultScript, "sync", function (model) {
+                    if (self.data.languages.length === 1) {
+                        self.data.entity.language = self.data.languages[0].id;
+                    } else {
+                        self.data.entity.language = model.attributes.language;
+                    }
                     self.data.entity.script = model.attributes.script;
-                    self.data.entity.language = model.attributes.language;
                     promise.resolve();
                 });
                 defaultScript.fetch();
