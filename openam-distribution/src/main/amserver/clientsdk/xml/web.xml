@@ -25,11 +25,10 @@
 
    $Id: web.xml,v 1.4 2008/08/19 19:08:17 veiming Exp $
 
+   Portions Copyrighted 2011-2015 ForgeRock AS.
 -->
-<!--
-   Portions Copyrighted 2011 ForgeRock AS
--->
-<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_0.xsd">
 
     <display-name>OpenSSO Web Application SDK Samples</display-name>
 

@@ -60,7 +60,6 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
     private Map<String, Object> internalAttributes = new HashMap<>();
     private String characterEncoding = null;
     private int contentLength = -1;
-    private long contentLengthLong = -1;
     private String contentType = null;
     private Map<String, String> internalParameters = new HashMap<>();
     private Map<String, String[]> internalParamererMap = new HashMap<>();
@@ -152,7 +151,6 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
         localName = getLocalName();
         localPort = getLocalPort();
         remotePort = getRemotePort();
-        contentLengthLong = getContentLengthLong();
         dispatcherType = getDispatcherType();
         
         Enumeration<Locale> lNames = getLocales();
@@ -314,11 +312,6 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      */
     public int getLocalPort() {
         return request != null ? this.request.getLocalPort() : localPort;
-    }
-
-    @Override
-    public long getContentLengthLong() {
-        return request != null ? this.request.getContentLengthLong() : contentLengthLong;
     }
 
     @Override

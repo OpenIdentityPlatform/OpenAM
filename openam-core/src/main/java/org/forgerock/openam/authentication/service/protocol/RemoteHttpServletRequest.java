@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2015 ForgeRock, Inc. All Rights Reserved
+ * Copyright 2010-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
-import javax.servlet.http.ProtocolHandler;
 
 /**
  * This class encapsulates a HttpServletRequest extending from RemoteServletRequest.
@@ -420,15 +419,6 @@ public class RemoteHttpServletRequest extends RemoteServletRequest implements Ht
     }
 
     @Override
-    public String changeSessionId() {
-        if (this._getHttpServletRequest() != null) {
-            return this._getHttpServletRequest().changeSessionId();
-        } else {
-            throw new IllegalStateException();
-        }
-    }
-
-    @Override
     public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
         return this._getHttpServletRequest() != null && this._getHttpServletRequest().authenticate(response);
     }
@@ -456,13 +446,6 @@ public class RemoteHttpServletRequest extends RemoteServletRequest implements Ht
     @Override
     public Part getPart(String name) throws IOException, ServletException {
          return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getPart(name) : null;
-    }
-
-    @Override
-    public void upgrade(ProtocolHandler handler) throws IOException {
-        if (this._getHttpServletRequest() != null) {
-            this._getHttpServletRequest().upgrade(handler);
-        }
     }
 
 }

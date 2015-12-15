@@ -94,8 +94,8 @@ public class RestEndpointServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        given(request.getHeaderNames()).willReturn(Collections.enumeration(Collections.emptySet()));
-        given(request.getAttributeNames()).willReturn(Collections.enumeration(Collections.emptySet()));
+        given(request.getHeaderNames()).willReturn(Collections.enumeration(Collections.<String>emptySet()));
+        given(request.getAttributeNames()).willReturn(Collections.enumeration(Collections.<String>emptySet()));
         given(request.getServletPath()).willReturn(path);
 
         restEndpointServlet.init();

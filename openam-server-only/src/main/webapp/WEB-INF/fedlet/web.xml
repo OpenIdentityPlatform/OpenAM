@@ -26,12 +26,10 @@
 
    $Id: web.xml,v 1.5 2010/01/07 00:22:19 exu Exp $
 
--->
-<!--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2011-2015 ForgeRock AS.
 -->
 
-<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_0.xsd">
     <display-name>Fedlet Sample Application</display-name>
     <distributable/>
 
