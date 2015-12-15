@@ -15,6 +15,10 @@
  */
 package com.sun.identity.log.service;
 
+import static org.forgerock.openam.utils.StringUtils.isEmpty;
+
+import org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,8 +31,8 @@ final class AgentLogParser {
 
     private enum Extractor {
 
-        WEB_AGENT("^user (\\S+) was (\\S+) access to (\\S+)$", 3, 1, 2),
-        JAVA_AGENT("^access to (\\S+) (\\S+) for user (\\S+)$", 1, 3, 2);
+        WEB_AGENT("^user\\s+(\\S+)\\s*was\\s*(\\S+)\\s*access to\\s*(\\S+)$", 3, 1, 2),
+        JAVA_AGENT("^access to\\s*(\\S+)\\s+(\\S+)\\s*for user\\s*(\\S+)$", 1, 3, 2);
 
         final Pattern pattern;
         final int resourceIndex;
@@ -79,12 +83,12 @@ final class AgentLogParser {
 
         private final String resourceUrl;
         private final String subjectId;
-        private final String status;
+        private final String statusCode;
 
-        private LogExtracts(String resourceUrl, String subjectId, String status) {
+        private LogExtracts(String resourceUrl, String subjectId, String statusCode) {
             this.resourceUrl = resourceUrl;
             this.subjectId = subjectId;
-            this.status = status;
+            this.statusCode = statusCode;
         }
 
         String getResourceUrl() {
@@ -95,8 +99,26 @@ final class AgentLogParser {
             return subjectId;
         }
 
-        String getStatus() {
-            return status;
+        String getStatusCode() {
+            return statusCode;
+        }
+
+        ResponseStatus getStatus() {
+            if (isEmpty(statusCode)) {
+                return null;
+            }
+
+            // statusCode can be "allowed"
+            if (statusCode.length() == 7) {
+                return ResponseStatus.SUCCESSFUL;
+            }
+
+            // or "denied"
+            if (statusCode.length() == 6) {
+                return ResponseStatus.FAILED;
+            }
+
+            return null;
         }
 
     }

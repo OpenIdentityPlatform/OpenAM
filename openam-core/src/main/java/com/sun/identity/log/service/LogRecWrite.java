@@ -234,7 +234,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
 
         AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
-                .eventName(EventName.AM_ACCESS_ATTEMPT)
+                .eventName(EventName.AM_ACCESS_OUTCOME)
                 .component(Component.POLICY_AGENT)
                 .userId(clientId)
                 .httpRequest(hasSecureScheme(resourceUrl), "UNKNOWN", path, queryParameters,
@@ -242,7 +242,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
                 .request("HTTP", "UNKNOWN")
                 .client(clientIp)
                 .trackingId(contextId)
-                .response(null, logExtracts.getStatus(), -1, MILLISECONDS)
+                .response(logExtracts.getStatus(), logExtracts.getStatusCode(), -1, MILLISECONDS)
                 .toEvent();
 
         auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, auditEvent);
