@@ -68,6 +68,7 @@ import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.setup.ServicesDefaultValues;
@@ -205,7 +206,7 @@ public class IdRepoUtils {
                     idRepoName + " for realm " + realm + " doesn't exist.");
                 }
                 Object args[] = { idRepoName, realm };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "317",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_DOESNT_EXIST_FOR_REALM,
                     args);
             }
 
@@ -234,19 +235,21 @@ public class IdRepoUtils {
                 DEBUG.message("IdRepoUtils.loadIdRepoSchema:", smsex);
             }
             Object args[] = { idRepoName, realm };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "314", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_READ_PLUGIN_FOR_REALM, args);
         } catch (SSOException ssoex) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("IdRepoUtils.loadIdRepoSchema:", ssoex);
             }
             Object args[] = { idRepoName, realm };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "315", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.UNABLE_READ_PLUGING_FOR_REALM_SSOTOKEN_NOT_VALID, args);
         } catch (Exception ex) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("IdRepoUtils.loadIdRepoSchema:", ex);
             }
             Object args[] = { idRepoName, realm, ex.getMessage() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "316", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.UNABLE_LOAD_SCHEMA_FOR_PLUGIN_FOR_REALM, args);
        }
     }
 
@@ -335,7 +338,7 @@ public class IdRepoUtils {
             if (DEBUG.warningEnabled()) {
                 DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAPURLs found");
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_AUTHENTICATE_LDAP_SERVER, null);
         }
 
         LDAPURL ldapUrl = ldapUrls.iterator().next();
@@ -343,7 +346,7 @@ public class IdRepoUtils {
             if (DEBUG.warningEnabled()) {
                 DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAP host found");
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_AUTHENTICATE_LDAP_SERVER, null);
         }
 
         // All connections will use authentication
@@ -352,14 +355,14 @@ public class IdRepoUtils {
             if (DEBUG.warningEnabled()) {
                 DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAP bindDN found");
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_AUTHENTICATE_LDAP_SERVER, null);
         }
         String bindPwd = CollectionHelper.getMapAttr(attrValues, "sun-idrepo-ldapv3-config-authpw");
         if (org.forgerock.openam.utils.StringUtils.isBlank(bindPwd)) {
             if (DEBUG.warningEnabled()) {
                 DEBUG.warning("IdRepoUtils.getLDAPConnection: No LDAP bindPW found");
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_AUTHENTICATE_LDAP_SERVER, null);
         }
         options = options.set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(bindDn, bindPwd.getBytes()));
 

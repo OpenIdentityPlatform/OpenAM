@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -41,6 +41,7 @@ import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoDuplicateObjectException;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
@@ -94,7 +95,8 @@ public class GenericRepoTest extends IdRepoTestBase {
             fail();
         } catch (Exception ex) {
             assertThat(ex).isInstanceOf(IdRepoException.class)
-                    .hasMessage(getIdRepoExceptionMessage("306", DJLDAPv3Repo.class.getName(), "49"));
+                    .hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.LDAP_EXCEPTION_OCCURRED,
+                            DJLDAPv3Repo.class.getName(), "49"));
         }
     }
 
@@ -171,7 +173,7 @@ public class GenericRepoTest extends IdRepoTestBase {
             fail();
         } catch (IdRepoException ire) {
             assertThat(ire).isInstanceOf(IdRepoException.class)
-                    .hasMessage(getIdRepoExceptionMessage("223", "invalid", "user"));
+                    .hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.TYPE_NOT_FOUND, "invalid", "user"));
         }
     }
 
@@ -217,7 +219,7 @@ public class GenericRepoTest extends IdRepoTestBase {
             idrepo.delete(null, IdType.USER, "invalid");
             fail();
         } catch (IdRepoException ire) {
-            assertThat(ire).hasMessage(getIdRepoExceptionMessage("223", "invalid", IdType.USER.getName()));
+            assertThat(ire).hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.TYPE_NOT_FOUND, "invalid", IdType.USER.getName()));
         }
     }
 
@@ -234,7 +236,7 @@ public class GenericRepoTest extends IdRepoTestBase {
             idrepo.setAttributes(null, IdType.USER, DEMO, Collections.EMPTY_MAP, true);
             fail();
         } catch (IdRepoException ire) {
-            assertThat(ire).hasMessage(getIdRepoExceptionMessage("201"));
+            assertThat(ire).hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.ILLEGAL_ARGUMENTS));
         }
     }
 
@@ -304,7 +306,7 @@ public class GenericRepoTest extends IdRepoTestBase {
             idrepo.removeAttributes(null, IdType.USER, DEMO, asSet("l"));
             fail();
         } catch (IdRepoException ire) {
-            assertThat(ire).hasMessage(getIdRepoExceptionMessage("201"));
+            assertThat(ire).hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.ILLEGAL_ARGUMENTS));
         }
     }
 
@@ -417,7 +419,7 @@ public class GenericRepoTest extends IdRepoTestBase {
             fail();
         } catch (Exception ex) {
             assertThat(ex).isInstanceOf(IdRepoDuplicateObjectException.class)
-                    .hasMessage(getIdRepoExceptionMessage("310", TEST1_GROUP));
+                    .hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.NAME_ALREADY_EXISTS, TEST1_GROUP));
         }
     }
 
@@ -467,7 +469,8 @@ public class GenericRepoTest extends IdRepoTestBase {
                     new HashMap<String, Set<String>>());
             fail();
         } catch (IdRepoException ire) {
-            assertThat(ire).hasMessage(getIdRepoExceptionMessage("213", DJLDAPv3Repo.class.getName()));
+            assertThat(ire).hasMessage(getIdRepoExceptionMessage(
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, DJLDAPv3Repo.class.getName()));
         }
     }
 
@@ -506,7 +509,8 @@ public class GenericRepoTest extends IdRepoTestBase {
             idrepo.getAssignedServices(null, IdType.GROUP, DEMO, null);
             fail();
         } catch (IdRepoException ire) {
-            assertThat(ire).hasMessage(getIdRepoExceptionMessage("213", DJLDAPv3Repo.class.getName()));
+            assertThat(ire).hasMessage(getIdRepoExceptionMessage(
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, DJLDAPv3Repo.class.getName()));
         }
     }
 

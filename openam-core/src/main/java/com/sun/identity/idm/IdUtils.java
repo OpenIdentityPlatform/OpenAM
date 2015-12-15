@@ -286,7 +286,7 @@ public final class IdUtils {
         if (amsdkdn == null || !LDAPUtils.isDN(amsdkdn)) {
             Object[] args = { amsdkdn };
             throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                "215", args));
+                    IdRepoErrorCode.ILLEGAL_UNIVERSAL_IDENTIFIER, args));
         }
         DN amsdkdnObject = LDAPUtils.newDN(amsdkdn);
 
@@ -427,7 +427,8 @@ public final class IdUtils {
         IdType returnType = (IdType) mapSupportedTypes.get(type);
         if (returnType == null) {
             Object args[] = { type };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "217", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.NOT_SUPPORTED_TYPE, args);
         }
         return returnType;
     }
@@ -478,7 +479,7 @@ public final class IdUtils {
             } catch (SMSException e) {
                 debug.message("IdUtils.getOrganization Exception in getting org name from SMS", e);
                 Object[] args = { orgIdentifier };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "401", args);
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
             }
         } else if (LDAPUtils.isDN(orgIdentifier)) {
             id = orgIdentifier;
@@ -493,8 +494,7 @@ public final class IdUtils {
                             + "getting org name from SMS", smse);
                 }
                 Object[] args = { orgIdentifier };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "401", 
-                        args);            	
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
             }
         } else if (ServiceManager.isCoexistenceMode()) {
             // Return the org DN as determined by AMStoreConnection
@@ -549,7 +549,7 @@ public final class IdUtils {
                                     } else {
                                         Object[] args = {orgIdentifier};
                                         throw new IdRepoException(IdRepoBundle
-                                            .BUNDLE_NAME, "404", args);
+                                            .BUNDLE_NAME, IdRepoErrorCode.MULTIPLE_MAPPINGS_FOUND, args);
                                     }
                                 }
                             }
@@ -576,7 +576,7 @@ public final class IdUtils {
                     }
                     Object[] args = {orgIdentifier};
                     throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                        "401", args);
+                            IdRepoErrorCode.NO_MAPPING_FOUND, args);
                 } else if ((orgAliases != null)  && (orgAliases.size() > 0) &&
                     (foundOrg || orgAliases.size() > 1)) {
                     // Multiple realms should not have the same alias
@@ -586,7 +586,7 @@ public final class IdUtils {
                     }
                     Object[] args = {orgIdentifier};
                     throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                        "404", args);
+                            IdRepoErrorCode.MULTIPLE_MAPPINGS_FOUND, args);
                 }
                 if (!foundOrg) {
                     String tmpS = (String) orgAliases.iterator().next();
@@ -599,8 +599,7 @@ public final class IdUtils {
                             + "getting org name from SMS", smse);
                 }
                 Object[] args = { orgIdentifier };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "401", 
-                        args);
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
             }
         }
 
@@ -656,8 +655,7 @@ public final class IdUtils {
                         token, org);
                 if (ocm == null) {
                     Object[] args = { org };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "401",
-                            args);
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
                 }
                 Map attributes = ocm.getAttributes(IdConstants.REPO_SERVICE);
                 Set vals = (Set) attributes
@@ -670,8 +668,7 @@ public final class IdUtils {
                 }
             } catch (SMSException smse) {
                 Object args[] = { org };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "401", 
-                        args);
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
             }
         } else if (ServiceManager.isAMSDKEnabled()) {
             // Return the org DN as determined by AMStoreConnection.
@@ -811,7 +808,8 @@ public final class IdUtils {
             String realm = DNUtils.normalizeDN(id.getRealm());
             if (!DNUtils.normalizeDN(orgName).equals(realm)) {
                 Object[] args = {uuid, orgName};
-		throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "403", args);
+		throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.REALM_NAME_NOT_MATCH_AUTHENTICATION_REALM,
+                args);
             }
         }
         return (username);

@@ -24,8 +24,8 @@
  *
  * $Id: AgentMigration71.java,v 1.5 2008/08/19 19:09:10 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 package com.sun.identity.idm;
 
 import java.security.AccessController;
@@ -62,9 +62,9 @@ public class AgentMigration71 {
             if (!orgSet.isEmpty()) {
                 getSet.addAll(orgSet);
             } 
-            System.out.println(IdRepoBundle.getString("500"));
+            System.out.println(IdRepoBundle.getString(IdRepoErrorCode.MIGRATION_START));
             Object [] args = { getSet.toString() };
-            System.out.println(IdRepoBundle.getString("501", args));
+            System.out.println(IdRepoBundle.getString(IdRepoErrorCode.MIGRATION_GETTING_SUBREALMS, args));
 
             String p = IdConstants.AGENTREPO_PLUGIN;
             Class thisClass = Class.forName(p);
@@ -85,7 +85,7 @@ public class AgentMigration71 {
                     AMIdentity iden = (AMIdentity) it.next();
                     String idName = iden.getName();
                     Object[] args1 = { idName };
-                    System.out.println(IdRepoBundle.getString("502", args1));
+                    System.out.println(IdRepoBundle.getString(IdRepoErrorCode.MIGRATION_IDNAME, args1));
                     Map attrs = iden.getAttributes();
                     attrs.remove("cn");
                     attrs.remove("dn");
@@ -102,7 +102,7 @@ public class AgentMigration71 {
                         attrs.put("sunIdentityServerDeviceStatus", dSet);
                     }
                     Object[] args2 = { attrs.toString() };
-                    System.out.println(IdRepoBundle.getString("503", args2));
+                    System.out.println(IdRepoBundle.getString(IdRepoErrorCode.MIGRATION_AGENT_ATTRIBUTES, args2));
                     thisPlugin.create(token, IdType.AGENTONLY, idName, attrs);
                 }
                 // Now upgrade scripts should reset the revision number of 
@@ -110,9 +110,9 @@ public class AgentMigration71 {
                 // as IdRepo Plugin and to display these migrated agents
                 // under 'Configuration/Agents' tab.
             }
-            System.out.println(IdRepoBundle.getString("505"));
+            System.out.println(IdRepoBundle.getString(IdRepoErrorCode.MIGRATION_COMPLETED));
         } catch (Exception ex2) {
-            System.out.println(IdRepoBundle.getString("504"));
+            System.out.println(IdRepoBundle.getString(IdRepoErrorCode.MIGRATION_TO_FAM80_FAILED));
             ex2.printStackTrace();
         }
     }

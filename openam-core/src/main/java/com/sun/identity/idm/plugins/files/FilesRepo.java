@@ -24,10 +24,7 @@
  *
  * $Id: FilesRepo.java,v 1.22 2008/07/02 17:21:21 kenwho Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm.plugins.files;
 
@@ -67,6 +64,7 @@ import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoDuplicateObjectException;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdRepoUnsupportedOpException;
@@ -317,7 +315,7 @@ public class FilesRepo extends IdRepo {
         } else {
             Object args[] = { NAME, IdOperation.SERVICE.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
     }
 
@@ -364,7 +362,7 @@ public class FilesRepo extends IdRepo {
             Object args[] = { NAME, IdOperation.SERVICE.getName(),
                 type.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
         return (name);
     }
@@ -575,7 +573,8 @@ public class FilesRepo extends IdRepo {
         if (!type.equals(IdType.ROLE) && !type.equals(IdType.GROUP)) {
             debug.message(
                 "FilesRepo.getMembers supported for roles and groups");
-            throw new IdRepoException(IdRepoBundle.getString("203"), "203");
+            throw new IdRepoException(IdRepoBundle.getString(IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED),
+                    IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED);
         }
 
         // Set to maintain the members
@@ -625,7 +624,7 @@ public class FilesRepo extends IdRepo {
             // throw unsupported operation exception
             Object args[] = {NAME, IdOperation.READ.getName(), type.getName()};
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
         return (results);
     }
@@ -654,7 +653,7 @@ public class FilesRepo extends IdRepo {
             debug.message(
                 "FilesRepo:getMemberships supported for users and agents");
             Object args[] = { NAME };
-            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args));
+            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, args));
         }
 
         // Set to maintain the members
@@ -696,7 +695,7 @@ public class FilesRepo extends IdRepo {
             Object args[] = { NAME, IdOperation.READ.getName(),
                 membershipType.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
         return (results);
     }
@@ -758,7 +757,7 @@ public class FilesRepo extends IdRepo {
             // Unsupported Operation
             Object args[] = { NAME, IdOperation.SERVICE.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
 
         // Get attributes from Identity Object
@@ -900,14 +899,16 @@ public class FilesRepo extends IdRepo {
         }
         if ((members == null) || members.isEmpty()) {
             debug.message("FilesRepo.modifyMemberShip: Members set is empty");
-            throw new IdRepoException(IdRepoBundle.getString("201"), "201");
+            throw new IdRepoException(IdRepoBundle.getString(IdRepoErrorCode.ILLEGAL_ARGUMENTS),
+                    IdRepoErrorCode.ILLEGAL_ARGUMENTS);
         }
         if (type.equals(IdType.USER) || type.equals(IdType.AGENT)) {
             if (debug.messageEnabled()) {
                 debug.message("FilesRepo.modifyMemberShip: "
                     + "Membership to users and agents is not supported");
             }
-            throw new IdRepoException(IdRepoBundle.getString("203"), "203");
+            throw new IdRepoException(IdRepoBundle.getString(IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED),
+                    IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED);
         }
         if (!membersType.equals(IdType.USER) &&
             !membersType.equals(IdType.AGENT)
@@ -918,7 +919,7 @@ public class FilesRepo extends IdRepo {
                     membersType.getName());
             }
             Object[] args = { NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, args);
         }
         if (type.equals(IdType.GROUP)) {
             // add the identities to the user's group membership
@@ -966,7 +967,7 @@ public class FilesRepo extends IdRepo {
             }
         } else {
             Object[] args = { NAME, type.getName() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "209", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIP_CANNOT_BE_MODIFIED, args);
         }
     }
 
@@ -1301,7 +1302,7 @@ public class FilesRepo extends IdRepo {
         Map attributes = getAttributes(token, type, name);
         if (attributes == null) {
             Object[] args = { NAME, name };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NOT_VALID_ENTRY, args);
         }
         Set activeVals = (Set) attributes.get(statusAttribute);
         if (activeVals == null || activeVals.isEmpty()) {
@@ -1366,7 +1367,7 @@ public class FilesRepo extends IdRepo {
         Set dns = results.getSearchResults();
         if (dns != null || dns.size() != 1) {
             String[] args = { NAME, name };
-            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, "220", args));
+            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_FIND_ENTRY, args));
         }
         return ("files://FilesRepo/" + type.getName() + "/" +
             dns.iterator().next().toString());
@@ -1473,11 +1474,11 @@ public class FilesRepo extends IdRepo {
         if (!root.exists() && !root.mkdirs()) {
             // Unable to create the directory
             Object args[] = { root.getAbsolutePath() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "309", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_CREATE_DIRECTORY, args);
         } else if (!root.isDirectory()) {
             // Not a directory
             Object args[] = { root.getAbsolutePath() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "308", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NOT_DIRECTORY, args);
         }
         // Check sub-directories
         Set types = supportedOps.keySet();
@@ -1487,12 +1488,12 @@ public class FilesRepo extends IdRepo {
             if (!dir.exists() && !dir.mkdir()) {
                 // Unable to create the directory
                 String args[] = { dir.getAbsolutePath() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "309",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_CREATE_DIRECTORY,
                     args);
             } else if (!dir.isDirectory()) {
                 // Not a directory
                 String args[] = { dir.getAbsolutePath() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "308",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NOT_DIRECTORY,
                     args);
             }
             if (subDir.equals(IdType.REALM.getName())) {
@@ -1536,7 +1537,7 @@ public class FilesRepo extends IdRepo {
                 debug.message("FilesRepo.writeFile: file = " + fileName, e);
             }
             String[] args = { NAME, fileName };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "220", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_FIND_ENTRY, args);
         } finally {
             if (pw != null) {
                 pw.close();
@@ -1597,14 +1598,14 @@ public class FilesRepo extends IdRepo {
             }
             String[] args = { NAME, fileName };
             throw new FilesRepoEntryNotFoundException(IdRepoBundle.BUNDLE_NAME,
-                "220", args);
+                    IdRepoErrorCode.UNABLE_FIND_ENTRY, args);
         } catch (IOException e) {
             if (debug.messageEnabled()) {
                 debug.message("FilesRepo.readFile: error reading file: " +
                     fileName, e);
             }
             String[] args = { NAME, fileName };
-            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, "220", args));
+            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_FIND_ENTRY, args));
         } finally {
             if (br != null) {
                 try {

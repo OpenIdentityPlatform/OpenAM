@@ -38,8 +38,8 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
-import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoDuplicateObjectException;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchOpModifier;
@@ -212,7 +212,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             throw new ConflictException("Resource already exists", ex);
         } catch (IdRepoException e) {
             debug.error("IdentityServicesImpl:create", e);
-            if (IdRepoBundle.ACCESS_DENIED.equals(e.getErrorCode())) {
+            if (IdRepoErrorCode.ACCESS_DENIED.equals(e.getErrorCode())) {
                 throw new ForbiddenException(e.getMessage());
             } else {
                 throw new NotFoundException(e.getMessage());
@@ -331,11 +331,11 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
         } catch (IdRepoException ex) {
             debug.error("IdentityServicesImpl:update", ex);
 
-            if (LDAPConstants.CONSTRAINT_VIOLATED_ERROR.equals(ex.getErrorCode())) {
+            if (IdRepoErrorCode.LDAP_EXCEPTION.equals(ex.getErrorCode())) {
                 throw new InternalServerErrorException(ex.getConstraintViolationDetails());
             } else if (LDAPConstants.LDAP_INVALID_SYNTAX.equals(ex.getLDAPErrorCode())) {
                 throw new BadRequestException("Unrecognized or invalid syntax for an attribute.");
-            } else if (LDAPConstants.ILLEGAL_ARGS_ERROR.equals(ex.getErrorCode())) {
+            } else if (IdRepoErrorCode.ILLEGAL_ARGUMENTS.equals(ex.getErrorCode())) {
                 throw new BadRequestException(ex);
             }
 
@@ -1034,7 +1034,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
 
                 // If it is error code 215, ignore the error as this indicates
                 // an invalid uid.
-                if (!"215".equals(errCode)) {
+                if (!IdRepoErrorCode.ILLEGAL_UNIVERSAL_IDENTIFIER.equals(errCode)) {
                     throw ex;
                 }
             }

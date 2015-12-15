@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -26,6 +26,7 @@ import org.forgerock.opendj.ldap.ResultCode;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 
@@ -67,7 +68,7 @@ public class ADBasicRepoTest extends IdRepoTestBase {
             idrepo.getAttributes(null, IdType.USER, "badger");
             fail();
         } catch (IdentityNotFoundException infe) {
-            assertThat(infe).hasMessage(getIdRepoExceptionMessage("223", "badger", IdType.USER.getName()));
+            assertThat(infe).hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.TYPE_NOT_FOUND, "badger", IdType.USER.getName()));
             assertThat(infe.getLDAPErrorCode()).isNotNull().isEqualTo(
                     String.valueOf(ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED.intValue()));
         }
@@ -79,7 +80,8 @@ public class ADBasicRepoTest extends IdRepoTestBase {
             idrepo.getFullyQualifiedName(null, IdType.USER, "duplicate");
             fail();
         } catch (IdRepoException ire) {
-            assertThat(ire).hasMessage(getIdRepoExceptionMessage("306", DJLDAPv3Repo.class.getName(),
+            assertThat(ire).hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.LDAP_EXCEPTION_OCCURRED,
+                    DJLDAPv3Repo.class.getName(),
                     ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED.intValue()));
             assertThat(ire.getLDAPErrorCode()).isNotNull().isEqualTo(
                     String.valueOf(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED.intValue()));

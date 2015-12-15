@@ -12,7 +12,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.idm;
@@ -48,19 +48,19 @@ public class IdRepoDuplicateObjectException extends IdRepoException {
     }
 
     /**
-     * Create an instance using the localized {@link IdRepoBundle#NAME_ALREADY_EXISTS }
+     * Create an instance using the localized {@link IdRepoErrorCode#NAME_ALREADY_EXISTS }
      * error message populated with the provided name.
      *
      * @param name An identity name that is already taken
      * @return exception with localized error message
      */
     public static IdRepoDuplicateObjectException nameAlreadyExists(String name) {
-        return new IdRepoDuplicateObjectException(IdRepoBundle.BUNDLE_NAME, IdRepoBundle.NAME_ALREADY_EXISTS,
+        return new IdRepoDuplicateObjectException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NAME_ALREADY_EXISTS,
                 new String[] { name });
     }
 
     /**
-     * Create an instance using the localized {@link IdRepoBundle#IDENTITY_OF_TYPE_ALREADY_EXISTS }
+     * Create an instance using the localized {@link IdRepoErrorCode#IDENTITY_OF_TYPE_ALREADY_EXISTS }
      * error message populated with the provided name and type.
      *
      * @param name An identity name that is already taken
@@ -69,7 +69,7 @@ public class IdRepoDuplicateObjectException extends IdRepoException {
      */
     public static IdRepoDuplicateObjectException identityOfTypeAlreadyExists(String name, String type) {
         return new IdRepoDuplicateObjectException(IdRepoBundle.BUNDLE_NAME,
-                IdRepoBundle.IDENTITY_OF_TYPE_ALREADY_EXISTS, new String[] { name, type });
+                IdRepoErrorCode.IDENTITY_OF_TYPE_ALREADY_EXISTS, new String[] { name, type });
     }
 
 }

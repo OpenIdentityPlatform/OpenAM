@@ -23,7 +23,9 @@
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
 * $Id: IdRepoPluginsCache.java,v 1.8 2009/11/10 01:52:37 hengming Exp $
-*/
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
+ */
 
 package com.sun.identity.idm.server;
 
@@ -35,6 +37,7 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdType;
@@ -116,7 +119,7 @@ public class IdRepoPluginsCache implements ServiceListener {
                             "Org does not exisit: " + orgName);
                         Object[] args = { orgName };
                         throw new IdRepoException(
-                            IdRepoBundle.BUNDLE_NAME, "312", args);
+                            IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.REALM_DOESNT_EXIST, args);
                     }
                     Set subConfigNames = sc.getSubConfigNames();
                     if (debug.messageEnabled()) {
@@ -315,7 +318,7 @@ public class IdRepoPluginsCache implements ServiceListener {
     /**
      * Adds an IdRepo plugin to an organization given the configuration
      * @param orgName organization to which IdRepo would be added
-     * @param configMap configuration of the IdRepo
+     * @param name id repo name
      */
     private void addIdRepo(String orgName, String name)
         throws IdRepoException, SSOException {
@@ -332,7 +335,7 @@ public class IdRepoPluginsCache implements ServiceListener {
                     orgName + " does not exisit");
                 Object[] args = {orgName};
                 throw new IdRepoException(
-                    IdRepoBundle.BUNDLE_NAME, "312", args);
+                    IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.REALM_DOESNT_EXIST, args);
             }
             sc = sc.getSubConfig(name);
             if (sc == null) {
@@ -340,7 +343,7 @@ public class IdRepoPluginsCache implements ServiceListener {
                     orgName + " subConfig does not exisit: " + name);
                 Object[] args = {orgName + ":" + name};
                 throw new IdRepoException(
-                    IdRepoBundle.BUNDLE_NAME, "312", args);
+                    IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.REALM_DOESNT_EXIST, args);
             }
             configMap = sc.getAttributes();
         } catch (SMSException smse) {

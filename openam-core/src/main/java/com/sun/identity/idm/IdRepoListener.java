@@ -229,7 +229,7 @@ public final class IdRepoListener {
                     "IdRepoListener.setServiveAttribute: realm or plugin name"
                     + " is null");
             Object[] args = { sName, IdType.ROLE.getName() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "105", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_ALREADY_ASSIGNED, args);
         }
         try {
             SSOToken token = (SSOToken) AccessController
@@ -262,12 +262,12 @@ public final class IdRepoListener {
             AMIdentityRepository.debug.error(
                     "IdRepoListener: Unable to set service attributes", smse);
             Object[] args = { sName, IdType.ROLE.getName() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "105", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_ALREADY_ASSIGNED, args);
         } catch (SSOException ssoe) {
             AMIdentityRepository.debug.error(
                     "IdRepoListener: Unable to set service attributes", ssoe);
             Object[] args = { sName, IdType.ROLE.getName() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "105", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_ALREADY_ASSIGNED, args);
         }
     }
 

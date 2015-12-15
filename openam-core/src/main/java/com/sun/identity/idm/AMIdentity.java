@@ -164,7 +164,7 @@ public class AMIdentity {
             // Not a valid UUID since it should have the
             // name, type and realm components
             Object args[] = { universalId };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "215", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_UNIVERSAL_IDENTIFIER, args);
         }
 
         // Valid UUID, construct rest of the parameters
@@ -491,7 +491,7 @@ public class AMIdentity {
     public void removeAttributes(Set attrNames) throws IdRepoException,
             SSOException {
         if (attrNames == null || attrNames.isEmpty()) {
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
 
         boolean agentflg = getType().equals(IdType.AGENTONLY);
@@ -559,7 +559,8 @@ public class AMIdentity {
             sm = new ServiceManager(token);
         } catch (SMSException smse) {
             debug.error("Error while creating Service manager:", smse);
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "106", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode
+                    .SERVICE_MANAGER_INITIALIZATION_FAILED, null);
         }
         Map sMap = sm.getServiceNamesAndOCs(type.getName());
 
@@ -571,7 +572,7 @@ public class AMIdentity {
                     orgName, univDN);
         } catch (IdRepoException ide) {
             // Check if this is permission denied exception
-            if (!ide.getErrorCode().equals("402")) {
+            if (!ide.getErrorCode().equals(IdRepoErrorCode.ACCESS_DENIED)) {
                 throw (ide);
             }
         }
@@ -596,7 +597,8 @@ public class AMIdentity {
         try {
             sm = new ServiceManager(token);
         } catch (SMSException smse) {
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "106", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode
+                    .SERVICE_MANAGER_INITIALIZATION_FAILED, null);
         }
         Map sMap = sm.getServiceNamesAndOCs(type.getName());
 
@@ -608,7 +610,7 @@ public class AMIdentity {
                     orgName, univDN);
         } catch (IdRepoException ide) {
             // Check if this is permission denied exception
-            if (!ide.getErrorCode().equals("402")) {
+            if (!ide.getErrorCode().equals(IdRepoErrorCode.ACCESS_DENIED)) {
                 throw (ide);
             } else {
                 // Return the empty set
@@ -651,7 +653,7 @@ public class AMIdentity {
 
         if (assignedServices.contains(serviceName)) {
             Object args[] = { serviceName, type.getName() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "105", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_ALREADY_ASSIGNED, args);
         }
 
         // Validate the service attributes
@@ -676,7 +678,7 @@ public class AMIdentity {
                 ss = ssm.getSchema(SchemaType.DYNAMIC);
                 if (ss == null) {
                     Object args[] = { serviceName };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "102",
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_GET_SERVICE_SCHEMA,
                             args);
                 }
                 if (attributes == null) {
@@ -701,7 +703,7 @@ public class AMIdentity {
         } catch (SMSException smse) {
             // debug.error here
             Object[] args = { serviceName };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "101", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_NOT_ASSIGNED, args);
         }
 
         attributes.put("objectclass", OCs);
@@ -737,7 +739,7 @@ public class AMIdentity {
 
         if (!assignedServices.contains(serviceName)) {
             Object args[] = { serviceName };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "101", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_NOT_ASSIGNED, args);
         }
 
         Map attrMap = new HashMap();
@@ -892,7 +894,7 @@ public class AMIdentity {
                 name, tMap, orgName, univDN);
         if (!assignedServices.contains(serviceName)) {
             Object args[] = { serviceName };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "101", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_NOT_ASSIGNED, args);
         }
 
         // Check if attrMap has cos priority attribute
@@ -919,12 +921,12 @@ public class AMIdentity {
             } else {
                  Object args[] = { serviceName };
                  throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                     "102", args);
+                         IdRepoErrorCode.UNABLE_GET_SERVICE_SCHEMA, args);
             }
         } catch (SMSException smse) {
             // debug.error
             Object args[] = { serviceName };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "103", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.DATA_INVALID_FOR_SERVICE, args);
         }
 
         // Add COS priority if present

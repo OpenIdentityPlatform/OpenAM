@@ -17,7 +17,6 @@ package com.sun.identity.idm;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import org.forgerock.openam.ldap.LDAPConstants;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -39,7 +38,8 @@ public class IdRepoExceptionTest {
 
         //given
         Object[] args = { null, null, match };
-        IdRepoException idre = new IdRepoException(null, LDAPConstants.CONSTRAINT_VIOLATED_ERROR, "313", args);
+        IdRepoException idre = new IdRepoException(null, IdRepoErrorCode.LDAP_EXCEPTION,
+                IdRepoErrorCode.LDAP_EXCEPTION, args);
 
         //when
         String answer = idre.getConstraintViolationDetails();

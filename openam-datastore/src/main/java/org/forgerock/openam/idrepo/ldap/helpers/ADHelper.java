@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap.helpers;
 
 import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -81,7 +82,7 @@ public class ADHelper extends ADAMHelper {
             if (DEBUG.warningEnabled()) {
                 DEBUG.warning("Invalid status value in " + userStatusAttr, nfe);
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202", new Object[]{name});
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NOT_VALID_ENTRY, new Object[]{name});
         }
     }
 }

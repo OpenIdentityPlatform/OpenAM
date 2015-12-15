@@ -88,6 +88,7 @@ import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoDuplicateObjectException;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoFatalException;
 import com.sun.identity.idm.IdRepoListener;
@@ -368,7 +369,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             }
         }
         if (userName == null || password == null) {
-            throw newIdRepoException("221", CLASS_NAME);
+            throw newIdRepoException(IdRepoErrorCode.UNABLE_TO_AUTHENTICATE, CLASS_NAME);
         }
         String dn = findDNForAuth(IdType.USER, userName);
         Connection conn = null;
@@ -418,7 +419,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             DEBUG.message("changePassword invoked");
         }
         if (!type.equals(IdType.USER)) {
-            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "229", new Object[]{CLASS_NAME});
+            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.CHANGE_PASSWORD_ONLY_FOR_USER, new Object[]{CLASS_NAME});
         }
         String dn = getDN(type, name);
         BindRequest bindRequest = Requests.newSimpleBindRequest(dn, oldPassword.toCharArray());
@@ -510,7 +512,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             DEBUG.message("setActiveStatus invoked");
         }
         if (!type.equals(IdType.USER)) {
-            throw newIdRepoException("206", CLASS_NAME);
+            throw newIdRepoException(IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, CLASS_NAME);
         }
         String status = helper.getStatus(this, name, active, userStatusAttr, activeValue, inactiveValue);
         if (DEBUG.messageEnabled()) {
@@ -540,7 +542,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             DEBUG.message("isActive invoked");
         }
         if (!type.equals(IdType.USER)) {
-            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                     new Object[]{CLASS_NAME, IdOperation.READ.getName(), type.getName()});
         }
         if (alwaysActive) {
@@ -975,7 +978,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("setAttributes: there are no modifications to perform");
             }
-            throw newIdRepoException("201");
+            throw newIdRepoException(IdRepoErrorCode.ILLEGAL_ARGUMENTS);
         }
         if (type.equals(IdType.USER) && changeOCs) {
             Set<String> missingOCs = new CaseInsensitiveHashSet();
@@ -1060,7 +1063,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         attrNames = removeUndefinedAttributes(type, attrNames);
         if (attrNames.isEmpty()) {
-            throw newIdRepoException("201");
+            throw newIdRepoException(IdRepoErrorCode.ILLEGAL_ARGUMENTS);
         }
         String dn = getDN(type, name);
         ModifyRequest modifyRequest = Requests.newModifyRequest(dn);
@@ -1203,7 +1206,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
             DEBUG.error("Got reference instead of entry", srrioe);
-            throw newIdRepoException("219", CLASS_NAME);
+            throw newIdRepoException(IdRepoErrorCode.SEARCH_FAILED, CLASS_NAME);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -1262,10 +1265,10 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             DEBUG.message("getMembers invoked");
         }
         if (type.equals(IdType.USER)) {
-            throw newIdRepoException("203");
+            throw newIdRepoException(IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED);
         }
         if (!membersType.equals(IdType.USER)) {
-            throw newIdRepoException("204", CLASS_NAME, membersType.getName(), type.getName());
+            throw newIdRepoException(IdRepoErrorCode.MEMBERSHIP_NOT_SUPPORTED, CLASS_NAME, membersType.getName(), type.getName());
         }
         String dn = getDN(type, name);
 
@@ -1276,7 +1279,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } else if (type.equals(IdType.FILTEREDROLE)) {
             return getFilteredRoleMembers(dn);
         }
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 new Object[]{CLASS_NAME, IdOperation.READ.getName(), type.getName()});
     }
 
@@ -1330,7 +1333,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
             DEBUG.error("Got reference instead of entry", srrioe);
-            throw newIdRepoException("219", CLASS_NAME);
+            throw newIdRepoException(IdRepoErrorCode.SEARCH_FAILED, CLASS_NAME);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -1370,7 +1373,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
             DEBUG.error("Got reference instead of entry", srrioe);
-            throw newIdRepoException("219", CLASS_NAME);
+            throw newIdRepoException(IdRepoErrorCode.SEARCH_FAILED, CLASS_NAME);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -1418,7 +1421,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
             DEBUG.error("Got reference instead of entry", srrioe);
-            throw newIdRepoException("219", CLASS_NAME);
+            throw newIdRepoException(IdRepoErrorCode.SEARCH_FAILED, CLASS_NAME);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -1443,7 +1446,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             DEBUG.message("getMemberships called");
         }
         if (!type.equals(IdType.USER)) {
-            throw newIdRepoException("206", CLASS_NAME);
+            throw newIdRepoException(IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, CLASS_NAME);
         }
         String dn = getDN(IdType.USER, name);
         if (membershipType.equals(IdType.GROUP)) {
@@ -1453,7 +1456,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } else if (membershipType.equals(IdType.FILTEREDROLE)) {
             return getFilteredRoleMemberships(dn);
         }
-        throw newIdRepoException("204", CLASS_NAME, type.getName(), membershipType.getName());
+        throw newIdRepoException(IdRepoErrorCode.MEMBERSHIP_NOT_SUPPORTED, CLASS_NAME, type.getName(), membershipType.getName());
     }
 
     /**
@@ -1492,7 +1495,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             } catch (SearchResultReferenceIOException srrioe) {
                 //should never ever happen...
                 DEBUG.error("Got reference instead of entry", srrioe);
-                throw newIdRepoException("219", CLASS_NAME);
+                throw newIdRepoException(IdRepoErrorCode.SEARCH_FAILED, CLASS_NAME);
             } finally {
                 IOUtils.closeIfNotNull(conn);
             }
@@ -1602,13 +1605,13 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             DEBUG.message("modifymembership invoked");
         }
         if (members == null || members.isEmpty()) {
-            throw newIdRepoException("201");
+            throw newIdRepoException(IdRepoErrorCode.ILLEGAL_ARGUMENTS);
         }
         if (type.equals(IdType.USER)) {
-            throw newIdRepoException("203");
+            throw newIdRepoException(IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED);
         }
         if (!membersType.equals(IdType.USER)) {
-            throw newIdRepoException("206", CLASS_NAME);
+            throw newIdRepoException(IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, CLASS_NAME);
         }
         String dn = getDN(type, name);
         Set<String> memberDNs = new HashSet<String>(members.size());
@@ -1620,7 +1623,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } else if (type.equals(IdType.ROLE)) {
             modifyRoleMembership(dn, memberDNs, operation);
         } else {
-            throw newIdRepoException("209", CLASS_NAME, type.getName());
+            throw newIdRepoException(IdRepoErrorCode.MEMBERSHIP_CANNOT_BE_MODIFIED, CLASS_NAME, type.getName());
         }
     }
 
@@ -1743,7 +1746,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 idRepoListener.setServiceAttributes(serviceName, serviceMap);
             }
         } else {
-            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "213", new Object[]{CLASS_NAME});
+            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, new Object[]{CLASS_NAME});
         }
     }
 
@@ -1786,7 +1790,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } else if (type.equals(IdType.REALM)) {
             results.addAll(serviceMap.keySet());
         } else {
-            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "213", new Object[]{CLASS_NAME});
+            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, new Object[]{CLASS_NAME});
         }
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Assigned services returned: " + results);
@@ -1906,7 +1911,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 return results;
             }
         } else {
-            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "213", new Object[]{CLASS_NAME});
+            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, new Object[]{CLASS_NAME});
         }
     }
 
@@ -1932,7 +1938,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         if (type.equals(IdType.USER)) {
             if (sType.equals(SchemaType.DYNAMIC)) {
-                throw newIdRepoException("214", CLASS_NAME, sType.toString(), type.getName());
+                throw newIdRepoException(IdRepoErrorCode.CANNOT_MODIFY_SERVICE, CLASS_NAME, sType.toString(), type.getName());
             } else {
                 setAttributes(token, type, name, (Map) attrMap, false, true, false);
             }
@@ -1959,7 +1965,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 idRepoListener.setServiceAttributes(serviceName, serviceMap);
             }
         } else {
-            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "213", new Object[]{CLASS_NAME});
+            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, new Object[]{CLASS_NAME});
         }
     }
 
@@ -2000,7 +2007,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                         }
                     } catch (UnknownSchemaElementException usee) {
                         DEBUG.error("Unable to unassign " + serviceName + " service from identity: " + name, usee);
-                        throw newIdRepoException("102", serviceName);
+                        throw newIdRepoException(IdRepoErrorCode.UNABLE_GET_SERVICE_SCHEMA, serviceName);
                     }
                 }
                 Set<String> requestedAttrs = new CaseInsensitiveHashSet(attrs.keySet());
@@ -2029,7 +2036,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 idRepoListener.setServiceAttributes(serviceName, serviceMap);
             }
         } else {
-            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "213", new Object[]{CLASS_NAME});
+            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, new Object[]{CLASS_NAME});
         }
     }
 
@@ -2313,7 +2321,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             while (reader.hasNext()) {
                 if (reader.isEntry()) {
                     if (entry != null) {
-                        throw newIdRepoException(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED, "306", CLASS_NAME,
+                        throw newIdRepoException(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED,
+                                IdRepoErrorCode.LDAP_EXCEPTION_OCCURRED, CLASS_NAME,
                                 ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED.intValue());
                     }
                     entry = reader.readEntry();
@@ -2325,8 +2334,10 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             if (entry == null) {
                 DEBUG.message("Unable to find entry with name: " + name + " under searchbase: " + searchBase
                         + " with scope: " + defaultScope);
-                throw new IdentityNotFoundException(ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED, "223", name,
-                        type.getName());
+
+                throw new IdentityNotFoundException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.TYPE_NOT_FOUND,
+                        ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED,
+                        new Object[]{name, type.getName()});
             }
             dn = entry.getName().toString();
         } catch (LdapException ere) {
@@ -2335,7 +2346,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } catch (SearchResultReferenceIOException srrioe) {
             //should never ever happen...
             DEBUG.error("Got reference instead of entry", srrioe);
-            throw newIdRepoException("219", CLASS_NAME);
+            throw newIdRepoException(IdRepoErrorCode.SEARCH_FAILED, CLASS_NAME);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -2459,16 +2470,18 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
     private void handleErrorResult(LdapException ere) throws IdRepoException {
         ResultCode resultCode = ere.getResult().getResultCode();
         if (ResultCode.CONSTRAINT_VIOLATION.equals(resultCode)) {
-            throw new IdRepoFatalException(IdRepoBundle.BUNDLE_NAME, "313",
+            throw new IdRepoFatalException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.LDAP_EXCEPTION, ResultCode.CONSTRAINT_VIOLATION,
                     new Object[]{CLASS_NAME, resultCode.intValue(), ere.getResult().getDiagnosticMessage()});
         } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
-            throw new IdentityNotFoundException(resultCode, "220", CLASS_NAME, ere.getResult().getDiagnosticMessage());
+            throw new IdentityNotFoundException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_FIND_ENTRY, ResultCode.NO_SUCH_OBJECT,
+                    new Object[]{CLASS_NAME, ere.getResult().getDiagnosticMessage()});
         } else if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
             DEBUG.warning("Size limit exceeded.", ere);
         } else if (resultCode.equals(ResultCode.TIME_LIMIT_EXCEEDED)) {
             DEBUG.warning("Time limit exceeded.", ere);
         } else {
-            throw newIdRepoException(resultCode, "306", CLASS_NAME, resultCode.intValue());
+            throw newIdRepoException(resultCode, IdRepoErrorCode.LDAP_EXCEPTION_OCCURRED,
+                    CLASS_NAME, resultCode.intValue());
         }
     }
 

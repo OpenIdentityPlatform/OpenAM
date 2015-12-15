@@ -17,6 +17,7 @@
 package org.forgerock.openam.idrepo.ldap;
 
 import com.sun.identity.idm.IdRepo;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import java.util.Map;
@@ -100,8 +101,8 @@ public class DSEERepoTest extends IdRepoTestBase {
                     IdRepo.REMOVEMEMBER);
             fail();
         } catch (IdRepoException ire) {
-            assertThat(ire).hasMessage(getIdRepoExceptionMessage("209", DJLDAPv3Repo.class.getName(),
-                    IdType.FILTEREDROLE.getName()));
+            assertThat(ire).hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.MEMBERSHIP_CANNOT_BE_MODIFIED,
+                    DJLDAPv3Repo.class.getName(), IdType.FILTEREDROLE.getName()));
         }
     }
 }

@@ -24,10 +24,7 @@
  *
  * $Id: IdRemoteCachedServicesImpl.java,v 1.20 2010/01/28 00:45:25 bigfatrat Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm.remote;
 
@@ -41,6 +38,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdCachedServices;
 import com.sun.identity.idm.IdConstants;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdServices;
 import com.sun.identity.idm.IdType;
@@ -640,7 +638,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                         isCached = true;
                     } catch (IdRepoException ide) {
                         // Check if the exception is name not found
-                        if (!ide.getErrorCode().equals("220")) {
+                        if (!ide.getErrorCode().equals(IdRepoErrorCode.UNABLE_FIND_ENTRY)) {
                             // Throw the exception
                             throw (ide);
                         }

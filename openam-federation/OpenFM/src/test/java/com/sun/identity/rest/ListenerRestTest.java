@@ -24,11 +24,7 @@
  *
  * $Id: ListenerRestTest.java,v 1.4 2009/12/15 00:44:19 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
- */
-
-/**
- * Portions copyright 2014 ForgeRock AS.
+ * Portions copyright 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.rest;
@@ -46,6 +42,7 @@ import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.AuthUtils;
 import com.sun.identity.entitlement.util.IdRepoUtils;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.unittest.UnittestLog;
@@ -229,7 +226,7 @@ public class ListenerRestTest {
             .cookie(cookie)
             .post(String.class, form);
         JSONObject jo = new JSONObject(result);
-        if (!jo.getString("statusCode").equals("201")) {
+        if (!jo.getString("statusCode").equals(IdRepoErrorCode.ILLEGAL_ARGUMENTS)) {
             throw new Exception("ListenerRESTTest.test failed to add");
         }
 
@@ -274,7 +271,7 @@ public class ListenerRestTest {
             .cookie(cookie)
             .post(String.class, form);
         JSONObject jo = new JSONObject(result);
-        if (!jo.getString("statusCode").equals("201")) {
+        if (!jo.getString("statusCode").equals(IdRepoErrorCode.ILLEGAL_ARGUMENTS)) {
             throw new Exception(
                 "ListenerRESTTest.testAddMoreResources failed to add");
         }
@@ -323,7 +320,7 @@ public class ListenerRestTest {
             .cookie(cookie)
             .post(String.class, form);
         JSONObject jo = new JSONObject(result);
-        if (!jo.getString("statusCode").equals("201")) {
+        if (!jo.getString("statusCode").equals(IdRepoErrorCode.ILLEGAL_ARGUMENTS)) {
             throw new Exception(
                 "ListenerRESTTest.testAddDifferentApp failed to add");
         }

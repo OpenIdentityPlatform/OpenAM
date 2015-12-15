@@ -62,6 +62,7 @@ import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoDuplicateObjectException;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdRepoUnsupportedOpException;
@@ -209,7 +210,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             if (debug.messageEnabled()) {
                 debug.message("AgentsRepo.create(): Attribute Map is empty ");
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
         String agentType = null;
         ServiceConfig aTypeConfig = null;
@@ -223,7 +224,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 } else {
                     debug.error("AgentsRepo.create():Unable to create agents."
                        + " Agent Type "+aTypeSet+ " is empty");
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201",
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS,
                         null);
                 }
             } else {
@@ -239,7 +240,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 } else {
                     debug.error("AgentsRepo.create():Unable to create agents."
                        + " Agent Type "+agentType+ " is empty");
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201",
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS,
                         null);
                 }
             }
@@ -302,7 +303,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         } catch (SMSException smse) {
             debug.error("AgentsRepo.create():Unable to create agents ", smse);
             Object args[] = { NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "226", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_CREATE_AGENT, args);
         }
         return (aTypeConfig.getDN());
     }
@@ -341,7 +342,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                     // Agent not found, throw an exception
                     Object args[] = { name, type.getName() };
                     throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                            "223", args));
+                            IdRepoErrorCode.TYPE_NOT_FOUND, args));
                 }
             } else if (type.equals(IdType.AGENTGROUP)) {
                 ServiceConfig agentGroupConfig = getAgentGroupConfig(token);
@@ -349,7 +350,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 	// Agent not found, throw an exception
                     Object args[] = { name, type.getName() };
                     throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                            "223", args));
+                            IdRepoErrorCode.TYPE_NOT_FOUND, args));
                 }
                 aCfg = agentGroupConfig.getSubConfig(name);
                 if (aCfg != null) {
@@ -368,13 +369,13 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 } else {
                     // Agent not found, throw an exception
                     Object args[] = { name, type.getName() };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "223", args);
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.TYPE_NOT_FOUND, args);
                 }
             }
         } catch (SMSException smse) {
             debug.error("AgentsRepo.delete: Unable to delete agents ", smse);
             Object args[] = { NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "200", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_READ_ATTRIBUTES, args);
         }
     }
 
@@ -471,7 +472,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                         e.getMessage());
                 }
                 Object args[] = { NAME };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "200",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_READ_ATTRIBUTES,
                     args);
             } catch (IdRepoException idpe) {
                 if (debug.warningEnabled()) {
@@ -480,12 +481,12 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                         idpe.getMessage(), idpe);
                 }
                 Object args[] = { NAME };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "200",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_READ_ATTRIBUTES,
                     args);
             }
         }
         Object args[] = { NAME, IdOperation.READ.getName() };
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 args);
     }
 
@@ -512,7 +513,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 // Agent not found, throw an exception
                 Object args[] = { agentName, type.getName() };
                 throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                        "223", args));
+                        IdRepoErrorCode.TYPE_NOT_FOUND, args));
             }
         } catch (SMSException sme) {
             debug.error("AgentsRepo.getAgentAttrs(): "
@@ -533,7 +534,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             Set attrNames) throws IdRepoException, SSOException {
 
         Object args[] = { NAME, IdOperation.READ.getName() };
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 args);
     }
 
@@ -549,7 +550,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             SSOException {
 
         Object args[] = { NAME, IdOperation.EDIT.getName() };
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 args);
 
     }
@@ -582,14 +583,15 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         if (type.equals(IdType.USER) || type.equals(IdType.AGENT)) {
             debug.error("AgentsRepo.getMembers: Membership operation is "
                     + "not supported for Users or Agents");
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "203", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED, null);
         }
         if (!membersType.equals(IdType.AGENTONLY) &&
             !membersType.equals(IdType.AGENT)) {
             debug.error("AgentsRepo.getMembers: Cannot get member from a "
                 + "non-agent type "+ membersType.getName());
             Object[] args = { NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, args);
         }
         if (type.equals(IdType.AGENTGROUP)) {
             try {
@@ -611,13 +613,13 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                         + "exception while getting agents"
                         + " from groups", sme);
                 Object args[] = { NAME, type.getName(), name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "212",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ERROR_SETTING_ATTRIBUTES,
                     args);
             }
         } else {
             Object args[] = { NAME, IdOperation.READ.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
         return (results);
     }
@@ -653,7 +655,8 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             debug.message(
                     "AgentsRepo:getMemberships supported only for agents");
             Object args[] = { NAME };
-            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, "225", args));
+            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.MEMBERSHIPS_OTHER_THAN_AGENTS_NOT_ALLOWED, args));
         }
 
         // Set to maintain the members
@@ -669,7 +672,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                         + "exception while getting memberships"
                         + " for Agent", sme);
                 Object args[] = { NAME, type.getName(), name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "212",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ERROR_SETTING_ATTRIBUTES,
                     args);
             }
         } else {
@@ -677,7 +680,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             Object args[] = { NAME, IdOperation.READ.getName(),
                 membershipType.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
         return (results);
     }
@@ -712,7 +715,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             SSOException {
 
         Object args[] = {NAME, IdOperation.READ.getName()};
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 args);
     }
 
@@ -728,7 +731,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             throws IdRepoException, SSOException {
 
         Object args[] = {NAME, IdOperation.READ.getName()};
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 args);
     }
 
@@ -786,17 +789,18 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         }
         if (members == null || members.isEmpty()) {
             debug.error("AgentsRepo.modifyMemberShip: Members set is empty");
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
         if (type.equals(IdType.USER) || type.equals(IdType.AGENT)) {
             debug.error("AgentsRepo.modifyMembership: Membership to users and agents is not supported");
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "203", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED, null);
         }
         if (!membersType.equals(IdType.AGENTONLY)) {
             debug.error("AgentsRepo.modifyMembership: A non-agent type cannot be made a member of any identity "
                     + membersType.getName());
             Object[] args = {NAME};
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, args);
         }
 
         if (type.equals(IdType.AGENTGROUP)) {
@@ -824,13 +828,13 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 debug.error("AgentsRepo.modifyMembership: Caught exception while adding/removing agents to groups",
                         sme);
                 Object args[] = {NAME, type.getName(), name};
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "212", args);
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ERROR_SETTING_ATTRIBUTES, args);
             }
         } else {
             // throw an exception
             debug.error("AgentsRepo.modifyMembership: Memberships cannot be modified for type= " + type.getName());
             Object[] args = {NAME, type.getName()};
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "209", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIP_CANNOT_BE_MODIFIED, args);
         }
     }
 
@@ -859,7 +863,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 debug.message("AgentsRepo.removeAttributes(): Attributes " +
                         "are empty");
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         } else {
             if (debug.messageEnabled()) {
                 debug.message("AgentsRepo.removeAttributes(): Attribute " +
@@ -881,7 +885,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                         // Agent not found, throw an exception
                         Object args[] = { name, type.getName() };
                         throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                            "223", args));
+                                IdRepoErrorCode.TYPE_NOT_FOUND, args));
                     }
                 }
             }
@@ -889,7 +893,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             debug.error("AgentsRepo.removeAttributes(): Unable to remove "
                 + "agent attributes ",smse);
             Object args[] = { NAME, type.getName(), name };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "212", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ERROR_SETTING_ATTRIBUTES, args);
         }
     }
 
@@ -960,7 +964,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             debug.error("AgentsRepo.search(): Unable to retrieve entries: ",
                     sse);
             Object args[] = { NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "219", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SEARCH_FAILED, args);
         }
         return new RepoSearchResults(agentRes, errorCode, agentAttrs, type);
     }
@@ -990,7 +994,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 debug.message("AgentsRepo.setAttributes(): Attributes " +
                         "are empty");
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
 
         ServiceConfig aCfg = null;
@@ -1003,13 +1007,13 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 if (agentGroupConfig == null) {
                 	Object args[] = { NAME, IdOperation.READ.getName() };
                     throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                        "305", args);
+                            IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
                 }
                 aCfg = agentGroupConfig.getSubConfig(name);
             } else {
                 Object args[] = { NAME, IdOperation.READ.getName() };
                 throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "305", args);
+                        IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
             }
 
             Set vals = (Set) attributes.get("userpassword");
@@ -1032,13 +1036,13 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 // Agent not found, throw an exception
                 Object args[] = { name, type.getName() };
                 throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                    "223", args));
+                        IdRepoErrorCode.TYPE_NOT_FOUND, args));
             }
         } catch (SMSException smse) {
             debug.error("AgentsRepo.setAttributes(): Unable to set agent"
                 + " attributes ",smse);
             Object args[] = { NAME, type.getName(), name };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "212", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ERROR_SETTING_ATTRIBUTES, args);
         }
     }
 
@@ -1082,7 +1086,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 slashRealmName = DNMapper.orgNameToRealmName(realmName);
                 Object[] args = { slashRealmName };
                 initializationException =
-                    new IdRepoException(IdRepoBundle.BUNDLE_NAME, "312", args);
+                    new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.REALM_DOESNT_EXIST, args);
             }
             getAgentGroupConfig(adminToken);
         }
@@ -1100,7 +1104,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         Map attributes = getAttributes(token, type, name);
         if (attributes == null) {
             Object[] args = { NAME, name };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NOT_VALID_ENTRY, args);
         }
         Set activeVals = (Set) attributes.get(statusAttribute);
         if (activeVals == null || activeVals.isEmpty()) {
@@ -1274,7 +1278,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         Set dns = results.getSearchResults();
         if (dns.size() != 1) {
             String[] args = { name };
-            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, "220", args));
+            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_FIND_ENTRY, args));
         }
         return ("sms://AgentsRepo/" + dns.iterator().next().toString());
     }
@@ -1317,7 +1321,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         if (username == null || (username.length() == 0) ||
             password == null || unhashedPassword == null) {
             Object args[] = { NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "221", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_TO_AUTHENTICATE, args);
         }
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
@@ -1376,7 +1380,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             throws IdRepoException, SSOException {
 
         Object args[] = { NAME, IdOperation.SERVICE.getName() };
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 args);
     }
 
@@ -1395,7 +1399,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         Object args[] = {
                 "com.sun.identity.idm.plugins.specialusers.SpecialRepo",
                 IdOperation.SERVICE.getName() };
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 args);
     }
 
@@ -1411,7 +1415,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             throws IdRepoException, SSOException {
 
         Object args[] = { NAME, IdOperation.SERVICE.getName() };
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 args);
 
     }
@@ -1427,7 +1431,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             Map mapOfServicesAndOCs) throws IdRepoException, SSOException {
 
         Object args[] = { NAME, IdOperation.SERVICE.getName() };
-        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "305",
+        throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED,
                 args);
     }
 

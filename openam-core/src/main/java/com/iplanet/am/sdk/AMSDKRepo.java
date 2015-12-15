@@ -45,6 +45,7 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoFatalException;
 import com.sun.identity.idm.IdRepoListener;
@@ -72,7 +73,6 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
 import org.forgerock.openam.ldap.LDAPAuthUtils;
-import org.forgerock.openam.ldap.LDAPConstants;
 import org.forgerock.openam.ldap.LDAPUtilException;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.ModuleState;
@@ -165,7 +165,7 @@ public class AMSDKRepo extends IdRepo {
             if (orgType != AMObject.ORGANIZATION) {
                 debug.error("AMSDKRepo.create(): Incorrectly configured "
                         + " plugin: Org DN is wrong = " + orgDN);
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "303",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_NOT_CONFIGURED_CORRECTLY,
                         null);
             }
         } catch (AMException ame) {
@@ -173,7 +173,7 @@ public class AMSDKRepo extends IdRepo {
                     + " initializing AM SDK ", ame);
             Object[] args = { CLASS_NAME, IdOperation.CREATE.getName() };
             IdRepoException ide = new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                    "304", args);
+                    IdRepoErrorCode.UNABLE_INITIALIZE_PLUGIN, args);
             ide.setLDAPErrorCode(ame.getLDAPErrorCode());
             throw ide;
         }
@@ -284,7 +284,7 @@ public class AMSDKRepo extends IdRepo {
                         false, profileType);
             } else {
                 Object[] args = { name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NOT_VALID_ENTRY,
                         args);
             }
         } catch (AMException ame) {
@@ -324,7 +324,7 @@ public class AMSDKRepo extends IdRepo {
                         profileType);
             } else {
                 Object[] args = { name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NOT_VALID_ENTRY,
                         args);
             }
         } catch (AMException ame) {
@@ -363,7 +363,7 @@ public class AMSDKRepo extends IdRepo {
                         profileType);
             } else {
                 Object[] args = { name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NOT_VALID_ENTRY,
                         args);
             }
         } catch (AMException ame) {
@@ -402,7 +402,8 @@ public class AMSDKRepo extends IdRepo {
         if (type.equals(IdType.USER) || type.equals(IdType.AGENT)) {
             debug.error("AMSDKRepo: Membership operation is not supported "
                     + " for Users or Agents");
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "203", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED, null);
 
         } else if (type.equals(IdType.GROUP)) {
             dn = getDN(type, name);
@@ -416,7 +417,7 @@ public class AMSDKRepo extends IdRepo {
                     Object[] args = { CLASS_NAME, membersType.getName(),
                             type.getName(), name };
                     IdRepoException ide = new IdRepoException(
-                            IdRepoBundle.BUNDLE_NAME, "205", args);
+                            IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_GET_MEMBERSHIP, args);
                     ide.setLDAPErrorCode(ame.getLDAPErrorCode());
                     throw ide;
                 }
@@ -462,7 +463,7 @@ public class AMSDKRepo extends IdRepo {
             } else {
                 Object[] args = { CLASS_NAME, membersType.getName(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "204",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIP_NOT_SUPPORTED,
                         args);
             }
 
@@ -470,7 +471,7 @@ public class AMSDKRepo extends IdRepo {
             Object[] args = { CLASS_NAME, IdOperation.READ.getName(),
                     type.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
         return results;
     }
@@ -489,7 +490,7 @@ public class AMSDKRepo extends IdRepo {
             debug.error("AMSDKRepo: Membership for identities other than "
                     + " Users is not allowed ");
             Object[] args = { CLASS_NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, args);
 
         } else {
             dn = getDN(type, name);
@@ -503,7 +504,7 @@ public class AMSDKRepo extends IdRepo {
                     Object[] args = { CLASS_NAME, membershipType.getName(),
                             type.getName(), name };
                     IdRepoException ide = new IdRepoException(
-                            IdRepoBundle.BUNDLE_NAME, "207", args);
+                            IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_GET_MEMBERSHIP, args);
                     ide.setLDAPErrorCode(ame.getLDAPErrorCode());
                     throw ide;
                 }
@@ -675,19 +676,20 @@ public class AMSDKRepo extends IdRepo {
         }
         if (members == null || members.isEmpty()) {
             debug.error("AMSDKRepo.modifyMemberShip: Members set is empty");
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
         if (type.equals(IdType.USER) || type.equals(IdType.AGENT)) {
             debug.error("AMSDKRepo.modifyMembership: Memberhsip to users and"
                     + " agents is not supported");
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "203", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED, null);
         }
         if (!membersType.equals(IdType.USER)) {
             debug.error("AMSDKRepo.modifyMembership: A non-user type cannot "
                     + " be made a member of any identity"
                     + membersType.getName());
             Object[] args = { CLASS_NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, args);
         }
         Set usersSet = new HashSet();
         Iterator it = members.iterator();
@@ -736,7 +738,7 @@ public class AMSDKRepo extends IdRepo {
             debug.error("AMSDKRepo.modifyMembership: Memberships cannot be"
                     + "modified for type= " + type.getName());
             Object[] args = { CLASS_NAME, type.getName() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "209", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIP_CANNOT_BE_MODIFIED, args);
         }
     }
 
@@ -873,7 +875,7 @@ public class AMSDKRepo extends IdRepo {
                 break;
             default:
                 Object[] args = { CLASS_NAME, type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "210",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SEARCH_OPERATION_NOT_SUPPORTED,
                         args);
             }
         } catch (AMException ame) {
@@ -992,7 +994,7 @@ public class AMSDKRepo extends IdRepo {
                 break;
             default:
                 Object[] args = { CLASS_NAME, type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "210",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SEARCH_OPERATION_NOT_SUPPORTED,
                         args);
             }
         } catch (AMException ame) {
@@ -1052,7 +1054,7 @@ public class AMSDKRepo extends IdRepo {
         }
 
         if (attributes == null || attributes.isEmpty()) {
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
 
         String dn = getDN(type, name);
@@ -1072,14 +1074,12 @@ public class AMSDKRepo extends IdRepo {
             String errorMessage = ame.getMessage();
             int errCode = Integer.parseInt(ldapError);
             if (ResultCode.CONSTRAINT_VIOLATION.equals(ResultCode.valueOf(errCode))) {
-                Object args[] =
-                    { this.getClass().getName(), ldapError, errorMessage };
+                Object args[] = { this.getClass().getName(), ldapError, errorMessage };
                 //Throw Fatal exception for errCode 19(eg.,Password too short)
                 //as it breaks password policy for password length.
-                IdRepoFatalException ide = new IdRepoFatalException(
-                   IdRepoBundle.BUNDLE_NAME, LDAPConstants.CONSTRAINT_VIOLATED_ERROR, args);
-                ide.setLDAPErrorCode(ldapError);
-                throw ide;
+                throw new IdRepoFatalException(
+                   IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.LDAP_EXCEPTION,
+                        ResultCode.CONSTRAINT_VIOLATION, args);
             } else {
                 throw IdUtils.convertAMException(ame);
             }
@@ -1096,7 +1096,7 @@ public class AMSDKRepo extends IdRepo {
                     + name + ": " + attributes);
         }
         if (attributes == null || attributes.isEmpty()) {
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
 
         String dn = getDN(type, name);
@@ -1129,7 +1129,7 @@ public class AMSDKRepo extends IdRepo {
         if (!type.equals(IdType.USER)) {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                "229", args);
+                IdRepoErrorCode.CHANGE_PASSWORD_ONLY_FOR_USER, args);
         }
 
         String dn = getDN(type, name);
@@ -1219,7 +1219,7 @@ public class AMSDKRepo extends IdRepo {
         if (type.equals(IdType.AGENT) || type.equals(IdType.GROUP)) {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "213", args);
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, args);
         }
         // Use adminToken if present
         if (adminToken != null) {
@@ -1296,7 +1296,7 @@ public class AMSDKRepo extends IdRepo {
         if (type.equals(IdType.AGENT) || type.equals(IdType.GROUP)) {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "213", args);
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, args);
         }
         // Use adminToken if present
         if (adminToken != null) {
@@ -1402,7 +1402,7 @@ public class AMSDKRepo extends IdRepo {
         } else {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "213", args);
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, args);
         }
 
     }
@@ -1414,7 +1414,7 @@ public class AMSDKRepo extends IdRepo {
         if (type.equals(IdType.AGENT) || type.equals(IdType.GROUP)) {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "213", args);
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, args);
         }
         if (mapOfServiceNamesandOCs == null
                 || mapOfServiceNamesandOCs.isEmpty()) {
@@ -1481,7 +1481,7 @@ public class AMSDKRepo extends IdRepo {
         } else {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "213", args);
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, args);
         }
         return resultsSet;
     }
@@ -1500,7 +1500,7 @@ public class AMSDKRepo extends IdRepo {
         if (type.equals(IdType.AGENT) || type.equals(IdType.GROUP)) {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(
-                IdRepoBundle.BUNDLE_NAME, "213", args);
+                IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, args);
         } else  {
             return getServiceAttributes(token, type, name, serviceName,
                 attrNames, true);
@@ -1537,7 +1537,7 @@ public class AMSDKRepo extends IdRepo {
         if (type.equals(IdType.AGENT) || type.equals(IdType.GROUP)) {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(
-                IdRepoBundle.BUNDLE_NAME, "213", args);
+                IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, args);
         } else if (type.equals(IdType.USER)) {
             return (isString ?
                 getAttributes(token, type, name, attrNames)
@@ -1580,7 +1580,7 @@ public class AMSDKRepo extends IdRepo {
                         : templ.getAttributesByteArray(attrNames));
                 } else {
                     Object args[] = { serviceName };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "101",
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_NOT_ASSIGNED,
                             args);
                 }
             } catch (AMException ame) {
@@ -1589,7 +1589,7 @@ public class AMSDKRepo extends IdRepo {
         } else {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "213", args);
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, args);
         }
     }
 
@@ -1607,12 +1607,12 @@ public class AMSDKRepo extends IdRepo {
         if (type.equals(IdType.AGENT) || type.equals(IdType.GROUP)) {
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "213", args);
+                    IdRepoErrorCode.SERVICES_NOT_SUPPORTED_FOR_AGENTS_AND_GROUPS, args);
         } else if (type.equals(IdType.USER)) {
             if (sType.equals(SchemaType.DYNAMIC)) {
                 Object args[] = { this.getClass().getName(), sType.toString(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "214",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.CANNOT_MODIFY_SERVICE,
                         args);
             } else {
                 setMixAttributes(token, type, name, attrMap, false);
@@ -1622,7 +1622,7 @@ public class AMSDKRepo extends IdRepo {
             if (sType.equals(SchemaType.USER)) {
                 Object args[] = { this.getClass().getName(), sType.toString(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "214",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.CANNOT_MODIFY_SERVICE,
                         args);
             }
             try {
@@ -1637,7 +1637,7 @@ public class AMSDKRepo extends IdRepo {
                     templ.store();
                 } else {
                     Object args[] = { serviceName };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "101",
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_NOT_ASSIGNED,
                             args);
                 }
             } catch (AMException ame) {
@@ -1649,7 +1649,7 @@ public class AMSDKRepo extends IdRepo {
             if (sType.equals(SchemaType.USER)) {
                 Object args[] = { this.getClass().getName(), sType.toString(),
                         type.getName() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "214",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.CANNOT_MODIFY_SERVICE,
                         args);
             }
             try {
@@ -1664,7 +1664,7 @@ public class AMSDKRepo extends IdRepo {
                     templ.store();
                 } else {
                     Object args[] = { serviceName };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "101",
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.SERVICE_NOT_ASSIGNED,
                             args);
                 }
             } catch (AMException ame) {
@@ -1891,7 +1891,7 @@ public class AMSDKRepo extends IdRepo {
             if (orgType != AMObject.ORGANIZATION) {
                 debug.error("AMSDKRepo.create(): Incorrectly configured "
                         + " plugin: Org DN is wrong = " + orgDN);
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "303",
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_NOT_CONFIGURED_CORRECTLY,
                         null);
             }
         } catch (AMException ame) {
@@ -1901,7 +1901,7 @@ public class AMSDKRepo extends IdRepo {
                     IdOperation.CREATE.getName() };
 
             IdRepoException ide = new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                    "304", args);
+                    IdRepoErrorCode.UNABLE_INITIALIZE_PLUGIN, args);
             ide.setLDAPErrorCode(ame.getLDAPErrorCode());
             throw ide;
         }
@@ -1919,7 +1919,7 @@ public class AMSDKRepo extends IdRepo {
         String dn;
         if (sc == null) {
             // initialization error. Throw an exception
-            throw new IdRepoException(AMSDKBundle.BUNDLE_NAME, "301", null);
+            throw new IdRepoException(AMSDKBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
         }
         if (type.equals(IdType.USER)) {
             if (pcDN != null) {
@@ -1935,8 +1935,8 @@ public class AMSDKRepo extends IdRepo {
                 int sdkType = sc.getAMObjectType(dn);
                 if (sdkType != AMObject.USER) {
                     Object[] args = { sc.getAMObjectName(sdkType) };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "217",
-                            args);
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                            IdRepoErrorCode.NOT_SUPPORTED_TYPE, args);
                 }
             } catch (AMException ame) {
                 throw IdUtils.convertAMException(ame);
@@ -1953,8 +1953,8 @@ public class AMSDKRepo extends IdRepo {
                 int sdkType = sc.getAMObjectType(dn);
                 if (sdkType != 100) {
                     Object[] args = { sc.getAMObjectName(sdkType) };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "217",
-                            args);
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                            IdRepoErrorCode.NOT_SUPPORTED_TYPE, args);
                 }
             } catch (AMException ame) {
                 throw IdUtils.convertAMException(ame);
@@ -1967,8 +1967,8 @@ public class AMSDKRepo extends IdRepo {
                 if (sdkType != AMObject.GROUP
                         && sdkType != AMObject.STATIC_GROUP) {
                     Object[] args = { sc.getAMObjectName(sdkType) };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "217",
-                            args);
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                            IdRepoErrorCode.NOT_SUPPORTED_TYPE, args);
                 }
             } catch (AMException ame) {
                 throw IdUtils.convertAMException(ame);
@@ -1980,8 +1980,8 @@ public class AMSDKRepo extends IdRepo {
                 int sdkType = sc.getAMObjectType(dn);
                 if (sdkType != AMObject.ROLE) {
                     Object[] args = { sc.getAMObjectName(sdkType) };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "217",
-                            args);
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                            IdRepoErrorCode.NOT_SUPPORTED_TYPE, args);
                 }
             } catch (AMException ame) {
                 throw IdUtils.convertAMException(ame);
@@ -1993,8 +1993,8 @@ public class AMSDKRepo extends IdRepo {
                 int sdkType = sc.getAMObjectType(dn);
                 if (sdkType != AMObject.FILTERED_ROLE) {
                     Object[] args = { sc.getAMObjectName(sdkType) };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "217",
-                            args);
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                            IdRepoErrorCode.NOT_SUPPORTED_TYPE, args);
                 }
             } catch (AMException ame) {
                 throw IdUtils.convertAMException(ame);
@@ -2008,7 +2008,7 @@ public class AMSDKRepo extends IdRepo {
             Object[] args = { CLASS_NAME, IdOperation.READ.getName(),
                     type.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
         return dn;
     }
@@ -2031,7 +2031,7 @@ public class AMSDKRepo extends IdRepo {
             Object[] args = { CLASS_NAME, IdOperation.READ.getName(),
                     type.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
         return profileType;
     }
@@ -2096,7 +2096,7 @@ public class AMSDKRepo extends IdRepo {
                         + " LDAPServiceException: " + ldex.getMessage());
             }
             Object[] args = { CLASS_NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "219", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,IdRepoErrorCode.SEARCH_FAILED, args);
         }
         return (svrCfg);
     }
@@ -2128,7 +2128,7 @@ public class AMSDKRepo extends IdRepo {
         if ((name == null) || (name.length() == 0)) {
             Object[] args = { CLASS_NAME, "" };
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                "220", args);
+                    IdRepoErrorCode.UNABLE_FIND_ENTRY, args);
         }
         String dn;
         AMStoreConnection amsc = (sc == null) ?
@@ -2181,7 +2181,7 @@ public class AMSDKRepo extends IdRepo {
         }
         if (username == null || (username.length() == 0) || password == null) {
             Object args[] = { CLASS_NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "221", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_TO_AUTHENTICATE, args);
         }
 
         ServerInstance svrCfg = getDsSvrCfg(LDAPUser.Type.AUTH_ADMIN);
@@ -2201,7 +2201,7 @@ public class AMSDKRepo extends IdRepo {
                         + " LDAPUtilException: " + ldapUtilEx.getMessage());
             }
             Object[] args = { CLASS_NAME, username };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "211", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ERROR_DURING_SEARCH, args);
         }
         ldapAuthUtil.setAuthDN(AdminUtils.getAdminDN());
         ldapAuthUtil.setAuthPassword(new String(AdminUtils.getAdminPassword()).toCharArray());

@@ -36,7 +36,7 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.forgerock.openam.ldap.LDAPConstants;
+
 import org.forgerock.opendj.ldap.ResultCode;
 
 /**
@@ -244,7 +244,11 @@ public class IdRepoException extends Exception implements L10NMessage {
       * @return Error code associated with this error message and null if
       *      not caused by <code>LDAPException</code>.
       * @see #IdRepoException(String, String, Object[])
+      *
+      * @deprecated
+      *     Use #getLdapErrorIntCode() instead. The ldap error code is always an int
       */
+     @Deprecated
      public String getLDAPErrorCode() {
          return ldapErrCode;
      }
@@ -301,7 +305,7 @@ public class IdRepoException extends Exception implements L10NMessage {
      * @return a user-facing representation of this exception.
      */
     public String getConstraintViolationDetails() {
-        if (!LDAPConstants.CONSTRAINT_VIOLATED_ERROR.equals(getErrorCode()) || args == null || args.length < 3) {
+        if (!IdRepoErrorCode.LDAP_EXCEPTION.equals(getErrorCode()) || args == null || args.length < 3) {
             return getMessage();
         }
 

@@ -24,9 +24,12 @@
  *
  * $Id: IdRepoFatalException.java,v 1.3 2008/06/25 05:43:28 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.idm;
+
+import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * The exception class whose instance is thrown if there is any error during the
@@ -73,9 +76,32 @@ public class IdRepoFatalException extends IdRepoException {
      * @param args
      *            arguments to message. If it is not present pass the as null.
      */
-    public IdRepoFatalException(String rbName, String errorCode, Object[] args)
-    {
+    public IdRepoFatalException(String rbName, String errorCode, Object[] args) {
         super(rbName, errorCode, args);
     }
 
+    /**
+     * This constructor is used to pass the localized error message At this
+     * level, the locale of the caller is not known and it is not possible to
+     * throw localized error message at this level. Instead this constructor
+     * provides Resource Bundle name ,error code and LDAP Result Code ( in case
+     * of LDAP related exception for correctly locating the
+     * error message. The default <code>getMessage()</code> will always return
+     * English messages only. This is in consistent with current JRE.
+     *
+     * @param rbName
+     *            Resource bundle Name to be used for getting localized error
+     *            message.
+     * @param errorCode
+     *            Key to resource bundle. You can use <code>ResourceBundle rb =
+     *        ResourceBunde.getBundle(rbName,locale);
+     *        String localizedStr = rb.getString(errorCode)</code>.
+     * @param ldapResultCode
+     *            ldap result code
+     * @param args
+     *            arguments to message. If it is not present pass the as null.
+     */
+    public IdRepoFatalException(String rbName, String errorCode, ResultCode ldapResultCode, Object[] args) {
+        super(rbName, errorCode, ldapResultCode, args);
+    }
 }

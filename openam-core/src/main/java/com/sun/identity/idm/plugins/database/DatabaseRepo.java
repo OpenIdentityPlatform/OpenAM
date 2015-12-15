@@ -24,10 +24,7 @@
  *
  * $Id: DatabaseRepo.java,v 1.1 2009/04/21 20:04:48 sean_brydon Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm.plugins.database;
 
@@ -50,6 +47,7 @@ import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoDuplicateObjectException;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdRepoUnsupportedOpException;
@@ -908,7 +906,7 @@ public class DatabaseRepo extends IdRepo {
              Object[] args = { PLUGIN_CLASS_NAME, membersType.getName(),
                         type.getName() };
              throw new IdRepoException(
-                        IdRepoBundle.BUNDLE_NAME, "204", args);
+                        IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIP_NOT_SUPPORTED, args);
          }
         //throw exception if this type user not allowed to do this
         //isValidType(type, "getMembers");
@@ -917,14 +915,15 @@ public class DatabaseRepo extends IdRepo {
         if (type.equals(IdType.USER)) {
             debug.error("DatabaseRepo.getMembers: Membership operation is not"
                     + " supported for Users");
-            throw new IdRepoException(IdRepoBundle.getString("203"), "203");
+            throw new IdRepoException(IdRepoBundle.getString(IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED),
+                    IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED);
         } else if (type.equals(IdType.GROUP)) {
             members = dao.getMembers(name, membershipIdAttributeName);
         } else {
             Object[] args = { PLUGIN_CLASS_NAME, IdOperation.READ.getName(),
                     type.getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
         if(members == null) {
             members = Collections.EMPTY_SET;
@@ -975,7 +974,7 @@ public class DatabaseRepo extends IdRepo {
             debug.error("DatabaseRepo.getMemberships: Membership for identities"
                     + " other than Users is not allowed ");
             Object[] args = { PLUGIN_CLASS_NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, args);
         } else {
             if (membershipType.equals(IdType.GROUP)) {
                 groups = dao.getMemberships(name, membershipIdAttributeName);
@@ -985,7 +984,7 @@ public class DatabaseRepo extends IdRepo {
                 Object args[] = { PLUGIN_CLASS_NAME, type.getName(),
                         membershipType.getName() };
                 throw new IdRepoException(
-                        IdRepoBundle.BUNDLE_NAME, "204", args);
+                        IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIP_NOT_SUPPORTED, args);
             }
         }
         if(groups == null) {
@@ -1046,14 +1045,15 @@ public class DatabaseRepo extends IdRepo {
                 debug.message("DatabaseRepo.modifyMemberShip: Members set"
                         + " is empty");
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
         if (type.equals(IdType.USER)) {
             if (debug.messageEnabled()) {
                 debug.message("DatabaseRepo.modifyMemberShip: Memberhsip" +
                         " to users is not supported");
             }
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "203", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    IdRepoErrorCode.MEMBERSHIP_TO_USERS_AND_AGENTS_NOT_ALLOWED, null);
         }
         if (!membersType.equals(IdType.USER)) {
             if (debug.messageEnabled()) {
@@ -1062,7 +1062,7 @@ public class DatabaseRepo extends IdRepo {
                                 + membersType.getName());
             }
             Object[] args = { PLUGIN_CLASS_NAME };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIPS_FOR_NOT_USERS_NOT_ALLOWED, args);
         }
 
         if (type.equals(IdType.GROUP)) {
@@ -1077,7 +1077,7 @@ public class DatabaseRepo extends IdRepo {
             debug.error("DatabaseRepo.modifyMemberShip: Memberships cannot be"
                     + "modified for type= " + type.getName());
             Object[] args = { PLUGIN_CLASS_NAME, type.getName() };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "209", args);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.MEMBERSHIP_CANNOT_BE_MODIFIED, args);
         }
     }
 
@@ -1687,7 +1687,7 @@ public class DatabaseRepo extends IdRepo {
         if ((name == null) || (name.length() == 0)) {
             Object[] args = { PLUGIN_CLASS_NAME, "" };
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                "220", args);
+                    IdRepoErrorCode.UNABLE_FIND_ENTRY, args);
         }
         isValidType(type, "getFullyQualifiedName");
 
@@ -1703,7 +1703,7 @@ public class DatabaseRepo extends IdRepo {
         }
         if (dns == null || dns.size() != 1) {
             String[] args = { PLUGIN_CLASS_NAME, name };
-            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, "220", args));
+            throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_FIND_ENTRY, args));
         }
         // example url is jdbc:mysql://localhost:3306/openssousersdb
         String dbURL = dao.getDataSourceURL();
@@ -2033,7 +2033,7 @@ public class DatabaseRepo extends IdRepo {
             Object args[] = { PLUGIN_CLASS_NAME, IdOperation.SERVICE.getName(),
                 ( type ==null ? null: type.getName()) };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                "305", args);
+                    IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
         }
     }
 }

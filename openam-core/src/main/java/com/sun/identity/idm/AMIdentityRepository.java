@@ -24,9 +24,6 @@
  *
  * $Id: AMIdentityRepository.java,v 1.21 2010/01/06 01:58:26 veiming Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm;
@@ -502,7 +499,7 @@ public final class AMIdentityRepository {
         Set results = new HashSet();
 
         if (identityNamesAndAttrs == null || identityNamesAndAttrs.isEmpty()) {
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
 
         Iterator it = identityNamesAndAttrs.keySet().iterator();
@@ -562,7 +559,7 @@ public final class AMIdentityRepository {
     public void deleteIdentities(Set identities) throws IdRepoException,
             SSOException {
         if (identities == null || identities.isEmpty()) {
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
 
         Iterator it = identities.iterator();

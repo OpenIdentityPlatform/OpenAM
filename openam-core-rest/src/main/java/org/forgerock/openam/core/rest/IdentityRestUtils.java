@@ -22,7 +22,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idsvcs.Attribute;
@@ -84,7 +84,7 @@ public final class IdentityRestUtils {
                     + "the password for user: " + username, ssoe);
             throw new PermanentException(401, "An error occurred while trying to change the password", ssoe);
         } catch (IdRepoException ire) {
-            if (IdRepoBundle.ACCESS_DENIED.equals(ire.getErrorCode())) {
+            if (IdRepoErrorCode.ACCESS_DENIED.equals(ire.getErrorCode())) {
                 throw new ForbiddenException("The user is not authorized to change the password");
             } else if (LDAPConstants.LDAP_INVALID_CREDENTIALS.equals(ire.getLDAPErrorCode())){
                 throw ResourceException.newResourceException(401, "Invalid user credentials.");

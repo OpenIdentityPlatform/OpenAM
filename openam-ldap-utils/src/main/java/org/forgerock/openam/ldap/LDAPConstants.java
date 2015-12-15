@@ -231,12 +231,6 @@ public final class LDAPConstants {
     /** LDAP Adam type property key. */
     public static final String LDAP_ADAM_TYPE = "sun-idrepo-ldapv3-ldapv3ADAM";
 
-    /** Constraint violated error. */
-    public static final String CONSTRAINT_VIOLATED_ERROR = "313";
-
-    /** No valid attributes found. */
-    public static final String ILLEGAL_ARGS_ERROR = "201";
-
     /** Unrecognized or invalid syntax for an attribute. */
     public static final String LDAP_INVALID_SYNTAX = "21";
 

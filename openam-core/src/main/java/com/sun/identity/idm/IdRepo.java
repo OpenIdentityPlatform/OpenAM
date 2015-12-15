@@ -24,10 +24,7 @@
  *
  * $Id: IdRepo.java,v 1.8 2009/07/02 20:33:30 hengming Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.idm;
 
@@ -318,7 +315,7 @@ public abstract class IdRepo {
 
             Object args[] = { this.getClass().getName() };
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                    "228", args);
+                    IdRepoErrorCode.CHANGE_USER_PASSWORD_NOT_SUPPORTED, args);
     }
 
     /**

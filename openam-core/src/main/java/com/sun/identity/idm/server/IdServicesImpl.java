@@ -47,6 +47,7 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoFatalException;
 import com.sun.identity.idm.IdRepoUnsupportedOpException;
@@ -408,7 +409,7 @@ public class IdServicesImpl implements IdServices {
        Map attrMap, String amOrgName) throws IdRepoException, SSOException {
 
        if (hasBookendSpaces(name)) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "233", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_SPACE_IDENTITY_NAMES, null);
        }
 
        if (type.equals(IdType.REALM)) {
@@ -433,7 +434,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.CREATE, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -546,7 +547,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.DELETE, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -588,7 +589,7 @@ public class IdServicesImpl implements IdServices {
                        + ide.getMessage());
                }
                noOfSuccess--;
-               if (!ide.getErrorCode().equalsIgnoreCase("220")) {
+               if (!ide.getErrorCode().equalsIgnoreCase(IdRepoErrorCode.UNABLE_FIND_ENTRY)) {
                    origEx = ide;
                }
            }
@@ -654,7 +655,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.READ, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        // Verify if it is an internal/special identity
@@ -766,7 +767,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.READ, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        // Verify if it is an internal/special identity
@@ -880,7 +881,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.READ, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -979,7 +980,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.READ, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        // If Special Identity, call SpecialRepo
@@ -1086,7 +1087,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.READ, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        // Verify if it is an internal/special identity
@@ -1139,7 +1140,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.READ, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        // Verify if it is an internal/special identity
@@ -1209,7 +1210,7 @@ public class IdServicesImpl implements IdServices {
            } else {
                Object args[] = { "isActive", IdOperation.READ.getName()};
                throw new IdRepoUnsupportedOpException(
-                   IdRepoBundle.BUNDLE_NAME, "305", args);
+                   IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
            }
        }
 
@@ -1234,7 +1235,7 @@ public class IdServicesImpl implements IdServices {
                IdOperation.EDIT, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -1272,7 +1273,7 @@ public class IdServicesImpl implements IdServices {
                // 220 is entry not found. this error should have lower
                // precedence than other error because we search thru all
                // the ds and this entry might exist in one of the other ds.
-               if (!ide.getErrorCode().equalsIgnoreCase("220") ||
+               if (!ide.getErrorCode().equalsIgnoreCase(IdRepoErrorCode.UNABLE_FIND_ENTRY) ||
                    (origEx == null)) {
                    origEx = ide;
                }
@@ -1296,7 +1297,7 @@ public class IdServicesImpl implements IdServices {
            String name = (String)i.next();
            if (!isExists(token, type, name, amOrgName)) {
                Object[] args = {name, type.getName() };
-               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "223",args);
+               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.TYPE_NOT_FOUND,args);
            }
        }
    }
@@ -1318,13 +1319,13 @@ public class IdServicesImpl implements IdServices {
            IdOperation.EDIT, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        //check if the identity exist
        if (!isExists(token, type, name, amOrgName)) {
            Object[] args = {name, type.getName()};
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "223", args);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.TYPE_NOT_FOUND, args);
        }
        validateMembers(token, members, membersType, amOrgName);
 
@@ -1379,7 +1380,7 @@ public class IdServicesImpl implements IdServices {
                Object args[] = { "modifyMemberShip",
                    IdOperation.EDIT.getName()};
                throw new IdRepoUnsupportedOpException(
-                   IdRepoBundle.BUNDLE_NAME, "305", args);
+                   IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED, args);
            }
        }
    }
@@ -1402,7 +1403,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.EDIT, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -1445,7 +1446,7 @@ public class IdServicesImpl implements IdServices {
                // 220 is entry not found. this error should have lower
                // precedence than other errors because we search through
                // all the ds and this entry might exist in one of the other ds.
-               if (!ide.getErrorCode().equalsIgnoreCase("220")
+               if (!ide.getErrorCode().equalsIgnoreCase(IdRepoErrorCode.UNABLE_FIND_ENTRY)
                        || (origEx == null)) {
                    origEx = ide;
                }
@@ -1484,7 +1485,7 @@ public class IdServicesImpl implements IdServices {
            // If permission denied and control has search filters
            // perform the search and check permissions on the matched objects
            Map filter = ctrl.getSearchModifierMap();
-           if ((!ire.getErrorCode().equals("402")) || (filter == null) ||
+           if ((!ire.getErrorCode().equals(IdRepoErrorCode.ACCESS_DENIED)) || (filter == null) ||
                (filter.isEmpty())) {
                throw (ire);
            }
@@ -1497,7 +1498,7 @@ public class IdServicesImpl implements IdServices {
        Set configuredPluginClasses = idrepoCache.getIdRepoPlugins(amOrgName, IdOperation.READ, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -1701,7 +1702,7 @@ public class IdServicesImpl implements IdServices {
            idrepoCache.getIdRepoPlugins(amOrgName, IdOperation.EDIT, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -1759,7 +1760,7 @@ public class IdServicesImpl implements IdServices {
                // 220 is entry not found. this error should have lower
                // precedence than other error because we search thru
                // all the ds and this entry might exist in one of the other ds.
-               if (!"220".equalsIgnoreCase(ide.getErrorCode())
+               if (!IdRepoErrorCode.UNABLE_FIND_ENTRY.equalsIgnoreCase(ide.getErrorCode())
                        || (origEx == null)) {
                    origEx = ide;
                }
@@ -1806,7 +1807,7 @@ public class IdServicesImpl implements IdServices {
            idrepoCache.getIdRepoPlugins(amOrgName, IdOperation.EDIT, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -1859,7 +1860,7 @@ public class IdServicesImpl implements IdServices {
                // 220 is entry not found. this error should have lower
                // precedence than other error because we search thru
                // all the ds and this entry might exist in one of the other ds.
-               if (!ide.getErrorCode().equalsIgnoreCase("220")
+               if (!ide.getErrorCode().equalsIgnoreCase(IdRepoErrorCode.UNABLE_FIND_ENTRY)
                        || (origEx == null)) {
                    origEx = ide;
                }
@@ -1951,7 +1952,7 @@ public class IdServicesImpl implements IdServices {
                IdOperation.SERVICE, type);
        if (configuredPluginClasses == null
                || configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -2024,7 +2025,7 @@ public class IdServicesImpl implements IdServices {
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()
        ) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -2286,7 +2287,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.READ, type);
        if (configuredPluginClasses == null
                || configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -2374,7 +2375,7 @@ public class IdServicesImpl implements IdServices {
            IdOperation.SERVICE, type);
        if ((configuredPluginClasses == null) ||
            configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -2428,7 +2429,7 @@ public class IdServicesImpl implements IdServices {
            }
            Object[] args = { IdOperation.SERVICE.toString() };
            throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
-                   "302", args);
+                   IdRepoErrorCode.OPERATION_NOT_SUPPORTED, args);
        }
    }
 
@@ -2438,7 +2439,7 @@ public class IdServicesImpl implements IdServices {
        Set configuredPluginClasses = idrepoCache.getIdRepoPlugins(amOrgName);
        if (configuredPluginClasses == null
                || configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -2463,7 +2464,7 @@ public class IdServicesImpl implements IdServices {
        Set configuredPluginClasses = idrepoCache.getIdRepoPlugins(amOrgName);
        if (configuredPluginClasses == null
                || configuredPluginClasses.isEmpty()) {
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", null);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_PLUGINS_CONFIGURED, null);
        }
 
        Iterator it = configuredPluginClasses.iterator();
@@ -2767,14 +2768,14 @@ public class IdServicesImpl implements IdServices {
            }
            if (!de.isAllowed(token, dp, envMap)) {
                Object[] args = { op.getName(), token.getPrincipal().getName()  };
-               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoBundle.ACCESS_DENIED, args);
+               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ACCESS_DENIED, args);
            }
            return true;
 
        } catch (DelegationException dex) {
            DEBUG.error("IdServicesImpl.checkPermission Got Delegation Exception: ", dex);
            Object[] args = { op.getName(), token.getPrincipal().getName() };
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoBundle.ACCESS_DENIED, args);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ACCESS_DENIED, args);
        }
    }
 

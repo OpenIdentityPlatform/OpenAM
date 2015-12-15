@@ -24,10 +24,8 @@
  *
  * $Id: IdRepoBundle.java,v 1.3 2008/06/25 05:43:28 qcheng Exp $
  *
- */
 
-/*
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.idm;
@@ -44,20 +42,6 @@ public class IdRepoBundle {
     private static Map bundles = new HashMap();
 
     public final static String BUNDLE_NAME = "amIdRepo";
-
-    /**
-     * Resource bundle key for error message template accepting name as single String argument
-     */
-    public static final String NAME_ALREADY_EXISTS = "310";
-    /**
-     * Resource bundle key for error message template accepting name and type as String arguments
-     */
-    public static final String IDENTITY_OF_TYPE_ALREADY_EXISTS = "224";
-
-    /**
-     * Resource bundle key for error message template accepting operation name and principal name as String arguments.
-     */
-    public static final String ACCESS_DENIED = "402";
 
     static {
         profileBundle = com.sun.identity.shared.locale.Locale

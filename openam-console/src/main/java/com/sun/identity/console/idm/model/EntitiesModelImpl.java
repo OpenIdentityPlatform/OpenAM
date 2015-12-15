@@ -24,9 +24,6 @@
  *
  * $Id: EntitiesModelImpl.java,v 1.17 2009/09/05 01:30:46 veiming Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.console.idm.model;
@@ -49,6 +46,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoFatalException;
 import com.sun.identity.idm.IdSearchControl;
@@ -79,7 +77,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
-import org.forgerock.openam.ldap.LDAPConstants;
 
 /* - LOG COMPLETE - */
 
@@ -705,7 +702,7 @@ public class EntitiesModelImpl
                 logEvent("IDM_EXCEPTION_MODIFY_IDENTITY_ATTRIBUTE_VALUE",
                     paramsEx);
 
-                if (e.getErrorCode().equals(LDAPConstants.CONSTRAINT_VIOLATED_ERROR)) {
+                if (e.getErrorCode().equals(IdRepoErrorCode.LDAP_EXCEPTION)) {
                     throw new AMConsoleException(e.getConstraintViolationDetails());
                 }
 
@@ -1344,7 +1341,7 @@ public class EntitiesModelImpl
             debug.warning("EntitiesModelImpl.getAssignedServiceNames", e);
             // special casing this, because exception message from this 
             // exception is too cryptic
-            if (e.getErrorCode().equals("305")) {
+            if (e.getErrorCode().equals(IdRepoErrorCode.PLUGIN_OPERATION_NOT_SUPPORTED)) {
                 isServicesSupported = false;
                 throw new AMConsoleException(
                     getLocalizedString("idrepo.sevices.not.supported"));

@@ -24,10 +24,7 @@
  *
  * $Id: IdCachedServicesImpl.java,v 1.21 2009/08/25 06:50:53 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2015 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm.server;
 
@@ -43,6 +40,7 @@ import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdCachedServices;
 import com.sun.identity.idm.IdConstants;
+import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
@@ -612,7 +610,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 
                     } catch (IdRepoException ide) {
                         // Check if the exception is name not found
-                        if (!ide.getErrorCode().equals("220")) {
+                        if (!ide.getErrorCode().equals(IdRepoErrorCode.UNABLE_FIND_ENTRY)) {
                             // Throw the exception
                             throw (ide);
                         }
