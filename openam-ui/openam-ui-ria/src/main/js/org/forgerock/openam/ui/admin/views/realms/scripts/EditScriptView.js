@@ -485,17 +485,11 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                         trigger: true
                     });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                },
-                onError = function (model, response) {
-                    Messages.addMessage({
-                        response: response,
-                        type: Messages.TYPE_DANGER
-                    });
                 };
 
             this.model.destroy({
                 success: onSuccess,
-                error: onError
+                wait: true
             });
         },
 

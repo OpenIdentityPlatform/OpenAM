@@ -314,7 +314,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
             this.model.destroy({
                 success: onSuccess,
-                error: onError
+                error: onError,
+                wait: true
             });
         }
     });

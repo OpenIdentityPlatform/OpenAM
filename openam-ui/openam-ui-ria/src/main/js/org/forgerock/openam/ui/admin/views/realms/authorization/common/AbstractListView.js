@@ -54,7 +54,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
 
             item.destroy({
                 success: onSuccess,
-                error: onError
+                error: onError,
+                wait: true
             });
         },
 

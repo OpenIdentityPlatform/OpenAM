@@ -219,7 +219,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
 
             this.model.destroy({
                 success: onSuccess,
-                error: onError
+                error: onError,
+                wait: true
             });
         }
     });

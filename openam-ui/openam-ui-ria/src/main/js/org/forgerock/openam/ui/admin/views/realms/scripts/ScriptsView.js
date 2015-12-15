@@ -181,16 +181,11 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 onDestroy = function () {
                     self.data.selectedUUIDs = [];
                     self.data.scripts.fetch({ reset: true });
-
                     self.renderToolbar();
                 },
                 onSuccess = function () {
                     onDestroy();
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                },
-                onError = function (model, response) {
-                    onDestroy();
-                    Messages.addMessage({ response: response, type: Messages.TYPE_DANGER });
                 };
 
             for (; i < this.data.selectedUUIDs.length; i++) {
@@ -198,7 +193,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
 
                 item.destroy({
                     success: onSuccess,
-                    error: onError
+                    wait: true
                 });
             }
         },
