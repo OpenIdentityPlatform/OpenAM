@@ -401,8 +401,7 @@
                 "provideYourOwn": "Provide your own",
                 "customQuestion": "Custom Security Question",
                 "answer": "Security Answer",
-                "securityQuestions": "Security Questions",
-                "insufficientNumberOfQuestions": "The number of questions does not match the required minimum. Provide more questions to continue registration."
+                "securityQuestions": "Security Questions"
             },
             "returnToLoginPage": "Return to Login Page",
             "userIdValidation" : "Enter the username or email address associated with your account. We will send you an email with a link that will allow you to reset your password.",
