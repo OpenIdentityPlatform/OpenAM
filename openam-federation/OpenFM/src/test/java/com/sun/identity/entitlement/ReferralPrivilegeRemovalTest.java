@@ -24,7 +24,7 @@
  *
  * $Id: ReferralPrivilegeRemovalTest.java,v 1.1.2.1 2010/01/05 15:18:40 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -33,16 +33,17 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  * One referral privilege in root realm pointing to two sub realm.
@@ -87,9 +88,6 @@ public class ReferralPrivilegeRemovalTest {
         realms.add(SUB_REALM1);
         ReferralPrivilege r1 = new ReferralPrivilege(REFERRAL_NAME,
             map, realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.add(r1);
     }
 
     @AfterClass
@@ -97,9 +95,6 @@ public class ReferralPrivilegeRemovalTest {
         if (!migrated) {
             return;
         }
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.remove(REFERRAL_NAME);
     }
 
     @Test
@@ -107,8 +102,5 @@ public class ReferralPrivilegeRemovalTest {
         OrganizationConfigManager ocm = new OrganizationConfigManager(
             adminToken, "/");
         ocm.deleteSubOrganization(SUB_REALM1.substring(1), true);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.remove(REFERRAL_NAME);
     }
 }

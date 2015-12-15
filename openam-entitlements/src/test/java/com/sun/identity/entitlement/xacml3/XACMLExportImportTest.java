@@ -11,17 +11,32 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
+
+import static com.sun.identity.entitlement.xacml3.FactoryMethods.createArbitraryPrivilege;
+import static com.sun.identity.entitlement.xacml3.FactoryMethods.createArbitraryReferralPrivilege;
+import static com.sun.identity.entitlement.xacml3.XACMLExportImport.DiffStatus;
+import static com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
+import static com.sun.identity.entitlement.xacml3.XACMLExportImport.PrivilegeManagerFactory;
+import static java.util.Arrays.asList;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.testng.AssertJUnit.fail;
 
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.shared.debug.Debug;
 import org.testng.annotations.BeforeMethod;
@@ -30,19 +45,8 @@ import org.testng.annotations.Test;
 import javax.security.auth.Subject;
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
-
-import static com.sun.identity.entitlement.xacml3.FactoryMethods.createArbitraryPrivilege;
-import static com.sun.identity.entitlement.xacml3.FactoryMethods.createArbitraryReferralPrivilege;
-import static com.sun.identity.entitlement.xacml3.XACMLExportImport.*;
-import static java.util.Arrays.asList;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.testng.AssertJUnit.fail;
 
 public class XACMLExportImportTest {
 
@@ -54,10 +58,8 @@ public class XACMLExportImportTest {
     private SearchFilterFactory searchFilterFactory;
     private PrivilegeValidator validator;
     private PrivilegeManager pm;
-    private ReferralPrivilegeManager rpm;
     private XACMLReaderWriter xacmlReaderWriter;
     private PrivilegeManagerFactory pmFactory;
-    private ReferralPrivilegeManagerFactory rpmFactory;
     private Debug debug;
 
     private XACMLExportImport xacmlExportImport;
@@ -70,9 +72,6 @@ public class XACMLExportImportTest {
         pmFactory = mock(PrivilegeManagerFactory.class);
         pm = mock(PrivilegeManager.class);
 
-        rpmFactory = mock(ReferralPrivilegeManagerFactory.class);
-        rpm = mock(ReferralPrivilegeManager.class);
-
         xacmlReaderWriter = mock(XACMLReaderWriter.class);
         validator = mock(PrivilegeValidator.class);
         searchFilterFactory = new SearchFilterFactory();
@@ -80,14 +79,12 @@ public class XACMLExportImportTest {
 
         // Class under test
 
-        xacmlExportImport = new XACMLExportImport(pmFactory, rpmFactory,
+        xacmlExportImport = new XACMLExportImport(pmFactory,
                 xacmlReaderWriter, validator, searchFilterFactory, debug);
 
         // Given (shared test state)
 
         given(pmFactory.createReferralPrivilegeManager(eq(ROOT_REALM), any(Subject.class))).willReturn(pm);
-        given(rpmFactory.createPrivilegeManager(eq(ROOT_REALM), any(Subject.class))).willReturn(rpm);
-
     }
 
     @Test
@@ -95,13 +92,10 @@ public class XACMLExportImportTest {
 
         // Given
         // shared test state
-        ReferralPrivilege referralPrivilegeToUpdate = existing(valid(referralPrivilege("rp1")));
-        ReferralPrivilege referralPrivilegeToAdd = notExisting(valid(referralPrivilege("rp2")));
         Privilege privilegeToUpdate = existing(valid(privilege("p1")));
         Privilege privilegeToAdd = notExisting(valid(privilege("p2")));
 
-        PrivilegeSet privilegeSet = new PrivilegeSet(
-                asList(referralPrivilegeToUpdate, referralPrivilegeToAdd),
+        PrivilegeSet privilegeSet = new PrivilegeSet(Collections.<ReferralPrivilege>emptyList(),
                 asList(privilegeToUpdate, privilegeToAdd));
 
         given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(privilegeSet);
@@ -110,21 +104,15 @@ public class XACMLExportImportTest {
         List<ImportStep> importSteps = xacmlExportImport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, false);
 
         // Then
-        assertThat(importSteps).hasSize(4);
-        assertImportStep(importSteps.get(0), DiffStatus.UPDATE, referralPrivilegeToUpdate);
-        assertImportStep(importSteps.get(1), DiffStatus.ADD, referralPrivilegeToAdd);
-        assertImportStep(importSteps.get(2), DiffStatus.UPDATE, privilegeToUpdate);
-        assertImportStep(importSteps.get(3), DiffStatus.ADD, privilegeToAdd);
+        assertThat(importSteps).hasSize(2);
+        assertImportStep(importSteps.get(0), DiffStatus.UPDATE, privilegeToUpdate);
+        assertImportStep(importSteps.get(1), DiffStatus.ADD, privilegeToAdd);
 
-        verify(validator).validateReferralPrivilege(referralPrivilegeToAdd);
-        verify(validator).validateReferralPrivilege(referralPrivilegeToUpdate);
         verify(validator).validatePrivilege(privilegeToAdd);
         verify(validator).validatePrivilege(privilegeToUpdate);
 
         verify(pm).add(privilegeToAdd);
         verify(pm).modify(privilegeToUpdate);
-        verify(rpm).add(referralPrivilegeToAdd);
-        verify(rpm).modify(referralPrivilegeToUpdate);
     }
 
     @Test
@@ -132,13 +120,10 @@ public class XACMLExportImportTest {
 
         // Given
         // shared test state
-        ReferralPrivilege referralPrivilegeToUpdate = existing(valid(referralPrivilege("rp1")));
-        ReferralPrivilege referralPrivilegeToAdd = notExisting(valid(referralPrivilege("rp2")));
         Privilege privilegeToUpdate = existing(valid(privilege("p1")));
         Privilege privilegeToAdd = notExisting(valid(privilege("p2")));
 
-        PrivilegeSet privilegeSet = new PrivilegeSet(
-                asList(referralPrivilegeToUpdate, referralPrivilegeToAdd),
+        PrivilegeSet privilegeSet = new PrivilegeSet(Collections.<ReferralPrivilege>emptyList(),
                 asList(privilegeToUpdate, privilegeToAdd));
 
         given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(privilegeSet);
@@ -147,21 +132,15 @@ public class XACMLExportImportTest {
         List<ImportStep> importSteps = xacmlExportImport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, true);
 
         // Then
-        assertThat(importSteps).hasSize(4);
-        assertImportStep(importSteps.get(0), DiffStatus.UPDATE, referralPrivilegeToUpdate);
-        assertImportStep(importSteps.get(1), DiffStatus.ADD, referralPrivilegeToAdd);
-        assertImportStep(importSteps.get(2), DiffStatus.UPDATE, privilegeToUpdate);
-        assertImportStep(importSteps.get(3), DiffStatus.ADD, privilegeToAdd);
+        assertThat(importSteps).hasSize(2);
+        assertImportStep(importSteps.get(0), DiffStatus.UPDATE, privilegeToUpdate);
+        assertImportStep(importSteps.get(1), DiffStatus.ADD, privilegeToAdd);
 
         verify(validator).validatePrivilege(privilegeToAdd);
         verify(validator).validatePrivilege(privilegeToUpdate);
-        verify(validator).validateReferralPrivilege(referralPrivilegeToAdd);
-        verify(validator).validateReferralPrivilege(referralPrivilegeToUpdate);
 
         verify(pm, times(0)).add(any(Privilege.class));
         verify(pm, times(0)).modify(any(Privilege.class));
-        verify(rpm, times(0)).add(any(ReferralPrivilege.class));
-        verify(rpm, times(0)).modify(any(ReferralPrivilege.class));
     }
 
     @Test(expectedExceptions = EntitlementException.class)
@@ -171,23 +150,6 @@ public class XACMLExportImportTest {
         Privilege invalidPrivilege = invalid(privilege("p1"));
         PrivilegeSet set = new PrivilegeSet();
         set.addPrivilege(invalidPrivilege);
-
-        given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(set);
-
-        // When
-        xacmlExportImport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, true);
-
-        // Then
-        fail("Expected validation exception");
-    }
-
-    @Test(expectedExceptions = EntitlementException.class)
-    public void throwsAnExceptionIfReferralPrivilegeValidationFails() throws EntitlementException {
-        // Given
-        // shared test state
-        ReferralPrivilege invalidReferral = invalid(referralPrivilege("rp1"));
-        PrivilegeSet set = new PrivilegeSet();
-        set.addReferralPrivilege(invalidReferral);
 
         given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(set);
 
@@ -236,8 +198,6 @@ public class XACMLExportImportTest {
     private <T extends IPrivilege> T existing(T privilege) throws EntitlementException {
         if (privilege instanceof Privilege) {
             given(pm.canFindByName(eq(privilege.getName()))).willReturn(true);
-        } else {
-            given(rpm.canFindByName(eq(privilege.getName()))).willReturn(true);
         }
         return privilege;
     }
@@ -245,8 +205,6 @@ public class XACMLExportImportTest {
     private <T extends IPrivilege> T notExisting(T privilege) throws EntitlementException {
         if (privilege instanceof Privilege) {
             given(pm.canFindByName(eq(privilege.getName()))).willReturn(false);
-        } else {
-            given(rpm.canFindByName(eq(privilege.getName()))).willReturn(false);
         }
         return privilege;
     }

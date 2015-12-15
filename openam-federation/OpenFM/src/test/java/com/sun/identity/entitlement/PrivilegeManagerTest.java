@@ -40,20 +40,20 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.unittest.UnittestLog;
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
+import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
+import org.json.JSONObject;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
-import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
-import org.json.JSONObject;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeClass;
 
 /**
  *
@@ -123,9 +123,7 @@ public class PrivilegeManagerTest {
 
         //Sub Realm
         PrivilegeManager prmSubReam = PrivilegeManager.getInstance(SUB_REALM, SubjectUtils.createSubject(adminToken));
-        ReferralPrivilegeManager referralM = new ReferralPrivilegeManager("/", SubjectUtils.createSubject(adminToken));
         prmSubReam.remove(PRIVILEGE_NAME);
-        referralM.remove(REFERRAL_PRIVILEGE_NAME);
 
         PrivilegeManager prm = PrivilegeManager.getInstance("/", SubjectUtils.createSubject(adminToken));
         prm.remove(PRIVILEGE_NAME);
@@ -252,7 +250,6 @@ public class PrivilegeManagerTest {
             //ok
         }
 
-        ReferralPrivilegeManager referralM = new ReferralPrivilegeManager("/", SubjectUtils.createSubject(adminToken));
         Set<String> realms = new HashSet<String>();
         realms.add(SUB_REALM);
         Map<String, Set<String>> map = new HashMap<String, Set<String>>();
@@ -261,7 +258,6 @@ public class PrivilegeManagerTest {
         map.put(APPL_NAME, referResources);
         ReferralPrivilege referral = new ReferralPrivilege(
             REFERRAL_PRIVILEGE_NAME, map, realms);
-        referralM.add(referral);
 
         if (!referral.getMapApplNameToResources().get(
             APPL_NAME).contains(RESOURCE)) {

@@ -29,28 +29,24 @@
 
 package com.sun.identity.entitlement;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.server.AuthSPrincipal;
-import com.sun.identity.entitlement.opensso.OpenSSOGroupSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.IdRepoUtils;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.SMSException;
-import java.security.AccessController;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.security.auth.Subject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
+import java.security.AccessController;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class SubRealmGroupTest {
     private static final String APPL_NAME = "SubRealmGroupAppl";
@@ -105,59 +101,9 @@ public class SubRealmGroupTest {
         tmpSet.add("true");
         ec.setSubjectAttributesCollectorConfiguration("OpenSSO", saccMap);
 
-        createReferral(adminToken, adminSubject, SUB_REALM1, REFERRAL1_NAME,
-            PRIVILEGE1_NAME, RESOURCE1, URL1);
-
         tmpSet.clear();
         tmpSet.add("false");
         ec.setSubjectAttributesCollectorConfiguration("OpenSSO", saccMap);
-
-        createReferral(adminToken, adminSubject, SUB_REALM2, REFERRAL2_NAME,
-            PRIVILEGE2_NAME, RESOURCE2, URL2);
-    }
-
-    private void createReferral(SSOToken adminToken, Subject adminSubject,
-        String subRealm, String referralName, String privilegeName,
-        String resource, String url)
-        throws SMSException, EntitlementException, SSOException,
-            IdRepoException, InterruptedException {
-
-        OrganizationConfigManager orgMgr = new OrganizationConfigManager(
-            adminToken, "/");
-        orgMgr.createSubOrganization(subRealm.substring(1),
-            Collections.EMPTY_MAP);
-
-        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-        Set<String> set = new HashSet<String>();
-        map.put(APPL_NAME, set);
-        set.add(resource);
-
-        Set<String> realms = new HashSet<String>();
-        realms.add(subRealm);
-
-        ReferralPrivilege referral1 =
-            new ReferralPrivilege(referralName, map, realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.add(referral1);
-
-        PrivilegeManager pm = PrivilegeManager.getInstance(subRealm,
-            adminSubject);
-        Map<String, Boolean> actions = new HashMap<String, Boolean>();
-        actions.put("GET", Boolean.TRUE);
-        Entitlement ent = new Entitlement(APPL_NAME, url, actions);
-
-        Set<EntitlementSubject> esSet = new HashSet<EntitlementSubject>();
-        EntitlementSubject es1 = new OpenSSOGroupSubject(
-            group1.getUniversalId());
-        esSet.add(es1);
-
-        EntitlementSubject eSubject = new OrSubject(esSet);
-        Privilege privilege = Privilege.getNewInstance();
-        privilege.setName(privilegeName);
-        privilege.setEntitlement(ent);
-        privilege.setSubject(eSubject);
-        pm.add(privilege);
     }
 
     @AfterClass
@@ -168,10 +114,6 @@ public class SubRealmGroupTest {
     private void removeOrganization() throws Exception {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.remove(REFERRAL1_NAME);
-        mgr.remove(REFERRAL2_NAME);
 
         Set<AMIdentity> identities = new HashSet<AMIdentity>();
         identities.add(user1);

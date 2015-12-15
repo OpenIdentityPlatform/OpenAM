@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
@@ -21,8 +21,6 @@ import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.IPrivilegeManager;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
@@ -56,13 +54,11 @@ public class XACMLExportImport {
     private final Debug debug;
     private final PrivilegeValidator privilegeValidator;
     private final PrivilegeManagerFactory privilegeManagerFactory;
-    private final ReferralPrivilegeManagerFactory referralPrivilegeManagerFactory;
 
     /**
      * Creates an instance of the XACMLExportImport with dependencies provided.
      *
      * @param privilegeManagerFactory Non null, required to create PrivilegeManager instances.
-     * @param referralPrivilegeManagerFactory Non null, required to create ReferralPrivilegeManager instances.
      * @param xacmlReaderWriter Non null, required for translating privileges to/from XACML XML.
      * @param privilegeValidator Non null, required for validation of imported privileges.
      * @param searchFilterFactory Non null, required for SearchFilter operations.
@@ -70,14 +66,12 @@ public class XACMLExportImport {
      */
     @Inject
     public XACMLExportImport(PrivilegeManagerFactory privilegeManagerFactory,
-                             ReferralPrivilegeManagerFactory referralPrivilegeManagerFactory,
                              XACMLReaderWriter xacmlReaderWriter,
                              PrivilegeValidator privilegeValidator,
                              SearchFilterFactory searchFilterFactory,
                              @Named(XACMLConstants.DEBUG) Debug debug) {
 
         this.privilegeManagerFactory = privilegeManagerFactory;
-        this.referralPrivilegeManagerFactory = referralPrivilegeManagerFactory;
         this.xacmlReaderWriter = xacmlReaderWriter;
         this.searchFilterFactory = searchFilterFactory;
         this.privilegeValidator = privilegeValidator;
@@ -126,25 +120,6 @@ public class XACMLExportImport {
         List<ImportStep> importSteps = new ArrayList<ImportStep>();
 
         PrivilegeManager pm = privilegeManagerFactory.createReferralPrivilegeManager(realm, admin);
-        ReferralPrivilegeManager rpm = referralPrivilegeManagerFactory.createPrivilegeManager(realm, admin);
-
-        for (ReferralPrivilege referralPrivilege : privilegeSet.getReferralPrivileges()) {
-            privilegeValidator.validateReferralPrivilege(referralPrivilege);
-
-            // OPENAM-5031
-            // For the moment, fail the whole import if any single referral is found to have a name which doesn't
-            // suit LDAP.
-            if (containsUndesiredCharacters(referralPrivilege.getName())) {
-                throw new EntitlementException(EntitlementException.INVALID_VALUE,
-                        new Object[] { "referral name " + referralPrivilege.getName() });
-            }
-
-            if (rpm.canFindByName(referralPrivilege.getName())) {
-                importSteps.add(referralImportStep(rpm, DiffStatus.UPDATE, referralPrivilege));
-            } else {
-                importSteps.add(referralImportStep(rpm, DiffStatus.ADD, referralPrivilege));
-            }
-        }
 
         for (Privilege privilege : privilegeSet.getPrivileges()) {
 
@@ -181,7 +156,6 @@ public class XACMLExportImport {
             throws EntitlementException {
 
         PrivilegeManager pm = privilegeManagerFactory.createReferralPrivilegeManager(realm, admin);
-        ReferralPrivilegeManager rpm = referralPrivilegeManagerFactory.createPrivilegeManager(realm, admin);
 
         Set<SearchFilter> filterSet = new HashSet<SearchFilter>();
         if (filters != null) {
@@ -193,21 +167,13 @@ public class XACMLExportImport {
         }
 
         Set<String> privilegeNames = pm.searchNames(filterSet);
-        Set<String> referralNames = rpm.searchNames(filterSet);
         message("Export: Privilege Matches {0}", privilegeNames.size());
-        message("Export: Referral Matches {0}", referralNames.size());
 
         PrivilegeSet privilegeSet = new PrivilegeSet();
         for (String name : privilegeNames) {
             Privilege privilege = pm.findByName(name, admin);
             message("Export: Privilege {0}", privilege.getName());
             privilegeSet.addPrivilege(privilege);
-        }
-
-        for (String name : referralNames) {
-            ReferralPrivilege referralPrivilege = rpm.findByName(name);
-            privilegeSet.addReferralPrivilege(referralPrivilege);
-            message("Export: Referral {0}", referralPrivilege.getName());
         }
 
         PolicySet policySet = xacmlReaderWriter.toXACML(realm, privilegeSet);
@@ -249,13 +215,6 @@ public class XACMLExportImport {
     }
 
     /**
-     * Factory method for ReferralPrivilege ImportStep
-     */
-    private ImportStep referralImportStep(ReferralPrivilegeManager rpm, DiffStatus type, ReferralPrivilege referral) {
-        return new ImportStepImpl<ReferralPrivilege>(rpm, type, referral, "Referral");
-    }
-
-    /**
      * Factory method for Privilege ImportStep
      */
     private ImportStep privilegeImportStep(PrivilegeManager pm, DiffStatus type, Privilege privilege) {
@@ -269,16 +228,6 @@ public class XACMLExportImport {
 
         PrivilegeManager createReferralPrivilegeManager(String realm, Subject admin) {
             return PrivilegeManager.getInstance(realm, admin);
-        }
-    }
-
-    /**
-     * Factory to allow ReferralPrivilegeManager to be mocked in tests
-     */
-    public static class ReferralPrivilegeManagerFactory {
-
-        ReferralPrivilegeManager createPrivilegeManager(String realm, Subject admin) {
-            return new ReferralPrivilegeManager(realm, admin);
         }
     }
 

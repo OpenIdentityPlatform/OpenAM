@@ -35,16 +35,17 @@ import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 
 public class ReferredResourcesTest {
@@ -119,9 +120,6 @@ public class ReferredResourcesTest {
         realms.add(SUB_REALM2);
         ReferralPrivilege r1 = new ReferralPrivilege(REFERRAL_NAME1,
             map, realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.add(r1);
     }
 
     private void createReferral2(Subject adminSubject)
@@ -134,9 +132,6 @@ public class ReferredResourcesTest {
         realms.add(SUB_REALM1);
         ReferralPrivilege r1 = new ReferralPrivilege(REFERRAL_NAME2, map,
             realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager(SUB_REALM2,
-            adminSubject);
-        mgr.add(r1);
     }
 
     @AfterClass
@@ -144,12 +139,6 @@ public class ReferredResourcesTest {
         if (!migrated) {
             return;
         }
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager(SUB_REALM2,
-            adminSubject);
-        mgr.remove(REFERRAL_NAME2);
-        mgr = new ReferralPrivilegeManager("/", adminSubject);
-        mgr.remove(REFERRAL_NAME1);
-
         ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
         OrganizationConfigManager ocm = new OrganizationConfigManager(
             adminToken, "/");

@@ -190,8 +190,6 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
     public static final String ADVICES_HANDLEABLE_BY_AM 
             = "sun-am-policy-config-advices-handleable-by-am";
 
-    public static final String REFERRALS_ENABLED = "openam-referrals-enabled";
-
     public static final String ORG_DN = "orgDN";
 
     /** 
@@ -711,13 +709,4 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
         return advicesHandleableByAM;
     }
 
-    /**
-     * Find out if Referrals are enabled or not. This is a Global Attribute.
-     * @return True if Referrals are enabled, false if not or if the attribute can not be read.
-     * @throws SMSException
-     */
-    public static boolean isReferralsEnabled() throws SMSException, SSOException {
-        return CollectionHelper.getBooleanMapAttr(
-                getServiceSchemaManager().getGlobalSchema().getAttributeDefaults(), REFERRALS_ENABLED, false);
-    }
 }

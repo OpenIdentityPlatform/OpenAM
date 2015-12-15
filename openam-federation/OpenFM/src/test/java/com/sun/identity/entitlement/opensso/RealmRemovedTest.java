@@ -29,20 +29,26 @@
 
 package com.sun.identity.entitlement.opensso;
 
-import com.sun.identity.entitlement.*;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.ApplicationPrivilege;
+import com.sun.identity.entitlement.ApplicationPrivilegeManager;
+import com.sun.identity.entitlement.ApplicationTypeManager;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.SubjectImplementation;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  *
@@ -75,12 +81,6 @@ public class RealmRemovedTest {
         subRealm = SUB_REALM2.substring(1);
         ocm.createSubOrganization(subRealm, Collections.EMPTY_MAP);
 
-        Set<String> realms = new HashSet<String>();
-        realms.add(SUB_REALM1);
-        realms.add(SUB_REALM2);
-        createReferral(REFERRAL_NAME2, realms);
-        realms.remove(SUB_REALM2);
-        createReferral(REFERRAL_NAME1, realms);
         createApplicationPrivilege();
     }
 
@@ -89,28 +89,12 @@ public class RealmRemovedTest {
         if (!migrated) {
             return;
         }
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.remove(REFERRAL_NAME2);
         OrganizationConfigManager ocm = new OrganizationConfigManager(
             adminToken, "/");
         String subRealm = SUB_REALM2.substring(1);
         ocm.deleteSubOrganization(subRealm, true);
     }
 
-    private void createReferral(String name, Set<String> realms)
-        throws EntitlementException {
-        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-        Set<String> set = new HashSet<String>();
-        set.add("http://www.RealmRemovedTest.com/*");
-        map.put(ApplicationTypeManager.URL_APPLICATION_TYPE_NAME, set);
-        ReferralPrivilege r1 = new ReferralPrivilege(name,
-            map, realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.add(r1);
-    }
-    
     private void createApplicationPrivilege() throws EntitlementException {
         ApplicationPrivilegeManager mgr =
             ApplicationPrivilegeManager.getInstance(SUB_REALM1,
@@ -145,24 +129,6 @@ public class RealmRemovedTest {
             adminToken, "/");
         String subRealm = SUB_REALM1.substring(1);
         ocm.deleteSubOrganization(subRealm, true);
-
-        ReferralPrivilegeManager rpm = new ReferralPrivilegeManager("/",
-            adminSubject);
-        // referral privilege that only referral subrealm 1 should be removed.
-        try {
-            ReferralPrivilege r = rpm.findByName(REFERRAL_NAME1);
-        } catch (EntitlementException e) {
-            if (e.getErrorCode() != 263) {
-                throw e;
-            }
-        }
-        // referral privilege that only referral subrealm 1 should NOT be
-        // removed.
-        ReferralPrivilege r = rpm.findByName(REFERRAL_NAME2);
-        Set<String> realms = r.getRealms();
-        if ((realms.size() != 1) || !realms.contains(SUB_REALM2)) {
-            throw new Exception("RealmRemovedTest: referred realm is incorrect");
-        }
 
         // application privilege should be removed.
         ApplicationPrivilegeManager apm =

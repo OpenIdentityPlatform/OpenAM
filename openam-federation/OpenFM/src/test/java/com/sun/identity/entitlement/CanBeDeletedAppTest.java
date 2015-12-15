@@ -34,18 +34,18 @@ import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  *
@@ -77,7 +77,6 @@ public class CanBeDeletedAppTest {
         ocm.createSubOrganization(subRealm, Collections.EMPTY_MAP);
 
         createAppl();
-        createReferral();
         createPrivilege();
         createApplicationPrivilege();
     }
@@ -106,21 +105,6 @@ public class CanBeDeletedAppTest {
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
         ApplicationManager.saveApplication(adminSubject, "/", appl);
-    }
-
-    private void createReferral()
-        throws EntitlementException {
-        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-        Set<String> set = new HashSet<String>();
-        set.add("http://www.CanBeDeletedAppTest.com/*");
-        map.put(APPL_NAME, set);
-        Set<String> realms = new HashSet<String>();
-        realms.add(SUB_REALM);
-        ReferralPrivilege r1 = new ReferralPrivilege(REFERRAL_NAME,
-            map, realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.add(r1);
     }
 
     private void createPrivilege() throws EntitlementException {
@@ -183,10 +167,6 @@ public class CanBeDeletedAppTest {
                 throw e;
             }
         }
-
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager(
-            "/", adminSubject);
-        mgr.remove(REFERRAL_NAME);
 
         // at this point, we still have application privilege, so application
         // still cannot be deleted.

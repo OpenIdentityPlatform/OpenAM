@@ -33,7 +33,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.AuthUtils;
-import org.testng.annotations.Test;
 import com.sun.identity.entitlement.util.IdRepoUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
@@ -43,14 +42,16 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
 
 /**
  *
@@ -94,8 +95,6 @@ public class DelegationPrivilegeIdRepoAccessTest {
             adminToken, SUB_REALM);
         orgMgr.createSubOrganization(SUB_SUB_REALM, Collections.EMPTY_MAP);
 
-        createReferral();
-        
         Application appl = ApplicationManager.newApplication(APPLICATION_NAME,
             ApplicationTypeManager.getAppplicationType(
                 PrivilegeManager.superAdminSubject,
@@ -119,10 +118,6 @@ public class DelegationPrivilegeIdRepoAccessTest {
         ApplicationManager.deleteApplication(
             SubjectUtils.createSuperAdminSubject(), SUB_REALM,
             APPLICATION_NAME);
-
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            SubjectUtils.createSuperAdminSubject());
-        mgr.remove(REFERRAL_NAME);
 
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(
             adminToken, "/");
@@ -221,21 +216,4 @@ public class DelegationPrivilegeIdRepoAccessTest {
         mgr.addPrivilege(ap);
     }
 
-    private void createReferral()
-        throws EntitlementException {
-
-        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-        Set<String> set = new HashSet<String>();
-        map.put(ApplicationTypeManager.URL_APPLICATION_TYPE_NAME, set);
-        set.add(DELEGATED_RESOURCE);
-
-        Set<String> realms = new HashSet<String>();
-        realms.add(SUB_REALM);
-
-        ReferralPrivilege referral1 =
-            new ReferralPrivilege(REFERRAL_NAME, map, realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            SubjectUtils.createSuperAdminSubject());
-        mgr.add(referral1);
-    }
 }

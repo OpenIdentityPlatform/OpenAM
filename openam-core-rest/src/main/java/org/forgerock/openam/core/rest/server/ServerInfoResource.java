@@ -27,7 +27,6 @@ import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.configuration.MapValueParser;
-import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -159,7 +158,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("lang", getJsLocale(localeContext.getLocale()));
             result.put("successfulUserRegistrationDestination", selfServiceInfo.getSuccessDestination());
             result.put("socialImplementations", getSocialAuthnImplementations(realm));
-            result.put("referralsEnabled", String.valueOf(PolicyConfig.isReferralsEnabled()));
+            result.put("referralsEnabled", Boolean.FALSE.toString());
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
             result.put("realm", realm);
             result.put("xuiUserSessionValidationEnabled", SystemProperties.getAsBoolean(Constants.XUI_USER_SESSION_VALIDATION_ENABLED, true));

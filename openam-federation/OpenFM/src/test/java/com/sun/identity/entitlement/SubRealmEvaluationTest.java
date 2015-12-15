@@ -29,28 +29,23 @@
 
 package com.sun.identity.entitlement;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.server.AuthSPrincipal;
-import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.IdRepoUtils;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.SMSException;
-import java.security.AccessController;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.security.auth.Subject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
+import java.security.AccessController;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SubRealmEvaluationTest {
     private static final String APPL_NAME = "TestEvaluatorAppl";
@@ -82,53 +77,8 @@ public class SubRealmEvaluationTest {
         appl.setEntitlementCombiner(DenyOverride.class);
         ApplicationManager.saveApplication(adminSubject, "/", appl);
 
-        createReferral(adminToken, adminSubject);
     }
 
-    private void createReferral(SSOToken adminToken, Subject adminSubject)
-        throws SMSException, EntitlementException, SSOException, IdRepoException,
-        InterruptedException {
-        OrganizationConfigManager orgMgr = new OrganizationConfigManager(
-            adminToken, "/");
-        String subRealm = SUB_REALM.substring(1);
-        orgMgr.createSubOrganization(subRealm, Collections.EMPTY_MAP);
-
-
-        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-        Set<String> set = new HashSet<String>();
-        map.put(APPL_NAME, set);
-        set.add("http://www.testevaluator.com:80/*");
-
-        Set<String> realms = new HashSet<String>();
-        realms.add(SUB_REALM);
-
-        ReferralPrivilege referral =
-            new ReferralPrivilege(REFERRAL_NAME, map, realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.add(referral);
-
-        PrivilegeManager pm = PrivilegeManager.getInstance(SUB_REALM,
-            adminSubject);
-        Map<String, Boolean> actions = new HashMap<String, Boolean>();
-        actions.put("GET", Boolean.TRUE);
-        Entitlement ent = new Entitlement(APPL_NAME, URL1, actions);
-        user1 = IdRepoUtils.createUser("/", USER1_NAME);
-        user2 = IdRepoUtils.createUser("/", USER2_NAME);
-        Set<EntitlementSubject> esSet = new HashSet<EntitlementSubject>();
-        EntitlementSubject es1 = new OpenSSOUserSubject(user1.getUniversalId());
-        EntitlementSubject es2 = new OpenSSOUserSubject(user2.getUniversalId());
-        esSet.add(es1);
-        esSet.add(es2);
-
-        EntitlementSubject eSubject = new OrSubject(esSet);
-        Privilege privilege = Privilege.getNewInstance();
-        privilege.setName(PRIVILEGE1_NAME);
-        privilege.setEntitlement(ent);
-        privilege.setSubject(eSubject);
-        pm.add(privilege);
-        Thread.sleep(1000);
-    }
 
     @AfterClass
     public void cleanup() throws EntitlementException {
@@ -138,10 +88,6 @@ public class SubRealmEvaluationTest {
     private void removeOrganization() throws Exception {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.remove(REFERRAL_NAME);
-
         Set<AMIdentity> identities = new HashSet<AMIdentity>();
         identities.add(user1);
         identities.add(user2);

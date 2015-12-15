@@ -39,7 +39,6 @@ import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
@@ -166,7 +165,6 @@ public class ListXACML extends AuthenticatedCommand {
         String currentPrivilegeName = null;
         try {
             PrivilegeManager pm = PrivilegeManager.getInstance(realm, adminSubject);
-            ReferralPrivilegeManager rpm = new ReferralPrivilegeManager(realm, adminSubject);
 
             String[] parameters = new String[1];
             parameters[0] = realm;
@@ -176,15 +174,6 @@ public class ListXACML extends AuthenticatedCommand {
 
             Set<SearchFilter> filterSet = getFilters(filters);
             Set<String> privilegeNames = pm.searchNames(filterSet);
-
-            Set<String> referralPrivilegeNames = rpm.searchNames(
-                    filterSet);
-            if (referralPrivilegeNames != null & !referralPrivilegeNames.isEmpty()) {
-                if (privilegeNames == null) {
-                    privilegeNames = new HashSet<String>();
-                }
-                privilegeNames.addAll(referralPrivilegeNames);
-            }
 
             if ((privilegeNames != null) && !privilegeNames.isEmpty()) {
                 FileOutputStream fout = null;
@@ -304,7 +293,6 @@ public class ListXACML extends AuthenticatedCommand {
                     new RealmValidator(new OrganizationConfigManager(adminSSOToken, "/")));
             XACMLExportImport importExport = new XACMLExportImport(
                     new XACMLExportImport.PrivilegeManagerFactory(),
-                    new XACMLExportImport.ReferralPrivilegeManagerFactory(),
                     new XACMLReaderWriter(),
                     privilegeValidator,
                     new SearchFilterFactory(),

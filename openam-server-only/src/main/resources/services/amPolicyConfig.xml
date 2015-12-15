@@ -110,15 +110,6 @@
 			<Value>com.sun.identity.policy.ResourceComparatorValidator</Value>
                     </DefaultValues>
 		</AttributeSchema>
-                <AttributeSchema name="openam-referrals-enabled"
-                                 type="single"
-                                 syntax="boolean"
-                                 resourceName="referralsEnabled"
-                                 i18nKey="a100f">
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
             </Global>
 
             <Organization>

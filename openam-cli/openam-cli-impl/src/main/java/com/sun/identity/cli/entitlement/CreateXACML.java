@@ -114,7 +114,6 @@ public class CreateXACML extends AuthenticatedCommand {
                     new RealmValidator(new OrganizationConfigManager(adminSSOToken, realm)));
             XACMLExportImport xacmlExportImport = new XACMLExportImport(
                     new XACMLExportImport.PrivilegeManagerFactory(),
-                    new XACMLExportImport.ReferralPrivilegeManagerFactory(),
                     new XACMLReaderWriter(),
                     privilegeValidator,
                     new SearchFilterFactory(),

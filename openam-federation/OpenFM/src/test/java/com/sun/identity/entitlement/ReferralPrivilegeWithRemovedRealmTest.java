@@ -24,7 +24,7 @@
  *
  * $Id: ReferralPrivilegeWithRemovedRealmTest.java,v 1.1 2010/01/08 23:59:31 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -33,16 +33,17 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /**
  *
@@ -79,9 +80,6 @@ public class ReferralPrivilegeWithRemovedRealmTest {
         if (!migrated) {
             return;
         }
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.remove(REFERRAL_NAME);
     }
 
     private void createReferral()
@@ -94,9 +92,6 @@ public class ReferralPrivilegeWithRemovedRealmTest {
         realms.add(SUB_REALM);
         ReferralPrivilege r1 = new ReferralPrivilege(REFERRAL_NAME,
             map, realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.add(r1);
     }
 
     @Test

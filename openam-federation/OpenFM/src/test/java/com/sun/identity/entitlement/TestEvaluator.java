@@ -40,16 +40,17 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class TestEvaluator {
     private static final String APPL_NAME = "TestEvaluatorAppl";
@@ -109,9 +110,6 @@ public class TestEvaluator {
         
         ReferralPrivilege referral =
             new ReferralPrivilege(REFERRAL_NAME, map, realms);
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.add(referral);
 
         PrivilegeManager pm = PrivilegeManager.getInstance(SUB_REALM,
             adminSubject);
@@ -144,10 +142,6 @@ public class TestEvaluator {
         PrivilegeManager pm = PrivilegeManager.getInstance(SUB_REALM,
             adminSubject);
         pm.remove(PRIVILEGE1_NAME);
-
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
-            adminSubject);
-        mgr.remove(REFERRAL_NAME);
 
         Set<AMIdentity> identities = new HashSet<AMIdentity>();
         identities.add(user1);

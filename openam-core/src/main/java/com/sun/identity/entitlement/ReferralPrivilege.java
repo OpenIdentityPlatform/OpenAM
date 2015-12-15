@@ -48,7 +48,11 @@ import org.json.JSONObject;
 
 /**
  * Referral privilege allows application to be referred to peer and sub realm.
+ *
+ * @deprecated referrals is no longer supported by the
+ * policy model and is in the process of being removed.
  */
+@Deprecated
 public final class ReferralPrivilege implements IPrivilege, Cloneable {
     private String name;
     private String description;

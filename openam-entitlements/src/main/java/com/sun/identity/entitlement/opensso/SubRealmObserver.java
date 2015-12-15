@@ -24,7 +24,7 @@
  *
  * $Id: SubRealmObserver.java,v 1.3 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -35,8 +35,6 @@ import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.setup.SetupListener;
@@ -44,10 +42,9 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
-import java.security.AccessController;
-import java.util.Iterator;
-import java.util.Set;
+
 import javax.security.auth.Subject;
+import java.security.AccessController;
 
 /**
  * This observer will remove all referral and application privileges
@@ -113,55 +110,8 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
                     "Unable to remove application  privileges", ex);
             }
 
-            String deletedRealm = DNMapper.orgNameToRealmName(orgName);
-            try {
-                EntitlementService es = new EntitlementService(deletedRealm);
-                Set<String> parentAndPeerRealms =
-                    es.getParentAndPeerRealmNames();
-
-                if ((parentAndPeerRealms != null) &&
-                    !parentAndPeerRealms.isEmpty()) {
-                    for (String r : parentAndPeerRealms) {
-                        removeReferrals(r, deletedRealm);
-                    }
-                }
-
-            } catch (EntitlementException ex) {
-                PrivilegeManager.debug.error(
-                    "SubRealmObserver.organizationConfigChanged: " +
-                    "Unable to remove referral privileges", ex);
-            }
         } else if (type == ServiceListener.MODIFIED) {
             ApplicationManager.clearCache(DNMapper.orgNameToRealmName(orgName));
-        }
-    }
-
-    private void removeReferrals(String realm, String deletedRealm) 
-        throws EntitlementException {
-        Set<String> referralNames = DataStore.getReferralNames(realm,
-            deletedRealm);
-        if ((referralNames != null) && !referralNames.isEmpty()) {
-            ReferralPrivilegeManager rfm = new ReferralPrivilegeManager(
-                realm, adminSubject);
-
-            for (String name : referralNames) {
-                ReferralPrivilege referral = rfm.findByName(name);
-                Set<String> realms = referral.getRealms();
-
-                for (Iterator<String> i = realms.iterator(); i.hasNext(); ) {
-                    String r = i.next();
-                    if (r.equalsIgnoreCase(deletedRealm)) {
-                        i.remove();
-                    }
-                }
-
-                if (realms.isEmpty()) {
-                    rfm.remove(name);
-                } else {
-                    referral.setRealms(realms);
-                    rfm.modify(referral);
-                }
-            }
         }
     }
 

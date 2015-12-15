@@ -19,7 +19,6 @@ package org.forgerock.openam.entitlement.rest;
 import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
 
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
-import org.forgerock.openam.rest.RealmContextFilter;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
@@ -44,11 +43,6 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
                 .toCollection(PolicyResource.class)
                 .forVersion(2)
                 .toCollection(PolicyResource.class);
-
-        realmRouter.route("referrals")
-                .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
-                .toCollection(ReferralsResourceV1.class);
 
         realmRouter.route("applications")
                 .auditAs(POLICY)
