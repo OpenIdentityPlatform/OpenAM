@@ -66,7 +66,13 @@ public class ContextHelper {
      * @return The resource users username.
      */
     public String getUserId(Context context) {
-        return context.asContext(UriRouterContext.class).getUriTemplateVariables().get("user");
+        UriRouterContext routerContext = context.asContext(UriRouterContext.class);
+        String userId = routerContext.getUriTemplateVariables().get("user");
+        if (userId == null && !routerContext.isRootContext()
+                && routerContext.getParent().containsContext(UriRouterContext.class)) {
+            return getUserId(routerContext.getParent());
+        }
+        return userId;
     }
 
     /**

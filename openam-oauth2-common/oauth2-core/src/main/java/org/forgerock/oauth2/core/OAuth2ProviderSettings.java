@@ -167,6 +167,14 @@ public interface OAuth2ProviderSettings {
     void saveConsent(ResourceOwner resourceOwner, String clientId, Set<String> scope);
 
     /**
+     * Revokes the resource owner's consent for the granting authorization for the specified client.
+     *
+     * @param userId The user id.
+     * @param clientId The client id.
+     */
+    void revokeConsent(String userId, String clientId);
+
+    /**
      * Whether the OAuth2 provider should issue refresh tokens when issuing access tokens.
      *
      * @return {@code true} if refresh tokens should be issued.

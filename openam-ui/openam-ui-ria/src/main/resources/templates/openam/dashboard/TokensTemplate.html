@@ -1,4 +1,4 @@
-{{#if tokens}}
+{{#if applications}}
 <div id="oAuthTokens" class="panel panel-default">
 
     <div class="panel-heading" role="tab" id="tokensCollapseHeading">
@@ -13,17 +13,17 @@
                 <table id="oAuthTokensTable" class="table">
                     <thead>
                     <th id="oAuthTokensAppName"     class="col-md-4"  scope="col">{{t "openam.oAuth2.tokens.appName"}}</th>
-                    <th id="oAuthTokensScope"       class="col-md-3"  scope="col">{{t "openam.oAuth2.tokens.scope"}}</th>
-                    <th id="oAuthTokensExpiryDate"  class="col-md-3"  scope="col">{{t "openam.oAuth2.tokens.expiryDate"}}</th>
+                    <th id="oAuthTokensScope"       class="col-md-3"  scope="col">{{t "openam.oAuth2.tokens.scopes"}}</th>
+                    <th id="oAuthTokensExpiryDate"  class="col-md-3"  scope="col">{{t "openam.oAuth2.tokens.expires"}}</th>
                     <th id="oAuthTokensDeleteBtn"   class="col-md-2"  abbr="" scope="col"></th>
                     </thead>
 
                     <tbody>
-                    {{#each tokens}}
+                    {{#each applications}}
                     <tr id="oAuthToken_{{@index}}">
-                        <td>{{this.display_name}} </td>
-                        <td>{{this.scopes}} </td>
-                        <td>{{this.expireTime}} </td>
+                        <td>{{this.name}}</td>
+                        <td>{{this.scopes}}</td>
+                        <td>{{this.expiryDateTime}}</td>
                         <td>
                             <div class="pull-right">
                                 <a  href="#" id="{{this.id}}" role="button"

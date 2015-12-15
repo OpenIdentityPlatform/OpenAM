@@ -26,14 +26,23 @@ define("org/forgerock/openam/ui/dashboard/views/OAuthTokensView", [
         noBaseTemplate: true,
         element: "#myOAuthTokensSection",
         events: {
-            "click  a.deleteToken": "deleteToken"
+            "click a.deleteToken": "deleteToken"
         },
 
         render: function () {
             var self = this;
 
-            OAuthTokensDelegate.getOAuthTokens().then(function (data) {
-                self.data.tokens = data.result;
+            OAuthTokensDelegate.getApplications().then(function (data) {
+                self.data.applications = _.map(data.result, function (application) {
+                    return {
+                        id: application._id,
+                        name: application.name,
+                        scopes: _.values(application.scopes).join(", "),
+                        expiryDateTime: (!application.expiryDateTime)
+                            ? $.t("openam.oAuth2.tokens.neverExpires")
+                            : new Date(application.expiryDateTime).toLocaleString()
+                    };
+                });
                 self.parentRender(function () {
                     self.$el.find("[data-toggle=\"tooltip\"]").tooltip();
                 });
@@ -44,11 +53,10 @@ define("org/forgerock/openam/ui/dashboard/views/OAuthTokensView", [
             event.preventDefault();
             var self = this;
 
-            OAuthTokensDelegate.deleteOAuthToken(event.currentTarget.id).then(function () {
-                console.log("Deleted access token");
+            OAuthTokensDelegate.revokeApplication(event.currentTarget.id).then(function () {
                 self.render();
             }, function () {
-                console.error("Failed to delete access token");
+                console.error("Failed to revoke application");
             });
         }
     });

@@ -43,6 +43,8 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
@@ -492,18 +494,51 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                     logger.message("Saving consents:" + consents + " for resourceOwner: " + resourceOwner.getId()
                             + " in attribute:" + consentAttribute + " in realm:" + realm);
                 }
-                //update the user profile with our new consent settings
-                Map<String, Set<String>> attrs = new HashMap<String, Set<String>>(1);
-                attrs.put(consentAttribute, consents);
-                id.setAttributes(attrs);
-                id.store();
+                updateConsentValues(consentAttribute, id, consents);
+
             } else {
                 logger.error("Cannot save consent as no saved consent attribute defined in realm:" + realm);
             }
         } catch (Exception e) {
-            logger.error("There was a problem saving the consent into the attribute: "
-                    + consentAttribute + " for realm:" + realm, e);
+            logger.error("There was a problem saving the consent into the attribute: {} for realm: {}",
+                    consentAttribute, realm, e);
         }
+    }
+
+    @Override
+    public void revokeConsent(String userId, String clientId) {
+        String consentAttribute = null;
+        try {
+            consentAttribute = getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
+            if (consentAttribute != null) {
+                AMIdentity id = IdUtils.getIdentity(userId, realm);
+
+                Set<String> consents = id.getAttribute(consentAttribute);
+                if (consents == null) {
+                    return;
+                }
+
+                Iterator<String> iterator = consents.iterator();
+                while (iterator.hasNext()) {
+                    if (iterator.next().startsWith(clientId + " ")) {
+                        iterator.remove();
+                    }
+                }
+                updateConsentValues(consentAttribute, id, consents);
+            }
+        } catch (SMSException | SSOException | IdRepoException e) {
+            logger.warning("There was a problem revoking consent from the attribute: {} for realm: {}",
+                    consentAttribute, realm, e);
+        }
+
+    }
+
+    private void updateConsentValues(String consentAttribute, AMIdentity id, Set<String> consents) throws IdRepoException, SSOException {
+        //update the user profile with our new consent settings
+        Map<String, Set<String>> attrs = new HashMap<>(1);
+        attrs.put(consentAttribute, consents);
+        id.setAttributes(attrs);
+        id.store();
     }
 
     /**

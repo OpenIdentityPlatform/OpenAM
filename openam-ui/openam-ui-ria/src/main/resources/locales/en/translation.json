@@ -514,9 +514,10 @@
         "oAuth2" : {
             "tokens" : {
                 "appName" : "Application",
-                "scope" : "Scope",
-                "expiryDate" : "Expiry Date",
-                "deleteToken" : "Revoke Access"
+                "scopes" : "Scopes",
+                "expires" : "Expires",
+                "deleteToken" : "Revoke Access",
+                "neverExpires": "Never"
             }
         },
         "authentication": {

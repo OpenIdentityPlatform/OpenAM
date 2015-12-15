@@ -19,21 +19,27 @@ define("org/forgerock/openam/ui/dashboard/delegates/OAuthTokensDelegate", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function ($, _, AbstractDelegate, Constants) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/frrest/");
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function ($, _, AbstractDelegate, Configuration, Constants, RealmHelper) {
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
-    obj.getOAuthTokens = function () {
+    obj.getApplications = function () {
         return obj.serviceCall({
-            url: "oauth2/token/?_queryId=access_token",
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                encodeURIComponent(Configuration.loggedUser.get("username")) +
+                "/oauth2/applications?_queryFilter=true"),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
-    obj.deleteOAuthToken = function (id) {
+    obj.revokeApplication = function (id) {
         return obj.serviceCall({
-            url: "oauth2/token/" + id + "?_action=revoke",
-            type: "POST",
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                encodeURIComponent(Configuration.loggedUser.get("username")) +
+                "/oauth2/applications/" + id),
+            type: "DELETE",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };

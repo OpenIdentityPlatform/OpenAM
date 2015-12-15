@@ -410,6 +410,21 @@ public class Routers {
          * <p>Using this method to complete the route registration will add a
          * version of {@literal 1} into the route.</p>
          *
+         * @param resourceClass The annotated resource endpoint class. Should be annotated with
+         *         {@link org.forgerock.json.resource.annotations.RequestHandler}.
+         */
+        public void toAnnotatedCollection(Class<? extends Object> resourceClass) {
+            Reject.ifNull(resourceClass);
+            forVersion(1).toAnnotatedCollection(resourceClass);
+        }
+
+        /**
+         * Completes the route registration with the resource that requests
+         * matching the route should be routed to.
+         *
+         * <p>Using this method to complete the route registration will add a
+         * version of {@literal 1} into the route.</p>
+         *
          * @param resourceClass The resource endpoint class.
          */
         public void toSingleton(Class<? extends SingletonResourceProvider> resourceClass) {
@@ -798,6 +813,18 @@ public class Routers {
         public VersionableResourceRoute toCollection(CollectionResourceProvider resource) {
             Reject.ifNull(resource);
             return addRoute(STARTS_WITH, Resources.newCollection(resource));
+        }
+
+        /**
+         * Completes the route registration with the resource that requests
+         * matching the route should be routed to.
+         *
+         * @param resourceClass The annotated resource endpoint class. Should be annotated with
+         *         {@link org.forgerock.json.resource.annotations.RequestHandler}.
+         */
+        public VersionableResourceRoute toAnnotatedCollection(Class<? extends Object> resourceClass) {
+            Reject.ifNull(resourceClass);
+            return addRoute(STARTS_WITH, Resources.newCollection(InjectorHolder.getInstance(resourceClass)));
         }
 
         /**
