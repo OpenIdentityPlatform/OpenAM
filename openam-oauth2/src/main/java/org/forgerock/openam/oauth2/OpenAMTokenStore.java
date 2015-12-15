@@ -608,7 +608,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
     protected void validateTokenRealm(final String tokenRealm, final OAuth2Request request)
             throws InvalidGrantException, NotFoundException {
-        if (!tokenRealm.equals(realmNormaliser.normalise(request.<String>getParameter(REALM)))) {
+        final String normalisedRequestRealm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        if (!tokenRealm.equals(normalisedRequestRealm) && !realmNormaliser.normalise(tokenRealm).equals(
+                normalisedRequestRealm)) {
             throw new InvalidGrantException("Grant is not valid for the requested realm");
         }
     }
