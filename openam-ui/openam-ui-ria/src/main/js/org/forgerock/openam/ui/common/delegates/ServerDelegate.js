@@ -32,7 +32,8 @@ define("org/forgerock/openam/ui/common/delegates/ServerDelegate", [
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/version")
         }).then(function (data) {
-            return data.version + " " + $.t("common.form.build") + " " + data.revision + "(" + data.date + ")";
+            return "OpenAM " + data.version + " " + $.t("common.form.build") + " " +
+                data.revision + " (" + data.date + ")";
         });
     };
 
