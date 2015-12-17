@@ -24,17 +24,27 @@
 
 
 define("org/forgerock/openam/ui/user/login/RESTLoginDialog", [
+    "backbone",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/openam/ui/user/login/RESTLoginView",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function (AbstractView, conf, RESTLoginView, RESTLoginHelper) {
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/openam/ui/user/login/RESTLoginView"
+], function (Backbone, AbstractView, Configuration, RESTLoginHelper, RESTLoginView) {
     var LoginDialog = AbstractView.extend({
         template: "templates/common/DefaultBaseTemplate.html",
         data : {},
         actions: [],
         render: function () {
-            conf.backgroundLogin = true;
+            /**
+             * Due to the limitations of the router, when a session expiry takes place, the hash changes to the page the
+             * user intended to navigate to without that page actually rendering. This creates a mismatch between hash
+             * and rendered page. The router design does not allow for short-circuiting of the route change due to it's
+             * use of events so this #back is a workaround to ensure the page and hash are in sync when the session
+             * expiry dialog is mis-missed.
+             */
+            Backbone.history.history.back();
+
+            Configuration.backgroundLogin = true;
             // The session cookie does not expire until the browser is closed. So if the server session expires and
             // the browser remains, the XUI will attempt to login sending the old cookie and the server will assume
             // this is a session upgrade. Removing the old session cookie first resolves this problem.

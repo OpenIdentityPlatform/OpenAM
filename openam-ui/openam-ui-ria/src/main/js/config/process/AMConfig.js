@@ -278,10 +278,16 @@ define("config/process/AMConfig", [
 
             function sessionTimeout () {
                 if (Configuration.loggedUser.hasRole("ui-self-service-user")) {
-                    // Users get redirected to session expired page
+                    /**
+                     * User may have sensative information on-screen so we exit them from the system when thier session
+                     * has expired with a message telling them as such
+                     */
                     return RouteTo.sessionExpired();
                 } else {
-                    // Admins get login dialog box
+                    /**
+                     * Admins are more likely to have work in-progress so they are presented with a login dialog to give
+                     * them the opportunity to continue their work
+                     */
                     return RouteTo.loginDialog();
                 }
             }
