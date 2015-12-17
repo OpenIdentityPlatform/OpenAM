@@ -101,6 +101,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                 url: "realms?_action=create",
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
+                suppressEvents: true,
                 data: JSON.stringify(data)
             });
         },
@@ -146,7 +147,8 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                 url: "realms" + RealmHelper.encodeRealm(getRealmPath(data)),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
-                data: JSON.stringify(data)
+                data: JSON.stringify(data),
+                suppressEvents: true
             });
         }
     };

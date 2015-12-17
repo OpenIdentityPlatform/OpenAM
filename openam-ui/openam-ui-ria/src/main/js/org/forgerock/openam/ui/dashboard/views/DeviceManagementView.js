@@ -18,12 +18,12 @@
 define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
     "jquery",
     "lodash",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate",
     "org/forgerock/openam/ui/dashboard/views/DeviceDetailsDialog",
     "org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog"
-], function ($, _, AbstractView, BootstrapDialog, DeviceManagementDelegate, DeviceDetailsDialog,
+], function ($, _, Messages, AbstractView, DeviceManagementDelegate, DeviceDetailsDialog,
              DevicesSettingsDialog) {
     var DeviceManagementView = AbstractView.extend({
         template: "templates/openam/dashboard/DeviceManagementTemplate.html",
@@ -45,6 +45,11 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
 
             DeviceManagementDelegate.deleteDevice(uuid).then(function () {
                 card.parent().remove();
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
             });
         },
 
@@ -70,6 +75,11 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                     if (callback) {
                         callback();
                     }
+                });
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
                 });
             });
         }

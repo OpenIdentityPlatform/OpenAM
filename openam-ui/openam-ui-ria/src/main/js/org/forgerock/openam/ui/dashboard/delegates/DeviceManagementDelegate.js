@@ -38,6 +38,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm(getPath() + uuid),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            suppressEvents: true,
             method: "DELETE"
         });
     };
@@ -53,6 +54,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
             url: RealmHelper.decorateURIWithRealm(getPath() + "?_action=skip"),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             data: JSON.stringify(skipOption),
+            suppressEvents: true,
             method: "POST"
         });
     };
@@ -65,6 +67,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithRealm(getPath() + "?_action=check"),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            suppressEvents: true,
             method: "POST"
         }).then(function (statusData) {
             return statusData.result;
@@ -78,7 +81,8 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
     obj.getDevices = function () {
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm(getPath() + "?_queryFilter=true"),
-            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            suppressEvents: true
         });
     };
 

@@ -17,12 +17,13 @@
 define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/components/BootstrapDialog",
-    "org/forgerock/openam/ui/admin/models/Form",
     "handlebars",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, _, AbstractView, BootstrapDialog, Form, Handlebars, SMSGlobalDelegate) {
+    "org/forgerock/commons/ui/common/components/BootstrapDialog",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/admin/models/Form"
+], function ($, _, Handlebars, BootstrapDialog, Messages, AbstractView, SMSGlobalDelegate, Form) {
     function validateRealmName (dialog) {
         var valid = true,
             alert = "",
@@ -94,7 +95,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                 promise = SMSGlobalDelegate.realms.get(options.realmPath);
             }
 
-            $.when(promise, allRealmsPromise).done(function (data, allRealmsData) {
+            $.when(promise, allRealmsPromise).then(function (data, allRealmsData) {
                 var i18nTitleKey = newRealm ? "createTitle" : "updateTitle",
                     i18nButtonKey = newRealm ? "create" : "save",
                     realmName = data.values.name === "/" ? $.t("console.common.topLevelRealm") : data.values.name;
@@ -148,8 +149,13 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                                 promise = SMSGlobalDelegate.realms.update(dialog.form.data());
                             }
 
-                            promise.done(function () {
+                            promise.then(function () {
                                 dialog.close();
+                            }, function (response) {
+                                Messages.addMessage({
+                                    type: Messages.TYPE_DANGER,
+                                    response: response
+                                });
                             }).always(function () {
                                 self.enable();
 
@@ -195,6 +201,11 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                             trigger: "focus"
                         });
                     }
+                });
+            }, function (response) {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
                 });
             });
         }

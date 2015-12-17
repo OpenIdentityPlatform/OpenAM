@@ -18,9 +18,10 @@ define("org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate"
-], function ($, _, BootstrapDialog, UIUtils, DeviceManagementDelegate) {
+], function ($, _, BootstrapDialog, Messages, UIUtils, DeviceManagementDelegate) {
     function closeDialog (dialog) {
         dialog.close();
     }
@@ -43,6 +44,11 @@ define("org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog", [
                     authSkip = !dialog.$modalBody.find("#oathStatus").is(":checked");
                     DeviceManagementDelegate.setDevicesOathSkippable(authSkip).then(function () {
                         dialog.close();
+                    }, function (response) {
+                        Messages.addMessage({
+                            type: Messages.TYPE_DANGER,
+                            response: response
+                        });
                     });
                 }
             }
@@ -50,6 +56,11 @@ define("org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog", [
             onshown: function (dialog) {
                 $.when(authSkip).then(function (skip) {
                     return UIUtils.compileTemplate(template, { authNeeded: !skip });
+                }, function (response) {
+                    Messages.addMessage({
+                        type: Messages.TYPE_DANGER,
+                        response: response
+                    });
                 }).then(function (tpl) {
                     dialog.$modalBody.append(tpl);
                 });
