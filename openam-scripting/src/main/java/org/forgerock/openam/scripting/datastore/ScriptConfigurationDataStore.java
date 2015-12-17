@@ -25,7 +25,9 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.datastruct.ValueNotFoundException;
 import com.sun.identity.sm.DNMapper;
@@ -43,6 +45,8 @@ import org.forgerock.util.query.QueryFilter;
 import org.slf4j.Logger;
 
 import javax.security.auth.Subject;
+
+import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -93,6 +97,9 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore {
                 getSubOrgConfig().addSubConfig(config.getId(), SCRIPT_CONFIGURATION, 0, data);
             }
         } catch (SSOException | SMSException e) {
+            if(IUMSConstants.SMS_INSUFFICIENT_ACCESS_RIGHTS.equals(e.getErrorCode())) {
+                throw createAndLogError(logger, INSUFFICIENT_PRIVILEGES, e, config.getName());
+            }
             throw createAndLogError(logger, SAVE_FAILED, e, config.getId(), realm);
         }
     }
@@ -360,9 +367,9 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore {
     }
 
     /**
-     * Returns an admin SSO token for administrative actions.
+     * Returns the subject SSO token for administrative actions.
      *
-     * @return An administrative SSO token.
+     * @return An SSO token for the Subject.
      */
     private SSOToken getToken() throws SSOException {
         final SSOToken token = SubjectUtils.getSSOToken(subject);

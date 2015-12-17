@@ -29,62 +29,57 @@
 
 package com.sun.identity.delegation.plugins;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
-import java.security.AccessController;
 
-import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationEvaluatorImpl;
-
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenID;
-import com.iplanet.sso.SSOException;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
-
-import com.sun.identity.security.AdminTokenAction;
-
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdEventListener;
-import com.sun.identity.sm.ServiceListener;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.OrganizationConfigManager;
-
-import com.sun.identity.policy.PolicyManager;
-import com.sun.identity.policy.PolicyEvaluator;
-import com.sun.identity.policy.Policy;
-import com.sun.identity.policy.PolicyConfig;
-import com.sun.identity.policy.PolicyEvent;
-import com.sun.identity.policy.PolicyDecision;
-import com.sun.identity.policy.ActionDecision;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.Rule;
-import com.sun.identity.policy.SubjectEvaluationCache;
-import com.sun.identity.policy.interfaces.Subject;
-import com.sun.identity.policy.interfaces.PolicyListener;
-
-import com.sun.identity.delegation.interfaces.DelegationInterface;
-import com.sun.identity.delegation.DelegationManager;
-import com.sun.identity.delegation.ResBundleUtils;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenID;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.delegation.DelegationManager;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPrivilege;
-import org.forgerock.openam.ldap.LDAPUtils;
-
-import java.util.List;
+import com.sun.identity.delegation.ResBundleUtils;
+import com.sun.identity.delegation.interfaces.DelegationInterface;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdEventListener;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.policy.ActionDecision;
+import com.sun.identity.policy.Policy;
+import com.sun.identity.policy.PolicyConfig;
+import com.sun.identity.policy.PolicyDecision;
+import com.sun.identity.policy.PolicyEvaluator;
+import com.sun.identity.policy.PolicyEvent;
+import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.PolicyManager;
+import com.sun.identity.policy.Rule;
+import com.sun.identity.policy.SubjectEvaluationCache;
+import com.sun.identity.policy.interfaces.PolicyListener;
+import com.sun.identity.policy.interfaces.Subject;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
 
 /**
  * The class <code>DelegationPolicyImpl</code> implements the interface
@@ -112,6 +107,9 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
     private static final String DELEGATION_AUTHN_USERS = "AuthenticatedUsers";
     private static final String AUTHENTICATED_USERS_SUBJECT = 
                                                   "AuthenticatedUsers";
+    static final String READ = "READ";
+    static final String DELEGATE = "DELEGATE";
+    static final String GLOBALCONFIG = "globalconfig";
 
     /**
      *  To configure the delegation cache size, specify the attribute
@@ -136,20 +134,19 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
 
     private SSOToken appToken;
     private PolicyEvaluator pe;
-
-   /**
-    * Initialize (or configure) the <code>DelegationInterface</code>
-    * object. Usually it will be initialized with the environmrnt
-    * parameters set by the system administrator via Service management service.
-    *
-    * @param token <code>SSOToken</code> of an administrator
-    * @param configParams configuration parameters as a <code>Map</code>.
-    * The values in the <code>Map</code> is <code>java.util.Set</code>,
-    * which contains one or more configuration parameters.
-    *
-    * @throws DelegationException if an error occurred during
-    * initialization of <code>DelegationInterface</code> instance
-    */
+    /**
+     * Initialize (or configure) the <code>DelegationInterface</code>
+     * object. Usually it will be initialized with the environmrnt
+     * parameters set by the system administrator via Service management service.
+     *
+     * @param token <code>SSOToken</code> of an administrator
+     * @param configParams configuration parameters as a <code>Map</code>.
+     * The values in the <code>Map</code> is <code>java.util.Set</code>,
+     * which contains one or more configuration parameters.
+     *
+     * @throws DelegationException if an error occurred during
+     * initialization of <code>DelegationInterface</code> instance
+     */
     public void initialize(SSOToken token, Map configParams) throws DelegationException {
         this.appToken = token;
         try {
@@ -522,6 +519,12 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             String tokenIdStr = tokenId.toString();
             Set actions = permission.getActions();
             if ((actions != null) && (!actions.isEmpty())) {
+                //If the user has delegated admin permissions in the realm they are currently logged in to,
+                //they have read access to global-config endpoints
+                if(GLOBALCONFIG.equals(permission.getConfigType()) && actions.equals(Collections.singleton(READ))) {
+                    return hasDelegationPermissionsForRealm(token, token.getProperty(ISAuthConstants.ORGANIZATION));
+                }
+
                 try {
                     resource = getResourceName(permission);
                     pd = getResultFromCache(tokenIdStr, resource, envParams);
@@ -1165,7 +1168,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         String orgName) throws SSOException, DelegationException {
         // Construct delegation permission object
         Set action = new HashSet();
-        action.add("DELEGATE");
+        action.add(DELEGATE);
         DelegationPermission de = new DelegationPermission(orgName,
             "sunAMRealmService", "1.0", "organizationconfig", null,
              action, Collections.EMPTY_MAP);
