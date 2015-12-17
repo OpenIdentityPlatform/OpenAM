@@ -128,6 +128,7 @@
         <forgerock.audit.version>2.0.0</forgerock.audit.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
 
+        <javadoc-utils.version>1.0.0</javadoc-utils.version>
         <ant.contrib.version>1.0b3</ant.contrib.version>
         <guice.version>3.0</guice.version>
         <restlet.version>2.3.4</restlet.version>
@@ -2126,8 +2127,8 @@
                     </taglets>
                     <tagletArtifact>
                         <groupId>org.forgerock.openam</groupId>
-                        <artifactId>openam-shared</artifactId>
-                        <version>${project.version}</version>
+                        <artifactId>javadoc-utils</artifactId>
+                        <version>${javadoc-utils.version}</version>
                     </tagletArtifact>
                 </configuration>
                 <executions>
@@ -2147,8 +2148,8 @@
                             <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
                             <docletArtifact>
                                 <groupId>org.forgerock.openam</groupId>
-                                <artifactId>openam-shared</artifactId>
-                                <version>${project.version}</version>
+                                <artifactId>javadoc-utils</artifactId>
+                                <version>${javadoc-utils.version}</version>
                             </docletArtifact>
                         </configuration>
                     </execution>
