@@ -11,18 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.operations.strategies;
 
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_LOGGED_OUT;
+
 import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionTimedOutException;
 import com.iplanet.dpro.session.operations.SessionOperations;
+import com.iplanet.dpro.session.service.SessionAuditor;
+import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import org.forgerock.openam.session.blacklist.SessionBlacklist;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 
 import javax.inject.Inject;
@@ -37,35 +44,59 @@ public class StatelessOperations implements SessionOperations {
     private final SessionService sessionService;
     private final StatelessSessionFactory statelessSessionFactory;
     private final SessionBlacklist sessionBlacklist;
+    private final SessionLogging sessionLogging;
+    private final SessionAuditor sessionAuditor;
 
     @Inject
     public StatelessOperations(final LocalOperations localOperations,
                                final SessionService sessionService,
                                final StatelessSessionFactory statelessSessionFactory,
-                               final SessionBlacklist sessionBlacklist) {
+                               final SessionBlacklist sessionBlacklist,
+                               final SessionLogging sessionLogging,
+                               final SessionAuditor sessionAuditor) {
         this.localOperations = localOperations;
         this.sessionService = sessionService;
         this.statelessSessionFactory = statelessSessionFactory;
         this.sessionBlacklist = sessionBlacklist;
+        this.sessionLogging = sessionLogging;
+        this.sessionAuditor = sessionAuditor;
     }
 
     @Override
     public SessionInfo refresh(final Session session, final boolean reset) throws SessionException {
         final SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
         if (sessionInfo.getExpiryTime() < System.currentTimeMillis()) {
-            throw new SessionTimedOutException("Stateless session corresponding to client " + sessionInfo.getClientID() + " timed out.");
+            throw new SessionTimedOutException("Stateless session corresponding to client "
+                    + sessionInfo.getClientID() + " timed out.");
         }
         return sessionInfo;
     }
 
     @Override
     public void logout(final Session session) throws SessionException {
+        if (session instanceof StatelessSession) {
+            SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
+            sessionLogging.logEvent(sessionInfo, SessionEvent.LOGOUT);
+            // Required since not possible to mock SessionAuditor in test case
+            if (sessionAuditor != null) {
+                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_LOGGED_OUT);
+            }
+        }
         sessionBlacklist.blacklist(session);
     }
 
     @Override
     public void destroy(final Session requester, final Session session) throws SessionException {
         sessionService.checkPermissionToDestroySession(requester, session.getID());
+        if (session instanceof StatelessSession) {
+            SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
+            sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
+            // Required since not possible to mock SessionAuditor in test case
+            if (sessionAuditor != null) {
+                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
+            }
+        }
+
         sessionBlacklist.blacklist(session);
     }
 

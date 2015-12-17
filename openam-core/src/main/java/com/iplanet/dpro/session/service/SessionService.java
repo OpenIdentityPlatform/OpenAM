@@ -24,7 +24,7 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.service;
 
@@ -772,7 +772,7 @@ public class SessionService {
         }
         if (sess != null && sess.getState() != INVALID) {
             signalRemove(sess, SessionEvent.DESTROY);
-            sessionAuditor.auditActivity(sess, AM_SESSION_DESTROYED);
+            sessionAuditor.auditActivity(sess.toSessionInfo(), AM_SESSION_DESTROYED);
         }
         sessionCache.removeSID(sid);
     }
@@ -789,7 +789,7 @@ public class SessionService {
         }
         if (sess != null && sess.getState() != INVALID) {
             signalRemove(sess, SessionEvent.LOGOUT);
-            sessionAuditor.auditActivity(sess, AM_SESSION_LOGGED_OUT);
+            sessionAuditor.auditActivity(sess.toSessionInfo(), AM_SESSION_LOGGED_OUT);
         }
     }
 
@@ -799,7 +799,7 @@ public class SessionService {
      * @param event An integrate from the SessionEvent class.
      */
     private void signalRemove(InternalSession session, int event) {
-        sessionLogging.logEvent(session, event);
+        sessionLogging.logEvent(session.toSessionInfo(), event);
         session.setState(DESTROYED);
         sendEvent(session, event);
     }

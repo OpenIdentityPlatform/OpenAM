@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.service;
 
@@ -20,6 +20,7 @@ import static org.forgerock.openam.audit.AuditConstants.ACTIVITY_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
 
+import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.DNMapper;
@@ -36,7 +37,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * Responsible for publishing audit activity for changes to {@link InternalSession} objects.
+ * Responsible for publishing audit activity for changes to {@link SessionInfo} objects.
  *
  * @since 13.0.0
  */
@@ -63,13 +64,19 @@ public final class SessionAuditor {
         this.adminTokenAction = adminTokenAction;
     }
 
-    public void auditActivity(InternalSession session, EventName eventName) {
-        String realm = session.getClientDomain();
+    public void auditActivity(SessionInfo sessionInfo, EventName eventName) {
+        String realm = sessionInfo.getClientDomain();
+        String contextId = sessionInfo.getProperties().get(Constants.AM_CTX_ID);
+        String uid = sessionInfo.getProperties().get(Constants.UNIVERSAL_IDENTIFIER);
+
+        auditActivity(realm, contextId, uid, eventName);
+    }
+
+    private void auditActivity(String realm, String contextId, String uid, EventName eventName) {
+
         realm = isEmpty(realm) ? NO_REALM : DNMapper.orgNameToRealmName(realm);
 
         if (auditEventPublisher.isAuditing(realm, ACTIVITY_TOPIC, eventName)) {
-
-            String contextId = session.getProperty(Constants.AM_CTX_ID);
 
             AMActivityAuditEventBuilder builder = auditEventFactory.activityEvent(realm)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
@@ -80,7 +87,6 @@ public final class SessionAuditor {
                     .objectId(contextId)
                     .operation(getCrudType(eventName));
 
-            String uid = session.getProperty(Constants.UNIVERSAL_IDENTIFIER);
             if (StringUtils.isNotEmpty(uid)) {
                 builder.userId(uid);
             }

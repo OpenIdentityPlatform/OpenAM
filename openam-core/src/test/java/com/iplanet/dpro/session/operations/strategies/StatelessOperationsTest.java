@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.operations.strategies;
@@ -24,13 +24,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionTimedOutException;
+import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import org.forgerock.openam.session.blacklist.SessionBlacklist;
 import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -52,7 +55,10 @@ public class StatelessOperationsTest {
     private SessionBlacklist mockSessionBlacklist;
 
     @Mock
-    private Session mockSession;
+    private StatelessSession mockSession;
+
+    @Mock
+    private SessionLogging mockSessionLogging;
 
     private SessionID sid;
 
@@ -63,7 +69,8 @@ public class StatelessOperationsTest {
         MockitoAnnotations.initMocks(this);
         sid = new SessionID("test");
         given(mockSession.getID()).willReturn(sid);
-        statelessOperations = new StatelessOperations(null, mockSessionService, mockSessionFactory, mockSessionBlacklist);
+        statelessOperations = new StatelessOperations(
+                null, mockSessionService, mockSessionFactory, mockSessionBlacklist, mockSessionLogging, null);
     }
 
     @Test
@@ -101,6 +108,8 @@ public class StatelessOperationsTest {
         statelessOperations.logout(mockSession);
 
         // Then
+        verify(mockSessionLogging).logEvent(
+                mockSessionFactory.getSessionInfo(mockSession.getSessionID()), SessionEvent.LOGOUT);
         verify(mockSessionBlacklist).blacklist(mockSession);
     }
 
@@ -125,6 +134,8 @@ public class StatelessOperationsTest {
         statelessOperations.destroy(requester, mockSession);
 
         // Then
+        verify(mockSessionLogging).logEvent(
+                mockSessionFactory.getSessionInfo(mockSession.getSessionID()), SessionEvent.DESTROY);
         verify(mockSessionBlacklist).blacklist(mockSession);
     }
 

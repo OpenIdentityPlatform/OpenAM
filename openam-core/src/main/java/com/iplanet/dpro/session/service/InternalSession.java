@@ -24,7 +24,7 @@
  *
  * $Id: InternalSession.java,v 1.21 2009/03/20 21:05:25 weisun2 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.service;
 
@@ -49,7 +49,6 @@ import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.session.SessionCookies;
 
 import javax.servlet.http.HttpServletResponse;
@@ -88,7 +87,7 @@ import static org.forgerock.openam.session.SessionConstants.*;
  * destroy | | destroy | max session time | | max session time | | V |
  * ------------> <destroy> <--------------------------
  * </pre>
- * 
+ *
  */
 
 public class InternalSession implements TaskRunnable, Serializable {
@@ -211,28 +210,28 @@ public class InternalSession implements TaskRunnable, Serializable {
     private static final String AM_MAX_SESSION_TIME = "AMMaxSessionTime";
 
     /* session property: SAML2IDPSessionIndex */
-    private static final String SAML2_IDP_SESSION_INDEX = 
+    private static final String SAML2_IDP_SESSION_INDEX =
         "SAML2IDPSessionIndex";
 
     /** AM User Universal Identifier Property*/
-    protected static final String UNIVERSAL_IDENTIFIER = 
+    protected static final String UNIVERSAL_IDENTIFIER =
         "sun.am.UniversalIdentifier";
 
-    private static final String LOG_MSG_SESSION_MAX_LIMIT_REACHED = 
+    private static final String LOG_MSG_SESSION_MAX_LIMIT_REACHED =
         "SESSION_MAX_LIMIT_REACHED";
 
-    /* Time interval, if the current time minus lastest access time is 
-       greater than this time interval. In SFO mode, the session record 
+    /* Time interval, if the current time minus lastest access time is
+       greater than this time interval. In SFO mode, the session record
        will get refreshed in data repository.*/
     private static int interval = Integer.parseInt(
         SystemProperties.get(
-        "com.sun.identity.session.interval", "10")); 
+        "com.sun.identity.session.interval", "10"));
     private transient volatile TaskRunnable nextTask = null;
     private transient volatile TaskRunnable previousTask = null;
     private transient volatile HeadTaskRunnable headTask = null;
     private transient TimerPool timerPool = null;
     private volatile boolean reschedulePossible;
-    
+
     /*
      * default idle time for invalid sessions
      */
@@ -247,7 +246,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Get the default property values set for invalid session , purge delay
-     * super user name etc 
+     * super user name etc
      */
     private static long getPropValue(String propName, long defaultValue) {
         String defaultPropValue = SystemProperties.get(propName, String
@@ -267,7 +266,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * SessionService. Allowing remote self-updates to session properties leads
      * to a security vulnerability which allows unconstrained user impersonation
      * or privilege elevation. See bug # 4814922 for more information
-     * 
+     *
      * protectedProperties contains a set of property names which can not be
      * remotely updated. It is initially populated using static initializer. We
      * also implemented an extra safety mechanism intended to protect from
@@ -276,25 +275,25 @@ public class InternalSession implements TaskRunnable, Serializable {
      * of the static hardcoded list of protected properties below. This
      * mechanism automatically adds any property to protectedProperties if it is
      * set via local invocation of putProperty.
-     * 
+     *
      * However, some properties (such as Locale and CharSet) must be settable
      * both locally and remotely. In order to make it configurable we use a
      * second table called remotelyUpdateableProperties. Note that
      * protectedProperties takes precedence over remotelyUpdateableProperties:
      * remotelyUpdateableProperties will be consulted only if a property is not
      * on the protectedProperties list already.
-     * 
+     *
      * The following tables defines the behavior of putProperty() and
      * putExternalProperty() depending on whether property name is present in
      * protectedProperties or remotelyUpdateableProperty list
-     * 
+     *
      * protectedProperties remotelyUpdateableProperties putProperty()
      * putExternalProperty()
-     * 
+     *
      * in n/a sets value logs, does nothing
-     * 
+     *
      * out in sets value sets value
-     * 
+     *
      * out out sets value and sets value adds to protectedProperty
      */
     protected static final Set<String> protectedProperties;
@@ -457,7 +456,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         }
         return -1;
     }
-    
+
     /**
      * Implements for TaskRunnable.
      *
@@ -467,7 +466,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         // no need to synchronize for single operation
         return headTask;
     }
-    
+
     /**
      * Implements for TaskRunnable.
      *
@@ -476,7 +475,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     public TaskRunnable previous() {
         return previousTask;
     }
-    
+
     /**
      * Implements for TaskRunnable.
      *
@@ -485,7 +484,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     public TaskRunnable next() {
         return nextTask;
     }
-    
+
     /**
      * Implements for TaskRunnable.
      *
@@ -494,7 +493,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     public void setPrevious(TaskRunnable task) {
         previousTask = task;
     }
-    
+
     /**
      * Implements for TaskRunnable.
      *
@@ -503,7 +502,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     public void setNext(TaskRunnable task) {
         nextTask = task;
     }
-    
+
     /**
      * Implements for TaskRunnable.
      *
@@ -512,7 +511,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     public boolean addElement(Object obj) {
         return false;
     }
-    
+
     /**
      * Implements for TaskRunnable.
      *
@@ -521,7 +520,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     public boolean removeElement(Object obj) {
         return false;
     }
-    
+
     /**
      * Implements for TaskRunnable.
      *
@@ -530,7 +529,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     public boolean isEmpty() {
         return true;
     }
-    
+
     /**
      * Implements for GeneralTaskRunnable.
      *
@@ -539,7 +538,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     public long getRunPeriod() {
         return -1;
     }
-    
+
     /**
      * The function to run when timeout.
      */
@@ -551,7 +550,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                 long timeLeft = getTimeLeft();
                 if (timeLeft == 0) {
                     changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
-                    sessionAuditor.auditActivity(this, AM_SESSION_MAX_TIMED_OUT);
+                    sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
                     if (timerPool != null) {
                         if (purgeDelay > 0) {
                             timerPool.schedule(this, new Date((timedOutAt +
@@ -562,7 +561,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                     long idleTimeLeft = (maxIdleTime * 60) - getIdleTime();
                     if (idleTimeLeft <= 0 && sessionState != INACTIVE) {
                         changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
-                        sessionAuditor.auditActivity(this, AM_SESSION_IDLE_TIMED_OUT);
+                        sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
                         if (timerPool != null) {
                             if (purgeDelay > 0) {
                                 timerPool.schedule(this, new Date((timedOutAt +
@@ -577,13 +576,13 @@ public class InternalSession implements TaskRunnable, Serializable {
                                 timeToWait) * 1000));
                         }
                     }
-                }        
+                }
             }
         } else {
             removeSession();
         }
     }
-    
+
     /**
      * Cancel the scheduled run of this task from TimerPool.
      */
@@ -614,7 +613,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         } while (oldHeadTask != headTask);
         headTask = null;
     }
-    
+
     /**
      * Schedule this task to TimerPool according to the current state.
      */
@@ -641,7 +640,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             }
         }
     }
-    
+
     /**
      * Returns the SessionID of this Internal Session.
      * @return SessionID for the internal session object
@@ -651,8 +650,8 @@ public class InternalSession implements TaskRunnable, Serializable {
     }
 
     /**
-     * Returns the type of Internal Session. 
-     * @return  <code>0 </code> if it is a USER_SESSION 
+     * Returns the type of Internal Session.
+     * @return  <code>0 </code> if it is a USER_SESSION
      *          <code>1 </code> if it s a APPLICATION_SESSION
      */
     public int getType() {
@@ -661,7 +660,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Set the type of Internal Session. User OR Application.
-     * 
+     *
      * @param type <code>0</code> for <code>USER_SESSION</code>.
      *             <code>1</code> for <code>APPLICATION_SESSION</code>.
      */
@@ -672,7 +671,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Returns Client ID, accessing this Internal Session.
-     * 
+     *
      * @return Client ID.
      */
     public String getClientID() {
@@ -681,7 +680,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Sets Client ID for this Internal Session.
-     * 
+     *
      * @param id
      */
     public void setClientID(String id) {
@@ -691,7 +690,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Returns the Domain of the Client
-     * 
+     *
      * @return Client Domain
      */
     public String getClientDomain() {
@@ -700,7 +699,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Sets the Clieant's Domain.
-     * 
+     *
      * @param domain
      *            Client Domain
      */
@@ -719,7 +718,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Sets the maximum time(in minutes) allowed for the Internal Session
-     * 
+     *
      * @param t
      *            Maximum Session Time
      */
@@ -745,7 +744,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Sets the maximum idle time(in minutes) for the Internal Session.
-     * 
+     *
      * @param t
      */
     public void setMaxIdleTime(long t) {
@@ -779,7 +778,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Sets the maximum caching time(in minutes) for the Internal Session.
-     * 
+     *
      * @param t
      *        Maximum Caching Time
      */
@@ -854,7 +853,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Returns the value of the specified key from the internal object map.
-     * 
+     *
      * @param key
      *            the key whose associated value is to be returned
      * @return internal object
@@ -865,7 +864,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Removes the mapping for this key from the internal object map if present.
-     * 
+     *
      * @param key
      *            key whose mapping is to be removed from the map
      */
@@ -875,7 +874,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Sets the key-value pair in the internal object map.
-     * 
+     *
      * @param key with which the specified value is to be associated
      * @param value to be associated with the specified key
      */
@@ -893,7 +892,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     /**
      * Returns the value of the specified key from the Internal Session property
      * table.
-     * 
+     *
      * @param key
      *            Property key
      * @return string value for the key from Internal Session table.
@@ -951,7 +950,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 		try {
         	SessionUtils.checkPermissionToSetProperty(clientToken, key, value);
 		} catch (SessionException se) {
-			sessionLogging.logIt(this, "SESSION_PROTECTED_PROPERTY_ERROR");
+            sessionLogging.logEvent(toSessionInfo(), SessionEvent.PROTECTED_PROPERTY);
 			throw se;
 		}
         internalPutProperty(key,value);
@@ -969,7 +968,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * registerProtectedProperty() to make sure that if a property key is not
      * already on the list of protected properties, it will be automatically
      * added there (unless it is also on remotelyUpdateableProperties list!)
-     * 
+     *
      * @param key
      *            Property key
      * @param value
@@ -981,7 +980,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Sets the key-value pair in the Internal Session property table.
-     * 
+     *
      * @param key
      *            Property key
      * @param value
@@ -1020,17 +1019,18 @@ public class InternalSession implements TaskRunnable, Serializable {
 
         if (sessionState == VALID && serviceConfig.isSendPropertyNotification(key)) {
             sessionService.sendEvent(this, SessionEvent.PROPERTY_CHANGED);
-            sessionLogging.logEvent(this, SessionEvent.PROPERTY_CHANGED);
-            sessionAuditor.auditActivity(this, AM_SESSION_PROPERTY_CHANGED);
+            SessionInfo sessionInfo = toSessionInfo();
+            sessionLogging.logEvent(sessionInfo, SessionEvent.PROPERTY_CHANGED);
+            sessionAuditor.auditActivity(sessionInfo, AM_SESSION_PROPERTY_CHANGED);
         }
         updateForFailover();
     }
 
-    /** 
-    * Sets the status of the isSessionUpgrade falg to which determines if the 
+    /**
+    * Sets the status of the isSessionUpgrade falg to which determines if the
     * <code>Session</code> is in the upgrade state or not.
-    * 
-    * @param value <code>true</code> if it is an upgrade 
+    *
+    * @param value <code>true</code> if it is an upgrade
     *        <code>false</code> otherwise
     */
     public void setIsSessionUpgrade(boolean value) {
@@ -1038,9 +1038,9 @@ public class InternalSession implements TaskRunnable, Serializable {
         isSessionUpgrade = value;
     }
 
-    /** 
+    /**
      * Gets the status of the <code>Session</code> if is an upgrade state
-     * 
+     *
      * @return <code>true</code> if the session is in upgrade state
      *         <code>false</code> otherwise
      */
@@ -1098,7 +1098,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * Changes the state of the session to ACTIVE after creation.
      * @param userDN
      * @param stateless Indicates that the log in session is a stateless session.
-     * @return <code> true </code> if the session is successfully activated 
+     * @return <code> true </code> if the session is successfully activated
      *         after creation , <code>false</code> otherwise
      */
     public boolean activate(String userDN, boolean stateless) {
@@ -1113,6 +1113,8 @@ public class InternalSession implements TaskRunnable, Serializable {
             return false;
         }
 
+        SessionInfo sessionInfo = toSessionInfo();
+
         // checking Session Quota Constraints
         if ((serviceConfig.isSessionConstraintEnabled()) && !shouldIgnoreSessionQuotaChecking(userDN)) {
 
@@ -1120,7 +1122,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                 if (debug.messageEnabled()) {
                     debug.message("Session Quota exhausted!");
                 }
-                sessionLogging.logEvent(this, SessionEvent.QUOTA_EXHAUSTED);
+                sessionLogging.logEvent(sessionInfo, SessionEvent.QUOTA_EXHAUSTED);
                 return false;
             }
         }
@@ -1129,8 +1131,8 @@ public class InternalSession implements TaskRunnable, Serializable {
         if (reschedulePossible && !stateless) {
             reschedule();
         }
-        sessionLogging.logEvent(this, SessionEvent.SESSION_CREATION);
-        sessionAuditor.auditActivity(this, AM_SESSION_CREATED);
+        sessionLogging.logEvent(sessionInfo, SessionEvent.SESSION_CREATION);
+        sessionAuditor.auditActivity(sessionInfo, AM_SESSION_CREATED);
         sessionService.sendEvent(this, SessionEvent.SESSION_CREATION);
 
         if (!stateless && (!isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
@@ -1139,7 +1141,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         return true;
     }
 
-   /** 
+   /**
     * Gets the User Universal ID
     * @return  UUID
     */
@@ -1156,15 +1158,16 @@ public class InternalSession implements TaskRunnable, Serializable {
         setLatestAccessTime();
         setState(VALID);
         reschedule();
-        sessionLogging.logEvent(this, SessionEvent.REACTIVATION);
-        sessionAuditor.auditActivity(this, AM_SESSION_REACTIVATED);
+        SessionInfo sessionInfo = toSessionInfo();
+        sessionLogging.logEvent(sessionInfo, SessionEvent.REACTIVATION);
+        sessionAuditor.auditActivity(sessionInfo, AM_SESSION_REACTIVATED);
         sessionService.sendEvent(this, SessionEvent.REACTIVATION);
     }
 
     /**
      * Sets the willExpireFlag. This flag specify that whether the session will
      * ever expire or not.
-     * 
+     *
      * @param expire <code>true</code> will the set internal session to expire
      */
     public void setExpire(boolean expire) {
@@ -1181,7 +1184,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     /**
      * Checks the invalid session idle time. If this session is invalid and idle
      * for more than 3 minutes, we will need to remove it from the session table
-     * 
+     *
      * @return <code>true</code> if the max default idle time expires
      */
     private boolean checkInvalidSessionDefaultIdleTime() {
@@ -1201,6 +1204,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         if (willExpireFlag == false) {
             return false;
         }
+        SessionInfo sessionInfo = toSessionInfo();
 
         if (!isTimedOut()) {
             if (isInvalid()) {
@@ -1215,14 +1219,14 @@ public class InternalSession implements TaskRunnable, Serializable {
 
             if (getTimeLeft() == 0) {
                 changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
-                sessionAuditor.auditActivity(this, AM_SESSION_MAX_TIMED_OUT);
+                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_MAX_TIMED_OUT);
                 return false;
             }
 
             if (getIdleTime() >= maxIdleTime * 60
                     && sessionState != INACTIVE) {
                 changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
-                sessionAuditor.auditActivity(this, AM_SESSION_IDLE_TIMED_OUT);
+                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_IDLE_TIMED_OUT);
                 return false;
             }
             return false;
@@ -1230,8 +1234,8 @@ public class InternalSession implements TaskRunnable, Serializable {
             // do something special for the timed out sessions
             if (getTimeLeftBeforePurge() <= 0) {
                 // destroy the session
-                sessionLogging.logEvent(this, SessionEvent.DESTROY);
-                sessionAuditor.auditActivity(this, AM_SESSION_DESTROYED);
+                sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
+                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
                 setState(DESTROYED);
                 sessionService.sendEvent(this, SessionEvent.DESTROY);
                 return true;
@@ -1240,13 +1244,13 @@ public class InternalSession implements TaskRunnable, Serializable {
             }
         }
     }
-    
+
     /**
      * Changes the state of the session and sends Session Notification when
      * session times out.
      */
     private void changeStateAndNotify(int eventType) {
-        sessionLogging.logEvent(this, eventType);
+        sessionLogging.logEvent(toSessionInfo(), eventType);
         timedOutAt = System.currentTimeMillis()/1000;
         putProperty("SessionTimedOut", String.valueOf(timedOutAt));
         sessionService.execSessionTimeoutHandlers(sessionID, eventType);
@@ -1257,11 +1261,11 @@ public class InternalSession implements TaskRunnable, Serializable {
         if (!isAppSession() || serviceConfig.isReturnAppSessionEnabled()) {
             sessionService.decrementActiveSessions();
         }
-        SessionCount.decrementSessionCount(this);  
+        SessionCount.decrementSessionCount(this);
         setState(INVALID);
         if (serviceConfig.isSessionTrimmingEnabled()){
             trimSession();
-        }        
+        }
         sessionService.sendEvent(this, eventType);
     }
 
@@ -1325,16 +1329,16 @@ public class InternalSession implements TaskRunnable, Serializable {
      * Once updated the Session will be persisted.
      */
     public void setLatestAccessTime() {
-        long oldLatestAccessTime = latestAccessTime; 
+        long oldLatestAccessTime = latestAccessTime;
         latestAccessTime = System.currentTimeMillis() / 1000;
         if ((latestAccessTime - oldLatestAccessTime) > interval) {
             updateForFailover();
-        }    
+        }
     }
 
     /**
      * Sets the state of the Internal Session.
-     * 
+     *
      * @param state
      */
     void setState(int state) {
@@ -1438,7 +1442,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Returns the value of willExpireFlag.
-     * 
+     *
      */
     boolean willExpire() {
         return willExpireFlag;
@@ -1485,7 +1489,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Returns the TokenRestriction for the given SessionID.
-     * 
+     *
      * @param sid Possibly null SessionID.
      * @return Null indicates there is no restriction on the Session.
      */
@@ -1515,7 +1519,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     /**
      * Encodes the url by adding the cookiename=sid to it.
      * if cookie support is true returns without encoding
-     * @param res HttpServletResponse 
+     * @param res HttpServletResponse
      * @param url url to be encoded
      * @param cookieName
      * @return url
@@ -1528,12 +1532,12 @@ public class InternalSession implements TaskRunnable, Serializable {
     /**
      * Encodes the url by adding the cookiename=sid to it. if cookie support is
      * true returns without encoding
-     * 
+     *
      * <p>
      * The cookie Value is written in the URL based on the encodingScheme
      * specified. The Cookie Value could be written as path info separated by
      * either a "/" OR ";" or as a query string.
-     * 
+     *
      * <p>
      * If the encoding scheme is SLASH then the cookie value would be written in
      * the URL as extra path info in the following format:
@@ -1546,7 +1550,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * file is specified then webcontainers return with "File Not found" error.
      * To rewrite links which are JSP files with cookie value use the SEMICOLON
      * OR QUERY encoding scheme.
-     * 
+     *
      * <p>
      * If the encoding scheme is SEMICOLON then the cookie value would be
      * written in the URL as extra path info in the following format:
@@ -1555,7 +1559,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * </pre>
      * Note that this is not supported in the servlet specification and some web
      * containers do not support this.
-     * 
+     *
      * <p>
      * If the encoding scheme is QUERY then the cookie value would be written in
      * the URL in the following format:
@@ -1570,11 +1574,11 @@ public class InternalSession implements TaskRunnable, Serializable {
      * the escape is true. Only the ampersand before appending cookie parameter
      * will be entity escaped.
      * <p>
-     * 
+     *
      * @param url the URL to be encoded.
      * @param encodingScheme possible values are <code>QUERY</code>,
      *        <code>SLASH</code>, <code>SEMICOLON</code>.
-     * @param escape entity escaping of ampersand when appending the SSOToken 
+     * @param escape entity escaping of ampersand when appending the SSOToken
      *        ID to request query string.
      * @return encoded URL with cookie value (session ID) based on the encoding
      *         scheme or the url itself if there is an error.
@@ -1583,7 +1587,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         return encodeURL(url, encodingScheme, escape, sessionCookies.getCookieName());
     }
 
-    
+
     /**
      * Encodes the url by adding the cookiename=sid to it.
      * if cookie support is true returns without encoding
@@ -1598,13 +1602,13 @@ public class InternalSession implements TaskRunnable, Serializable {
      * written in the URL as extra path info in the following format:
      * <pre>
      * protocol://server:port/servletpath/&lt;cookieName>=&lt;cookieValue>?
-     *       queryString     
+     *       queryString
      * </pre>
      * <p>
      * Note that this format works only if the path is a servlet, if a
      * a jsp file is specified then webcontainers return with
      * "File Not found" error. To rewrite links which are JSP files with
-     * cookie value use the SEMICOLON OR QUERY encoding scheme.     
+     * cookie value use the SEMICOLON OR QUERY encoding scheme.
      *
      * <p>
      * If the encoding scheme is SEMICOLON then the cookie value would be
@@ -1626,7 +1630,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * This is the default and OpenAM always encodes in this format
      * unless otherwise specified. If the URL passed in has query parameter then
      * entity escaping of ampersand will be done before appending the cookie
-     * if the escape is true.  Only the ampersand before appending 
+     * if the escape is true.  Only the ampersand before appending
      * cookie parameter
      * will be entity escaped.
      * <p>
@@ -1634,7 +1638,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * @param encodingScheme possible values are QUERY,SLASH,SEMICOLON
      * @param escape entity escaping of ampersand when appending the
      *        SSOToken ID to request query string.
-     * @param cookieName 
+     * @param cookieName
      * @return encoded URL with cookie value (session id) based
      *         on the encoding scheme or the url itself if there is an error.
      */
@@ -1666,7 +1670,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Returns true if cookies are supported.
-     * 
+     *
      * @return true if cookie supported;
      */
 
@@ -1691,7 +1695,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Sets the HttpSession into the Internal Session.
-     * 
+     *
      * @param hSession
      */
     void setHttpSession(HttpSession hSession) {
@@ -1726,7 +1730,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * period, the memory is not abused. Instance variables preserved are, 1)
      * sessionID 2) timedOutAt 3) clientID 4) purgeDelay 5)
      * sessionProperties(loginURL/SessionTimedOut/AM_CTX_ID/SAML2IDPSessionIndex)
-     * 6) sessionEventURLs 7) sessionState All other instance variables are 
+     * 6) sessionEventURLs 7) sessionState All other instance variables are
      * cleaned to save memory.
      */
     private void trimSession() {
@@ -1747,14 +1751,14 @@ public class InternalSession implements TaskRunnable, Serializable {
         }
         if (idpSessionIndex != null) {
             newProperties.put(SAML2_IDP_SESSION_INDEX, idpSessionIndex);
-        }        
+        }
         sessionProperties = newProperties;
     }
 
     /**
      * set the cookieMode based on whether the request has cookies or not. This
      * method is called from createSSOToken(request) method in SSOTokenManager.
-     * 
+     *
      * @param cookieMode ,
      *            Boolean value whether request has cookies or not.
      */
@@ -1788,9 +1792,9 @@ public class InternalSession implements TaskRunnable, Serializable {
     }
 
      /**
-      * Computes session object expiration time as smallest of idle limit or 
+      * Computes session object expiration time as smallest of idle limit or
       * session maximum lifetime limit adjusted by purgeDelay
-      * Time value is in seconds and uses the same epoch start as 
+      * Time value is in seconds and uses the same epoch start as
       * System.currentTimeMillis()
       * @return session expiration time
       */
@@ -1803,13 +1807,13 @@ public class InternalSession implements TaskRunnable, Serializable {
         return System.currentTimeMillis() / 1000
                 + Math.min(getTimeLeft(), timeLeft);
     }
-    
+
     /**
      * Correctly read and reschedule this session when it is read.
      */
     public void scheduleExpiry() {
         if (willExpireFlag) {
-            timerPool = SystemTimerPool.getTimerPool();   
+            timerPool = SystemTimerPool.getTimerPool();
             if (!isTimedOut()) {
                 if (isInvalid()) {
                     long expectedTime = creationTime +
@@ -1826,17 +1830,17 @@ public class InternalSession implements TaskRunnable, Serializable {
                     long timeLeft = getTimeLeft();
                     if (timeLeft == 0) {
                         changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
-                        sessionAuditor.auditActivity(this, AM_SESSION_MAX_TIMED_OUT);
+                        sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
                         if (timerPool != null) {
                             timerPool.schedule(this, new Date((timedOutAt +
                                 (purgeDelay * 60)) * 1000));
                         }
                     } else {
                         long idleTimeLeft = (maxIdleTime * 60) - getIdleTime();
-                        if (idleTimeLeft <= 0 && 
+                        if (idleTimeLeft <= 0 &&
                             sessionState != INACTIVE) {
                             changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
-                            sessionAuditor.auditActivity(this, AM_SESSION_IDLE_TIMED_OUT);
+                            sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
                             if (timerPool != null) {
                                 timerPool.schedule(this, new Date((timedOutAt +
                                     (purgeDelay * 60)) * 1000));
@@ -1849,7 +1853,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                                     timeToWait) * 1000));
                             }
                         }
-                    }        
+                    }
                 }
             } else {
                 long expectedTime = timedOutAt + purgeDelay * 60;
@@ -1876,8 +1880,9 @@ public class InternalSession implements TaskRunnable, Serializable {
      * Signals the Session for removal.
      */
     private void removeSession() {
-        sessionLogging.logEvent(this, SessionEvent.DESTROY);
-        sessionAuditor.auditActivity(this, AM_SESSION_DESTROYED);
+        SessionInfo sessionInfo = toSessionInfo();
+        sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
+        sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
         setState(DESTROYED);
         sessionService.removeInternalSession(sessionID);
         sessionService.sendEvent(this, SessionEvent.DESTROY);

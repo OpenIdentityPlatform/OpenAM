@@ -24,6 +24,7 @@
  *
  * $Id: SessionEvent.java,v 1.2 2008/06/25 05:41:29 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
@@ -43,7 +44,7 @@ import org.forgerock.util.Reject;
  * <code>LOGOUT</code>,
  * <code>REACTIVATION</code>, and
  * <code>DESTROY</code>.
- * 
+ *
  * @see com.iplanet.dpro.session.Session
  */
 
@@ -79,6 +80,8 @@ public class SessionEvent {
     /** Session quota exhausted */
     public static final int QUOTA_EXHAUSTED = 7;
 
+    /** Session property protected against change */
+    public static final int PROTECTED_PROPERTY = 8;
 
     public SessionEvent(Session sess, int type, long time) {
         session = sess;
