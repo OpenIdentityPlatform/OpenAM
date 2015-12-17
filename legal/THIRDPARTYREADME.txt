@@ -1248,9 +1248,6 @@ Copyright: Copyright (c) 2001-2011 Oracle and/or its affiliates. All rights rese
 Version: javax.security.auth.message-3.1.jar
 Copyright: Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
 
-Version: javax.servlet-api-3.1-b02.jar
-Copyright: Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
-
 Version: jaxb-libs-1.0.6.jar
 Copyright: Copyright (c) 2001-2011 Oracle and/or its affiliates. All rights reserved.
 
@@ -1325,9 +1322,6 @@ Copyright: Copyright 2014 ForgeRock AS.
 
 Version: opendj-server-2.6.2.jar
 Copyright: Copyright 2014 ForgeRock AS.
-
-Version: servlet-api-2.5.jar
-Copyright: Copyright 2005 Sun Microsystems, Inc. All rights reserved.
 
 Version: webservices-api-2009-14-01.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
