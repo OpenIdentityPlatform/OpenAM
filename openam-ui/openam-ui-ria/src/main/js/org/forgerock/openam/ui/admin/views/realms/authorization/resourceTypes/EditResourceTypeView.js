@@ -163,34 +163,25 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
 
             var self = this,
                 savePromise,
-                nonModifiedAttributes = _.clone(this.model.attributes),
-                activeTab = this.$el.find(".tab-pane.active"),
-                activeTabProperties;
+                nonModifiedAttributes = _.clone(this.model.attributes);
 
             this.updateFields();
-            this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
+            this.activeTabId = self.$el.find(".tab-menu li:not(.dropdown).active a").attr("href");
 
-            if (this.newEntity) {
-                _.extend(this.model.attributes, this.data.entity);
-            } else {
-                activeTabProperties = _.pick(this.data.entity, this.tabs[activeTab.index()].attr);
-                _.extend(this.model.attributes, activeTabProperties);
-            }
-
+            _.extend(this.model.attributes, this.data.entity);
             savePromise = this.model.save();
 
             if (savePromise) {
-                savePromise
-                    .done(function () {
-                        if (self.newEntity) {
-                            Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
-                                args: _.map([self.data.realmPath, self.model.id], encodeURIComponent),
-                                trigger: true
-                            });
-                        }
+                savePromise.done(function () {
+                    if (self.newEntity) {
+                        Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
+                            args: _.map([self.data.realmPath, self.model.id], encodeURIComponent),
+                            trigger: true
+                        });
+                    }
 
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                    });
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                });
             } else {
                 _.extend(this.model.attributes, nonModifiedAttributes);
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, this.model.validationError);

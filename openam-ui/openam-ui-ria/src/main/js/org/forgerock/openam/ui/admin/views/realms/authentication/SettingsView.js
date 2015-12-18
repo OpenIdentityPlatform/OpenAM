@@ -40,14 +40,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             var self = this;
 
             this.data.realmLocation = args[0];
-
             SMSRealmDelegate.authentication.get(this.data.realmLocation).then(function (data) {
                 self.data.formData = data;
 
                 self.parentRender(function () {
                     self.$el.find("div.tab-pane").show(); // FIXME: To remove
                     self.$el.find("ul.nav a:first").tab("show");
-
                     self.$el.find(".tab-menu .nav-tabs").tabdrop();
 
                     if (callback) {
@@ -62,20 +60,28 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             });
         },
         renderTab: function (event) {
-            this.$el.find("#tabpanel").empty();
 
             var id = $(event.target).attr("href").slice(1),
                 schema = this.data.formData.schema.properties[id],
                 element = this.$el.find("#tabpanel").get(0);
 
+            if (event.relatedTarget && this.data.form) {
+                _.merge(this.data.formData.values, this.data.form.data());
+            }
+
+            this.$el.find("#tabpanel").empty();
             this.data.form = new Form(element, schema, this.data.formData.values);
         },
         revert: function () {
-            this.data.form.reset();
+            var self = this;
+            SMSRealmDelegate.authentication.get(this.data.realmLocation).then(function (data) {
+                self.data.formData = data;
+                self.data.form.reset();
+            });
         },
         save: function (event) {
             var data = this.data.form.data(),
-                promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, data),
+                promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, this.data.formData.values),
                 self = this;
 
             promise.then(function () {

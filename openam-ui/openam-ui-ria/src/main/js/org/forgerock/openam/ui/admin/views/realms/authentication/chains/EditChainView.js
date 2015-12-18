@@ -101,8 +101,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     return AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
         events: {
-            "click #saveEditChain":  "saveChain",
-            "click #saveSettings":   "saveSettings",
+            "click #saveChanges":   "saveChanges",
             "click .add-new-module": "addNewModule",
             "click #delete":         "onDeleteClick"
         },
@@ -215,7 +214,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             });
         },
 
-        saveSettings: function (e) {
+        saveChanges: function (e) {
             var self = this,
                 chainData = this.data.form.chainData;
 
@@ -223,13 +222,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             chainData.loginFailureUrl[0] = this.$el.find("#loginFailureUrl").val();
 
             PostProcessView.addClassNameDialog().then(function () {
-                var savedData = {
-                        loginFailureUrl: chainData.loginFailureUrl,
-                        loginPostProcessClass: chainData.loginPostProcessClass,
-                        loginSuccessUrl: chainData.loginSuccessUrl
-                    },
-                    promise = SMSRealmDelegate.authentication.chains.update(
-                        self.data.realmPath, chainData._id, savedData);
+                var promise = SMSRealmDelegate.authentication.chains.update(
+                    self.data.realmPath,
+                    chainData._id,
+                    chainData
+                );
 
                 promise.fail(function (response) {
                     Messages.addMessage({
@@ -240,23 +237,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
                 FormHelper.bindSavePromiseToElement(promise, e.currentTarget);
             });
-        },
-
-        saveChain: function (e) {
-            var chainData = this.data.form.chainData,
-                savedData = {
-                    authChainConfiguration: chainData.authChainConfiguration
-                },
-                promise = SMSRealmDelegate.authentication.chains.update(this.data.realmPath, chainData._id, savedData);
-
-            promise.fail(function (response) {
-                Messages.addMessage({
-                    type: Messages.TYPE_DANGER,
-                    response: response
-                });
-            });
-
-            FormHelper.bindSavePromiseToElement(promise, e.currentTarget);
         },
 
         sortChainData: function (from, to) {
@@ -296,7 +276,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             }
 
             this.$el.find("#alertContainer").html(alert);
-            this.$el.find("#saveEditChain").prop("disabled", invalid);
+            this.$el.find("#saveChanges").prop("disabled", invalid);
         }
 
     });
