@@ -46,6 +46,7 @@ import org.forgerock.selfservice.core.SelfServiceContext;
 import org.forgerock.services.context.Context;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,6 +69,7 @@ public final class IdentityRestUtils {
 
     public static final String USERNAME = "username";
 
+    private static final List<String> PASSWORD_ATTRIBUTES = Arrays.asList("userpassword", "unicodepwd");
     private static final Debug debug = Debug.getInstance("frRest");
 
     private IdentityRestUtils() {
@@ -136,7 +138,7 @@ public final class IdentityRestUtils {
                         kbaChildren.add(kbaValue.getObject());
                     }
                     result.put(USER_KBA_ATTRIBUTE, kbaChildren);
-                } else if ("userPassword".equals(entry.getKey())) {
+                } else if (isPasswordAttribute(entry.getKey())) {
                     continue;
                 } else {
                     result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
@@ -146,6 +148,10 @@ public final class IdentityRestUtils {
         } catch (final Exception e) {
             throw new JsonValueException(result);
         }
+    }
+
+    private static boolean isPasswordAttribute(String attributeName) {
+        return PASSWORD_ATTRIBUTES.contains(attributeName.toLowerCase());
     }
 
     /**
