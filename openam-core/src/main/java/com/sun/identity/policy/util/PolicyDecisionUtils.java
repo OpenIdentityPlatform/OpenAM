@@ -24,18 +24,17 @@
  *
  * $Id: PolicyDecisionUtils.java,v 1.3 2009/06/19 20:39:09 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.policy.util;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
@@ -350,7 +349,8 @@ public class PolicyDecisionUtils {
             if ((value == null) || (value.length() == 0)) {
                 return null;
             }
-            StringBuilder sb = new StringBuilder("/UI/Login");
+            StringBuilder sb = new StringBuilder(SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR));
+            sb.append("/UI/Login");
             if (AuthenticateToRealmCondition.
                 AUTHENTICATE_TO_REALM_CONDITION_ADVICE.equals(adviceType)) {
                 sb.append("?realm=").append(value);
