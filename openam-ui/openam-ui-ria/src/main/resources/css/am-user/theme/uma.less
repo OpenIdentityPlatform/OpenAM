@@ -1,0 +1,74 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015 ForgeRock AS.
+ */
+
+.invalid-background(@bgcolor: #ffd4d4){
+    background-color: @bgcolor;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(60, 60, 60, 0.1) 35px, rgba(60, 60, 60, 0.1) 70px);
+}
+
+span.tooltips {
+    span {
+        color: #fff;
+        background-color: #000;
+        background-image: -webkit-linear-gradient(top, #555, #000);
+
+        &:after {
+            border-top-color: #000;
+        }
+    }
+}
+
+.policy-header {
+    h2 {
+        span {
+            color: #999;
+        }
+    }
+}
+
+#umaShareImage.header-icon {
+    background-color: transparent;
+
+    &.no-image{
+        background-color: @base-theme-color;
+    }
+}
+
+
+#uma {
+    input[type="text"]:invalid:required, input[type="text"].invalid {
+        .invalid-background;
+    }
+    
+    .backgrid {
+        td.permissions-cell {
+            a {
+                background-color: #f7f7f7;
+                color: #1f2223;
+            }
+        }
+
+        td.fa-share {
+            &:hover {
+                color: darken(@base-theme-color, 5%);
+            }
+        }
+
+        tbody tr.unsaved-changes {
+            background-color: #fff;
+        }
+    }
+}

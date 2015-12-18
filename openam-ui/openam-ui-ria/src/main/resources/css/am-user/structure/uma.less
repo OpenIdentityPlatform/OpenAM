@@ -14,15 +14,9 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-
 .webkit-text-rendering-bugfix{
     -webkit-transform: translateZ(0px);
     -webkit-backface-visibility: hidden;
-}
-
-.invalid-background(@bgcolor: #ffd4d4){
-    background-color:@bgcolor;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(60, 60, 60, 0.1) 35px, rgba(60, 60, 60, 0.1) 70px);
 }
 
 span.tooltips {
@@ -32,18 +26,15 @@ span.tooltips {
     span {
         position: absolute;
         width: 0;
-        color: #fff;
-        background-color:#000;
-        background-image:-webkit-linear-gradient(top, #555, #000);
         text-align: center;
         visibility: hidden;
         border-radius: 3px;
         font-size: 13px;
         padding: 6px 5px 10px;
-        box-shadow: 0px 1px 3px #666;
+        box-shadow: 0 1px 3px #666;
         bottom: 25px;
-        transition:bottom 200ms ease-out, opacity 100ms ease-in;
-        opacity:0;
+        transition: bottom 200ms ease-out, opacity 100ms ease-in;
+        opacity: 0;
 
         &:after {
             content: '';
@@ -51,8 +42,9 @@ span.tooltips {
             top: 100%;
             left: 50%;
             margin-left: -8px;
-            width: 0; height: 0;
-            border-top: 8px solid #000;
+            width: 0;
+            height: 0;
+            border-top: 8px solid;
             border-right: 8px solid transparent;
             border-left: 8px solid transparent;
         }
@@ -70,17 +62,16 @@ span.tooltips {
 }
 
 span.item-button-panel {
-
     > span {
         opacity:0.5;
         .transition(opacity, 200ms, linear);
 
         &.fa-check {
-            display:none;
+            display: none;
         }
 
         &:hover, &:focus {
-            opacity:1;
+            opacity: 1;
             box-shadow: none;
         }
     }
@@ -88,15 +79,17 @@ span.item-button-panel {
 
 
 .policy-header {
-    padding:0 0 30px;
+    padding: 0 0 30px;
     margin: 0 10px;
+
     h1 {
-        font-weight:normal;
-        padding:0 0 10px;
+        font-weight: normal;
+        padding: 0 0 10px;
         line-height: 32px;
+
         span, a{
-            font-weight:bold;
-            text-decoration:none;
+            font-weight: bold;
+            text-decoration: none;
         }
     }
 
@@ -107,27 +100,27 @@ span.item-button-panel {
         font-size: 12px;
 
         span {
-            font-weight:normal;
-            color: #999;
+            font-weight: normal;
         }
+
         a {
-            font-weight:normal;
-            text-decoration:none;
+            font-weight: normal;
+            text-decoration: none;
         }
     }
 }
 
 #lastFSlash, select {
     .transition(opacity, 300ms, linear);
+
     &.fade{
-        opacity:0;
+        opacity: 0;
     }
 }
 
 #umaShareImage.header-icon {
-    display:block;
-    position:relative;
-    background-color:transparent;
+    display: block;
+    position: relative;
     .transition(background-color, 200ms, linear);
 
     // If this img fails to load the class no-image is added to #umaShareImage
@@ -139,9 +132,8 @@ span.item-button-panel {
     }
 
     &.no-image{
-        background-color:@base-theme-color;
         img {
-            display:none;
+            display: none;
         }
     }
 }
@@ -149,7 +141,6 @@ span.item-button-panel {
 
 #uma {
     input[type="text"]:invalid:required, input[type="text"].invalid {
-        .invalid-background;
         .transition(background-color, 200ms, linear);
     }
 
@@ -157,19 +148,13 @@ span.item-button-panel {
         margin-bottom: 30px;
     }
 
-
     .backgrid {
         td.permissions-cell {
             overflow: visible;
 
-            a {
-                background-color: #f7f7f7;
-                color: #1f2223;
-
-                &:hover {
-                    background-color: inherit;
-                    color: inherit;
-                }
+            a:hover {
+                background-color: inherit;
+                color: inherit;
             }
         }
 
@@ -183,17 +168,15 @@ span.item-button-panel {
         }
 
         td.fa-share {
-            font-size:14px;
-            text-align:right;
+            font-size: 14px;
+            text-align: right;
 
             &:hover {
-                color: darken(@base-theme-color, 5%);
-                cursor:pointer;
+                cursor: pointer;
             }
         }
 
         tbody tr.unsaved-changes {
-            background-color: #fff;
             .transition(background, 0.2s, linear);
 
             #revoke {
@@ -211,9 +194,9 @@ span.item-button-panel {
     }
 
     #advancedView {
-        overflow:hidden;
-        max-height:0;
-        opacity:0;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
         transition: opacity 500ms ease-in-out ;
         border-bottom:none;
     }
@@ -224,9 +207,9 @@ span.item-button-panel {
         }
 
         #advancedView{
-            max-height:500px;
-            opacity:1;
-            transition:max-height 500ms ease-out, opacity 500ms ease-in-out ;
+            max-height: 500px;
+            opacity: 1;
+            transition: max-height 500ms ease-out, opacity 500ms ease-in-out ;
         }
     }
 
@@ -235,12 +218,13 @@ span.item-button-panel {
         border-color: transparent;
         box-shadow: none;
         opacity: 1;
+
         > div {
             box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.4);
         }
 
         &:not(.has-options){
-            display:none;
+            display: none;
         }
     }
 
@@ -256,11 +240,11 @@ span.item-button-panel {
 
     #editLabels{
         margin: 6px 0 0 -10px;
+
         &:hover{
-            text-decoration:none;
+            text-decoration: none;
         }
     }
-
 }
 
 #dialog-background.show {
