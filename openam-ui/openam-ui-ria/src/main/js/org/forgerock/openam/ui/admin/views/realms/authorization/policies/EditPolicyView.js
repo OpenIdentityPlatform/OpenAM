@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
@@ -41,6 +41,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
              SubjectResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView, FormHelper) {
     return AbstractView.extend({
         partials: [
+            "partials/breadcrumb/_Breadcrumb.html",
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
         ],
         validationFields: ["name", "resources"],
@@ -111,6 +112,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             // this line is needed for the correctly saving policy
             this.data.entity.applicationName = self.data.policySetName;
             this.data.options = {};
+            this.data.status = {};
+
+            if (this.data.entity.active) {
+                this.data.status.text = "common.user.active";
+                this.data.status.icon = "fa-check-circle";
+                this.data.status.class = "text-success";
+            } else {
+                this.data.status.text = "common.user.inactive";
+                this.data.status.icon = "fa-ban";
+                this.data.status.class = "text-warning";
+            }
 
             if (self.newEntity) {
                 $.when(this.policySetModelPromise, this.resourceTypesPromise).done(

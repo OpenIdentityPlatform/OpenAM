@@ -1,0 +1,7 @@
+<div class="breadcrumb">
+{{#each backLinks}}
+    <a href="{{this.href}}">{{#if this.icon}}<i class="fa {{this.icon}}"></i> {{/if}}{{this.text}}</a>
+{{else}}
+    <a href="{{backLink.href}}">{{#if backLink.icon}}<i class="fa {{backLink.icon}}"></i> {{/if}}{{backLink.text}}</a>
+{{/each}}
+</div>
