@@ -28,6 +28,7 @@
  */
 package com.sun.identity.sm;
 
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
@@ -78,7 +79,8 @@ public class DirectoryServerVendor {
      */
     public Vendor query(Connection conn) throws LdapException, SearchResultReferenceIOException {
         String result = null;
-        ConnectionEntryReader res = conn.search("", SearchScope.BASE_OBJECT, "(objectclass=*)", attrs);
+        ConnectionEntryReader res = conn.search(LDAPRequests.newSearchRequest("", SearchScope.BASE_OBJECT,
+                "(objectclass=*)", attrs));
 
         while (res.hasNext()) {
             if (res.isReference()) {

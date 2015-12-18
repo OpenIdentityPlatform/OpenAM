@@ -29,60 +29,8 @@
 
 package org.forgerock.openam.upgrade;
 
-import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
-
-import javax.security.auth.login.LoginException;
-
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.ldap.LdifUtils;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LdapException;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
-import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
-import org.forgerock.util.Options;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.time.Duration;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.AUTHN_BIND_REQUEST;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
 
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.util.SystemProperties;
@@ -117,6 +65,58 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
+import javax.security.auth.login.LoginException;
+
+import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdifUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
+import org.forgerock.util.Options;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.time.Duration;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This class contains utilities to upgrade the service schema
@@ -1450,7 +1450,7 @@ public class UpgradeUtils {
         try {
             // All connections will use authentication.
             Options options = Options.defaultOptions()
-                    .set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()))
+                    .set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()))
                     .set(CONNECT_TIMEOUT, new Duration((long) 3, TimeUnit.SECONDS));
 
             return getLDAPConnectionFactory(dsHostName, dsPort, options).getConnection();
@@ -3070,7 +3070,7 @@ public class UpgradeUtils {
         String serviceID = "";
         try (Connection conn = getLDAPConnection()) {
             String dn = subConfig.getDN();
-            SearchResultEntry result = conn.readEntry(dn);
+            SearchResultEntry result = conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn));
             if (result != null) {
                 for (Attribute attribute : result.getAllAttributes()) {
                     String attrName = attribute.getAttributeDescriptionAsString();
@@ -3337,7 +3337,7 @@ public class UpgradeUtils {
         try (Connection conn = getLDAPConnection()) {
             if (conn != null) {
                 String dn = subConfig.getDN();
-                SearchResultEntry result = conn.readEntry(dn);
+                SearchResultEntry result = conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn));
                 if (result != null) {
                     for (Attribute attribute : result.getAllAttributes()) {
                         String attributeName = attribute.getAttributeDescriptionAsString();
@@ -3521,7 +3521,8 @@ public class UpgradeUtils {
         try {
             // Find all immediate child nodes; return no
             // attributes
-            ConnectionEntryReader res = ld.search(dn, SearchScope.SINGLE_LEVEL, "objectclass=*");
+            ConnectionEntryReader res = ld.search(LDAPRequests.newSearchRequest(dn, SearchScope.SINGLE_LEVEL,
+                    "objectclass=*"));
             while (res.hasNext()) {
                 if (res.isReference()) {
                     //ignore
@@ -3538,7 +3539,7 @@ public class UpgradeUtils {
             // so stop recursing and delete the node
             try {
                 if (doDelete) {
-                    ld.delete(dn);
+                    ld.delete(LDAPRequests.newDeleteRequest(dn));
                     if (debug.messageEnabled()) {
                         debug.message(dn + " deleted");
                     }

@@ -28,6 +28,7 @@
  */
 package com.sun.identity.security.cert;
 
+import com.forgerock.opendj.ldap.controls.TransactionIdControl;
 import com.iplanet.security.x509.CertUtils;
 import com.iplanet.security.x509.IssuingDistributionPointExtension;
 import com.sun.identity.common.HttpURLConnectionManager;
@@ -57,6 +58,8 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
@@ -65,7 +68,6 @@ import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
@@ -475,7 +477,7 @@ public class AMCRLStore extends AMCertStore {
      */
     private void updateCRL(Connection ldc, String dn, byte[] crls) {
         try {
-            ModifyRequest modifyRequest = Requests.newModifyRequest(dn)
+            ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(dn)
                     .addModification(ModificationType.REPLACE, mCrlAttrName, crls);
             ldc.modify(modifyRequest);
         } catch (LdapException e) {
@@ -553,7 +555,9 @@ public class AMCRLStore extends AMCertStore {
         }
 
         try (Connection ldc = factory.getConnection()) {
-            ConnectionEntryReader results = ldc.search(url.asSearchRequest());
+            ConnectionEntryReader results = ldc.search(url.asSearchRequest()
+                                                          .addControl(TransactionIdControl.newControl(
+                                                                  AuditRequestContext.createSubTransactionIdValue())));
 
             if (!results.hasNext()) {
                 debug.error("verifyCertificate - No CRL distribution Point configured");

@@ -28,23 +28,6 @@
  */
 package com.sun.identity.sm.ldap;
 
-import java.security.Principal;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.ModificationItem;
-
-import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -52,6 +35,8 @@ import com.iplanet.ums.DataLayer;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.security.AdminDNAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
@@ -61,9 +46,23 @@ import com.sun.identity.sm.SMSObjectListener;
 import com.sun.identity.sm.SMSUtils;
 
 import java.security.AccessController;
+import java.security.Principal;
+import java.text.MessageFormat;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
@@ -81,7 +80,6 @@ import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.SortKey;
 import org.forgerock.opendj.ldap.controls.ServerSideSortRequestControl;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
@@ -273,7 +271,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
 
             ResultCode errorCode = null;
             try (Connection conn = getConnection(token.getPrincipal())) {
-                ldapEntry = conn.readEntry(DN.valueOf(dn), getAttributeNames());
+                ldapEntry = conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(DN.valueOf(dn),
+                        getAttributeNames()));
                 break;
             } catch (LdapException e) {
                 errorCode = e.getResult().getResultCode();
@@ -329,7 +328,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             debug.message("SMSLdapObject.create() retry: {}", retry);
 
             try (Connection conn = getConnection(p)) {
-                conn.add(entry);
+                conn.add(LDAPRequests.newAddRequest(entry));
                 debug.message("SMSLdapObject.create Successfully created entry: {}", dn);
                 break;
             } catch (LdapException e) {
@@ -424,7 +423,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                     debug.message("SMSLdapObject.delete() retry: " + retry);
                 }
                 try (Connection conn = getConnection(p)) {
-                    conn.delete(dn);
+                    conn.delete(LDAPRequests.newDeleteRequest(dn));
                     break;
                 } catch (LdapException e) {
                     ResultCode errorCode = e.getResult().getResultCode();
@@ -777,7 +776,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         boolean entryExists = false;
         try (Connection conn = getConnection(adminPrincipal)) {
             // Use the Admin Principal to check if entry exists
-            conn.readEntry(dn, OU_ATTR);
+            conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn, OU_ATTR));
             entryExists = true;
         } catch (EntryNotFoundException e) {
             debug.warning("SMSLdapObject:entryExists: {} does not exist", dn);
@@ -810,7 +809,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
 
     // Method to covert JNDI ModificationItems to LDAPModificationSet
     private static ModifyRequest copyModItemsToModifyRequest(DN dn, ModificationItem mods[]) throws SMSException {
-        ModifyRequest modifyRequest = Requests.newModifyRequest(dn);
+        ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(dn);
         try {
             for (ModificationItem mod : mods) {
                 Attribute attribute = mod.getAttribute();
@@ -941,7 +940,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
 
     private SearchRequest getSearchRequest(String dn, String filter, SearchScope scope, int numOfEntries, int timeLimit,
             boolean sortResults, boolean ascendingOrder, String sortAttribute, String... attributes) {
-        SearchRequest request = Requests.newSearchRequest(dn, scope, filter, attributes)
+        SearchRequest request = LDAPRequests.newSearchRequest(dn, scope, filter, attributes)
                 .setDereferenceAliasesPolicy(DereferenceAliasesPolicy.NEVER)
                 .setTimeLimit(timeLimit);
         if (numOfEntries > 0) {

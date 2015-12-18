@@ -18,20 +18,22 @@ package org.forgerock.openam.oauth2.resources.labels;
 
 import static org.forgerock.openam.oauth2.resources.labels.LabelsConstants.*;
 import static org.forgerock.opendj.ldap.Filter.*;
-import static org.forgerock.opendj.ldap.ModificationType.*;
-import static org.forgerock.opendj.ldap.requests.Requests.*;
+import static org.forgerock.opendj.ldap.ModificationType.REPLACE;
 
 import com.google.inject.Inject;
 import com.sun.identity.shared.debug.Debug;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
@@ -48,7 +50,6 @@ import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.AddRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
@@ -97,7 +98,7 @@ public class UmaLabelsStore {
                 DN realmDn = userDn.parent();
                 try (Connection connection = getConnection()) {
                     try {
-                        connection.add(newAddRequest(realmDn)
+                        connection.add(LDAPRequests.newAddRequest(realmDn)
                                 .addAttribute("ou", LDAPUtils.rdnValueFromDn(realmDn))
                                 .addAttribute("objectClass", "top", ORG_UNIT_OBJECT_CLASS));
                     } catch (LdapException ex) {
@@ -106,7 +107,7 @@ public class UmaLabelsStore {
                         }
                     }
                     try {
-                        connection.add(newAddRequest(userDn)
+                        connection.add(LDAPRequests.newAddRequest(userDn)
                                 .addAttribute("ou", LDAPUtils.rdnValueFromDn(userDn))
                                 .addAttribute("objectClass", "top", ORG_UNIT_OBJECT_CLASS));
                     } catch (LdapException ex) {
@@ -126,7 +127,7 @@ public class UmaLabelsStore {
 
     private ResourceSetLabel createLabel(String realm, String username, ResourceSetLabel label, String id,
                                          Connection connection) throws LdapException, InternalServerErrorException {
-        final AddRequest addRequest = newAddRequest(getLabelDn(realm, username, id))
+        final AddRequest addRequest = LDAPRequests.newAddRequest(getLabelDn(realm, username, id))
                 .addAttribute("objectClass", "top", OBJECT_CLASS)
                 .addAttribute(ID_ATTR, id)
                 .addAttribute(NAME_ATTR, label.getName())
@@ -151,7 +152,8 @@ public class UmaLabelsStore {
      */
     public ResourceSetLabel read(String realm, String username, String id) throws ResourceException {
         try (Connection connection = getConnection()) {
-            SearchResultEntry entry = connection.readEntry(getLabelDn(realm, username, id));
+            SearchResultEntry entry = connection.searchSingleEntry(
+                    LDAPRequests.newSingleEntrySearchRequest(getLabelDn(realm, username, id)));
             Set<String> resourceSets = new HashSet<>();
             final Attribute resourceSetAttribute = entry.getAttribute(RESOURCE_SET_ATTR);
             if (resourceSetAttribute != null) {
@@ -179,7 +181,7 @@ public class UmaLabelsStore {
     public void update(String realm, String username, ResourceSetLabel label) throws ResourceException {
         try (Connection connection = getConnection()) {
             Result result = connection.modify(
-                    Requests.newModifyRequest(getLabelDn(realm, username, label.getId()))
+                    LDAPRequests.newModifyRequest(getLabelDn(realm, username, label.getId()))
                             .addModification(REPLACE, NAME_ATTR, label.getName())
                             .addModification(REPLACE, RESOURCE_SET_ATTR, label.getResourceSetIds().toArray()));
             if (!result.isSuccess()) {
@@ -203,7 +205,7 @@ public class UmaLabelsStore {
      */
     public void delete(String realm, String username, String labelId) throws ResourceException {
         try (Connection connection = getConnection()) {
-            Result result = connection.delete(Requests.newDeleteRequest(getLabelDn(realm, username, labelId)));
+            Result result = connection.delete(LDAPRequests.newDeleteRequest(getLabelDn(realm, username, labelId)));
             if (!result.isSuccess()) {
                 throw new InternalServerErrorException("Unknown unsuccessful request");
             }
@@ -262,7 +264,7 @@ public class UmaLabelsStore {
                 attrs = new String[]{ID_ATTR, NAME_ATTR, TYPE_ATTR};
             }
             ConnectionEntryReader searchResult = connection.search(
-                    Requests.newSearchRequest(getUserDn(realm, username), SearchScope.SUBORDINATES, filter, attrs));
+                    LDAPRequests.newSearchRequest(getUserDn(realm, username), SearchScope.SUBORDINATES, filter, attrs));
             while (searchResult.hasNext()) {
                 if (searchResult.isReference()) {
                     debug.warning("Encountered reference {} searching for resource set labels for user {} in realm {}",

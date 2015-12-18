@@ -29,7 +29,22 @@
 
 package com.iplanet.ums;
 
-import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.AUTHN_BIND_REQUEST;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.ldap.Attr;
+import com.iplanet.services.ldap.AttrSet;
+import com.iplanet.services.ldap.DSConfigMgr;
+import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.services.ldap.LDAPUser;
+import com.iplanet.services.ldap.ServerInstance;
+import com.iplanet.services.ldap.event.EventService;
+import com.iplanet.services.util.I18n;
+import com.sun.identity.common.configuration.ConfigurationListener;
+import com.sun.identity.common.configuration.ConfigurationObserver;
+import com.sun.identity.security.ServerInstanceAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 import java.io.IOException;
 import java.security.AccessController;
@@ -43,6 +58,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Attributes;
 import org.forgerock.opendj.ldap.ByteString;
@@ -66,7 +82,6 @@ import org.forgerock.opendj.ldap.requests.AddRequest;
 import org.forgerock.opendj.ldap.requests.DeleteRequest;
 import org.forgerock.opendj.ldap.requests.ModifyDNRequest;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
@@ -75,21 +90,6 @@ import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
-
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.ldap.Attr;
-import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.DSConfigMgr;
-import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.services.ldap.LDAPUser;
-import com.iplanet.services.ldap.ServerInstance;
-import com.iplanet.services.ldap.event.EventService;
-import com.iplanet.services.util.I18n;
-import com.sun.identity.common.configuration.ConfigurationListener;
-import com.sun.identity.common.configuration.ConfigurationObserver;
-import com.sun.identity.security.ServerInstanceAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * DataLayer (A PACKAGE SCOPE CLASS) to access LDAP or other database
@@ -322,7 +322,7 @@ public class DataLayer implements java.io.Serializable {
      */
     public String[] getAttributeString(Principal principal, Guid guid, String attrName) {
         String id = guid.getDn();
-        SearchRequest request = Requests.newSearchRequest(id, SearchScope.BASE_OBJECT, "(objectclass=*)");
+        SearchRequest request = LDAPRequests.newSearchRequest(id, SearchScope.BASE_OBJECT, "(objectclass=*)");
         try {
             try (ConnectionEntryReader reader = readLDAPEntry(principal, request)) {
                 Attribute attribute = reader.readEntry().getAttribute(attrName);
@@ -354,7 +354,8 @@ public class DataLayer implements java.io.Serializable {
     public Attr getAttribute(Principal principal, Guid guid, String attrName) {
         String id = guid.getDn();
         try {
-            SearchRequest request = Requests.newSearchRequest(id, SearchScope.BASE_OBJECT, "(objectclass=*)", attrName);
+            SearchRequest request = LDAPRequests.newSearchRequest(id, SearchScope.BASE_OBJECT, "(objectclass=*)",
+                    attrName);
             try (ConnectionEntryReader reader = readLDAPEntry(principal, request)) {
                 Attribute attribute = reader.readEntry().getAttribute(attrName);
                 if (attribute == null) {
@@ -384,7 +385,7 @@ public class DataLayer implements java.io.Serializable {
      */
     public Collection<Attr> getAttributes(Principal principal, Guid guid, Collection<String> attrNames) {
         String id = guid.getDn();
-        SearchRequest request = Requests.newSearchRequest(id, SearchScope.BASE_OBJECT, "(objectclass=*)",
+        SearchRequest request = LDAPRequests.newSearchRequest(id, SearchScope.BASE_OBJECT, "(objectclass=*)",
                 attrNames.toArray(EMPTY_STRING_ARRAY));
         ConnectionEntryReader ldapEntry;
         try {
@@ -432,7 +433,7 @@ public class DataLayer implements java.io.Serializable {
         ResultCode errorCode;
 
         try {
-            AddRequest request = Requests.newAddRequest(id);
+            AddRequest request = LDAPRequests.newAddRequest(id);
             for (Attribute attribute : attrSet.toLDAPAttributeSet()) {
                 request.addAttribute(attribute);
             }
@@ -499,7 +500,7 @@ public class DataLayer implements java.io.Serializable {
         ResultCode errorCode;
 
         try {
-            DeleteRequest request = Requests.newDeleteRequest(id);
+            DeleteRequest request = LDAPRequests.newDeleteRequest(id);
             int retry = 0;
             while (retry <= connNumRetry) {
                 if (debug.messageEnabled()) {
@@ -573,7 +574,8 @@ public class DataLayer implements java.io.Serializable {
     ) throws UMSException {
         String id = guid.getDn();
         ConnectionEntryReader entryReader;
-        SearchRequest request = Requests.newSearchRequest(id, SearchScope.BASE_OBJECT, "(objectclass=*)", attrNames);
+        SearchRequest request = LDAPRequests.newSearchRequest(id, SearchScope.BASE_OBJECT, "(objectclass=*)",
+                attrNames);
 
         entryReader = readLDAPEntry(principal, request);
 
@@ -609,7 +611,7 @@ public class DataLayer implements java.io.Serializable {
         ResultCode errorCode;
 
         try {
-            ModifyDNRequest request = Requests.newModifyDNRequest(id, newName);
+            ModifyDNRequest request = LDAPRequests.newModifyDNRequest(id, newName);
             int retry = 0;
             while (retry <= connNumRetry) {
                 if (debug.messageEnabled()) {
@@ -664,7 +666,7 @@ public class DataLayer implements java.io.Serializable {
         ResultCode errorCode;
 
         try {
-            ModifyRequest request = Requests.newModifyRequest(id);
+            ModifyRequest request = LDAPRequests.newModifyRequest(id);
             for (Modification modification : modifications) {
                 request.addModification(modification);
             }
@@ -730,13 +732,13 @@ public class DataLayer implements java.io.Serializable {
             String hostAndPort = dsCfg.getHostName("default");
 
             // All connections will use authentication
-            SimpleBindRequest bindRequest = Requests.newSimpleBindRequest(id, oldPassword.toCharArray());
+            SimpleBindRequest bindRequest = LDAPRequests.newSimpleBindRequest(id, oldPassword.toCharArray());
             Options options = Options.defaultOptions()
                     .set(AUTHN_BIND_REQUEST, bindRequest);
 
             try (ConnectionFactory factory = new LDAPConnectionFactory(hostAndPort, 389, options)) {
                 Connection ldc = factory.getConnection();
-                ldc.modify(Requests.newModifyRequest(id).addModification(modification));
+                ldc.modify(LDAPRequests.newModifyRequest(id).addModification(modification));
             } catch (LdapException ldex) {
                 if (debug.warningEnabled()) {
                     debug.warning("DataLayer.changePassword:", ldex);
@@ -897,7 +899,7 @@ public class DataLayer implements java.io.Serializable {
                      */
                     attrNames1 = new String[] { "*" };
                 }
-                request = Requests.newSearchRequest(id, SearchScope.valueOf(scope), searchFilter, attrNames1);
+                request = LDAPRequests.newSearchRequest(id, SearchScope.valueOf(scope), searchFilter, attrNames1);
                 break;
             }
             for (Control control : controls) {
@@ -1062,9 +1064,9 @@ public class DataLayer implements java.io.Serializable {
             }
             try {
                 if (attrnames == null) {
-                    return ld.readEntry(dn);
+                    return ld.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn));
                 } else {
-                    return ld.readEntry(dn, attrnames);
+                    return ld.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn, attrnames));
                 }
             } catch (LdapException e) {
                 ResultCode errorCode = e.getResult().getResultCode();

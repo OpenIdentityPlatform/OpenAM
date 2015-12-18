@@ -29,11 +29,23 @@ import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
+
+import java.io.IOException;
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -49,21 +61,10 @@ import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.DeleteRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Pair;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.IOException;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This upgrade step is responsible for the removal of referrals. Referrals virtualise applications into realms that
@@ -136,7 +137,7 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
 
     private void searchForReferrals(Connection connection)
             throws SearchResultReferenceIOException, LdapException, UpgradeException {
-        SearchRequest request = Requests.newSearchRequest(
+        SearchRequest request = LDAPRequests.newSearchRequest(
                 rootDN, SearchScope.WHOLE_SUBTREE, REFERRAL_SEARCH_FILTER, "sunKeyValue");
 
         try (ConnectionEntryReader reader = connection.search(request)) {
@@ -332,7 +333,7 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
             for (DN referral : referralsToBeRemoved) {
                 UpgradeProgress.reportStart(AUDIT_REMOVING_REFERRAL_START, referral);
 
-                DeleteRequest request = Requests.newDeleteRequest(referral);
+                DeleteRequest request = LDAPRequests.newDeleteRequest(referral);
                 connection.delete(request);
 
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);

@@ -30,35 +30,6 @@ package com.sun.identity.idm.common;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.ServletContext;
-
-import org.forgerock.openam.ldap.LDAPURL;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.ldap.LdifUtils;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.SSLContextBuilder;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
-import org.forgerock.util.Options;
-import org.forgerock.util.time.Duration;
-
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
@@ -79,6 +50,33 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
+import javax.servlet.ServletContext;
+
+import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdifUtils;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
+import org.forgerock.util.time.Duration;
 
 /**
  * This class provides common utility functions for IdRepo.
@@ -307,7 +305,8 @@ public class IdRepoUtils {
              Connection ld = factory.getConnection()){
             String attrName = "schemaNamingContext";
             String[] attrs = { attrName };
-            ConnectionEntryReader res = ld.search("", SearchScope.BASE_OBJECT, "(objectclass=*)");
+            ConnectionEntryReader res = ld.search(LDAPRequests.newSearchRequest("", SearchScope.BASE_OBJECT,
+                    "(objectclass=*)"));
             if (res.hasNext()) {
                 SearchResultEntry entry = res.readEntry();
                 Attribute ldapAttr = entry.getAttribute(attrName);
@@ -364,7 +363,7 @@ public class IdRepoUtils {
             }
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.UNABLE_AUTHENTICATE_LDAP_SERVER, null);
         }
-        options = options.set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(bindDn, bindPwd.getBytes()));
+        options = options.set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(bindDn, bindPwd.toCharArray()));
 
         return new LDAPConnectionFactory(ldapUrl.getHost(), ldapUrl.getPort(), options);
     }

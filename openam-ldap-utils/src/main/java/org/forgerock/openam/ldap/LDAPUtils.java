@@ -49,7 +49,6 @@ import org.forgerock.opendj.ldap.RDN;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
 import org.forgerock.util.Reject;
@@ -247,7 +246,7 @@ public final class LDAPUtils {
 
         // Enable Authenticated connection
         if (username != null) {
-            ldapOptions = ldapOptions.set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(username, password));
+            ldapOptions = ldapOptions.set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(username, password));
         }
 
         return new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
@@ -513,7 +512,8 @@ public final class LDAPUtils {
         String filter = "cn=" + suffix;
 
         try {
-            ConnectionEntryReader results = ld.search("cn=mapping tree,cn=config", SearchScope.WHOLE_SUBTREE, filter);
+            ConnectionEntryReader results = ld.search(LDAPRequests.newSearchRequest("cn=mapping tree,cn=config",
+                    SearchScope.WHOLE_SUBTREE, filter));
             while (results.hasNext()) {
                 Attribute dbName = results.readEntry().getAttribute("nsslapd-backend");
                 if (dbName != null) {
@@ -677,7 +677,7 @@ public final class LDAPUtils {
 
     private static ConnectionFactory createSingleHostConnectionFactory(String host, int port,
             String authDN, String authPasswd, Options options) {
-        options = options.set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(authDN, authPasswd.getBytes()));
+        options = options.set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(authDN, authPasswd.toCharArray()));
         return new LDAPConnectionFactory(host, port, options);
     }
 }

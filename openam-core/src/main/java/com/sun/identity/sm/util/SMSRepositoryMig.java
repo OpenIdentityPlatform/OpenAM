@@ -29,13 +29,17 @@
 
 package com.sun.identity.sm.util;
 
-import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.AUTHN_BIND_REQUEST;
+
+import com.sun.identity.sm.ServiceAlreadyExistsException;
+import com.sun.identity.sm.flatfile.SMSFlatFileObject;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
@@ -43,13 +47,9 @@ import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
-
-import com.sun.identity.sm.ServiceAlreadyExistsException;
-import com.sun.identity.sm.flatfile.SMSFlatFileObject;
 
 /**
  * Migrates a SMS in LDAP to flat file structure usable # by SMSFlatFileObject
@@ -92,8 +92,8 @@ public class SMSRepositoryMig {
         SMSFlatFileObject smsFlatFileObject = new SMSFlatFileObject();
         try (Connection conn = factory.getConnection()) {
             // Loop through LDAP attributes, create SMS object for each.
-            ConnectionEntryReader res = conn.search("ou=services," + basedn, SearchScope.BASE_OBJECT,
-                    "(objectclass=*)", "*");
+            ConnectionEntryReader res = conn.search(LDAPRequests.newSearchRequest("ou=services," + basedn,
+                    SearchScope.BASE_OBJECT, "(objectclass=*)", "*"));
             while (res.hasNext()) {
                 if (res.isReference()) {
                     //ignore
@@ -116,7 +116,8 @@ public class SMSRepositoryMig {
 
     private static ConnectionFactory getConnectionFactory(String hostname, int port, String bindDN, char[] bindPassword) {
         Options options = Options.defaultOptions()
-                .set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(bindDN, bindPassword));
+                .set(AUTHN_BIND_REQUEST,
+                        LDAPRequests.newSimpleBindRequest(bindDN, bindPassword));
         return new LDAPConnectionFactory(hostname, port, options);
     }
 

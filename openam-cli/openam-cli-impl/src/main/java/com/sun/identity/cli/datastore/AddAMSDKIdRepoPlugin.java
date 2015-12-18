@@ -32,31 +32,6 @@ package com.sun.identity.cli.datastore;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.ldap.LdifUtils;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.SSLContextBuilder;
-import org.forgerock.opendj.ldap.requests.BindRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.util.Options;
-import org.forgerock.util.time.Duration;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
@@ -85,6 +60,31 @@ import com.sun.identity.sm.SMSSchema;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+
+import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdifUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.requests.BindRequest;
+import org.forgerock.util.Options;
+import org.forgerock.util.time.Duration;
 
 /**
  * This command creates identity.
@@ -393,7 +393,7 @@ public class AddAMSDKIdRepoPlugin extends AuthenticatedCommand {
     }
     
     private ConnectionFactory getLDAPConnection(DSEntry ds) throws Exception {
-        BindRequest bindRequest = Requests.newSimpleBindRequest(bindDN, bindPwd.getBytes());
+        BindRequest bindRequest = LDAPRequests.newSimpleBindRequest(bindDN, bindPwd.toCharArray());
         Options options = Options.defaultOptions()
                 .set(CONNECT_TIMEOUT, new Duration((long) 300, TimeUnit.MILLISECONDS))
                 .set(AUTHN_BIND_REQUEST, bindRequest);

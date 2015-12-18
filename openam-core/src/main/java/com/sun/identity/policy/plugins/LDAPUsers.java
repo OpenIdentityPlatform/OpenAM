@@ -29,29 +29,6 @@
  */
 package com.sun.identity.policy.plugins;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.DereferenceAliasesPolicy;
-import org.forgerock.opendj.ldap.LdapException;
-import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.requests.SearchRequest;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.InvalidNameException;
@@ -67,6 +44,29 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.shared.debug.Debug;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.DereferenceAliasesPolicy;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This class respresents a group of LDAP users
@@ -366,7 +366,7 @@ public class LDAPUsers implements Subject {
     }
 
     protected ConnectionEntryReader search(String searchFilter, Connection ld, String... attributeNames) {
-        SearchRequest request = Requests.newSearchRequest(baseDN, userSearchScope, searchFilter, attributeNames)
+        SearchRequest request = LDAPRequests.newSearchRequest(baseDN, userSearchScope, searchFilter, attributeNames)
                 .setDereferenceAliasesPolicy(DereferenceAliasesPolicy.NEVER)
                 .setTimeLimit(timeLimit);
         if (maxResults > 0) {

@@ -16,17 +16,20 @@
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
+import com.sun.identity.shared.debug.Debug;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
@@ -38,12 +41,8 @@ import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.SimplePagedResultsControl;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
-
-import com.google.inject.name.Named;
-import com.sun.identity.shared.debug.Debug;
 
 public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
 
@@ -93,7 +92,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     private Collection<Entry> getEntries(Connection connection) throws CoreTokenException {
         // Prepare the search
         Filter ldapFilter = getLDAPFilter();
-        SearchRequest searchRequest = Requests.newSearchRequest(
+        SearchRequest searchRequest = LDAPRequests.newSearchRequest(
                 dataLayerConfiguration.getTokenStoreRootSuffix(),
                 SearchScope.WHOLE_SUBTREE,
                 ldapFilter,

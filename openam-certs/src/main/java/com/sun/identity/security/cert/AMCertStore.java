@@ -29,7 +29,11 @@
 
 package com.sun.identity.security.cert;
 
-import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.AUTHN_BIND_REQUEST;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.SSL_CONTEXT;
+
+import com.iplanet.security.x509.CertUtils;
+import com.sun.identity.security.SecurityDebug;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -39,6 +43,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
@@ -47,15 +52,11 @@ import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.responses.SearchResultReference;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
-
-import com.iplanet.security.x509.CertUtils;
-import com.sun.identity.security.SecurityDebug;
 
 /**
 * The class is used to manage certificate store in LDAP server
@@ -107,7 +108,7 @@ public class AMCertStore {
             LDAPConnectionFactory factory;
 
             // Regardless of SSL on connection, we will use authentication
-            SimpleBindRequest authenticatedRequest = Requests.newSimpleBindRequest(
+            SimpleBindRequest authenticatedRequest = LDAPRequests.newSimpleBindRequest(
                     storeParam.getUser(), storeParam.getPassword().toCharArray());
             Options options = Options.defaultOptions()
                     .set(AUTHN_BIND_REQUEST, authenticatedRequest);
@@ -149,8 +150,8 @@ public class AMCertStore {
         ConnectionEntryReader results = null;
 
         try {
-            results = ldc.search(storeParam.getStartLoc(), SearchScope.SUBORDINATES, storeParam.getSearchFilter(),
-                    attributes);
+            results = ldc.search(LDAPRequests.newSearchRequest(storeParam.getStartLoc(), SearchScope.SUBORDINATES,
+                    storeParam.getSearchFilter(), attributes));
                                                  
             /*
              * The search based on the cn yielded no results
@@ -183,8 +184,8 @@ public class AMCertStore {
          * certficate directory.
          */
         try {
-            return ldc.searchSingleEntry(storeParam.getStartLoc(), SearchScope.SUBORDINATES,
-                    storeParam.getSearchFilter(), attributes);
+            return ldc.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(storeParam.getStartLoc(),
+                    SearchScope.SUBORDINATES, storeParam.getSearchFilter(), attributes));
         } catch (Exception e) {
             debug.error("AMCertStore.getLdapEntry : Error in getting Cached CRL");
             return null;

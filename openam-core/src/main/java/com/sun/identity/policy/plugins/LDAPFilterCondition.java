@@ -29,7 +29,7 @@
 
 package com.sun.identity.policy.plugins;
 
-import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -46,6 +46,7 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,15 +58,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
@@ -420,7 +421,7 @@ public class LDAPFilterCondition implements Condition {
         Connection ld = null;
         try (Connection conn = connPool.getConnection()) {
 
-            SearchRequest searchRequest = Requests.newSearchRequest(baseDN, userSearchScope, searchFilter, attrs);
+            SearchRequest searchRequest = LDAPRequests.newSearchRequest(baseDN, userSearchScope, searchFilter, attrs);
             ConnectionEntryReader reader = conn.search(searchRequest);
 
             if (reader.hasNext()) {

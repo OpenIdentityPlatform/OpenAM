@@ -17,7 +17,10 @@ package org.forgerock.openam.entitlement.indextree;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManagementDAO;
+
 import javax.inject.Inject;
+
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -27,7 +30,6 @@ import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
 import org.forgerock.opendj.ldap.controls.PersistentSearchRequestControl;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 
@@ -56,7 +58,7 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
         this.factory = factory;
 
         // Construct the persistent search request.
-        request = Requests.newSearchRequest(
+        request = LDAPRequests.newSearchRequest(
                 "ou=services," + smDAO.getRootSuffix(),
                 SearchScope.WHOLE_SUBTREE,
                 PATH_INDEX_FILTER)

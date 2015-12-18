@@ -42,6 +42,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import org.apache.click.Context;
 import org.apache.click.control.ActionLink;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.LdapException;
@@ -623,7 +624,7 @@ public class Step3 extends LDAPStoreWizardPage {
         try (Connection conn = getConnection(host, port, bindDN, bindPwd.toCharArray(), 5, ssl)) {
             String filter = "cn=" + "\"" + rootSuffix + "\"";
             String[] attrs = {""};
-            conn.search(rootSuffix, SearchScope.BASE_OBJECT, filter, attrs);
+            conn.search(LDAPRequests.newSearchRequest(rootSuffix, SearchScope.BASE_OBJECT, filter, attrs));
             writeToResponse("ok");
         } catch (LdapException lex) {
             if (!writeErrorToResponse(lex.getResult().getResultCode())) {

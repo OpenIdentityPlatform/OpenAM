@@ -27,6 +27,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-ldap-utils</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.forgerock.opendj</groupId>
             <artifactId>opendj-core</artifactId>
         </dependency>

@@ -29,6 +29,7 @@ import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
@@ -43,7 +44,9 @@ import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.requests.DeleteRequest;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
@@ -100,9 +103,9 @@ public class LdapAdapterTest {
         adapter.read(mockConnection, tokenId);
 
         // Then
-        ArgumentCaptor<DN> captor = ArgumentCaptor.forClass(DN.class);
-        verify(mockConnection).readEntry(captor.capture());
-        assertEquals(testDN, captor.getValue());
+        ArgumentCaptor<SearchRequest> captor = ArgumentCaptor.forClass(SearchRequest.class);
+        verify(mockConnection).searchSingleEntry(captor.capture());
+        assertEquals(testDN, captor.getValue().getName());
     }
 
     @Test
@@ -110,9 +113,10 @@ public class LdapAdapterTest {
         // Given
         String tokenId = "badger";
         DN testDN = DN.rootDN();
+        SearchRequest request = LDAPRequests.newSingleEntrySearchRequest(testDN);
 
         LdapException exception = LdapException.newLdapException(ResultCode.NO_SUCH_OBJECT);
-        given(mockConnection.readEntry(eq(testDN))).willThrow(exception);
+        given(mockConnection.searchSingleEntry(request)).willThrow(exception);
 
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 
@@ -130,7 +134,7 @@ public class LdapAdapterTest {
         DN testDN = DN.rootDN();
 
         Result successResult = mockSuccessfulResult();
-        given(mockConnection.delete(anyString())).willReturn(successResult);
+        given(mockConnection.delete(any(DeleteRequest.class))).willReturn(successResult);
 
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 
@@ -138,9 +142,9 @@ public class LdapAdapterTest {
         adapter.delete(mockConnection, tokenId);
 
         // Then
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<DeleteRequest> captor = ArgumentCaptor.forClass(DeleteRequest.class);
         verify(mockConnection).delete(captor.capture());
-        assertEquals(String.valueOf(testDN), captor.getValue());
+        assertEquals(testDN, captor.getValue().getName());
     }
 
     @Test
@@ -150,7 +154,7 @@ public class LdapAdapterTest {
         DN testDN = DN.rootDN();
 
         LdapException exception = LdapException.newLdapException(ResultCode.NO_SUCH_OBJECT);
-        given(mockConnection.delete(anyString())).willThrow(exception);
+        given(mockConnection.delete(any(DeleteRequest.class))).willThrow(exception);
 
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 
@@ -165,7 +169,7 @@ public class LdapAdapterTest {
         DN testDN = DN.rootDN();
 
         LdapException exception = LdapException.newLdapException(ResultCode.OTHER);
-        given(mockConnection.delete(anyString())).willThrow(exception);
+        given(mockConnection.delete(any(DeleteRequest.class))).willThrow(exception);
 
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 

@@ -30,32 +30,7 @@
 
 package com.sun.identity.policy.plugins;
 
-import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.LdapException;
-import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.requests.SearchRequest;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
-import org.forgerock.util.Options;
-import org.forgerock.util.time.Duration;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.REQUEST_TIMEOUT;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -72,6 +47,31 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.shared.debug.Debug;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
+import org.forgerock.util.time.Duration;
 
 /**
  * This class represents a group of LDAP roles
@@ -319,7 +319,7 @@ public class LDAPRoles implements Subject {
         Set<String> validRoleDNs = new HashSet<>();
         int status = ValidValues.SUCCESS;
         try (Connection conn = connPool.getConnection()) {
-            SearchRequest searchRequest = Requests.newSearchRequest(baseDN, roleSearchScope, searchFilter, attrs);
+            SearchRequest searchRequest = LDAPRequests.newSearchRequest(baseDN, roleSearchScope, searchFilter, attrs);
             ConnectionEntryReader reader = conn.search(searchRequest);
 
             while (reader.hasNext()) {
@@ -717,7 +717,7 @@ public class LDAPRoles implements Subject {
         // search the remote ldap and find out the user DN        
         String[] myAttrs = { LDAP_USER_ROLE_ATTR };
         try (Connection conn = connPool.getConnection()) {
-            SearchRequest searchRequest = Requests.newSearchRequest(searchBaseDN, userSearchScope, searchFilter,
+            SearchRequest searchRequest = LDAPRequests.newSearchRequest(searchBaseDN, userSearchScope, searchFilter,
                     myAttrs);
             ConnectionEntryReader reader = conn.search(searchRequest);
 

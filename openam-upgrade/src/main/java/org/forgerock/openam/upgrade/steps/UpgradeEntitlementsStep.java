@@ -15,36 +15,9 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
-import static org.forgerock.openam.upgrade.UpgradeServices.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-
-import java.security.PrivilegedAction;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayer;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ModificationType;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.requests.SearchRequest;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
-import org.json.JSONObject;
+import static org.forgerock.openam.upgrade.UpgradeServices.LF;
+import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -59,6 +32,33 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+
+import java.security.PrivilegedAction;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Inject;
+
+import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.ModifyRequest;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.json.JSONObject;
 
 /**
  * Upgrades the entitlements stored in the configuration. The following steps are taken:
@@ -330,7 +330,7 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
             conn = getConnection();
             //obtaining a second connection to perform the modifications.
             modConn = getConnection();
-            SearchRequest sr = Requests.newSearchRequest(SMSEntry.getRootSuffix(), SearchScope.WHOLE_SUBTREE,
+            SearchRequest sr = LDAPRequests.newSearchRequest(SMSEntry.getRootSuffix(), SearchScope.WHOLE_SUBTREE,
                     ENTITLEMENT_INDEX_FILTER, SUN_KEY_VALUE, SUN_XML_KEY_VALUE);
             ConnectionEntryReader reader = conn.search(sr);
             int counter = 0;
@@ -343,7 +343,7 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
                     }
                     SearchResultEntry entry = reader.readEntry();
                     Set<String> newValues = processEntry(entry);
-                    ModifyRequest modifyRequest = Requests.newModifyRequest(entry.getName());
+                    ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(entry.getName());
                     modifyRequest.addModification(ModificationType.REPLACE, SUN_XML_KEY_VALUE, newValues.toArray());
                     if (DEBUG.messageEnabled()) {
                         DEBUG.message("Upgrading entitlements index for: " + entry.getName());

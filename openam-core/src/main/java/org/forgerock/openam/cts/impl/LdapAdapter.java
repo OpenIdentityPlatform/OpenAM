@@ -15,11 +15,16 @@
  */
 package org.forgerock.openam.cts.impl;
 
+import com.forgerock.opendj.ldap.controls.TransactionIdControl;
+
 import java.util.Collection;
 import javax.inject.Inject;
+
+import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
@@ -73,7 +78,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
     public void create(Connection connection, Token token) throws LdapOperationFailedException {
         Entry entry = conversion.getEntry(token);
         try {
-            processResult(connection.add(entry));
+            processResult(connection.add(LDAPRequests.newAddRequest(entry)));
         } catch (LdapException e) {
             throw new LdapOperationFailedException(e.getResult());
         }
@@ -89,7 +94,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
     public Token read(Connection connection,  String tokenId) throws DataLayerException {
         DN dn = conversion.generateTokenDN(tokenId);
         try {
-            SearchResultEntry resultEntry = connection.readEntry(dn);
+            SearchResultEntry resultEntry = connection.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn));
             return conversion.tokenFromEntry(resultEntry);
         } catch (LdapException e) {
             Result result = e.getResult();
@@ -118,6 +123,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
         LdapTokenAttributeConversion.stripObjectClass(previousEntry);
 
         ModifyRequest request = Entries.diffEntries(previousEntry, currentEntry);
+        request.addControl(TransactionIdControl.newControl(AuditRequestContext.createSubTransactionIdValue()));
 
         // Test to see if there are any modifications
         if (request.getModifications().isEmpty()) {
@@ -143,7 +149,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
     public void delete(Connection connection, String tokenId) throws LdapOperationFailedException {
         String dn = String.valueOf(conversion.generateTokenDN(tokenId));
         try {
-            processResult(connection.delete(dn));
+            processResult(connection.delete(LDAPRequests.newDeleteRequest(dn)));
         } catch (LdapException e) {
             Result result = e.getResult();
             // Check for NO_SUCH_OBJECT

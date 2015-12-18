@@ -16,65 +16,8 @@
 package org.forgerock.openam.idrepo.ldap;
 
 import static org.forgerock.openam.ldap.LDAPConstants.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
-
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-
-import org.forgerock.openam.idrepo.ldap.helpers.ADAMHelper;
-import org.forgerock.openam.idrepo.ldap.helpers.ADHelper;
-import org.forgerock.openam.idrepo.ldap.helpers.DirectoryHelper;
-import org.forgerock.openam.idrepo.ldap.psearch.DJLDAPv3PersistentSearch;
-import org.forgerock.openam.ldap.LDAPURL;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.ldap.LdapFromJsonQueryFilterVisitor;
-import org.forgerock.openam.utils.CrestQuery;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.LDAPUrl;
-import org.forgerock.opendj.ldap.LdapException;
-import org.forgerock.opendj.ldap.LinkedAttribute;
-import org.forgerock.opendj.ldap.LinkedHashMapEntry;
-import org.forgerock.opendj.ldap.Modification;
-import org.forgerock.opendj.ldap.ModificationType;
-import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SSLContextBuilder;
-import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.BindRequest;
-import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
-import org.forgerock.opendj.ldap.requests.SearchRequest;
-import org.forgerock.opendj.ldap.responses.BindResult;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.opendj.ldap.schema.AttributeType;
-import org.forgerock.opendj.ldap.schema.ObjectClass;
-import org.forgerock.opendj.ldap.schema.ObjectClassType;
-import org.forgerock.opendj.ldap.schema.Schema;
-import org.forgerock.opendj.ldap.schema.UnknownSchemaElementException;
-import org.forgerock.opendj.ldif.ConnectionEntryReader;
-import org.forgerock.util.Function;
-import org.forgerock.util.Options;
-import org.forgerock.util.time.Duration;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
@@ -100,6 +43,62 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
 import com.sun.identity.sm.SchemaType;
+
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+
+import org.forgerock.openam.idrepo.ldap.helpers.ADAMHelper;
+import org.forgerock.openam.idrepo.ldap.helpers.ADHelper;
+import org.forgerock.openam.idrepo.ldap.helpers.DirectoryHelper;
+import org.forgerock.openam.idrepo.ldap.psearch.DJLDAPv3PersistentSearch;
+import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdapFromJsonQueryFilterVisitor;
+import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Entry;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LDAPUrl;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.LinkedAttribute;
+import org.forgerock.opendj.ldap.LinkedHashMapEntry;
+import org.forgerock.opendj.ldap.Modification;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.BindRequest;
+import org.forgerock.opendj.ldap.requests.ModifyRequest;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.BindResult;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldap.schema.AttributeType;
+import org.forgerock.opendj.ldap.schema.ObjectClass;
+import org.forgerock.opendj.ldap.schema.ObjectClassType;
+import org.forgerock.opendj.ldap.schema.Schema;
+import org.forgerock.opendj.ldap.schema.UnknownSchemaElementException;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Function;
+import org.forgerock.util.Options;
+import org.forgerock.util.time.Duration;
 
 /**
  * This is an IdRepo implementation that utilizes the LDAP protocol via OpenDJ LDAP SDK to access directory servers.
@@ -374,7 +373,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         String dn = findDNForAuth(IdType.USER, userName);
         Connection conn = null;
         try {
-            BindRequest bindRequest = Requests.newSimpleBindRequest(dn, password);
+            BindRequest bindRequest = LDAPRequests.newSimpleBindRequest(dn, password);
             conn = bindConnectionFactory.getConnection();
             BindResult bindResult = conn.bind(bindRequest);
             return bindResult.isSuccess();
@@ -423,8 +422,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     IdRepoErrorCode.CHANGE_PASSWORD_ONLY_FOR_USER, new Object[]{CLASS_NAME});
         }
         String dn = getDN(type, name);
-        BindRequest bindRequest = Requests.newSimpleBindRequest(dn, oldPassword.toCharArray());
-        ModifyRequest modifyRequest = Requests.newModifyRequest(dn);
+        BindRequest bindRequest = LDAPRequests.newSimpleBindRequest(dn, oldPassword.toCharArray());
+        ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(dn);
 
         byte[] encodedOldPwd = helper.encodePassword(oldPassword);
         byte[] encodedNewPwd = helper.encodePassword(newPassword);
@@ -661,10 +660,10 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         Connection conn = null;
         try {
             conn = connectionFactory.getConnection();
-            conn.add(Requests.newAddRequest(entry));
+            conn.add(LDAPRequests.newAddRequest(entry));
             if (type.equals(IdType.GROUP) && defaultGroupMember != null) {
                 if (memberOfAttr != null) {
-                    ModifyRequest modifyRequest = Requests.newModifyRequest(defaultGroupMember);
+                    ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(defaultGroupMember);
                     modifyRequest.addModification(ModificationType.ADD, memberOfAttr, dn);
                     conn.modify(modifyRequest);
                 }
@@ -797,7 +796,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         try {
             conn = connectionFactory.getConnection();
-            SearchResultEntry entry = conn.readEntry(dn, attrs.toArray(new String[attrs.size()]));
+            SearchResultEntry entry = conn.searchSingleEntry(
+                    LDAPRequests.newSingleEntrySearchRequest(dn, attrs.toArray(new String[attrs.size()])));
             for (Attribute attribute : entry.getAllAttributes()) {
                 String attrName = attribute.getAttributeDescriptionAsString();
                 if (!definedAttributes.isEmpty() && !definedAttributes.contains(attrName)) {
@@ -923,7 +923,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
      */
     private void setAttributes(SSOToken token, IdType type, String name, Map attributes,
             boolean isAdd, boolean isString, boolean changeOCs) throws IdRepoException {
-        ModifyRequest modifyRequest = Requests.newModifyRequest(getDN(type, name));
+        ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(getDN(type, name));
         attributes = removeUndefinedAttributes(type, attributes);
 
         if (type.equals(IdType.USER)) {
@@ -1066,7 +1066,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             throw newIdRepoException(IdRepoErrorCode.ILLEGAL_ARGUMENTS);
         }
         String dn = getDN(type, name);
-        ModifyRequest modifyRequest = Requests.newModifyRequest(dn);
+        ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(dn);
         for (String attr : attrNames) {
             modifyRequest.addModification(ModificationType.DELETE, attr);
         }
@@ -1152,7 +1152,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } else {
             attrs = new String[]{searchAttr};
         }
-        SearchRequest searchRequest = Requests.newSearchRequest(baseDN, scope, filter, attrs);
+        SearchRequest searchRequest = LDAPRequests.newSearchRequest(baseDN, scope, filter, attrs);
         searchRequest.setSizeLimit(maxResults < 1 ? defaultSizeLimit : maxResults);
         searchRequest.setTimeLimit(maxTime < 1 ? defaultTimeLimit : maxTime);
         Connection conn = null;
@@ -1230,7 +1230,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         Connection conn = null;
         try {
             conn = connectionFactory.getConnection();
-            conn.delete(dn);
+            conn.delete(LDAPRequests.newDeleteRequest(dn));
         } catch (LdapException ere) {
             DEBUG.error("Unable to delete entry: " + dn, ere);
             handleErrorResult(ere);
@@ -1302,7 +1302,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         try {
             conn = connectionFactory.getConnection();
-            SearchResultEntry entry = conn.readEntry(dn, attrs);
+            SearchResultEntry entry = conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn, attrs));
             Attribute attr = entry.getAttribute(uniqueMemberAttr);
             if (attr != null) {
                 results.addAll(LDAPUtils.getAttributeValuesAsStringSet(attr));
@@ -1311,7 +1311,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 if (attr != null) {
                     for (ByteString byteString : attr) {
                         LDAPUrl url = LDAPUrl.valueOf(byteString.toString());
-                        SearchRequest searchRequest = Requests.newSearchRequest(
+                        SearchRequest searchRequest = LDAPRequests.newSearchRequest(
                                 url.getName(), url.getScope(), url.getFilter(), DN_ATTR);
                         searchRequest.setTimeLimit(defaultTimeLimit);
                         searchRequest.setSizeLimit(defaultSizeLimit);
@@ -1352,7 +1352,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         Set<String> results = new HashSet<String>();
         DN roleBase = getBaseDN(IdType.ROLE);
         Filter filter = Filter.equality(roleDNAttr, dn);
-        SearchRequest searchRequest = Requests.newSearchRequest(roleBase, roleScope, filter, DN_ATTR);
+        SearchRequest searchRequest = LDAPRequests.newSearchRequest(roleBase, roleScope, filter, DN_ATTR);
         searchRequest.setTimeLimit(defaultTimeLimit);
         searchRequest.setSizeLimit(defaultSizeLimit);
         Connection conn = null;
@@ -1394,14 +1394,15 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         Connection conn = null;
         try {
             conn = connectionFactory.getConnection();
-            SearchResultEntry entry = conn.readEntry(dn, roleFilterAttr);
+            SearchResultEntry entry = conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn,
+                    roleFilterAttr));
             Attribute filterAttr = entry.getAttribute(roleFilterAttr);
             if (filterAttr != null) {
                 for (ByteString byteString : filterAttr) {
                     Filter filter = Filter.valueOf(byteString.toString());
                     //TODO: would it make sense to OR these filters and run a single search?
                     SearchRequest searchRequest =
-                            Requests.newSearchRequest(rootSuffix, defaultScope, filter.toString(), DN_ATTR);
+                            LDAPRequests.newSearchRequest(rootSuffix, defaultScope, filter.toString(), DN_ATTR);
                     searchRequest.setTimeLimit(defaultTimeLimit);
                     searchRequest.setSizeLimit(defaultSizeLimit);
                     ConnectionEntryReader reader = conn.search(searchRequest);
@@ -1473,7 +1474,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         if (memberOfAttr == null) {
             Filter filter = Filter.and(groupSearchFilter, Filter.equality(uniqueMemberAttr, dn));
             SearchRequest searchRequest =
-                    Requests.newSearchRequest(getBaseDN(IdType.GROUP), defaultScope, filter, DN_ATTR);
+                    LDAPRequests.newSearchRequest(getBaseDN(IdType.GROUP), defaultScope, filter, DN_ATTR);
             searchRequest.setTimeLimit(defaultTimeLimit);
             searchRequest.setSizeLimit(defaultSizeLimit);
             Connection conn = null;
@@ -1503,7 +1504,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             Connection conn = null;
             try {
                 conn = connectionFactory.getConnection();
-                SearchResultEntry entry = conn.readEntry(dn, memberOfAttr);
+                SearchResultEntry entry = conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn,
+                        memberOfAttr));
                 Attribute attr = entry.getAttribute(memberOfAttr);
                 if (attr != null) {
                     results.addAll(LDAPUtils.getAttributeValuesAsStringSet(attr));
@@ -1532,7 +1534,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         Connection conn = null;
         try {
             conn = connectionFactory.getConnection();
-            SearchResultEntry entry = conn.readEntry(dn, roleDNAttr);
+            SearchResultEntry entry = conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn, roleDNAttr));
             Attribute attr = entry.getAttribute(roleDNAttr);
             if (attr != null) {
                 results.addAll(LDAPUtils.getAttributeValuesAsStringSet(attr));
@@ -1562,7 +1564,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         Connection conn = null;
         try {
             conn = connectionFactory.getConnection();
-            SearchResultEntry entry = conn.readEntry(dn, roleAttr);
+            SearchResultEntry entry = conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn, roleAttr));
             Attribute attr = entry.getAttribute(roleAttr);
             if (attr != null) {
                 results.addAll(LDAPUtils.getAttributeValuesAsStringSet(attr));
@@ -1639,7 +1641,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
      * @throws IdRepoException If there was an error while modifying the membership data.
      */
     private void modifyGroupMembership(String groupDN, Set<String> memberDNs, int operation) throws IdRepoException {
-        ModifyRequest modifyRequest = Requests.newModifyRequest(groupDN);
+        ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(groupDN);
         Attribute attr = new LinkedAttribute(uniqueMemberAttr, memberDNs);
         ModificationType modType;
         if (ADDMEMBER == operation) {
@@ -1654,7 +1656,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             conn.modify(modifyRequest);
             if (memberOfAttr != null) {
                 for (String member : memberDNs) {
-                    ModifyRequest userMod = Requests.newModifyRequest(member);
+                    ModifyRequest userMod = LDAPRequests.newModifyRequest(member);
                     userMod.addModification(modType, memberOfAttr, groupDN);
                     conn.modify(userMod);
                 }
@@ -1691,7 +1693,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         try {
             conn = connectionFactory.getConnection();
             for (String memberDN : memberDNs) {
-                ModifyRequest modifyRequest = Requests.newModifyRequest(memberDN);
+                ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(memberDN);
                 modifyRequest.addModification(mod);
                 conn.modify(modifyRequest);
             }
@@ -2312,7 +2314,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             searchAttr = getSearchAttribute(type);
         }
         Filter filter = Filter.and(Filter.equality(searchAttr, name), getObjectClassFilter(type));
-        SearchRequest searchRequest = Requests.newSearchRequest(searchBase, defaultScope, filter, DN_ATTR);
+        SearchRequest searchRequest = LDAPRequests.newSearchRequest(searchBase, defaultScope, filter, DN_ATTR);
         Connection conn = null;
         try {
             conn = connectionFactory.getConnection();

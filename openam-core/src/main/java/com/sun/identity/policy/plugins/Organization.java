@@ -30,13 +30,6 @@
 
 package com.sun.identity.policy.plugins;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.InvalidNameException;
@@ -52,13 +45,21 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.shared.debug.Debug;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
@@ -299,7 +300,7 @@ public class Organization implements Subject {
         Set<String> validOrgDNs = new HashSet<>();
         int status = ValidValues.SUCCESS;
         try {
-            SearchRequest request = Requests.newSearchRequest(baseDN, orgSearchScope, searchFilter, attrs);
+            SearchRequest request = LDAPRequests.newSearchRequest(baseDN, orgSearchScope, searchFilter, attrs);
             try (Connection conn = connPool.getConnection()) {
                 // connect to the server to authenticate
                 ConnectionEntryReader reader = conn.search(request);
@@ -639,7 +640,7 @@ public class Organization implements Subject {
             String[] attrs = { userRDNAttrName }; 
             // search the remote ldap and find out the user DN          
             try (Connection conn = connPool.getConnection()) {
-                SearchRequest request = Requests.newSearchRequest(baseDN, userSearchScope, searchFilter, attrs);
+                SearchRequest request = LDAPRequests.newSearchRequest(baseDN, userSearchScope, searchFilter, attrs);
                 ConnectionEntryReader reader = conn.search(request);
                 while (reader.hasNext()) {
                     if (reader.isReference()) {

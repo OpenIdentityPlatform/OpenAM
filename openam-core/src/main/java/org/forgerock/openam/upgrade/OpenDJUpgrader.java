@@ -49,13 +49,13 @@ import java.util.zip.ZipInputStream;
 import javax.annotation.Nonnull;
 import javax.servlet.ServletContext;
 
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldif.EntryReader;
 import org.forgerock.opendj.ldif.LDIF;
@@ -320,7 +320,7 @@ public final class OpenDJUpgrader {
 
     private List<DN> findBaseDNs() throws IOException {
         final List<DN> baseDNs = new LinkedList<DN>();
-        final SearchRequest request = Requests.newSearchRequest("cn=backends,cn=config", SearchScope.WHOLE_SUBTREE,
+        final SearchRequest request = LDAPRequests.newSearchRequest("cn=backends,cn=config", SearchScope.WHOLE_SUBTREE,
                 "(objectclass=ds-cfg-backend)", "ds-cfg-base-dn");
 
         try (LDIFEntryReader reader = new LDIFEntryReader(new FileInputStream(installRoot + "/config/config.ldif"))) {

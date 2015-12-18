@@ -18,6 +18,12 @@ package com.iplanet.services.ldap.event;
 
 import static org.forgerock.openam.ldap.LDAPConstants.*;
 
+import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.common.SystemTimerPool;
+import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.shared.debug.Debug;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,11 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.idm.IdRepoListener;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
@@ -51,7 +53,6 @@ import org.forgerock.opendj.ldap.controls.EntryChangeNotificationResponseControl
 import org.forgerock.opendj.ldap.controls.GenericControl;
 import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
 import org.forgerock.opendj.ldap.controls.PersistentSearchRequestControl;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
@@ -184,7 +185,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
                 attrs = attributes.toArray(new String[0]);
             }
         }
-        SearchRequest searchRequest = Requests.newSearchRequest(searchBaseDN, searchScope, searchFilter, attrs);
+        SearchRequest searchRequest = LDAPRequests.newSearchRequest(searchBaseDN, searchScope, searchFilter, attrs);
         searchRequest.addControl(control);
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Starting persistent search against baseDN: " + searchBaseDN

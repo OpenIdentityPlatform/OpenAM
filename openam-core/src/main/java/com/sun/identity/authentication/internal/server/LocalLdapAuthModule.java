@@ -54,6 +54,8 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
+
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
@@ -320,7 +322,8 @@ public class LocalLdapAuthModule implements LoginModule {
                         "LocalLdapAuthModule.getDN(): lda connection is null");
                 throw (new LoginException("INVALID_USER_NAME"));
             } else {
-                results = conn.search(baseDN, SearchScope.WHOLE_SUBTREE, filter.toString(), attrs);
+                results = conn.search(LDAPRequests.newSearchRequest(baseDN, SearchScope.WHOLE_SUBTREE,
+                        filter.toString(), attrs));
             }
 
             if (results.hasNext()) {

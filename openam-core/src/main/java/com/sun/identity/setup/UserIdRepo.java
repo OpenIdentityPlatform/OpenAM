@@ -31,6 +31,21 @@ package com.sun.identity.setup;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.idm.IdConstants;
+import com.sun.identity.shared.StringUtils;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -47,10 +62,10 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
-
 import javax.net.ssl.SSLContext;
 import javax.servlet.ServletContext;
 
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.LdifUtils;
 import org.forgerock.opendj.ldap.Attribute;
@@ -59,28 +74,12 @@ import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.time.Duration;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.idm.IdConstants;
-import com.sun.identity.shared.StringUtils;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * This class does Directory Server related tasks for 
@@ -247,7 +246,8 @@ class UserIdRepo {
     private String getADAMInstanceGUID(Map userRepo) throws Exception {
         try (Connection ld = getLDAPConnection(userRepo)) {
             String attrName = "schemaNamingContext";
-            ConnectionEntryReader res = ld.search("", SearchScope.BASE_OBJECT, "(objectclass=*)");
+            ConnectionEntryReader res = ld.search(LDAPRequests.newSearchRequest("", SearchScope.BASE_OBJECT,
+                    "(objectclass=*)"));
             if (res.hasNext()) {
                 SearchResultEntry entry = res.readEntry();
                     Attribute ldapAttr = entry.getAttribute(attrName);
@@ -381,7 +381,8 @@ class UserIdRepo {
         String userSSLStore = (String) userRepo.get(SetupConstants.USER_STORE_SSL);
 
         // All connections will use authentication.
-        SimpleBindRequest request = Requests.newSimpleBindRequest(getBindDN(userRepo), getBindPassword(userRepo).toCharArray());
+        SimpleBindRequest request = LDAPRequests.newSimpleBindRequest(getBindDN(userRepo),
+                getBindPassword(userRepo).toCharArray());
         Options options = Options.defaultOptions()
                 .set(REQUEST_TIMEOUT, new Duration((long)3, TimeUnit.SECONDS))
                 .set(AUTHN_BIND_REQUEST, request);

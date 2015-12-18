@@ -30,9 +30,19 @@
 
 package org.forgerock.openam.ldap;
 
-import static org.forgerock.openam.ldap.LDAPUtils.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.ldap.LDAPUtils.convertToLDAPURLs;
+import static org.forgerock.openam.ldap.LDAPUtils.newFailoverConnectionPool;
+import static org.forgerock.openam.utils.CollectionUtils.asList;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 import java.nio.charset.Charset;
 import java.security.AccessController;
@@ -50,7 +60,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
 import javax.net.ssl.SSLContext;
 
 import org.forgerock.opendj.ldap.Attribute;
@@ -77,7 +86,6 @@ import org.forgerock.opendj.ldap.controls.PasswordPolicyResponseControl;
 import org.forgerock.opendj.ldap.controls.PasswordPolicyWarningType;
 import org.forgerock.opendj.ldap.requests.BindRequest;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.BindResult;
 import org.forgerock.opendj.ldap.responses.Result;
@@ -86,15 +94,6 @@ import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.time.Duration;
-
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
 
 public class LDAPAuthUtils {
     private boolean returnUserDN;
@@ -271,7 +270,7 @@ public class LDAPAuthUtils {
             String configName = servers.toString() + ":" + bindingUser;
             connPool = connectionPools.get(configName);
             if (connPool == null) {
-                synchronized(connectionPools) {
+                synchronized (connectionPools) {
                     connPool = connectionPools.get(configName);
                     Options options = Options.defaultOptions()
                             .set(REQUEST_TIMEOUT, new Duration((long) operationsTimeout, TimeUnit.MILLISECONDS));
@@ -490,7 +489,7 @@ public class LDAPAuthUtils {
         List<Control> controls;
 
         try {
-            ModifyRequest mods = Requests.newModifyRequest(userDN);
+            ModifyRequest mods = LDAPRequests.newModifyRequest(userDN);
 
             if (beheraEnabled) {
                 mods.addControl(PasswordPolicyRequestControl.newControl(false));
@@ -500,7 +499,7 @@ public class LDAPAuthUtils {
                 mods.addModification(ModificationType.DELETE, LDAP_PASSWD_ATTR, oldPwd);
                 mods.addModification(ModificationType.ADD, LDAP_PASSWD_ATTR, password);
                 modConn = getConnection();
-                modConn.bind(userDN, oldPwd.toCharArray());
+                modConn.bind(LDAPRequests.newSimpleBindRequest(userDN, oldPwd.toCharArray()));
             } else {
                 mods.addModification(ModificationType.DELETE, AD_PASSWD_ATTR, updateADPassword(oldPwd));
                 mods.addModification(ModificationType.ADD, AD_PASSWD_ATTR, updateADPassword(password));
@@ -698,7 +697,7 @@ public class LDAPAuthUtils {
             }
 
             ConnectionEntryReader results;
-            SearchRequest searchForUser = Requests.newSearchRequest(baseDN, searchScope, searchFilter, attrs);
+            SearchRequest searchForUser = LDAPRequests.newSearchRequest(baseDN, searchScope, searchFilter, attrs);
 
             int userMatches = 0;
             SearchResultEntry entry;
@@ -838,7 +837,7 @@ public class LDAPAuthUtils {
         try {
             try {
                 BindRequest bindRequest =
-                        Requests.newSimpleBindRequest(userDN, userPassword.toCharArray());
+                        LDAPRequests.newSimpleBindRequest(userDN, userPassword.toCharArray());
 
                 if (beheraEnabled) {
                     bindRequest.addControl(PasswordPolicyRequestControl.newControl(false));

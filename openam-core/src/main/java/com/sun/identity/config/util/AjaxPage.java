@@ -31,6 +31,13 @@ package com.sun.identity.config.util;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
+import com.sun.identity.config.SessionAttributeNames;
+import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.AMSetupUtils;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.Locale;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -40,29 +47,21 @@ import java.security.GeneralSecurityException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.click.Page;
 import org.apache.click.control.ActionLink;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.util.Options;
 import org.forgerock.util.time.Duration;
 import org.publicsuffix.PSS;
-
-import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.setup.AMSetupServlet;
-import com.sun.identity.setup.AMSetupUtils;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.Locale;
 
 public abstract class AjaxPage extends Page {
 
@@ -167,7 +166,7 @@ public abstract class AjaxPage extends Page {
             throws GeneralSecurityException, LdapException {
         Options ldapOptions = Options.defaultOptions()
                 .set(CONNECT_TIMEOUT, new Duration((long)timeout, TimeUnit.SECONDS))
-                .set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(bindDN, bindPwd));
+                .set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(bindDN, bindPwd));
 
         if (isSSl) {
             ldapOptions = ldapOptions.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());

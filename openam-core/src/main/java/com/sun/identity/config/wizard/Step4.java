@@ -42,6 +42,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import org.apache.click.Context;
 import org.apache.click.control.ActionLink;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.LdapException;
@@ -374,7 +375,7 @@ public class Step4 extends ProtectedPage {
         try (Connection conn = getConnection(host, port, bindDN, bindPwd.toCharArray(), 5, ssl)) {
             //String filter = "cn=" + "\"" + rootSuffix + "\"";    // NOT SURE Why "cn" is specified. would never work.
             String[] attrs = {""};
-            conn.search(rootSuffix, SearchScope.BASE_OBJECT, ObjectClassFilter, attrs);
+            conn.search(LDAPRequests.newSearchRequest(rootSuffix, SearchScope.BASE_OBJECT, ObjectClassFilter, attrs));
             writeToResponse("ok");
         } catch (LdapException lex) {
             ResultCode resultCode = lex.getResult().getResultCode();
@@ -427,7 +428,7 @@ public class Step4 extends ProtectedPage {
         try (Connection conn = getConnection(host, port, bindDN, bindPwd.toCharArray(), 3, ssl)) {
             //String filter = "cn=" + "\"" + rootSuffix + "\"";
             String[] attrs = {""};
-            conn.search(rootSuffix, SearchScope.BASE_OBJECT, ObjectClassFilter, attrs);
+            conn.search(LDAPRequests.newSearchRequest(rootSuffix, SearchScope.BASE_OBJECT, ObjectClassFilter, attrs));
             writeToResponse("ok");
         } catch (LdapException lex) {
             ResultCode resultCode = lex.getResult().getResultCode();

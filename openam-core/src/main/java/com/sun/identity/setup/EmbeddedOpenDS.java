@@ -29,7 +29,14 @@
 
 package com.sun.identity.setup;
 
-import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.AUTHN_BIND_REQUEST;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
+
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSEntry;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -60,13 +67,13 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.servlet.ServletContext;
 
 import org.forgerock.guava.common.io.ByteStreams;
 import org.forgerock.i18n.LocalizableMessage;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.config.dsconfig.DSConfig;
 import org.forgerock.opendj.ldap.Attribute;
@@ -79,7 +86,6 @@ import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.Modification;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.util.Options;
 import org.forgerock.util.thread.listener.ShutdownListener;
@@ -95,12 +101,6 @@ import org.opends.server.types.DirectoryEnvironmentConfig;
 import org.opends.server.util.EmbeddedUtils;
 import org.opends.server.util.ServerConstants;
 import org.opends.server.util.TimeThread;
-
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSEntry;
 
 // OpenDS, now OpenDJ, does not have APIs to install and setup replication yet
 
@@ -838,7 +838,7 @@ public class EmbeddedOpenDS {
         try (Connection conn = getLDAPConnection(hostname, port, username, password)) {
             // We'll use Directory Manager
             if (conn != null) {
-                SearchResultEntry le = conn.readEntry(replDN, attrs);
+                SearchResultEntry le = conn.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(replDN, attrs));
                 if (le != null) {
                     Attribute la = le.getAttribute(attrs[0]);
                     if (la != null) {
@@ -876,7 +876,8 @@ public class EmbeddedOpenDS {
 
         try (Connection conn = getLDAPConnection(hostname, port, username, password)) {
             if (conn != null) {
-                SearchResultEntry le = conn.readEntry(adminConnectorDN, attrs);
+                SearchResultEntry le = conn.searchSingleEntry(
+                        LDAPRequests.newSingleEntrySearchRequest(adminConnectorDN, attrs));
 
                 if (le != null) {
                     Attribute la = le.getAttribute(attrs[0]);
@@ -1183,7 +1184,7 @@ public class EmbeddedOpenDS {
 
             // All connections will use authentication
             Options options = Options.defaultOptions()
-                    .set(AUTHN_BIND_REQUEST, Requests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()))
+                    .set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()))
                     .set(CONNECT_TIMEOUT, new Duration((long)3, TimeUnit.SECONDS));
 
             factory = new LDAPConnectionFactory(dsHostName, Integer.parseInt(dsPort), options);
@@ -1216,7 +1217,7 @@ public class EmbeddedOpenDS {
         }
         String trustKey = null;
         try {
-            SearchResultEntry le = lc.readEntry(replServerDN, attrs);
+            SearchResultEntry le = lc.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(replServerDN, attrs));
             if (le != null) {
                 Attribute la = le.getAttribute(attrs[0]);
                 if (la != null) {
@@ -1224,7 +1225,7 @@ public class EmbeddedOpenDS {
                 }
                 String keyDN = "ds-cfg-key-id=" + trustKey +
                         ",cn=instance keys,cn=admin data";
-                lc.delete(keyDN);
+                lc.delete(LDAPRequests.newDeleteRequest(keyDN));
             } else {
                 debug.error("EmbeddedOpenDS:syncOpenDSServer():" +
                         "Could not find trustkey for:" + replServerDN);
@@ -1235,14 +1236,14 @@ public class EmbeddedOpenDS {
 
         }
         try {
-            lc.delete(replServerDN);
+            lc.delete(LDAPRequests.newDeleteRequest(replServerDN));
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS.syncOpenDSServer()." +
                     " Error getting deleting server entry:" + replServerDN, ex);
 
         }
         try {
-            ModifyRequest modifyRequest = Requests.newModifyRequest(replDN)
+            ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(replDN)
                     .addModification(new Modification(ModificationType.DELETE,
                             Attributes.singletonAttribute("uniqueMember", "cn=" + delServer)));
             lc.modify(modifyRequest);
@@ -1261,7 +1262,7 @@ public class EmbeddedOpenDS {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         try {
             if (lc != null) {
-                SearchResultEntry le = lc.readEntry(replDN, attrs);
+                SearchResultEntry le = lc.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(replDN, attrs));
                 if (le != null) {
                     Set hostSet = new HashSet();
                     Attribute la = le.getAttribute(attrs[0]);

@@ -31,6 +31,7 @@
 
 package org.forgerock.openam.ldap;
 
+import com.forgerock.opendj.ldap.controls.TransactionIdControl;
 import com.sun.identity.shared.debug.Debug;
 
 import java.io.BufferedInputStream;
@@ -38,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.LdapException;
@@ -48,7 +50,6 @@ import org.forgerock.opendj.ldap.requests.AddRequest;
 import org.forgerock.opendj.ldap.requests.DeleteRequest;
 import org.forgerock.opendj.ldap.requests.ModifyDNRequest;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldif.ChangeRecord;
 import org.forgerock.opendj.ldif.ChangeRecordVisitor;
 import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
@@ -102,11 +103,13 @@ public final class LdifUtils {
                 @Override
                 public Void visitChangeRecord(Void aVoid, AddRequest change) {
                     try {
+                        change.addControl(TransactionIdControl.newControl(
+                                AuditRequestContext.createSubTransactionIdValue()));
                         ld.add(change);
                     } catch (LdapException e) {
                         if (ResultCode.ENTRY_ALREADY_EXISTS.equals(e.getResult().getResultCode())) {
                             for (Attribute attr : change.getAllAttributes()) {
-                                ModifyRequest modifyRequest = Requests.newModifyRequest(change.getName());
+                                ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(change.getName());
                                 modifyRequest.addModification(new Modification(ModificationType.ADD, attr));
                                 try {
                                     ld.modify(modifyRequest);
@@ -125,6 +128,8 @@ public final class LdifUtils {
                 @Override
                 public Void visitChangeRecord(Void aVoid, ModifyRequest change) {
                     try {
+                        change.addControl(TransactionIdControl.newControl(
+                                AuditRequestContext.createSubTransactionIdValue()));
                         ld.modify(change);
                     } catch (LdapException e) {
                         DEBUG.warning("LDAPUtils.createSchemaFromLDIF - Could not modify schema: {}", change, e);

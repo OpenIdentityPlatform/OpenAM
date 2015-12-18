@@ -30,6 +30,9 @@ package com.sun.identity.setup;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSSchema;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.LdifUtils;
 import org.forgerock.opendj.ldap.Connection;
@@ -47,16 +51,12 @@ import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 import org.forgerock.util.time.Duration;
-
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSSchema;
 
 /**
  * This class does Directory Server related tasks for 
@@ -199,7 +199,8 @@ public class AMSetupDSConfig {
      */
     public boolean connectDSwithDN(boolean ssl) {
         try (Connection conn = getLDAPConnection(ssl)) {
-            ConnectionEntryReader results = conn.search(suffix, SearchScope.BASE_OBJECT, Filter.objectClassPresent().toString());
+            ConnectionEntryReader results = conn.search(LDAPRequests.newSearchRequest(suffix, SearchScope.BASE_OBJECT,
+                    Filter.objectClassPresent().toString()));
             return results.hasNext();
         } catch (LdapException e) {
             disconnectDServer();
@@ -218,7 +219,8 @@ public class AMSetupDSConfig {
         String baseDN = "ou=services," + suffix;
         String filter = "(|(ou=DAI)(ou=sunIdentityRepositoryService))";
         try (Connection conn = getLDAPConnection(ssl)){
-            ConnectionEntryReader results = conn.search(baseDN, SearchScope.WHOLE_SUBTREE, filter, "dn");
+            ConnectionEntryReader results = conn.search(LDAPRequests.newSearchRequest(baseDN, SearchScope.WHOLE_SUBTREE,
+                    filter, "dn"));
             return Boolean.toString(results.hasNext());
         } catch (LdapException e) {
              if (Debug.getInstance(SetupConstants.DEBUG_NAME).messageEnabled()) {
@@ -282,7 +284,7 @@ public class AMSetupDSConfig {
                 ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
 
                 // All connections will use authentication
-                SimpleBindRequest request = Requests.newSimpleBindRequest(dsManager, dsAdminPwd.getBytes());
+                SimpleBindRequest request = LDAPRequests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray());
                 Options options = Options.defaultOptions()
                         .set(REQUEST_TIMEOUT, new Duration((long)3, TimeUnit.SECONDS))
                         .set(AUTHN_BIND_REQUEST, request);
