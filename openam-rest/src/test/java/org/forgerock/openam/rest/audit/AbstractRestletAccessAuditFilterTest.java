@@ -58,14 +58,14 @@ public class AbstractRestletAccessAuditFilterTest {
     public void setUp() throws Exception {
         restlet = mock(Restlet.class);
 
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false, false);
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService().withConfiguration(serviceConfig);
         AMAuditService auditService = new DefaultAuditServiceProxy(builder.build(), serviceConfig);
         auditService.startup();
         auditServiceProvider = mock(AuditServiceProvider.class);
         when(auditServiceProvider.getDefaultAuditService()).thenReturn(auditService);
 
-        eventFactory = new AuditEventFactory(auditServiceProvider);
+        eventFactory = new AuditEventFactory();
         eventPublisher = mock(AuditEventPublisher.class);
         auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory, null, null);
     }

@@ -52,7 +52,7 @@ public class AuthenticationProcessEventAuditorTest {
         MockitoAnnotations.initMocks(this);
 
         when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
-        when(eventFactory.authenticationEvent()).thenCallRealMethod();
+        when(eventFactory.authenticationEvent(anyString())).thenCallRealMethod();
         auditor = new AuthenticationProcessEventAuditor(eventPublisher, eventFactory);
     }
 

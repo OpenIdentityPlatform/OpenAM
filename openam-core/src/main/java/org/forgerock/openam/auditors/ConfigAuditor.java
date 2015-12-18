@@ -174,13 +174,12 @@ public abstract class ConfigAuditor {
      * @return The builder used as a foundation for all events
      */
     protected AMConfigAuditEventBuilder getBaseBuilder() {
-        return auditEventFactory.configEvent()
+        return auditEventFactory.configEvent(realm)
                 .timestamp(startTime)
                 .objectId(objectId)
                 .runAs(runAsName)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
-                .eventName(EventName.AM_CONFIG_CHANGE)
-                .realm(realm);
+                .eventName(EventName.AM_CONFIG_CHANGE);
     }
 
     /**

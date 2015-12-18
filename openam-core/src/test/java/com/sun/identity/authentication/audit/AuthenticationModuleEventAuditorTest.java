@@ -54,7 +54,7 @@ public class AuthenticationModuleEventAuditorTest {
         MockitoAnnotations.initMocks(this);
 
         when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
-        when(eventFactory.authenticationEvent()).thenCallRealMethod();
+        when(eventFactory.authenticationEvent(anyString())).thenCallRealMethod();
         auditor = new AuthenticationModuleEventAuditor(eventPublisher, eventFactory);
     }
 

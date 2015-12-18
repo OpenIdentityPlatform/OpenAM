@@ -157,7 +157,7 @@ public class AuditEventPublisherImplTest {
         when(mockHandler.publishEvent(
                 any(Context.class), eq("access"), auditEventCaptor.capture())).thenReturn(dummyPromise);
 
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, true, false);
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, true);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
                 .withAuditEventHandler(mock(AuditEventHandler.class));
@@ -190,7 +190,7 @@ public class AuditEventPublisherImplTest {
     }
 
     private void givenSuppressedFailureAuditService() throws ServiceUnavailableException, AuditException {
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, true, false);
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, true);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
                 .withAuditEventHandler(mockHandler);
@@ -201,7 +201,7 @@ public class AuditEventPublisherImplTest {
     }
 
     private void givenNonSuppressedFailureAuditService() throws ServiceUnavailableException, AuditException {
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false, false);
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
                 .withAuditEventHandler(mockHandler);
@@ -212,7 +212,7 @@ public class AuditEventPublisherImplTest {
     }
 
     private void givenDefaultAuditService() throws ServiceUnavailableException, AuditException {
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false, false);
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
                 .withAuditEventHandler(mockHandler);

@@ -111,16 +111,6 @@ public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAud
         }
     }
 
-    @Override
-    public boolean isResolveHostNameEnabled() {
-        obtainReadLock();
-        try {
-            return auditServiceConfiguration.isResolveHostNameEnabled();
-        } finally {
-            releaseReadLock();
-        }
-    }
-
     private boolean isAuditEnabled(CreateRequest createRequest) {
         JsonValue auditEventValue = createRequest.getContent();
         JsonValue eventNameJson = auditEventValue.get("eventName");

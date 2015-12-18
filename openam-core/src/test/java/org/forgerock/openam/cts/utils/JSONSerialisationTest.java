@@ -211,12 +211,12 @@ public class JSONSerialisationTest extends GuiceTestCase {
 
         @Override
         public AMAuditServiceConfiguration getDefaultConfiguration() {
-            return new AMAuditServiceConfiguration(false, true, false);
+            return new AMAuditServiceConfiguration(false, true);
         }
 
         @Override
         public AMAuditServiceConfiguration getRealmConfiguration(String realm) {
-            return new AMAuditServiceConfiguration(false, true, false);
+            return new AMAuditServiceConfiguration(false, true);
         }
 
         @Override

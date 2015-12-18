@@ -110,12 +110,11 @@ public class AuthenticationModuleEventAuditor extends AbstractAuthenticationEven
             auditEntryDetail.addInfo(AUTH_CONTROL_FLAG, controlFlag);
         }
 
-        AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent()
+        AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
                 .transactionId(getTransactionIdValue())
                 .component(AUTHENTICATION)
                 .eventName(AM_LOGIN_MODULE_COMPLETED)
                 .result(result)
-                .realm(realm)
                 .entry(auditEntryDetail)
                 .trackingIds(getTrackingIds(loginState))
                 .userId(userId)

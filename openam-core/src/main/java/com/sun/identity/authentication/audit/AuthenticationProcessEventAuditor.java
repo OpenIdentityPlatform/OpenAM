@@ -81,12 +81,11 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
                 userDN = loginState.getUserDN();
             }
 
-            AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent()
+            AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
                     .transactionId(getTransactionIdValue())
                     .component(AUTHENTICATION)
                     .eventName(AM_LOGIN_COMPLETED)
                     .result(SUCCESSFUL)
-                    .realm(realm)
                     .entry(getAuditEntryDetail(moduleName, loginState))
                     .trackingIds(getTrackingIds(loginState))
                     .userId(userDN == null ? "" : userDN)
@@ -125,12 +124,11 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
             }
             entryDetail.addInfo(FAILURE_REASON, failureReason.name());
 
-            AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent()
+            AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
                     .transactionId(getTransactionIdValue())
                     .component(AUTHENTICATION)
                     .eventName(AM_LOGIN_COMPLETED)
                     .result(FAILED)
-                    .realm(realm)
                     .entry(entryDetail)
                     .trackingIds(getTrackingIds(loginState))
                     .userId(getUserId(principal, realm))
@@ -168,12 +166,11 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
             String trackingId = getTrackingIdFromSSOToken(token);
             String userId = AMAuditEventBuilderUtils.getUserId(token);
 
-            AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent()
+            AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
                     .transactionId(getTransactionIdValue())
                     .component(AUTHENTICATION)
                     .eventName(AM_LOGOUT)
                     .result(SUCCESSFUL)
-                    .realm(realm)
                     .entry(entryDetail)
                     .trackingId(trackingId == null ? "" : trackingId)
                     .userId(userId == null ? "" : userId)

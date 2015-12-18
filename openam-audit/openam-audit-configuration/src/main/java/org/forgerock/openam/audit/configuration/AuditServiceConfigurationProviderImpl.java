@@ -223,9 +223,7 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
 
         AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration(
                 getBooleanMapAttr(attributes, "auditEnabled", false),
-                getBooleanMapAttr(attributes, "suppressAuditFailure", true),
-                getBooleanMapAttr(attributes, "resolveHostNameEnabled", false),
-                blacklistedEventNames);
+                getBooleanMapAttr(attributes, "suppressAuditFailure", true), blacklistedEventNames);
 
         Set<String> filterPolicies = new HashSet<>();
         for (String policy : attributes.get("fieldFilterPolicy")) {

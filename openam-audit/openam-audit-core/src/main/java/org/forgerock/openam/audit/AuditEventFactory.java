@@ -15,9 +15,8 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.openam.utils.StringUtils.isBlank;
+import static org.forgerock.openam.utils.StringUtils.isNotBlank;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
@@ -30,21 +29,9 @@ import javax.inject.Singleton;
 @Singleton
 public class AuditEventFactory {
 
-    private final AuditServiceProvider auditServiceProvider;
-
-    /**
-     * Constructs a new {@code AuditEventFactory}.
-     *
-     * @param auditServiceProvider A {@code AuditServiceProvider} instance.
-     */
-    @Inject
-    public AuditEventFactory(AuditServiceProvider auditServiceProvider) {
-        this.auditServiceProvider = auditServiceProvider;
-    }
-
     /**
      * Creates a new AMAccessAuditEventBuilder for the specified {@literal realm} and adds the realm to the event. If
-     * the {@literal realm} is either {@code null} or empty the it will not be added to the event.
+     * the {@literal realm} is either {@code null} or empty it will not be added to the event.
      *
      * Note that we deliberately do not provide a convenience method with no realm to force implementers to consider
      * providing the realm. We must publish per realm wherever applicable.
@@ -54,44 +41,64 @@ public class AuditEventFactory {
      */
     public AMAccessAuditEventBuilder accessEvent(String realm) {
         AMAccessAuditEventBuilder auditEventBuilder = new AMAccessAuditEventBuilder();
-        if (isBlank(realm)) {
-            if (auditServiceProvider.getDefaultAuditService().isResolveHostNameEnabled()) {
-                auditEventBuilder.withReverseDnsLookup();
-            }
-        } else {
+        if (isNotBlank(realm)) {
             auditEventBuilder.realm(realm);
-            if (auditServiceProvider.getAuditService(realm).isResolveHostNameEnabled()) {
-                auditEventBuilder.withReverseDnsLookup();
-            }
         }
         return auditEventBuilder;
     }
 
     /**
-     * Creates a new AMActivityAuditEventBuilder.
+     * Creates a new AMActivityAuditEventBuilder for the specified {@literal realm} and adds the realm to the event. If
+     * the {@literal realm} is either {@code null} or empty it will not be added to the event.
      *
-     * @return An AMActivityAuditEventBuilder.
+     * Note that we deliberately do not provide a convenience method with no realm to force implementers to consider
+     * providing the realm. We must publish per realm wherever applicable.
+     *
+     * @param realm The realm in which the audit event occurred, or null if realm is not applicable.
+     * @return AMActivityAuditEventBuilder
      */
-    public AMActivityAuditEventBuilder activityEvent() {
-        return new AMActivityAuditEventBuilder();
+    public AMActivityAuditEventBuilder activityEvent(String realm) {
+        AMActivityAuditEventBuilder auditEventBuilder = new AMActivityAuditEventBuilder();
+        if (isNotBlank(realm)) {
+            auditEventBuilder.realm(realm);
+        }
+        return auditEventBuilder;
     }
 
     /**
-     * Creates a new AMConfigAuditEventBuilder.
+     * Creates a new AMConfigAuditEventBuilder for the specified {@literal realm} and adds the realm to the event. If
+     * the {@literal realm} is either {@code null} or empty it will not be added to the event.
      *
-     * @return An AMConfigAuditEventBuilder.
+     * Note that we deliberately do not provide a convenience method with no realm to force implementers to consider
+     * providing the realm. We must publish per realm wherever applicable.
+     *
+     * @param realm The realm in which the audit event occurred, or null if realm is not applicable.
+     * @return AMConfigAuditEventBuilder
      */
-    public AMConfigAuditEventBuilder configEvent() {
-        return new AMConfigAuditEventBuilder();
+    public AMConfigAuditEventBuilder configEvent(String realm) {
+        AMConfigAuditEventBuilder auditEventBuilder = new AMConfigAuditEventBuilder();
+        if (isNotBlank(realm)) {
+            auditEventBuilder.realm(realm);
+        }
+        return auditEventBuilder;
     }
 
     /**
-     * Creates a new AMAuthenticationAuditEventBuilder.
+     * Creates a new AMAuthenticationAuditEventBuilder for the specified {@literal realm} and adds the realm to the
+     * event. If the {@literal realm} is either {@code null} or empty it will not be added to the event.
      *
-     * @return An AMAuthenticationAuditEventBuilder.
+     * Note that we deliberately do not provide a convenience method with no realm to force implementers to consider
+     * providing the realm. We must publish per realm wherever applicable.
+     *
+     * @param realm The realm in which the audit event occurred, or null if realm is not applicable.
+     * @return AMAuthenticationAuditEventBuilder
      */
-    public AMAuthenticationAuditEventBuilder authenticationEvent() {
-        return new AMAuthenticationAuditEventBuilder();
+    public AMAuthenticationAuditEventBuilder authenticationEvent(String realm) {
+        AMAuthenticationAuditEventBuilder auditEventBuilder = new AMAuthenticationAuditEventBuilder();
+        if (isNotBlank(realm)) {
+            auditEventBuilder.realm(realm);
+        }
+        return auditEventBuilder;
     }
 
 }

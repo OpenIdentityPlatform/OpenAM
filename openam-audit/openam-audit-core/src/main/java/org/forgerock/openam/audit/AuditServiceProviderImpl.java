@@ -70,7 +70,7 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
     }
 
     private DefaultAuditServiceProxy createDefaultAuditService() {
-        AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration(false, true, false);
+        AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration(false, true);
         configuration.setAvailableAuditEventHandlers(Collections.<String>emptyList());
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withEventTopicsMetaData(eventTopicsMetaData)

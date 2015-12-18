@@ -44,15 +44,6 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="resolveHostNameEnabled" type="single" syntax="boolean" i18nKey="a003">
-                    <BooleanValues>
-                        <BooleanTrueValue>true</BooleanTrueValue>
-                        <BooleanFalseValue>false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="fieldFilterPolicy" i18nKey="a004">
                     <DefaultValues>
                         <DefaultValuesClassName
@@ -468,15 +459,6 @@
                     </BooleanValues>
                     <DefaultValues>
                         <Value>true</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="resolveHostNameEnabled" type="single" syntax="boolean" i18nKey="a003">
-                    <BooleanValues>
-                        <BooleanTrueValue>true</BooleanTrueValue>
-                        <BooleanFalseValue>false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="fieldFilterPolicy" i18nKey="a004">

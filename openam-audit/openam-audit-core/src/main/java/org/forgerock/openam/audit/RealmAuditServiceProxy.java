@@ -99,19 +99,6 @@ public class RealmAuditServiceProxy extends AuditServiceProxy implements AMAudit
         }
     }
 
-    @Override
-    public boolean isResolveHostNameEnabled() {
-        obtainReadLock();
-        try {
-            checkServiceAvailable();
-            return auditServiceConfiguration.isResolveHostNameEnabled();
-        } catch (ServiceUnavailableException e) {
-            return defaultDelegate.isAuditFailureSuppressed();
-        } finally {
-            releaseReadLock();
-        }
-    }
-
     private void checkServiceAvailable() throws ServiceUnavailableException {
         // Ideally we would check the current status of the AuditService, but it's not exposed so this is a workaround.
         getKnownTopics();

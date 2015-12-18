@@ -27,8 +27,9 @@ import java.util.Set;
  * will represent the current settings in the SMS.
  * <p/>
  * Each of the Audit Services has its own configuration, which is stored with the Audit Service and can be retrieved
- * in a thread-safe way via its own accessor methods - {@link AMAuditService#isAuditEnabled(String)},
- * {@link AMAuditService#isAuditFailureSuppressed()} and {@link AMAuditService#isResolveHostNameEnabled()}.
+ * in a thread-safe way via its own accessor methods -
+ * {@link AMAuditService#isAuditEnabled(String, org.forgerock.openam.audit.AuditConstants.EventName)} and
+ * {@link AMAuditService#isAuditFailureSuppressed()}.
  *
  * @since 13.0.0
  */
@@ -37,21 +38,16 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
     private final Set<String> blacklistedEventNames;
     private final boolean auditEnabled;
     private final boolean auditFailureSuppressed;
-    private final boolean resolveHostNameEnabled;
 
     /**
      * Create an instance of {@code AMAuditServiceConfiguration} with the specified values.
      *
      * @param auditEnabled Is audit logging enabled.
      * @param auditFailureSuppressed Is audit failure suppressed.
-     * @param resolveHostNameEnabled Is resolve host name enabled.
      */
-    public AMAuditServiceConfiguration(boolean auditEnabled, boolean auditFailureSuppressed,
-                                        boolean resolveHostNameEnabled) {
-
+    public AMAuditServiceConfiguration(boolean auditEnabled, boolean auditFailureSuppressed) {
         this.auditEnabled = auditEnabled;
         this.auditFailureSuppressed = auditFailureSuppressed;
-        this.resolveHostNameEnabled = resolveHostNameEnabled;
         this.blacklistedEventNames = new HashSet<>();
     }
 
@@ -60,15 +56,13 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
      *
      * @param auditEnabled Is audit logging enabled.
      * @param auditFailureSuppressed Is audit failure suppressed.
-     * @param resolveHostNameEnabled Is resolve host name enabled.
      * @param blacklistedEventNames A set of event names which we DO NOT want to audit.
      */
     public AMAuditServiceConfiguration(boolean auditEnabled, boolean auditFailureSuppressed,
-                                       boolean resolveHostNameEnabled, Set<String> blacklistedEventNames) {
+            Set<String> blacklistedEventNames) {
 
         this.auditEnabled = auditEnabled;
         this.auditFailureSuppressed = auditFailureSuppressed;
-        this.resolveHostNameEnabled = resolveHostNameEnabled;
         this.blacklistedEventNames = blacklistedEventNames;
     }
 
@@ -86,14 +80,6 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
      */
     public boolean isAuditFailureSuppressed() {
         return auditFailureSuppressed;
-    }
-
-    /**
-     * Is access event reverse DNS lookup enabled.
-     * @return true if enabled
-     */
-    public boolean isResolveHostNameEnabled() {
-        return resolveHostNameEnabled;
     }
 
     /**

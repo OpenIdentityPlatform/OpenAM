@@ -57,11 +57,4 @@ public interface AMAuditService extends AuditService {
      */
     boolean isAuditFailureSuppressed();
 
-    /**
-     * Is access event reverse DNS lookup enabled.
-     *
-     * @return true if enabled
-     */
-    boolean isResolveHostNameEnabled();
-
 }

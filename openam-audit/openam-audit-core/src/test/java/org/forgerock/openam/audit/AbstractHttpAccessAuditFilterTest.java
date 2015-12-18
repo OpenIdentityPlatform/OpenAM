@@ -73,7 +73,7 @@ public class AbstractHttpAccessAuditFilterTest {
         initMocks(this);
         when(auditServiceProvider.getDefaultAuditService()).thenReturn(auditService);
         when(auditServiceProvider.getAuditService(realm)).thenReturn(auditService);
-        AuditEventFactory eventFactory = new AuditEventFactory(auditServiceProvider);
+        AuditEventFactory eventFactory = new AuditEventFactory();
 
         auditFilter = new MockAccessAuditFilter(eventPublisher, eventFactory);
 

@@ -20,12 +20,10 @@ import static org.forgerock.openam.audit.AuditConstants.ACTIVITY_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
 
-import com.ctc.wstx.util.StringUtil;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
 import org.forgerock.openam.audit.AuditConstants.EventName;
 import org.forgerock.openam.audit.AuditEventFactory;
@@ -73,15 +71,14 @@ public final class SessionAuditor {
 
             String contextId = session.getProperty(Constants.AM_CTX_ID);
 
-            AMActivityAuditEventBuilder builder = auditEventFactory.activityEvent()
+            AMActivityAuditEventBuilder builder = auditEventFactory.activityEvent(realm)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(eventName)
                     .component(Component.SESSION)
                     .trackingId(contextId)
                     .runAs(getUserId(getAdminToken()))
                     .objectId(contextId)
-                    .operation(getCrudType(eventName))
-                    .realm(realm);
+                    .operation(getCrudType(eventName));
 
             String uid = session.getProperty(Constants.UNIVERSAL_IDENTIFIER);
             if (StringUtils.isNotEmpty(uid)) {

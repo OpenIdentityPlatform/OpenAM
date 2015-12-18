@@ -77,7 +77,7 @@ public class AuditServiceProviderImplTest extends GuiceTestCase {
                 .withEventTopicsMetaData(EventTopicsMetaDataBuilder.coreTopicSchemas().build()).build();
         handlerConfigs.add(configuration);
 
-        auditServiceConfig = new AMAuditServiceConfiguration(true, true, false);
+        auditServiceConfig = new AMAuditServiceConfiguration(true, true);
         provider = new AuditServiceProviderImpl(new MockAuditServiceConfigurationProvider(), mockShutdownManager);
     }
 
@@ -146,7 +146,7 @@ public class AuditServiceProviderImplTest extends GuiceTestCase {
     @Test
     public void shouldNotRegisterHandlersWhenDefaultAuditServiceDisabled() throws Exception {
         // Given
-        auditServiceConfig = new AMAuditServiceConfiguration(false, true, false);
+        auditServiceConfig = new AMAuditServiceConfiguration(false, true);
 
         // When
         configListener.globalConfigurationChanged();
@@ -158,7 +158,7 @@ public class AuditServiceProviderImplTest extends GuiceTestCase {
     @Test
     public void shouldNotRegisterHandlersWhenRealmAuditServiceDisabled() throws Exception {
         // Given
-        auditServiceConfig = new AMAuditServiceConfiguration(false, true, false);
+        auditServiceConfig = new AMAuditServiceConfiguration(false, true);
 
         // When
         configListener.realmConfigurationChanged("anyRealm");
