@@ -25,7 +25,7 @@
    $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
 
    Portions Copyrighted 2013-2015 ForgeRock AS.
-   Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+   Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
 -->
 <accesscontrols>
     <!-- REALM -->
@@ -488,6 +488,6 @@
     <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLSiteIDEditViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureSalesForceAppsCompleteViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLSetTrustedPartnerTypeViewBean" />
-
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditUMAViewBean" />
 
 </accesscontrols>
