@@ -125,7 +125,6 @@
 
         <forgerock.bloomfilter.version>1.0.1</forgerock.bloomfilter.version>
         <forgerock.ui.version>11.0.0</forgerock.ui.version>
-        <forgerock.audit.version>2.0.0</forgerock.audit.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
 
         <javadoc-utils.version>1.0.0</javadoc-utils.version>
@@ -499,7 +498,7 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-bom</artifactId>
-                <version>4.0.3</version>
+                <version>4.1.0</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

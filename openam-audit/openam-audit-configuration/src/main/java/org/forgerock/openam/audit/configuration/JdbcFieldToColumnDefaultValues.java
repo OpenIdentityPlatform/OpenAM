@@ -72,7 +72,6 @@ public final class JdbcFieldToColumnDefaultValues extends DefaultValues {
                     "[trackingIds]=trackingids",
                     "[server/ip]=server_ip",
                     "[server/port]=server_port",
-                    "[client/host]=client_host",
                     "[client/ip]=client_ip",
                     "[client/port]=client_port",
                     "[request/protocol]=request_protocol",
