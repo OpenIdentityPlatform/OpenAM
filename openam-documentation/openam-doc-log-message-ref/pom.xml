@@ -14,10 +14,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
  <modelVersion>4.0.0</modelVersion>
 
@@ -115,17 +112,12 @@
       </goals>
       <configuration>
        <target>
-        <concat
-         destfile="target/generated-resources/chap-log-messages.xml">
-         <header
-          file="src/main/resources/log-messages-preface.header"/>
+        <concat destfile="target/generated-resources/chap-log-messages.xml">
+         <header file="src/main/resources/log-messages-preface.header" />
 
-         <fileset
-          dir="target/generated-resources/xml/xslt"
-          includes="**/*.xml" />
+         <fileset dir="target/generated-resources/xml/xslt" includes="**/*.xml" />
 
-         <footer
-          file="src/main/resources/log-messages-preface.footer"/>
+         <footer file="src/main/resources/log-messages-preface.footer" />
         </concat>
        </target>
       </configuration>

@@ -47,7 +47,8 @@ Copyright 2014-2015 ForgeRock AS.
         <url>https://svn.forgerock.org/commons/forgerock-http-client/trunk</url>
         <connection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</connection>
         <developerConnection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</developerConnection>
-    </scm>
+      <tag>release/13.0.0</tag>
+  </scm>
 
     <repositories>
         <repository>
