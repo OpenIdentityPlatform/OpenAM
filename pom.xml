@@ -2130,7 +2130,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>attach-javadoc</id>
+                        <id>attach-javadocs</id>
                         <phase>site</phase>
                         <goals>
                             <goal>aggregate-jar</goal>
