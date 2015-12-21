@@ -167,7 +167,7 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
         Application application = applicationService.getApplication(entitlement.getApplicationName());
 
         if (application == null) {
-            throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, entitlement.getApplicationName());
+            throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, realm);
         }
 
         if (CollectionUtils.isEmpty(application.getResourceTypeUuids())) {
