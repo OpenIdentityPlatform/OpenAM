@@ -35,7 +35,7 @@ import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
  * This class is the base for entitlement configuration and contains common tasks for interacting with the
  * persisted entitlement configuration model.
  */
-public abstract class AbstractConfiguration {
+class ResourceTypeServiceConfig {
 
     /**
      * Get the organization configuration for the sunEntitlementService service.
@@ -45,7 +45,7 @@ public abstract class AbstractConfiguration {
      * @throws SMSException If the sub configuration could not be read.
      * @throws SSOException If the Admin token could not be found.
      */
-    protected ServiceConfig getOrgConfig(Subject subject, String realm) throws SMSException, SSOException {
+    ServiceConfig getOrgConfig(Subject subject, String realm) throws SMSException, SSOException {
         final SSOToken token = getSSOToken(subject);
         if (token == null) {
             throw new SSOException("Could not find Admin token.");
@@ -67,7 +67,7 @@ public abstract class AbstractConfiguration {
      * @throws SMSException If the sub configuration could not be read.
      * @throws SSOException If the Admin token could not be found.
      */
-    protected ServiceConfig getSubOrgConfig(Subject subject, String realm, String configName) throws SMSException,
+    ServiceConfig getSubOrgConfig(Subject subject, String realm, String configName) throws SMSException,
             SSOException {
 
         final ServiceConfig config = getOrgConfig(subject, realm).getSubConfig(configName);
@@ -83,7 +83,7 @@ public abstract class AbstractConfiguration {
      * @param attributes The map holding the attributes to be modified.
      * @param serviceID The ID of the entry that is being modified.
      */
-    protected void prepareAttributeMap(Map<String, Set<String>> attributes, String serviceID) {
+    void prepareAttributeMap(Map<String, Set<String>> attributes, String serviceID) {
         attributes.put(SMSEntry.ATTR_SERVICE_ID, Collections.singleton(serviceID));
 
         final Set<String> setObjectClass = new HashSet<String>();

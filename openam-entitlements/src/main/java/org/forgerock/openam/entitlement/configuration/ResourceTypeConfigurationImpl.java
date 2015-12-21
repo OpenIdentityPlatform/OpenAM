@@ -80,16 +80,19 @@ import java.util.logging.Level;
  *
  * @since 13.0.0
  */
-public class ResourceTypeConfigurationImpl extends AbstractConfiguration implements ResourceTypeConfiguration {
+public class ResourceTypeConfigurationImpl implements ResourceTypeConfiguration {
 
     private static final String REFERENCE_FILTER =
             "(|(sunxmlKeyValue=resourceTypeUuid={0})(sunxmlKeyValue=resourceTypeUuids={0}))";
 
     private final DNWrapper dnHelper;
 
+    private final ResourceTypeServiceConfig resourceTypeServiceConfig;
+
     @Inject
-    public ResourceTypeConfigurationImpl(DNWrapper dnHelper) {
+    public ResourceTypeConfigurationImpl(DNWrapper dnHelper, ResourceTypeServiceConfig resourceTypeServiceConfig) {
         this.dnHelper = dnHelper;
+        this.resourceTypeServiceConfig = resourceTypeServiceConfig;
     }
 
     /**
@@ -101,7 +104,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
             return null;
         }
         try {
-            return resourceTypeFromMap(uuid, getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES)
+            return resourceTypeFromMap(uuid, resourceTypeServiceConfig.getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES)
                     .getSubConfig(uuid).getAttributesForRead());
         } catch (SMSException ex) {
             PrivilegeManager.debug.error("ResourceTypeConfiguration.getResourceType", ex);
@@ -119,7 +122,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
     public boolean containsUUID(Subject subject, String realm, String uuid) throws EntitlementException {
         final ServiceConfig resourceTypeConf;
         try {
-            final ServiceConfig subOrgConfig = getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES);
+            final ServiceConfig subOrgConfig = resourceTypeServiceConfig.getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES);
             if (subOrgConfig == null) {
                 return false;
             }
@@ -141,13 +144,13 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
     @Override
     public boolean containsName(Subject subject, String realm, String name) throws EntitlementException {
         try {
-            final ServiceConfig subOrgConfig = getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES);
+            final ServiceConfig subOrgConfig = resourceTypeServiceConfig.getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES);
             if (subOrgConfig == null) {
                 return false;
             }
             final Set<String> configNames = subOrgConfig.getSubConfigNames();
             for (String configName : configNames) {
-                if (name.equals(getAttribute(subOrgConfig.getSubConfig(configName).getAttributes(), CONFIG_NAME))) {
+                if (name.equalsIgnoreCase(getAttribute(subOrgConfig.getSubConfig(configName).getAttributes(), CONFIG_NAME))) {
                     return true;
                 }
             }
@@ -174,7 +177,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
                 throw new EntitlementException(EntitlementException.RESOURCE_TYPE_REFERENCED, uuid);
             }
 
-            getSubOrgConfig(subject, realm, CONFIG_RESOURCE_TYPES).removeSubConfig(uuid);
+            resourceTypeServiceConfig.getSubOrgConfig(subject, realm, CONFIG_RESOURCE_TYPES).removeSubConfig(uuid);
 
             OpenSSOLogger.log(MESSAGE, Level.INFO, SUCCEEDED_REMOVE_RESOURCE_TYPE, logParams, subject);
         } catch (SMSException e) {
@@ -308,7 +311,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
 
         final Map<String, Map<String, Set<String>>> configData = new HashMap<String, Map<String, Set<String>>>();
         try {
-            final ServiceConfig subOrgConfig = getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES);
+            final ServiceConfig subOrgConfig = resourceTypeServiceConfig.getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES);
             if (subOrgConfig == null) {
                 return configData;
             }
@@ -336,7 +339,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
             throws EntitlementException {
 
         try {
-            final ServiceConfig orgConfig = getOrgConfig(subject, realm);
+            final ServiceConfig orgConfig = resourceTypeServiceConfig.getOrgConfig(subject, realm);
             if (orgConfig.getSubConfig(CONFIG_RESOURCE_TYPES) == null) {
                 orgConfig.addSubConfig(CONFIG_RESOURCE_TYPES, SCHEMA_RESOURCE_TYPES, 0, Collections.EMPTY_MAP);
             }
@@ -373,7 +376,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
      */
     private Map<String, Set<String>> getResourceTypeData(ResourceType resourceType) {
         final Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-        prepareAttributeMap(map, RESOURCE_TYPE);
+        resourceTypeServiceConfig.prepareAttributeMap(map, RESOURCE_TYPE);
 
         Set<String> nonSearchableData = new HashSet<String>();
         map.put(SMSEntry.ATTR_KEYVAL, nonSearchableData);
