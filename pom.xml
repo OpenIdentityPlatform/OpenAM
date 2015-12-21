@@ -113,9 +113,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Version Properties -->
-        <opendj.server.version>3.0.0-M7</opendj.server.version>
-        <opendj.sdk.version>3.0.0-M7</opendj.sdk.version>
-        <opendj.server.legacy>3.0.0-M7</opendj.server.legacy>
+        <opendj.server.version>3.0.0-RC1</opendj.server.version>
+        <opendj.sdk.version>3.0.0-RC1</opendj.sdk.version>
+        <opendj.server.legacy>3.0.0-RC1</opendj.server.legacy>
 
         <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
         <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
