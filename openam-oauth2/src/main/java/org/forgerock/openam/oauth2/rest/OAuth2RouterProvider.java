@@ -114,7 +114,7 @@ public class OAuth2RouterProvider implements Provider<Router> {
 
         router.attach("/introspect", auditWithOAuthFilter(wrap(TokenIntrospectionResource.class),
                 formAuditor(TOKEN_TYPE_HINT),
-                jacksonAuditor(SCOPE, TOKEN_TYPE, CLIENT_ID, USERNAME, ACTIVE)));
+                jsonAuditor(SCOPE, TOKEN_TYPE, CLIENT_ID, USERNAME, ACTIVE)));
 
         // OpenID Connect endpoints
 
