@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypesView", [
     "jquery",
-    "underscore",
+    "lodash",
     "backbone",
     "backbone.paginator",
     "backgrid-filter",
@@ -109,7 +109,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                             self.editRecord(e, this.model.id, Router.configuration.routes.realmsResourceTypeEdit);
                         },
                         deleteItem: function (e) {
-                            self.deleteRecord(e, this.model.id);
+                            self.onDeleteClick(e, { type: $.t("console.authorization.common.resourceType") },
+                                this.model.id);
                         }
                     }),
                     sortable: false,

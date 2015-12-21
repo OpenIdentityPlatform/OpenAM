@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/PoliciesView", [
     "jquery",
-    "underscore",
+    "lodash",
     "backbone",
     "backbone.paginator",
     "backgrid-filter",
@@ -128,12 +128,16 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                             });
                         },
                         deleteItem: function (e) {
-                            self.deleteRecord(e, this.model.id, function () {
-                                EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                                    route: Router.currentRoute,
-                                    args: _.map([self.data.realmPath, self.data.policySetModel.id], encodeURIComponent)
-                                });
-                            });
+                            self.onDeleteClick(e, { type: $.t("console.authorization.common.policy") },
+                                this.model.id,
+                                function () {
+                                    EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                                        route: Router.currentRoute,
+                                        args: _.map([self.data.realmPath, self.data.policySetModel.id],
+                                                encodeURIComponent)
+                                    });
+                                }
+                            );
                         }
                     }),
                     sortable: false,

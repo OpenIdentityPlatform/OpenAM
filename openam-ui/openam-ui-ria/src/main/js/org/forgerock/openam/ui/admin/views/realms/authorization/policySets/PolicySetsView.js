@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/PolicySetsView", [
     "jquery",
-    "underscore",
+    "lodash",
     "backbone",
     "backbone.paginator",
     "backgrid-filter",
@@ -27,15 +27,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
-    "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/openam/ui/common/util/URLHelper"
 ], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Configuration,
-             EventManager, Router, Constants, BackgridUtils, URLHelper, PolicySetModel, AbstractListView,
-             PoliciesDelegate, RealmHelper) {
+             EventManager, Router, Constants, PolicySetModel, AbstractListView,
+             PoliciesDelegate, BackgridUtils, RealmHelper, URLHelper) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/authorization/policySets/PolicySetsTemplate.html",
         // Used in AbstractListView
@@ -121,7 +121,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                                     self.editRecord(e, this.model.id, Router.configuration.routes.realmsPolicySetEdit);
                                 },
                                 deleteItem: function (e) {
-                                    self.deleteRecord(e, this.model.id);
+                                    self.onDeleteClick(e, { type: $.t("console.authorization.common.policySet") },
+                                        this.model.id);
+
                                 }
                             }),
                             sortable: false,

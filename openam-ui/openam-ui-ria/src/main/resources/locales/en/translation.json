@@ -846,7 +846,8 @@
             "list": {
                 "title": "Scripts List",
                 "addNew": "New Script",
-                "grid": ["Name", "Script Type", "Language", "Description"]
+                "grid": ["Name", "Script Type", "Language", "Description"],
+                "confirmDeleteText": "Are you sure you want to delete the selected scripts?"
             }
         },
         "authorization": {

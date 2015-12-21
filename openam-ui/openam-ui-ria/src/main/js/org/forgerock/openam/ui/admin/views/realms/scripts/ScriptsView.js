@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "jquery",
-    "underscore",
+    "lodash",
     "backbone",
     "backbone.paginator",
     "backgrid-filter",
@@ -33,17 +33,18 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
+    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/admin/utils/FormHelper"
 ], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, ThemeableSelectAllCell,
              Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script,
-             SMSGlobalDelegate) {
+             SMSGlobalDelegate, FormHelper) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/scripts/ScriptsTemplate.html",
         toolbarTemplate: "templates/admin/views/realms/scripts/ScriptsToolbarTemplate.html",
         events: {
             "click #addNewScript": "addNewScript",
-            "click #deleteRecords": "deleteRecords"
+            "click #deleteRecords": "onDeleteClick"
         },
 
         render: function (args, callback) {
@@ -172,6 +173,12 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                     });
                 });
             });
+        },
+
+        onDeleteClick: function (e) {
+            var msg = { message: $.t("console.scripts.list.confirmDeleteText") };
+            e.preventDefault();
+            FormHelper.showConfirmationBeforeDeleting(msg, _.bind(this.deleteRecords, this));
         },
 
         deleteRecords: function () {

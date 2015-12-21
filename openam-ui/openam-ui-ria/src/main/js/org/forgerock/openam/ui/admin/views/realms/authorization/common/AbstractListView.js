@@ -11,20 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, Messages, AbstractView, EventManager, Router, BackgridUtils, Constants, UIUtils) {
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/openam/ui/common/util/BackgridUtils"
+], function ($, _, Messages, AbstractView, EventManager, Router, Constants, UIUtils, FormHelper, BackgridUtils) {
 
     return AbstractView.extend({
         toolbarTemplateID: "#gridToolbar",
@@ -33,7 +34,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
             AbstractView.prototype.initialize.call(this);
         },
 
-        deleteRecord: function (e, id, callback) {
+        onDeleteClick: function (e, msg, id, callback) {
+            e.preventDefault();
+
+            FormHelper.showConfirmationBeforeDeleting(msg, _.bind(this.deleteRecord, this, id, callback));
+        },
+
+        deleteRecord: function (id, callback) {
             var self = this,
                 item = self.data.items.get(id),
                 onSuccess = function () {
