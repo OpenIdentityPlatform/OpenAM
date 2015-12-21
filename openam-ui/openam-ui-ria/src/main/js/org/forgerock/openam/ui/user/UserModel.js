@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/user/UserModel", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractModel",
     "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -24,13 +24,16 @@ define("org/forgerock/openam/ui/user/UserModel", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/main/ServiceInvoker"
+    "org/forgerock/commons/ui/common/main/ServiceInvoker",
+    "org/forgerock/openam/ui/common/util/object/flattenValues"
 ], function ($, _, AbstractModel, arrayify, Configuration, Constants, EventManager, RealmHelper, Router,
-             ServiceInvoker) {
+             ServiceInvoker, flattenValues) {
     var baseUrl = Constants.host + "/" + Constants.context + "/json/__subrealm__/users",
         UserModel = AbstractModel.extend({
             idAttribute: "id",
-
+            defaults: {
+                kbaInfo: []
+            },
             sync: function (method, model, options) {
                 var clearPassword = _.bind(function () {
                         delete this.currentPassword;
@@ -102,21 +105,23 @@ define("org/forgerock/openam/ui/user/UserModel", [
                 }
             },
             parse: function (response) {
-                var user = {};
-
                 delete response.userPassword;
 
-                // many keys in response have single-element arrays for each property;
-                // translate these into a simpler map object, when possible
-                // kbaInfo property though needs to stay as an array
-                _.each(_.keys(response), function (property) {
-                    if (_.isArray(response[property]) && response[property].length === 1 &&
-                        property !== "kbaInfo") {
-                        user[property] = response[property][0];
-                    } else {
-                        user[property] = response[property];
-                    }
-                });
+                /**
+                 * flattenValues due to the response having many values wrapped in arrays (makes for a simpler data
+                 * structure)
+                 */
+                var user = flattenValues(response);
+                // "kbaInfo" property must stay as an array (it's original value)
+                user.kbaInfo = response.kbaInfo;
+
+                /**
+                 * Re-apply defaults to attributes that were not present in the response. Duplicate of what Backbone
+                 * does when a model is first initialised. Fixes scenaries where a previous server response was an value
+                 * but the next was missing the attribute and value entirely, failing to clear the previous now invalid
+                 * value from the model
+                 */
+                user = _.defaults({}, user, _.result(this, "defaults"));
 
                 // When we parse response the first time, amadmin don't have uid
                 user.id = user.uid || user.username;
