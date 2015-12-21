@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-cli</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>13.0.0-RC1</version>
     </parent>
 
     <!-- Component Definition -->
