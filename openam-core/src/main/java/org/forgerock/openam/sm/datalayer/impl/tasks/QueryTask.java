@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
@@ -20,6 +20,7 @@ import java.util.Collection;
 
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
@@ -31,17 +32,16 @@ import org.forgerock.util.Reject;
  *
  * @see PartialQueryTask
  */
-public class QueryTask implements Task {
+public class QueryTask extends AbstractTask {
     private final TokenFilter tokenFilter;
-    private final ResultHandler<Collection<Token>, ?> handler;
 
     /**
      * @param tokenFilter Non null and must not define any Return Attributes.
      * @param handler Non null, required for asynchronous response.
      */
     public QueryTask(TokenFilter tokenFilter, ResultHandler<Collection<Token>, ?> handler) {
+        super(handler);
         this.tokenFilter = tokenFilter;
-        this.handler = handler;
     }
 
     /**
@@ -59,13 +59,9 @@ public class QueryTask implements Task {
      * @throws IllegalArgumentException If the TokenFilter provided defined any return fields.
      */
     @Override
-    public <C> void execute(C connection, TokenStorageAdapter<C> adapter) throws DataLayerException {
+    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
         Reject.ifFalse(tokenFilter.getReturnFields().isEmpty());
-        try {
-            handler.processResults(adapter.query(connection, tokenFilter));
-        } catch (DataLayerException e) {
-            handler.processError(e);
-        }
+        handler.processResults(adapter.query(connection, tokenFilter));
     }
 
     @Override

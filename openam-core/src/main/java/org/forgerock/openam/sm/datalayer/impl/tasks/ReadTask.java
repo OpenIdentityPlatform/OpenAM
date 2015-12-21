@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
@@ -27,17 +28,16 @@ import java.text.MessageFormat;
 /**
  * Performs a Read against the LDAP persistence layer.
  */
-public class ReadTask implements Task {
+public class ReadTask extends AbstractTask {
     private final String tokenId;
-    private final ResultHandler<Token, ?> handler;
 
     /**
      * @param tokenId The Token ID to read.
      * @param handler The ResultHandler to update with the result.
      */
     public ReadTask(String tokenId, ResultHandler<Token, ?> handler) {
+        super(handler);
         this.tokenId = tokenId;
-        this.handler = handler;
     }
 
     /**
@@ -49,17 +49,12 @@ public class ReadTask implements Task {
      *
      * @param connection Non null connection.
      * @param adapter Non null for connection-coupled operations.
-     * @throws CoreTokenException If there was an error whilst performing the read.
+     * @throws DataLayerException If there was an error whilst performing the read.
      */
     @Override
-    public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
-        try {
-            Token token = adapter.read(connection, tokenId);
-            handler.processResults(token);
-        } catch (DataLayerException e) {
-            handler.processError(e);
-            throw e;
-        }
+    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
+        Token token = adapter.read(connection, tokenId);
+        handler.processResults(token);
     }
 
     @Override

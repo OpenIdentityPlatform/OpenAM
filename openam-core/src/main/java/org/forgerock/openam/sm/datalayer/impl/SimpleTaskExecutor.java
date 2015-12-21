@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.impl;
@@ -78,6 +78,13 @@ public class SimpleTaskExecutor<T> implements TaskExecutor {
                 close();
                 start();
             }
+        } catch (DataLayerException e) {
+            error("acquiring connection", e);
+            task.processError(e);
+            return;
+        }
+
+        try {
             task.execute(connection, adapter);
         } catch (DataLayerException e) {
             error("processing task", e);

@@ -11,15 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 
 import java.text.MessageFormat;
@@ -27,17 +26,16 @@ import java.text.MessageFormat;
 /**
  * Responsible for creating a Token in LDAP Store.
  */
-public class CreateTask implements Task {
+public class CreateTask extends AbstractTask {
     private final Token token;
-    private final ResultHandler<Token, ?> handler;
 
     /**
      * @param token Non null Token to create.
      * @param handler Non null handler to notify.
      */
     public CreateTask(Token token, ResultHandler<Token, ?> handler) {
+        super(handler);
         this.token = token;
-        this.handler = handler;
     }
 
     /**
@@ -47,17 +45,12 @@ public class CreateTask implements Task {
      *
      * @param connection Non null connection to use.
      * @param adapter Required for LDAP operations.
-     * @throws CoreTokenException If there was any problem creating the Token.
+     * @throws DataLayerException If there was any problem creating the Token.
      */
     @Override
-    public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
-        try {
-            adapter.create(connection, token);
-            handler.processResults(token);
-        } catch (DataLayerException e) {
-            handler.processError(e);
-            throw e;
-        }
+    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
+        adapter.create(connection, token);
+        handler.processResults(token);
     }
 
     @Override

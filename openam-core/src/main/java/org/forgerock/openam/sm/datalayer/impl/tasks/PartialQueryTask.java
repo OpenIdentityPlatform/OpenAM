@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
@@ -19,6 +19,7 @@ package org.forgerock.openam.sm.datalayer.impl.tasks;
 import java.util.Collection;
 
 import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
@@ -33,8 +34,7 @@ import org.forgerock.util.Reject;
  *
  * @see QueryTask
  */
-public class PartialQueryTask implements Task {
-    private final ResultHandler<Collection<PartialToken>, ?> handler;
+public class PartialQueryTask extends AbstractTask {
     private final TokenFilter tokenFilter;
 
     /**
@@ -42,7 +42,7 @@ public class PartialQueryTask implements Task {
      * @param handler Non null, required for asynchronous response.
      */
     public PartialQueryTask(TokenFilter tokenFilter, ResultHandler<Collection<PartialToken>, ?> handler) {
-        this.handler = handler;
+        super(handler);
         this.tokenFilter = tokenFilter;
     }
 
@@ -54,13 +54,10 @@ public class PartialQueryTask implements Task {
      * @throws IllegalArgumentException If the TokenFilter did not define any return fields.
      */
     @Override
-    public <C> void execute(C connection, TokenStorageAdapter<C> adapter) throws DataLayerException {
+    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
         Reject.ifTrue(tokenFilter.getReturnFields().isEmpty());
-        try {
-            handler.processResults(adapter.partialQuery(connection, tokenFilter));
-        } catch (DataLayerException e) {
-            handler.processError(e);
-        }
+
+        handler.processResults(adapter.partialQuery(connection, tokenFilter));
     }
 
     @Override

@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
@@ -27,17 +28,16 @@ import java.text.MessageFormat;
 /**
  * Responsible for updating the LDAP persistence with the provided Token.
  */
-public class UpdateTask implements Task {
+public class UpdateTask extends AbstractTask {
     private final Token token;
-    private final ResultHandler<Token, ?> handler;
 
     /**
      * @param token Non null Token to update.
      * @param handler Non null handler to notify.
      */
     public UpdateTask(Token token, ResultHandler<Token, ?> handler) {
+        super(handler);
         this.token = token;
-        this.handler = handler;
     }
 
     /**
@@ -48,22 +48,17 @@ public class UpdateTask implements Task {
      *
      * @param connection Non null Connection.
      * @param adapter Non null for connection-coupled operations.
-     * @throws CoreTokenException If there was an error of any kind.
+     * @throws DataLayerException If there was an error of any kind.
      */
     @Override
-    public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
-        try {
-            Token previous = adapter.read(connection, token.getTokenId());
-            if (previous == null) {
-                adapter.create(connection, token);
-            } else {
-                adapter.update(connection, previous, token);
-            }
-            handler.processResults(token);
-        } catch (DataLayerException e) {
-            handler.processError(e);
-            throw e;
+    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
+        Token previous = adapter.read(connection, token.getTokenId());
+        if (previous == null) {
+            adapter.create(connection, token);
+        } else {
+            adapter.update(connection, previous, token);
         }
+        handler.processResults(token);
     }
 
     @Override

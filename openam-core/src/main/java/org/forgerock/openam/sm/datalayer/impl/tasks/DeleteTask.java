@@ -11,14 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 
 import java.text.MessageFormat;
@@ -26,18 +25,17 @@ import java.text.MessageFormat;
 /**
  * Deletes a given Token from the persistence layer.
  */
-public class DeleteTask implements Task {
+public class DeleteTask extends AbstractTask {
 
     private final String tokenId;
-    private final ResultHandler<String, ?> handler;
 
     /**
      * @param tokenID The Token ID to delete when executed.
      * @param handler Non null result handler for signalling status of operation.
      */
     public DeleteTask(String tokenID, ResultHandler<String, ?> handler) {
+        super(handler);
         this.tokenId = tokenID;
-        this.handler = handler;
     }
 
     /**
@@ -46,17 +44,12 @@ public class DeleteTask implements Task {
      * @param connection Non null connection to use for the operation.
      * @param adapter Non null adapter to use for the operation.
      *
-     * @throws CoreTokenException If there was a problem performing the operation.
+     * @throws DataLayerException If there was a problem performing the operation.
      */
     @Override
-    public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
-        try {
-            adapter.delete(connection, tokenId);
-            handler.processResults(tokenId);
-        } catch (DataLayerException e) {
-            handler.processError(e);
-            throw e;
-        }
+    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
+        adapter.delete(connection, tokenId);
+        handler.processResults(tokenId);
     }
 
     @Override
