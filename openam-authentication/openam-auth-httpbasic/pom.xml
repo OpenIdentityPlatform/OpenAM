@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-authentication</artifactId>
-        <version>12.0.0-1</version>
+        <version>12.0.0-2-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -64,7 +64,7 @@
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                             <Version>${project.version}</Version>
                             <Create-On>${maven.build.timestamp}</Create-On>
-                            <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
+                            <Revision>${git.short.sha1}</Revision>
                             <!-- TODO Add License to Manifest -->
                             <License />
                         </manifestEntries>

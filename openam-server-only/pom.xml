@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>12.0.0-1</version>
+        <version>12.0.0-2-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -55,7 +55,7 @@
                             <target>
 
                                 <property name="openam.version" value="${project.version}" />
-                                <property name="openam.svn.revision" value="${svn-revision.revision}" />
+                                <property name="openam.svn.revision" value="${git.short.sha1}" />
 
                                 <property name="openam.temp.target" value="${project.build.directory}/openam_TEMP" />
 
