@@ -15,10 +15,12 @@
  */
 package org.forgerock.openam.audit;
 
-import static java.util.Collections.*;
-import static org.forgerock.json.JsonValue.*;
+import static java.util.Collections.list;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
-import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.audit.AuditConstants.Component;
+import static org.forgerock.openam.audit.AuditConstants.EventName;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -29,8 +31,6 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.http.MutableUri;
 import org.forgerock.http.protocol.Form;
@@ -43,9 +43,10 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
-import org.forgerock.openam.utils.ClientUtils.*;
 
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
 /**
  * Builder for OpenAM audit access events.
