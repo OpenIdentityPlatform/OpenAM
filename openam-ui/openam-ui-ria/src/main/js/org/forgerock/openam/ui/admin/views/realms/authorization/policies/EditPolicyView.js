@@ -71,6 +71,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             if (callback) {
                 this.renderCallback = callback;
             }
+
             this.data.realmPath = args[0];
             this.data.policySetName = args[1];
 
@@ -148,7 +149,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
                         self.data.options.availableActions = self.getAvailableActionsForResourceType(resourceType);
                         self.data.options.availablePatterns = resourceType.patterns;
-
 
                         self.parentRender(function () {
                             var promises = [],
@@ -245,20 +245,29 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
         submitForm: function () {
             var savePromise,
-                self = this;
+                self = this,
+                activeTabIndex,
+                activeTab,
+                activeTabProperties;
 
             this.updateFields();
-            this.activeTabId = self.$el.find(".tab-menu li:not(.dropdown).active a").attr("href");
+            this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
 
-            if (!this.newEntity) {
-                _.each(this.tabs, function (tab) {
-                    if (tab.action) {
-                        self[tab.action]();
-                    }
-                });
+            if (this.newEntity) {
+                _.extend(this.model.attributes, this.data.entity);
+            } else {
+                activeTabIndex = this.$el.find(".tab-pane.active").index();
+                activeTab = this.tabs[activeTabIndex];
+
+                if (activeTab.action) {
+                    this[activeTab.action]();
+                }
+
+                if (activeTab.attr) {
+                    activeTabProperties = _.pick(this.data.entity, this.tabs[activeTabIndex].attr);
+                    _.extend(this.model.attributes, activeTabProperties);
+                }
             }
-
-            _.extend(this.model.attributes, this.data.entity);
 
             savePromise = this.model.save();
 

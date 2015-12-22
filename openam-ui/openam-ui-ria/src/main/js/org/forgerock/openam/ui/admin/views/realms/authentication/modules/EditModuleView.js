@@ -16,7 +16,6 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditModuleView", [
     "jquery",
-    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -29,7 +28,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, AbstractView, Configuration, EventManager, Router, Constants,
+], function ($, AbstractView, Configuration, EventManager, Router, Constants,
              SMSRealmDelegate, SMSGlobalDelegate, Form, FormHelper) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
@@ -71,32 +70,20 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             });
         },
         save: function (event) {
-            var promise = SMSRealmDelegate.authentication.modules.update(
-                this.data.realmPath,
-                this.data.name,
-                this.data.type,
-                this.data.values
-            );
+            var promise = SMSRealmDelegate.authentication.modules.update(this.data.realmPath,
+                                                                         this.data.name,
+                                                                         this.data.type,
+                                                                         this.data.form.data());
             FormHelper.bindSavePromiseToElement(promise, event.currentTarget);
         },
         revert: function () {
-            var self = this;
-            SMSRealmDelegate.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type)
-                .then(function (data) {
-                    self.data.values = data;
-                    self.data.form.reset();
-                });
+            this.data.form.reset();
         },
         renderTab: function (event) {
             var id = $(event.target).attr("href").slice(1),
                 schema = this.data.schema.properties[id],
-                element = this.$el.find("#tabpanel").get(0);
+                element = this.$el.find("#tabpanel").empty().get(0);
 
-            if (event.relatedTarget && this.data.form) {
-                _.merge(this.data.values, this.data.form.data());
-            }
-
-            this.$el.find("#tabpanel").empty();
             this.data.form = new Form(element, schema, this.data.values);
         }
     });
