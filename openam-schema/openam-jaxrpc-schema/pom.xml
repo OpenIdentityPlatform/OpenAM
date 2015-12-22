@@ -181,10 +181,6 @@
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>webservices-api</artifactId>
-        </dependency>
     </dependencies>
 </project>
 

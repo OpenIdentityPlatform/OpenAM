@@ -114,7 +114,7 @@ public final class AMSetupFilter implements Filter {
                         throw new ConfigurationException(CONFIG_STORE_DOWN_ERROR_CODE, null);
                     }
                 } else {
-                    if (isPassthrough && isRequestForAllowedResource(request.getServletPath())) {
+                    if (isPassthrough && isRequestForAllowedResource(resourcePath(request))) {
                         filterChain.doFilter(request, response);
                     } else if (isConfiguratorRequest(request.getRequestURI())) {
                         filterChain.doFilter(request, response);
@@ -134,6 +134,17 @@ public final class AMSetupFilter implements Filter {
             e.printStackTrace();
             throw new ServletException("AMSetupFilter.doFilter", e);
         }
+    }
+
+    private String resourcePath(HttpServletRequest request) {
+        StringBuilder path = new StringBuilder();
+        if (request.getServletPath() != null) {
+            path.append(request.getServletPath());
+        }
+        if (request.getPathInfo() != null) {
+            path.append(request.getPathInfo());
+        }
+        return path.toString();
     }
 
     @Override

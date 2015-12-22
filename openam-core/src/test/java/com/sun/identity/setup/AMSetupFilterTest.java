@@ -339,6 +339,7 @@ public class AMSetupFilterTest {
         given(request.getContextPath()).willReturn("/CONTEXT_PATH");
         given(request.getRequestURI()).willReturn("REQUEST_URI" + suffix);
         given(request.getServletPath()).willReturn("SERVLET_PATH" + suffix);
+        given(request.getPathInfo()).willReturn("PATH_INFO" + suffix);
         return request;
     }
 

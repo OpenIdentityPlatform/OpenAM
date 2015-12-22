@@ -178,10 +178,6 @@
         <jsr173_api.version>2004-30-01</jsr173_api.version>
         <jss4.version>2007-08-11</jss4.version>
         <publicsuffix.version>1.0.1</publicsuffix.version>
-        <webservices-extra.version>2008-03-12</webservices-extra.version>
-        <webservices-extra-api.version>2003-09-04</webservices-extra-api.version>
-        <webservices-rt.version>2009-29-07</webservices-rt.version>
-        <webservices-api.version>2009-14-01</webservices-api.version>
         <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
         <jquery-amd.version>1.7.1-alpha-1</jquery-amd.version>
         <freemarker.version>2.3.19</freemarker.version>
@@ -190,6 +186,7 @@
         <hikaricp.version>2.4.1</hikaricp.version>
         <h2database.version>1.4.188</h2database.version>
         <javax.inject.version>1_2</javax.inject.version>
+        <fastinfoset.version>1.2.13</fastinfoset.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -1456,6 +1453,13 @@
             </dependency>
 
             <dependency>
+                <groupId>com.sun.xml.fastinfoset</groupId>
+                <artifactId>FastInfoset</artifactId>
+                <version>${fastinfoset.version}</version>
+            </dependency>
+
+
+            <dependency>
                 <groupId>javax.servlet.jsp</groupId>
                 <artifactId>jsp-api</artifactId>
                 <version>${jsp-api.version}</version>
@@ -1573,26 +1577,6 @@
                 <groupId>external</groupId>
                 <artifactId>publicsuffix</artifactId>
                 <version>${publicsuffix.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>external</groupId>
-                <artifactId>webservices-extra</artifactId>
-                <version>${webservices-extra.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>external</groupId>
-                <artifactId>webservices-extra-api</artifactId>
-                <version>${webservices-extra-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>external</groupId>
-                <artifactId>webservices-rt</artifactId>
-                <version>${webservices-rt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>external</groupId>
-                <artifactId>webservices-api</artifactId>
-                <version>${webservices-api.version}</version>
             </dependency>
 
             <!-- Preferred JSON Data Binding API -->

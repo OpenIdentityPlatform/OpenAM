@@ -144,22 +144,7 @@
 
         <dependency>
             <groupId>external</groupId>
-            <artifactId>webservices-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>webservices-extra</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>webservices-extra-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>webservices-rt</artifactId>
+            <artifactId>jaxrpc-impl</artifactId>
         </dependency>
 
         <dependency>

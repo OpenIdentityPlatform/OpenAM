@@ -109,10 +109,10 @@
          <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>external</groupId>
-            <artifactId>webservices-rt</artifactId>
-        </dependency>             
+            <artifactId>jaxrpc-impl</artifactId>
+        </dependency>
     </dependencies>
 </project>

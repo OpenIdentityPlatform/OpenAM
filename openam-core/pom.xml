@@ -300,6 +300,17 @@
         </dependency>
 
         <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+        </dependency>
+
+
+        <dependency>
             <groupId>com.sleepycat</groupId>
             <artifactId>je</artifactId>
         </dependency>
@@ -368,22 +379,6 @@
         <dependency>
             <groupId>external</groupId>
             <artifactId>publicsuffix</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>webservices-extra</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>webservices-extra-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>webservices-rt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>webservices-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>

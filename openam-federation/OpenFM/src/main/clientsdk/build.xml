@@ -97,9 +97,6 @@
             <fileset dir="${openfm.dir}/resources">
                 <filename name="META-INF/services/com.sun.xml.ws.api.pipe.TransportPipeFactory"/>    
             </fileset>
-            
-             <zipfileset src="${extlib.dir}/webservices-rt.jar"
-                    includes="com/sun/xml/ws/security/Token.class"/>
 
             <manifest>
                <attribute name="Created-On" value="${pstamp}" />

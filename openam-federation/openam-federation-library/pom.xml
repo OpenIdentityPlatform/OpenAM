@@ -249,7 +249,7 @@
 
         <dependency>
             <groupId>external</groupId>
-            <artifactId>webservices-rt</artifactId>
+            <artifactId>jaxrpc-impl</artifactId>
         </dependency>
         
         <dependency>
