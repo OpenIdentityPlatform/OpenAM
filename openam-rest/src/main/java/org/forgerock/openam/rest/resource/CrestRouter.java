@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 package org.forgerock.openam.rest.resource;
 
@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -55,7 +54,7 @@ public class CrestRouter<T extends CrestRouter> implements RequestHandler, Versi
 
     private final VersionRouter router = new VersionRouter();
     private final Set<String> routes = new CopyOnWriteArraySet<String>();
-    private Set<String> defaultRoutes;
+    private Set<String> defaultRoutes = Collections.emptySet();
 
     protected VersionRouter getRouter() {
         return router;

@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.rest.router;
@@ -38,6 +38,7 @@ public class RestEndpointManagerImpl implements RestEndpointManager {
 
     private final Set<String> resourceEndpoints;
     private final Set<String> serviceEndpoints;
+    private final Set<String> frrestEndpoints;
 
     private final Map<EndpointTemplate, String> endpointTemplateMap = new HashMap<EndpointTemplate, String>();
 
@@ -50,8 +51,10 @@ public class RestEndpointManagerImpl implements RestEndpointManager {
     public RestEndpointManagerImpl(RestEndpoints restEndpoints) {
         this.resourceEndpoints = restEndpoints.getResourceRouter().getRoutes();
         this.serviceEndpoints = restEndpoints.getJSONServiceRouter().getRoutes();
+        this.frrestEndpoints = restEndpoints.getFrestRouter().getRoutes();
         createEndpointTemplates(resourceEndpoints);
         createEndpointTemplates(serviceEndpoints);
+        createEndpointTemplates(frrestEndpoints);
     }
 
     /**

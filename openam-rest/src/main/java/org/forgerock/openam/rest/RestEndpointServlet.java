@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
@@ -43,9 +43,11 @@ import java.io.IOException;
 public class RestEndpointServlet extends HttpServlet {
 
     public static final String CREST_CONNECTION_FACTORY_NAME = "CrestConnectionFactory";
+    public static final String FRREST_CONNECTION_FACTORY_NAME = "FRrestConnectionFactory";
     private static ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<HttpServletRequest>();
 
     private final org.forgerock.json.resource.servlet.HttpServlet crestServlet;
+    private final org.forgerock.json.resource.servlet.HttpServlet frrestServlet;
     private final RestletServiceServlet restletJSONServiceServlet;
     private final RestletServiceServlet restletXACMLServiceServlet;
     private final RestletServiceServlet restletOAuth2ServiceServlet;
@@ -57,7 +59,10 @@ public class RestEndpointServlet extends HttpServlet {
     public RestEndpointServlet() {
         this.crestServlet = new CrestHttpServlet(this, InjectorHolder.getInstance(Key.get(ConnectionFactory.class,
                 Names.named(CREST_CONNECTION_FACTORY_NAME))));
-        this.restletJSONServiceServlet = new RestletServiceServlet(this, JSONServiceEndpointApplication.class,
+        this.frrestServlet = new CrestHttpServlet(this, InjectorHolder.getInstance(Key.get(ConnectionFactory.class,
+                Names.named(FRREST_CONNECTION_FACTORY_NAME))));
+
+                this.restletJSONServiceServlet = new RestletServiceServlet(this, JSONServiceEndpointApplication.class,
                 "jsonRestletServiceServlet");
         this.restletXACMLServiceServlet = new RestletServiceServlet(this, XACMLServiceEndpointApplication.class,
                 "xacmlRestletServiceServlet");
@@ -75,11 +80,13 @@ public class RestEndpointServlet extends HttpServlet {
      * @param endpointManager An instance of the RestEndpointManager.
      */
     RestEndpointServlet(final CrestHttpServlet crestServlet,
+            final CrestHttpServlet frrestServlet,
             final RestletServiceServlet restletJSONServiceServlet,
             final RestletServiceServlet restletXACMLServiceServlet,
             final RestletServiceServlet restletOAuth2ServiceServlet,
             final RestEndpointManager endpointManager) {
         this.crestServlet = crestServlet;
+        this.frrestServlet = frrestServlet;
         this.restletJSONServiceServlet = restletJSONServiceServlet;
         this.restletXACMLServiceServlet = restletXACMLServiceServlet;
         this.restletOAuth2ServiceServlet = restletOAuth2ServiceServlet;
@@ -94,6 +101,8 @@ public class RestEndpointServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         crestServlet.init();
+        frrestServlet.init();
+
         // Don't need to call restServiceServlet.init() as starts Restlet which is not needed as is not created by
         // Servlet Container.
     }
@@ -133,8 +142,11 @@ public class RestEndpointServlet extends HttpServlet {
                         break;
                     }
                 }
-            } else if ("/xacml".equals(request.getServletPath())) {
+            }
+            else if ("/xacml".equals(request.getServletPath())) {
                 restletXACMLServiceServlet.service(new HttpServletRequestWrapper(request), response);
+            } else if ("/frrest/oauth2".equals(request.getServletPath())) {
+                frrestServlet.service(request, response);
             } else if ("/oauth2".equals(request.getServletPath())) {
                 restletOAuth2ServiceServlet.service(new HttpServletRequestWrapper(request), response);
             } 
@@ -167,6 +179,7 @@ public class RestEndpointServlet extends HttpServlet {
     @Override
     public void destroy() {
         crestServlet.destroy();
+        frrestServlet.destroy();
         restletXACMLServiceServlet.destroy();
         restletOAuth2ServiceServlet.destroy();
         restletJSONServiceServlet.destroy();

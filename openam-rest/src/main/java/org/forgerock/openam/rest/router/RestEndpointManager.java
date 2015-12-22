@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.rest.router;
@@ -42,6 +42,11 @@ public interface RestEndpointManager {
      * The authenticate service endpoint.
      */
     String AUTHENTICATE = "/authenticate";
+
+    /**
+     * The token service endpoint.
+     */
+    String TOKEN = "/token";
 
     /**
      * Returns the type of endpoint of the given endpoint.

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -43,6 +43,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
@@ -141,10 +142,14 @@ public class TokenResource implements CollectionResourceProvider {
             if (deleteToken(context, resourceId, handler, true)) {
                 handler.handleResult(json(object()));
             }
+        } else if ("revokeTokens".equalsIgnoreCase(actionId)) {
+            if (revokeTokens(resourceId, handler, request)) {
+                handler.handleResult(json(object()));
+            }
         } else {
             if (debug.errorEnabled()) {
                 debug.error("TokenResource :: ACTION : Unsupported action request performed, " + actionId + " on " +
-                    resourceId);
+                        resourceId);
             }
             RestUtils.generateUnsupportedOperation(handler);
         }
@@ -169,13 +174,7 @@ public class TokenResource implements CollectionResourceProvider {
         try {
             AMIdentity uid = getUid(context);
 
-            JsonValue token = tokenStore.read(tokenId);
-            if (token == null) {
-                if (debug.errorEnabled()) {
-                    debug.error("TokenResource :: DELETE : No token with ID, " + tokenId + " found to delete");
-                }
-                throw new NotFoundException("Token Not Found", null);
-            }
+            JsonValue token = getToken(tokenId);
             String username = getAttributeValue(token, USERNAME);
             if (username == null || username.isEmpty()) {
                 if (debug.errorEnabled()) {
@@ -227,6 +226,58 @@ public class TokenResource implements CollectionResourceProvider {
         }
 
         return false;
+    }
+
+    /**
+     * Deletes an access token and its associated refresh token or just the provided refresh token.
+     * @param tokenId The token id.
+     * @param handler The handler.
+     * @param request The action request.
+     * @return {@code true} if the token has been deleted.
+     */
+    private boolean revokeTokens( final String tokenId, ResultHandler<JsonValue> handler,
+            ActionRequest request) {
+        try {
+            JsonValue token = getToken(tokenId);
+
+            String username = getAttributeValue(token, USERNAME);
+            if (StringUtils.isEmpty(username)) {
+                debug.error("TokenResource :: revokeTokens : No username associated with " +
+                        "token with ID, " + tokenId + ".");
+                throw new NotFoundException( "Not Found", null);
+            }
+
+            final JsonValue jVal = request.getContent();
+            final String clientIdParameter = jVal.get(OAuth2Constants.Params.CLIENT_ID).asString();
+            if (StringUtils.isEmpty(clientIdParameter)) {
+                debug.error("TokenResource :: revokeTokens : No clientId provided");
+                throw new PermanentException(ResourceException.BAD_REQUEST, "Missing clientId", null);
+            }
+
+            final String clientId = getAttributeValue(token, OAuthTokenField.CLIENT_ID.getOAuthField());
+            if (!clientId.equalsIgnoreCase(clientIdParameter)) {
+                debug.error("TokenResource :: revokeTokens : clientIds do not match");
+                throw new ForbiddenException( "Unauthorized", null);
+            } else {
+                deleteAccessTokensRefreshToken(token);
+                tokenStore.delete(tokenId);
+            }
+            return true;
+        } catch (CoreTokenException e) {
+            handler.handleError(new ServiceUnavailableException(e.getMessage(), e));
+        } catch (ResourceException e) {
+            handler.handleError(e);
+        }
+        return false;
+    }
+
+    private JsonValue getToken(String tokenId) throws CoreTokenException, NotFoundException {
+        JsonValue token = tokenStore.read(tokenId);
+        if (token == null) {
+            debug.error("TokenResource :: No token with ID, " + tokenId + " found");
+            throw new NotFoundException("Token Not Found", null);
+        }
+        return token;
     }
 
     /**

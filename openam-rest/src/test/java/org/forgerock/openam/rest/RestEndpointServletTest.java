@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
@@ -43,6 +43,7 @@ public class RestEndpointServletTest {
     private RestEndpointServlet restEndpointServlet;
 
     private CrestHttpServlet crestServlet;
+    private CrestHttpServlet frrestServlet;
     private RestletServiceServlet restletJSONServiceServlet;
     private RestletServiceServlet restletXACMLServiceServlet;
     private RestEndpointManager endpointManager;
@@ -59,12 +60,13 @@ public class RestEndpointServletTest {
     public void setUp() {
 
         crestServlet = mock(CrestHttpServlet.class);
+        frrestServlet = mock(CrestHttpServlet.class);
         reset(restletJSONServiceServlet);
         reset(restletXACMLServiceServlet);
         reset(restletOAuth2ServiceServlet);
         endpointManager = mock(RestEndpointManager.class);
 
-        restEndpointServlet = new RestEndpointServlet(crestServlet, restletJSONServiceServlet,
+        restEndpointServlet = new RestEndpointServlet(crestServlet, frrestServlet, restletJSONServiceServlet,
                 restletXACMLServiceServlet, restletOAuth2ServiceServlet, endpointManager);
     }
 
@@ -78,6 +80,7 @@ public class RestEndpointServletTest {
 
         //Then
         verify(crestServlet).init();
+        verify(frrestServlet).init();
         verifyZeroInteractions(restletJSONServiceServlet);
         verifyZeroInteractions(restletXACMLServiceServlet);
     }

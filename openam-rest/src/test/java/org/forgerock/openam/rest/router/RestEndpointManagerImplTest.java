@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.router;
@@ -36,19 +36,27 @@ public class RestEndpointManagerImplTest {
 
         RestEndpoints restEndpoints = mock(RestEndpoints.class);
         CrestRouter resourceRouter = mock(CrestRouter.class);
+        CrestRouter frrestRouter = mock(CrestRouter.class);
         ServiceRouter serviceRouter = mock(ServiceRouter.class);
         Set<String> resourceRoutes = new HashSet<String>();
         Set<String> serviceRoutes = new HashSet<String>();
+        Set<String> frrestRoutes = new HashSet<String>();
+
 
         given(restEndpoints.getResourceRouter()).willReturn(resourceRouter);
+        given(restEndpoints.getFrestRouter()).willReturn(frrestRouter);
         given(restEndpoints.getJSONServiceRouter()).willReturn(serviceRouter);
 
         given(resourceRouter.getRoutes()).willReturn(resourceRoutes);
+        given(frrestRouter.getRoutes()).willReturn(frrestRoutes);
         given(serviceRouter.getRoutes()).willReturn(serviceRoutes);
 
         resourceRoutes.add("/users");
         resourceRoutes.add("/groups");
         resourceRoutes.add("/config");
+        resourceRoutes.add("/tokens");// this should not be returned
+
+        frrestRoutes.add("/token");
 
         serviceRoutes.add("/authenticate");
         serviceRoutes.add("/other");
@@ -62,10 +70,10 @@ public class RestEndpointManagerImplTest {
         //Given
 
         //When
-        String endpointType = endpointManager.findEndpoint("/realm1/{realm2}/realm3/authenticate/{id}");
+        String endpoint = endpointManager.findEndpoint("/realm1/{realm2}/realm3/authenticate/{id}");
 
         //Then
-        assertEquals(endpointType, "/authenticate");
+        assertEquals(endpoint, "/authenticate");
     }
 
     @Test
@@ -74,10 +82,10 @@ public class RestEndpointManagerImplTest {
         //Given
 
         //When
-        String endpointType = endpointManager.findEndpoint("/realm1/{realm2}/realm3/groups/{id}");
+        String endpoint = endpointManager.findEndpoint("/realm1/{realm2}/realm3/groups/{id}");
 
         //Then
-        assertEquals(endpointType, "/groups");
+        assertEquals(endpoint, "/groups");
     }
 
     @Test
@@ -86,9 +94,35 @@ public class RestEndpointManagerImplTest {
         //Given
 
         //When
-        String endpointType = endpointManager.findEndpoint("/realm1/{realm2}/realm3/config/{id}");
+        String endpoint = endpointManager.findEndpoint("/realm1/{realm2}/realm3/config/{id}");
 
         //Then
-        assertEquals(endpointType, "/config");
+        assertEquals(endpoint, "/config");
     }
+
+    @Test
+    public void shouldFindTokenResourceEndpoint() {
+
+        //Given
+
+        //When
+        String endpoint = endpointManager.findEndpoint("/frrest/oauth2/token/{id}");
+
+        //Then
+        assertEquals(endpoint, "/token");
+    }
+
+    @Test
+    public void shouldNotFindTokenResourceEndpoint() {
+
+        //Given
+
+        //When
+        String endpoint = endpointManager.findEndpoint("/frrest/oauth2/tokens/{id}_action=RevokeTokens");
+
+        //Then
+        assertEquals(endpoint, "/tokens");
+    }
+
+
 }

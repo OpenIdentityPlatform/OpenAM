@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest;
 
@@ -40,6 +40,8 @@ import org.forgerock.openam.forgerockrest.entitlements.SubjectAttributesResource
 import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
+import org.forgerock.openam.oauth2.rest.ClientResource;
+import org.forgerock.openam.oauth2.rest.TokenResource;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
@@ -81,6 +83,7 @@ public class RestEndpoints {
     private final VersionSelector versionSelector;
     private final CoreWrapper coreWrapper;
     private final CrestRouter resourceRouter;
+    private final CrestRouter frrestRouter;
     private final ServiceRouter jsonServiceRouter;
     private final ServiceRouter xacmlServiceRouter;
     private final Router oauth2ServiceRouter;
@@ -97,11 +100,14 @@ public class RestEndpoints {
         this.versionSelector = versionSelector;
         this.coreWrapper = coreWrapper;
 
+        this.frrestRouter = createFrrestRouter() ;
         this.resourceRouter = createResourceRouter();
         this.jsonServiceRouter = createJSONServiceRouter();
         this.xacmlServiceRouter = createXACMLServiceRouter();
         this.oauth2ServiceRouter = createOAuth2Router();
     }
+
+
 
     /**
      * Gets the CREST resource router.
@@ -109,6 +115,14 @@ public class RestEndpoints {
      */
     public CrestRouter getResourceRouter() {
         return resourceRouter;
+    }
+
+    /**
+     * Gets the frrest CREST  router.
+     * @return The router.
+     */
+    public CrestRouter getFrestRouter() {
+        return frrestRouter;
     }
 
     /**
@@ -219,6 +233,7 @@ public class RestEndpoints {
                 .forVersion("1.0").to(RecordResource.class);
 
 
+
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);
 
@@ -281,6 +296,21 @@ public class RestEndpoints {
         router.attach("/.well-known/openid-configuration", wrap(OpenIDConnectConfiguration.class));
 
         return router;
+    }
+
+    private CrestRouter createFrrestRouter() {
+        FluentRouter rootRealmRouter = InjectorHolder.getInstance(LoggingFluentRouter.class);
+
+        // frrest/oauth2/endpoints
+        rootRealmRouter.route("/token/").forVersion("1.0").to(TokenResource.class);
+
+        rootRealmRouter.route("/client/").through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(ClientResource.class);
+
+        VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
+
+        return rootRealmRouter;
+
     }
 
 }

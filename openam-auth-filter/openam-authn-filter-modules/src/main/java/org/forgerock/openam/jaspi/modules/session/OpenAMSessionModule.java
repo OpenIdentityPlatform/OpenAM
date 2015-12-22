@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.jaspi.modules.session;
@@ -38,7 +38,10 @@ import java.util.Map;
 public class OpenAMSessionModule implements ServerAuthModule {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
+    private static final String FRREST_OAUTH2_ROOT_PATH = "/frrest/oauth2";
+    private static final String JSON_ROOT_PATH = "/json";
     private EndpointMatcher endpointMatcher;
+    private EndpointMatcher frrestEndpointMatcher;
     private final OptionalSSOTokenSessionModule optionalSSOTokenSessionModule;
     private final LocalSSOTokenSessionModule localSSOTokenSessionModule;
 
@@ -50,12 +53,12 @@ public class OpenAMSessionModule implements ServerAuthModule {
         localSSOTokenSessionModule = new LocalSSOTokenSessionModule();
     }
 
-    @Override
-    public void initialize(MessagePolicy messagePolicy, MessagePolicy messagePolicy2, CallbackHandler callbackHandler, Map map) throws AuthException {
-        endpointMatcher = new EndpointMatcher("/json", InjectorHolder.getInstance(RestEndpointManager.class));
-
+    @Override public void initialize(MessagePolicy messagePolicy, MessagePolicy messagePolicy2,
+            CallbackHandler callbackHandler, Map map) throws AuthException {
+        endpointMatcher = new EndpointMatcher(JSON_ROOT_PATH, InjectorHolder.getInstance(RestEndpointManager.class));
+        frrestEndpointMatcher = new EndpointMatcher(FRREST_OAUTH2_ROOT_PATH,
+                InjectorHolder.getInstance(RestEndpointManager.class));
         optionalSSOTokenSessionModule.initialize(messagePolicy, messagePolicy2, callbackHandler, map);
-
         localSSOTokenSessionModule.initialize(messagePolicy, messagePolicy2, callbackHandler, map);
         init();
     }
@@ -71,7 +74,8 @@ public class OpenAMSessionModule implements ServerAuthModule {
             optionalSSOTokenSessionModule, LocalSSOTokenSessionModule localSSOTokenSessionModule) {
         this.optionalSSOTokenSessionModule = optionalSSOTokenSessionModule;
         this.localSSOTokenSessionModule = localSSOTokenSessionModule;
-        endpointMatcher = new EndpointMatcher("/json", endpointManager);
+        endpointMatcher = new EndpointMatcher(JSON_ROOT_PATH, endpointManager);
+        frrestEndpointMatcher = new EndpointMatcher(FRREST_OAUTH2_ROOT_PATH, endpointManager);
         init();
     }
 
@@ -92,6 +96,7 @@ public class OpenAMSessionModule implements ServerAuthModule {
                 "forgotPassword", "forgotPasswordReset", "anonymousCreate");
         endpointMatcher.endpoint(RestEndpointManager.SERVER_INFO, HttpMethod.GET);
         endpointMatcher.endpoint(RestEndpointManager.SESSIONS, HttpMethod.POST, "_action", "validate");
+        frrestEndpointMatcher.endpoint(RestEndpointManager.TOKEN, HttpMethod.POST, "_action", "revokeTokens");
     }
 
     @Override
@@ -108,6 +113,9 @@ public class OpenAMSessionModule implements ServerAuthModule {
         String path = requestURI.substring(contextPath.length());
 
         if (endpointMatcher.match(request)) {
+            DEBUG.message("Path: " + path + " Method: " + request.getMethod() + " Added as exception. Not protected");
+            return optionalSSOTokenSessionModule.validateRequest(messageInfo, subject, subject2);
+        } else if (FRREST_OAUTH2_ROOT_PATH.equals(request.getServletPath()) && frrestEndpointMatcher.match(request)) {
             DEBUG.message("Path: " + path + " Method: " + request.getMethod() + " Added as exception. Not protected");
             return optionalSSOTokenSessionModule.validateRequest(messageInfo, subject, subject2);
         } else {

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.forgerockrest.guice;
 import javax.security.auth.Subject;
@@ -153,6 +153,14 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Singleton
     public ConnectionFactory getConnectionFactory(RestEndpoints restEndpoints) {
         return Resources.newInternalConnectionFactory(restEndpoints.getResourceRouter());
+    }
+
+    @Provides
+    @Inject
+    @Named(RestEndpointServlet.FRREST_CONNECTION_FACTORY_NAME)
+    @Singleton
+    public ConnectionFactory getConnectionFactory(RestEndpoints restEndpoints, String factoryName) {
+        return Resources.newInternalConnectionFactory(restEndpoints.getFrestRouter());
     }
 
     @Inject
