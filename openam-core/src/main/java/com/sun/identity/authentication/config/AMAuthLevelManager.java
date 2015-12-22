@@ -664,15 +664,13 @@ public class AMAuthLevelManager implements ServiceListener {
                 String attrName = 
                     AMAuthConfigUtils.getAuthLevelAttribute(attrs, module);
                 String authLevel = CollectionHelper.getMapAttr(attrs, attrName);
-                Integer level = null;
                 if ((authLevel != null) && (authLevel.length() > 0)) {
-                        level = Integer.valueOf(authLevel);
-                }
-                globalAuthLevelMap.put(module, level);
-                if (debug.messageEnabled()) {
-                    debug.message("authLevel is :" + authLevel);
-                    debug.message(
-                        "globalAuthLevelMap is :" + globalAuthLevelMap);
+                    Integer level = Integer.valueOf(authLevel);
+                    globalAuthLevelMap.put(module, level);
+                    debug.message("authLevel is : {}", authLevel);
+                    debug.message("globalAuthLevelMap is : {}", globalAuthLevelMap);
+                } else {
+                    debug.warning("No auth level for module {}", module);
                 }
             }
         } catch (Exception e) {
