@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-auth-deviceprint</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>13.0.0-RC2</version>
     </parent>
 
     <name>OpenAM Auth Device Print Module</name>

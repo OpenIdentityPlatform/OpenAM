@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-oauth2-common</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>13.0.0-RC2</version>
     </parent>
 
     <artifactId>oauth2-core</artifactId>
