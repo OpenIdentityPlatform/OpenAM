@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-sts</artifactId>
-        <version>13.0.0-RC2</version>
+        <version>13.0.0-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM STS Token Service</name>

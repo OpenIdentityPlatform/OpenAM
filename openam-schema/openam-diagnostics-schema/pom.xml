@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>13.0.0-RC2</version>
+        <version>13.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
