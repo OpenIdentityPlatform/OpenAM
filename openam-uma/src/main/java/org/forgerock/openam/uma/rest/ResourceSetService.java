@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Requests.newQueryRequest;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.security.auth.Subject;
@@ -49,12 +50,15 @@ import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.rest.AggregateQuery;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.uma.ResourceSetSharedFilter;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.uma.UmaProviderSettingsFactory;
+import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.Function;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
@@ -144,7 +148,7 @@ public class ResourceSetService {
                         } catch (InternalServerErrorException isee) {
                             return isee.asPromise();
                         }
-                        return Promises.newResultPromise(sharedResourceSets);
+                        return newResultPromise(sharedResourceSets);
                     }
                 });
     }
@@ -232,7 +236,7 @@ public class ResourceSetService {
                                         public Promise<Collection<ResourceSetDescription>, ResourceException> apply(
                                                 Pair<QueryResponse, Collection<UmaPolicy>> result) throws ResourceException {
                                             try {
-                                                return Promises.newResultPromise(combine(context, query,
+                                                return newResultPromise(combine(context, query,
                                                         filteredResourceSets, result.getSecond(), augmentWithPolicies,
                                                         resourceOwnerId));
                                             } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
@@ -262,12 +266,12 @@ public class ResourceSetService {
                                                         resourceSetDescriptions.add(rs);
                                                     }
                                                 }
-                                                return Promises.newResultPromise(resourceSetDescriptions);
+                                                return newResultPromise(resourceSetDescriptions);
                                             }
                                         });
                                 kicker.handleResult(null);
                             } else {
-                                resourceSetsPromise = Promises.newResultPromise(filteredResourceSets);
+                                resourceSetsPromise = newResultPromise(filteredResourceSets);
                             }
                         }
                         return resourceSetsPromise;
@@ -275,6 +279,16 @@ public class ResourceSetService {
                 });
     }
 
+    private static final AsyncFunction<ResourceException, Void, ResourceException> IGNORE_NOTFOUNDEXCEPTION =
+            new AsyncFunction<ResourceException, Void, ResourceException>() {
+                public Promise<Void, ResourceException> apply(ResourceException e) {
+                    if (e instanceof org.forgerock.json.resource.NotFoundException) {
+                        return newResultPromise(null);
+                    } else {
+                        return e.asPromise();
+                    }
+                }
+            };
     /**
      * Revokes all UMA policies for a user's resource sets.
      *
@@ -296,14 +310,15 @@ public class ResourceSetService {
                         PromiseImpl<Void, ResourceException> kicker = PromiseImpl.create();
                         promises.add(kicker);
                         for (ResourceSetDescription resourceSet : resourceSets) {
-                            promises.add(policyService.deletePolicy(context, resourceSet.getId()));
+                            promises.add(policyService.deletePolicy(context, resourceSet.getId())
+                                    .thenCatchAsync(IGNORE_NOTFOUNDEXCEPTION));
                         }
                         Promise<List<Void>, ResourceException> when = Promises.when(promises);
                         kicker.handleResult(null);
                         return when.thenAsync(new AsyncFunction<List<Void>, Void, ResourceException>() {
                             @Override
                             public Promise<Void, ResourceException> apply(List<Void> voids) {
-                                return Promises.newResultPromise(null);
+                                return newResultPromise(null);
                             }
                         });
                     }
@@ -315,7 +330,7 @@ public class ResourceSetService {
         try {
             ResourceSetDescription resourceSet = resourceSetStoreFactory.create(realm)
                     .read(resourceSetId, new ResourceSetSharedFilter(this, resourceOwnerId, realm));
-            return Promises.newResultPromise(resourceSet);
+            return newResultPromise(resourceSet);
         } catch (NotFoundException e) {
             return new org.forgerock.json.resource.NotFoundException("No resource set with id, " + resourceSetId
                     + ", found.").asPromise();
@@ -331,12 +346,12 @@ public class ResourceSetService {
                     @Override
                     public Promise<ResourceSetDescription, ResourceException> apply(UmaPolicy result) throws ResourceException {
                         resourceSet.setPolicy(result.asJson());
-                        return Promises.newResultPromise(resourceSet);
+                        return newResultPromise(resourceSet);
                     }
                 }, new AsyncFunction<ResourceException, ResourceSetDescription, ResourceException>() {
                     @Override
                     public Promise<ResourceSetDescription, ResourceException> apply(ResourceException e) throws ResourceException {
-                        return Promises.newResultPromise(resourceSet);
+                        return newResultPromise(resourceSet);
                     }
                 });
     }
