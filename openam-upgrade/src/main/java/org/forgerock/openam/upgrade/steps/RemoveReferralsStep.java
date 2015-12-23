@@ -210,7 +210,6 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
         String shallowestRealm = findShallowestRealm(destinationRealms);
         String sourceRealm = shallowestRealm.substring(0, shallowestRealm.lastIndexOf('/') + 1);
 
-        applicationService.clearCache(sourceRealm);
         Application application = applicationService.getApplication(getAdminSubject(), sourceRealm, applicationName);
 
         if (application == null) {

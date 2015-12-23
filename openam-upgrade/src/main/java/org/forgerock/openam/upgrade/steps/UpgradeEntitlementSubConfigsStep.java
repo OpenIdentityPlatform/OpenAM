@@ -34,6 +34,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.sun.identity.entitlement.ApplicationManager;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
@@ -336,6 +337,9 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractEntitlementUpgrade
         if (isNotEmpty(changedResourceTypeUUIDs)) {
             addMissingResourceTypeUUIDs();
         }
+
+        // Clear application cache to pick up any application changes.
+        ApplicationManager.clearCache("/");
     }
 
     /**

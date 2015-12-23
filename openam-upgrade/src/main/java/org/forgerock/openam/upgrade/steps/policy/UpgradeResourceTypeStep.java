@@ -25,6 +25,7 @@ import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
@@ -184,6 +185,8 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
                 if (state.applicationNeedsResourceType) {
                     ResourceType resourceType = createResourceType(state, realm);
                     upgradeApplication(ec, state.appName, resourceType.getUUID());
+                    // Application modified, clear cache.
+                    ApplicationManager.clearCache(realm);
                 }
 
                 if (state.policiesNeedsResourceType) {
