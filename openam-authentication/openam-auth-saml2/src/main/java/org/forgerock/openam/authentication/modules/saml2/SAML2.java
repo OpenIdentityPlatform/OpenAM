@@ -516,13 +516,9 @@ public class SAML2 extends AMLoginModule {
             }
 
             if (authenticationContext.hasMoreRequirements()) {
-                return injectAndReturn();
+                return injectAndReturn(state);
             } else { //completed auth, status should be failure or success, allow stepLogin to return
-                if (authenticationContext.getStatus().equals(AuthContext.Status.IN_PROGRESS)) {
-                    return processError(bundle.getString("invalidLoginState"),
-                            "SAML2 :: injectCallbacks() : Authentication Module - invalid login state");
-                }
-                return stepLogin(null, state);
+                return finishLoginModule(state);
             }
         }
 
@@ -533,12 +529,21 @@ public class SAML2 extends AMLoginModule {
     /**
      * Draws the next set of callbacks on to the current (externally-facing) auth module's step.
      */
-    private int injectAndReturn() throws AuthLoginException {
+    private int injectAndReturn(int state) throws AuthLoginException {
+        Callback[] injectedCallbacks = authenticationContext.getRequirements();
+
+        while (injectedCallbacks.length == 0) {
+            authenticationContext.submitRequirements(injectedCallbacks);
+            if (authenticationContext.hasMoreRequirements()) {
+                injectedCallbacks = authenticationContext.getRequirements();
+            } else { //completed auth with zero callbacks status should be failure or success, allow stepLogin to return
+                return finishLoginModule(state);
+            }
+        }
 
         replaceHeader(LOGIN_STEP,
                 ((PagePropertiesCallback)
                         authenticationContext.getAuthContextLocal().getLoginState().getReceivedInfo()[0]).getHeader());
-        final Callback[] injectedCallbacks = authenticationContext.getRequirements();
         if (injectedCallbacks.length > MAX_CALLBACKS_INJECTED) {
             return processError(bundle.getString("samlLocalAuthFailed"),
                     "SAML2 :: injectAndReturn() : Local authentication failed");
@@ -557,6 +562,17 @@ public class SAML2 extends AMLoginModule {
         previousLength = injectedCallbacks.length;
 
         return LOGIN_STEP;
+    }
+
+    /**
+     * Finishes a login module and then progresses to the next state.
+     */
+    private int finishLoginModule(int state) throws AuthLoginException {
+        if (authenticationContext.getStatus().equals(AuthContext.Status.IN_PROGRESS)) {
+            return processError(bundle.getString("invalidLoginState"),
+                    "SAML2 :: injectCallbacks() : Authentication Module - invalid login state");
+        }
+        return stepLogin(null, state);
     }
 
     /**
