@@ -158,7 +158,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                         self.data.contextName = context.name;
                         self.data.languages = self.addLanguageNames(context.languages);
                         self.reRenderView();
-                    }
+                    },
+                    alertClass: "alert-warning alert-sm"
                 });
 
                 this.showUploadButton();
