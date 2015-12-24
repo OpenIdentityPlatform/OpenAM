@@ -191,13 +191,13 @@
         opacity: 0.7;
         transition: opacity 200ms linear;
 
-        &.fa-check {
-            display: none;
-        }
-
         &:hover, &:focus {
             opacity: 1;
         }
+    }
+
+    &.edit-state .fa {
+        display: none;
     }
 }
 
@@ -237,12 +237,14 @@ body.editing {
                 display: none;
             }
 
-            .fa-pencil, .fa-times {
-                display: none;
-            }
+            .item-button-panel {
+                .fa {
+                    display: none;
+                }
 
-            .fa-check {
-                display: block;
+                &.edit-state .fa {
+                    display: inline-block;
+                }
             }
         }
     }

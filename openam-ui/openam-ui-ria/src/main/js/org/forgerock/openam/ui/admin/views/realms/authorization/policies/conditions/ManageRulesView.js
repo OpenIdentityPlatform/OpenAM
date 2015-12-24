@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
@@ -335,12 +335,23 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
 
             var self = this,
-                item = $(e.currentTarget).closest("li");
+                item = $(e.currentTarget).closest("li"),
+                disabledConditions;
 
             item.animate({
                 height: 0, paddingTop: 0, paddingBottom: 0,
                 marginTop: 0, marginBottom: 0, opacity: 0
             }, function () {
+                // if deleted on edit step
+                if ($("body").hasClass("editing")) {
+                    $("body").removeClass("editing");
+                    item.next().remove();
+
+                    disabledConditions = self.$el.find(".rule, .operator").not(".editing");
+                    disabledConditions.removeClass("editing-disabled");
+                    disabledConditions.find("> select").prop("disabled", false);
+                }
+
                 item.remove();
                 self.save();
             });
