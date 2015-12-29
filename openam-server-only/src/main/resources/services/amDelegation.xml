@@ -365,26 +365,6 @@
                             <Value>READ</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="ReferralsResourceRead" id="Permission">
-                        <AttributeValuePair>
-                            <Attribute name="resource" />
-                            <Value>REALM/rest/1.0/referrals/read</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="actions" />
-                            <Value>READ</Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
-                    <SubConfiguration name="ReferralsResourceModify" id="Permission">
-                        <AttributeValuePair>
-                            <Attribute name="resource" />
-                            <Value>REALM/rest/1.0/referrals/modify</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="actions" />
-                            <Value>MODIFY</Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
                     <SubConfiguration name="ApplicationResourceRead" id="Permission">
                         <AttributeValuePair>
                             <Attribute name="resource" />
@@ -587,8 +567,6 @@
                             <Value>DatastoresReadOnly</Value>
                             <Value>PolicyResourceRead</Value>
                             <Value>PolicyResourceModify</Value>
-                            <Value>ReferralsResourceRead</Value>
-                            <Value>ReferralsResourceModify</Value>
                             <Value>ApplicationResourceRead</Value>
                             <Value>ApplicationResourceModify</Value>
                             <Value>ResourceTypeResourceRead</Value>
@@ -630,18 +608,6 @@
                             <Attribute name="listOfPermissions" />
                             <Value>EntitlementRESTPrivilegeWrite</Value>
                             <Value>PolicyResourceModify</Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
-                    <SubConfiguration name="ReferralsReadAccess" id="Privilege">
-                        <AttributeValuePair>
-                            <Attribute name="listOfPermissions" />
-                            <Value>ReferralsResourceRead</Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
-                    <SubConfiguration name="ReferralsModifyAccess" id="Privilege">
-                        <AttributeValuePair>
-                            <Attribute name="listOfPermissions" />
-                            <Value>ReferralsResourceModify</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="ApplicationReadAccess" id="Privilege">
