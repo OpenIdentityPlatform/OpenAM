@@ -169,11 +169,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-            <scope>test</scope>
-        </dependency>
 
     </dependencies>
 

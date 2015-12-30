@@ -230,11 +230,6 @@
             <artifactId>forgerock-test-utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-resource</artifactId>
             <type>test-jar</type>

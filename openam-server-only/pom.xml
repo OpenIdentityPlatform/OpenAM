@@ -927,23 +927,5 @@
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
         </dependency>
-        <!-- XML -->
-        <!-- Xerces-J Required for fedlet -->
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-resolver</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-serializer</artifactId>
-        </dependency>
     </dependencies>
 </project>

@@ -72,10 +72,6 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-resource</artifactId>
         </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
