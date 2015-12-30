@@ -17,7 +17,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
 ], function ($, _, AbstractView, RedirectToLegacyConsole) {
@@ -35,13 +35,15 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView"
         },
 
         cardClick: function (e) {
-            e.preventDefault();
             var dataset = $(e.currentTarget).data();
-            if (dataset.taskGroup) {
-                this.data.taskGroup = _.find(this.data.allTasks, { _id: dataset.taskGroup });
-                this.parentRender();
-            } else {
-                RedirectToLegacyConsole.commonTasks(this.realmPath, dataset.taskLink);
+            if (!dataset.taskLink || dataset.taskLink.indexOf("http") !== 0) {
+                e.preventDefault();
+                if (dataset.taskGroup) {
+                    this.data.taskGroup = _.find(this.data.allTasks, { _id: dataset.taskGroup });
+                    this.parentRender();
+                } else {
+                    RedirectToLegacyConsole.commonTasks(this.realmPath, dataset.taskLink);
+                }
             }
         },
 
