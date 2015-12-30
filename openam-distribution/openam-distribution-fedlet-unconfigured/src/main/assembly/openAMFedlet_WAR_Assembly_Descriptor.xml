@@ -46,11 +46,6 @@
                 <include>external:webservices-extra</include>
                 <include>external:webservices-extra-api</include>
                 <include>external:webservices-rt</include>
-                <include>xalan:xalan</include>
-                <include>xerces-J:xercesImpl</include>
-                <include>xerces-J:xml-apis</include>
-                <include>xerces-J:xml-resolver</include>
-                <include>xerces-J:xml-serializer</include>
                 <include>org.apache.santuario:xmlsec</include>
                 <include>commons-logging:commons-logging-api</include>
                 <include>org.slf4j:slf4j-api</include>

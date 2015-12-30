@@ -75,11 +75,6 @@
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <!-- Test dependencies -->
         <dependency>

@@ -192,31 +192,6 @@
         </dependency>
 
         <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-resolver</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-serializer</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.santuario</groupId>
        	    <artifactId>xmlsec</artifactId>
         </dependency>

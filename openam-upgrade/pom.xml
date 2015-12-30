@@ -81,11 +81,6 @@
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
         </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

@@ -24,7 +24,7 @@
  *
  * $Id: SAML2MetaSecurityUtils.java,v 1.6 2009/06/08 23:43:18 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.meta;
@@ -48,7 +48,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.apache.xpath.XPathAPI;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.storage.implementations.KeyStoreResolver;
 import org.apache.xml.security.keys.storage.StorageResolver;
@@ -59,6 +58,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.shared.xml.XPathAPI;
 import com.sun.identity.shared.encode.Base64;
 
 import com.sun.identity.saml.common.SAMLUtils;

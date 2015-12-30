@@ -352,21 +352,6 @@
         </dependency>
 
         <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-serializer</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
         </dependency>
@@ -388,12 +373,6 @@
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-guice-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
