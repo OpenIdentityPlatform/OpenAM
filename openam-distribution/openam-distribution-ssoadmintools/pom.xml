@@ -220,11 +220,6 @@
         </dependency>
 
         <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-        </dependency>
-
-        <dependency>
         	<groupId>commons-logging</groupId>
         	<artifactId>commons-logging-api</artifactId>
         </dependency>

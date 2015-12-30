@@ -1298,8 +1298,6 @@
 ./WEB-INF/lib/webservices-extra.jar
 ./WEB-INF/lib/webservices-rt.jar
 ./WEB-INF/lib/webservices-tools.jar
-./WEB-INF/lib/xalan.jar
-./WEB-INF/lib/xercesImpl.jar
 ./WEB-INF/lib/xmlsec.jar
 ./WEB-INF/lib/xsdlib.jar
 ./WEB-INF/template/keystore/keystore.jks

@@ -24,14 +24,15 @@
  *
  * $Id: FMSigProvider.java,v 1.5 2009/05/09 15:43:59 mallas Exp $
  *
- *  Portions Copyrighted 2011-2014 ForgeRock AS
+ *  Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.xmlsig;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import javax.xml.transform.TransformerException;
+
+import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -47,10 +48,10 @@ import org.apache.xml.security.keys.keyresolver.KeyResolverException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.utils.ElementProxy;
-import org.apache.xpath.XPathAPI;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.shared.xml.XPathAPI;
 
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
@@ -273,10 +274,10 @@ public final class FMSigProvider implements SigProvider {
 	    createDSctx(doc,"ds",Constants.SignatureSpecNS);
 	Element sigElement = null;
 	try {
-	    sigElement = (Element) org.apache.xpath.XPathAPI.selectSingleNode(
+	    sigElement = (Element) XPathAPI.selectSingleNode(
                 doc,
                 "//ds:Signature[1]", nscontext);
-	} catch (TransformerException te) {
+	} catch (XPathException te) {
 	    throw new SAML2Exception(te);
 	}
         Element refElement;
@@ -284,7 +285,7 @@ public final class FMSigProvider implements SigProvider {
 	    refElement = (Element) XPathAPI.selectSingleNode(
 	    doc,
 	    "//ds:Reference[1]", nscontext);
-	} catch (TransformerException te) {
+	} catch (XPathException te) {
 	    throw new SAML2Exception(te);
 	}
         String refUri = refElement.getAttribute("URI");

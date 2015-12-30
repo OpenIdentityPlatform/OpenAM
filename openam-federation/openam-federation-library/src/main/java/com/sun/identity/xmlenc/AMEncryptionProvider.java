@@ -24,15 +24,11 @@
  *
  * $Id: AMEncryptionProvider.java,v 1.7 2009/08/29 07:30:38 mallas Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.xmlenc;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.Key;
@@ -56,16 +52,18 @@ import org.apache.xml.security.keys.keyresolver.implementations.X509CertificateR
 import org.apache.xml.security.keys.keyresolver.implementations.X509IssuerSerialResolver;
 import org.apache.xml.security.keys.keyresolver.implementations.X509SKIResolver;
 import org.apache.xml.security.keys.keyresolver.implementations.X509SubjectNameResolver;
-import org.apache.xml.serialize.DOMSerializer;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
-import org.apache.xml.serialize.Method;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Document;
+
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.shared.xml.XMLUtils;
 
 
 /**
- * <code>AMEncryptionProvier</code> is a class for encrypting and
+ * <code>AMEncryptionProvider</code> is a class for encrypting and
  * decrypting XML Documents which implements <code>EncryptionProvider</code>.
  */
 
@@ -540,18 +538,7 @@ public class AMEncryptionProvider implements EncryptionProvider {
     
     // converts the element to a string.
     private String toString(Element doc) {
-        OutputFormat of = new OutputFormat();
-        of.setIndenting(true);
-        of.setMethod(Method.XML);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DOMSerializer serializer = new XMLSerializer(baos, of);
-        try {
-            serializer.serialize(doc);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        return (baos.toString());
-        
+        return XMLUtils.print(doc);
     }
     
     /**

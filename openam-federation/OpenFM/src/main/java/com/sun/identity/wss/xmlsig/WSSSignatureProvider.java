@@ -24,22 +24,24 @@
  *
  * $Id: WSSSignatureProvider.java,v 1.13 2009/11/16 21:53:00 mallas Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.wss.xmlsig;
 
-import org.apache.xml.security.utils.ElementProxy;
+import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import javax.xml.xpath.XPathException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import java.security.Key;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.keys.KeyInfo;
@@ -47,7 +49,7 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.utils.Constants;
-import org.apache.xpath.XPathAPI;
+import org.apache.xml.security.utils.ElementProxy;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.saml.common.SAMLConstants;
@@ -57,12 +59,12 @@ import com.sun.identity.saml.xmlsig.XMLSignatureException;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.shared.xml.XPathAPI;
 import com.sun.identity.wss.security.WSSConstants;
 import com.sun.identity.wss.security.WSSUtils;
 import com.sun.identity.wss.security.STRTransform;
 import com.sun.identity.wss.security.BinarySecurityToken;
 import com.iplanet.security.x509.CertUtils;
-import javax.xml.transform.TransformerException;
 
 /**
  * <code>WSSSignatureProvider</code> is a class for signing and 
@@ -629,7 +631,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
                 Element refElement;
                 try {
                     refElement = (Element) XPathAPI.selectSingleNode(sigElement, "//ds:Reference[1]", nscontext);
-                } catch (TransformerException te) {
+                } catch (XPathException te) {
                     throw new XMLSignatureException(te);
                 }
                 String refUri = refElement.getAttribute("URI");

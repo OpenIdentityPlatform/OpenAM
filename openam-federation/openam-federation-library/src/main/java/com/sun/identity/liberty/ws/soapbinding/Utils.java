@@ -24,7 +24,7 @@
  *
  * $Id: Utils.java,v 1.9 2008/11/10 22:56:59 veiming Exp $
  *
- * Portions Copyright 2013-2014 ForgeRock AS
+ * Portions Copyright 2013-2015 ForgeRock AS.
  */
 
 package com.sun.identity.liberty.ws.soapbinding; 
@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -55,7 +56,10 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.MimeHeaders;
-import java.util.ResourceBundle;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import com.sun.identity.common.PeriodicCleanUpMap;
 import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.common.TaskRunnable;
@@ -65,10 +69,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.xml.XMLUtils;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.apache.xml.utils.PrefixResolverDefault;
 
 /**
  * This class contains utility methods.
@@ -478,10 +478,21 @@ public class Utils {
             prefix = str.substring(0, index);
             localPart = str.substring(index + 1);
         }
-        PrefixResolverDefault prd =
-                new PrefixResolverDefault(element.getOwnerDocument());
-        String ns = prd.getNamespaceForPrefix(prefix, element);
+        String ns = getNamespaceForPrefix(prefix, element);
         return new QName(ns, localPart);
+    }
+
+
+    /**
+     *  Gets the XML namespace URI that is mapped to the specified prefix, in
+     *  the context of the DOM element e
+     *
+     * @param  prefix  The namespace prefix to map
+     * @param  e       The DOM element in which to calculate the prefix binding
+     * @return         The XML namespace URI mapped to prefix in the context of e
+     */
+    public static String getNamespaceForPrefix(String prefix, Element e) {
+        return e.lookupNamespaceURI(prefix);
     }
 
     /**

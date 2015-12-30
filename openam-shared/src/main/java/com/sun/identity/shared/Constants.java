@@ -1301,6 +1301,11 @@ public interface Constants {
             "org.forgerock.openam.utils.xml.transformerfactory.cache.size";
 
     /**
+     * Size of XML shared XPathFactory cache.
+     */
+    final String XPATHFACTORY_CACHE_SIZE = "org.forgerock.openam.utils.xml.xpathfactory.cache.size";
+
+    /**
      * Property to enable/disable resource lookup caching.
      */
     public static final String RESOURCE_LOOKUP_CACHE_ENABLED =

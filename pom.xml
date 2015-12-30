@@ -125,7 +125,6 @@
         <forgerock.json.version>2.4.3-SNAPSHOT</forgerock.json.version>
         <forgerock-ui.version>1.1.10-2-SNAPSHOT</forgerock-ui.version>
         <restlet.version>2.1.7</restlet.version>
-        <xercesj.version>2.11.0</xercesj.version>
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.4.2</jackson.version>
         <guice.version>3.0</guice.version>
@@ -170,7 +169,6 @@
         <saaj-impl.version>1.3.19</saaj-impl.version>
         <servlet-api.version>2.5</servlet-api.version>
         <jsp-api.version>2.1</jsp-api.version>
-        <xalan.version>2.7.1</xalan.version>
         <xsdlib.version>20060615</xsdlib.version>
         <authapi.version>2005-08-12</authapi.version>
         <FastInfoset.version>2006-26-09</FastInfoset.version>
@@ -1394,18 +1392,6 @@
             </dependency>
 
             <dependency>
-                <groupId>xalan</groupId>
-                <artifactId>xalan</artifactId>
-                <version>${xalan.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
                 <groupId>com.sun.msv.datatype.xsd</groupId>
                 <artifactId>xsdlib</artifactId>
                 <version>${xsdlib.version}</version>
@@ -1692,28 +1678,6 @@
                 <artifactId>freemarker</artifactId>
                 <version>${freemarker.version}</version>
             </dependency>
-            <!-- Xerces-J Required for fedlet and XACML -->
-            <dependency>
-                <groupId>xerces-J</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>${xercesj.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xerces-J</groupId>
-                <artifactId>xml-apis</artifactId>
-                <version>${xercesj.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xerces-J</groupId>
-                <artifactId>xml-resolver</artifactId>
-                <version>${xercesj.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xerces-J</groupId>
-                <artifactId>xml-serializer</artifactId>
-                <version>${xercesj.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>com.googlecode.java-ipv6</groupId>
                 <artifactId>java-ipv6</artifactId>
@@ -2201,6 +2165,11 @@
                     <groupId>org.apache.portals.jetspeed-2</groupId>
                     <artifactId>jetspeed-unpack-maven-plugin</artifactId>
                     <version>2.2.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.8</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

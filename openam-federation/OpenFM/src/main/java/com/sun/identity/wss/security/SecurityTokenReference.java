@@ -24,22 +24,25 @@
  *
  * $Id: SecurityTokenReference.java,v 1.4 2008/06/25 05:50:09 qcheng Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.wss.security;
 
 import java.util.ResourceBundle;
-import javax.xml.transform.TransformerException;
+
+import javax.xml.xpath.XPathException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import com.sun.identity.shared.debug.Debug;
+
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xpath.XPathAPI;
 
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XPathAPI;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.common.SAMLConstants;
 
@@ -246,7 +249,7 @@ public class SecurityTokenReference {
                      doc,  "//*[@" + "wsu:Id" + "=\"" + uri + "\"]");
             }
             return tokenElement;
-        } catch (TransformerException te) {
+        } catch (XPathException te) {
             debug.error("SecurityTokenReference.getTokenElement: XPath "  +
             "exception.", te);
             throw new SecurityException(te.getMessage());
