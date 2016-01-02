@@ -74,10 +74,10 @@ public class OAuthProxy  {
         try {
             String code = req.getParameter(PARAM_CODE);
             if (code != null && !OAuthUtil.isEmpty(code)) {
-                if (!ESAPI.validator().isValidInput(PARAM_CODE, code, "HTTPParameterValue", 512, true)) {
+                if (!ESAPI.validator().isValidInput(PARAM_CODE, code, "HTTPParameterValue", 2000, true)) {
                     OAuthUtil.debugError("OAuthProxy.toPostForm: Parameter " + PARAM_CODE
                             + " is not valid!! : " + code);
-                    out.println(getError("Request not valid"));
+                    out.println(getError("Invalid authorization code"));
                     return;
                 }
             }
