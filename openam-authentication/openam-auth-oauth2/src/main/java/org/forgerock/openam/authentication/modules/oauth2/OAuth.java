@@ -283,7 +283,7 @@ public class OAuth extends AMLoginModule {
                         return ISAuthConstants.LOGIN_START;
                     }
 
-                    validateInput("code", code, "HTTPParameterValue", 512, false);
+                    validateInput("code", code, "HTTPParameterValue", 2000, false);
 
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
