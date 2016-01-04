@@ -12,7 +12,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
@@ -204,8 +204,20 @@
                         <AttributeSchema name="name" type="single" syntax="string" i18nKey="no-i18n"/>
                         <AttributeSchema name="description" type="single" syntax="string" i18nKey="no-i18n"/>
                         <AttributeSchema name="script" type="single" syntax="script" i18nKey="no-i18n"/>
-                        <AttributeSchema name="language" type="single" syntax="string" i18nKey="no-i18n"/>
-                        <AttributeSchema name="context" type="single" syntax="string" i18nKey="no-i18n"/>
+                        <AttributeSchema name="language" type="single" syntax="string" i18nKey="no-i18n">
+                            <ChoiceValues>
+                                <ChoiceValue i18nKey="language-01">JAVASCRIPT</ChoiceValue>
+                                <ChoiceValue i18nKey="language-02">GROOVY</ChoiceValue>
+                            </ChoiceValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="context" type="single" syntax="string" i18nKey="no-i18n">
+                            <ChoiceValues>
+                                <ChoiceValue i18nKey="script-type-01">POLICY_CONDITION</ChoiceValue>
+                                <ChoiceValue i18nKey="script-type-02">AUTHENTICATION_SERVER_SIDE</ChoiceValue>
+                                <ChoiceValue i18nKey="script-type-03">AUTHENTICATION_CLIENT_SIDE</ChoiceValue>
+                                <ChoiceValue i18nKey="script-type-04">OIDC_CLAIMS</ChoiceValue>
+                            </ChoiceValues>
+                        </AttributeSchema>
                         <AttributeSchema name="createdBy" type="single" syntax="string" i18nKey="no-i18n"/>
                         <AttributeSchema name="creationDate" type="single" syntax="string" i18nKey="no-i18n"/>
                         <AttributeSchema name="lastModifiedBy" type="single" syntax="string" i18nKey="no-i18n"/>
