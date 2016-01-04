@@ -21,12 +21,12 @@ define("org/forgerock/openam/ui/user/UserModel", [
     "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/openam/ui/common/util/object/flattenValues"
-], function ($, _, AbstractModel, arrayify, Configuration, Constants, EventManager, RealmHelper, Router,
+], function ($, _, AbstractModel, arrayify, Configuration, Constants, Messages, RealmHelper, Router,
              ServiceInvoker, flattenValues) {
     var baseUrl = Constants.host + "/" + Constants.context + "/json/__subrealm__/users",
         UserModel = AbstractModel.extend({
@@ -40,7 +40,13 @@ define("org/forgerock/openam/ui/user/UserModel", [
                         this.unset("password");
                         return this;
                     }, this),
-                    currentPassword;
+                    currentPassword,
+                    errorCallback = function (response) {
+                        Messages.addMessage({
+                            type: Messages.TYPE_DANGER,
+                            response: response
+                        });
+                    };
 
                 if (method === "update" || method === "patch") {
                     if (_.has(this.changed, "password")) {
@@ -49,6 +55,8 @@ define("org/forgerock/openam/ui/user/UserModel", [
                             url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id + "?_action=changePassword"),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             type: "POST",
+                            suppressEvents: true,
+                            error: errorCallback,
                             data: JSON.stringify({
                                 username: this.get("id"),
                                 currentpassword: this.currentPassword,
@@ -60,10 +68,11 @@ define("org/forgerock/openam/ui/user/UserModel", [
                         // if unchanged attributes are included along with the request
                         currentPassword = this.currentPassword;
                         delete this.currentPassword;
+                        options.error = errorCallback;
                         return ServiceInvoker.restCall(_.extend(
                             {
-                                "type": "PUT",
-                                "data": JSON.stringify(
+                                type: "PUT",
+                                data: JSON.stringify(
                                     _.chain(this.toJSON())
                                         .pick(["givenName", "sn", "mail", "postalAddress", "telephoneNumber"])
                                         .mapValues(function (val) {
@@ -74,8 +83,9 @@ define("org/forgerock/openam/ui/user/UserModel", [
                                         })
                                         .value()
                                 ),
-                                "url": RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
-                                "headers": {
+                                suppressEvents: true,
+                                url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                                headers: {
                                     "If-Match": this.getMVCCRev(),
                                     "Accept-API-Version": "protocol=1.0,resource=2.0",
                                     "currentpassword": currentPassword
