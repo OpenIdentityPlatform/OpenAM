@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditModuleView", [
@@ -22,14 +22,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
 
     // jquery dependencies
     "bootstrap-tabdrop"
 ], function ($, AbstractView, Configuration, EventManager, Router, Constants,
-             SMSRealmDelegate, SMSGlobalDelegate, Form, FormHelper) {
+             SMSRealmDelegate, Form, FormHelper) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
@@ -45,7 +44,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             this.data.name = args[2];
 
             $.when(
-                SMSGlobalDelegate.authentication.modules.schema(this.data.type),
+                SMSRealmDelegate.authentication.modules.schema(this.data.realmPath, this.data.type),
                 SMSRealmDelegate.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type),
                 SMSRealmDelegate.authentication.modules.types.get(this.data.realmPath, this.data.type)
             ).done(function (schemaData, valuesData, moduleType) {

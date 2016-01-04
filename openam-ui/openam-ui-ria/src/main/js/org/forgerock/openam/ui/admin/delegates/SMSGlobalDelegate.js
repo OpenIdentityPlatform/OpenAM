@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
@@ -150,25 +150,6 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                 data: JSON.stringify(data),
                 suppressEvents: true
             });
-        }
-    };
-
-    obj.authentication = {
-        modules: {
-            /**
-             * Gets the schema for a authentication module type.
-             * @param {string} type Authentication module type
-             * @returns {Promise} Service promise
-             */
-            schema: function (type) {
-                return obj.serviceCall({
-                    url: "authentication/modules/" + type + "?_action=schema",
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                    type: "POST"
-                }).then(function (data) {
-                    return SMSDelegateUtils.sanitizeSchema(data);
-                });
-            }
         }
     };
 
