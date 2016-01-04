@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
+
 package org.forgerock.openam.audit.configuration;
 
 import com.sun.identity.sm.DefaultValues;
@@ -46,6 +47,7 @@ public final class EventFilterDefaultValues extends DefaultValues {
         "/access/http/request/queryParameters/Login.Token1",
         "/access/http/request/queryParameters/redirect_uri",
         "/access/http/request/queryParameters/requester",
+        "/access/http/request/queryParameters/sessionUpgradeSSOTokenId",
         "/config/after",
         "/config/before"
     };
