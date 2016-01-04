@@ -22,8 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: InvalidAttributeValueException.java,v 1.6 2008/06/25 05:44:04 qcheng Exp $
- *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -103,19 +102,18 @@ public class InvalidAttributeValueException extends SMSException {
      * @return localized error message.
      */
     public String getL10NMessage(java.util.Locale locale) {
-        String message = errCode;
+        String message;
 
-        if ((resourceBundleName == null) || (locale == null)
-                || (attributeI18nKey == null) || (rbName == null)) {
+        if ((resourceBundleName == null) || (locale == null) || (attributeI18nKey == null) || (rbName == null)) {
             message = super.getL10NMessage(locale);
         } else {
-            ResourceBundle bundle = amCache.getResBundle(resourceBundleName,
-                    locale);
+            ResourceBundle bundle = amCache.getResBundle(resourceBundleName, locale);
             String mid = Locale.getString(bundle, errCode, debug);
-            ResourceBundle serviceResouceBundle = amCache.getResBundle(rbName,
-                    locale);
-            String localizedAttributeName = Locale.getString(
-                    serviceResouceBundle, attributeI18nKey, debug);
+            ResourceBundle serviceResouceBundle = amCache.getResBundle(rbName, locale);
+            String localizedAttributeName = Locale.getString(serviceResouceBundle, attributeI18nKey, debug);
+            if (localizedAttributeName.equals(attributeI18nKey)) {
+                return super.getL10NMessage(locale);
+            }
             String[] argsEx = { localizedAttributeName };
             message = MessageFormat.format(mid, (Object[])argsEx);
         }
