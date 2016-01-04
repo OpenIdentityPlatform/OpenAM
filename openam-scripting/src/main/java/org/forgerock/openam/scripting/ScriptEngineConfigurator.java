@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting;
@@ -81,7 +81,7 @@ public class ScriptEngineConfigurator implements ServiceListener {
                 if (listenerId == null) {
                     throw new SMSException("Unable to register service config listener");
                 }
-                logger.info("Registered service config listener: %s", listenerId);
+                logger.info("Registered service config listener: {}", listenerId);
 
                 updateConfig(POLICY_CONDITION);
                 updateConfig(AUTHENTICATION_SERVER_SIDE);

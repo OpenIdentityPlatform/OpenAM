@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting;
@@ -161,15 +161,16 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
                     delegateConfigurator.getMaximumPoolSize() != newConfiguration.getThreadPoolMaxSize() ||
                     delegateConfigurator.getKeepAliveTime(TimeUnit.SECONDS) != newConfiguration.getThreadPoolIdleTimeoutSeconds())
                 {
-
-                    LOGGER.debug("Reconfiguring script evaluation thread pool. " +
-                                    "Core pool size: old=%d, new=%d. " +
-                                    "Max pool size: old=%d, new=%d. " +
-                                    "Idle timeout (seconds): old=%d, new=%d.",
-                            delegateConfigurator.getCorePoolSize(), newConfiguration.getThreadPoolCoreSize(),
-                            delegateConfigurator.getMaximumPoolSize(), newConfiguration.getThreadPoolMaxSize(),
-                            delegateConfigurator.getKeepAliveTime(TimeUnit.SECONDS),
-                            newConfiguration.getThreadPoolIdleTimeoutSeconds());
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Reconfiguring script evaluation thread pool. " +
+                                        "Core pool size: old={}, new={}. " +
+                                        "Max pool size: old={}, new={}. " +
+                                        "Idle timeout (seconds): old={}, new={}.",
+                                delegateConfigurator.getCorePoolSize(), newConfiguration.getThreadPoolCoreSize(),
+                                delegateConfigurator.getMaximumPoolSize(), newConfiguration.getThreadPoolMaxSize(),
+                                delegateConfigurator.getKeepAliveTime(TimeUnit.SECONDS),
+                                newConfiguration.getThreadPoolIdleTimeoutSeconds());
+                    }
 
                     delegateConfigurator.setCorePoolSize(newConfiguration.getThreadPoolCoreSize());
                     delegateConfigurator.setMaximumPoolSize(newConfiguration.getThreadPoolMaxSize());

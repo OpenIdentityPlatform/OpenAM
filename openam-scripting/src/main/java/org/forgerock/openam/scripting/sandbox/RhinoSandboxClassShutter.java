@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting.sandbox;
@@ -63,13 +63,13 @@ public final class RhinoSandboxClassShutter implements ClassShutter {
      */
     @Override
     public boolean visibleToScripts(final String fullClassName) {
-        LOGGER.debug("Checking access to class '%s'", fullClassName);
+        LOGGER.debug("Checking access to class '{}'", fullClassName);
 
         if (securityManager != null) {
             try {
                 securityManager.checkPackageAccess(fullClassName);
             } catch (SecurityException ex) {
-                LOGGER.error("Access denied by SecurityManager for class '%s'", fullClassName);
+                LOGGER.error("Access denied by SecurityManager for class '{}'", fullClassName);
                 return false;
             }
         }
@@ -83,18 +83,18 @@ public final class RhinoSandboxClassShutter implements ClassShutter {
         }
 
         if (!allowed) {
-            LOGGER.warn("Classname failed to match whitelist: '%s'", fullClassName);
+            LOGGER.warn("Classname failed to match whitelist: '{}'", fullClassName);
             return false;
         }
 
         for (final Pattern pattern : blackList) {
             if (pattern.matcher(fullClassName).matches()) {
-                LOGGER.error("Access to class '%s' denied by blacklist pattern: %s", fullClassName, pattern.pattern());
+                LOGGER.error("Access to class '{}' denied by blacklist pattern: {}", fullClassName, pattern.pattern());
                 return false;
             }
         }
 
-        LOGGER.debug("Access allowed for class '%s'", fullClassName);
+        LOGGER.debug("Access allowed for class '{}'", fullClassName);
         return true;
     }
 }

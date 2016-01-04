@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.slf4j;
@@ -19,9 +19,8 @@ package org.forgerock.openam.slf4j;
 import com.sun.identity.shared.debug.Debug;
 import org.slf4j.helpers.MarkerIgnoringBase;
 
-/*
-Delegate logging invocations to the AM Debug instance. Where more expensive MessageFormat formatting of to-be-logged
-Strings would take place, insure that the corresponding level of logging is enabled before incurring this overhead.
+/**
+ * Delegate logging invocations to the AM Debug instance.
  */
 public class AMDebugLogger extends MarkerIgnoringBase {
     private final Debug debug;
@@ -39,21 +38,15 @@ public class AMDebugLogger extends MarkerIgnoringBase {
     }
 
     public void trace(String s, Object o) {
-        if (isTraceEnabled()) {
-            debug.message(format(s, o));
-        }
+        debug.message(s, o);
     }
 
     public void trace(String s, Object o, Object o2) {
-        if (isTraceEnabled()) {
-            debug.message(format(s, o, o2));
-        }
+        debug.message(s, o, o2);
     }
 
     public void trace(String s, Object... objects) {
-        if (isTraceEnabled()) {
-            debug.message(format(s, objects));
-        }
+        debug.message(s, objects);
     }
 
     public void trace(String s, Throwable throwable) {
@@ -69,21 +62,15 @@ public class AMDebugLogger extends MarkerIgnoringBase {
     }
 
     public void debug(String s, Object o) {
-        if (isDebugEnabled()) {
-            debug.message(format(s, o));
-        }
+        debug.message(s, o);
     }
 
     public void debug(String s, Object o, Object o2) {
-        if (isDebugEnabled() ) {
-            debug.message(format(s, o, o2));
-        }
+        debug.message(s, o, o2);
     }
 
     public void debug(String s, Object... objects) {
-        if (isDebugEnabled()) {
-            debug.message(format(s, objects));
-        }
+        debug.message(s, objects);
     }
 
     public void debug(String s, Throwable throwable) {
@@ -99,21 +86,15 @@ public class AMDebugLogger extends MarkerIgnoringBase {
     }
 
     public void info(String s, Object o) {
-        if (isInfoEnabled()) {
-            debug.message(format(s, o));
-        }
+        debug.message(s, o);
     }
 
     public void info(String s, Object o, Object o2) {
-        if (isInfoEnabled()) {
-            debug.message(format(s, o, o2));
-        }
+        debug.message(s, o, o2);
     }
 
     public void info(String s, Object... objects) {
-        if (isInfoEnabled()) {
-            debug.message(format(s, objects));
-        }
+        debug.message(s, objects);
     }
 
     public void info(String s, Throwable throwable) {
@@ -129,21 +110,15 @@ public class AMDebugLogger extends MarkerIgnoringBase {
     }
 
     public void warn(String s, Object o) {
-        if (isWarnEnabled()) {
-            debug.warning(format(s, o));
-        }
+        debug.warning(s, o);
     }
 
     public void warn(String s, Object... objects) {
-        if (isWarnEnabled()) {
-            debug.warning(format(s, objects));
-        }
+        debug.warning(s, objects);
     }
 
     public void warn(String s, Object o, Object o2) {
-        if (isWarnEnabled()) {
-            debug.warning(format(s, o, o2));
-        }
+        debug.warning(s, o, o2);
     }
 
     public void warn(String s, Throwable throwable) {
@@ -159,34 +134,18 @@ public class AMDebugLogger extends MarkerIgnoringBase {
     }
 
     public void error(String s, Object o) {
-        if (isErrorEnabled()) {
-            debug.error(format(s, o));
-        }
+        debug.error(s, o);
     }
 
     public void error(String s, Object o, Object o2) {
-        if (isErrorEnabled()) {
-            debug.error(format(s, o, o2));
-        }
+        debug.error(s, o, o2);
     }
 
     public void error(String s, Object... objects) {
-        if (isErrorEnabled()) {
-            debug.error(format(s, objects));
-        }
+        debug.error(s, objects);
     }
 
     public void error(String s, Throwable throwable) {
         debug.error(s, throwable);
-    }
-
-    private String format(String pattern, Object... objects) {
-        try {
-            return String.format(pattern, objects);
-        } catch (IllegalArgumentException e) {
-            debug.warning("The MessageFormat pattern passed to log method incorrect, or the parameters are of an unexpected type. " +
-                    "Pattern of message which can't be logged: " + pattern + ";\t and the object params: " + objects);
-        }
-        return "";
     }
 }

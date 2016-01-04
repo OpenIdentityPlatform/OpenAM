@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.token.validator.wss;
@@ -89,9 +89,9 @@ public class OpenAMWSSUsernameTokenValidator extends org.apache.ws.security.vali
     protected void printConfig(RequestData data) {
         WSSConfig config =  data.getWssConfig();
         if (config != null) {
-            logger.debug("Passwords are encoded: %b", config.getPasswordsAreEncoded());
-            logger.debug("Handle custom password types: %b", config.getHandleCustomPasswordTypes());
-            logger.debug("Required Password Type: %s", config.getRequiredPasswordType());
+            logger.debug("Passwords are encoded: {}", config.getPasswordsAreEncoded());
+            logger.debug("Handle custom password types: {}", config.getHandleCustomPasswordTypes());
+            logger.debug("Required Password Type: {}", config.getRequiredPasswordType());
         }
     }
 }
