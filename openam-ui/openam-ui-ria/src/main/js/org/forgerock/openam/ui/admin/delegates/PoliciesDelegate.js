@@ -57,7 +57,8 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
 
     obj.getAllUserAttributes = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/subjectattributes?_queryFilter=true"),
+            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() +
+                "/subjectattributes?_queryFilter=true"),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
