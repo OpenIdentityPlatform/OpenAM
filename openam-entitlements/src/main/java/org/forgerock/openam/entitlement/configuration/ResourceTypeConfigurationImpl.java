@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.configuration;
 
@@ -260,43 +260,46 @@ public class ResourceTypeConfigurationImpl implements ResourceTypeConfiguration 
         final Set<ResourceType> resourceTypes = new HashSet<ResourceType>();
 
         try {
-            @SuppressWarnings("unchecked") // Interaction with legacy service.
-            final Iterator<SMSDataEntry> iterator = (Iterator<SMSDataEntry>)SMSEntry
-                    .search(token, dn, filter.toString(), 0, 0, false, false, Collections.emptySet());
-
-            while (iterator.hasNext()) {
-                final SMSDataEntry entry = iterator.next();
-                final String name = entry.getAttributeValue(CONFIG_NAME);
-                // Extract the resource types UUID from the LDAP DN representation.
-                final String uuid = LDAPUtils.getName(DN.valueOf(entry.getDN()));
+            if (SMSEntry.checkIfEntryExists(dn, token)) {
 
                 @SuppressWarnings("unchecked") // Interaction with legacy service.
-                final Set<String> actionSet = entry.getAttributeValues(CONFIG_ACTIONS);
-                final Map<String, Boolean> actions = getActions(actionSet);
+                final Iterator<SMSDataEntry> iterator = (Iterator<SMSDataEntry>) SMSEntry
+                        .search(token, dn, filter.toString(), 0, 0, false, false, Collections.emptySet());
 
-                @SuppressWarnings("unchecked") // Interaction with legacy service.
-                final Set<String> resources = entry.getAttributeValues(CONFIG_PATTERNS);
+                while (iterator.hasNext()) {
+                    final SMSDataEntry entry = iterator.next();
+                    final String name = entry.getAttributeValue(CONFIG_NAME);
+                    // Extract the resource types UUID from the LDAP DN representation.
+                    final String uuid = LDAPUtils.getName(DN.valueOf(entry.getDN()));
 
-                final String description = entry.getAttributeValue(CONFIG_DESCRIPTION);
-                final String createdBy = entry.getAttributeValue(CONFIG_CREATED_BY);
-                final String creationDate = entry.getAttributeValue(CONFIG_CREATION_DATE);
-                final String modifiedBy = entry.getAttributeValue(CONFIG_LAST_MODIFIED_BY);
-                final String modifiedDate = entry.getAttributeValue(CONFIG_LAST_MODIFIED_DATE);
+                    @SuppressWarnings("unchecked") // Interaction with legacy service.
+                    final Set<String> actionSet = entry.getAttributeValues(CONFIG_ACTIONS);
+                    final Map<String, Boolean> actions = getActions(actionSet);
 
-                final ResourceType resourceType = ResourceType
-                        .builder()
-                        .setUUID(uuid)
-                        .setName(name)
-                        .setActions(actions)
-                        .setPatterns(resources)
-                        .setDescription(description)
-                        .setCreatedBy(createdBy)
-                        .setCreationDate(Long.parseLong(creationDate))
-                        .setLastModifiedBy(modifiedBy)
-                        .setLastModifiedDate(Long.parseLong(modifiedDate))
-                        .build();
+                    @SuppressWarnings("unchecked") // Interaction with legacy service.
+                    final Set<String> resources = entry.getAttributeValues(CONFIG_PATTERNS);
 
-                resourceTypes.add(resourceType);
+                    final String description = entry.getAttributeValue(CONFIG_DESCRIPTION);
+                    final String createdBy = entry.getAttributeValue(CONFIG_CREATED_BY);
+                    final String creationDate = entry.getAttributeValue(CONFIG_CREATION_DATE);
+                    final String modifiedBy = entry.getAttributeValue(CONFIG_LAST_MODIFIED_BY);
+                    final String modifiedDate = entry.getAttributeValue(CONFIG_LAST_MODIFIED_DATE);
+
+                    final ResourceType resourceType = ResourceType
+                            .builder()
+                            .setUUID(uuid)
+                            .setName(name)
+                            .setActions(actions)
+                            .setPatterns(resources)
+                            .setDescription(description)
+                            .setCreatedBy(createdBy)
+                            .setCreationDate(Long.parseLong(creationDate))
+                            .setLastModifiedBy(modifiedBy)
+                            .setLastModifiedDate(Long.parseLong(modifiedDate))
+                            .build();
+
+                    resourceTypes.add(resourceType);
+                }
             }
         } catch (SMSException smsE) {
             throw new EntitlementException(RESOURCE_TYPE_RETRIEVAL_ERROR, realm, smsE);
