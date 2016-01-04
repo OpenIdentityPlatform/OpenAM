@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -22,12 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ModifySubConfiguration.java,v 1.4 2008/06/25 05:42:18 qcheng Exp $
- *
- */
-
-/*
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 package com.sun.identity.cli.schema;
@@ -85,8 +80,9 @@ public class ModifySubConfiguration extends SchemaCommand {
                 ExitCodes.INCORRECT_OPTION, rc.getSubCommand().getName());
         }
 
-        Map attributeValues = AttributeValues.parse(
-            getCommandManager(), datafile, attrValues);
+        Map<String, Set<String>> attributeValues = AttributeValues.parse(getCommandManager(), datafile, attrValues);
+
+        attributeValues = processFileAttributes(attributeValues);
 
         if ((realmName == null) || (realmName.length() == 0)) {
             modifySubConfigRoot(serviceName, subConfigName, attributeValues,

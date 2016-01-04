@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -22,8 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RealmAddServiceAttributes.java,v 1.3 2009/10/09 23:14:26 veiming Exp $
- *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.realm;
@@ -85,8 +84,8 @@ public class RealmAddServiceAttributes extends AuthenticatedCommand {
                 ExitCodes.INCORRECT_OPTION, rc.getSubCommand().getName());
         }
 
-        Map attributeValues = AttributeValues.parse(
-            getCommandManager(), datafile, attrValues);
+        Map<String, Set<String>> attributeValues = AttributeValues.parse(getCommandManager(), datafile, attrValues);
+        attributeValues = processFileAttributes(attributeValues);
         try {
             String[] params = {realm, serviceName};
 

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -22,12 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AttributeValues.java,v 1.10 2009/10/09 23:14:26 veiming Exp $
- *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.cli;
 
@@ -62,12 +57,12 @@ public class AttributeValues {
      * @return service attribute values.
      * @throws CLIException if the file contains data of incorrect format.
      */
-    public static Map parse(
+    public static Map<String, Set<String>> parse(
         CommandManager mgr,
         String fileName,
         List listAttributeValues
     ) throws CLIException {
-        Map results = null;
+        Map<String, Set<String>> results = null;
         if (fileName != null) {
             results = parse(mgr, fileName);
         }
@@ -80,7 +75,7 @@ public class AttributeValues {
             }
         }
 
-        return (results == null) ? new HashMap() : results;
+        return (results == null) ? new HashMap<String, Set<String>>() : results;
     }
 
     /**
@@ -92,10 +87,9 @@ public class AttributeValues {
      * @return service attribute values.
      * @throws CLIException if the file contains data of incorrect format.
      */
-    public static Map parse(CommandManager mgr, List listAttributeValues) 
+    public static Map<String, Set<String>> parse(CommandManager mgr, List listAttributeValues)
         throws CLIException {
-        Map attrValues = 
-            new HashMap();
+        Map<String, Set<String>> attrValues = new HashMap<>();
 
         if ((listAttributeValues != null) && !listAttributeValues.isEmpty()) {
             for (Iterator i = listAttributeValues.iterator(); i.hasNext(); ) {
@@ -119,9 +113,9 @@ public class AttributeValues {
                     attrValue = attrValue.trim();
                     attrName = stripEscapeChars(attrName);
                     
-                    Set set = (Set)attrValues.get(attrName);
+                    Set<String> set = attrValues.get(attrName);
                     if (set == null) {
-                        set = new HashSet();
+                        set = new HashSet<>();
                         attrValues.put(attrName, set);
                     }
                     set.add(attrValue);
@@ -139,10 +133,10 @@ public class AttributeValues {
      * @return service attribute values.
      * @throws CLIException if the file contains data of incorrect format.
      */
-    public static Map parse(CommandManager mgr, String fileName)
+    public static Map<String, Set<String>> parse(CommandManager mgr, String fileName)
         throws CLIException {
         BufferedReader in = null;
-        Map attrValues = new HashMap();
+        Map<String, Set<String>> attrValues = new HashMap<>();
 
         try {
             in = new BufferedReader(new FileReader(fileName));
@@ -165,9 +159,9 @@ public class AttributeValues {
                     String value = line.substring(idx+1).trim();
                     
                     key = stripEscapeChars(key);
-                    Set values = (Set)attrValues.get(key);
+                    Set<String> values = attrValues.get(key);
                     if (values == null) {
-                        values = new HashSet();
+                        values = new HashSet<>();
                         attrValues.put(key, values);
                     }
                     values.add(hexToString(value));

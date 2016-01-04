@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -22,9 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AccessManager.java,v 1.115 2010/01/15 18:10:54 veiming Exp $
- *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.cli.definition;
@@ -299,7 +297,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.realm.RealmAssignService",
-          description="Add service to a realm.",
+          description="Add service to a realm. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Name of realm.",
@@ -406,7 +404,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.realm.RealmModifyService",
-          description="Set service attribute values in a realm.",
+          description="Set service attribute values in a realm. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Name of realm.",
@@ -440,7 +438,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.realm.RealmAddServiceAttributes",
-          description="Add service attribute values in a realm.",
+          description="Add service attribute values in a realm. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Name of realm.",
@@ -457,7 +455,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.realm.RealmSetServiceAttributeValues",
-          description="Set attribute values of a service that is assigned to a realm.",
+          description="Set attribute values of a service that is assigned to a realm. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Name of realm.",
@@ -941,11 +939,11 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.schema.AddSubConfiguration",
-          description="Create a new sub configuration.",
+          description="Create a new sub configuration. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.",
           webSupport="true",
           mandatoryOptions={
                   "servicename|s|s|Name of service.",
-                  "subconfigname|g|s|Name of sub configuration."},
+                  "subconfigname|g|s|Name of (or path to) sub configuration."},
           optionAliases={},
           macro="authentication",
           optionalOptions={
@@ -995,7 +993,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.schema.ModifySubConfiguration",
-          description="Set sub configuration.",
+          description="Set sub configuration. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.",
           webSupport="true",
           mandatoryOptions={
                   "servicename|s|s|Name of service.",

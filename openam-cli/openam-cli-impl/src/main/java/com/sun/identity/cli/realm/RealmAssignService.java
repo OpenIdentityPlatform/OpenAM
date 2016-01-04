@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -22,12 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RealmAssignService.java,v 1.3 2008/06/25 05:42:16 qcheng Exp $
- *
- */
-
-/*
- * Portions copyright 2010-2015 ForgeRock AS.
+ * Portions copyright 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.realm;
@@ -73,11 +68,13 @@ public class RealmAssignService extends AuthenticatedCommand {
         String datafile = getStringOptionValue(IArgument.DATA_FILE);
         List attrValues = rc.getOption(IArgument.ATTRIBUTE_VALUES);
 
-        Map attributeValues = null;
+        Map<String, Set<String>> attributeValues = null;
 
         if ((datafile != null) || (attrValues != null)) {
             attributeValues = AttributeValues.parse(
                 getCommandManager(), datafile, attrValues);
+
+            attributeValues = processFileAttributes(attributeValues);
         }
 
         IOutput outputWriter = getOutputWriter();

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -22,8 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AddSubConfiguration.java,v 1.7 2008/06/25 05:42:17 qcheng Exp $
- *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.schema;
@@ -45,6 +44,7 @@ import com.sun.identity.sm.ServiceConfig;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
@@ -92,8 +92,9 @@ public class AddSubConfiguration extends SchemaCommand {
             }
         }
 
-        Map attributeValues = AttributeValues.parse(
-            getCommandManager(), datafile, attrValues);
+        Map<String, Set<String>> attributeValues = AttributeValues.parse(getCommandManager(), datafile, attrValues);
+
+        attributeValues = processFileAttributes(attributeValues);
 
         if ((realmName == null) || (realmName.length() == 0)) {
             addSubConfigToRoot(serviceName, subConfigName, subConfigId,
@@ -221,10 +222,10 @@ public class AddSubConfiguration extends SchemaCommand {
                 sc = sc.getSubConfig(scn);
             } else {
                 if (subConfigId == null) {
-                    subConfigId = subConfigName;
+                    subConfigId = scn;
                 }
 
-                sc.addSubConfig(scn, subConfigId, priority, attrValues);
+                sc.addSubConfig(subConfigId, scn, priority, attrValues);
              }
         }
     }

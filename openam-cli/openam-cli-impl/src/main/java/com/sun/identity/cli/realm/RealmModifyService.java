@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -22,12 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RealmModifyService.java,v 1.3 2008/06/25 05:42:16 qcheng Exp $
- *
- */
-
-/*
- * Portions copyright 2015 ForgeRock AS.
+ * Portions copyright 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.cli.realm;
 
@@ -81,8 +76,11 @@ public class RealmModifyService extends AuthenticatedCommand {
                 ExitCodes.INCORRECT_OPTION, rc.getSubCommand().getName());
         }
 
-        Map attributeValues = AttributeValues.parse(
+        Map<String, Set<String>> attributeValues = AttributeValues.parse(
             getCommandManager(), datafile, attrValues);
+
+        attributeValues = processFileAttributes(attributeValues);
+
         try {
             String[] params = {realm, serviceName};
 

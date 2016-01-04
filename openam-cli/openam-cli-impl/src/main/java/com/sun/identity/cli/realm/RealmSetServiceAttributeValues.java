@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RealmSetServiceAttributeValues.java,v 1.1 2008/08/27 22:08:38 veiming Exp $
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.realm;
@@ -82,9 +82,8 @@ public class RealmSetServiceAttributeValues extends AuthenticatedCommand {
                 ExitCodes.INCORRECT_OPTION, rc.getSubCommand().getName());
         }
 
-        Map attributeValues = AttributeValues.parse(
-            getCommandManager(), datafile, attrValues);
-        
+        Map<String, Set<String>> attributeValues = AttributeValues.parse(getCommandManager(), datafile, attrValues);
+        attributeValues = processFileAttributes(attributeValues);
         try {
             AMIdentityRepository repo = new AMIdentityRepository(
                 adminSSOToken, realm);
