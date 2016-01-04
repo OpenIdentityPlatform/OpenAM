@@ -48,6 +48,7 @@ public final class EventFilterDefaultValues extends DefaultValues {
         "/access/http/request/queryParameters/redirect_uri",
         "/access/http/request/queryParameters/requester",
         "/access/http/request/queryParameters/sessionUpgradeSSOTokenId",
+        "/access/http/request/queryParameters/tokenId",
         "/config/after",
         "/config/before"
     };
