@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -34,8 +34,8 @@ public class ZipUtilsTest {
     @Test
     public void tryZippingAFolderWithSpace() throws IOException, URISyntaxException {
 
-        String testFolder =  File.separator + "zipUtils" + File.separator + "Fake Folder";
-        testFolder = ZipUtilsTest.class.getResource(testFolder).toURI().getPath();
+        String testFolder =  "/zipUtils/Fake Folder";
+        testFolder = new File(ZipUtilsTest.class.getResource(testFolder).toURI().getPath()).getAbsolutePath();
         Path zipTempFolder = Files.createTempDirectory("tmp");
 
         String outputZip = zipTempFolder + File.separator + "Fake Folder.zip";
