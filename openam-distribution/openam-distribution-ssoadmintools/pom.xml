@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2016 ForgeRock AS.
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -41,7 +41,11 @@
     <packaging>pom</packaging>
     <properties>
         <setupArtifactIDs>opendj-server,forgerock-util,json,xalan,xercesImpl,xml-apis,xmlsec,openam-core,
-            openam-entitlements,openam-shared,openam-dtd-schema,openam-license-manager-cli,openam-license-core,openam-audit-context,forgerock-guice-core,guice,guice-assistedinject,commons-lang,commons-collections,org.apache.servicemix.bundles.javax-inject,slf4j-api,slf4j-nop,opendj-core,opendj-grizzly,i18n-core,openam-ldap-utils,grizzly-framework,forgerock-audit-core,openam-audit-configuration,i18n-slf4j,opendj-server-legacy,opendj-config,opendj-cli</setupArtifactIDs>
+            openam-entitlements,openam-shared,openam-dtd-schema,openam-license-manager-cli,openam-license-core,
+            openam-audit-context,forgerock-guice-core,guice,guice-assistedinject,commons-lang,commons-collections,
+            org.apache.servicemix.bundles.javax-inject,slf4j-api,slf4j-nop,opendj-core,opendj-grizzly,i18n-core,
+            openam-ldap-utils,grizzly-framework,forgerock-audit-core,openam-audit-configuration,i18n-slf4j
+            ,opendj-server-legacy,opendj-config,opendj-cli,chf-http-core</setupArtifactIDs>
     </properties>
 
 
@@ -260,6 +264,11 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-license-manager-cli</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.http</groupId>
+            <artifactId>chf-http-core</artifactId>
         </dependency>
 
         <dependency>
