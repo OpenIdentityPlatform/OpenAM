@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -275,8 +275,24 @@ public class CoreGuiceModule extends AbstractModule {
 
         bind(SessionCache.class).toInstance(SessionCache.getInstance());
         bind(SessionPollerPool.class).toInstance(SessionPollerPool.getInstance());
-        bind(SessionCookies.class).toInstance(SessionCookies.getInstance());
-        bind(SessionURL.class).toInstance(SessionURL.getInstance());
+        /*
+         * Must use a provider to ensure initialisation happens after SystemProperties have been set.
+         */
+        bind(SessionCookies.class).toProvider(new Provider<SessionCookies>() {
+            @Override
+            public SessionCookies get() {
+                return SessionCookies.getInstance();
+            }
+        });
+        /*
+         * Must use a provider to ensure initialisation happens after SystemProperties have been set.
+         */
+        bind(SessionURL.class).toProvider(new Provider<SessionURL>() {
+            @Override
+            public SessionURL get() {
+                return SessionURL.getInstance();
+            }
+        });
         bind(SessionServiceURLService.class).toInstance(SessionServiceURLService.getInstance());
 
         bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
