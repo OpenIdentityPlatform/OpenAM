@@ -11,16 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
-import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -43,23 +42,19 @@ import org.restlet.ext.servlet.ServletUtils;
  */
 public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
 
-    @GuardedBy("itself")
-    private final Map<RealmInfo, OAuth2Uris> providerSettingsMap = new HashMap<>();
-    private final OAuth2UrisFactory oAuth2UriFactory;
+    private final Map<RealmInfo, OAuth2Uris> providerSettingsMap = new ConcurrentHashMap<>();
     private final OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
     private final BaseURLProviderFactory baseURLProviderFactory;
 
     /**
      * Constructs a new UmaUrlsFactory.
      *
-     * @param oAuth2UriFactory An instance of the OAuth2UrisFactory.
      * @param oAuth2ProviderSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param baseURLProviderFactory An instance of the BaseURLProviderFactory.
      */
     @Inject
-    OpenAMOAuth2UrisFactory(OAuth2UrisFactory oAuth2UriFactory, OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
+    OpenAMOAuth2UrisFactory(OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
             BaseURLProviderFactory baseURLProviderFactory) {
-        this.oAuth2UriFactory = oAuth2UriFactory;
         this.oAuth2ProviderSettingsFactory = oAuth2ProviderSettingsFactory;
         this.baseURLProviderFactory = baseURLProviderFactory;
     }
@@ -98,14 +93,12 @@ public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
     }
 
     private OAuth2Uris get(RealmInfo realmInfo, String baseUrlPattern) throws NotFoundException {
-        synchronized (providerSettingsMap) {
-            OAuth2Uris providerSettings = providerSettingsMap.get(realmInfo);
-            if (providerSettings == null) {
-                OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realmInfo.getAbsoluteRealm());
-                providerSettings = getOAuth2Uris(realmInfo, baseUrlPattern, oAuth2ProviderSettings);
-            }
-            return providerSettings;
+        OAuth2Uris providerSettings = providerSettingsMap.get(realmInfo);
+        if (providerSettings == null) {
+            OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realmInfo.getAbsoluteRealm());
+            providerSettings = getOAuth2Uris(realmInfo, baseUrlPattern, oAuth2ProviderSettings);
         }
+        return providerSettings;
     }
 
     private OAuth2Uris getOAuth2Uris(RealmInfo realmInfo, String baseUrlPattern,
