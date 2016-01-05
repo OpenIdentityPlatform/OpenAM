@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
+
 package com.sun.identity.console.audit;
 
 import static com.sun.identity.console.audit.AuditConsoleConstants.*;
@@ -115,7 +116,7 @@ public abstract class AbstractEventHandlerEditViewBean extends AMPrimaryMastHead
         try {
             AbstractAuditModel model = (AbstractAuditModel) getModel();
             String subConfigName = (String) getPageSessionAttribute(AUDIT_HANDLER_NAME);
-            String realm = (String) getPageSessionAttribute(CURRENT_REALM);
+            String realm = isGlobalService() ? "/" : (String) getPageSessionAttribute(CURRENT_REALM);
             propertySheetModel = new AMPropertySheetModel(
                     model.getEditEventHandlerPropertyXML(realm, subConfigName, getClass().getName()));
             propertySheetModel.clear();
@@ -123,6 +124,11 @@ public abstract class AbstractEventHandlerEditViewBean extends AMPrimaryMastHead
             setInlineAlertMessage(TYPE_ERROR, ERROR_MESSAGE, e.getMessage());
         }
     }
+
+    /**
+     * @return {@code true} if service is displaying global config.
+     */
+    abstract boolean isGlobalService();
 
     @Override
     public void beginDisplay(DisplayEvent event) throws ModelControlException {

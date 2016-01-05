@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
+
 package com.sun.identity.console.audit;
 
 import static com.sun.identity.console.audit.AuditConsoleConstants.*;
@@ -129,9 +130,14 @@ public abstract class AbstractAuditViewBean extends AMServiceProfileViewBeanBase
 
     @Override
     protected String getPropertySheetXML(AMServiceProfileModel model) throws AMConsoleException {
-        String realm = (String) getPageSessionAttribute(CURRENT_REALM);
+        String realm = isGlobalService() ? "/" : (String) getPageSessionAttribute(CURRENT_REALM);
         return model.getPropertySheetXML(realm, getName(), getClass().getName());
     }
+
+    /**
+     * @return {@code true} if service is displaying global config.
+     */
+    abstract boolean isGlobalService();
 
     private void populateTableModel(List<SMSubConfig> subConfigs) {
         CCActionTable tbl = (CCActionTable) getChild(TBL_SUB_CONFIG);
