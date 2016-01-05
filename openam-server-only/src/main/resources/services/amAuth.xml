@@ -26,7 +26,7 @@
 
     $Id: amAuth.xml,v 1.16 2009/11/25 12:06:32 manish_rustagi Exp $
 
-    Portions Copyrighted 2011-2015 ForgeRock AS.
+    Portions Copyrighted 2011-2016 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -129,14 +129,6 @@
                                  syntax="boolean"
                                  i18nKey="a154"
                                  resourceName="xuiInterfaceEnabled">
-                    <DefaultValues>
-                        <Value>true</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="openam-xui-reverseproxy-support"
-                                 type="single"
-                                 syntax="boolean"
-                                 i18nKey="a157">
                     <DefaultValues>
                         <Value>true</Value>
                     </DefaultValues>

@@ -24,7 +24,7 @@
  *
  * $Id: Constants.java,v 1.47 2009/08/12 23:10:44 ericow Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.shared;
 
@@ -1377,11 +1377,6 @@ public interface Constants {
      * The heartbeat timeout after which a connection will be marked as failed
      */
     public static final String LDAP_HEARTBEAT_TIMEOUT = "org.forgerock.openam.ldap.heartbeat.timeout";
-
-    /**
-     * Property that defines whether XUI's Reverse Proxy support should be enabled or not.
-     */
-    public static final String XUI_REVERSE_PROXY_SUPPORT = "org.forgerock.openam.xui.reverseproxy.support";
 
     /**
      * Sets the maximum file upload size - if not set the default will be 750k.

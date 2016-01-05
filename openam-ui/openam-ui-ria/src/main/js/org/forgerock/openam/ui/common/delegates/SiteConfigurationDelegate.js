@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
@@ -58,16 +58,8 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
         }
 
         ServerDelegate.getConfiguration({ suppressEvents: true }).then(function (response) {
-            var hostname = location.hostname,
-                fqdn = response.FQDN;
-
-            if (fqdn !== null && hostname !== fqdn) {
-                // Redirect browser back to the server using the FQDN to ensure cookies are set correctly
-                location.href = URIUtils.getCurrentUrl().replace(hostname, fqdn);
-            } else {
-                setRequireMapConfig(response);
-                successCallback(response);
-            }
+            setRequireMapConfig(response);
+            successCallback(response);
         }, errorCallback);
     };
 

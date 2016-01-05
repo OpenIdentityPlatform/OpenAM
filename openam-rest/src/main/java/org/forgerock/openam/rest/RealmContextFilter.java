@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
@@ -218,6 +218,10 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
 
     private Context evaluate(Context context, String hostname, List<String> requestUri,
             List<String> overrideRealmParameter) throws ResourceException {
+
+        if (!coreWrapper.isValidFQDN(hostname)) {
+            throw new BadRequestException("FQDN \"" + hostname + "\" is not valid.");
+        }
 
         SSOToken adminToken = coreWrapper.getAdminToken();
 

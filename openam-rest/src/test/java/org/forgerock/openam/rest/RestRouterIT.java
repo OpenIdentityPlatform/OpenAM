@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
@@ -34,6 +34,7 @@ import static org.forgerock.openam.rest.Routers.ssoToken;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -82,14 +83,12 @@ import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.forgerock.openam.http.HttpGuiceModule;
 import org.forgerock.openam.http.annotations.Get;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.RequestAuditContext;
@@ -166,6 +165,7 @@ public class RestRouterIT extends GuiceTestCase {
         coreWrapper = mock(CoreWrapper.class);
         SSOToken adminToken = mock(SSOToken.class);
         given(coreWrapper.getAdminToken()).willReturn(adminToken);
+        given(coreWrapper.isValidFQDN(anyString())).willReturn(true);
         realmValidator = mock(RestRealmValidator.class);
     }
 

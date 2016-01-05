@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core;
@@ -26,6 +26,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.AMAuthUtils;
+import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
@@ -153,6 +154,15 @@ public class CoreWrapper {
      */
     public SSOToken getAdminToken() {
         return AccessController.doPrivileged(AdminTokenAction.getInstance());
+    }
+
+    /**
+     * Validates that the hostname is a valid FQDN that is known to OpenAM.
+     * @param hostname The FQDN to test.
+     * @return {@code true} if the FQDN is valid.
+     */
+    public boolean isValidFQDN(String hostname) {
+        return FQDNUtils.getInstance().isHostnameValid(hostname);
     }
 
     /**

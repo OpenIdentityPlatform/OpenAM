@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
@@ -39,7 +39,6 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.FilterChain;
-import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResponse;
@@ -152,7 +151,7 @@ public class RealmContextFilterTest {
         Response response = filter.filter(context, request, handler).getOrThrowUninterruptibly();
 
         //Then
-        assertThat(response.getStatus()).isSameAs(Status.INTERNAL_SERVER_ERROR);
+        assertThat(response.getStatus()).isSameAs(Status.BAD_REQUEST);
     }
 
     @Test
@@ -411,9 +410,9 @@ public class RealmContextFilterTest {
         Response response = filter.filter(context, request, handler).getOrThrowUninterruptibly();
 
         //Then
-        assertThat(response.getStatus()).isSameAs(Status.INTERNAL_SERVER_ERROR);
+        assertThat(response.getStatus()).isSameAs(Status.BAD_REQUEST);
         assertThat(response.getEntity().getJson()).isEqualTo(
-                new InternalServerErrorException("EXCEPTION_MESSAGE").toJsonValue().getObject());
+                new BadRequestException("FQDN \"HOSTNAME\" is not valid.").toJsonValue().getObject());
     }
 
     @Test(dataProvider = "CRUDPAQ")
@@ -511,10 +510,12 @@ public class RealmContextFilterTest {
 
     private void mockDnsAlias(String alias, String realm) throws Exception {
         mockRealmAlias(alias, realm);
+        given(coreWrapper.isValidFQDN(anyString())).willReturn(true);
     }
 
     private void mockInvalidDnsAlias(String alias) throws Exception {
         mockInvalidRealmAlias(alias);
+        given(coreWrapper.isValidFQDN(anyString())).willReturn(false);
     }
 
     private void mockRealmAlias(String alias, String realm) throws Exception {

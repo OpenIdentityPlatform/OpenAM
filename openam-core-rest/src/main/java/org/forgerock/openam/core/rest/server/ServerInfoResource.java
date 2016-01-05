@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest.server;
 
@@ -162,14 +162,6 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
             result.put("realm", realm);
             result.put("xuiUserSessionValidationEnabled", SystemProperties.getAsBoolean(Constants.XUI_USER_SESSION_VALIDATION_ENABLED, true));
-
-            String hostName = URI.create(httpContext.getPath()).getHost();
-
-            String fqdn = FQDNUtils.getInstance().getFullyQualifiedHostName(hostName);
-            if (fqdn == null && !SystemProperties.getAsBoolean(Constants.XUI_REVERSE_PROXY_SUPPORT)) {
-                fqdn = hostName;
-            }
-            result.put("FQDN", fqdn);
 
             if (debug.messageEnabled()) {
                 debug.message("ServerInfoResource.getAllServerInfo ::" +
