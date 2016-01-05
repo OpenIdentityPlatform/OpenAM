@@ -90,14 +90,13 @@
                                  i18nKey="a505"
                                  resourceName="authComparison">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="none">none</ChoiceValue>
                         <ChoiceValue i18nKey="better">better</ChoiceValue>
                         <ChoiceValue i18nKey="exact">exact</ChoiceValue>
                         <ChoiceValue i18nKey="maximum">maximum</ChoiceValue>
                         <ChoiceValue i18nKey="minimum">minimum</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>none</Value>
+                        <Value>exact</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-saml2-authn-context-class-ref"
@@ -144,12 +143,11 @@
                                  i18nKey="a510"
                                  resourceName="forceAuthn">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="none">none</ChoiceValue>
                         <ChoiceValue i18nKey="true">true</ChoiceValue>
                         <ChoiceValue i18nKey="false">false</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>none</Value>
+                        <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-saml2-is-passive"
@@ -158,12 +156,11 @@
                                  i18nKey="a511"
                                  resourceName="isPassive">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="none">none</ChoiceValue>
                         <ChoiceValue i18nKey="true">true</ChoiceValue>
                         <ChoiceValue i18nKey="false">false</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>none</Value>
+                        <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-saml2-name-id-format"
@@ -253,14 +250,13 @@
                                      i18nKey="a505"
                                      resourceName="authComparison">
                         <ChoiceValues>
-                            <ChoiceValue i18nKey="none">none</ChoiceValue>
                             <ChoiceValue i18nKey="better">better</ChoiceValue>
                             <ChoiceValue i18nKey="exact">exact</ChoiceValue>
                             <ChoiceValue i18nKey="maximum">maximum</ChoiceValue>
                             <ChoiceValue i18nKey="minimum">minimum</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>none</Value>
+                            <Value>exact</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-saml2-authn-context-class-ref"
@@ -307,12 +303,11 @@
                                      i18nKey="a510"
                                      resourceName="forceAuthn">
                         <ChoiceValues>
-                            <ChoiceValue i18nKey="none">none</ChoiceValue>
                             <ChoiceValue i18nKey="true">true</ChoiceValue>
                             <ChoiceValue i18nKey="false">false</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>none</Value>
+                            <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-saml2-is-passive"
@@ -321,12 +316,11 @@
                                      i18nKey="a511"
                                      resourceName="isPassive">
                         <ChoiceValues>
-                            <ChoiceValue i18nKey="none">none</ChoiceValue>
                             <ChoiceValue i18nKey="true">true</ChoiceValue>
                             <ChoiceValue i18nKey="false">false</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>none</Value>
+                            <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-saml2-name-id-format"
