@@ -26,30 +26,7 @@
  */
 package com.iplanet.am.util;
 
-import static org.forgerock.openam.utils.CollectionUtils.*;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.InetAddress;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import javax.annotation.Nullable;
-
-import org.forgerock.guava.common.base.Predicate;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.AttributeStruct;
@@ -60,6 +37,29 @@ import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.SMSEntry;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetAddress;
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.Nullable;
+
+import org.forgerock.guava.common.base.Predicate;
+import org.forgerock.guava.common.collect.ImmutableMap;
+import org.forgerock.guava.common.collect.Maps;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * This class provides functionality that allows single-point-of-access to all
@@ -82,44 +82,6 @@ import com.sun.identity.sm.SMSEntry;
  * @supported.all.api
  */
 public class SystemProperties {
-    private static String instanceName;
-    private static ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
-    private static Map<String, AttributeStruct> attributeMap = new HashMap<>();
-    private static boolean sitemonitorDisabled = false;
-    private final static String TRUE = "true";
-    /** Regular expression pattern for a sequence of 1 or more white space characters. */
-    private static final String WHITESPACE = "\\s+";
-    
-    static {
-        initAttributeMapping();
-    }
-    
-    private static void initAttributeMapping() {
-        try {
-            ResourceBundle rb = ResourceBundle.getBundle("serverAttributeMap");
-            for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
-                String propertyName = (String)e.nextElement();
-                attributeMap.put(propertyName, new AttributeStruct(rb.getString(propertyName)));
-            }
-        } catch(java.util.MissingResourceException mse) {
-            // No Resource Bundle Found, Continue.
-            // Could be in Test Mode.
-        }
-    }
-
-    private static Properties props;
-
-    private static long lastModified;
-
-    private static String initError;
-
-    private static String initSecondaryError;
-
-    private static final String SERVER_NAME_PROPERTY = "server.name";
-
-    private static final String CONFIG_NAME_PROPERTY = "amconfig";
-
-    private static final String AMCONFIG_FILE_NAME = "AMConfig";
 
     /**
      * Runtime flag to be set, in order to override the path of the
@@ -139,34 +101,55 @@ public class SystemProperties {
 
     public static final String NEWCONFDIR = "NEW_CONF_DIR";
 
-    private static Map mapTagswap = new HashMap();
-    private static Map tagswapValues;
+    private static final String SERVER_NAME_PROPERTY = "server.name";
+
+    private static final String CONFIG_NAME_PROPERTY = "amconfig";
+
+    private static final String AMCONFIG_FILE_NAME = "AMConfig";
+
+    /** Regular expression pattern for a sequence of 1 or more white space characters. */
+    private static final String WHITESPACE = "\\s+";
+
+    private static final Map<String, AttributeStruct> ATTRIBUTE_MAP = initAttributeMapping();
+
+    private static final int TAG_START = '%';
 
     /**
+     * Maps from tags to the system properties that they should be replaced with. System property values containing
+     * these tags will be replaced with the actual values of these properties by {@link #get(String)}.
+     */
+    private static final Map<String, String> TAG_SWAP_PROPERTIES = ImmutableMap.<String, String>builder()
+            .put("%SERVER_PORT%", Constants.AM_SERVER_PORT)
+            .put("%SERVER_URI%", Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR)
+            .put("%SERVER_HOST%", Constants.AM_SERVER_HOST)
+            .put("%SERVER_PROTO%", Constants.AM_SERVER_PROTOCOL)
+            .put("%BASE_DIR%", CONFIG_PATH)
+            .put("%SESSION_ROOT_SUFFIX%", CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX)
+            .put("%SESSION_STORE_TYPE%", CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE)
+            .build();
+
+    private static final boolean SITEMONITOR_DISABLED;
+
+    /**
+     * Reference to the current properties map and tagswap values.
+     */
+    private static final AtomicReference<PropertiesHolder> propertiesHolderRef =
+            new AtomicReference<>(new PropertiesHolder());
+
+    private static String initError = null;
+    private static String initSecondaryError = null;
+    private static String instanceName = null;
+
+    /*
      * Initialization to load the properties file for config information before
      * anything else starts.
      */
     static {
-        mapTagswap.put("%SERVER_PORT%",  Constants.AM_SERVER_PORT);
-        mapTagswap.put("%SERVER_URI%",   Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-        mapTagswap.put("%SERVER_HOST%",  Constants.AM_SERVER_HOST);
-        mapTagswap.put("%SERVER_PROTO%", Constants.AM_SERVER_PROTOCOL);
-        mapTagswap.put("%BASE_DIR%", CONFIG_PATH);
-        mapTagswap.put("%SESSION_ROOT_SUFFIX%",
-                CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX);
-        mapTagswap.put("%SESSION_STORE_TYPE%",
-                CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE);
-
         try {
-            // Initialize properties
-            props = new Properties();
-
             // Load properties from file
             String serverName = System.getProperty(SERVER_NAME_PROPERTY);
-            String configName = System.getProperty(CONFIG_NAME_PROPERTY,
-                    AMCONFIG_FILE_NAME);
+            String configName = System.getProperty(CONFIG_NAME_PROPERTY, AMCONFIG_FILE_NAME);
             String fname = null;
-            FileInputStream fis = null;
             if (serverName != null) {
                 serverName = serverName.replace('.', '_');
                 fname = configName + "-" + serverName;
@@ -174,49 +157,32 @@ public class SystemProperties {
                 fname = configName;
             }
             initializeProperties(fname);
+            PropertiesHolder props = propertiesHolderRef.get();
 
             // Get the location of the new configuration file in case
             // of single war deployment
             try {
-                String newConfigFileLoc = props
-                        .getProperty(Constants.AM_NEW_CONFIGFILE_PATH);
-                if ((newConfigFileLoc != null) &&
-                    (newConfigFileLoc.length() > 0) && 
-                    !newConfigFileLoc.equals(NEWCONFDIR)
-                ) {
-                    String hostName = InetAddress.getLocalHost().getHostName()
-                            .toLowerCase();
-                    String serverURI = props.getProperty(
-                            Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-                    serverURI = serverURI.replace('/', '_').toLowerCase();
-                    StringBuilder fileName = new StringBuilder();
-                    fileName.append(newConfigFileLoc).append("/").append(
-                            AMCONFIG_FILE_NAME).append(serverURI).append(
-                            hostName).append(
-                            props.getProperty(Constants.AM_SERVER_PORT))
-                            .append(".").append(PROPERTIES);
-                    Properties modProp = new Properties();
+                String newConfigFileLoc = props.getProperty(Constants.AM_NEW_CONFIGFILE_PATH);
+
+                if (!StringUtils.isEmpty(newConfigFileLoc) && !NEWCONFDIR.equals(newConfigFileLoc)) {
+                    String hostName = InetAddress.getLocalHost().getHostName().toLowerCase();
+                    String serverURI = props.getProperty(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR).replace('/', '_')
+                                            .toLowerCase();
+
+                    String fileName = newConfigFileLoc + "/" + AMCONFIG_FILE_NAME + serverURI + hostName +
+                            props.getProperty(Constants.AM_SERVER_PORT) + "." + PROPERTIES;
+
                     try {
-                        fis = new FileInputStream(fileName.toString());
-                        modProp.load(fis);
-                        props.putAll(modProp);
+                        props = loadProperties(props, fileName);
                     } catch (IOException ioe) {
-                        StringBuilder fileNameOrig = new StringBuilder();
-                        fileNameOrig.append(newConfigFileLoc).append("/")
-                                .append(AMCONFIG_FILE_NAME).append(".").append(
-                                        PROPERTIES);
                         try {
-                            fis = new FileInputStream(fileNameOrig.toString());
-                            modProp.load(fis);
-                            props.putAll(modProp);
-                        } catch (IOException ioexp) {
-                            saveException(ioexp);
-                        }
-                    } finally {
-                        if (fis != null) {
-                            fis.close();
+                            props = loadProperties(props, newConfigFileLoc + "/" + AMCONFIG_FILE_NAME + "." +
+                                    PROPERTIES);
+                        } catch (IOException ioe2) {
+                            saveException(ioe2);
                         }
                     }
+                    propertiesHolderRef.set(props);
                 }
             } catch (Exception ex) {
                 saveException(ex);
@@ -224,17 +190,19 @@ public class SystemProperties {
         } catch (MissingResourceException e) {
             // Can't print the message to debug due to dependency
             // Save it as a String and provide when requested.
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            e.printStackTrace(new PrintStream(baos));
-            initError = baos.toString();
-            try {
-                baos.close();
-            } catch (IOException ioe) {
-                // Should not happend, ignore the exception
-            }
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            initError = sw.toString();
         }
-        sitemonitorDisabled = Boolean.valueOf(getProp(
-               Constants.SITEMONITOR_DISABLED, "false")).booleanValue();
+        SITEMONITOR_DISABLED = Boolean.parseBoolean(getProp(Constants.SITEMONITOR_DISABLED, "false"));
+    }
+
+    private static PropertiesHolder loadProperties(PropertiesHolder props, String file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            Properties temp = new Properties();
+            temp.load(fis);
+            return props.putAll(temp);
+        }
     }
 
     /**
@@ -243,80 +211,64 @@ public class SystemProperties {
      */
     static void saveException(Exception ex) {
         // Save it as a String and provide when requested.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ex.printStackTrace(new PrintStream(baos));
-        initSecondaryError = baos.toString();
-        try {
-            baos.close();
-        } catch (IOException ioe) {
-            // Should not happend, ignore the exception
-        }
+        StringWriter sw = new StringWriter();
+        ex.printStackTrace(new PrintWriter(sw));
+        initSecondaryError = sw.toString();
     }
 
     /**
      * This method lets you query for a system property whose value is same as
      * <code>String</code> key. The method first tries to read the property
      * from java.lang.System followed by a lookup in the config file.
-     * 
+     *
      * @param key
      *            type <code>String</code>, the key whose value one is
      *            looking for.
      * @return the value if the key exists; otherwise returns <code>null</code>
      */
     public static String get(String key) {
-        rwLock.readLock().lock();
 
-        try {
-            String answer = null;
+        String answer = null;
 
-            // look up values in SMS services only if in server mode.
-            if (isServerMode() || sitemonitorDisabled) {
-                AttributeStruct ast = (AttributeStruct) attributeMap.get(key);
-                if (ast != null) {
-                    answer = PropertiesFinder.getProperty(key, ast);
-                }
+        // look up values in SMS services only if in server mode.
+        if (isServerMode() || SITEMONITOR_DISABLED) {
+            AttributeStruct ast = ATTRIBUTE_MAP.get(key);
+            if (ast != null) {
+                answer = PropertiesFinder.getProperty(key, ast);
             }
-
-            if (answer == null) {
-                answer = getProp(key);
-
-                if ((answer != null) && (tagswapValues != null)) {
-                    Set set = new HashSet();
-                    set.addAll(tagswapValues.keySet());
-
-                    for (Iterator i = set.iterator(); i.hasNext();) {
-                        String k = (String) i.next();
-                        String val = (String) tagswapValues.get(k);
-
-                        if (k.equals("%SERVER_URI%")) {
-                            if ((val != null) && (val.length() > 0)) {
-                                if (val.charAt(0) == '/') {
-                                    answer = answer.replaceAll("/%SERVER_URI%",
-                                        val);
-                                    String lessSlash = val.substring(1);
-                                    answer = answer.replaceAll("%SERVER_URI%",
-                                        lessSlash);
-                                } else {
-                                    answer = answer.replaceAll(k, val);
-                                }
-                            }
-                        } else {
-                            answer = answer.replaceAll(k, val);
-                        }
-                    }
-
-                    if (answer.indexOf("%ROOT_SUFFIX%") != -1) {
-                        answer = answer.replaceAll("%ROOT_SUFFIX%",
-                            SMSEntry.getAMSdkBaseDN());
-                    }
-                }
-            }
-
-
-            return (answer);
-        } finally {
-            rwLock.readLock().unlock();
         }
+
+        if (answer == null) {
+            answer = getProp(key);
+
+            final Map<String, String> tagswapValues = propertiesHolderRef.get().tagSwapValues;
+            if (answer != null && tagswapValues != null && answer.indexOf(TAG_START) != -1) {
+                for (Map.Entry<String, String> tagSwapEntry : tagswapValues.entrySet()) {
+                    String k = tagSwapEntry.getKey();
+                    String val = tagSwapEntry.getValue();
+
+                    if (k.equals("%SERVER_URI%")) {
+                        if (!StringUtils.isEmpty(val)) {
+                            if (val.charAt(0) == '/') {
+                                answer = answer.replaceAll("/%SERVER_URI%", val);
+                                String lessSlash = val.substring(1);
+                                answer = answer.replaceAll("%SERVER_URI%", lessSlash);
+                            } else {
+                                answer = answer.replaceAll(k, val);
+                            }
+                        }
+                    } else {
+                        answer = answer.replaceAll(k, val);
+                    }
+                }
+
+                if (answer.contains("%ROOT_SUFFIX%")) {
+                    answer = answer.replaceAll("%ROOT_SUFFIX%", SMSEntry.getAMSdkBaseDN());
+                }
+            }
+        }
+
+        return answer;
     }
 
     private static String getProp(String key, String def) {
@@ -327,22 +279,22 @@ public class SystemProperties {
     private static String getProp(String key) {
         String answer = System.getProperty(key);
         if (answer == null) {
-            answer = props.getProperty(key);
+            answer = propertiesHolderRef.get().getProperty(key);
         }
         return answer;
     }
-    
+
     /**
      * This method lets you query for a system property whose value is same as
      * <code>String</code> key.
-     * 
+     *
      * @param key the key whose value one is looking for.
      * @param def the default value if the key does not exist.
      * @return the value if the key exists; otherwise returns default value.
      */
     public static String get(String key, String def) {
         String value = get(key);
-        return ((value == null) ? def : value);
+        return value == null ? def : value;
     }
 
     /**
@@ -353,27 +305,24 @@ public class SystemProperties {
      */
     public static boolean getAsBoolean(String key) {
         String value = get(key);
-
-        if (value == null)
-            return false;
-
-        return (value.equalsIgnoreCase(TRUE) ? true : false);
+        return Boolean.parseBoolean(value);
     }
 
     /**
      * Returns the property value as a boolean
      *
-     * @param key
+     * @param key the property name.
      * @param defaultValue value if key is not found.
      * @return the boolean value if the key exists; otherwise the default value
      */
     public static boolean getAsBoolean(String key, boolean defaultValue) {
         String value = get(key);
 
-        if (value == null)
-            { return defaultValue; }
+        if (value == null) {
+            return defaultValue;
+        }
 
-        return (value.equalsIgnoreCase(TRUE) ? true : false);
+        return Boolean.parseBoolean(value);
     }
 
     /**
@@ -450,74 +399,43 @@ public class SystemProperties {
     }
 
     /**
-     * Returns all the properties defined and their values.
-     * 
-     * @return Properties object with all the key value pairs.
+     * Returns all the properties defined and their values. This is a defensive copy of the properties and so updates
+     * to the returned object will not be reflected in the actual properties used by OpenAM.
+     *
+     * @return Properties object with a copy of all the key value pairs.
      */
     public static Properties getProperties() {
-        rwLock.readLock().lock();
-        try {
-            Properties properties = new Properties();
-            properties.putAll(props);
-            return properties;
-        } finally {
-            rwLock.readLock().unlock();
-        }
+        Properties properties = new Properties();
+        properties.putAll(propertiesHolderRef.get().properties);
+        return properties;
     }
-    
+
     /**
      * This method lets you get all the properties defined and their values. The
      * method first tries to load the properties from java.lang.System followed
      * by a lookup in the config file.
-     * 
+     *
      * @return Properties object with all the key value pairs.
-     * 
+     *
      */
     public static Properties getAll() {
-        rwLock.readLock().lock();
-
-        try {
-            Properties properties = new Properties();
-            properties.putAll(props);
-            // Iterate over the System Properties & add them in result obj
-            Iterator it = System.getProperties().entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry entry = (Map.Entry) it.next();
-                String key = (String) entry.getKey();
-                String val = (String) entry.getValue();
-                if ((key != null) && (key.length() > 0)) {
-                    properties.setProperty(key, val);
-                }
-            }
-            return properties;
-        } finally {
-            rwLock.readLock().unlock();
-        }
+        Properties properties = new Properties();
+        properties.putAll(propertiesHolderRef.get().properties);
+        // Iterate over the System Properties & add them in result obj
+        properties.putAll(System.getProperties());
+        return properties;
     }
 
     /**
      * This method lets you query for all the platform properties defined and
      * their values. Returns a Properties object with all the key value pairs.
-     * 
+     *
      * @deprecated use <code>getAll()</code>
-     * 
+     *
      * @return the platform properties
      */
     public static Properties getPlatform() {
         return getAll();
-    }
-
-    private static void updateTagswapMap(Properties properties) {
-        tagswapValues = new HashMap();
-        for (Iterator i = mapTagswap.keySet().iterator(); i.hasNext(); ) {
-            String key = (String)i.next();
-            String rgKey = (String)mapTagswap.get(key);
-            String val = System.getProperty(rgKey);
-            if (val == null) {
-                val = (String)properties.get(rgKey);
-            }
-            tagswapValues.put(key, val);
-        }
     }
 
     /**
@@ -527,89 +445,67 @@ public class SystemProperties {
      * @param file type <code>String</code>, file name for the resource bundle
      * @exception MissingResourceException
      */
-    public static void initializeProperties(String file)
-        throws MissingResourceException {
-        rwLock.writeLock().lock();
-        try {
-            ResourceBundle bundle = ResourceBundle.getBundle(file);
-            // Copy the properties to props
-            Enumeration e = bundle.getKeys();
-            Properties newProps = new Properties();
-            newProps.putAll(props);
-            while (e.hasMoreElements()) {
-                String key = (String) e.nextElement();
-                newProps.put(key, bundle.getString(key));
-            }
-            // Reset the last modified time
-            props = newProps;
-            updateTagswapMap(props);
-            lastModified = System.currentTimeMillis();
-        } finally {
-            rwLock.writeLock().unlock();
+    public static void initializeProperties(String file) throws MissingResourceException {
+        Properties props = new Properties();
+        ResourceBundle bundle = ResourceBundle.getBundle(file);
+        // Copy the properties to props
+        for (String key : bundle.keySet()) {
+            props.put(key, bundle.getString(key));
         }
+        initializeProperties(props, false, false);
     }
 
-    public static void initializeProperties(Properties properties){
+    public static void initializeProperties(Properties properties) {
         initializeProperties(properties, false);
     }
-    
+
     /**
      * Initializes the properties to be used by OpenAM. Ideally this
      * must be called first before any other method is called within OpenAM.
      * This method provides a programmatic way to set the properties, and will
      * override similar properties if loaded for a properties file.
-     * 
+     *
      * @param properties properties for OpenAM
      * @param reset <code>true</code> to reset existing properties.
      */
-    public static void initializeProperties(
-        Properties properties,
-        boolean reset) 
-    {
+    public static void initializeProperties(Properties properties, boolean reset) {
         initializeProperties(properties, reset, false);
     }
-    
+
     /**
      * Initializes the properties to be used by OpenAM. Ideally this
      * must be called first before any other method is called within OpenAM.
      * This method provides a programmatic way to set the properties, and will
      * override similar properties if loaded for a properties file.
-     * 
+     *
      * @param properties properties for OpenAM.
      * @param reset <code>true</code> to reset existing properties.
      * @param withDefaults <code>true</code> to include default properties.
      */
-    public static void initializeProperties(
-        Properties properties,
-        boolean reset,
-        boolean withDefaults) {
+    public static void initializeProperties(Properties properties, boolean reset, boolean withDefaults) {
         Properties defaultProp = null;
         if (withDefaults) {
-            SSOToken appToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
+            SSOToken appToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             defaultProp = ServerConfiguration.getDefaults(appToken);
         }
 
-        rwLock.writeLock().lock();
-
-        try {
-            Properties newProps = new Properties();
+        PropertiesHolder oldProps;
+        PropertiesHolder newProps;
+        do {
+            oldProps = propertiesHolderRef.get();
+            final Properties combined = new Properties();
             if (defaultProp != null) {
-                newProps.putAll(defaultProp);
+                combined.putAll(defaultProp);
             }
-
 
             if (!reset) {
-                newProps.putAll(props);
+                combined.putAll(oldProps.properties);
             }
 
-            newProps.putAll(properties);
-            props = newProps;
-            updateTagswapMap(props);
-            lastModified = System.currentTimeMillis();
-        } finally {
-            rwLock.writeLock().unlock();
-        }
+            combined.putAll(properties);
+
+            newProps = new PropertiesHolder(Maps.fromProperties(combined));
+        } while (!propertiesHolderRef.compareAndSet(oldProps, newProps));
     }
 
     /**
@@ -617,26 +513,14 @@ public class SystemProperties {
      * must be called first before any other method is called within OpenAM.
      * This method provides a programmatic way to set a specific property, and
      * will override similar property if loaded for a properties file.
-     * 
+     *
      * @param propertyName property name.
      * @param propertyValue property value.
      */
-    public static void initializeProperties(
-        String propertyName,
-        String propertyValue
-    ) {
-        rwLock.writeLock().lock();
-
-        try {
-            Properties newProps = new Properties();
-            newProps.putAll(props);
-            newProps.put(propertyName, propertyValue);
-            props = newProps;
-            updateTagswapMap(props);
-            lastModified = System.currentTimeMillis();
-        } finally {
-            rwLock.writeLock().unlock();
-        }
+    public static void initializeProperties(String propertyName, String propertyValue) {
+        Properties newProps = new Properties();
+        newProps.put(propertyName, propertyValue);
+        initializeProperties(newProps, false, false);
     }
 
     /**
@@ -644,32 +528,32 @@ public class SystemProperties {
      * the properties are changed by calling the following method
      * <code>initializeProperties</code>. This is a convenience method for
      * applications to track changes to OpenAM properties.
-     * 
+     *
      * @return counter of the last modification
      */
     public static long lastModified() {
-        return (lastModified);
+        return propertiesHolderRef.get().lastModified;
     }
 
     /**
      * Returns error messages during initialization, else <code>null</code>.
-     * 
+     *
      * @return error messages during initialization
      */
     public static String getInitializationError() {
-        return (initError);
+        return initError;
     }
 
     /**
      * Returns error messages during initialization using the single war
      * deployment, else <code>null</code>.
-     * 
+     *
      * @return error messages during initialization of OpenAM as single war
      */
     public static String getSecondaryInitializationError() {
-        return (initSecondaryError);
+        return initSecondaryError;
     }
-    
+
     /**
      * Sets the server instance name of which properties are retrieved
      * to initialized this object.
@@ -689,7 +573,7 @@ public class SystemProperties {
     public static String getServerInstanceName() {
         return instanceName;
     }
-    
+
     /**
      * Returns <code>true</code> if instance is running in server mode.
      *
@@ -698,20 +582,30 @@ public class SystemProperties {
     public static boolean isServerMode() {
         return IsServerModeHolder.isServerMode;
     }
-    
+
     /**
      * Returns the property name to service attribute schema name mapping.
      *
      * @return Property name to service attribute schema name mapping.
      */
     public static Map getAttributeMap() {
-        rwLock.readLock().lock();
-        try {
-            return attributeMap;
-        } finally {
-            rwLock.readLock().unlock();
-        }
+        return ATTRIBUTE_MAP;
     }
+
+    private static Map<String, AttributeStruct> initAttributeMapping() {
+        final Map<String, AttributeStruct> attributeMapping = new HashMap<>();
+        try {
+            ResourceBundle rb = ResourceBundle.getBundle("serverAttributeMap");
+            for (String propertyName : rb.keySet()) {
+                attributeMapping.put(propertyName, new AttributeStruct(rb.getString(propertyName)));
+            }
+        } catch (MissingResourceException mse) {
+            // No Resource Bundle Found, Continue.
+            // Could be in Test Mode.
+        }
+        return Collections.unmodifiableMap(attributeMapping);
+    }
+
 
     /**
      * Lazy initialisation holder idiom for server mode flag as this is read frequently but never changes.
@@ -737,7 +631,7 @@ public class SystemProperties {
             platformServicePropertiesListener = new ServicePropertiesConfigurationListener();
 
             Map<String, Set<String>> services = new HashMap<>();
-            for (Map.Entry<String, AttributeStruct> property : attributeMap.entrySet()) {
+            for (Map.Entry<String, AttributeStruct> property : ATTRIBUTE_MAP.entrySet()) {
                 String serviceName = property.getValue().getServiceName();
                 if (!services.containsKey(serviceName)) {
                     services.put(serviceName, new HashSet<String>());
@@ -839,6 +733,47 @@ public class SystemProperties {
                 }
                 serviceListener.propertyListeners.get(property).add(listener);
             }
+        }
+    }
+
+    /**
+     * Holds the current properties map together with the tagswap values and last updated timestamp to allow atomic
+     * updates of all three as one unit without locking. This is an immutable structure that is intended to be used
+     * with an AtomicReference.
+     */
+    private static final class PropertiesHolder {
+        private final Map<String, String> properties;
+        private final Map<String, String> tagSwapValues;
+        private final long lastModified;
+
+        PropertiesHolder() {
+            this.properties = Collections.emptyMap();
+            this.tagSwapValues = Collections.emptyMap();
+            this.lastModified = System.currentTimeMillis();
+        }
+
+        PropertiesHolder(final Map<String, String> properties) {
+            Map<String, String> tagSwapMap = new HashMap<>();
+            for (Map.Entry<String, String> tagSwapEntry : TAG_SWAP_PROPERTIES.entrySet()) {
+                String tag = tagSwapEntry.getKey();
+                String propertyName = tagSwapEntry.getValue();
+                String val = System.getProperty(propertyName);
+                if (val == null) {
+                    val = properties.get(propertyName);
+                }
+                tagSwapMap.put(tag, val);
+            }
+            this.properties = Collections.unmodifiableMap(properties);
+            this.tagSwapValues = Collections.unmodifiableMap(tagSwapMap);
+            this.lastModified = System.currentTimeMillis();
+        }
+
+        String getProperty(String name) {
+            return properties.get(name);
+        }
+
+        PropertiesHolder putAll(Properties newProperties) {
+            return new PropertiesHolder(Maps.fromProperties(newProperties));
         }
     }
 }
