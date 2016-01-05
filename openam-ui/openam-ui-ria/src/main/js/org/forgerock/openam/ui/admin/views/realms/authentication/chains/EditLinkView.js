@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLinkView", [
@@ -87,6 +87,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                             dialog.getButton("saveBtn").disable();
                             dialog.getModalBody().find("#selectModule").selectize({
                                 options: formData.allModules,
+                                searchField: ["_id", "typeDescription"],
                                 render: {
                                     item: function (item) {
                                         return "<div>" + item._id + " - <span class='text-muted'><em>" +
