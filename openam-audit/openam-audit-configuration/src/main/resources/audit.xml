@@ -12,7 +12,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
 -->
 <!DOCTYPE ServicesConfiguration
         PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
@@ -179,6 +179,20 @@
 
                 <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
                            i18nFileName="commonAudit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
@@ -198,8 +212,10 @@
                                     className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host" />
-                    <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port" />
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host"
+                                     validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port"
+                                     validator="PositiveIntegerValidator" />
                     <AttributeSchema name="transportProtocol" i18nKey="audit.handlers.syslog.transportProtocol"
                                      type="single_choice">
                         <ChoiceValues>
@@ -210,10 +226,9 @@
                             <Value>TCP</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="connectTimeout" type="single"
-                                     i18nKey="audit.handlers.syslog.connectTimeout" />
-                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility"
-                                     type="single_choice">
+                    <AttributeSchema name="connectTimeout" type="single" i18nKey="audit.handlers.syslog.connectTimeout"
+                                     validator="PositiveIntegerValidator"/>
+                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility" type="single_choice">
                         <ChoiceValues>
                             <ChoiceValue>KERN</ChoiceValue>
                             <ChoiceValue>USER</ChoiceValue>
@@ -596,6 +611,20 @@
 
                 <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
                            i18nFileName="commonAudit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
@@ -615,8 +644,10 @@
                                     className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host" />
-                    <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port" />
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host"
+                                     validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port"
+                                     validator="PositiveIntegerValidator" />
                     <AttributeSchema name="transportProtocol" i18nKey="audit.handlers.syslog.transportProtocol"
                                      type="single_choice">
                         <ChoiceValues>
@@ -627,10 +658,9 @@
                             <Value>TCP</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="connectTimeout" type="single"
-                                     i18nKey="audit.handlers.syslog.connectTimeout" />
-                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility"
-                                     type="single_choice">
+                    <AttributeSchema name="connectTimeout" type="single" i18nKey="audit.handlers.syslog.connectTimeout"
+                                     validator="PositiveIntegerValidator"/>
+                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility" type="single_choice">
                         <ChoiceValues>
                             <ChoiceValue>KERN</ChoiceValue>
                             <ChoiceValue>USER</ChoiceValue>
