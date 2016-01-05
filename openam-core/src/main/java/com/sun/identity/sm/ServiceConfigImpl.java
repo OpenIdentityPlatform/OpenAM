@@ -24,7 +24,7 @@
  *
  * $Id: ServiceConfigImpl.java,v 1.15 2008/10/14 04:57:20 arviranga Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -34,12 +34,17 @@ import com.iplanet.services.util.AMEncryption;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.shared.concurrency.LockFactory;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
 
 /**
  * The class <code>ServiceConfigImpl</code> provides interfaces to read the
@@ -48,6 +53,12 @@ import java.util.Set;
  */
 class ServiceConfigImpl implements ServiceListener {
 
+    // Static variables
+    private static ConcurrentMap<String, ServiceConfigImpl> configImpls = new ConcurrentHashMap<>();
+    private static Map<String, Set<String>> userPrincipals = Collections.synchronizedMap(
+            new HashMap<String, Set<String>>());
+    private static final LockFactory<String> LOCK_FACTORY = new LockFactory<>();
+    private static Debug debug = SMSEntry.debug;
     private ServiceConfigManagerImpl scm;
     
     // Schema manager to register for schema changes
@@ -552,24 +563,25 @@ class ServiceConfigImpl implements ServiceListener {
             }
         }
 
-        // Add to cache
-        synchronized (configImpls) {
-            // Check if already added by another thread
-            ServiceConfigImpl tmp = getFromCache(cacheName, null);
-            if (tmp == null) {
-                // Not in cache, construct service config impl
-                answer = new ServiceConfigImpl(scm, ss, entry, orgName,
-                    groupName, compName, globalConfig, token);
-                configImpls.put(cacheName, answer);
-            } else {
-                answer = tmp;
+        answer = getFromCache(cacheName, null);
+        if (answer == null) {
+            final Lock lock = LOCK_FACTORY.acquireLock(cacheName);
+            try {
+                lock.lock();
+                answer = getFromCache(cacheName, null);
+                if (answer == null) {
+                    answer = new ServiceConfigImpl(scm, ss, entry, orgName, groupName, compName, globalConfig, token);
+                    configImpls.put(cacheName, answer);
+                }
+            } finally {
+                lock.unlock();
             }
         }
 
         if (debug.messageEnabled()) {
             debug.message("ServiceConfigImpl::getInstance: return: " + dn);
         }
-        return (answer);
+        return answer;
     }
 
     // Method called by ServiceConfig to delete sub-service configuration
@@ -606,10 +618,10 @@ class ServiceConfigImpl implements ServiceListener {
     // This function is executed after obtaining "configMutex" lock
     static ServiceConfigImpl getFromCache(String cn, SSOToken t)
         throws SMSException, SSOException {
-        ServiceConfigImpl answer = (ServiceConfigImpl) configImpls.get(cn);
+        ServiceConfigImpl answer = configImpls.get(cn);
         if (answer != null) {
             if (!answer.isValid()) {
-                configImpls.remove(cn);
+                configImpls.remove(cn, answer);
                 answer.clear();
                 answer = null;
             } else if (answer.smsEntry.isNewEntry()) {
@@ -618,7 +630,7 @@ class ServiceConfigImpl implements ServiceListener {
         }
         if ((answer != null) && (t != null)) {
             // Check if the user has permissions
-            Set principals = (Set) userPrincipals.get(cn);
+            Set<String> principals = userPrincipals.get(cn);
             if ((principals == null) ||
                 !principals.contains(t.getTokenID().toString())) {
                 // Principal name not in cache, need to check perm
@@ -632,7 +644,7 @@ class ServiceConfigImpl implements ServiceListener {
         String cacheName, String dn, SSOToken t)
         throws SMSException, SSOException {
         CachedSMSEntry answer = CachedSMSEntry.getInstance(t, dn);
-        Set sudoPrincipals = (Set) userPrincipals.get(cacheName);
+        Set<String> sudoPrincipals = userPrincipals.get(cacheName);
         if (sudoPrincipals == null) {
             sudoPrincipals = Collections.synchronizedSet(new HashSet(2));
             userPrincipals.put(cacheName, sudoPrincipals);
@@ -643,13 +655,12 @@ class ServiceConfigImpl implements ServiceListener {
 
     // Clears the cache
     static void clearCache() {
-        synchronized (configImpls) {
-            for (Iterator items = configImpls.values().iterator();
-                items.hasNext();) {
-                ServiceConfigImpl sc = (ServiceConfigImpl) items.next();
-                sc.clear();
-            }
-            configImpls.clear();
+        Map<String, ServiceConfigImpl> cache = new HashMap<>(configImpls);
+        for (Map.Entry<String, ServiceConfigImpl> entry : cache.entrySet()) {
+            final String cacheName = entry.getKey();
+            final ServiceConfigImpl serviceConfig = entry.getValue();
+            serviceConfig.clear();
+            configImpls.remove(cacheName, serviceConfig);
         }
         userPrincipals.clear();
     }
@@ -806,12 +817,4 @@ class ServiceConfigImpl implements ServiceListener {
         buff.append("</").append(nodeName).append(">");
         return buff.toString();
     }
-
-    // Static variables
-    private static Map configImpls = Collections.synchronizedMap(new HashMap());
-
-    private static Map userPrincipals = Collections.synchronizedMap(
-        new HashMap());
-
-    private static Debug debug = SMSEntry.debug;
 }
