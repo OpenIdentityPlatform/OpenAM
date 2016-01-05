@@ -24,7 +24,7 @@
  *
  * $Id: Session.java,v 1.25 2009/08/14 17:53:35 weisun2 Exp $
  *
- * Portions copyright 2010-2015 ForgeRock AS.
+ * Portions copyright 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
@@ -74,7 +74,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -156,6 +155,11 @@ public class Session extends GeneralTaskRunnable {
      * Total time left for the session, in seconds.
      */
     private long sessionTimeLeft;
+
+    /**
+     * Time after which the session will be considered invalid, in milliseconds.
+     */
+    private long sessionExpiryTime;
 
     /*
      * This is the time value (computed as System.currentTimeMillis()/1000) when
@@ -571,9 +575,7 @@ public class Session extends GeneralTaskRunnable {
      *            during communication with session service.
      */
     public long getIdleTime() throws SessionException {
-        if (!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()) {
-            refresh(false);
-        }
+        refreshSessionIfStale();
         return sessionIdleTime;
     }
 
@@ -587,10 +589,14 @@ public class Session extends GeneralTaskRunnable {
      *            service.
      */
     public long getTimeLeft() throws SessionException {
+        refreshSessionIfStale();
+        return sessionTimeLeft;
+    }
+
+    private void refreshSessionIfStale() throws SessionException {
         if (!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()) {
             refresh(false);
         }
-        return sessionTimeLeft;
     }
 
     /**
@@ -602,7 +608,8 @@ public class Session extends GeneralTaskRunnable {
      * @throws SessionException if the session has already expired or an error occurs.
      */
     public long getBlacklistExpiryTime(long purgeDelayMs) throws SessionException {
-        return TimeUnit.SECONDS.toMillis(getTimeLeft()) + purgeDelayMs + System.currentTimeMillis();
+        refreshSessionIfStale();
+        return sessionExpiryTime + purgeDelayMs;
     }
 
     /**
@@ -1071,6 +1078,7 @@ public class Session extends GeneralTaskRunnable {
         maxIdleTime = info.getMaxIdle();
         maxCachingTime = info.getMaxCaching();
         sessionIdleTime = info.getTimeIdle();
+        sessionExpiryTime = info.getExpiryTime();
         sessionTimeLeft = info.getTimeLeft();
         if (info.getState().equals("invalid")) {
             sessionState = INVALID;
