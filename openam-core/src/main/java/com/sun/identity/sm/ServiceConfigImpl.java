@@ -54,10 +54,11 @@ import java.util.concurrent.locks.Lock;
 class ServiceConfigImpl implements ServiceListener {
 
     // Static variables
-    private static ConcurrentMap<String, ServiceConfigImpl> configImpls = new ConcurrentHashMap<>();
+    private static ConcurrentMap<String, ServiceConfigImpl> configImpls =
+            new ConcurrentHashMap<String, ServiceConfigImpl>();
     private static Map<String, Set<String>> userPrincipals = Collections.synchronizedMap(
             new HashMap<String, Set<String>>());
-    private static final LockFactory<String> LOCK_FACTORY = new LockFactory<>();
+    private static final LockFactory<String> LOCK_FACTORY = new LockFactory<String>();
     private static Debug debug = SMSEntry.debug;
     private ServiceConfigManagerImpl scm;
     
@@ -648,7 +649,7 @@ class ServiceConfigImpl implements ServiceListener {
 
     // Clears the cache
     static void clearCache() {
-        Map<String, ServiceConfigImpl> cache = new HashMap<>(configImpls);
+        Map<String, ServiceConfigImpl> cache = new HashMap<String, ServiceConfigImpl>(configImpls);
         for (Map.Entry<String, ServiceConfigImpl> entry : cache.entrySet()) {
             final String cacheName = entry.getKey();
             final ServiceConfigImpl serviceConfig = entry.getValue();
