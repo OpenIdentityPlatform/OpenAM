@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
  /**
@@ -20,7 +20,7 @@
 define("org/forgerock/openam/ui/common/sessions/SessionValidator", [
     "org/forgerock/openam/ui/common/RouteTo"
 ], function (RouteTo) {
-    var delay, ONE_SECOND_IN_MILLISECONDS = 1000;
+    var delay, ONE_SECOND_IN_MILLISECONDS = 1000, SESSION_ALMOST_EXPIRED_BACKOFF_SECONDS = 1;
 
     function stop () {
         clearTimeout(delay);
@@ -31,7 +31,13 @@ define("org/forgerock/openam/ui/common/sessions/SessionValidator", [
     function validate (strategy, token, seconds) {
         delay = setTimeout(function () {
             strategy(token).then(function (seconds) {
-                validate(strategy, token, seconds);
+                /**
+                 * If we're within the window of 0 seconds left on the session but still monumentality valid,
+                 * backoff the next schedule by a predetermined number of seconds. Avoids an immediate schedule.
+                 */
+                var adjustedSeconds = seconds > 0 ? seconds : SESSION_ALMOST_EXPIRED_BACKOFF_SECONDS;
+
+                validate(strategy, token, adjustedSeconds);
             }, function () {
                 stop();
 
