@@ -1,3 +1,4 @@
+<%@ tag pageEncoding="UTF-8" %>
 <%@ tag import="com.sun.identity.console.XuiRedirectHelper" %>
 <%--
   ~ The contents of this file are subject to the terms of the Common Development and
@@ -12,9 +13,8 @@
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
-  ~ Copyright 2015 ForgeRock AS.
+  ~ Copyright 2015-2016 ForgeRock AS.
   --%>
-<%@ tag pageEncoding="UTF-8" %>
 <%@ tag description="Replaces the current window location with the XUI page for the realm, or Home if XUI is disabled" %>
 <%@ attribute name="xuiPath" type="java.lang.String" required="true" description="The path to the XUI page to redirect to" %>
 <%@ attribute name="realm" type="java.lang.String" required="true" description="The realm to go back to, or empty string" %>
