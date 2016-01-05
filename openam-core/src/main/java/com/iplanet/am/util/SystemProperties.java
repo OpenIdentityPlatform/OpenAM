@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -22,22 +22,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SystemProperties.java,v 1.21 2009/10/12 17:55:06 alanchu Exp $
- *
- */
-
-/*
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.iplanet.am.util;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.AttributeStruct;
-import com.sun.identity.common.PropertiesFinder;
-import com.sun.identity.common.configuration.ServerConfiguration;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.sm.SMSEntry;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -57,8 +46,20 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.Nullable;
+
+import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.utils.CollectionUtils;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.AttributeStruct;
+import com.sun.identity.common.PropertiesFinder;
+import com.sun.identity.common.configuration.ConfigurationListener;
+import com.sun.identity.common.configuration.ConfigurationObserver;
+import com.sun.identity.common.configuration.ServerConfiguration;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.SMSEntry;
 
 /**
  * This class provides functionality that allows single-point-of-access to all
@@ -82,9 +83,8 @@ import org.forgerock.openam.utils.CollectionUtils;
  */
 public class SystemProperties {
     private static String instanceName;
-    private static ReentrantReadWriteLock rwLock = new
-        ReentrantReadWriteLock();
-    private static Map attributeMap = new HashMap();
+    private static ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private static Map<String, AttributeStruct> attributeMap = new HashMap<>();
     private static boolean sitemonitorDisabled = false;
     private final static String TRUE = "true";
     /** Regular expression pattern for a sequence of 1 or more white space characters. */
@@ -96,18 +96,16 @@ public class SystemProperties {
     
     private static void initAttributeMapping() {
         try {
-        ResourceBundle rb = ResourceBundle.getBundle("serverAttributeMap");
-        for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
-            String propertyName = (String)e.nextElement();
-            attributeMap.put(propertyName, new AttributeStruct(
-                rb.getString(propertyName)));
-        }
+            ResourceBundle rb = ResourceBundle.getBundle("serverAttributeMap");
+            for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
+                String propertyName = (String)e.nextElement();
+                attributeMap.put(propertyName, new AttributeStruct(rb.getString(propertyName)));
+            }
         } catch(java.util.MissingResourceException mse) {
             // No Resource Bundle Found, Continue.
             // Could be in Test Mode.
         }
     }
-    
 
     private static Properties props;
 
@@ -427,7 +425,7 @@ public class SystemProperties {
         if (value == null || value.trim().isEmpty()) {
             return defaultValue;
         }
-        return CollectionUtils.asSet(value.split(delimiterRegex));
+        return asSet(value.split(delimiterRegex));
     }
 
     /**
@@ -721,5 +719,126 @@ public class SystemProperties {
     private static final class IsServerModeHolder {
         // use getProp and not get method to avoid infinite loop
         private static final boolean isServerMode = Boolean.parseBoolean(getProp(Constants.SERVER_MODE, "false"));
+    }
+
+    /**
+     * A singleton enum for the configuration listeners, which will be lazily initialized on first use. The code
+     * here cannot be added to the {@code SystemProperties} class initialization as it would create a cyclic
+     * dependency on the static initialization of {@code ConfigurationObserver}.
+     */
+    private enum Listeners {
+        INSTANCE;
+
+        private final Map<String, ServicePropertiesConfigurationListener> servicePropertiesListeners;
+        private final ServicePropertiesConfigurationListener platformServicePropertiesListener;
+
+        Listeners() {
+            servicePropertiesListeners = new HashMap<>();
+            platformServicePropertiesListener = new ServicePropertiesConfigurationListener();
+
+            Map<String, Set<String>> services = new HashMap<>();
+            for (Map.Entry<String, AttributeStruct> property : attributeMap.entrySet()) {
+                String serviceName = property.getValue().getServiceName();
+                if (!services.containsKey(serviceName)) {
+                    services.put(serviceName, new HashSet<String>());
+                }
+                services.get(serviceName).add(property.getKey());
+            }
+
+            ConfigurationObserver configurationObserver = ConfigurationObserver.getInstance();
+
+            for (final Map.Entry<String, Set<String>> service : services.entrySet()) {
+                if (!Constants.SVC_NAME_PLATFORM.equals(service.getKey())) {
+                    Set<String> properties = service.getValue();
+                    ServicePropertiesConfigurationListener listener =
+                            new ServicePropertiesConfigurationListener(properties);
+                    for (String property : properties) {
+                        servicePropertiesListeners.put(property, listener);
+                    }
+                    configurationObserver.addServiceListener(listener, new Predicate<String>() {
+                        @Override
+                        public boolean apply(@Nullable String s) {
+                            return s != null && s.equals(service.getKey());
+                        }
+                    });
+                }
+            }
+
+            configurationObserver.addServiceListener(platformServicePropertiesListener, new Predicate<String>() {
+                @Override
+                public boolean apply(@Nullable String s) {
+                    return Constants.SVC_NAME_PLATFORM.equals(s);
+                }
+            });
+        }
+    }
+
+    /**
+     * A listener for the properties that are provided by a single service. Property values are cached so that
+     * property listeners are only notified when the property(-ies) they are observing have changed.
+     */
+    private static final class ServicePropertiesConfigurationListener implements ConfigurationListener {
+
+        private final Map<String, Set<ConfigurationListener>> propertyListeners = new HashMap<>();
+        private final Map<String, String> propertyValues = new HashMap<>();
+
+        private ServicePropertiesConfigurationListener(Set<String> propertyNames) {
+            for (String propertyName : propertyNames) {
+                registerPropertyName(propertyName);
+            }
+        }
+
+        private void registerPropertyName(String propertyName) {
+            propertyListeners.put(propertyName, Collections.synchronizedSet(new HashSet<ConfigurationListener>()));
+        }
+
+        private ServicePropertiesConfigurationListener() {
+            // nothing to see here
+        }
+
+        @Override
+        public void notifyChanges() {
+            Set<ConfigurationListener> affectedListeners = new HashSet<>();
+            for (Map.Entry<String, Set<ConfigurationListener>> propertyListeners : this.propertyListeners.entrySet()) {
+                String propertyName = propertyListeners.getKey();
+                String value = get(propertyName);
+                String oldValue = propertyValues.get(propertyName);
+                if (value != null && !value.equals(oldValue) || value == null && oldValue != null) {
+                    Set<ConfigurationListener> listeners = propertyListeners.getValue();
+                    for (ConfigurationListener listener : listeners) {
+                        affectedListeners.add(listener);
+                    }
+                    propertyValues.put(propertyName, value);
+                }
+            }
+            for (ConfigurationListener listener : affectedListeners) {
+                listener.notifyChanges();
+            }
+        }
+    }
+
+    /**
+     * Listen for runtime changes to a system property value. Only values that are stored in the SMS will
+     * be changed at runtime. See {@code serverdefaults.properties}, {@code amPlatform.xml} and
+     * {@code serverAttributeMap.properties}.
+     *
+     * @param listener The listener to call when one of the provided properties has changed.
+     * @param properties The list of properties that should be observed. A change in any one of these properties
+     *                   will cause the listener to be notified.
+     */
+    public static void observe(ConfigurationListener listener, String... properties) {
+        for (String property : properties) {
+            ServicePropertiesConfigurationListener serviceListener =
+                    Listeners.INSTANCE.servicePropertiesListeners.get(property);
+            if (serviceListener == null) {
+                serviceListener = Listeners.INSTANCE.platformServicePropertiesListener;
+            }
+            synchronized (serviceListener) {
+                if (!serviceListener.propertyListeners.containsKey(property)) {
+                    serviceListener.registerPropertyName(property);
+                }
+                serviceListener.propertyListeners.get(property).add(listener);
+            }
+        }
     }
 }

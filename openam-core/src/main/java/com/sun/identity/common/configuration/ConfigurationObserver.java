@@ -22,9 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ConfigurationObserver.java,v 1.5 2008/06/25 05:42:27 qcheng Exp $
- *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 
 package com.sun.identity.common.configuration;
@@ -48,17 +46,19 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.forgerock.guava.common.base.Predicate;
+import org.forgerock.util.Pair;
+
 /**
  * This class listens to changes in configuration changes
  */
 public class ConfigurationObserver implements ServiceListener {
-    private static ConfigurationObserver instance = new ConfigurationObserver();
-    private static int PARENT_LEN = ConfigurationBase.CONFIG_SERVERS.length()
-    + 2;
-    private Set migratedServiceNames = new HashSet();
-    private Set listeners = new HashSet();
-    private static boolean hasRegisteredListeners;
-    
+    private static final ConfigurationObserver instance = new ConfigurationObserver();
+    private static int PARENT_LEN = ConfigurationBase.CONFIG_SERVERS.length() + 2;
+    private Set<String> migratedServiceNames = new HashSet<>();
+    private Set<Pair<ConfigurationListener, Predicate<String>>> serviceListeners = new HashSet<>();
+    private static boolean hasRegisteredListeners = false;
+
     private ConfigurationObserver() {
         //always add PlatformService to the "monitored" services list, as this class makes sure that the
         //PlatformService related changes are properly propagated to different components that are involved with
@@ -83,22 +83,16 @@ public class ConfigurationObserver implements ServiceListener {
     
     private synchronized void registerListeners() {
         if (!hasRegisteredListeners) {
-            SSOToken adminToken = (SSOToken)AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-            for (Iterator i = migratedServiceNames.iterator(); i.hasNext(); ) {
+            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            for (String serviceName : migratedServiceNames) {
                 try {
-                    ServiceConfigManager scm = new ServiceConfigManager(
-                        (String)i.next(), adminToken);
-                    scm.addListener(instance);
-                } catch (SSOException ex) {
-                    Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                        "ConfigurationObserver.registeringListeners", ex);
-                } catch (SMSException ex) {
-                    Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                        "ConfigurationObserver.registeringListeners", ex);
+                    ServiceConfigManager scm = new ServiceConfigManager(serviceName, adminToken);
+                    scm.addListener(this);
+                } catch (SSOException | SMSException ex) {
+                    Debug.getInstance(SetupConstants.DEBUG_NAME).error("ConfigurationObserver.registeringListeners", ex);
                 }
-           }
-           hasRegisteredListeners = true;
+            }
+            hasRegisteredListeners = true;
         }
     }
     
@@ -135,94 +129,69 @@ public class ConfigurationObserver implements ServiceListener {
      * @param serviceComponent Name of the service components that changed.
      * @param type change type, i.e., ADDED, REMOVED or MODIFIED.
      */
-    public void globalConfigChanged(
-        String serviceName, 
-        String version,
-        String groupName, 
-        String serviceComponent, 
-        int type
-    ) {
+    public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent,
+            int type) {
         if (serviceName.equals(Constants.SVC_NAME_PLATFORM)) {
-            if (serviceComponent.startsWith("/" +
-                    ConfigurationBase.CONFIG_SERVERS + "/")) {
+            if (serviceComponent.startsWith("/" + ConfigurationBase.CONFIG_SERVERS + "/")) {
                 String serverName = serviceComponent.substring(PARENT_LEN);
 
                 if (serverName.equals(ServerConfiguration.DEFAULT_SERVER_CONFIG)
-                    ||
-                    serverName.equals(SystemProperties.getServerInstanceName())
-                 ) {
+                        || serverName.equals(SystemProperties.getServerInstanceName())) {
                     // always use the server instance name with initialising properties
                     if (serverName.equals(ServerConfiguration.DEFAULT_SERVER_CONFIG)) {
                         serverName = SystemProperties.getServerInstanceName();
                     }
 
-                    SSOToken adminToken = (SSOToken)
-                        AccessController.doPrivileged(
-                            AdminTokenAction.getInstance());
+                    SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
                     try {
-                        Properties newProp = 
-                            ServerConfiguration.getServerInstance(
-                                adminToken, serverName);
-                        SystemProperties.initializeProperties(
-                            newProp, true, true);
-                        notifies();
-                    } catch (SSOException ex) {
-                    //ingored
-                    } catch (IOException ex) {
-                    //ingored
-                    } catch (SMSException ex) {
-                    //ingored
+                        Properties newProp = ServerConfiguration.getServerInstance(adminToken, serverName);
+                        SystemProperties.initializeProperties(newProp, true, true);
+                        notifies(Constants.SVC_NAME_PLATFORM);
+                    } catch (SSOException | IOException | SMSException ex) {
+                        // ignored
                     }
                 }
             } else {
-                notifies();
+                notifies(Constants.SVC_NAME_PLATFORM);
             }
         } else {
             /* need to do this else bcoz some of the property have been moved
              * to services
              */
-            notifies();
+            notifies(serviceName);
         }
     }
-    
+
     /**
-     * Adds listeners
+     * Adds listener for all services.
      *
-     * @param l Listener to be added
+     * @param l Listener to be added.
      */
     public void addListener(ConfigurationListener l) {
-        listeners.add(l);
-    }
-
-    private void notifies() {
-        for (Iterator i = listeners.iterator(); i.hasNext(); ) {
-            ConfigurationListener l = (ConfigurationListener)i.next();
-            l.notifyChanges();
-        }
+        serviceListeners.add(Pair.<ConfigurationListener, Predicate<String>>of(l, null));
     }
 
     /**
-     * This method will be invoked when a service's organization configuration
-     * data has been changed. The parameters <code>orgName</code>,
-     * <code>groupName</code> and <code>serviceComponent</code> denotes the
-     * organization name, configuration grouping name and service's
-     * sub-component that are changed respectively.
-     * 
-     * @param serviceName Name of the service.
-     * @param version Version of the service.
-     * @param orgName Organization name as DN.
-     * @param groupName Name of the configuration grouping
-     * @param serviceComponent Name of the service components that changed.
-     * @param type Change type, i.e., ADDED, REMOVED or MODIFIED
+     * Adds listeners for service names that match the provided predicate.
+     *
+     * @param l Listener to be added.
+     * @param servicePredicate The predicate.
      */
-    public void organizationConfigChanged(
-        String serviceName, 
-        String version,
-        String orgName, 
-        String groupName, 
-        String serviceComponent,
-        int type
-     ) {
+    public void addServiceListener(ConfigurationListener l, Predicate<String> servicePredicate) {
+        serviceListeners.add(Pair.of(l, servicePredicate));
+    }
+
+    private void notifies(String serviceName) {
+        for (Pair<ConfigurationListener, Predicate<String>> listenerPair : serviceListeners) {
+            if (listenerPair.getSecond() == null || listenerPair.getSecond().apply(serviceName)) {
+                listenerPair.getFirst().notifyChanges();
+            }
+        }
+    }
+
+    @Override
+    public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
+            String serviceComponent, int type) {
         // no-op
      }
 }

@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.configuration.ConfigurationListener;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.messageid.LogMessageProvider;
@@ -36,7 +37,7 @@ import java.security.AccessController;
  *
  * @since 12.0.0
  */
-public class OAuth2AuditLogger {
+public class OAuth2AuditLogger implements ConfigurationListener {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private LogMessageProvider msgProvider;
@@ -49,11 +50,18 @@ public class OAuth2AuditLogger {
      */
     @Inject
     public OAuth2AuditLogger() {
-        final String status = SystemProperties.get(Constants.AM_LOGSTATUS);
-        logStatus = ((status != null) && status.equalsIgnoreCase("ACTIVE"));
+        init();
+        SystemProperties.observe(this, Constants.AM_LOGSTATUS);
+    }
+
+    private void init() {
+        logStatus = "ACTIVE".equalsIgnoreCase(SystemProperties.get(Constants.AM_LOGSTATUS));
         if (logStatus) {
             accessLogger = (Logger)Logger.getLogger(OAuth2Constants.ACCESS_LOG_NAME);
             errorLogger = (Logger)Logger.getLogger(OAuth2Constants.ERROR_LOG_NAME);
+        } else {
+            accessLogger = null;
+            errorLogger = null;
         }
     }
 
@@ -127,5 +135,10 @@ public class OAuth2AuditLogger {
                 accessLogger.log(lr, ssoToken);
             }
         }
+    }
+
+    @Override
+    public void notifyChanges() {
+        init();
     }
 }
