@@ -42,11 +42,13 @@ import com.sun.identity.common.configuration.MapValueParser;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.InvalidAttributeValueException;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
+import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonPointer;
@@ -345,6 +347,8 @@ public class SmsJsonConverter {
             } else {
                 throw new JsonException("Invalid attributes");
             }
+        } catch (InvalidAttributeValueException e) {
+            throw new BadRequestException(e.getLocalizedMessage(), e);
         } catch (SMSException e) {
             throw new JsonException("Unable to validate attributes", e);
         }
