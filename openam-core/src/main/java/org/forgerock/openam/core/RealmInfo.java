@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core;
@@ -105,7 +105,7 @@ public class RealmInfo {
         RealmInfo realmInfo = (RealmInfo) o;
 
         return Objects.equals(absoluteRealm, realmInfo.absoluteRealm)
-                && Objects.equals(realmInfo, realmInfo.realmSubPath)
+                && Objects.equals(realmSubPath, realmInfo.realmSubPath)
                 && Objects.equals(overrideRealm, realmInfo.overrideRealm);
     }
 
