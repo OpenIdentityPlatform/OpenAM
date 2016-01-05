@@ -20,8 +20,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.forgerock.json.resource.Request;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.rest.resource.AuditInfoContext;
 import org.forgerock.services.context.Context;
 
 import com.sun.identity.shared.debug.Debug;
@@ -48,6 +50,17 @@ public class CrestAuditorFactory {
     }
 
     public CrestAuditor create(Context context, Request request) {
+
+        // If creating an auditor for SESSION, return our own tailored auditor which does not log path information.
+        //
+        if (context.containsContext(AuditInfoContext.class)) {
+            AuditConstants.Component component = context.asContext(AuditInfoContext.class).getComponent();
+            if (component == AuditConstants.Component.SESSION) {
+                return new CrestNoPathDetailsAuditor(debug, auditEventPublisher, auditEventFactory,
+                        context, request);
+            }
+        }
+
         return new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
     }
 }

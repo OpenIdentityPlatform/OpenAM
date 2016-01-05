@@ -15,25 +15,19 @@
  */
 package org.forgerock.openam.rest.fluent;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.FAILED;
-import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.SUCCESSFUL;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
-import static org.forgerock.openam.audit.AuditConstants.ACCESS_RESPONSE_DETAIL_REASON;
-import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
-import static org.forgerock.openam.audit.AuditConstants.Component;
-import static org.forgerock.openam.audit.AuditConstants.EventName;
-import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
-import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.getTokenFromContext;
+import static java.util.concurrent.TimeUnit.*;
+import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
+import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.*;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
+import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.http.HttpContext;
@@ -115,7 +109,10 @@ class CrestAuditor {
                 setClientFromHttpContextHeaderIfExists(builder, context);
             }
 
-            auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
+            AuditEvent auditEvent = builder.toEvent();
+            postProcessEvent(auditEvent);
+
+            auditEventPublisher.publish(ACCESS_TOPIC, auditEvent);
         }
     }
 
@@ -151,7 +148,10 @@ class CrestAuditor {
                 setClientFromHttpContextHeaderIfExists(builder, context);
             }
 
-            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
+            AuditEvent auditEvent = builder.toEvent();
+            postProcessEvent(auditEvent);
+
+            auditEventPublisher.tryPublish(ACCESS_TOPIC, auditEvent);
         }
     }
 
@@ -183,7 +183,10 @@ class CrestAuditor {
                 setClientFromHttpContextHeaderIfExists(builder, context);
             }
 
-            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
+            AuditEvent auditEvent = builder.toEvent();
+            postProcessEvent(auditEvent);
+
+            auditEventPublisher.tryPublish(ACCESS_TOPIC, auditEvent);
         }
     }
 
@@ -207,5 +210,15 @@ class CrestAuditor {
     private boolean ipAddressHeaderPropertyIsSet() {
         String ipAddrHeader = SystemPropertiesManager.get(Constants.CLIENT_IP_ADDR_HEADER);
         return StringUtils.isNotBlank(ipAddrHeader);
+    }
+
+    /**
+     * This function provided for derived classes to modify the audit event before it is published.  For instance,
+     * {@link CrestNoPathDetailsAuditor} uses it to remove the session id from the http request path to avoid the
+     * possibility of session hijacking.
+     *
+     * @param auditEvent The audit event, to be modified in whatever way a subclass sees fit.
+     */
+    protected void postProcessEvent(AuditEvent auditEvent) {
     }
 }
