@@ -6,6 +6,7 @@
 	- [Update Process](#update-process)
 - [Building](#building)
 - [Development](#development)
+	- [ES6 Transpiling](#es6-transpiling)
 	- [Unit Tests](#unit-tests)
 
 <!-- /TOC -->
@@ -56,6 +57,21 @@ $ grunt
 ```
 
 Grunt will then start watching the source and sync any changed files over to your server's webapp directory.
+
+### ES6 Transpiling
+* ✅Phase 0 - Babel support (no-op)
+* ❎Phase 1 - Arrow functions, `const` and `let`
+* ❎Phase 2 - TBA
+
+ES6 is supported via [Babel](https://babeljs.io) transpiling. The following files and directories are transpiled:
+* `main-authorize.js`
+* `main-device.js`
+* `main.js`
+* `org/forgerock/openam/**/*`
+
+n.b. `config` is ***NOT*** transpiled due to inter-mixing of commons modules into this directory.
+
+Ensure you have `Enable JavaScript source maps` enabled in Chrome or your preferred browser so see the original source before it was transpiled.
 
 ### Unit Tests
 

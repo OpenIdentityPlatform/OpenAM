@@ -29,7 +29,10 @@ module.exports = function (config) {
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {},
+        preprocessors: {
+            "target/test-classes/test-main.js": ["babel"],
+            "target/test-classes/org/**/*.js": ["babel"]
+        },
 
 
         // test results reporter to use

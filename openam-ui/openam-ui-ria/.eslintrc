@@ -1,6 +1,9 @@
 {
     "root": true,
-    "extends": "eslint-config-forgerock",
+    "extends": [
+        "forgerock",
+        "forgerock/es6"
+    ],
     "env": {
         "amd": true,
         "browser": true
