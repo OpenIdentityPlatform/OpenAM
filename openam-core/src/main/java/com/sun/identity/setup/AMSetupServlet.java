@@ -24,7 +24,7 @@
  *
  * $Id: AMSetupServlet.java,v 1.117 2010/01/20 17:01:35 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -983,7 +983,6 @@ public class AMSetupServlet extends HttpServlet {
             ServiceXMLTemplates.copy(basedir + "/template/xml", servletCtx);
             createDotVersionFile(basedir);
             handlePostPlugins(adminSSOToken);
-            postInitialize(adminSSOToken);
            
             if (!isDITLoaded && userRepo != null && !userRepo.isEmpty()) {
                 // Construct the SMSEntry for the node to check to 
@@ -1001,6 +1000,8 @@ public class AMSetupServlet extends HttpServlet {
                     }
                 }
             }
+            // postInitialize requires the user repo to be configured
+            postInitialize(adminSSOToken);
 
             /*
              * Requiring the keystore.jks file in OpenAM workspace.
