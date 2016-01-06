@@ -11,14 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps.policy;
 
 import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.APPLICATION;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_ACTIONS;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_RESOURCES;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_RESOURCE_TYPE_UUIDS;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.REGISTERED_APPLICATIONS;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActions;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
+import static org.forgerock.openam.upgrade.VersionUtils.isCurrentVersionLessThan;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
@@ -76,6 +82,8 @@ import java.util.Set;
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeEntitlementSubConfigsStep")
 public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
 
+    private final static int AM_13 = 1300;
+
     private static final String RESOURCES_TYPE_NAME_SUFFIX = "ResourceType";
     private static final String RESOURCE_TYPE_DESCRIPTION = "This resource type was created during upgrade for ";
 
@@ -93,6 +101,8 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
     private final ResourceTypeService resourceTypeService;
     private final ServiceConfigManager configManager;
     private final Set<String> defaultApplicationNames;
+    private final Set<String> removedDefaultApplications;
+
     private class ResourceTypeState {
         private boolean applicationNeedsResourceType = false;
         private boolean policiesNeedsResourceType = false;
@@ -102,6 +112,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
         private Set<String> patterns;
         private Set<String> policyNames;
     }
+
     private final Map<String, Set<ResourceTypeState>> resourceTypeStatePerRealm;
 
     private int upgradeableApplicationCount = 0;
@@ -112,13 +123,15 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
             @Named(EntitlementUtils.SERVICE_NAME) final ServiceConfigManager configManager,
             final ResourceTypeService resourceTypeService,
             final PrivilegedAction<SSOToken> adminTokenAction,
-            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory,
+            @Named("removedDefaultApplications") Set<String> removedDefaultApplications) {
         super(adminTokenAction, connectionFactory);
 
         this.configManager = configManager;
         this.resourceTypeService = resourceTypeService;
         this.defaultApplicationNames = new HashSet<String>();
         this.resourceTypeStatePerRealm = new HashMap<String, Set<ResourceTypeState>>();
+        this.removedDefaultApplications = removedDefaultApplications;
     }
 
     /**
@@ -128,6 +141,12 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
      */
     @Override
     public void initialize() throws UpgradeException {
+        if (isCurrentVersionLessThan(AM_13, true)) {
+            identifyApplicationsAndPoliciesRequiringUpgrade();
+        }
+    }
+
+    private void identifyApplicationsAndPoliciesRequiringUpgrade() throws UpgradeException {
         DEBUG.message("Initialising the upgrade step for adding resource types to the entitlement model");
         populateDefaultApplications();
 
@@ -142,6 +161,12 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
             final Set<ResourceTypeState> states = new HashSet<ResourceTypeState>();
 
             for (String appName : appNames) {
+
+                if (removedDefaultApplications.contains(appName)) {
+                    // Ignore applications that are to be removed.
+                    continue;
+                }
+
                 final Map<String, Set<String>> appData = getApplicationData(appConfig, appName);
                 final ResourceTypeState state = new ResourceTypeState();
                 state.appName = appName;
