@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -19,8 +19,11 @@ package org.forgerock.openam.uma;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -32,6 +35,13 @@ import org.restlet.ext.jackson.JacksonRepresentation;
  * @since 13.0.0
  */
 public class UmaExceptionHandler {
+
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
+
+    @Inject
+    public UmaExceptionHandler(JacksonRepresentationFactory jacksonRepresentationFactory) {
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
+    }
 
     /**
      * Checks if an error response is being returned and translates the error into the format described by the
@@ -62,7 +72,7 @@ public class UmaExceptionHandler {
         if (detail != null) {
             responseBody.putAll(detail.asMap());
         }
-        response.setEntity(new JacksonRepresentation<>(responseBody));
+        response.setEntity(jacksonRepresentationFactory.create(responseBody));
         response.setStatus(new Status(statusCode, response.getStatus().getThrowable()));
     }
 }

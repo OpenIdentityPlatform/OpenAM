@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -43,7 +43,7 @@ public class OAuth2FlowFinder extends Finder {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final Map<String, Finder> endpointClasses;
     private final ExceptionHandler exceptionHandler;
 
@@ -54,7 +54,7 @@ public class OAuth2FlowFinder extends Finder {
      * @param exceptionHandler An instance of the ExceptionHandler.
      * @param endpointClasses The endpoint handlers for the OAuth2 token endpoints.
      */
-    public OAuth2FlowFinder(OAuth2RequestFactory<Request> requestFactory,
+    public OAuth2FlowFinder(OAuth2RequestFactory<?, Request> requestFactory,
             ExceptionHandler exceptionHandler, Map<String, Finder> endpointClasses) {
         this.requestFactory = requestFactory;
         this.exceptionHandler = exceptionHandler;

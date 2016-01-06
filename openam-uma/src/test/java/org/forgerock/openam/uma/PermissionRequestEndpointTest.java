@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -38,13 +38,17 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.uma.extensions.PermissionRequestFilter;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
@@ -58,12 +62,14 @@ public class PermissionRequestEndpointTest {
     private Response response;
     private UmaTokenStore umaTokenStore;
     private PermissionRequestFilter permissionRequestFilter;
+    private JacksonRepresentationFactory jacksonRepresentationFactory =
+            new JacksonRepresentationFactory(new ObjectMapper());
 
     @BeforeMethod
     @SuppressWarnings("unchecked")
     public void setup() throws ServerException, InvalidGrantException, NotFoundException {
         resourceSetStore = mock(ResourceSetStore.class);
-        OAuth2RequestFactory<Request> requestFactory = mock(OAuth2RequestFactory.class);
+        OAuth2RequestFactory<?, Request> requestFactory = mock(OAuth2RequestFactory.class);
         umaTokenStore = mock(UmaTokenStore.class);
 
         OAuth2ProviderSettingsFactory providerSettingFactory = mock(OAuth2ProviderSettingsFactory.class);
@@ -85,7 +91,7 @@ public class PermissionRequestEndpointTest {
         UmaExceptionHandler exceptionHandler = mock(UmaExceptionHandler.class);
 
         endpoint = spy(new PermissionRequestEndpoint(providerSettingFactory, requestFactory,
-                umaProviderSettingsFactory, extensionFilterManager, exceptionHandler));
+                umaProviderSettingsFactory, extensionFilterManager, exceptionHandler, jacksonRepresentationFactory));
 
         response = mock(Response.class);
         endpoint.setResponse(response);

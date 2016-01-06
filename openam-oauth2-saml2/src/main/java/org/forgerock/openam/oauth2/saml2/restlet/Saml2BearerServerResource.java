@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 /**
@@ -35,6 +35,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Request;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
@@ -95,14 +96,16 @@ public class Saml2BearerServerResource extends ServerResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final AccessTokenService accessTokenService;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     @Inject
-    public Saml2BearerServerResource(final OAuth2RequestFactory<Request> requestFactory,
-            final AccessTokenService accessTokenService) {
+    public Saml2BearerServerResource(final OAuth2RequestFactory<?, Request> requestFactory,
+            final AccessTokenService accessTokenService, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.requestFactory = requestFactory;
         this.accessTokenService = accessTokenService;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     @Post
@@ -112,7 +115,7 @@ public class Saml2BearerServerResource extends ServerResource {
 
         try {
             final AccessToken accessToken = accessTokenService.requestAccessToken(request);
-            return new JacksonRepresentation<Map<String, Object>>(accessToken.toMap());
+            return jacksonRepresentationFactory.create(accessToken.toMap());
         } catch (InvalidGrantException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), "Assertion is invalid.", request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
         } catch (InvalidClientAuthZHeaderException e) {

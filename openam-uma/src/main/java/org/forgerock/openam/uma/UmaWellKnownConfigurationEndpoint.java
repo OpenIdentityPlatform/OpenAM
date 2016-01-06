@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -25,7 +25,7 @@ import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -41,19 +41,22 @@ public class UmaWellKnownConfigurationEndpoint extends ServerResource {
     private final UmaUrisFactory urisFactory;
     private final UmaExceptionHandler exceptionHandler;
     private final UmaProviderSettingsFactory providerSettingsFactory;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new instance of a UmaWellKnownConfigurationEndpoint.
-     *
-     * @param urisFactory An instance of the UmaProviderSettingFactory.
+     *  @param urisFactory An instance of the UmaProviderSettingFactory.
      * @param exceptionHandler An instance of the UmaExceptionHandler.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
     public UmaWellKnownConfigurationEndpoint(UmaUrisFactory urisFactory,
-            UmaProviderSettingsFactory providerSettingsFactory, UmaExceptionHandler exceptionHandler) {
+            UmaProviderSettingsFactory providerSettingsFactory, UmaExceptionHandler exceptionHandler,
+            JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.urisFactory = urisFactory;
         this.providerSettingsFactory = providerSettingsFactory;
         this.exceptionHandler = exceptionHandler;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -101,7 +104,7 @@ public class UmaWellKnownConfigurationEndpoint extends ServerResource {
             configuration.add("requesting_party_claims_endpoint", requestingPartyClaimsEndpoint.toString());
         }
 
-        return new JacksonRepresentation<>(configuration.asMap());
+        return jacksonRepresentationFactory.create(configuration.asMap());
     }
 
     @Override

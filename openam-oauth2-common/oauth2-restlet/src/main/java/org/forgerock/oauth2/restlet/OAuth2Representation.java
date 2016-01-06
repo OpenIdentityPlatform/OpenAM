@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -49,11 +49,11 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
  */
 public class OAuth2Representation {
 
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
     @Inject
-    public OAuth2Representation(OAuth2RequestFactory<Request> requestFactory) {
+    public OAuth2Representation(OAuth2RequestFactory<?, Request> requestFactory) {
         this.requestFactory = requestFactory;
     }
 

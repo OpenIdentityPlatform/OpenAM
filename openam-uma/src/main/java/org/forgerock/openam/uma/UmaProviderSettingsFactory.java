@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
 
 import javax.inject.Inject;
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletRequest;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,10 +31,9 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.restlet.RestletOAuth2Request;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
-import org.forgerock.services.context.Context;
 import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
 
 /**
  * <p>A factory for creating/retrieving UmaProviderSettings instances.</p>
@@ -50,18 +49,20 @@ public class UmaProviderSettingsFactory {
     private final Map<String, UmaProviderSettingsImpl> providerSettingsMap = new HashMap<>();
     private final OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
     private final UmaTokenStoreFactory tokenStoreFactory;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Contructs a new UmaProviderSettingsFactory.
-     *
-     * @param oAuth2ProviderSettingsFactory An instance of the OAuth2ProviderSettingFactory.
+     *  @param oAuth2ProviderSettingsFactory An instance of the OAuth2ProviderSettingFactory.
      * @param tokenStoreFactory An instance of the UmaTokenStoreFactory.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
     UmaProviderSettingsFactory(OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
-            UmaTokenStoreFactory tokenStoreFactory) {
+            UmaTokenStoreFactory tokenStoreFactory, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.oAuth2ProviderSettingsFactory = oAuth2ProviderSettingsFactory;
         this.tokenStoreFactory = tokenStoreFactory;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -71,7 +72,7 @@ public class UmaProviderSettingsFactory {
      * @return A UmaProviderSettings instance.
      */
     UmaProviderSettings get(Request req) throws NotFoundException {
-        return get(new RestletOAuth2Request(req));
+        return get(new RestletOAuth2Request(jacksonRepresentationFactory, req));
     }
 
     public UmaProviderSettings get(OAuth2Request request) throws NotFoundException {

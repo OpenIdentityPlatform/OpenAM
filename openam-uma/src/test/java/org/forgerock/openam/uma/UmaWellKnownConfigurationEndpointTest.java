@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -26,14 +26,16 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
+
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -47,6 +49,8 @@ public class UmaWellKnownConfigurationEndpointTest {
     private Response response;
     private UmaUris umaUris;
     private UmaProviderSettings providerSettings;
+    private JacksonRepresentationFactory jacksonRepresentationFactory =
+            new JacksonRepresentationFactory(new ObjectMapper());
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -56,7 +60,8 @@ public class UmaWellKnownConfigurationEndpointTest {
 
         UmaExceptionHandler exceptionHandler = mock(UmaExceptionHandler.class);
 
-        endpoint = new UmaWellKnownConfigurationEndpoint(umaUrisFactory, providerSettingsFactory, exceptionHandler);
+        endpoint = new UmaWellKnownConfigurationEndpoint(umaUrisFactory, providerSettingsFactory, exceptionHandler,
+                jacksonRepresentationFactory);
 
         response = mock(Response.class);
         endpoint.setResponse(response);

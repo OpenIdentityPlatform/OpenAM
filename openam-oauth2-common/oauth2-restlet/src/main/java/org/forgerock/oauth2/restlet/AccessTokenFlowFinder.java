@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -33,13 +33,13 @@ import static org.forgerock.openam.rest.service.RestletUtils.*;
 public class AccessTokenFlowFinder extends OAuth2FlowFinder {
 
     public AccessTokenFlowFinder() {
-        super(InjectorHolder.getInstance(Key.get(new TypeLiteral<OAuth2RequestFactory<Request>>() { })),
+        super(InjectorHolder.getInstance(Key.get(new TypeLiteral<OAuth2RequestFactory<?, Request>>() { })),
                 InjectorHolder.getInstance(ExceptionHandler.class),
                 getEndpointClasses());
     }
 
     private static Map<String, Finder> getEndpointClasses() {
-        Map<String, Finder> endpointClasses = new HashMap<String, Finder>();
+        Map<String, Finder> endpointClasses = new HashMap<>();
         endpointClasses.put(AUTHORIZATION_CODE, wrap(TokenEndpointResource.class));
         endpointClasses.put(REFRESH_TOKEN, wrap(RefreshTokenResource.class));
         endpointClasses.put(CLIENT_CREDENTIALS, wrap(TokenEndpointResource.class));

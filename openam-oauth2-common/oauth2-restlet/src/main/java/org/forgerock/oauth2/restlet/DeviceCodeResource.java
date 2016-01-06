@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -37,10 +37,10 @@ import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.openam.oauth2.OAuth2Utils;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.StringUtils;
 import org.restlet.Request;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
@@ -56,22 +56,27 @@ public class DeviceCodeResource extends ServerResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final TokenStore tokenStore;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final ClientRegistrationStore clientRegistrationStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final BaseURLProviderFactory baseURLProviderFactory;
     private final ExceptionHandler exceptionHandler;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
+    private final OAuth2Utils oAuth2Utils;
 
     @Inject
-    public DeviceCodeResource(TokenStore tokenStore, OAuth2RequestFactory<Request> requestFactory,
+    public DeviceCodeResource(TokenStore tokenStore, OAuth2RequestFactory<?, Request> requestFactory,
             ClientRegistrationStore clientRegistrationStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            BaseURLProviderFactory baseURLProviderFactory, ExceptionHandler exceptionHandler) {
+            BaseURLProviderFactory baseURLProviderFactory, ExceptionHandler exceptionHandler,
+            JacksonRepresentationFactory jacksonRepresentationFactory, OAuth2Utils oAuth2Utils) {
         this.tokenStore = tokenStore;
         this.requestFactory = requestFactory;
         this.clientRegistrationStore = clientRegistrationStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.baseURLProviderFactory = baseURLProviderFactory;
         this.exceptionHandler = exceptionHandler;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
+        this.oAuth2Utils = oAuth2Utils;
     }
 
     @Post
@@ -98,7 +103,7 @@ public class DeviceCodeResource extends ServerResource {
             }
             final String maxAge = request.getParameter(MAX_AGE);
             DeviceCode code = tokenStore.createDeviceCode(
-                    OAuth2Utils.split(scope, " "),
+                    oAuth2Utils.split(scope, " "),
                     null,
                     clientId,
                     request.<String>getParameter(NONCE),
@@ -130,7 +135,7 @@ public class DeviceCodeResource extends ServerResource {
             }
             result.put(VERIFICATION_URL, verificationUrl);
 
-            return new JacksonRepresentation<>(result);
+            return jacksonRepresentationFactory.create(result);
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), state);
         }

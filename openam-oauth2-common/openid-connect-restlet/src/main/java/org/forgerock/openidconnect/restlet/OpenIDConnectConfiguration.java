@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect.restlet;
@@ -38,7 +38,7 @@ import javax.inject.Inject;
  */
 public class OpenIDConnectConfiguration extends ServerResource {
 
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final OpenIDConnectProviderConfiguration providerConfiguration;
     private final ExceptionHandler exceptionHandler;
 
@@ -50,7 +50,7 @@ public class OpenIDConnectConfiguration extends ServerResource {
      * @param exceptionHandler An instance of the ExceptionHandler.
      */
     @Inject
-    public OpenIDConnectConfiguration(OAuth2RequestFactory<Request> requestFactory,
+    public OpenIDConnectConfiguration(OAuth2RequestFactory<?, Request> requestFactory,
             OpenIDConnectProviderConfiguration providerConfiguration, ExceptionHandler exceptionHandler) {
         this.requestFactory = requestFactory;
         this.providerConfiguration = providerConfiguration;

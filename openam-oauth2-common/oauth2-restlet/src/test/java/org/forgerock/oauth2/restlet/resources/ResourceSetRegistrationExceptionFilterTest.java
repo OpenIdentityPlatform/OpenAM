@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet.resources;
@@ -19,16 +19,17 @@ package org.forgerock.oauth2.restlet.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -38,6 +39,8 @@ import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class ResourceSetRegistrationExceptionFilterTest {
 
     private ResourceSetRegistrationExceptionFilter exceptionFilter;
@@ -45,8 +48,10 @@ public class ResourceSetRegistrationExceptionFilterTest {
     @BeforeMethod
     public void setup() {
         Restlet next = mock(Restlet.class);
+        JacksonRepresentationFactory jacksonRepresentationFactory =
+                new JacksonRepresentationFactory(new ObjectMapper());
 
-        exceptionFilter = new ResourceSetRegistrationExceptionFilter(next);
+        exceptionFilter = new ResourceSetRegistrationExceptionFilter(next, jacksonRepresentationFactory);
     }
 
     @Test

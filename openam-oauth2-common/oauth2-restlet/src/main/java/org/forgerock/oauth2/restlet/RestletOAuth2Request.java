@@ -11,13 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
 
-import org.forgerock.oauth2.core.OAuth2Request;
+import java.io.IOException;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.forgerock.json.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -27,9 +34,7 @@ import org.restlet.ext.servlet.ServletUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Locale;
-import java.util.Map;
+import com.google.inject.assistedinject.Assisted;
 
 /**
  * An implementation of a OAuth2Request for Restlet.
@@ -40,6 +45,7 @@ public class RestletOAuth2Request extends OAuth2Request {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final Request request;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
     private JsonValue body;
 
     /**
@@ -47,7 +53,9 @@ public class RestletOAuth2Request extends OAuth2Request {
      *
      * @param request The Restlet request.
      */
-    public RestletOAuth2Request(Request request) {
+    @Inject
+    public RestletOAuth2Request(JacksonRepresentationFactory jacksonRepresentationFactory, @Assisted Request request) {
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
         this.request = request;
     }
 
@@ -127,7 +135,7 @@ public class RestletOAuth2Request extends OAuth2Request {
     public JsonValue getBody() {
         if (body == null) {
             final JacksonRepresentation<Map> representation =
-                    new JacksonRepresentation<Map>(request.getEntity(), Map.class);
+                    jacksonRepresentationFactory.create(request.getEntity(), Map.class);
             try {
                 body = new JsonValue(representation.getObject());
             } catch (IOException e) {

@@ -11,24 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
 
-import java.util.Map;
-
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.CacheDirective;
-import org.restlet.data.Form;
-import org.restlet.data.Header;
 import org.restlet.engine.header.HeaderConstants;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.routing.Filter;
-import org.restlet.util.Series;
 
 /**
  * Provides validation for OAuth2 endpoints to ensure that the request is valid for the endpoint being requested.
@@ -37,12 +32,16 @@ import org.restlet.util.Series;
  */
 public abstract class OAuth2Filter extends Filter {
 
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
+
     /**
      * Constructs a new OAuth2Filter.
      *
      * @param restlet The Restlet resource.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
-    public OAuth2Filter(Restlet restlet) {
+    public OAuth2Filter(Restlet restlet, JacksonRepresentationFactory jacksonRepresentationFactory) {
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
         setNext(restlet);
     }
 
@@ -62,12 +61,12 @@ public abstract class OAuth2Filter extends Filter {
             validateContentType(request);
         } catch (OAuth2RestletException e) {
             response.setStatus(e.getStatus());
-            response.setEntity(new JacksonRepresentation<Map>(e.asMap()));
+            response.setEntity(jacksonRepresentationFactory.create(e.asMap()));
         } catch (InvalidRequestException e) {
             final OAuth2RestletException ex = new OAuth2RestletException(e.getStatusCode(), e.getError(),
                     e.getMessage(), null);
             response.setStatus(ex.getStatus());
-            response.setEntity(new JacksonRepresentation<Map>(ex.asMap()));
+            response.setEntity(jacksonRepresentationFactory.create(ex.asMap()));
         }
         // -------------------------------------
         // Add Cache-Control: no-store

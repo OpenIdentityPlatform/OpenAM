@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -36,6 +36,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.uma.extensions.PermissionRequestFilter;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
@@ -55,27 +56,31 @@ import org.restlet.resource.ServerResource;
 public class PermissionRequestEndpoint extends ServerResource {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final ExtensionFilterManager extensionFilterManager;
     private final UmaExceptionHandler exceptionHandler;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new PermissionRequestEndpoint instance
-     *  @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param extensionFilterManager An instance of the ExtensionFilterManager.
-     * @param exceptionHandler
+     * @param exceptionHandler The exception handler.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
     public PermissionRequestEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            OAuth2RequestFactory<Request> requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory,
-            ExtensionFilterManager extensionFilterManager, UmaExceptionHandler exceptionHandler) {
+            OAuth2RequestFactory<?, Request> requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory,
+            ExtensionFilterManager extensionFilterManager, UmaExceptionHandler exceptionHandler,
+            JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.requestFactory = requestFactory;
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
         this.extensionFilterManager = extensionFilterManager;
         this.exceptionHandler = exceptionHandler;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -175,7 +180,7 @@ public class PermissionRequestEndpoint extends ServerResource {
 
     private Representation setResponse(int statusCode, Map<String, Object> entity) {
         getResponse().setStatus(new Status(statusCode));
-        return new JacksonRepresentation<Map<String, Object>>(entity);
+        return jacksonRepresentationFactory.create(entity);
     }
 
     private Map<String, Object> toMap(JsonRepresentation entity) throws UmaException {

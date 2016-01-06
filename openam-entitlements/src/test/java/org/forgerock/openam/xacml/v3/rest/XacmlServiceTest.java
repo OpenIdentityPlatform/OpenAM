@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.xacml.v3.rest;
@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.delegation.DelegationEvaluator;
@@ -47,6 +48,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.entitlement.rest.StubPrivilege;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -91,6 +93,8 @@ public class XacmlServiceTest extends PowerMockTestCase {
         }
     };
     private Form query;
+    private JacksonRepresentationFactory jacksonRepresentationFactory =
+            new JacksonRepresentationFactory(new ObjectMapper());
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -98,7 +102,8 @@ public class XacmlServiceTest extends PowerMockTestCase {
         this.debug = mock(Debug.class);
         this.adminTokenAction = mock(AdminTokenAction.class);
         doAnswer(ssoTokenAnswer).when(adminTokenAction).run();
-        this.service = new XacmlServiceTestWrapper(importExport, adminTokenAction, this.debug, null, null);
+        this.service = new XacmlServiceTestWrapper(importExport, adminTokenAction, this.debug, null, null,
+                jacksonRepresentationFactory);
         this.request = mock(Request.class);
         doReturn(REQUEST_ATTRIBUTES).when(request).getAttributes();
         this.response = mock(Response.class);
@@ -315,7 +320,7 @@ public class XacmlServiceTest extends PowerMockTestCase {
         RestLog restLog = PowerMockito.mock(RestLog.class);
 
         DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
-        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator);
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator, jacksonRepresentationFactory);
 
         SSOToken adminToken = mock(SSOToken.class);
         DelegationPermission delegationPermission = mock(DelegationPermission.class);
@@ -347,7 +352,7 @@ public class XacmlServiceTest extends PowerMockTestCase {
         RestLog restLog = PowerMockito.mock(RestLog.class);
 
         DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
-        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator);
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator, jacksonRepresentationFactory);
 
         SSOToken adminToken = mock(SSOToken.class);
         DelegationPermission delegationPermission = mock(DelegationPermission.class);

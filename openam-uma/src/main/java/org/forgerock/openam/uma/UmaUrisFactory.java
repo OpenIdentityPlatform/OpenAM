@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -31,6 +31,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.restlet.RestletOAuth2Request;
 import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.services.context.Context;
@@ -49,6 +50,7 @@ public class UmaUrisFactory {
     private final OAuth2UrisFactory<RealmInfo> oAuth2UriFactory;
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final BaseURLProviderFactory baseURLProviderFactory;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new UmaUrisFactory.
@@ -59,10 +61,11 @@ public class UmaUrisFactory {
      */
     @Inject
     UmaUrisFactory(OAuth2UrisFactory<RealmInfo> oAuth2UriFactory, UmaProviderSettingsFactory umaProviderSettingsFactory,
-            BaseURLProviderFactory baseURLProviderFactory) {
+            BaseURLProviderFactory baseURLProviderFactory, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.oAuth2UriFactory = oAuth2UriFactory;
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
         this.baseURLProviderFactory = baseURLProviderFactory;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -72,7 +75,7 @@ public class UmaUrisFactory {
      * @return A UmaProviderSettings instance.
      */
     UmaUris get(Request req) throws NotFoundException {
-        return get(new RestletOAuth2Request(req));
+        return get(new RestletOAuth2Request(jacksonRepresentationFactory, req));
     }
 
     public UmaUris get(OAuth2Request request) throws NotFoundException {

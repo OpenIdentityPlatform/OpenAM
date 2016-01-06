@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
@@ -57,6 +58,7 @@ import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
@@ -67,8 +69,11 @@ import org.json.JSONObject;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -85,7 +90,7 @@ public class AuthorizationRequestEndpointTest {
     private AuthorizationRequestEndpoint endpoint;
     private UmaProviderSettings umaProviderSettings;
     private UmaProviderSettingsFactory umaProviderSettingsFactory;
-    private OAuth2RequestFactory<Request> requestFactory;
+    private OAuth2RequestFactory<?, Request> requestFactory;
     private TokenStore oauth2TokenStore;
     private Evaluator policyEvaluator;
     private UmaTokenStore umaTokenStore;
@@ -102,19 +107,21 @@ public class AuthorizationRequestEndpointTest {
     private PendingRequestsService pendingRequestsService;
     private IdTokenClaimGatherer idTokenClaimGatherer;
     private RequestAuthorizationFilter requestAuthorizationFilter;
+    private JacksonRepresentationFactory jacksonRepresentationFactory =
+            new JacksonRepresentationFactory(new ObjectMapper());
 
     private class AuthorizationRequestEndpoint2 extends AuthorizationRequestEndpoint {
 
         public AuthorizationRequestEndpoint2(UmaProviderSettingsFactory umaProviderSettingsFactory,
-                TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
+                TokenStore oauth2TokenStore, OAuth2RequestFactory<?, Request> requestFactory,
                 OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
                 OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory,
                 UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,
                 Map<String, ClaimGatherer> claimGatherers, ExtensionFilterManager extensionFilterManager,
-                UmaExceptionHandler exceptionHandler) {
+                UmaExceptionHandler exceptionHandler, JacksonRepresentationFactory jacksonRepresentationFactory) {
             super(umaProviderSettingsFactory, oauth2TokenStore, requestFactory, oAuth2ProviderSettingsFactory,
                     oAuth2UrisFactory, auditLogger, pendingRequestsService, claimGatherers, extensionFilterManager,
-                    exceptionHandler);
+                    exceptionHandler, jacksonRepresentationFactory);
         }
 
         @Override
@@ -202,7 +209,8 @@ public class AuthorizationRequestEndpointTest {
 
         endpoint = spy(new AuthorizationRequestEndpoint2(umaProviderSettingsFactory, oauth2TokenStore,
                 requestFactory, oauth2ProviderSettingsFactory, oauth2UrisFactory, umaAuditLogger,
-                pendingRequestsService, claimGatherers, extensionFilterManager, exceptionHandler));
+                pendingRequestsService, claimGatherers, extensionFilterManager, exceptionHandler,
+                jacksonRepresentationFactory));
         request = mock(Request.class);
         given(endpoint.getRequest()).willReturn(request);
 

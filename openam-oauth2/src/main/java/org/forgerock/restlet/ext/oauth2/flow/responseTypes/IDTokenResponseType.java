@@ -12,7 +12,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 
@@ -47,19 +47,20 @@ import org.restlet.Request;
 public class IDTokenResponseType implements ResponseType {
 
     private final OpenAMIdTokenResponseTypeHandler handler;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final ResourceOwnerAuthenticator ownerAuthenticator;
 
     @Inject
     public IDTokenResponseType(OpenAMIdTokenResponseTypeHandler handler,
-                               OAuth2RequestFactory<Request> requestFactory,
+                               OAuth2RequestFactory<?, Request> requestFactory,
                                ResourceOwnerAuthenticator ownerAuthenticator) {
         this.handler = handler;
         this.requestFactory = requestFactory;
         this.ownerAuthenticator = ownerAuthenticator;
     }
 
-    public CoreToken createToken(org.forgerock.oauth2.core.Token accessToken, Map<String, Object> data) throws NotFoundException {
+    public CoreToken createToken(org.forgerock.oauth2.core.Token accessToken, Map<String, Object> data)
+            throws NotFoundException {
 
         final OAuth2Request request = requestFactory.create(Request.getCurrent());
         final ResourceOwner resourceOwner = ownerAuthenticator.authenticate(request, true);

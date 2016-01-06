@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -26,6 +26,7 @@ import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Request;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
@@ -46,9 +47,10 @@ import java.util.Map;
  */
 public class RefreshTokenResource extends ServerResource {
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final AccessTokenService accessTokenService;
     private final ExceptionHandler exceptionHandler;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new RefreshTokenResource.
@@ -56,13 +58,15 @@ public class RefreshTokenResource extends ServerResource {
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param accessTokenService An instance of the AccessTokenService.
      * @param exceptionHandler An instance of the ExceptionHandler.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public RefreshTokenResource(OAuth2RequestFactory<Request> requestFactory, AccessTokenService accessTokenService,
-            ExceptionHandler exceptionHandler) {
+    public RefreshTokenResource(OAuth2RequestFactory<?, Request> requestFactory, AccessTokenService accessTokenService,
+            ExceptionHandler exceptionHandler, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.requestFactory = requestFactory;
         this.accessTokenService = accessTokenService;
         this.exceptionHandler = exceptionHandler;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -78,7 +82,7 @@ public class RefreshTokenResource extends ServerResource {
         final OAuth2Request request = requestFactory.create(getRequest());
         try {
             final AccessToken accessToken = accessTokenService.refreshToken(request);
-            return new JacksonRepresentation<Map<String, Object>>(accessToken.toMap());
+            return jacksonRepresentationFactory.create(accessToken.toMap());
         } catch (IllegalArgumentException e) {
             throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
                     request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));

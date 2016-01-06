@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -49,6 +49,8 @@ import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2Utils;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.services.baseurl.BaseURLProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.mockito.Mock;
@@ -62,6 +64,8 @@ import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DeviceCodeResourceTest {
 
@@ -78,15 +82,18 @@ public class DeviceCodeResourceTest {
     private BaseURLProviderFactory baseURLProviderFactory;
     @Mock
     private Request request;
+    private JacksonRepresentationFactory jacksonRepresentationFactory =
+            new JacksonRepresentationFactory(new ObjectMapper());
 
     @BeforeMethod
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         when(request.getMethod()).thenReturn(Method.POST);
-
+        
         resource = spy(new DeviceCodeResource(tokenStore, mockOAuth2RequestFactory(), clientRegistrationStore,
-                mockProviderSettingsFactory(), baseURLProviderFactory, null));
+                mockProviderSettingsFactory(), baseURLProviderFactory, null, jacksonRepresentationFactory,
+                new OAuth2Utils(jacksonRepresentationFactory)));
 
         when(resource.getRequest()).thenReturn(request);
     }
@@ -218,12 +225,12 @@ public class DeviceCodeResourceTest {
         return providerSettingsFactory;
     }
 
-    private OAuth2RequestFactory<Request> mockOAuth2RequestFactory() {
-        OAuth2RequestFactory<Request> requestFactory = mock(OAuth2RequestFactory.class);
+    private OAuth2RequestFactory<?, Request> mockOAuth2RequestFactory() {
+        OAuth2RequestFactory<?, Request> requestFactory = mock(OAuth2RequestFactory.class);
         when(requestFactory.create(any(Request.class))).then(new Answer<OAuth2Request>() {
             @Override
             public OAuth2Request answer(InvocationOnMock invocation) throws Throwable {
-                return new RestletOAuth2Request((Request) invocation.getArguments()[0]);
+                return new RestletOAuth2Request(null, (Request) invocation.getArguments()[0]);
             }
         });
         return requestFactory;

@@ -11,15 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.resources;
 
 import javax.inject.Inject;
-import javax.security.auth.Subject;
 
-import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,13 +44,8 @@ import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.extensions.ResourceRegistrationFilter;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
-import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.resource.SubjectContext;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.utils.JsonValueBuilder;
-import org.forgerock.services.context.AbstractContext;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.context.RootContext;
-import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.restlet.Request;
@@ -69,14 +62,6 @@ import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.security.AdminTokenAction;
-
 /**
  * Restlet endpoint for OAuth2 resource servers to register resource set that should be protected.
  *
@@ -91,12 +76,13 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ResourceSetDescriptionValidator validator;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final Set<ResourceSetRegistrationHook> hooks;
     private final ResourceSetLabelRegistration labelRegistration;
     private final ExtensionFilterManager extensionFilterManager;
     private final ExceptionHandler exceptionHandler;
     private final UmaLabelsStore umaLabelsStore;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Construct a new ResourceSetRegistrationEndpoint instance.
@@ -108,12 +94,14 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
      * @param extensionFilterManager An instance of the {@code ExtensionFilterManager}.
      * @param exceptionHandler An instance of the {@code ExceptionHandler}.
      * @param umaLabelsStore An instance of the Uma Label Store
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
     public ResourceSetRegistrationEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            ResourceSetDescriptionValidator validator, OAuth2RequestFactory<Request> requestFactory,
+            ResourceSetDescriptionValidator validator, OAuth2RequestFactory<?, Request> requestFactory,
             Set<ResourceSetRegistrationHook> hooks, ResourceSetLabelRegistration labelRegistration,
-            ExtensionFilterManager extensionFilterManager, ExceptionHandler exceptionHandler, UmaLabelsStore umaLabelsStore) {
+            ExtensionFilterManager extensionFilterManager, ExceptionHandler exceptionHandler,
+            UmaLabelsStore umaLabelsStore, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.validator = validator;
         this.requestFactory = requestFactory;
@@ -122,6 +110,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         this.extensionFilterManager = extensionFilterManager;
         this.exceptionHandler = exceptionHandler;
         this.umaLabelsStore = umaLabelsStore;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -261,7 +250,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
             resourceSetIds.add(resourceSetDescription.getId());
         }
 
-        return new JacksonRepresentation<Set<String>>(resourceSetIds);
+        return jacksonRepresentationFactory.create(resourceSetIds);
     }
 
     /**
@@ -326,7 +315,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         if (withPolicyUri && resourceSetDescription.getPolicyUri() != null) {
             response.put(POLICY_URI_FIELD, resourceSetDescription.getPolicyUri());
         }
-        Representation representation = new JacksonRepresentation<Map<String, Object>>(response);
+        Representation representation = jacksonRepresentationFactory.create(response);
         representation.setTag(generateETag(resourceSetDescription));
         return representation;
     }

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -103,12 +103,12 @@ public class ScopeImpl implements Scope {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final IdentityManager identityManager;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final OpenIDTokenIssuer openIDTokenIssuer;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     @Inject
-    public ScopeImpl(IdentityManager identityManager, OAuth2RequestFactory<Request> requestFactory,
+    public ScopeImpl(IdentityManager identityManager, OAuth2RequestFactory<?, Request> requestFactory,
             final OpenIDTokenIssuer openIDTokenIssuer, OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.identityManager = identityManager;
         this.requestFactory = requestFactory;

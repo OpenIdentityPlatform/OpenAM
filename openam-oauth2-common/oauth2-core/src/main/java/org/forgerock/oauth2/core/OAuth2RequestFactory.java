@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -20,9 +20,10 @@ package org.forgerock.oauth2.core;
  * A factory for creating OAuth2Request instances.
  *
  * @param <T> The type of the underlying request.
+ * @param <R> The request type to be returned.
  * @since 12.0.0
  */
-public interface OAuth2RequestFactory<T> {
+public interface OAuth2RequestFactory<R extends OAuth2Request, T> {
 
     /**
      * Creates a new OAuth2Request for the underlying HTTP request.
@@ -30,5 +31,5 @@ public interface OAuth2RequestFactory<T> {
      * @param request The underlying request.
      * @return The OAuth2Request.
      */
-    OAuth2Request create(T request);
+    R create(T request);
 }

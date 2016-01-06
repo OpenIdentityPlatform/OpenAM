@@ -11,10 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
- */
-
-/*
+ * Copyright 2012-2016 ForgeRock AS.
+ *
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
@@ -27,6 +25,7 @@ import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
@@ -51,8 +50,9 @@ public class ConnectClientRegistration extends ServerResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final OpenIdConnectClientRegistrationService clientRegistrationService;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final ExceptionHandler exceptionHandler;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new ConnectClientRegistration.
@@ -60,13 +60,16 @@ public class ConnectClientRegistration extends ServerResource {
      * @param clientRegistrationService An instance of the OpenIdConnectClientRegistrationService.
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param exceptionHandler An instance of the ExceptionHandler.
+     * @param jacksonRepresentationFactory The factory for instances of {@code JacksonRepresentation}.
      */
     @Inject
     public ConnectClientRegistration(OpenIdConnectClientRegistrationService clientRegistrationService,
-            OAuth2RequestFactory<Request> requestFactory, ExceptionHandler exceptionHandler) {
+            OAuth2RequestFactory<?, Request> requestFactory, ExceptionHandler exceptionHandler,
+            JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.clientRegistrationService = clientRegistrationService;
         this.requestFactory = requestFactory;
         this.exceptionHandler = exceptionHandler;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -90,7 +93,7 @@ public class ConnectClientRegistration extends ServerResource {
             final JsonValue registration = clientRegistrationService.createRegistration(accessToken,
                     deploymentUrl, request);
             setStatus(Status.SUCCESS_CREATED);
-            return new JacksonRepresentation(registration.asMap());
+            return jacksonRepresentationFactory.create(registration.asMap());
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
         }
@@ -113,7 +116,7 @@ public class ConnectClientRegistration extends ServerResource {
         try {
             final JsonValue registration = clientRegistrationService.getRegistration(clientId, accessToken, request);
 
-            return new JacksonRepresentation(registration.asMap());
+            return jacksonRepresentationFactory.create(registration.asMap());
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
         }

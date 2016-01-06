@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -25,9 +25,11 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -48,12 +50,23 @@ public class OAuth2Utils {
 
     public static final String SCOPE_DELIMITER = " ";
 
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
+
+    /**
+     * Default constructor with guice provided variables.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
+     */
+    @Inject
+    public OAuth2Utils(JacksonRepresentationFactory jacksonRepresentationFactory) {
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
+    }
+
     /**
      * Gets the deployment URI of the OAuth2 authorization server
      * @param request the request to get the deployment uri of
      * @return
      */
-    public static String getDeploymentURL(HttpServletRequest request){
+    public String getDeploymentURL(HttpServletRequest request){
         String uri = request.getRequestURI();
         String deploymentURI = uri;
         int firstSlashIndex = uri.indexOf("/");
@@ -86,7 +99,7 @@ public class OAuth2Utils {
      *            string to evaluate as empty.
      * @return true if the string is empty else false.
      */
-    public static boolean isEmpty(String val) {
+    public boolean isEmpty(String val) {
         return (val == null) ? true : "".equals(val) ? true : false;
     }
 
@@ -99,15 +112,15 @@ public class OAuth2Utils {
      *      OAuth2Utils.isBlank(&quot;  bob  &quot;) = false
      * </pre>
      */
-    public static boolean isBlank(String val) {
+    public boolean isBlank(String val) {
         return (val == null) ? true : isEmpty(val.trim());
     }
 
-    public static boolean isNotBlank(String val) {
+    public boolean isNotBlank(String val) {
         return !isBlank(val);
     }
 
-    public static String join(Iterable<? extends Object> iterable, String delimiter) {
+    public String join(Iterable<? extends Object> iterable, String delimiter) {
         if (null != iterable) {
             Iterator<? extends Object> iterator = iterable.iterator();
             if (!iterator.hasNext()) {
@@ -124,7 +137,7 @@ public class OAuth2Utils {
         return null;
     }
 
-    public static Set<String> split(String string, String delimiter) {
+    public Set<String> split(String string, String delimiter) {
         if (isNotBlank(string)) {
             StringTokenizer tokenizer =
                     new StringTokenizer(string, null != delimiter ? delimiter : SCOPE_DELIMITER);
@@ -152,12 +165,12 @@ public class OAuth2Utils {
      * @param request
      * @return
      */
-    public static String getRealm(Request request) {
+    public String getRealm(Request request) {
         HttpServletRequest httpRequest = ServletUtils.getRequest(request);
         return getRealm(httpRequest);
     }
 
-    public static String getRealm(HttpServletRequest request) {
+    public String getRealm(HttpServletRequest request) {
         Object realm = request.getParameter(OAuth2Constants.Custom.REALM);
         if (realm instanceof String) {
             return (String) realm;
@@ -165,7 +178,7 @@ public class OAuth2Utils {
         return "/";
     }
 
-    public static String getLocale(Request request) {
+    public String getLocale(Request request) {
         Object locale = request.getAttributes().get(OAuth2Constants.Custom.LOCALE);
         if (locale instanceof String) {
             return (String) locale;
@@ -173,7 +186,7 @@ public class OAuth2Utils {
         return getRequestParameter(request, OAuth2Constants.Custom.LOCALE, String.class);
     }
 
-    public static <T> T getRequestParameter(Request request, String parameterName, Class<T> clazz) {
+    public <T> T getRequestParameter(Request request, String parameterName, Class<T> clazz) {
         Object value = getRequestParameters(request).get(parameterName);
         if (null != value && clazz.isAssignableFrom(value.getClass())) {
             return clazz.cast(value);
@@ -190,7 +203,7 @@ public class OAuth2Utils {
      *            incoming request object
      * @return The modifiable attributes map.
      */
-    public static Map<String, Object> getRequestParameters(Request request) {
+    public Map<String, Object> getRequestParameters(Request request) {
         Map<String, String> parameters = null;
         if (request.getAttributes().get(OAuth2Constants.Params.class.getName()) instanceof Map == false) {
             parameters = getParameters(request);
@@ -216,20 +229,21 @@ public class OAuth2Utils {
      *            incoming request object
      * @return null if the request does not contains any parameter
      */
-    public static Map<String, String> getParameters(Request request) {
+    public Map<String, String> getParameters(Request request) {
         if (Method.GET.equals(request.getMethod())
                 || request.getEntity() instanceof EmptyRepresentation) {
-            return OAuth2Utils.ParameterLocation.HTTP_QUERY.getParameters(request);
+            return OAuth2Utils.ParameterLocation.HTTP_QUERY.getParameters(jacksonRepresentationFactory, request);
         } else {
-            return OAuth2Utils.ParameterLocation.HTTP_QUERY.getParameters(request);
+            return OAuth2Utils.ParameterLocation.HTTP_QUERY.getParameters(jacksonRepresentationFactory, request);
         }
     }
 
-    public static enum ParameterLocation {
+    private enum ParameterLocation {
         HTTP_QUERY, HTTP_HEADER, HTTP_FRAGMENT, HTTP_BODY;
 
         @SuppressWarnings(value = "unchecked")
-        public Map<String, String> getParameters(Request request) {
+        private Map<String, String> getParameters(JacksonRepresentationFactory jacksonRepresentationFactory,
+                Request request) {
             Map<String, String> result = null;
             switch (this) {
                 case HTTP_FRAGMENT:
@@ -259,7 +273,7 @@ public class OAuth2Utils {
                         } else if (MediaType.APPLICATION_JSON
                                 .equals(request.getEntity().getMediaType())) {
                             JacksonRepresentation<Map> representation =
-                                    new JacksonRepresentation<Map>(request.getEntity(), Map.class);
+                                    jacksonRepresentationFactory.create(request.getEntity(), Map.class);
                             try {
                                 result.putAll(representation.getObject());
                             } catch (IOException e) {

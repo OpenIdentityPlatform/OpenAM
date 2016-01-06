@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 package org.forgerock.restlet.ext.oauth2.flow.responseTypes;
@@ -45,12 +45,12 @@ import org.restlet.Request;
 public class CodeResponseType implements ResponseType {
 
     private final AuthorizationCodeResponseTypeHandler handler;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final ResourceOwnerAuthenticator ownerAuthenticator;
 
     @Inject
     public CodeResponseType(AuthorizationCodeResponseTypeHandler handler,
-                            OAuth2RequestFactory<Request> requestFactory,
+                            OAuth2RequestFactory<?, Request> requestFactory,
                             ResourceOwnerAuthenticator ownerAuthenticator) {
         this.handler = handler;
         this.requestFactory = requestFactory;

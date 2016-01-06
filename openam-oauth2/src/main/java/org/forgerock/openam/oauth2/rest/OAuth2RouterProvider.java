@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.rest;
@@ -49,6 +49,7 @@ import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.audit.OAuth2AccessAuditFilter;
 import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
 import org.forgerock.openam.rest.audit.RestletBodyAuditor;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openidconnect.restlet.ConnectClientRegistration;
@@ -75,26 +76,28 @@ public class OAuth2RouterProvider implements Provider<Router> {
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
     private final Set<OAuth2AuditContextProvider> contextProviders;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new RestEndpoints instance.
-     *
-     * @param realmValidator An instance of the RestRealmValidator.
+     *  @param realmValidator An instance of the RestRealmValidator.
      * @param coreWrapper An instance of the CoreWrapper.
      * @param eventPublisher The publisher responsible for logging the events.
      * @param eventFactory The factory that can be used to create the events.
      * @param contextProviders The OAuth2 audit context providers, responsible for finding details which can
-     *                         be audit logged from various tokens which may be attached to requests and/or responses.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
     public OAuth2RouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
             AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
-            @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS) Set<OAuth2AuditContextProvider> contextProviders) {
+            @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS) Set<OAuth2AuditContextProvider> contextProviders,
+            JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
         this.eventPublisher = eventPublisher;
         this.eventFactory = eventFactory;
         this.contextProviders = contextProviders;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     @Override
@@ -103,8 +106,10 @@ public class OAuth2RouterProvider implements Provider<Router> {
 
         // Standard OAuth2 endpoints
 
-        router.attach("/authorize", auditWithOAuthFilter(new AuthorizeEndpointFilter(wrap(AuthorizeResource.class))));
-        router.attach("/access_token", auditWithOAuthFilter(new TokenEndpointFilter(new AccessTokenFlowFinder()),
+        router.attach("/authorize", auditWithOAuthFilter(new AuthorizeEndpointFilter(wrap(AuthorizeResource.class),
+                jacksonRepresentationFactory)));
+        router.attach("/access_token", auditWithOAuthFilter(new TokenEndpointFilter(new AccessTokenFlowFinder(),
+                jacksonRepresentationFactory),
                 formAuditor(RESPONSE_TYPE, GRANT_TYPE, CLIENT_ID, USERNAME, SCOPE, REDIRECT_URI),
                 jacksonAuditor(SCOPE, TOKEN_TYPE)));
         router.attach("/tokeninfo", auditWithOAuthFilter(wrap(ValidationServerResource.class),

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -21,6 +21,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenInfoService;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Request;
 import org.restlet.data.CacheDirective;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -31,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Map;
 
 /**
  * Handles requests to the OAuth2 tokeninfo endpoint for retrieving information about the provided token.
@@ -41,23 +41,25 @@ import java.util.Map;
 public class ValidationServerResource extends ServerResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final TokenInfoService tokenInfoService;
     private final ExceptionHandler exceptionHandler;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new ValidationServerResource.
-     *
-     * @param requestFactory An instance of the ValidationServerResource.
+     *  @param requestFactory An instance of the ValidationServerResource.
      * @param tokenInfoService An instance of the TokenInfoService.
      * @param exceptionHandler An instance of the ExceptionHandler.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public ValidationServerResource(OAuth2RequestFactory<Request> requestFactory, TokenInfoService tokenInfoService,
-            ExceptionHandler exceptionHandler) {
+    public ValidationServerResource(OAuth2RequestFactory<?, Request> requestFactory, TokenInfoService tokenInfoService,
+            ExceptionHandler exceptionHandler, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.requestFactory = requestFactory;
         this.tokenInfoService = tokenInfoService;
         this.exceptionHandler = exceptionHandler;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -77,7 +79,7 @@ public class ValidationServerResource extends ServerResource {
             // Sets the no-store Cache-Control header
             getResponse().getCacheDirectives().add(CacheDirective.noCache());
             getResponse().getCacheDirectives().add(CacheDirective.noStore());
-            return new JacksonRepresentation<Map<String, Object>>(tokenInfo.asMap());
+            return jacksonRepresentationFactory.create(tokenInfo.asMap());
 
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.oauth2.guice;
 
@@ -123,6 +123,7 @@ import org.forgerock.openam.rest.audit.OAuth2AuditAccessTokenContextProvider;
 import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
 import org.forgerock.openam.rest.audit.OAuth2AuditRefreshTokenContextProvider;
 import org.forgerock.openam.rest.audit.OAuth2AuditSSOTokenContextProvider;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.sm.datalayer.utils.ThreadSafeTokenIdGenerator;
 import org.forgerock.openam.utils.OpenAMSettings;
@@ -160,7 +161,7 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
-        bind(new TypeLiteral<OAuth2RequestFactory<Request>>() { }).to(RestletOAuth2RequestFactory.class);
+        bind(new TypeLiteral<OAuth2RequestFactory<?, Request>>() { }).to(RestletOAuth2RequestFactory.class);
         bind(ResourceOwnerConsentVerifier.class).to(OpenIdResourceOwnerConsentVerifier.class);
         bind(ClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OpenIdConnectClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
@@ -345,9 +346,11 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Provides
     @Singleton
     @Named(OAuth2Constants.Custom.RSR_ENDPOINT)
-    public Restlet createResourceSetRegistrationEndpoint(TokenStore store, OAuth2RequestFactory<Request> reqFactory) {
+    public Restlet createResourceSetRegistrationEndpoint(TokenStore store, OAuth2RequestFactory<?, Request> reqFactory,
+            JacksonRepresentationFactory jacksonRepresentationFactory) {
         return new ResourceSetRegistrationExceptionFilter(
-                new AccessTokenProtectionFilter(null, store, reqFactory, wrap(ResourceSetRegistrationEndpoint.class)));
+                new AccessTokenProtectionFilter(null, store, reqFactory, wrap(ResourceSetRegistrationEndpoint.class)),
+                jacksonRepresentationFactory);
     }
 
     public static class RealmAgnosticTokenStore extends OpenAMTokenStore {
@@ -372,8 +375,8 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Singleton
     @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS)
     Set<OAuth2AuditContextProvider> getOAuth2AuditContextProviders(TokenStore tokenStore,
-                                                                   OAuth2RequestFactory<Request> requestFactory) {
-        Set<OAuth2AuditContextProvider> set = new HashSet();
+            OAuth2RequestFactory<?, Request> requestFactory) {
+        Set<OAuth2AuditContextProvider> set = new HashSet<>();
 
         set.add(new OAuth2AuditAccessTokenContextProvider(tokenStore, requestFactory));
         set.add(new OAuth2AuditRefreshTokenContextProvider(tokenStore, requestFactory));

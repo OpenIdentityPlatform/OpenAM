@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -47,7 +47,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final AuthorizationService authorizationService;
     private final ExceptionHandler exceptionHandler;
     private final OAuth2Representation representation;
@@ -62,7 +62,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
      * @param representation An instance of the OAuth2Representation.
      */
     @Inject
-    public AuthorizeResource(OAuth2RequestFactory<Request> requestFactory, AuthorizationService authorizationService,
+    public AuthorizeResource(OAuth2RequestFactory<?, Request> requestFactory, AuthorizationService authorizationService,
             ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
             XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory) {
         super(router, baseURLProviderFactory, xuiState);

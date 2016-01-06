@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.xacml.v3.rest;
 
@@ -20,6 +20,7 @@ import com.sun.identity.entitlement.xacml3.XACMLExportImport;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 
 /**
  * Allow testing of XacmlService without the unpleasantness of mocking a dozen static functions and classes.
@@ -33,12 +34,9 @@ public class XacmlServiceTestWrapper extends XacmlService {
      * @param adminTokenAction Non null admin action function.
      * @param debug The debug instance for logging.
      */
-    public XacmlServiceTestWrapper(XACMLExportImport importExport,
-                                   AdminTokenAction adminTokenAction,
-                                   Debug debug,
-                                   RestLog restLog,
-                                   DelegationEvaluator evaluator) {
-        super(importExport, adminTokenAction, debug, restLog, evaluator);
+    public XacmlServiceTestWrapper(XACMLExportImport importExport, AdminTokenAction adminTokenAction, Debug debug,
+            RestLog restLog, DelegationEvaluator evaluator, JacksonRepresentationFactory jacksonRepresentationFactory) {
+        super(importExport, adminTokenAction, debug, restLog, evaluator, jacksonRepresentationFactory);
     }
 
     @Override

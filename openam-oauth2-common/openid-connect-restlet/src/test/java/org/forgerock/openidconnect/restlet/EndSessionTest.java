@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openidconnect.restlet;
 
@@ -59,7 +59,7 @@ public class EndSessionTest {
         oAuth2Request = mock(OAuth2Request.class);
         when(oAuth2Request.getParameter(OAuth2Constants.Params.END_SESSION_ID_TOKEN_HINT)).thenReturn(idToken);
 
-        OAuth2RequestFactory<Request> requestFactory = mock(OAuth2RequestFactory.class);
+        OAuth2RequestFactory<?, Request> requestFactory = mock(OAuth2RequestFactory.class);
         ExceptionHandler exceptionHandler = mock(ExceptionHandler.class);
         ClientRegistrationStore clientRegistrationStore = mock(ClientRegistrationStore.class);
         openIDConnectEndSession = mock(OpenIDConnectEndSession.class);

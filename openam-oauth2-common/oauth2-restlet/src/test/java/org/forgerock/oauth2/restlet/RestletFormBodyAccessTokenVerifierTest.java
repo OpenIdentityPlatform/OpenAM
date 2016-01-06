@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.oauth2.restlet;
 
@@ -43,7 +43,7 @@ public class RestletFormBodyAccessTokenVerifierTest {
     public void shouldCheckBody() throws Exception {
         // Given
         Request request = new Request();
-        OAuth2Request req = new RestletOAuth2Request(request);
+        OAuth2Request req = new RestletOAuth2Request(null, request);
 
         // When
         AccessTokenVerifier.TokenState result = verifier.verify(req);
@@ -57,7 +57,7 @@ public class RestletFormBodyAccessTokenVerifierTest {
         // Given
         Request request = new Request();
         request.setEntity(new EmptyRepresentation());
-        OAuth2Request req = new RestletOAuth2Request(request);
+        OAuth2Request req = new RestletOAuth2Request(null, request);
 
         // When
         AccessTokenVerifier.TokenState result = verifier.verify(req);
@@ -72,7 +72,7 @@ public class RestletFormBodyAccessTokenVerifierTest {
         Form form = new Form();
         Request request = new Request();
         request.setEntity(form.getWebRepresentation());
-        OAuth2Request req = new RestletOAuth2Request(request);
+        OAuth2Request req = new RestletOAuth2Request(null, request);
 
         // When
         AccessTokenVerifier.TokenState result = verifier.verify(req);
@@ -88,7 +88,7 @@ public class RestletFormBodyAccessTokenVerifierTest {
         form.add("access_token", "freddy");
         Request request = new Request();
         request.setEntity(form.getWebRepresentation());
-        OAuth2Request req = new RestletOAuth2Request(request);
+        OAuth2Request req = new RestletOAuth2Request(null, request);
 
         // When
         AccessTokenVerifier.TokenState result = verifier.verify(req);
@@ -105,7 +105,7 @@ public class RestletFormBodyAccessTokenVerifierTest {
         form.add("access_token", "freddy");
         Request request = new Request();
         request.setEntity(form.getWebRepresentation());
-        OAuth2Request req = new RestletOAuth2Request(request);
+        OAuth2Request req = new RestletOAuth2Request(null, request);
 
         AccessToken token = new AccessToken(json(object()), "access_token", "freddy") {
             @Override
@@ -130,7 +130,7 @@ public class RestletFormBodyAccessTokenVerifierTest {
         form.add("access_token", "freddy");
         Request request = new Request();
         request.setEntity(form.getWebRepresentation());
-        OAuth2Request req = new RestletOAuth2Request(request);
+        OAuth2Request req = new RestletOAuth2Request(null, request);
 
         AccessToken token = new AccessToken(json(object()), "access_token", "freddy") {
             @Override

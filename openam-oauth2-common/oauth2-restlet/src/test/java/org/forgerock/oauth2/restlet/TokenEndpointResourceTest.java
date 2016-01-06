@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -20,11 +20,15 @@ import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenService;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.EmptyRepresentation;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -34,9 +38,11 @@ import static org.testng.Assert.*;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class TokenEndpointResourceTest {
 
-    private OAuth2RequestFactory<Request> requestFactory;
+    private OAuth2RequestFactory<?, Request> requestFactory;
     private AccessTokenService accessTokenService;
     private ExceptionHandler exceptionHandler;
     private TokenRequestHook hook;
@@ -46,14 +52,16 @@ public class TokenEndpointResourceTest {
     @BeforeClass
     @SuppressWarnings("unchecked")
     public void setUp() {
+        JacksonRepresentationFactory jacksonRepresentationFactory =
+                new JacksonRepresentationFactory(new ObjectMapper());
         requestFactory = mock(OAuth2RequestFactory.class);
         accessTokenService = mock(AccessTokenService.class);
         OAuth2Representation representation = new OAuth2Representation(null);
-        exceptionHandler = new ExceptionHandler(representation, null, null);
+        exceptionHandler = new ExceptionHandler(representation, null, null, jacksonRepresentationFactory);
         hook = mock(TokenRequestHook.class);
 
         tokenEndpointResource = new TokenEndpointResource(requestFactory, accessTokenService, exceptionHandler,
-                CollectionUtils.asSet(hook));
+                CollectionUtils.asSet(hook), jacksonRepresentationFactory);
     }
 
     @Test

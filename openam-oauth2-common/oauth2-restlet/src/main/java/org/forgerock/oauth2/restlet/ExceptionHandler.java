@@ -11,16 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
 
 import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
-import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -51,20 +51,24 @@ public class ExceptionHandler {
 
     private final OAuth2Representation representation;
     private final BaseURLProviderFactory baseURLProviderFactory;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new ExceptionHandler.
      *
      * @param representation An instance of the OAuth2Representation.
-     * @param baseURLProviderFactory
+     * @param baseURLProviderFactory The factory to create {@code BaseURLProvider} instances.
+     * @param jacksonRepresentationFactory The factory to create {@code JacksonRepresentation} instances.
      */
     @Inject
     public ExceptionHandler(OAuth2Representation representation, BaseURLProviderFactory baseURLProviderFactory,
-            OAuth2RequestFactory<Request> requestFactory) {
+            OAuth2RequestFactory<?, Request> requestFactory,
+            JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.representation = representation;
         this.baseURLProviderFactory = baseURLProviderFactory;
         this.requestFactory = requestFactory;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -150,7 +154,7 @@ public class ExceptionHandler {
 
         final OAuth2RestletException exception = toOAuth2RestletException(throwable);
         response.setStatus(exception.getStatus());
-        response.setEntity(new JacksonRepresentation<Map>(exception.asMap()));
+        response.setEntity(jacksonRepresentationFactory.create(exception.asMap()));
     }
 
     private OAuth2RestletException toOAuth2RestletException(Throwable throwable) {

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -46,7 +46,7 @@ public class AccessTokenProtectionFilterTest {
 
     private AccessTokenProtectionFilter filter;
     private TokenStore tokenStore;
-    private OAuth2RequestFactory<Request> requestFactory;
+    private OAuth2RequestFactory<?, Request> requestFactory;
 
     @BeforeMethod
     public void setUp() throws Exception {

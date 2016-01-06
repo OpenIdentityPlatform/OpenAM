@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -26,6 +26,7 @@ import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Request;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
@@ -45,10 +46,11 @@ import java.util.Set;
  */
 public class TokenEndpointResource extends ServerResource {
 
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final AccessTokenService accessTokenService;
     private final ExceptionHandler exceptionHandler;
     private final Set<TokenRequestHook> hooks;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new instance of the TokenEndpointResource.
@@ -56,14 +58,17 @@ public class TokenEndpointResource extends ServerResource {
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param accessTokenService An instance of the AccessTokenService.
      * @param exceptionHandler An instance of the ExceptionHandler.
+     * @param jacksonRepresentationFactory The factory to use for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public TokenEndpointResource(OAuth2RequestFactory<Request> requestFactory, AccessTokenService accessTokenService,
-            ExceptionHandler exceptionHandler, Set<TokenRequestHook> hooks) {
+    public TokenEndpointResource(OAuth2RequestFactory<?, Request> requestFactory, AccessTokenService accessTokenService,
+            ExceptionHandler exceptionHandler, Set<TokenRequestHook> hooks,
+            JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.requestFactory = requestFactory;
         this.accessTokenService = accessTokenService;
         this.exceptionHandler = exceptionHandler;
         this.hooks = hooks;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -85,7 +90,7 @@ public class TokenEndpointResource extends ServerResource {
                 hook.afterTokenHandling(request, getRequest(), getResponse());
             }
 
-            return new JacksonRepresentation<Map<String, Object>>(accessToken.toMap());
+            return jacksonRepresentationFactory.create(accessToken.toMap());
 
         } catch (RedirectUriMismatchException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),

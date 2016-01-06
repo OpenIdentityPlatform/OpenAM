@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.resources;
@@ -35,7 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.identity.entitlement.EntitlementException;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
@@ -56,6 +55,7 @@ import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.extensions.ResourceRegistrationFilter;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.util.query.BaseQueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
@@ -73,6 +73,7 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Conditions;
 import org.restlet.data.Status;
 import org.restlet.data.Tag;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
@@ -94,8 +95,9 @@ public class ResourceSetRegistrationEndpointTest {
     private ResourceSetRegistrationHook hook;
     private ResourceSetLabelRegistration labelRegistration;
     private ResourceRegistrationFilter resourceRegistrationFilter;
-
     private Response response;
+    private JacksonRepresentationFactory jacksonRepresentationFactory =
+            new JacksonRepresentationFactory(new ObjectMapper());
 
     @BeforeMethod
     @SuppressWarnings("unchecked")
@@ -103,8 +105,8 @@ public class ResourceSetRegistrationEndpointTest {
 
         store = mock(ResourceSetStore.class);
         validator = mock(ResourceSetDescriptionValidator.class);
-        OAuth2RequestFactory<Request> requestFactory = mock(OAuth2RequestFactory.class);
-        Set<ResourceSetRegistrationHook> hooks = new HashSet<ResourceSetRegistrationHook>();
+        OAuth2RequestFactory<?, Request> requestFactory = mock(OAuth2RequestFactory.class);
+        Set<ResourceSetRegistrationHook> hooks = new HashSet<>();
         hook = mock(ResourceSetRegistrationHook.class);
         hooks.add(hook);
         labelRegistration = mock(ResourceSetLabelRegistration.class);
@@ -123,7 +125,8 @@ public class ResourceSetRegistrationEndpointTest {
         UmaLabelsStore umaLabelsStore = mock(UmaLabelsStore.class);
 
         endpoint = spy(new ResourceSetRegistrationEndpoint(providerSettingsFactory, validator, requestFactory,
-                hooks, labelRegistration, extensionFilterManager, exceptionHandler, umaLabelsStore));
+                hooks, labelRegistration, extensionFilterManager, exceptionHandler, umaLabelsStore,
+                jacksonRepresentationFactory));
 
         Request request = mock(Request.class);
         ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC);

@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
 
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
@@ -37,9 +38,10 @@ public class AuthorizeEndpointFilter extends OAuth2Filter {
      * Constructs a new AuthorizeEndpointFilter.
      *
      * @param resource The Restlet resource.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
-    public AuthorizeEndpointFilter(Restlet resource) {
-        super(resource);
+    public AuthorizeEndpointFilter(Restlet resource, JacksonRepresentationFactory jacksonRepresentationFactory) {
+        super(resource, jacksonRepresentationFactory);
     }
 
     /**

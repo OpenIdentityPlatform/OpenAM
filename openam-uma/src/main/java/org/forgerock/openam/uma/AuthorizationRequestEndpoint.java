@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -54,6 +54,7 @@ import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
@@ -79,7 +80,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     private final Logger logger = LoggerFactory.getLogger("UmaProvider");
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final Debug debug = Debug.getInstance("UmaProvider");
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final TokenStore oauth2TokenStore;
 
     private static final String UNABLE_TO_RETRIEVE_TICKET_MESSAGE = "Unable to retrieve Permission Ticket";
@@ -91,17 +92,18 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     private final Map<String, ClaimGatherer> claimGatherers;
     private final ExtensionFilterManager extensionFilterManager;
     private final UmaExceptionHandler exceptionHandler;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new AuthorizationRequestEndpoint
      */
     @Inject
     public AuthorizationRequestEndpoint(UmaProviderSettingsFactory umaProviderSettingsFactory,
-            TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
+            TokenStore oauth2TokenStore, OAuth2RequestFactory<?, Request> requestFactory,
             OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory,
             UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,
             Map<String, ClaimGatherer> claimGatherers, ExtensionFilterManager extensionFilterManager,
-            UmaExceptionHandler exceptionHandler) {
+            UmaExceptionHandler exceptionHandler, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
         this.requestFactory = requestFactory;
         this.oauth2TokenStore = oauth2TokenStore;
@@ -112,6 +114,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         this.claimGatherers = claimGatherers;
         this.extensionFilterManager = extensionFilterManager;
         this.exceptionHandler = exceptionHandler;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     @Post
@@ -357,7 +360,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         RequestingPartyToken rpt = umaTokenStore.createRPT(permissionTicket);
         Map<String, Object> response = new HashMap<>();
         response.put("rpt", rpt.getId());
-        return new JacksonRepresentation<>(response);
+        return jacksonRepresentationFactory.create(response);
     }
 
     private PermissionTicket getPermissionTicket(UmaTokenStore umaTokenStore, JsonValue requestBody)

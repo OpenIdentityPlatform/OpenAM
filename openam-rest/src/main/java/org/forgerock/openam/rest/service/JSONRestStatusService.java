@@ -11,11 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.service;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 
@@ -24,9 +26,19 @@ import java.util.Map;
 /**
  * An implementation of {@code RestStatusService} that returns a {@code JacksonRepresentation}.
  */
-public class JSONRestStatusService extends RestStatusService{
+public class JSONRestStatusService extends RestStatusService {
+
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
+
+    /**
+     * Default constructor - will initialise Guice objects from the {@code InjectorHolder}.
+     */
+    public JSONRestStatusService() {
+        jacksonRepresentationFactory = InjectorHolder.getInstance(JacksonRepresentationFactory.class);
+    }
+
     @Override
     protected Representation representMap(Map<String, Object> map) {
-        return new JacksonRepresentation<Map>(map);
+        return jacksonRepresentationFactory.create(map);
     }
 }

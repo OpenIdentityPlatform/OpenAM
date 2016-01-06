@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.xacml.v3.rest;
@@ -32,6 +32,7 @@ import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
 import org.forgerock.util.annotations.VisibleForTesting;
@@ -85,25 +86,25 @@ public class XacmlService extends ServerResource {
     private final Debug debug;
     private final RestLog restLog;
     private final DelegationEvaluator evaluator;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructor with dependencies exposed for unit testing.
-     *
-     * @param importExport Non null utility functions.
+     *  @param importExport Non null utility functions.
      * @param adminTokenAction Non null admin action function.
      * @param debug The debug instance for logging.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public XacmlService(XACMLExportImport importExport,
-            PrivilegedAction<SSOToken> adminTokenAction,
-                        @Named("frRest") Debug debug,
-                        RestLog restLog,
-                        DelegationEvaluator evaluator) {
+    public XacmlService(XACMLExportImport importExport, PrivilegedAction<SSOToken> adminTokenAction,
+            @Named("frRest") Debug debug, RestLog restLog, DelegationEvaluator evaluator,
+            JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.importExport = importExport;
         this.admin = adminTokenAction;
         this.debug = debug;
         this.restLog = restLog;
         this.evaluator = evaluator;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -146,7 +147,7 @@ public class XacmlService extends ServerResource {
             }
             getResponse().setStatus(Status.SUCCESS_OK);
 
-            return new JacksonRepresentation<List<Map<String, String>>>(result);
+            return jacksonRepresentationFactory.create(result);
 
         } catch (EntitlementException e) {
             debug.warning("Importing XACML to policies failed", e);

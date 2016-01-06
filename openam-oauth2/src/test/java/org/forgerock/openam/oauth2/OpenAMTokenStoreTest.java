@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -29,6 +29,7 @@ import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
 import java.security.SecureRandom;
@@ -48,9 +49,11 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.restlet.RestletOAuth2Request;
+import org.forgerock.oauth2.restlet.RestletOAuth2RequestFactory;
 import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.guice.OAuth2GuiceModule;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.util.query.QueryFilter;
@@ -73,6 +76,7 @@ public class OpenAMTokenStoreTest {
     private OAuth2AuditLogger auditLogger;
     private Debug debug;
     private ClientAuthenticationFailureFactory failureFactory;
+    private RestletOAuth2RequestFactory oAuth2RequestFactory;
 
     @BeforeMethod
     public void setUp() {
@@ -88,6 +92,8 @@ public class OpenAMTokenStoreTest {
         auditLogger = mock(OAuth2AuditLogger.class);
         debug = mock(Debug.class);
         failureFactory = mock(ClientAuthenticationFailureFactory.class);
+
+        oAuth2RequestFactory = new RestletOAuth2RequestFactory(new JacksonRepresentationFactory(new ObjectMapper()));
 
         ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
         InvalidClientException expectedResult = mock(InvalidClientException.class);
@@ -114,7 +120,7 @@ public class OpenAMTokenStoreTest {
         
         given(realmNormaliser.normalise("/testrealm")).willReturn("/testrealm");
 
-        OAuth2Request request = new RestletOAuth2Request(this.request);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
 
         //When
         AccessToken accessToken = openAMtokenStore.readAccessToken(request, "TOKEN_ID");
@@ -136,7 +142,7 @@ public class OpenAMTokenStoreTest {
         given(request.getAttributes()).willReturn(attributes);
         attributes.put("realm", "/testrealm");
 
-        OAuth2Request request = new RestletOAuth2Request(this.request);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
 
         //When
         AccessToken accessToken = openAMtokenStore.readAccessToken(request, "TOKEN_ID");
@@ -149,7 +155,7 @@ public class OpenAMTokenStoreTest {
     public void shouldReadAccessTokenWhenNull() throws Exception {
         //Given
         given(tokenStore.read("TOKEN_ID")).willReturn(null);
-        OAuth2Request request = new RestletOAuth2Request(this.request);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
 
         //When
         openAMtokenStore.readAccessToken(request, "TOKEN_ID");
@@ -163,7 +169,7 @@ public class OpenAMTokenStoreTest {
 
         //Given
         doThrow(CoreTokenException.class).when(tokenStore).read("TOKEN_ID");
-        OAuth2Request request = new RestletOAuth2Request(this.request);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
 
         //When
         openAMtokenStore.readAccessToken(request, "TOKEN_ID");
@@ -176,7 +182,7 @@ public class OpenAMTokenStoreTest {
     public void shouldFailWhenNoProvider() throws Exception {
 
         //Given
-        OAuth2Request request = new RestletOAuth2Request(this.request);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
         doThrow(NotFoundException.class).when(providerSettingsFactory).get(request);
 
         //When
@@ -200,7 +206,7 @@ public class OpenAMTokenStoreTest {
         given(request.getAttributes()).willReturn(attributes);
         attributes.put("realm", "/testrealm");
 
-        OAuth2Request request = new RestletOAuth2Request(this.request);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
 
         //When
         AccessToken accessToken = realmAgnosticTokenStore.readAccessToken(request, "TOKEN_ID");
@@ -217,7 +223,7 @@ public class OpenAMTokenStoreTest {
         given(providerSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
         given(providerSettings.getDeviceCodeLifetime()).willReturn(10);
         given(tokenStore.query(any(QueryFilter.class))).willReturn(json(array()));
-        final RestletOAuth2Request oauth2Request = new RestletOAuth2Request(this.request);
+        final RestletOAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "MY_REALM")));
         given(realmNormaliser.normalise("MY_REALM")).willReturn("MY_REALM");
         ResourceOwner resourceOwner = mock(ResourceOwner.class);
@@ -267,7 +273,7 @@ public class OpenAMTokenStoreTest {
                 field("user_code", asSet("456")),
                 field("realm", asSet("/")),
                 field("clientID", asSet("CLIENT_ID")))));
-        final RestletOAuth2Request oauth2Request = new RestletOAuth2Request(this.request);
+        final RestletOAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
         given(realmNormaliser.normalise("/")).willReturn("/");
 
@@ -290,7 +296,7 @@ public class OpenAMTokenStoreTest {
                 field("realm", asSet("/")),
                 field("clientID", asSet("CLIENT_ID")))));
         given(tokenStore.read("123")).willReturn(code);
-        final RestletOAuth2Request oauth2Request = new RestletOAuth2Request(this.request);
+        final RestletOAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
         given(realmNormaliser.normalise("/")).willReturn("/");
 
@@ -311,7 +317,7 @@ public class OpenAMTokenStoreTest {
                 field("realm", asSet("/")),
                 field("clientID", asSet("CLIENT_ID")))));
         given(tokenStore.read("123")).willReturn(code);
-        final RestletOAuth2Request oauth2Request = new RestletOAuth2Request(this.request);
+        final RestletOAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
         given(realmNormaliser.normalise("/")).willReturn("/");
 

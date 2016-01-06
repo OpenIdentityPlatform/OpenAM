@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -165,6 +166,7 @@ public class OAuthProblemException extends ResourceException {
     private String scope;
 
     private Map<String, String> parameters = new HashMap<String, String>();
+    private OAuth2Utils oAuth2Utils = InjectorHolder.getInstance(OAuth2Utils.class);
 
     // Constructors
     private OAuthProblemException(OAuthError error, Request request) {
@@ -174,13 +176,13 @@ public class OAuthProblemException extends ResourceException {
         this.request = request;
         if (null != this.request) {
             String redirect =
-                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.REDIRECT_URI,
+                    oAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.REDIRECT_URI,
                             String.class);
             this.redirectTargetPattern = null != redirect ? URI.create(redirect) : null;
             this.state =
-                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.STATE, String.class);
+                    oAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.STATE, String.class);
             this.scope =
-                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.SCOPE, String.class);
+                    oAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.SCOPE, String.class);
         } else {
             this.redirectTargetPattern = null;
             this.state = null;
@@ -317,7 +319,7 @@ public class OAuthProblemException extends ResourceException {
     public Map<String, Object> getErrorMessage() {
         Map<String, Object> response = new HashMap<String, Object>(3);
         response.put(OAuth2Constants.Error.ERROR, getError());
-        if (OAuth2Utils.isNotBlank(getDescription())) {
+        if (oAuth2Utils.isNotBlank(getDescription())) {
             response.put(OAuth2Constants.Error.ERROR_DESCRIPTION, getDescription());
         }
         if (errorUri != null && errorUri.length() > 0) {
@@ -342,13 +344,13 @@ public class OAuthProblemException extends ResourceException {
     public Form getErrorForm() {
         Form response = new Form();
         response.add(OAuth2Constants.Error.ERROR, getError());
-        if (OAuth2Utils.isNotBlank(getDescription())) {
+        if (oAuth2Utils.isNotBlank(getDescription())) {
             response.add(OAuth2Constants.Error.ERROR_DESCRIPTION, getDescription());
         }
         if (errorUri != null && errorUri.length() > 0) {
             response.add(OAuth2Constants.Error.ERROR_URI, errorUri);
         }
-        if (OAuth2Utils.isNotBlank(getState())) {
+        if (oAuth2Utils.isNotBlank(getState())) {
             response.add(OAuth2Constants.Params.STATE, getState());
         }
         return response;

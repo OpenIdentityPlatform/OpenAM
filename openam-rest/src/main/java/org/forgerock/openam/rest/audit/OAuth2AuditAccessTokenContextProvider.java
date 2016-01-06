@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.rest.audit;
 
@@ -36,7 +36,7 @@ import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_ACC
  */
 public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2TokenContextProvider {
 
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final TokenStore tokenStore;
 
     /**
@@ -46,7 +46,8 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
      * @param tokenStore The helper to use for reading authentication JWTs.
      * @param requestFactory The factory for creating OAuth2Request instances.
      */
-    public OAuth2AuditAccessTokenContextProvider(TokenStore tokenStore, OAuth2RequestFactory<Request> requestFactory) {
+    public OAuth2AuditAccessTokenContextProvider(TokenStore tokenStore,
+            OAuth2RequestFactory<?, Request> requestFactory) {
         this.tokenStore = tokenStore;
         this.requestFactory = requestFactory;
     }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.oauth2.restlet;
 
@@ -79,25 +79,27 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
 
     private final OAuth2Representation representation;
     private final TokenStore tokenStore;
-    private final OAuth2RequestFactory<Request> requestFactory;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final AuthorizationService authorizationService;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ExceptionHandler exceptionHandler;
     private final ResourceOwnerSessionValidator resourceOwnerSessionValidator;
     private final ClientRegistrationStore clientRegistrationStore;
+    private final OAuth2Utils oAuth2Utils;
 
     /**
      * Constructs user code verification resource for OAuth2 Device Flow
      * @param router The base router
      * @param exceptionHandler
+     * @param oAuth2Utils An OAuth2Utils instance.
      */
     @Inject
     public DeviceCodeVerificationResource(XUIState xuiState, @Named("OAuth2Router") Router router,
             BaseURLProviderFactory baseURLProviderFactory, OAuth2Representation representation,
-            TokenStore tokenStore, OAuth2RequestFactory<Request> requestFactory,
+            TokenStore tokenStore, OAuth2RequestFactory<?, Request> requestFactory,
             AuthorizationService authorizationService, OAuth2ProviderSettingsFactory providerSettingsFactory,
             ExceptionHandler exceptionHandler, ResourceOwnerSessionValidator resourceOwnerSessionValidator,
-            ClientRegistrationStore clientRegistrationStore) {
+            ClientRegistrationStore clientRegistrationStore, OAuth2Utils oAuth2Utils) {
         super(router, baseURLProviderFactory, xuiState);
         this.representation = representation;
         this.tokenStore = tokenStore;
@@ -107,6 +109,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         this.exceptionHandler = exceptionHandler;
         this.resourceOwnerSessionValidator = resourceOwnerSessionValidator;
         this.clientRegistrationStore = clientRegistrationStore;
+        this.oAuth2Utils = oAuth2Utils;
     }
 
     /**
@@ -198,7 +201,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         for (Preference<Language> language : getRequest().getClientInfo().getAcceptedLanguages()) {
             locale.add(language.getMetadata().getName());
         }
-        dataModel.put("locale", OAuth2Utils.join(locale, " "));
+        dataModel.put("locale", oAuth2Utils.join(locale, " "));
         dataModel.put("realm", request.<String>getParameter(OAuth2Constants.Params.REALM));
         response.setDataModel(dataModel);
         return response;
@@ -213,7 +216,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
             if (!entry.getKey().equals(OAuth2Constants.Params.SCOPE)) {
                 value = ((Set<String>) value).iterator().next();
             } else {
-                value = OAuth2Utils.join((Set<String>) value, " ");
+                value = oAuth2Utils.join((Set<String>) value, " ");
             }
 
             if (entry.getKey().equals(OAuth2Constants.CoreTokenParams.CLIENT_ID)) {
