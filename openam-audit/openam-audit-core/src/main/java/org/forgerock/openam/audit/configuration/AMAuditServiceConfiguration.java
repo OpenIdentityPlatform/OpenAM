@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit.configuration;
 
@@ -28,8 +28,7 @@ import java.util.Set;
  * <p/>
  * Each of the Audit Services has its own configuration, which is stored with the Audit Service and can be retrieved
  * in a thread-safe way via its own accessor methods -
- * {@link AMAuditService#isAuditEnabled(String, org.forgerock.openam.audit.AuditConstants.EventName)} and
- * {@link AMAuditService#isAuditFailureSuppressed()}.
+ * {@link AMAuditService#isAuditEnabled(String, org.forgerock.openam.audit.AuditConstants.EventName)}.
  *
  * @since 13.0.0
  */
@@ -37,17 +36,14 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
 
     private final Set<String> blacklistedEventNames;
     private final boolean auditEnabled;
-    private final boolean auditFailureSuppressed;
 
     /**
      * Create an instance of {@code AMAuditServiceConfiguration} with the specified values.
      *
      * @param auditEnabled Is audit logging enabled.
-     * @param auditFailureSuppressed Is audit failure suppressed.
      */
-    public AMAuditServiceConfiguration(boolean auditEnabled, boolean auditFailureSuppressed) {
+    public AMAuditServiceConfiguration(boolean auditEnabled) {
         this.auditEnabled = auditEnabled;
-        this.auditFailureSuppressed = auditFailureSuppressed;
         this.blacklistedEventNames = new HashSet<>();
     }
 
@@ -55,14 +51,11 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
      * Create an instance of {@code AMAuditServiceConfiguration} with the specified values.
      *
      * @param auditEnabled Is audit logging enabled.
-     * @param auditFailureSuppressed Is audit failure suppressed.
      * @param blacklistedEventNames A set of event names which we DO NOT want to audit.
      */
-    public AMAuditServiceConfiguration(boolean auditEnabled, boolean auditFailureSuppressed,
-            Set<String> blacklistedEventNames) {
+    public AMAuditServiceConfiguration(boolean auditEnabled, Set<String> blacklistedEventNames) {
 
         this.auditEnabled = auditEnabled;
-        this.auditFailureSuppressed = auditFailureSuppressed;
         this.blacklistedEventNames = blacklistedEventNames;
     }
 
@@ -72,14 +65,6 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
      */
     public boolean isAuditEnabled() {
         return auditEnabled;
-    }
-
-    /**
-     * Stop failure to log an audit message form also failing the operation that is audited.
-     * @return true if audit failure should be suppressed.
-     */
-    public boolean isAuditFailureSuppressed() {
-        return auditFailureSuppressed;
     }
 
     /**

@@ -11,9 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.audit.servlet;
 
 import java.io.IOException;
@@ -59,16 +58,12 @@ public class AuditAccessServletFilter implements Filter {
         Auditor auditor = Singleton.getAuditorFactory().create((HttpServletRequest) request, auditableResponse,
                 component);
 
+        Singleton.getAuditEventPublisher().tryPublish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessAttempt());
         try {
-            Singleton.getAuditEventPublisher().publish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessAttempt());
-            try {
-                chain.doFilter(request, auditableResponse);
-            } finally {
-                Singleton.getAuditEventPublisher().tryPublish(AuditConstants.ACCESS_TOPIC,
-                        auditor.auditAccessOutcome());
-            }
-        } catch (AuditException e) {
-            Singleton.getLogger().error("Failed to publish audit event: {}", e.getMessage(), e);
+            chain.doFilter(request, auditableResponse);
+        } finally {
+            Singleton.getAuditEventPublisher().tryPublish(AuditConstants.ACCESS_TOPIC,
+                    auditor.auditAccessOutcome());
         }
     }
 

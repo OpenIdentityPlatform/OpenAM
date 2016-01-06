@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit;
 
@@ -99,16 +99,6 @@ public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAud
             releaseReadLock();
         }
         return false;
-    }
-
-    @Override
-    public boolean isAuditFailureSuppressed() {
-        obtainReadLock();
-        try {
-            return auditServiceConfiguration.isAuditFailureSuppressed();
-        } finally {
-            releaseReadLock();
-        }
     }
 
     private boolean isAuditEnabled(CreateRequest createRequest) {

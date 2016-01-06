@@ -11,9 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.sts.soap.audit;
 
 import static java.net.HttpURLConnection.HTTP_CREATED;
@@ -73,7 +72,7 @@ public final class SoapSTSAuditEventPublisher implements AuditEventPublisher {
      * @param auditEvent AuditEvent to be published.
      */
     @Override
-    public void publish(String topic, AuditEvent auditEvent) {
+    public void tryPublish(String topic, AuditEvent auditEvent) {
         try {
 
             String sessionId = null;
@@ -106,11 +105,6 @@ public final class SoapSTSAuditEventPublisher implements AuditEventPublisher {
         } catch (Exception e) {
             logger.error("Failed to publish audit event: {}", e.getMessage(), e);
         }
-    }
-
-    @Override
-    public void tryPublish(String topic, AuditEvent auditEvent) {
-        publish(topic, auditEvent);
     }
 
     @Override

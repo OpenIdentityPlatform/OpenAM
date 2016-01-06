@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest.fluent;
 
@@ -84,11 +84,7 @@ public class AuditFilter implements Filter {
             RequestHandler next) {
 
         final CrestAuditor auditor = newAuditor(context, request);
-        try {
-            auditor.auditAccessAttempt();
-        } catch (AuditException e) {
-            return new InternalServerErrorException().asPromise();
-        }
+        auditor.auditAccessAttempt();
 
         return auditResponse(next.handleAction(context, request), auditor, request);
     }
@@ -109,11 +105,7 @@ public class AuditFilter implements Filter {
             RequestHandler next) {
 
         CrestAuditor auditor = newAuditor(context, request);
-        try {
-            auditor.auditAccessAttempt();
-        } catch (AuditException e) {
-            return new InternalServerErrorException().asPromise();
-        }
+        auditor.auditAccessAttempt();
 
         return auditResponse(next.handleCreate(context, request), auditor, request);
     }
@@ -134,11 +126,7 @@ public class AuditFilter implements Filter {
             RequestHandler next) {
 
         CrestAuditor auditor = newAuditor(context, request);
-        try {
-            auditor.auditAccessAttempt();
-        } catch (AuditException e) {
-            return new InternalServerErrorException().asPromise();
-        }
+        auditor.auditAccessAttempt();
 
         return auditResponse(next.handleDelete(context, request), auditor, request);
     }
@@ -159,11 +147,7 @@ public class AuditFilter implements Filter {
             RequestHandler next) {
 
         CrestAuditor auditor = newAuditor(context, request);
-        try {
-            auditor.auditAccessAttempt();
-        } catch (AuditException e) {
-            return new InternalServerErrorException().asPromise();
-        }
+        auditor.auditAccessAttempt();
 
         return auditResponse(next.handlePatch(context, request), auditor, request);
     }
@@ -185,11 +169,7 @@ public class AuditFilter implements Filter {
             QueryResourceHandler handler, RequestHandler next) {
 
         CrestAuditor auditor = newAuditor(context, request);
-        try {
-            auditor.auditAccessAttempt();
-        } catch (AuditException e) {
-            return new InternalServerErrorException().asPromise();
-        }
+        auditor.auditAccessAttempt();
 
         return auditResponse(next.handleQuery(context, request, handler), auditor, request);
     }
@@ -210,11 +190,7 @@ public class AuditFilter implements Filter {
             RequestHandler next) {
 
         CrestAuditor auditor = newAuditor(context, request);
-        try {
-            auditor.auditAccessAttempt();
-        } catch (AuditException e) {
-            return new InternalServerErrorException().asPromise();
-        }
+        auditor.auditAccessAttempt();
 
         return auditResponse(next.handleRead(context, request), auditor, request);
     }
@@ -235,11 +211,7 @@ public class AuditFilter implements Filter {
             RequestHandler next) {
 
         CrestAuditor auditor = newAuditor(context, request);
-        try {
-            auditor.auditAccessAttempt();
-        } catch (AuditException e) {
-            return new InternalServerErrorException().asPromise();
-        }
+        auditor.auditAccessAttempt();
 
         return auditResponse(next.handleUpdate(context, request), auditor, request);
     }

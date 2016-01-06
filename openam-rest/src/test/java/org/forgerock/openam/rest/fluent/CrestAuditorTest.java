@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest.fluent;
 
@@ -75,7 +75,7 @@ public class CrestAuditorTest {
         auditor.auditAccessAttempt();
 
         ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
-        verify(auditEventPublisher).publish(eq(ACCESS_TOPIC), auditEventCaptor.capture());
+        verify(auditEventPublisher).tryPublish(eq(ACCESS_TOPIC), auditEventCaptor.capture());
         assertThat(getField(auditEventCaptor, EVENT_NAME).asString()).isEqualTo(EventName.AM_ACCESS_ATTEMPT.toString());
     }
 

@@ -11,9 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.audit;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -26,18 +25,15 @@ import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailabl
 import static org.forgerock.openam.audit.AuditConstants.ACCESS_RESPONSE_DETAIL_REASON;
 import static org.forgerock.openam.audit.AuditConstants.Component;
 import static org.forgerock.openam.audit.AuditConstants.EventName;
-import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Set;
 
-import org.forgerock.audit.AuditException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.services.context.Context;
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
-import org.forgerock.http.protocol.Status;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.services.context.RequestAuditContext;
 import org.forgerock.util.Function;
@@ -72,11 +68,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
 
     @Override
     public Promise<Response, NeverThrowsException> filter(final Context context, final Request request, Handler next) {
-        try {
-            auditAccessAttempt(request, context);
-        } catch (AuditException e) {
-            return newResultPromise(new Response().setStatus(Status.INTERNAL_SERVER_ERROR).setCause(e));
-        }
+        auditAccessAttempt(request, context);
         return next.handle(context, request).then(new Function<Response, Response, NeverThrowsException>() {
             @Override
             public Response apply(Response response) {
@@ -90,7 +82,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
         });
     }
 
-    private void auditAccessAttempt(Request request, Context context) throws AuditException {
+    private void auditAccessAttempt(Request request, Context context) {
         String realm = getRealm(context);
         if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
@@ -103,7 +95,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     .trackingIds(getTrackingIdsForAccessAttempt(request))
                     .forRequest(request, context);
 
-            auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
+            auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
         }
     }
 

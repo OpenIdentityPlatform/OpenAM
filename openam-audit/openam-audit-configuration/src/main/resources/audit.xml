@@ -35,15 +35,6 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="suppressAuditFailure" type="single" syntax="boolean" i18nKey="a002">
-                    <BooleanValues>
-                        <BooleanTrueValue>true</BooleanTrueValue>
-                        <BooleanFalseValue>false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>true</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="fieldFilterPolicy" i18nKey="a004">
                     <DefaultValues>
                         <DefaultValuesClassName
@@ -459,15 +450,6 @@
 
             <Organization>
                 <AttributeSchema name="auditEnabled" type="single" syntax="boolean" i18nKey="a001">
-                    <BooleanValues>
-                        <BooleanTrueValue>true</BooleanTrueValue>
-                        <BooleanFalseValue>false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>true</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="suppressAuditFailure" type="single" syntax="boolean" i18nKey="a002">
                     <BooleanValues>
                         <BooleanTrueValue>true</BooleanTrueValue>
                         <BooleanFalseValue>false</BooleanFalseValue>

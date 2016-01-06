@@ -11,9 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,30 +103,7 @@ public class AbstractHttpAccessAuditFilterTest {
         auditFilter.filter(context, request, handler);
 
         //Then
-        verify(eventPublisher, never()).publish(anyString(), any(AuditEvent.class));
-    }
-
-    @Test
-    public void shouldReturnInternalServerErrorResponseWhenAuditingFails() throws AuditException {
-
-        //Given
-        Context context = new RequestAuditContext(mockContext());
-        Request request = new Request()
-                .setUri(URI.create("http://example.com"));
-
-        enableAccessTopicAuditing();
-        Handler handler = mockHandler(context, request, Status.OK);
-
-        AuditException auditException = mock(AuditException.class);
-        doThrow(auditException).when(eventPublisher).publish(anyString(), any(AuditEvent.class));
-
-        //When
-        Promise<Response, NeverThrowsException> promise = auditFilter.filter(context, request, handler);
-
-        //Then
-        Response response = promise.getOrThrowUninterruptibly();
-        assertThat(response.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
-        assertThat(response.getCause()).isSameAs(auditException);
+        verify(eventPublisher, never()).tryPublish(anyString(), any(AuditEvent.class));
     }
 
     @Test(dataProvider = "handlerResponses")
@@ -147,16 +123,14 @@ public class AbstractHttpAccessAuditFilterTest {
         auditFilter.filter(context, request, handler);
 
         //Then
-        ArgumentCaptor<AuditEvent> accessAttemptAuditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
-        ArgumentCaptor<AuditEvent> accessResultAuditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
-        verify(eventPublisher).publish(eq(AuditConstants.ACCESS_TOPIC), accessAttemptAuditEventCaptor.capture());
-        verify(eventPublisher).tryPublish(eq(AuditConstants.ACCESS_TOPIC), accessResultAuditEventCaptor.capture());
+        ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        verify(eventPublisher, times(2)).tryPublish(eq(AuditConstants.ACCESS_TOPIC), auditEventCaptor.capture());
 
-        verifyAccessAttemptAuditEvent(accessAttemptAuditEventCaptor.getValue().getValue());
+        verifyAccessAttemptAuditEvent(auditEventCaptor.getAllValues().get(0).getValue());
         if (responseStatus.isSuccessful()) {
-            verifyAccessSuccessAuditEvent(accessResultAuditEventCaptor.getValue().getValue());
+            verifyAccessSuccessAuditEvent(auditEventCaptor.getAllValues().get(1).getValue());
         } else {
-            verifyAccessFailedAuditEvent(accessResultAuditEventCaptor.getValue().getValue());
+            verifyAccessFailedAuditEvent(auditEventCaptor.getAllValues().get(1).getValue());
         }
     }
 

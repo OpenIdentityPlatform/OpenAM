@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest.fluent;
 
@@ -91,10 +91,8 @@ class CrestAuditor {
 
     /**
      * Publishes an audit event with details of the attempted CREST operation, if the 'access' topic is audited.
-     *
-     * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
-    void auditAccessAttempt() throws AuditException {
+    void auditAccessAttempt() {
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
@@ -112,7 +110,7 @@ class CrestAuditor {
             AuditEvent auditEvent = builder.toEvent();
             postProcessEvent(auditEvent);
 
-            auditEventPublisher.publish(ACCESS_TOPIC, auditEvent);
+            auditEventPublisher.tryPublish(ACCESS_TOPIC, auditEvent);
         }
     }
 

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest.fluent;
 
@@ -130,26 +130,6 @@ public abstract class AbstractAuditFilterTest {
 
         // Then
         verifyNoEventsPublished();
-    }
-
-    @Test(dataProvider = "auditedCrudpaqOperations")
-    public void cancelsOperationIfAccessAuditingGeneratesException(Runnable filteredOp) throws Exception {
-        // Given
-        givenAccessAuditingFails();
-
-        // When
-        filteredOp.run();
-
-        // Then
-        verify(auditor).auditAccessAttempt();
-        verifyNoOutcomeEventsPublished();
-        verifyNoMoreInteractions(filterChain);
-    }
-
-    private void givenAccessAuditingFails() throws AuditException {
-        doThrow(AuditException.class).when(auditor).auditAccessSuccess(any(JsonValue.class));
-        doThrow(AuditException.class).when(auditor).auditAccessFailure(anyInt(), anyString());
-        doThrow(AuditException.class).when(auditor).auditAccessAttempt();
     }
 
     @SuppressWarnings("unchecked")

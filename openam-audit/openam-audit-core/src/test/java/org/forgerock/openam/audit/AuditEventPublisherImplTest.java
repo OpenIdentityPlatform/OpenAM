@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit;
 
@@ -85,7 +85,7 @@ public class AuditEventPublisherImplTest {
                 any(Context.class), eq("access"), auditEventCaptor.capture())).thenReturn(dummyPromise);
 
         // When
-        auditEventPublisher.publish("access", auditEvent);
+        auditEventPublisher.tryPublish("access", auditEvent);
 
         // Then
         verify(mockHandler, times(1)).publishEvent(any(Context.class), any(String.class), any(JsonValue.class));
@@ -99,54 +99,7 @@ public class AuditEventPublisherImplTest {
         givenSuppressedFailureAuditService();
 
         // When
-        try {
-            auditEventPublisher.publish("unknownTopic", auditEvent);
-        } catch (AuditException e) {
-            fail("Audit exceptions should be suppressed when publish fails.");
-        }
-    }
-
-    @Test(expectedExceptions = AuditException.class)
-    public void shouldNotSuppressExceptionsOnPublish() throws Exception {
-        // Given
-        AuditEvent auditEvent = getAuditEvent(FAILURE_NOT_SUPPRESSED_REALM);
-        givenNonSuppressedFailureAuditService();
-
-        // When
-        auditEventPublisher.publish("unknownTopic", auditEvent);
-
-        // Then
-        // expect exception
-    }
-
-    @Test(expectedExceptions = AuditException.class)
-    public void shouldThrowExceptionWhenDefaultAuditServiceShutdown() throws Exception {
-        // Given
-        AuditEvent auditEvent = getAuditEvent(null);
-        givenDefaultAuditService();
-        auditServiceProvider.getDefaultAuditService().shutdown();
-
-        // When
-        auditEventPublisher.publish("access", auditEvent);
-
-        // Then
-        // expect exception
-    }
-
-    @Test(expectedExceptions = AuditException.class)
-    public void shouldThrowExceptionWhenRealmAndDefaultAuditServiceShutdown() throws Exception {
-        // Given
-        AuditEvent auditEvent = getAuditEvent(FAILURE_NOT_SUPPRESSED_REALM);
-        givenDefaultAuditService();
-        auditServiceProvider.getDefaultAuditService().shutdown();
-        givenNonSuppressedFailureAuditService();
-        auditServiceProvider.getAuditService(FAILURE_NOT_SUPPRESSED_REALM).shutdown();
-
-        // When
-        auditEventPublisher.publish("access", auditEvent);
-
-        // Then
-        // expect exception
+        auditEventPublisher.tryPublish("unknownTopic", auditEvent);
     }
 
     @Test
@@ -157,7 +110,7 @@ public class AuditEventPublisherImplTest {
         when(mockHandler.publishEvent(
                 any(Context.class), eq("access"), auditEventCaptor.capture())).thenReturn(dummyPromise);
 
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, true);
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
                 .withAuditEventHandler(mock(AuditEventHandler.class));
@@ -168,7 +121,7 @@ public class AuditEventPublisherImplTest {
         when(auditServiceProvider.getAuditService("deadRealm")).thenReturn(auditService);
 
         // When
-        auditEventPublisher.publish("access", auditEvent);
+        auditEventPublisher.tryPublish("access", auditEvent);
 
         // Then
         assertThat(auditEventCaptor.getValue()).isEqualTo(auditEvent.getValue());
@@ -190,7 +143,7 @@ public class AuditEventPublisherImplTest {
     }
 
     private void givenSuppressedFailureAuditService() throws ServiceUnavailableException, AuditException {
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, true);
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
                 .withAuditEventHandler(mockHandler);
@@ -200,19 +153,8 @@ public class AuditEventPublisherImplTest {
         when(auditServiceProvider.getAuditService(FAILURE_SUPPRESSED_REALM)).thenReturn(auditService);
     }
 
-    private void givenNonSuppressedFailureAuditService() throws ServiceUnavailableException, AuditException {
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false);
-        AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
-                .withConfiguration(serviceConfig)
-                .withAuditEventHandler(mockHandler);
-        AMAuditService auditService = new RealmAuditServiceProxy(builder.build(), mock(AMAuditService.class),
-                serviceConfig);
-        auditService.startup();
-        when(auditServiceProvider.getAuditService(FAILURE_NOT_SUPPRESSED_REALM)).thenReturn(auditService);
-    }
-
     private void givenDefaultAuditService() throws ServiceUnavailableException, AuditException {
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false);
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService()
                 .withConfiguration(serviceConfig)
                 .withAuditEventHandler(mockHandler);

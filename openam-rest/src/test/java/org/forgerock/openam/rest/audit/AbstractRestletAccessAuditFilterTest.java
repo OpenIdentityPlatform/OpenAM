@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest.audit;
 
@@ -58,7 +58,7 @@ public class AbstractRestletAccessAuditFilterTest {
     public void setUp() throws Exception {
         restlet = mock(Restlet.class);
 
-        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true, false);
+        AMAuditServiceConfiguration serviceConfig = new AMAuditServiceConfiguration(true);
         AuditServiceBuilder builder = AuditServiceBuilder.newAuditService().withConfiguration(serviceConfig);
         AMAuditService auditService = new DefaultAuditServiceProxy(builder.build(), serviceConfig);
         auditService.startup();
@@ -68,29 +68,6 @@ public class AbstractRestletAccessAuditFilterTest {
         eventFactory = new AuditEventFactory();
         eventPublisher = mock(AuditEventPublisher.class);
         auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory, null, null);
-    }
-
-    @Test
-    public void shouldHandleAuditException() throws AuditException {
-        // Given
-        Request request = mock(Request.class);
-        Response response = new Response(request);
-        Representation representation = mock(Representation.class);
-        when(request.getEntity()).thenReturn(representation);
-        when(request.getDate()).thenReturn(new Date());
-        when(request.getAttributes()).thenReturn(new ConcurrentHashMap<String, Object>());
-        when(representation.isTransient()).thenReturn(false);
-        AuditRequestContext.putProperty(USER_ID, "User 1");
-        when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
-        doThrow(AuditException.class).when(eventPublisher).publish(anyString(), any(AuditEvent.class));
-
-        // When
-        auditFilter.handle(request, response);
-
-        // Then
-        verify(eventPublisher, times(1)).publish(anyString(), any(AuditEvent.class));
-        verify(restlet, never()).handle(any(Request.class), any(Response.class));
-        assertThat(response.getStatus()).isEqualTo(Status.SERVER_ERROR_INTERNAL);
     }
 
     @Test
@@ -127,7 +104,7 @@ public class AbstractRestletAccessAuditFilterTest {
 
         // Then
         ArgumentCaptor<AuditEvent> captor = ArgumentCaptor.forClass(AuditEvent.class);
-        verify(eventPublisher).publish(anyString(), captor.capture());
+        verify(eventPublisher).tryPublish(anyString(), captor.capture());
         assertThat(captor.getValue().getValue()).isObject()
                 .hasObject("request")
                 .hasObject("detail")

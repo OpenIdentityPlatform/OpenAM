@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit.configuration;
 
@@ -222,8 +222,7 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
         }
 
         AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration(
-                getBooleanMapAttr(attributes, "auditEnabled", false),
-                getBooleanMapAttr(attributes, "suppressAuditFailure", true), blacklistedEventNames);
+                getBooleanMapAttr(attributes, "auditEnabled", false), blacklistedEventNames);
 
         Set<String> filterPolicies = new HashSet<>();
         for (String policy : attributes.get("fieldFilterPolicy")) {

@@ -11,9 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.sts.soap.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,7 +72,7 @@ public class AuditEventPublisherTest {
         given(httpURLConnectionWrapperFactory.httpURLConnectionWrapper(urlCaptor.capture())).willReturn(httpURLConnectionWrapper);
 
         // When
-        auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, auditEvent);
+        auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, auditEvent);
 
         // Then
         verify(soapSTSAccessTokenProvider, times(1)).getAccessToken();
@@ -93,7 +92,7 @@ public class AuditEventPublisherTest {
         given(httpURLConnectionWrapperFactory.httpURLConnectionWrapper(any(URL.class))).willThrow(new RuntimeException());
 
         // When
-        auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, mock(AuditEvent.class));
+        auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, mock(AuditEvent.class));
 
         // Then
         verify(soapSTSAccessTokenProvider, times(1)).getAccessToken();

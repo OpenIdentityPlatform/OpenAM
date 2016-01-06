@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit;
 
@@ -77,7 +77,7 @@ public class AuditServiceProviderImplTest extends GuiceTestCase {
                 .withEventTopicsMetaData(EventTopicsMetaDataBuilder.coreTopicSchemas().build()).build();
         handlerConfigs.add(configuration);
 
-        auditServiceConfig = new AMAuditServiceConfiguration(true, true);
+        auditServiceConfig = new AMAuditServiceConfiguration(true);
         provider = new AuditServiceProviderImpl(new MockAuditServiceConfigurationProvider(), mockShutdownManager);
     }
 
@@ -146,7 +146,7 @@ public class AuditServiceProviderImplTest extends GuiceTestCase {
     @Test
     public void shouldNotRegisterHandlersWhenDefaultAuditServiceDisabled() throws Exception {
         // Given
-        auditServiceConfig = new AMAuditServiceConfiguration(false, true);
+        auditServiceConfig = new AMAuditServiceConfiguration(false);
 
         // When
         configListener.globalConfigurationChanged();
@@ -158,7 +158,7 @@ public class AuditServiceProviderImplTest extends GuiceTestCase {
     @Test
     public void shouldNotRegisterHandlersWhenRealmAuditServiceDisabled() throws Exception {
         // Given
-        auditServiceConfig = new AMAuditServiceConfiguration(false, true);
+        auditServiceConfig = new AMAuditServiceConfiguration(false);
 
         // When
         configListener.realmConfigurationChanged("anyRealm");

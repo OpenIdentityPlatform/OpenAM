@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.radius.server.audit;
 
@@ -169,11 +169,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
             LOG.warning("Failed to set client details on access audit event. Reason; {}", e.getMessage());
         }
 
-        try {
-            this.auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
-        } catch (AuditException e) {
-            LOG.warning("Failed to publish audit event.", e);
-        }
+        this.auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
         LOG.message("Leaving RadiusAuditLoggerEventBus.makeLogEntry()");
     }
 

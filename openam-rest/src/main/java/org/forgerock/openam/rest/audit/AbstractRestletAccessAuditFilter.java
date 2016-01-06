@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest.audit;
 
@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
@@ -91,8 +92,8 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
             }
             auditAccessAttempt(request);
         } catch (AuditException e) {
-            response.setStatus(Status.SERVER_ERROR_INTERNAL, e);
-            return STOP;
+            debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
+                    ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT, e.getMessage(), e);
         }
         return CONTINUE;
     }
@@ -126,7 +127,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
             addHttpData(request, builder);
 
-            auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
+            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
         }
     }
 

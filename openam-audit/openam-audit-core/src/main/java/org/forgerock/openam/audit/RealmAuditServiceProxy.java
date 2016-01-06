@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit;
 
@@ -86,21 +86,4 @@ public class RealmAuditServiceProxy extends AuditServiceProxy implements AMAudit
         }
     }
 
-    @Override
-    public boolean isAuditFailureSuppressed() {
-        obtainReadLock();
-        try {
-            checkServiceAvailable();
-            return auditServiceConfiguration.isAuditFailureSuppressed();
-        } catch (ServiceUnavailableException e) {
-            return defaultDelegate.isAuditFailureSuppressed();
-        } finally {
-            releaseReadLock();
-        }
-    }
-
-    private void checkServiceAvailable() throws ServiceUnavailableException {
-        // Ideally we would check the current status of the AuditService, but it's not exposed so this is a workaround.
-        getKnownTopics();
-    }
 }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit;
 
@@ -58,21 +58,16 @@ public class AuditEventPublisherImpl implements AuditEventPublisher {
     }
 
     @Override
-    public void publish(String topic, AuditEvent auditEvent) throws AuditException {
-        String realm = getValue(auditEvent.getValue(), EVENT_REALM, null);
-        if (isBlank(realm)) {
-            publishToDefault(topic, auditEvent);
-        } else {
-            publishForRealm(realm, topic, auditEvent);
-        }
-    }
-
-    @Override
     public void tryPublish(String topic, AuditEvent auditEvent) {
         try {
-            publish(topic, auditEvent);
-        } catch (AuditException e) {
-            // suppress - error logged in publish method
+            String realm = getValue(auditEvent.getValue(), EVENT_REALM, null);
+            if (isBlank(realm)) {
+                publishToDefault(topic, auditEvent);
+            } else {
+                publishForRealm(realm, topic, auditEvent);
+            }
+        } catch (Exception e) {
+            logException(e, topic, auditEvent);
         }
     }
 
@@ -85,20 +80,16 @@ public class AuditEventPublisherImpl implements AuditEventPublisher {
         }
     }
 
-    private void publishToDefault(String topic, AuditEvent auditEvent) throws AuditException {
+    private void publishToDefault(String topic, AuditEvent auditEvent) throws ResourceException {
 
         AMAuditService auditService = auditServiceProvider.getDefaultAuditService();
         Connection connection = newInternalConnection(auditService);
         CreateRequest request = newCreateRequest(topic, auditEvent.getValue());
 
-        try {
-            connection.create(new RootContext(), request);
-        } catch (ResourceException e) {
-            handleResourceException(e, auditService, topic, auditEvent);
-        }
+        connection.create(new RootContext(), request);
     }
 
-    private void publishForRealm(String realm, String topic, AuditEvent auditEvent) throws AuditException {
+    private void publishForRealm(String realm, String topic, AuditEvent auditEvent) throws ResourceException {
         AMAuditService auditService = auditServiceProvider.getAuditService(realm);
         Connection connection = newInternalConnection(auditService);
         CreateRequest request = newCreateRequest(topic, auditEvent.getValue());
@@ -108,20 +99,17 @@ public class AuditEventPublisherImpl implements AuditEventPublisher {
         } catch (ServiceUnavailableException e) {
             debug.message("Audit Service for realm {} is unavailable. Trying the default Audit Service.", realm, e);
             publishToDefault(topic, auditEvent);
-        } catch (ResourceException e) {
-            handleResourceException(e, auditService, topic, auditEvent);
         }
     }
 
-    private void handleResourceException(ResourceException e, AMAuditService auditService, String topic,
-            AuditEvent auditEvent) throws AuditException {
-
+    private void logException(Exception exception, String topic, AuditEvent auditEvent) {
         final String eventName = getValue(auditEvent.getValue(), EVENT_NAME, "-unknown-");
-        debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
-                topic, eventName, e.getMessage(), e.getReason(), e);
-
-        if (!auditService.isAuditFailureSuppressed()) {
-            throw new AuditException("Unable to publish " + topic + " audit event '" + eventName + "'", e);
+        if (exception instanceof ResourceException) {
+            debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
+                    topic, eventName, exception.getMessage(), ((ResourceException) exception).getReason(), exception);
+        } else {
+            debug.error("Unable to publish {} audit event '{}' due to error: [{}]",
+                    topic, eventName, exception.getMessage(), exception);
         }
     }
 

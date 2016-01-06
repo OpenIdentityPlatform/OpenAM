@@ -11,11 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit;
 
-import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
 
 /**
@@ -26,28 +25,11 @@ import org.forgerock.audit.events.AuditEvent;
 public interface AuditEventPublisher {
 
     /**
-     * Publishes the provided AuditEvent to the specified topic of the AuditService.
-     * <p/>
-     * If an error occurs that prevents the AuditEvent from being published, then details regarding the error
-     * are recorded in the debug logs. However, the debug logs are not be treated as the fallback destination
-     * for audit information. If we need guaranteed capture of audit information then this needs to be a feature
-     * of the audit service itself. Also, the audit event may contain sensitive information that shouldn't be
-     * stored in debug logs.
-     * <p/>
-     * After recording details of the error, the exception will only be propagated back to the caller if the
-     * 'suppress exceptions' configuration option is set to false.
-     *
-     * @param topic Coarse-grained categorization of the AuditEvent's type.
-     * @param auditEvent The AuditEvent to publish.
-     *
-     * @throws AuditException if an exception occurs while trying to publish the audit event.
-     */
-    void publish(String topic, AuditEvent auditEvent) throws AuditException;
-
-    /**
      * Tries to publish the provided AuditEvent to the specified topic of the AuditService.
      * <p/>
-     * If an exception occurs, details are logged but the exception is suppressed.
+     * If an error occurs that prevents the AuditEvent from being published, then details regarding the error
+     * are recorded in the debug logs. However, only details relating to the error are logged; the debug logs
+     * are not treated as the fallback destination for audit information.
      *
      * @param topic Coarse-grained categorization of the AuditEvent's type.
      * @param auditEvent The AuditEvent to publish.
