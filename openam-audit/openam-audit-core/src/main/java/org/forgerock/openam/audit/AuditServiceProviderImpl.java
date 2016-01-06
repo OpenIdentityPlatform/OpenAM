@@ -201,7 +201,7 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
             Class<? extends AuditEventHandlerFactory> handlerFactoryClass =
                     Class.forName(className).asSubclass(AuditEventHandlerFactory.class);
             return InjectorHolder.getInstance(handlerFactoryClass).create(config);
-        } catch (AuditException | ClassNotFoundException e) {
+        } catch (AuditException | ClassNotFoundException | RuntimeException e) {
             debug.error("Unable to create audit event handler called {}", config.getHandlerName(), e);
         }
 
