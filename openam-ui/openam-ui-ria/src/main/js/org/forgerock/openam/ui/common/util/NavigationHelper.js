@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/common/util/NavigationHelper", [
@@ -26,6 +26,18 @@ define("org/forgerock/openam/ui/common/util/NavigationHelper", [
             var maxRealms = 4,
                 name;
 
+            // Remove any previously added dynamic navigation links.
+            // The reason why this is required is because we override the values in the AppConfiguration when we
+            // add new links at runtime via the common Navigation module. This stops us from being able to reset the
+            // navigation's configuration upon log out or session end. Which in turn means that the next user to log in
+            // will get the altered configuration.
+            // FIXME: The correct fix would be to change the way the Navigation works so that the original configuration
+            // remains intact and we just call Navigation.reset() when a users session ends or a new one begins.
+            if (_.has(Navigation.configuration, "links.admin.urls.realms.urls")) {
+                Navigation.configuration.links.admin.urls.realms.urls = _.reject(
+                    Navigation.configuration.links.admin.urls.realms.urls, "dynamicLink", true);
+            }
+
             SMSGlobalDelegate.realms.all().done(function (data) {
                 _(data.result).filter("active").sortBy("path").take(maxRealms).forEach(function (realm) {
                     name = realm.name === "/" ? $.t("console.common.topLevelRealm") : realm.name;
@@ -33,14 +45,16 @@ define("org/forgerock/openam/ui/common/util/NavigationHelper", [
                         "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
                             [encodeURIComponent(realm.path)]),
                         "name": name,
-                        "cssClass": "dropdown-sub"
+                        "cssClass": "dropdown-sub",
+                        "dynamicLink": true
                     }, "admin", "realms");
                 }).run();
 
                 Navigation.addLink({
                     "url": "#" + Router.getLink(Router.configuration.routes.realms),
                     "name": $.t("config.AppConfiguration.Navigation.links.realms.viewAll"),
-                    "cssClass": "dropdown-sub"
+                    "cssClass": "dropdown-sub",
+                    "dynamicLink": true
                 }, "admin", "realms");
 
                 Navigation.reload();
