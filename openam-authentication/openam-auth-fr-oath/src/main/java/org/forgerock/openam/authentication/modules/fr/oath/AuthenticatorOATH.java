@@ -141,6 +141,9 @@ public class AuthenticatorOATH extends AMLoginModule {
     private final OathDevicesDao devicesDao = InjectorHolder.getInstance(OathDevicesDao.class);
     private final OathMaker deviceFactory = InjectorHolder.getInstance(OathMaker.class);
 
+    private OathDeviceSettings newDevice = null;
+
+
     /**
      * Standard constructor sets-up the debug logging module.
      */
@@ -252,25 +255,7 @@ public class AuthenticatorOATH extends AMLoginModule {
     @Override
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         try {
-            //check for session and get username and UUID
-            if (userName == null || userName.length() == 0) {
-                // session upgrade case. Need to find the user ID from the old
-                SSOTokenManager mgr = SSOTokenManager.getInstance();
-                InternalSession isess = getLoginState("OATH").getOldSession();
-                if (isess == null) {
-                    throw new AuthLoginException("amAuth", "noInternalSession", null);
-                }
-                SSOToken token = mgr.createSSOToken(isess.getID().toString());
-                userId = token.getPrincipal().getName();
-                userName = token.getProperty("UserToken");
-                if (debug.messageEnabled()) {
-                    debug.message("OATH.process() : Username from SSOToken : " + userName);
-                }
-
-                if (userName == null || userName.length() == 0) {
-                    throw new AuthLoginException("amAuth", "noUserName", null);
-                }
-            }
+            checkForSessionAndGetUsernameAndUUID();
 
             final OathDeviceSettings settings = getOathDeviceSettings(id.getName(), id.getRealm());
 
@@ -282,106 +267,49 @@ public class AuthenticatorOATH extends AMLoginModule {
 
             int selectedIndex;
 
+            switch (state) {
+                case LOGIN_OPTIONAL:
+                case LOGIN_NO_DEVICE:
+                case LOGIN_OPT_DEVICE:
+                case LOGIN_SAVED_DEVICE:
+                    if (null == callbacks) {
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                    }
+            }
+
             //fall-throughs are INTENTIONAL
             switch (state) {
                 case LOGIN_START:
+                    return beginLogin(settings);
 
-                    if (isOptional && userConfiguredSkippable == AuthenticatorOathService.SKIPPABLE) {
-                        return ISAuthConstants.LOGIN_SUCCEED;
-                    } else if (isOptional && userConfiguredSkippable == AuthenticatorOathService.NOT_SET) {
-                        return LOGIN_OPTIONAL;
-                    } else if (isOptional && userConfiguredSkippable != AuthenticatorOathService.NOT_SKIPPABLE) {
-                        throw new AuthLoginException(amAuthOATH, "authFailed", null); //invalid so error
-                    } else {
-                        if (settings == null) {
-                            if (isOptional) {
-                                return LOGIN_OPTIONAL;
-                            } else {
-                                return LOGIN_NO_DEVICE;
-                            }
-                        } else {
-                            replaceHeader(LOGIN_SAVED_DEVICE, MODULE_NAME);
-                            return LOGIN_SAVED_DEVICE;
-                        }
-                    }
-
-                //process callbacks
                 case LOGIN_OPTIONAL:
-
-                    if (callbacks == null) {
-                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                    }
-
                     selectedIndex = ((ConfirmationCallback) callbacks[0]).getSelectedIndex();
                     if (selectedIndex == SKIP_OATH_INDEX) {
                         realmOathService.setUserSkipOath(id, AuthenticatorOathService.SKIPPABLE);
                         return ISAuthConstants.LOGIN_SUCCEED;
                     }
+                    //fall through
 
                 case LOGIN_NO_DEVICE:
-
-                    if (callbacks == null) {
-                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                    }
-
                     selectedIndex = ((ConfirmationCallback) callbacks[0]).getSelectedIndex();
                     if (selectedIndex == REGISTER_DEVICE_OPTION_VALUE_INDEX) {
-                        paintRegisterDeviceCallback(id, createBasicDevice(id));
+                        newDevice = createBasicDevice();
+                        paintRegisterDeviceCallback(id, newDevice);
                         return REGISTER_DEVICE;
                     }
+                    //fall through
+
                 case LOGIN_OPT_DEVICE:
-
-                    if (callbacks == null) {
-                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                    }
-
                     selectedIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
                     if (selectedIndex == OPT_DEVICE_SKIP_INDEX) {
                         realmOathService.setUserSkipOath(id, AuthenticatorOathService.SKIPPABLE);
                         realmOathService.removeAllUserDevices(id); //user backed out of saving device
                         return ISAuthConstants.LOGIN_SUCCEED;
                     }
+                    //fall through
+
                 case LOGIN_SAVED_DEVICE:
-
-                    if (callbacks == null) {
-                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                    }
-
-                    //get OTP
-                    String OTP = ((NameCallback) callbacks[0]).getName();
-                    if (OTP.length() == 0) {
-                        debug.error("OATH.process() : invalid OTP code");
-                        if (++attempt >= TOTAL_ATTEMPTS) {
-                            setFailureID(userName);
-                            throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
-                        }
-
-                        replaceHeader(state, MODULE_NAME
-                                + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
-                        return state;
-                    }
-
-                    //get Arrival time of the OTP
-                    time = System.currentTimeMillis() / 1000L;
-
-                    if (isRecoveryCode(OTP, settings, id)) {
-                        return RECOVERY_USED;
-                    } else if (checkOTP(OTP, id, settings)) {
-                        if (isOptional) { //if it's optional and you log in, config not skippable
-                            realmOathService.setUserSkipOath(id, AuthenticatorOathService.NOT_SKIPPABLE);
-                        }
-                        return ISAuthConstants.LOGIN_SUCCEED;
-                    } else {
-                        //the OTP is out of the window or incorrect
-                        if (++attempt >= TOTAL_ATTEMPTS) {
-                            setFailureID(userName);
-                            throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
-                        }
-
-                        replaceHeader(state, MODULE_NAME
-                                + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
-                        return state;
-                    }
+                    return doLoginSavedDevice(callbacks, state, settings);
 
                 case REGISTER_DEVICE:
                     if (isOptional) {
@@ -391,12 +319,11 @@ public class AuthenticatorOATH extends AMLoginModule {
                         replaceHeader(LOGIN_SAVED_DEVICE, MODULE_NAME);
                         return LOGIN_SAVED_DEVICE;
                     }
-                case RECOVERY_USED:
 
+                case RECOVERY_USED:
                     if (isOptional) { //if it's optional and you log in, config not skippable
                         realmOathService.setUserSkipOath(id, AuthenticatorOathService.NOT_SKIPPABLE);
                     }
-
                     return ISAuthConstants.LOGIN_SUCCEED;
 
                 default:
@@ -408,14 +335,104 @@ public class AuthenticatorOATH extends AMLoginModule {
         }
     }
 
-    private OathDeviceSettings createBasicDevice(AMIdentity id) throws AuthLoginException {
+    private void checkForSessionAndGetUsernameAndUUID() throws SSOException, AuthLoginException {
+        if (StringUtils.isEmpty(userName)) {
+            // session upgrade case. Need to find the user ID from the old
+            SSOTokenManager mgr = SSOTokenManager.getInstance();
+            InternalSession isess = getLoginState("OATH").getOldSession();
+            if (isess == null) {
+                throw new AuthLoginException("amAuth", "noInternalSession", null);
+            }
+            SSOToken token = mgr.createSSOToken(isess.getID().toString());
+            userId = token.getPrincipal().getName();
+            userName = token.getProperty("UserToken");
+            if (debug.messageEnabled()) {
+                debug.message("OATH.process() : Username from SSOToken : " + userName);
+            }
+
+            if (StringUtils.isEmpty(userName)) {
+                throw new AuthLoginException("amAuth", "noUserName", null);
+            }
+        }
+    }
+
+    private int beginLogin(OathDeviceSettings settings) throws AuthLoginException {
+        if (isOptional && userConfiguredSkippable == AuthenticatorOathService.SKIPPABLE) {
+            return ISAuthConstants.LOGIN_SUCCEED;
+        } else if (isOptional && userConfiguredSkippable == AuthenticatorOathService.NOT_SET) {
+            return LOGIN_OPTIONAL;
+        } else if (isOptional && userConfiguredSkippable != AuthenticatorOathService.NOT_SKIPPABLE) {
+            throw new AuthLoginException(amAuthOATH, "authFailed", null); //invalid so error
+        } else {
+            if (settings == null) {
+                if (isOptional) {
+                    return LOGIN_OPTIONAL;
+                } else {
+                    return LOGIN_NO_DEVICE;
+                }
+            } else {
+                replaceHeader(LOGIN_SAVED_DEVICE, MODULE_NAME);
+                return LOGIN_SAVED_DEVICE;
+            }
+        }
+    }
+
+    private int doLoginSavedDevice(final Callback[] callbacks,
+                                   final int state,
+                                   final OathDeviceSettings settings) throws AuthLoginException,
+            IOException, IdRepoException, SSOException {
+
+        OathDeviceSettings deviceToAuthAgainst = settings;
+
+        if (null == deviceToAuthAgainst && null != newDevice) {
+            deviceToAuthAgainst = newDevice;
+        }
+
+        //get OTP
+        String OTP = ((NameCallback) callbacks[0]).getName();
+        if (OTP.length() == 0) {
+            debug.error("OATH.process() : invalid OTP code");
+            if (++attempt >= TOTAL_ATTEMPTS) {
+                setFailureID(userName);
+                throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+            }
+
+            replaceHeader(state, MODULE_NAME + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
+            return state;
+        }
+
+        //get Arrival time of the OTP
+        time = System.currentTimeMillis() / 1000L;
+
+        if (isRecoveryCode(OTP, deviceToAuthAgainst, id)) {
+            return RECOVERY_USED;
+        } else if (checkOTP(OTP, id, deviceToAuthAgainst)) {
+            if (isOptional) { //if it's optional and you log in, config not skippable
+                realmOathService.setUserSkipOath(id, AuthenticatorOathService.NOT_SKIPPABLE);
+            }
+            if (null == settings) {
+                // this is the first time we have authorised against this device - we can now save it.
+                deviceFactory.saveDeviceProfile(id.getName(), id.getRealm(), deviceToAuthAgainst);
+            }
+            return ISAuthConstants.LOGIN_SUCCEED;
+        } else {
+            //the OTP is out of the window or incorrect
+            if (++attempt >= TOTAL_ATTEMPTS) {
+                setFailureID(userName);
+                throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+            }
+
+            replaceHeader(state, MODULE_NAME + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
+            return state;
+        }
+    }
+
+    private OathDeviceSettings createBasicDevice() throws AuthLoginException {
 
         OathDeviceSettings settings = deviceFactory.createDeviceProfile(minSecretKeyLength);
         settings.setLastLogin(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
         settings.setChecksumDigit(checksum);
         settings.setRecoveryCodes(OathDeviceSettings.generateRecoveryCodes(NUM_CODES));
-
-        deviceFactory.saveDeviceProfile(id.getName(), id.getRealm(), settings);
 
         return settings;
     }
