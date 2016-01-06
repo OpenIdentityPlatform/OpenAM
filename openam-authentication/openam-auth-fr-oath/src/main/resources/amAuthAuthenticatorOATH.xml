@@ -3,19 +3,19 @@
 <!--
 
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- 
-  Copyright 2012-2015 ForgeRock AS.
- 
+
+  Copyright 2012-2016 ForgeRock AS.
+
   The contents of this file are subject to the terms
   of the Common Development and Distribution License
   (the License). You may not use this file except in
   compliance with the License.
- 
+
   You can obtain a copy of the License at
   http://forgerock.org/license/CDDLv1.0.html
   See the License for the specific language governing
   permission and limitations under the License.
- 
+
   When distributing Covered Code, include this CDDL
   Header Notice in each file and include the License file
   at http://forgerock.org/license/CDDLv1.0.html
@@ -23,7 +23,7 @@
   with the fields enclosed by brackets [] replaced by
   your own identifying information:
   "Portions Copyrighted 2012 ForgeRock AS"
- 
+
 -->
 
 
@@ -79,7 +79,7 @@
 
                 <AttributeSchema name="iplanet-am-auth-fr-oath-min-secret-key-length"
                                  type="single"
-                                 syntax="string"
+                                 syntax="number_range" rangeStart="16" rangeEnd="2147483647"
                                  i18nKey="a502"
                                  resourceName="minimumSecretKeyLength">
                     <DefaultValues>
@@ -102,7 +102,7 @@
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-fr-oath-hotp-window-size"
                                  type="single"
-                                 syntax="number"
+                                 syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                                  i18nKey="a505"
                                  resourceName="hotpWindowSize">
                     <DefaultValues>
@@ -134,7 +134,7 @@
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-fr-oath-size-of-time-step"
                                  type="single"
-                                 syntax="number"
+                                 syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                                  i18nKey="a509"
                                  resourceName="totpTimeStepInterval">
                     <DefaultValues>
@@ -152,10 +152,9 @@
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-fr-oath-maximum-clock-drift"
                                  type="single"
-                                 syntax="number"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  i18nKey="a514"
-                                 resourceName="totpMaximumClockDrift"
-                                 rangeStart="0" rangeEnd="2147483648">
+                                 resourceName="totpMaximumClockDrift">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -206,7 +205,7 @@
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-fr-oath-min-secret-key-length"
                                      type="single"
-                                     syntax="string"
+                                     syntax="number_range" rangeStart="16" rangeEnd="2147483647"
                                      i18nKey="a502"
                                      resourceName="minimumSecretKeyLength">
                         <DefaultValues>
@@ -228,7 +227,7 @@
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-fr-oath-hotp-window-size"
                                      type="single"
-                                     syntax="number"
+                                     syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                                      i18nKey="a505"
                                      resourceName="hotpWindowSize">
                         <DefaultValues>
@@ -260,7 +259,7 @@
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-fr-oath-size-of-time-step"
                                      type="single"
-                                     syntax="number"
+                                     syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                                      i18nKey="a509"
                                      resourceName="totpTimeStepInterval">
                         <DefaultValues>
@@ -277,11 +276,10 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-fr-oath-maximum-clock-drift"
-                        type="single"
-                        syntax="number"
-                        i18nKey="a514"
-                        resourceName="totpMaximumClockDrift"
-                        rangeStart="0" rangeEnd="2147483648">
+                                    type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                    i18nKey="a514"
+                                    resourceName="totpMaximumClockDrift">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>
