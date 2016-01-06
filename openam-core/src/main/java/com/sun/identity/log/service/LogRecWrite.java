@@ -24,7 +24,7 @@
  *
  * $Id: LogRecWrite.java,v 1.6 2009/06/19 02:33:29 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 package com.sun.identity.log.service;
@@ -202,10 +202,6 @@ public class LogRecWrite implements LogOperation, ParseOutput {
 
     private void auditAccessMessage(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
             LogRecord record, String realm) {
-
-        if (!auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
-            return;
-        }
 
         AgentLogParser logParser = new AgentLogParser();
         LogExtracts logExtracts = logParser.tryParse(record.getMessage());
