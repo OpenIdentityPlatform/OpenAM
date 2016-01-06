@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
+
 package org.forgerock.openam.ldap;
 
 /**
@@ -230,6 +231,9 @@ public final class LDAPConstants {
 
     /** LDAP Adam type property key. */
     public static final String LDAP_ADAM_TYPE = "sun-idrepo-ldapv3-ldapv3ADAM";
+
+    /** Constraint violation. */
+    public static final int LDAP_CONSTRAINT_VIOLATION = 19;
 
     /** Unrecognized or invalid syntax for an attribute. */
     public static final String LDAP_INVALID_SYNTAX = "21";

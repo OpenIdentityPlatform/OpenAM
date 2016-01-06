@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,21 @@
  *
  * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
+
 package com.sun.identity.idsvcs.opensso;
+
+import java.net.MalformedURLException;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -65,16 +77,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import java.net.MalformedURLException;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
@@ -214,6 +216,9 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             debug.error("IdentityServicesImpl:create", e);
             if (IdRepoErrorCode.ACCESS_DENIED.equals(e.getErrorCode())) {
                 throw new ForbiddenException(e.getMessage());
+            } else if (e.getLdapErrorIntCode() == LDAPConstants.LDAP_CONSTRAINT_VIOLATION) {
+                debug.error(e.getMessage(), e);
+                throw new BadRequestException();
             } else {
                 throw new NotFoundException(e.getMessage());
             }
