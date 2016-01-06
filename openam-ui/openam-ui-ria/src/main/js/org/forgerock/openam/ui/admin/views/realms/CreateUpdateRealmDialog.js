@@ -22,7 +22,8 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
-    "org/forgerock/openam/ui/admin/models/Form"
+    "org/forgerock/openam/ui/admin/models/Form",
+    "popoverclickaway" // depends on jquery and bootstrap
 ], function ($, _, Handlebars, BootstrapDialog, Messages, AbstractView, SMSGlobalDelegate, Form) {
     function validateRealmName (dialog) {
         var valid = true,
@@ -186,14 +187,14 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                         });
                     },
                     onshown: function (dialog) {
-                        dialog.$modalBody.find("[data-toggle='popover-realm-status']").popover({
+                        dialog.$modalBody.find("[data-toggle='popover-realm-status']").popoverclickaway({
                             content: $.t("console.realms.realmStatusPopover.content"),
                             placement: "left",
                             title: $.t("console.realms.realmStatusPopover.title"),
                             trigger: "focus"
                         });
 
-                        dialog.$modalBody.find("[data-toggle='popover-realm-aliases']").popover({
+                        dialog.$modalBody.find("[data-toggle='popover-realm-aliases']").popoverclickaway({
                             content: $.t("console.realms.realmAliasesPopover.content"),
                             html: true,
                             placement: "left",

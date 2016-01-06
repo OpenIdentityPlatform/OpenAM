@@ -19,6 +19,7 @@ define("org/forgerock/openam/ui/admin/models/Form", [
     "underscore",
     "jsonEditor",
     "org/forgerock/openam/ui/admin/utils/JSONEditorTheme",
+    "popoverclickaway", // depends on jquery and bootstrap
     "selectize" // jquery dependencies
 ], function ($, _, JSONEditor, JSONEditorTheme) {
     var obj = function Form (element, schema, values) {
@@ -51,11 +52,11 @@ define("org/forgerock/openam/ui/admin/models/Form", [
             var group = $(this).parent(),
                 element = $('<a class="btn info-button visible-lg-inline-block' +
                     ' visible-md-inline-block visible-sm-inline-block" ' +
-                    'tabindex="0" data-toggle="popover" data-trigger="focus"><i class="fa fa-info-circle"></i></a>');
+                    'tabindex="0" data-toggle="popoverclickaway" ><i class="fa fa-info-circle"></i></a>');
 
             $(group).append(element);
 
-            element.popover({
+            element.popoverclickaway({
                 container: "#content",
                 html: true,
                 placement: "auto top",
