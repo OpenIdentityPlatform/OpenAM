@@ -50,6 +50,7 @@ public class RestSecurity {
     private RestSecurityConfiguration restSecurityConfiguration;
 
     private final static String TWO_FACTOR_AUTH_ENABLED = "forgerockRESTSecurityTwoFactorAuthEnabled";
+    private final static String SELF_SERVICE = "forgerockRESTSecuritySelfServiceEnabled";
     private final static String SELF_REGISTRATION = "forgerockRESTSecuritySelfRegistrationEnabled";
     private final static String SELF_REG_CONFIRMATION_URL = "forgerockRESTSecuritySelfRegConfirmationUrl";
     private final static String FORGOT_PASSWORD = "forgerockRESTSecurityForgotPasswordEnabled";
@@ -124,11 +125,12 @@ public class RestSecurity {
         final Set<String> protectedUserAttributes;
         final String successfulUserRegistrationDestination;
         final Boolean twoFactorAuthEnabled;
+        final Boolean selfService;
 
         private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl,
                 Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, Boolean selfRegistration,
                 Boolean forgotPassword, Set<String> protectedUserAttributes,
-                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled) {
+                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled, Boolean selfService) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
             this.selfRegistrationConfirmationUrl = selfRegistrationConfirmationUrl;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
@@ -138,12 +140,14 @@ public class RestSecurity {
             this.protectedUserAttributes = protectedUserAttributes;
             this.successfulUserRegistrationDestination = successfulUserRegistrationDestination;
             this.twoFactorAuthEnabled = twoFactorAuthEnabled;
+            this.selfService = selfService;
         }
     }
 
     private void initializeSettings(ServiceConfigManager serviceConfigManager) {
         try {
             ServiceConfig serviceConfig = serviceConfigManager.getOrganizationConfig(realm, null);
+            Boolean selfService = ServiceConfigUtils.getBooleanAttribute(serviceConfig, SELF_SERVICE);
             Boolean selfRegistration = ServiceConfigUtils.getBooleanAttribute(serviceConfig, SELF_REGISTRATION);
             String selfRegistrationConfirmationUrl = ServiceConfigUtils.getStringAttribute(serviceConfig, SELF_REG_CONFIRMATION_URL);
             Boolean forgotPassword = ServiceConfigUtils.getBooleanAttribute(serviceConfig, FORGOT_PASSWORD);
@@ -162,7 +166,8 @@ public class RestSecurity {
                     forgotPassword,
                     protectedUserAttributes,
                     successfulUserRegistrationDestination,
-                    twoFactorAuthEnabled);
+                    twoFactorAuthEnabled,
+                    selfService);
 
             setProviderConfig(newRestSecuritySettings);
             if (debug.messageEnabled()) {
@@ -202,6 +207,16 @@ public class RestSecurity {
             return restSecurityConfiguration.twoFactorAuthEnabled;
         } else {
             String message = "RestSecurity::Unable to get provider setting for : " + TWO_FACTOR_AUTH_ENABLED;
+            debug.error(message);
+            throw new ServiceNotFoundException(message);
+        }
+    }
+
+    public boolean isSelfServiceRestEndpointEnabled() throws ServiceNotFoundException {
+        if ((restSecurityConfiguration != null) && (restSecurityConfiguration.selfService != null)) {
+            return restSecurityConfiguration.selfService;
+        } else {
+            String message = "RestSecurity::Unable to get provider setting for : "+ SELF_SERVICE;
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }

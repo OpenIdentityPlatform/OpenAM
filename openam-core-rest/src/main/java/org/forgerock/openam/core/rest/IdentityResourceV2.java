@@ -329,6 +329,13 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 }
                 throw new NotFoundException("Rest Security Service not created" );
             }
+            if (!restSecurity.isSelfServiceRestEndpointEnabled()) {
+                if (debug.warningEnabled()) {
+                    debug.warning("IdentityResource.createRegistrationEmail(): Self-Registration set to : {}",
+                            restSecurity.isSelfServiceRestEndpointEnabled());
+                }
+                throw new NotSupportedException("Legacy Self Service REST Endpoint is not enabled.");
+            }
             if (!restSecurity.isSelfRegistration()) {
                 if (debug.warningEnabled()) {
                     debug.warning("IdentityResource.createRegistrationEmail(): Self-Registration set to : {}",
@@ -707,6 +714,12 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                     debug.warning("Rest Security not created. restSecurity={}", restSecurity);
                 }
                 throw getException(UNAVAILABLE, "Rest Security Service not created");
+            }
+            if (!restSecurity.isSelfServiceRestEndpointEnabled()) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Forgot Password set to : {}", restSecurity.isSelfServiceRestEndpointEnabled());
+                }
+                throw getException(UNAVAILABLE, "Legacy Self Service REST Endpoint is not enabled.");
             }
             if (!restSecurity.isForgotPassword()) {
                 if (debug.warningEnabled()) {
