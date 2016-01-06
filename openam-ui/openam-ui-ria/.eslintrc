@@ -1,12 +1,15 @@
 {
     "root": true,
     "extends": [
-        "forgerock",
-        "forgerock/es6"
+        "forgerock"
     ],
     "env": {
         "amd": true,
         "browser": true
+    },
+    "ecmaFeatures": {
+        arrowFunctions: true,
+        blockBindings: true
     },
     "rules": {
         /*
@@ -433,7 +436,7 @@
          *
          * var a = (b === 2); # good
          */
-        "yoda": [2, "never"]
+        "yoda": [2, "never"],
 
         /*
          * --------------------------------------------------------------------------------
@@ -444,6 +447,13 @@
          * error rules.
          * --------------------------------------------------------------------------------
          */
+        "arrow-body-style": [1, "as-needed"],
+        "arrow-parens": [1, "always"],
+        "arrow-spacing": 1,
+        "no-arrow-condition": 1,
+        "no-var": 1,
+        "prefer-arrow-callback": 1,
+        "prefer-const": 1,
 
         /*
          * --------------------------------------------------------------------------------

@@ -10,6 +10,9 @@
     "test": "grunt karma:dev"
   },
   "devDependencies": {
+    "babel-plugin-check-es2015-constants": "6.5.0",
+    "babel-plugin-transform-es2015-arrow-functions": "6.5.2",
+    "babel-plugin-transform-es2015-block-scoping": "6.5.0",
     "chai": "3.5.0",
     "cross-env": "1.0.7",
     "eslint": "1.10.3",
