@@ -11,19 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
     "jquery",
     "lodash",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog",
     "org/forgerock/openam/ui/common/util/array/arrayify",
-    "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/common/util/Promise",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
-], function ($, _, AbstractView, AddChainDialog, arrayify, Messages, Promise, SMSRealmDelegate) {
+    "org/forgerock/openam/ui/common/util/Promise"
+], function ($, _, Messages, AbstractView, SMSRealmDelegate, FormHelper, AddChainDialog, arrayify, Promise) {
     function getChainNameFromElement (element) {
         return $(element).data().chainName;
     }
@@ -37,8 +38,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         template: "templates/admin/views/realms/authentication/ChainsTemplate.html",
         events: {
             "change input[data-chain-name]" : "chainSelected",
-            "click  button.delete-chain-btn": "deleteChain",
-            "click  #deleteChains"          : "deleteChains",
+            "click  button.delete-chain-btn": "onDeleteSingle",
+            "click  #deleteChains"          : "onDeleteMultiple",
             "click  #selectAll"             : "selectAll",
             "click  #addChain"              : "addChain"
         },
@@ -75,6 +76,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             }
             this.$el.find("#deleteChains").prop("disabled", !checked);
         },
+        onDeleteSingle: function (e) {
+            e.preventDefault();
+
+            FormHelper.showConfirmationBeforeDeleting({
+                type: $.t("console.authentication.common.chain")
+            }, _.bind(this.deleteChain, this, e));
+        },
+        onDeleteMultiple: function (e) {
+            e.preventDefault();
+
+            var selectedChains = this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked");
+
+            FormHelper.showConfirmationBeforeDeleting({
+                message: $.t("console.authentication.chains.confirmDeleteSelected", { count: selectedChains.length })
+            }, _.bind(this.deleteChains, this, e, selectedChains));
+        },
         deleteChain: function (event) {
             var self = this,
                 element = event.currentTarget,
@@ -92,11 +109,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                 $(element).prop("disabled", false);
             });
         },
-        deleteChains: function (event) {
+        deleteChains: function (event, selectedChains) {
             var self = this,
                 element = event.currentTarget,
-                elements = this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked"),
-                names = _(elements).toArray().map(getChainNameFromElement).value();
+                names = _(selectedChains).toArray().map(getChainNameFromElement).value();
 
             $(element).prop("disabled", true);
 

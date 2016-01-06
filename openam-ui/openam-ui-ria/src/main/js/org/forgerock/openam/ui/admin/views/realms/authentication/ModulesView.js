@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", [
@@ -47,8 +47,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         events: {
             "click #addModule": "addModule",
             "change input.select-module": "moduleSelected",
-            "click button.delete-module-button": "deleteModule",
-            "click #deleteModules": "deleteModules",
+            "click button.delete-module-button": "onDeleteSingle",
+            "click #deleteModules": "onDeleteMultiple",
             "click .check-before-edit": "editModule"
         },
         partials: [
@@ -87,6 +87,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
 
             EditModuleDialog(data.moduleName, data.moduleChains, href);
         },
+        onDeleteSingle: function (e) {
+            e.preventDefault();
+
+            FormHelper.showConfirmationBeforeDeleting({
+                type: $.t("console.authentication.common.module")
+            }, _.bind(this.deleteModule, this, e));
+        },
+        onDeleteMultiple: function (e) {
+            e.preventDefault();
+
+            var selectedModules = this.$el.find("input[type=checkbox]:checked");
+
+            FormHelper.showConfirmationBeforeDeleting({
+                message: $.t("console.authentication.modules.confirmDeleteSelected", { count: selectedModules.length })
+            }, _.bind(this.deleteModules, this, e, selectedModules));
+        },
         deleteModule: function (event) {
             var self = this,
                 element = event.currentTarget,
@@ -104,11 +120,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                 $(element).prop("disabled", false);
             });
         },
-        deleteModules: function (event) {
+        deleteModules: function (event, selectedModules) {
             var self = this,
                 element = event.currentTarget,
-                elements = this.$el.find("input[type=checkbox]:checked"),
-                moduleInfos = _(elements).toArray().map(getModuleInfoFromElement).value();
+                moduleInfos = _(selectedModules).toArray().map(getModuleInfoFromElement).value();
 
             $(element).prop("disabled", true);
 

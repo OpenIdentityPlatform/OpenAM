@@ -695,6 +695,10 @@
             "confirmDeleteText": "Are you sure that you want to delete this __type__?"
         },
         "authentication": {
+            "common": {
+                "module": "module",
+                "chain": "chain"
+            },
             "settings": {
                 "title": "Authentication Settings"
             },
@@ -712,7 +716,9 @@
                     "title": "Edit module",
                     "message": "The <code>__moduleName__</code> module is being used by the following Authentication Chain(s) <code>__usedChains__</code>. Editing this module may change their behaviour. <br><br>Are you sure you want to continue?"
                 },
-                "moduleNameValidationError" : "Spaces are not allowed in a module's name"
+                "moduleNameValidationError" : "Spaces are not allowed in a module's name",
+                "confirmDeleteSelected": "Are you sure you want to delete the selected module?",
+                "confirmDeleteSelected_plural": "Are you sure you want to delete the selected modules?"
             },
             "chains": {
                 "title" : "Authentication Chains",
@@ -722,7 +728,9 @@
                 "defaultAdminAuthConfiguration" : "Default Administrator Authentication Chain",
                 "defaultOrgAuthConfiguration" : "Default Organization Authentication Chain",
                 "duplicateChain" : "A Chain with the same name already exists",
-                "createNewChain" : "Create new chain"
+                "createNewChain" : "Create new chain",
+                "confirmDeleteSelected": "Are you sure you want to delete the selected chain?",
+                "confirmDeleteSelected_plural": "Are you sure you want to delete the selected chains?"
             },
             "editChains": {
                 "options" : "Options",
