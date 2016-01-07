@@ -26,7 +26,7 @@
 : $Id: ssoadm.bat,v 1.19 2010/01/28 00:49:05 bigfatrat Exp $
 :
 
-: Portions Copyrighted 2010-2014 ForgeRock AS.
+: Portions Copyrighted 2010-2016 ForgeRock AS.
 
 setlocal enabledelayedexpansion
 
@@ -37,11 +37,7 @@ IF NOT DEFINED JAVA_HOME (
 set TOOLS_HOME=@TOOLS_HOME@
 set ORIG_CLASSPATH=%CLASSPATH%
 set CLASSPATH=@CONFIG_DIR@
-set CLASSPATH=%CLASSPATH%;%TOOLS_HOME%/classes;%TOOLS_HOME%/resources
-
-for /f %%f in ('dir /b "%TOOLS_HOME%/lib"') do (
-    set CLASSPATH=!CLASSPATH!;%TOOLS_HOME%/lib/%%f
-)
+set CLASSPATH=%CLASSPATH%;%TOOLS_HOME%/classes;%TOOLS_HOME%/resources;%TOOLS_HOME%/lib/*
 
 IF DEFINED ORIG_CLASSPATH (
 	set CLASSPATH=%ORIG_CLASSPATH%;%CLASSPATH%
