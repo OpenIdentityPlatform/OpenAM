@@ -73,6 +73,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Encoder;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -422,9 +424,10 @@ public  class FederationViewBean
                 if ((entitySet != null) && (!entitySet.isEmpty())) {
                     Iterator it = entitySet.iterator();
                     StringBuffer sb = new StringBuffer();
+                    Encoder encoder = ESAPI.encoder();
                     while (it.hasNext()) {
                         String entity = (String)it.next();
-                        sb.append (entity).append("<br>");
+                        sb.append(encoder.encodeForHTML(entity)).append("<br>");
                     }
                     tableModel.setValue(COT_ENTITY_VALUE, sb.toString());
                 } else {
