@@ -150,7 +150,7 @@ public class RedirectUrlValidatorTest {
 
     }
     private RedirectUrlValidator<String> getValidator(final Set<String> domains) {
-        return new RedirectUrlValidator<>(new ValidDomainExtractor<String>() {
+        return new RedirectUrlValidator<String>(new ValidDomainExtractor<String>() {
 
             public Collection<String> extractValidDomains(String configInfo) {
                 return domains;
