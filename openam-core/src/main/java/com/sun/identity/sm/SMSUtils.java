@@ -24,7 +24,7 @@
  *
  * $Id: SMSUtils.java,v 1.5 2008/07/11 01:46:21 arviranga Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -213,6 +213,7 @@ public class SMSUtils {
 
     public static final String RESOURCE_NAME = "resourceName";
     public static final String HIDE_CONFIG_UI = "hideConfigUI";
+    static final String REALM_CLONEABLE = "realmCloneable";
 
     protected static int counter = 0;
 

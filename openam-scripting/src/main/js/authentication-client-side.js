@@ -1,0 +1,1 @@
+/* Default Authentication client side script to use as a template for new scripts */

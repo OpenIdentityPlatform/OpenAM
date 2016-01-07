@@ -11,9 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.scripting;
+
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
 
 /**
  * Constants used for managing scripts.
@@ -83,17 +85,25 @@ public final class ScriptConstants {
      * scripting service and accessible in all realms.
      */
     public enum GlobalScript {
-        AUTH_MODULE_SERVER_SIDE("Scripted Module - Server Side", "7e3d7067-d50f-4674-8c76-a3e13a810c33"),
-        AUTH_MODULE_CLIENT_SIDE("Scripted Module - Client Side", ""),
-        DEVICE_ID_MATCH_SERVER_SIDE("Device Id (Match) - Server Side", "703dab1a-1921-4981-98dd-b8e5349d8548"),
-        DEVICE_ID_MATCH_CLIENT_SIDE("Device Id (Match) - Client Side", "157298c0-7d31-4059-a95b-eeb08473b7e5"),
-        OIDC_CLAIMS_SCRIPT("OIDC Claims Script", "36863ffb-40ec-48b9-94b1-9a99f71cc3b5");
+        AUTH_MODULE_SERVER_SIDE("Scripted Module - Server Side", "7e3d7067-d50f-4674-8c76-a3e13a810c33",
+                AUTHENTICATION_SERVER_SIDE),
+        AUTH_MODULE_CLIENT_SIDE("Scripted Module - Client Side", "c827d2b4-3608-4693-868e-bbcf86bd87c7",
+                AUTHENTICATION_CLIENT_SIDE),
+        DEVICE_ID_MATCH_SERVER_SIDE("Device Id (Match) - Server Side", "703dab1a-1921-4981-98dd-b8e5349d8548",
+                AUTHENTICATION_SERVER_SIDE),
+        DEVICE_ID_MATCH_CLIENT_SIDE("Device Id (Match) - Client Side", "157298c0-7d31-4059-a95b-eeb08473b7e5",
+                AUTHENTICATION_CLIENT_SIDE),
+        OIDC_CLAIMS_SCRIPT("OIDC Claims Script", "36863ffb-40ec-48b9-94b1-9a99f71cc3b5", OIDC_CLAIMS),
+        POLICY_CONDITION_SCRIPT("Policy Condition", "9de3eb62-f131-4fac-a294-7bd170fd4acb", POLICY_CONDITION);
+
         private final String displayName;
         private final String id;
+        private final ScriptContext context;
 
-        GlobalScript(String displayName, String id) {
+        GlobalScript(String displayName, String id, ScriptContext context) {
             this.displayName = displayName;
             this.id = id;
+            this.context = context;
         }
 
         /**
@@ -110,6 +120,14 @@ public final class ScriptConstants {
          */
         public String getId() {
             return id;
+        }
+
+        /**
+         * Get the {@link ScriptContext} of the global script.
+         * @return The context of the global script.
+         */
+        public ScriptContext getContext() {
+            return context;
         }
     }
 

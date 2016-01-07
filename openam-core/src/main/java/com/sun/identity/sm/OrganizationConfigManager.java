@@ -24,7 +24,7 @@
  *
  * $Id: OrganizationConfigManager.java,v 1.31 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -114,6 +114,8 @@ public class OrganizationConfigManager {
     // inetDomainStatus in org DIT.
     private String SUNORG_STATUS = "sunOrganizationStatus";
 
+    private static final String SMS_INVALID_SSO_TOKEN = "sms-INVALID_SSO_TOKEN";
+
     static {
         initializeFlags();
     }
@@ -165,8 +167,8 @@ public class OrganizationConfigManager {
         } catch (SSOException ssoe) {
             SMSEntry.debug.error("OrganizationConfigManager:Constructor", ssoe);
             throw (new SMSException(SMSEntry.bundle
-                    .getString("sms-INVALID_SSO_TOKEN"),
-                    "sms-INVALID_SSO_TOKEN"));
+                    .getString(SMS_INVALID_SSO_TOKEN),
+                    SMS_INVALID_SSO_TOKEN));
         }
 
         if (coexistMode) {
@@ -235,8 +237,8 @@ public class OrganizationConfigManager {
             SMSEntry.debug.error("OrganizationConfigManager:getServiceSchemas"
                     + " unable to get service schema", ssoe);
             throw (new SMSException(SMSEntry.bundle
-                    .getString("sms-INVALID_SSO_TOKEN"), ssoe,
-                    "sms-INVALID_SSO_TOKEN"));
+                    .getString(SMS_INVALID_SSO_TOKEN), ssoe,
+                    SMS_INVALID_SSO_TOKEN));
         }
         return (serviceSchemaSet);
     }
@@ -405,7 +407,7 @@ public class OrganizationConfigManager {
                     SMSEntry.debug.error("OrganizationConfigManager::"+
                         "createSubOrganization:", ssoe);
                     throw (new SMSException(SMSEntry.bundle.getString(
-                        "sms-INVALID_SSO_TOKEN"), "sms-INVALID_SSO_TOKEN"));
+                        SMS_INVALID_SSO_TOKEN), SMS_INVALID_SSO_TOKEN));
                 }
             }
         }
@@ -626,8 +628,8 @@ public class OrganizationConfigManager {
                         "String subOrgName, boolean recursive) Unable to " +
                         "delete sub organization ", ssoe);
                 throw (new SMSException(SMSEntry.bundle
-                        .getString("sms-INVALID_SSO_TOKEN"),
-                        "sms-INVALID_SSO_TOKEN"));
+                        .getString(SMS_INVALID_SSO_TOKEN),
+                        SMS_INVALID_SSO_TOKEN));
             }
         }
 
@@ -726,8 +728,8 @@ public class OrganizationConfigManager {
                         + "getAttributes(String serviceName) Unable to "
                         + "get Attributes", ssoe);
                 throw (new SMSException(SMSEntry.bundle
-                        .getString("sms-INVALID_SSO_TOKEN"),
-                        "sms-INVALID_SSO_TOKEN"));
+                        .getString(SMS_INVALID_SSO_TOKEN),
+                        SMS_INVALID_SSO_TOKEN));
             }
         }
 
@@ -835,8 +837,8 @@ public class OrganizationConfigManager {
                 SMSEntry.debug.error("OrganizationConfigManager: Unable "
                         + "to add Attribute Values", ssoe);
                 throw (new SMSException(SMSEntry.bundle
-                        .getString("sms-INVALID_SSO_TOKEN"),
-                        "sms-INVALID_SSO_TOKEN"));
+                        .getString(SMS_INVALID_SSO_TOKEN),
+                        SMS_INVALID_SSO_TOKEN));
             }
         }
 
@@ -975,8 +977,8 @@ public class OrganizationConfigManager {
                 SMSEntry.debug.error("OrganizationConfigManager: Unable "
                         + "to set Attributes", ssoe);
                 throw (new SMSException(SMSEntry.bundle
-                        .getString("sms-INVALID_SSO_TOKEN"),
-                        "sms-INVALID_SSO_TOKEN"));
+                        .getString(SMS_INVALID_SSO_TOKEN),
+                        SMS_INVALID_SSO_TOKEN));
             }
         }
 
@@ -1024,8 +1026,8 @@ public class OrganizationConfigManager {
                 SMSEntry.debug.error("OrganizationConfigManager: Unable "
                         + "to remove Attribute", ssoe);
                 throw (new SMSException(SMSEntry.bundle
-                        .getString("sms-INVALID_SSO_TOKEN"),
-                        "sms-INVALID_SSO_TOKEN"));
+                        .getString(SMS_INVALID_SSO_TOKEN),
+                        SMS_INVALID_SSO_TOKEN));
             }
         }
 
@@ -1083,8 +1085,8 @@ public class OrganizationConfigManager {
                 SMSEntry.debug.error("OrganizationConfigManager: Unable "
                         + "to remove Attribute Values", ssoe);
                 throw (new SMSException(SMSEntry.bundle
-                        .getString("sms-INVALID_SSO_TOKEN"),
-                        "sms-INVALID_SSO_TOKEN"));
+                        .getString(SMS_INVALID_SSO_TOKEN),
+                        SMS_INVALID_SSO_TOKEN));
             }
         }
 
@@ -1120,8 +1122,17 @@ public class OrganizationConfigManager {
             SMSEntry.debug.error("OrganizationConfigManager: Unable to "
                     + "get Service Config", ssoe);
             throw (new SMSException(SMSEntry.bundle
-                    .getString("sms-INVALID_SSO_TOKEN"),
-                    "sms-INVALID_SSO_TOKEN"));
+                    .getString(SMS_INVALID_SSO_TOKEN),
+                    SMS_INVALID_SSO_TOKEN));
+        }
+    }
+
+    ServiceSchema getServiceSchema(String serviceName) throws SMSException {
+        try {
+            return new ServiceSchemaManager(serviceName, token).getOrganizationSchema();
+        } catch (SSOException ssoe) {
+            SMSEntry.debug.error("OrganizationConfigManager: Unable to get Service Schema", ssoe);
+            throw new SMSException(SMSEntry.bundle.getString(SMS_INVALID_SSO_TOKEN), SMS_INVALID_SSO_TOKEN);
         }
     }
 
@@ -1160,8 +1171,8 @@ public class OrganizationConfigManager {
             SMSEntry.debug.error("OrganizationConfigManager: Unable to "
                     + "add Service Config", ssoe);
             throw (new SMSException(SMSEntry.bundle
-                    .getString("sms-INVALID_SSO_TOKEN"),
-                    "sms-INVALID_SSO_TOKEN"));
+                    .getString(SMS_INVALID_SSO_TOKEN),
+                    SMS_INVALID_SSO_TOKEN));
         }
     }
 
@@ -1184,8 +1195,8 @@ public class OrganizationConfigManager {
             SMSEntry.debug.error("OrganizationConfigManager: Unable to "
                     + "delete Service Config", ssoe);
             throw (new SMSException(SMSEntry.bundle
-                    .getString("sms-INVALID_SSO_TOKEN"),
-                    "sms-INVALID_SSO_TOKEN"));
+                    .getString(SMS_INVALID_SSO_TOKEN),
+                    SMS_INVALID_SSO_TOKEN));
         }
     }
 
@@ -1351,8 +1362,8 @@ public class OrganizationConfigManager {
             SMSEntry.debug.error("OrganizationConfigManager."
                     + "getAssignableServices(): SSOException", ssoe);
             throw (new SMSException(SMSEntry.bundle
-                    .getString("sms-INVALID_SSO_TOKEN"),
-                    "sms-INVALID_SSO_TOKEN"));
+                    .getString(SMS_INVALID_SSO_TOKEN),
+                    SMS_INVALID_SSO_TOKEN));
         }
         // Remove assigned services
         HashSet answer = new HashSet(orgSchemaServiceNames);
@@ -1485,8 +1496,8 @@ public class OrganizationConfigManager {
             SMSEntry.debug.error("OrganizationConfigManager.modifyService "
                     + "SSOException in modify service ", ssoe);
             throw (new SMSException(SMSEntry.bundle
-                    .getString("sms-INVALID_SSO_TOKEN"),
-                    "sms-INVALID_SSO_TOKEN"));
+                    .getString(SMS_INVALID_SSO_TOKEN),
+                    SMS_INVALID_SSO_TOKEN));
         }
     }
 
@@ -1578,6 +1589,7 @@ public class OrganizationConfigManager {
             }
             try {
                 ServiceConfig sc = parentOrg.getServiceConfig(serviceName);
+                ServiceSchema ss = parentOrg.getServiceSchema(serviceName);
                 Map attrs = null;
                 if (sc != null && assignedServices.contains(serviceName)) {
                     attrs = sc.getAttributesWithoutDefaults();
@@ -1591,7 +1603,7 @@ public class OrganizationConfigManager {
                     ServiceConfig scn = ocm
                             .addServiceConfig(serviceName, attrs);
                     // Copy sub-configurations, if any
-                    copySubConfig(sc, scn);
+                    copySubConfig(sc, scn, ss);
                 }
             } catch (SSOException ssoe) {
                 if (SMSEntry.debug.messageEnabled()) {
@@ -1601,8 +1613,8 @@ public class OrganizationConfigManager {
                                     ssoe);
                 }
                 throw (new SMSException(SMSEntry.bundle
-                        .getString("sms-INVALID_SSO_TOKEN"),
-                        "sms-INVALID_SSO_TOKEN"));
+                        .getString(SMS_INVALID_SSO_TOKEN),
+                        SMS_INVALID_SSO_TOKEN));
             }
         }
     }
@@ -1670,16 +1682,18 @@ public class OrganizationConfigManager {
     /**
      * Copies service configurations recursively from source to destination
      */
-    static void copySubConfig(ServiceConfig from, ServiceConfig to)
+    static void copySubConfig(ServiceConfig from, ServiceConfig to, ServiceSchema serviceSchema)
             throws SMSException, SSOException {
         Set subConfigNames = from.getSubConfigNames();
         for (Iterator items = subConfigNames.iterator(); items.hasNext();) {
             String subConfigName = (String) items.next();
             ServiceConfig scf = from.getSubConfig(subConfigName);
-            to.addSubConfig(subConfigName, scf.getSchemaID(),
-                    scf.getPriority(), scf.getAttributesWithoutDefaults());
-            ServiceConfig sct = to.getSubConfig(subConfigName);
-            copySubConfig(scf, sct);
+            ServiceSchema subSchema = serviceSchema.getSubSchema(scf.getSchemaID());
+            if (subSchema.isRealmCloneable()) {
+                to.addSubConfig(subConfigName, scf.getSchemaID(), scf.getPriority(), scf.getAttributesWithoutDefaults());
+                ServiceConfig sct = to.getSubConfig(subConfigName);
+                copySubConfig(scf, sct, subSchema);
+            }
         }
     }
 
@@ -1775,7 +1789,7 @@ public class OrganizationConfigManager {
                 orgConfigImpl = OrganizationConfigManagerImpl.getInstance(
                     token, orgName);
             } catch (SSOException ssoe) {
-                throw (new SMSException(ssoe, "sms-INVALID_SSO_TOKEN"));
+                throw (new SMSException(ssoe, SMS_INVALID_SSO_TOKEN));
             }
         }
     }

@@ -12,7 +12,7 @@
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
-  ~ Copyright 2014-2015 ForgeRock AS.
+  ~ Copyright 2014-2016 ForgeRock AS.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -141,6 +141,7 @@
                         sharedState,fontDetector,output,autoSubmitDelay,submit</predefinedVars>
                     <excludes>
                         <exclude>**/authentication-server-side.js</exclude>
+                        <exclude>**/authentication-client-side.js</exclude>
                         <exclude>**/policy-condition.js</exclude>
                     </excludes>
                 </configuration>
@@ -172,6 +173,7 @@
                     <sourceExcludes>
                         <sourceExclude>**/fontdetector.js</sourceExclude>
                         <sourceExclude>**/authentication-server-side.js</sourceExclude>
+                        <sourceExclude>**/authentication-client-side.js</sourceExclude>
                         <sourceExclude>**/policy-condition.js</sourceExclude>
                     </sourceExcludes>
                 </configuration>
@@ -195,6 +197,10 @@
                                 <content>
                                     <id>authentication-server-side-javascript</id>
                                     <file>${project.build.sourceDirectory}/../js/authentication-server-side.js</file>
+                                </content>
+                                <content>
+                                    <id>authentication-client-side-javascript</id>
+                                    <file>${project.build.sourceDirectory}/../js/authentication-client-side.js</file>
                                 </content>
                                 <content>
                                     <id>fontdetector</id>

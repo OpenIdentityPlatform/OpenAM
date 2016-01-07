@@ -24,7 +24,7 @@
  *
  * $Id: ServiceSchemaImpl.java,v 1.7 2008/06/25 05:44:05 qcheng Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -70,6 +70,8 @@ class ServiceSchemaImpl {
     String resourceName;
 
     String hideConfigUI;
+
+    String realmCloneable;
 
     // Attribute & sub-schema variables
     Set serviceAttributes;
@@ -134,6 +136,19 @@ class ServiceSchemaImpl {
      */
     boolean isHiddenInConfigUI() {
         return "yes".equalsIgnoreCase(hideConfigUI);
+    }
+
+    /**
+     * During the creation of a new organisation/realm the services assigned to the parent realm are copied to the
+     * child realm. This will include the sub configs for that service, which in some cases are realm specific and will
+     * fail validation if copied. The schemas of these sub configs should set {@code realmCloneable} to {@code no} to
+     * avoid being copied.
+     *
+     * @return {@code true} if the config is cloneable between realms.
+     */
+    boolean isRealmCloneable() {
+        // value is null in some schemas and we want to default to true, so check for "no" rather than "yes"
+        return !"no".equalsIgnoreCase(realmCloneable);
     }
 
     /**
@@ -377,6 +392,7 @@ class ServiceSchemaImpl {
         resourceName = XMLUtils
                 .getNodeAttributeValue(schemaNode, SMSUtils.RESOURCE_NAME);
         hideConfigUI = XMLUtils.getNodeAttributeValue(schemaNode, SMSUtils.HIDE_CONFIG_UI);
+        realmCloneable = XMLUtils.getNodeAttributeValue(schemaNode, SMSUtils.REALM_CLONEABLE);
 
         // Update sub-schema's, organization schema and attributes
         Set newServiceAttributes = new HashSet();

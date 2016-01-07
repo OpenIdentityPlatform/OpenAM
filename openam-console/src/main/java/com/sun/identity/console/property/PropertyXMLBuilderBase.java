@@ -27,11 +27,13 @@
  */
 
 /*
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2013-2014 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.console.property;
+
+import static com.sun.identity.sm.AttributeSchema.UIType.*;
 
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMModel;
@@ -695,7 +697,9 @@ public abstract class PropertyXMLBuilderBase
            .append(PROPERTY_END_TAG);
     }
 
-    private void buildScriptSelectXML(AttributeSchema as, StringBuffer xml, AMModel model, ResourceBundle bundle) {
+    private void buildScriptSelectXML(AttributeSchema as, StringBuffer xml, AMModel model, ResourceBundle bundle,
+            boolean globalOnly) {
+
         String attrName = getAttributeNameForPropertyXML(as);
 
         xml.append(PROPERTY_START_TAG);
@@ -713,11 +717,14 @@ public abstract class PropertyXMLBuilderBase
         getInlineHelp(as, xml, serviceBundle);
         xml.append(PROPERTY_END_TAG);
 
-        xml.append(PROPERTY_START_TAG)
-           .append(MessageFormat.format(COMPONENT_ACTION_BUTTON_START_TAG, "create", attrName,
+        xml.append(PROPERTY_START_TAG);
+        // Users can't create global scripts
+        if (!globalOnly) {
+           xml.append(MessageFormat.format(COMPONENT_ACTION_BUTTON_START_TAG, "create", attrName,
                    as.getPropertiesViewBeanURL(), model.getLocalizedString("button.create")))
-           .append(COMPONENT_END_TAG)
-           .append(MessageFormat.format(COMPONENT_ACTION_BUTTON_START_TAG, "edit", attrName,
+               .append(COMPONENT_END_TAG);
+        }
+        xml.append(MessageFormat.format(COMPONENT_ACTION_BUTTON_START_TAG, "edit", attrName,
                    as.getPropertiesViewBeanURL(), model.getLocalizedString("button.edit")))
            .append(COMPONENT_END_TAG)
            .append(PROPERTY_END_TAG);
@@ -1115,8 +1122,11 @@ public abstract class PropertyXMLBuilderBase
             if (allAttributesReadonly || readonly.contains(as.getName())) {
                 buildReadonlyXML(as, xml, model, serviceBundle);
 
-            } else if (AttributeSchema.UIType.SCRIPTSELECT.equals(as.getUIType())) {
-                buildScriptSelectXML(as, xml, model, serviceBundle);
+            } else if (SCRIPTSELECT.equals(as.getUIType())) {
+                buildScriptSelectXML(as, xml, model, serviceBundle, false);
+
+            } else if (GLOBALSCRIPTSELECT.equals(as.getUIType())) {
+                buildScriptSelectXML(as, xml, model, serviceBundle, true);
 
             } else {
                 buildAttributeSchemaTypeXML(as, xml, model, serviceBundle, addSubSection);

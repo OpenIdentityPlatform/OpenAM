@@ -50,12 +50,17 @@
                             <Value>GROOVY</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="defaultScript" type="single_choice" uitype="scriptSelect"
+                    <AttributeSchema name="defaultScript" type="single_choice" uitype="globalScriptSelect"
                                      propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}" syntax="string"
                                      i18nKey="st103">
                         <ChoiceValues>
                             <ChoiceValuesClassName
-                                    className="org.forgerock.openam.scripting.service.ScriptChoiceValues"/>
+                                    className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
+                                <AttributeValuePair>
+                                    <Attribute name="GlobalOnly"/>
+                                    <Value>true</Value>
+                                </AttributeValuePair>
+                            </ChoiceValuesClassName>
                         </ChoiceValues>
                     </AttributeSchema>
                     <SubSchema name="engineConfiguration" i18nKey="ec100">
@@ -393,6 +398,26 @@
                             <Attribute name="script"/>
                             <Value>
                                 ${inject.content.authentication-server-side-javascript}
+                            </Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="@GlobalClientSideAuthModuleScriptId@" id="globalScript">
+                        <AttributeValuePair>
+                            <Attribute name="name"/>
+                            <Value>Scripted Module - Client Side</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description"/>
+                            <Value>Default global script for client side Scripted Authentication Module</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="context"/>
+                            <Value>AUTHENTICATION_CLIENT_SIDE</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="script"/>
+                            <Value>
+                                ${inject.content.authentication-client-side-javascript}
                             </Value>
                         </AttributeValuePair>
                     </SubConfiguration>

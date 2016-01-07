@@ -24,7 +24,7 @@
  *
  * $Id: AttributeSchema.java,v 1.13 2009/01/13 06:56:08 mahesh_prasad_r Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -1164,6 +1164,12 @@ public class AttributeSchema {
          * attribute should be display as drop down widget.
          */
         public static final UIType SCRIPTSELECT = new UIType("scriptSelect");
+
+        /**
+         * The <code>GLOBALSCRIPTSELECT</code> attribute type specifies that the
+         * attribute should be display as drop down widget with only global scripts.
+         */
+        public static final UIType GLOBALSCRIPTSELECT = new UIType("globalScriptSelect");
 
         private String attrType;
 

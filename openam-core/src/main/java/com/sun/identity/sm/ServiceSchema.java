@@ -24,7 +24,7 @@
  *
  * $Id: ServiceSchema.java,v 1.12 2008/08/30 16:46:47 goodearth Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -279,6 +279,18 @@ public class ServiceSchema {
      */
     public boolean isHiddenInConfigUI() {
         return ss.isHiddenInConfigUI();
+    }
+
+    /**
+     * During the creation of a new organisation/realm the services assigned to the parent realm are copied to the
+     * child realm. This will include the sub configs for that service, which in some cases are realm specific and will
+     * fail validation if copied. The schemas of these sub configs should set {@code realmCloneable} to {@code no} to
+     * avoid being copied.
+     *
+     * @return {@code true} if the config is cloneable between realms.
+     */
+    public boolean isRealmCloneable() {
+        return ss.isRealmCloneable();
     }
 
     /**
