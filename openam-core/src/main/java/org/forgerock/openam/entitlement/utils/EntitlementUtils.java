@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.utils;
 
@@ -68,6 +68,7 @@ public final class EntitlementUtils {
     public static final String CONFIG_LAST_MODIFIED_BY = "lastModifiedBy";
     public static final String CONFIG_LAST_MODIFIED_DATE = "lastModifiedDate";
     public static final String CONFIG_NAME = "name";
+    public static final String CONFIG_APPLICATION_TYPE = "applicationType";
     public static final String EMPTY = "";
     public static final String SCHEMA_RESOURCE_TYPES = "resourceTypes";
     public static final String CONFIG_RESOURCE_TYPES = "registeredResourceTypes";

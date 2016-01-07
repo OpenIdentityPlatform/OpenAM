@@ -19,12 +19,14 @@ package org.forgerock.openam.upgrade.steps.policy;
 import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.APPLICATION;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_ACTIONS;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_APPLICATION_TYPE;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_RESOURCES;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_RESOURCE_TYPE_UUIDS;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.REGISTERED_APPLICATIONS;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActions;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.VersionUtils.isCurrentVersionLessThan;
+import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
@@ -154,37 +156,62 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
 
         for (String realm : realms) {
             final ServiceConfig appConfig = getApplicationsConfig(realm);
+
             if (appConfig == null) {
                 continue;
             }
+
             final Set<String> appNames = getApplicationNames(appConfig);
             final Set<ResourceTypeState> states = new HashSet<ResourceTypeState>();
 
             for (String appName : appNames) {
-
                 if (removedDefaultApplications.contains(appName)) {
                     // Ignore applications that are to be removed.
                     continue;
                 }
 
-                final Map<String, Set<String>> appData = getApplicationData(appConfig, appName);
-                final ResourceTypeState state = new ResourceTypeState();
-                state.appName = appName;
-                if (applicationEligibleForUpgrade(realm, appName, appData)) {
-                    state.applicationNeedsResourceType = true;
-                    state.actions = appData.get(CONFIG_ACTIONS);
-                    state.patterns = appData.get(CONFIG_RESOURCES);
-                    upgradeableApplicationCount += 1;
-                }
-                state.policyNames = policiesEligibleForUpgrade(appName, realm);
-                state.policiesNeedsResourceType = !state.policyNames.isEmpty();
-                upgradeablePrivilegeCount += state.policyNames.size();
-                states.add(state);
+                states.add(extractResourceTypeStateInformation(realm, appName, appConfig));
             }
+
             if (!states.isEmpty()) {
                 resourceTypeStatePerRealm.put(realm, states);
             }
         }
+    }
+
+    private ResourceTypeState extractResourceTypeStateInformation(String realm,
+            String appName, ServiceConfig appConfig) throws UpgradeException {
+
+        ResourceTypeState state = new ResourceTypeState();
+        Map<String, Set<String>> appData = getApplicationData(appConfig, appName);
+
+        if (applicationEligibleForUpgrade(realm, appName, appData)) {
+            populateApplicationUpgradeState(state, appData);
+        }
+
+        state.appName = appName;
+        state.policyNames = policiesEligibleForUpgrade(appName, realm);
+        state.policiesNeedsResourceType = !state.policyNames.isEmpty();
+        upgradeablePrivilegeCount += state.policyNames.size();
+
+        return state;
+    }
+
+    private void populateApplicationUpgradeState(ResourceTypeState state,
+            Map<String, Set<String>> appData) throws UpgradeException {
+
+        Set<String> actions = appData.get(CONFIG_ACTIONS);
+
+        if (isEmpty(actions)) {
+            String appTypeName = appData.get(CONFIG_APPLICATION_TYPE).iterator().next();
+            Map<String, Set<String>> appTypeData = getApplicationTypeData(appTypeName);
+            actions = appTypeData.get(CONFIG_ACTIONS);
+        }
+
+        state.actions = actions;
+        state.patterns = appData.get(CONFIG_RESOURCES);
+        state.applicationNeedsResourceType = true;
+        upgradeableApplicationCount += 1;
     }
 
     /**
@@ -439,6 +466,30 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
         } catch (SSOException e) {
             throw new UpgradeException("Failed to retrieve application data for " + appName, e);
         }
+    }
+
+    private Map<String, Set<String>> getApplicationTypeData(String appTypeName) throws UpgradeException {
+        try {
+            ServiceConfig config = configManager.getGlobalConfig(null).getSubConfig("applicationTypes");
+
+            if (config == null) {
+                throw new UpgradeException("Expected sub config applicationTypes under service "
+                        + EntitlementUtils.SERVICE_NAME);
+            }
+
+            config = config.getSubConfig(appTypeName);
+
+            if (config == null) {
+                throw new UpgradeException("Expected to find application type " + appTypeName);
+            }
+
+            @SuppressWarnings("unchecked")
+            Map<String, Set<String>> attributes = config.getAttributes();
+            return attributes;
+        } catch (SSOException | SMSException e) {
+            throw new UpgradeException("Failed to retrieve application type data for " + appTypeName, e);
+        }
+
     }
 
     /**
