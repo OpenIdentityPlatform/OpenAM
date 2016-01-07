@@ -26,6 +26,10 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2016 ForgeRock AS.
+ */
+
 
 package com.sun.identity.authentication.service;
 
@@ -156,5 +160,10 @@ public class AMAuthErrorCode {
      *  Session upgrade failed
      */
     public static final String SESSION_UPGRADE_FAILED = "124";
+
+    /**
+     *  Stateless ForceAuth failed
+     */
+    public static final String STATELESS_FORCE_FAILED = "125";
     
 }

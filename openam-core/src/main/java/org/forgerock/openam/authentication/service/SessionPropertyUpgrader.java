@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2016 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,8 +24,12 @@
  */
 package org.forgerock.openam.authentication.service;
 
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.service.InternalSession;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
+
 import java.util.Enumeration;
+import java.util.Set;
 
 /**
  * This class is used in case of session upgrade for copying session properties
@@ -36,7 +40,6 @@ import java.util.Enumeration;
  * to override {@link #updateProperty(com.iplanet.dpro.session.service.InternalSession,
  * java.lang.String, java.lang.String)} method.
  *
- * @author Peter Major
  * @supported.all.api
  */
 public abstract class SessionPropertyUpgrader {
@@ -59,6 +62,26 @@ public abstract class SessionPropertyUpgrader {
                     updateProperty(newSession, key, value);
                 } else {
                     updateProperty(oldSession, key, value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Entry point for LoginState. This method is called during session upgrade
+     * in order to copy session attributes from one session to another.
+     *
+     * @param oldSession The previous (stateless) session
+     * @param newSession The new session
+     */
+    public final void populatePropertiesFromStateless(StatelessSession oldSession,
+                                                      InternalSession newSession) throws SessionException {
+        Set<String> allProperties = oldSession.getPropertyNames();
+        for (String key : allProperties) {
+            String value = oldSession.getProperty(key);
+            if (shouldCopy(key)) {
+                if (value != null) {
+                    newSession.putProperty(key, value);
                 }
             }
         }

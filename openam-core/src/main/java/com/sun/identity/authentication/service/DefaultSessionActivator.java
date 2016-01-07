@@ -26,7 +26,9 @@
  *
  */
 
-// Portions Copyrighted 2015 ForgeRock AS.
+/**
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
+ */
 
 package com.sun.identity.authentication.service;
 
@@ -36,21 +38,23 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 
 import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.Enumeration;
 
 /**
- * The default session activator
+ * The default session activator: creates a new session, sets that as the current session,
+ * copies in properties from the session it's upgrading from (if appropriate) and then
+ * from the auth session into this new session, deletes the auth session and returns.
  */
-class DefaultSessionActivator implements SessionActivator {
+public class DefaultSessionActivator implements SessionActivator {
     static final DefaultSessionActivator INSTANCE = new DefaultSessionActivator();
 
-    private static final Debug DEBUG = AuthD.debug;
+    protected static final Debug DEBUG = AuthD.debug;
 
-    DefaultSessionActivator() {
-        // Visible for same-package sub-classes only
+    protected DefaultSessionActivator() {
     }
 
     @Override
@@ -58,44 +62,62 @@ class DefaultSessionActivator implements SessionActivator {
                                    final InternalSession authSession, final Subject subject, final Object loginContext)
             throws AuthException {
 
-        final SessionID oldSessId = authSession.getID();
-
+        //create our new session - the loginState needs this session as it's the one we'll be passing back to the user
         final InternalSession session = createSession(sessionService, loginState);
+        loginState.setSession(session);
 
-        session.removeObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
-        loginState.setSessionProperties(session);
+        return updateSessions(session, loginState, session, authSession, sessionService, subject, loginContext);
+    }
 
-        //copying over the session properties that were set on the authentication session onto the new session
-        // TODO: move forceAuth (and session upgrade) into a different session activator
-        final InternalSession sessionToUpdate = loginState.getForceFlag() ? loginState.getOldSession() : session;
+    /**
+     * newSession and sessionToActivate may be the same session -- e.g. in the default case for normal or stateless
+     * tokens. In other circumstances they will differ (i.e. ForceAuth).
+     */
+    protected boolean updateSessions(InternalSession newSession, LoginState loginState,
+                                     InternalSession sessionToActivate, InternalSession authSession,
+                                     SessionService sessionService, Subject subject, Object loginContext)
+            throws AuthException {
+
+        final SessionID authSessionId = authSession.getID();
+
+        newSession.removeObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
+
+        //session upgrade and anonymous conditions are handled in here
+        loginState.setSessionProperties(newSession);
+
+        //copy in our auth session properties (if any)
+        putAllPropertiesFromAuthSession(authSession, sessionToActivate);
+
+        //destroying the authentication session
+        sessionService.destroyInternalSession(authSessionId);
+
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Activating session: " + newSession);
+        }
+
+        //ensure that we've updated the subject (if appropriate, e.g. from anonymous -> known)
+        loginState.setSubject(addSSOTokenPrincipal(subject, sessionToActivate.getID()));
+
+        //set the login context for this session
+        if (loginState.isModulesInSessionEnabled() && loginContext != null) {
+            newSession.setObject(ISAuthConstants.LOGIN_CONTEXT, loginContext);
+        }
+
+        try {
+            return activateSession(sessionToActivate, loginState);
+        } catch (SessionException e) {
+            throw new AuthException(e);
+        }
+    }
+
+    protected void putAllPropertiesFromAuthSession(InternalSession authSession, InternalSession sessionToUpdate) {
         Enumeration<String> authSessionProperties = authSession.getPropertyNames();
         while (authSessionProperties.hasMoreElements()) {
             String key = authSessionProperties.nextElement();
             String value = authSession.getProperty(key);
             sessionToUpdate.putProperty(key, value);
         }
-
-        //destroying the authentication session
-        sessionService.destroyInternalSession(oldSessId);
-
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Activating session: " + session);
-        }
-
-        loginState.setSession(session);
-        loginState.setSubject(addSSOTokenPrincipal(subject, session.getID()));
-
-        if (loginState.isModulesInSessionEnabled() && loginContext != null) {
-            session.setObject(ISAuthConstants.LOGIN_CONTEXT, loginContext);
-        }
-
-        try {
-            return activateSession(session, loginState);
-        } catch (SessionException e) {
-            throw new AuthException(e);
-        }
     }
-
 
     protected InternalSession createSession(SessionService sessionService, LoginState loginState) {
         return sessionService.newInternalSession(loginState.getOrgDN(), null, false);
@@ -105,8 +127,7 @@ class DefaultSessionActivator implements SessionActivator {
         return session.activate(loginState.getUserDN());
     }
 
-    /* add the SSOTokenPrincipal to the Subject */
-    private Subject addSSOTokenPrincipal(Subject subject, SessionID sid) {
+    protected Subject addSSOTokenPrincipal(Subject subject, SessionID sid) {
         if (subject == null) {
             subject = new Subject();
         }

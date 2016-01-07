@@ -672,6 +672,10 @@ public class Session extends GeneralTaskRunnable {
         return sessionProperties.get(name);
     }
 
+    public Set<String> getPropertyNames() {
+        return sessionProperties.keySet();
+    }
+
     /**
      * Given a restricted token, returns the SSOTokenID of the master token
      * can only be used if the requester is an app token

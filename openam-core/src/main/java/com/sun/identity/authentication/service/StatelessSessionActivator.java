@@ -11,17 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.service;
 
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.InternalSessionFactory;
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 import org.forgerock.util.annotations.VisibleForTesting;
+
+import javax.security.auth.Subject;
 
 /**
  * Creates stateless sessions after authentication.
@@ -30,6 +39,7 @@ class StatelessSessionActivator extends DefaultSessionActivator {
     static final StatelessSessionActivator INSTANCE = new StatelessSessionActivator();
 
     private volatile StatelessSessionFactory statelessSessionFactory;
+    private StatelessSession oldSession;
 
     @VisibleForTesting
     StatelessSessionActivator(final StatelessSessionFactory statelessSessionFactory) {
@@ -37,7 +47,37 @@ class StatelessSessionActivator extends DefaultSessionActivator {
     }
 
     private StatelessSessionActivator() {
-        this(null);
+    }
+
+    @Override
+    public boolean activateSession(final LoginState loginState, final SessionService sessionService,
+                                   final InternalSession authSession, final Subject subject, final Object loginContext)
+            throws AuthException {
+
+        if (loginState.getForceFlag()) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Cannot force auth stateless sessions.");
+            }
+            throw new AuthException(AMAuthErrorCode.STATELESS_FORCE_FAILED, null);
+        }
+
+        if (loginState.isSessionUpgrade()) {
+            //set our old session -- necessary as if the currently owned token is stateless this won't be set
+            SessionID sid = new SessionID(loginState.getHttpServletRequest());
+            SessionInfo info = getStatelessSessionFactory().getSessionInfo(sid);
+            try {
+                oldSession = getStatelessSessionFactory().generate(info);
+                loginState.setOldStatelessSession(oldSession);
+            } catch (SessionException e) {
+                throw new AuthException(AMAuthErrorCode.SESSION_UPGRADE_FAILED, null);
+            }
+        }
+
+        //create our new session - the loginState needs this session as it's the one we'll be passing back to the user
+        final InternalSession session = createSession(sessionService, loginState);
+        loginState.setSession(session);
+
+        return updateSessions(session, loginState, session, authSession, sessionService, subject, loginContext);
     }
 
     @Override
@@ -54,6 +94,15 @@ class StatelessSessionActivator extends DefaultSessionActivator {
         }
         // Make sure that session is never scheduled
         session.cancel();
+
+        if (oldSession != null) {
+            try {
+                oldSession.logout(); //attempt to blacklist the old session
+            } catch (SessionException e) {
+                DEBUG.warning("Unable to blacklist old stateless session after session upgrade.");
+            }
+        }
+
         return activated;
     }
 

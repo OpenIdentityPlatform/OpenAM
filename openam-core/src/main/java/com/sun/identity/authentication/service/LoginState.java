@@ -24,7 +24,7 @@
  *
  * $Id: LoginState.java,v 1.57 2010/01/20 21:30:40 qcheng Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.service;
@@ -67,6 +67,7 @@ import com.iplanet.am.sdk.AMObject;
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
@@ -116,7 +117,9 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
+import org.forgerock.openam.authentication.service.activators.ForceAuthSessionActivator;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -329,6 +332,7 @@ public class LoginState {
     private String defaultAuthLevel = "0";
     private ZeroPageLoginConfig zeroPageLoginConfig;
     private InternalSession oldSession = null;
+    private StatelessSession oldStatelessSession = null;
     private SSOToken oldSSOToken = null;
     private boolean forceAuth;
     private boolean cookieTimeToLiveEnabledFlag = false;
@@ -1134,7 +1138,7 @@ public class LoginState {
 
             final boolean isSessionActivated = getSessionActivator().activateSession(this, AuthD.getSessionService(),
                     session, subject, loginContext);
-            if (sessionUpgrade && !forceAuth && isSessionActivated) {
+            if (sessionUpgrade && !forceAuth && isSessionActivated && oldStatelessSession == null) {
                 invokeSessionUpgradeHandlers();
             }
 
@@ -1162,7 +1166,15 @@ public class LoginState {
             return StatelessSessionActivator.INSTANCE;
         }
 
+        if (forceAuth) {
+            return ForceAuthSessionActivator.getInstance();
+        }
+
         return DefaultSessionActivator.INSTANCE;
+    }
+
+    public void setOldStatelessSession(StatelessSession session) {
+        this.oldStatelessSession = session;
     }
 
     /**
@@ -1192,15 +1204,22 @@ public class LoginState {
         String oldUserDN = null;
         String oldAuthenticationModuleInstanceName = null;
         AMIdentity oldAMIdentity = null;
-        if (oldSession != null) {
-            oldUserDN = oldSession.getProperty(ISAuthConstants.PRINCIPAL);
-            oldAuthenticationModuleInstanceName = oldSession.getProperty(
-                    ISAuthConstants.AUTH_TYPE);
+        if (oldSession != null || oldStatelessSession != null) {
+            if (oldSession != null) {
+                oldUserDN = oldSession.getProperty(ISAuthConstants.PRINCIPAL);
+                oldAuthenticationModuleInstanceName = oldSession.getProperty(ISAuthConstants.AUTH_TYPE);
+            } else {
+                try {
+                    oldUserDN = oldStatelessSession.getProperty(ISAuthConstants.PRINCIPAL);
+                    oldAuthenticationModuleInstanceName = oldStatelessSession.getProperty(ISAuthConstants.AUTH_TYPE);
+                } catch (SessionException e) {
+                    throw new AuthException(AMAuthErrorCode.SESSION_UPGRADE_FAILED, null);
+                }
+            }
+
             if (!ignoreUserProfile) {
-                newAMIdentity =
-                        LazyConfig.AUTHD.getIdentity(IdType.USER, userDN, getOrgDN());
-                oldAMIdentity =
-                        LazyConfig.AUTHD.getIdentity(IdType.USER, oldUserDN, getOrgDN());
+                newAMIdentity = LazyConfig.AUTHD.getIdentity(IdType.USER, userDN, getOrgDN());
+                oldAMIdentity = LazyConfig.AUTHD.getIdentity(IdType.USER, oldUserDN, getOrgDN());
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("LoginState.setSessionProperties()" +
                             " newAMIdentity is: " + newAMIdentity);
@@ -1248,8 +1267,7 @@ public class LoginState {
             if ("Anonymous".equalsIgnoreCase(oldAuthenticationModuleClassName)) {
                 sessionUpgrade();
             } else if (!ignoreUserProfile) {
-                if ((oldAMIdentity != null) &&
-                        oldAMIdentity.equals(newAMIdentity)) {
+                if ((oldAMIdentity != null) && oldAMIdentity.equals(newAMIdentity)) {
                     sessionUpgrade();
                 } else {
                     if (DEBUG.messageEnabled()) {
@@ -1261,9 +1279,7 @@ public class LoginState {
                             AMAuthErrorCode.SESSION_UPGRADE_FAILED, null);
                 }
             } else {
-                if ((oldUserDN != null) &&
-                        (DNUtils.normalizeDN(userDN)).equals(
-                                DNUtils.normalizeDN(oldUserDN))) {
+                if ((oldUserDN != null) && (DNUtils.normalizeDN(userDN)).equals(DNUtils.normalizeDN(oldUserDN))) {
                     sessionUpgrade();
                 } else {
                     if (DEBUG.messageEnabled()) {
@@ -1287,8 +1303,12 @@ public class LoginState {
         String moduleAuthTime = null;
         if (sessionUpgrade) {
             try {
-                oldSSOToken = SSOTokenManager.getInstance().createSSOToken
-                        (oldSession.getID().toString());
+
+                if (oldStatelessSession != null) {
+                    oldSSOToken = SSOTokenManager.getInstance().createSSOToken(oldStatelessSession.getID().toString());
+                } else {
+                    oldSSOToken = SSOTokenManager.getInstance().createSSOToken(oldSession.getID().toString());
+                }
             } catch (SSOException ssoExp) {
                 DEBUG.error("LoginState.setSessionProperties: Cannot get "
                         + "oldSSOToken.");
@@ -4598,18 +4618,38 @@ public class LoginState {
         this.sessionUpgrade = sessionUpgrade;
     }
 
-    void sessionUpgrade() {
+    void sessionUpgrade() throws AuthException {
         // set the larger authlevel
-        if (oldSession == null) {
+        if (oldSession == null && oldStatelessSession == null) {
             return;
         }
 
-        upgradeAllProperties(oldSession);
+        String strPrevAuthLevel;
+        String prevServiceName;
+        String prevRoleName;
+        String prevModuleList;
+
+        if (oldSession != null) {
+            strPrevAuthLevel = AMAuthUtils.getDataFromRealmQualifiedData(oldSession.getProperty("AuthLevel"));
+            prevServiceName = oldSession.getProperty("Service");
+            prevRoleName = oldSession.getProperty("Role");
+            prevModuleList = oldSession.getProperty("AuthType");
+            upgradeAllProperties(oldSession);
+        } else {
+            try {
+                strPrevAuthLevel = AMAuthUtils.getDataFromRealmQualifiedData(oldStatelessSession.getProperty("AuthLevel"));
+                prevServiceName = oldStatelessSession.getProperty("Service");
+                prevRoleName = oldStatelessSession.getProperty("Role");
+                prevModuleList = oldStatelessSession.getProperty("AuthType");
+                upgradeAllPropertiesFromStateless(oldStatelessSession);
+            } catch (SessionException se) {
+                throw new AuthException(AMAuthErrorCode.SESSION_UPGRADE_FAILED, null);
+            }
+        }
 
         int prevAuthLevel = 0;
-        String upgradeAuthLevel = null;
-        String strPrevAuthLevel = AMAuthUtils.getDataFromRealmQualifiedData(
-                oldSession.getProperty("AuthLevel"));
+        String upgradeAuthLevel;
+
         try {
             prevAuthLevel = Integer.parseInt(strPrevAuthLevel);
         } catch (NumberFormatException e) {
@@ -4633,7 +4673,6 @@ public class LoginState {
         }
 
         // update service name if indextype is service
-        String prevServiceName = oldSession.getProperty("Service");
         String upgradeServiceName = prevServiceName;
         String newServiceName;
         newServiceName = getAuthConfigName(indexType, indexName);
@@ -4657,10 +4696,7 @@ public class LoginState {
             }
         }
 
-
         // update role if indexType is role
-
-        String prevRoleName = oldSession.getProperty("Role");
         String upgradeRoleName = prevRoleName;
         if (indexType == AuthContext.IndexType.ROLE) {
             if (prevRoleName != null) {
@@ -4676,7 +4712,6 @@ public class LoginState {
 
         // update auth meth name
 
-        String prevModuleList = oldSession.getProperty("AuthType");
         String newModuleList = authMethName;
         if ((qualifiedOrgDN != null) && (qualifiedOrgDN.length() != 0)) {
             newModuleList = getRealmQualifiedModulesList(
@@ -4707,7 +4742,6 @@ public class LoginState {
             DEBUG.message("newModuleList: " + newModuleList);
             DEBUG.message("upgradeModuleList: " + upgradeModuleList);
         }
-
 
         updateSessionProperty("AuthLevel", upgradeAuthLevel);
         updateSessionProperty("AuthType", upgradeModuleList);
@@ -4795,6 +4829,14 @@ public class LoginState {
             DEBUG.message("LoginState::upgradeAllProperties() : Calling SessionPropertyUpgrader");
         }
         LazyConfig.SESSION_PROPERTY_UPGRADER.populateProperties(oldSession, session, forceAuth);
+    }
+
+    // Upgrade all Properties from the existing (old) session to new session
+    void upgradeAllPropertiesFromStateless(StatelessSession oldSession) throws SessionException {
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("LoginState::upgradeAllProperties() : Calling SessionPropertyUpgrader");
+        }
+        LazyConfig.SESSION_PROPERTY_UPGRADER.populatePropertiesFromStateless(oldSession, session);
     }
 
     private void invokeSessionUpgradeHandlers() {
@@ -6159,7 +6201,7 @@ public class LoginState {
      * useful if the login modules have particular logout callback functionality that must be invoked. See
      * authentication service setting "sunAMAuthKeepAuthModuleIntances". Not supported for stateless sessions.
      */
-    boolean isModulesInSessionEnabled() {
+    public boolean isModulesInSessionEnabled() {
         return modulesInSession;
     }
 
