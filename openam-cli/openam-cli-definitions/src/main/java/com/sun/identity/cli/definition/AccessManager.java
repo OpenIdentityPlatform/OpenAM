@@ -2988,7 +2988,7 @@ public class AccessManager {
           optionAliases={},
           macro="authentication",
           optionalOptions={
-                  "dryrun|n|u|Provide a summary of the policies and referral policies which would be updated, and those which would be added, as a result of the create-xacml command without the 'dryrun' option specified. Nothing will be updated or added when using this option.",
+                  "dryrun|n|u|Provide a summary of the policies which would be updated, and those which would be added, as a result of the create-xacml command without the 'dryrun' option specified. Nothing will be updated or added when using this option.",
                   "outfile|o|s|Filename where the output of a 'dryrun' command will be sent to. If no 'dryrun' command is specified, the outfile will not be used for anything."
           },
           resourceStrings={
