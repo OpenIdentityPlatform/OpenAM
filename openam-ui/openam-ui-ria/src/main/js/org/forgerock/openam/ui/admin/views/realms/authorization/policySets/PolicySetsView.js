@@ -69,7 +69,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                         model: PolicySetModel,
                         state: BackgridUtils.getState(),
                         queryParams: BackgridUtils.getQueryParams({
-                            filterName: "eq"
+                            filterName: "eq",
+                            _queryFilter: [
+                                "name+eq+" + encodeURIComponent('"^(?!sunAMDelegationService$).*"')
+                            ]
                         }),
                         parseState: BackgridUtils.parseState,
                         parseRecords: BackgridUtils.parseRecords,

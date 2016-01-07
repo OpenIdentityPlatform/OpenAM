@@ -114,7 +114,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
     obj.listResourceTypes = function () {
         return obj.serviceCall({
             url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() +
-                "/resourcetypes?_queryFilter=true"),
+                "/resourcetypes?_queryFilter=name+eq+" + encodeURIComponent('"^(?!Delegation Service$).*"')),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };

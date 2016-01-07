@@ -55,7 +55,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 url: URLHelper.substitute("__api__/resourcetypes"),
                 model: ResourceTypeModel,
                 state: BackgridUtils.getState(),
-                queryParams: BackgridUtils.getQueryParams(),
+                queryParams: BackgridUtils.getQueryParams({
+                    _queryFilter: [
+                        "name+eq+" + encodeURIComponent('"^(?!Delegation Service$).*"')
+                    ]
+                }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
                 sync: function (method, model, options) {
