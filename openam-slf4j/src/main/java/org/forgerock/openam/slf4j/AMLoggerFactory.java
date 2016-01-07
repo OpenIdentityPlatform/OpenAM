@@ -11,17 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.slf4j;
 
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.guava.common.cache.CacheBuilder;
+import org.forgerock.guava.common.cache.CacheLoader;
+import org.forgerock.guava.common.cache.LoadingCache;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
 public class AMLoggerFactory implements ILoggerFactory {
+
+    private static final LoadingCache<String, Debug> cache = CacheBuilder.newBuilder()
+            .build(new CacheLoader<String, Debug>() {
+                @Override
+                public Debug load(String s) {
+                    return Debug.getInstance(s);
+                }
+            });
+
     public Logger getLogger(String s) {
-        return new AMDebugLogger(Debug.getInstance(s));
+        return new AMDebugLogger(cache.getUnchecked(s));
     }
 }
