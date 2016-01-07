@@ -25,7 +25,7 @@
 # $Id: ssoadm,v 1.20 2010/01/28 00:49:05 bigfatrat Exp $
 #
 
-# Portions Copyrighted 2010-2015 ForgeRock AS.
+# Portions Copyrighted 2010-2016 ForgeRock AS.
 
 if [ -z "$JAVA_HOME" ] ; then
         JAVA_HOME="\@JAVA_HOME@"
@@ -47,7 +47,7 @@ if [ -n "$EXT_CLASSPATH" ] ; then
     CLASSPATH=$EXT_CLASSPATH:$CLASSPATH
 fi
 
-if [ "$1" == "-debug" ] ; then
+if [ "$1" = "-debug" ] ; then
     DEBUG="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9897"
     shift
 fi
