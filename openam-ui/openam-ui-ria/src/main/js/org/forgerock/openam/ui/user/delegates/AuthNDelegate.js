@@ -159,9 +159,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 errorBody,
                 currentStage = requirementList.length,
                 message,
-                failReason = null,
-                countIndex,
-                warningText = "Invalid Password!!Warning: Account lockout will occur after next ";
+                reasonThatWillNotBeDisplayed = 1;
             if (jqXHR.status === 408) {
                 // we timed out, so let's try again with a fresh session
                 oldReqs = requirementList[0];
@@ -201,8 +199,6 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                     message: message,
                     type: Messages.TYPE_DANGER
                 });
-
-                return;
             } else { // we have a 401 unauthorized response
                 errorBody = $.parseJSON(jqXHR.responseText);
 
@@ -211,32 +207,18 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 if (errorBody.hasOwnProperty("authId")) {
                     return obj.submitRequirements(errorBody).then(processSucceeded, processFailed);
                 } else {
-                    // TODO to refactor this switch soon. Something like a map from error.message to failReason
-                    // http://sources.forgerock.org/cru/CR-6216#CFR-114597
-                    switch (errorBody.message) {
-                        case "User Account Locked":
-                            failReason = "loginFailureLockout";
-                            break;
-                        case "Maximum Sessions Limit Reached.":
-                            failReason = "maxSessionsLimitOrSessionQuota";
-                            break;
-                        case " Your password has expired. Please contact service desk to reset your password":
-                            failReason = "loginFailureLockout";
-                            break;
-                        default:
-                            countIndex = errorBody.message.indexOf(warningText);
-                            if (countIndex >= 0) {
-                                failReason = {
-                                    key: "authenticationFailedWarning",
-                                    count: errorBody.message.slice(warningText.length, warningText.length + 1)
-                                };
-                            } else {
-                                failReason = "authenticationFailed";
-                            }
-                    }
+                    obj.resetProcess();
 
-                    processFailed(failReason);
+                    Messages.addMessage({
+                        message: errorBody.message,
+                        type: Messages.TYPE_DANGER
+                    });
+
                     goToFailureUrl(errorBody);
+
+                    // The reason used here will not be translated into a common message and hence not displayed.
+                    // This is so that only the message above is displayed.
+                    return $.Deferred().reject(currentStage, reasonThatWillNotBeDisplayed).promise();
                 }
             }
         });

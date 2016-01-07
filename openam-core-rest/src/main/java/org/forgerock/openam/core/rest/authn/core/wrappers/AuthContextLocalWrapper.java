@@ -166,7 +166,7 @@ public class AuthContextLocalWrapper implements AuthenticationContext {
     public String getErrorMessage() {
         String lockoutWarning = authContextLocal.getLockoutMsg();
         if (lockoutWarning != null) {
-            return authContextLocal.getErrorMessage() + lockoutWarning;
+            return authContextLocal.getErrorMessage() + " " + lockoutWarning;
         }
 
         return authContextLocal.getErrorMessage();

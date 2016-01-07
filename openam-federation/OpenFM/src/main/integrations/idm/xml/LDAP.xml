@@ -61,7 +61,7 @@
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
-    <Callbacks length="0" order="3" timeout="120" header=" Your password has expired. Please contact service desk to reset your password" error="true" />
+    <Callbacks length="0" order="3" timeout="120" header="Your password has expired. Please contact service desk to reset your password." error="true" />
     <Callbacks length="0" order="4" timeout="120" template="user_inactive.jsp" error="true"/>
 
 </ModuleProperties>
