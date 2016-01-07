@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.oauth2;
@@ -595,9 +595,12 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      */
     public AuthorizationCode readAuthorizationCode(OAuth2Request request, String code) 
             throws InvalidGrantException, ServerException, NotFoundException {
-        if (logger.messageEnabled()) {
-            logger.message("Reading Authorization code: " + code);
+        AuthorizationCode loaded = request.getToken(AuthorizationCode.class);
+        if (loaded != null) {
+            return loaded;
         }
+
+        logger.message("Reading Authorization code: {}", code);
         final JsonValue token;
 
         // Read from CTS
@@ -743,6 +746,10 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      */
     public AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException, NotFoundException {
+        AccessToken loaded = request.getToken(AccessToken.class);
+        if (loaded != null) {
+            return loaded;
+        }
 
         logger.message("Reading access token");
 
@@ -773,6 +780,10 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      */
     public RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException, NotFoundException {
+        RefreshToken loaded = request.getToken(RefreshToken.class);
+        if (loaded != null) {
+            return loaded;
+        }
 
         logger.message("Read refresh token");
         JsonValue token;
@@ -873,29 +884,37 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public DeviceCode readDeviceCode(String clientId, String code, OAuth2Request request) throws ServerException,
             NotFoundException, InvalidGrantException {
-        try {
-            JsonValue token = tokenStore.read(code);
+        DeviceCode deviceCode = request.getToken(DeviceCode.class);
+        if (deviceCode == null) {
+            try {
+                JsonValue token = tokenStore.read(code);
 
-            if (token == null) {
-                return null;
-            }
+                if (token == null) {
+                    return null;
+                }
 
-            DeviceCode deviceCode = new DeviceCode(token);
-            if (!clientId.equals(deviceCode.getClientId())) {
-                throw new InvalidGrantException();
+                deviceCode = new DeviceCode(token);
+            } catch (CoreTokenException e) {
+                logger.error("Unable to read device code corresponding to id: " + code, e);
+                throw new ServerException("Could not read token in CTS: " + e.getMessage());
             }
-            validateTokenRealm(deviceCode.getRealm(), request);
-            request.setToken(DeviceCode.class, deviceCode);
-            return deviceCode;
-        } catch (CoreTokenException e) {
-            logger.error("Unable to read device code corresponding to id: " + code, e);
-            throw new ServerException("Could not read token in CTS: " + e.getMessage());
         }
+        if (!clientId.equals(deviceCode.getClientId())) {
+            throw new InvalidGrantException();
+        }
+        validateTokenRealm(deviceCode.getRealm(), request);
+        request.setToken(DeviceCode.class, deviceCode);
+        return deviceCode;
     }
 
     @Override
     public DeviceCode readDeviceCode(String userCode, OAuth2Request request) throws ServerException, NotFoundException,
             InvalidGrantException {
+        DeviceCode loaded = request.getToken(DeviceCode.class);
+        if (loaded != null) {
+            return loaded;
+        }
+
         try {
             JsonValue token = tokenStore.query(equalTo(CoreTokenField.STRING_FOURTEEN, userCode));
 

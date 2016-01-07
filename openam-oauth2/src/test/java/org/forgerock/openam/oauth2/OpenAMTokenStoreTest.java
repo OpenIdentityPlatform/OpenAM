@@ -261,7 +261,7 @@ public class OpenAMTokenStoreTest {
         given(tokenStore.read("123")).willReturn(json(object(field("tokenName", asSet("device_code")))));
 
         // When
-        openAMtokenStore.readDeviceCode(null, "123", null);
+        openAMtokenStore.readDeviceCode(null, "123", mock(OAuth2Request.class));
     }
 
     @Test
