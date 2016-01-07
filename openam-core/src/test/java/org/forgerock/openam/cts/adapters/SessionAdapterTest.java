@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -35,6 +35,7 @@ import org.testng.annotations.Test;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -77,7 +78,7 @@ public class SessionAdapterTest {
         // Ensure Session User is ferret
         given(coreTokenConfig .getUserId(any(InternalSession.class))).willReturn(userId);
         // Ensure the expiration time is set.
-        given(session.getExpirationTime()).willReturn(mockTimestamp);
+        given(session.getExpirationTime(TimeUnit.MILLISECONDS)).willReturn(TimeUnit.SECONDS.toMillis(mockTimestamp));
 
         SessionID mockSessionID = mock(SessionID.class);
         given(mockSessionID.toString()).willReturn(sessionId);

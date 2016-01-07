@@ -71,6 +71,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import static org.forgerock.openam.session.SessionConstants.*;
@@ -1792,20 +1793,37 @@ public class InternalSession implements TaskRunnable, Serializable {
     }
 
      /**
-      * Computes session object expiration time as smallest of idle limit or
-      * session maximum lifetime limit adjusted by purgeDelay
-      * Time value is in seconds and uses the same epoch start as
-      * System.currentTimeMillis()
-      * @return session expiration time
+      * Computes session object expiration time as the smallest of the remaining idle time (or purge delay if the
+      * session has already timed out) or the session lifetime limit.
+      * <p>
+      * Time value is in seconds and uses the same epoch start as {@link System#currentTimeMillis()}
+      * @return session expiration time in seconds.
+      * @see #getExpirationTime(TimeUnit)
       */
     public long getExpirationTime() {
-        long timeLeft = Math.max(0L, getMaxIdleTime() * 60 - getIdleTime());
+        return getExpirationTime(TimeUnit.SECONDS);
+    }
 
-        if (timeLeft == 0) {
-            timeLeft = getTimeLeftBeforePurge();
+    /**
+     * Computes session object expiration time as the smallest of the remaining idle time (or purge delay if the
+     * session has already timed out) or the session lifetime limit.
+     * <p>
+     * Time value is returned in the requested unit (accurate to millisecond) and uses the
+     * same epoch as {@link System#currentTimeMillis()}.
+     *
+     * @param timeUnit the time unit to return the result in.
+     * @return the result in the given units.
+     */
+    public long getExpirationTime(final TimeUnit timeUnit) {
+        long timeLeftSeconds = Math.max(0L, TimeUnit.MINUTES.toSeconds(getMaxIdleTime()) - getIdleTime());
+
+        if (timeLeftSeconds == 0) {
+            timeLeftSeconds = getTimeLeftBeforePurge();
         }
-        return System.currentTimeMillis() / 1000
-                + Math.min(getTimeLeft(), timeLeft);
+
+        return timeUnit.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                + Math.min(timeUnit.convert(getTimeLeft(), TimeUnit.SECONDS),
+                           timeUnit.convert(timeLeftSeconds, TimeUnit.SECONDS));
     }
 
     /**

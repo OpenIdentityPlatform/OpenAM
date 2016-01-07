@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
 
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A collection of static immutable time functions.
@@ -57,9 +58,24 @@ public final class TimeUtils {
      * @return Non null Calendar representing this timestamp.
      */
     public static Calendar fromUnixTime(long unixTime) {
+        return fromUnixTime(unixTime, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Converts Unix Time in the given time units into Java Calendar time.
+     *
+     * Unix Time is a measure of time from the epoch. Therefore is devoid of
+     * any timezone information. The current default timezone will be assumed
+     * for this function.
+     *
+     * @param unixTime A Unix timestamp in the given time units.
+     * @param timeUnit The time units of the timestamp.
+     * @return Non null Calendar representing this timestamp.
+     */
+    public static Calendar fromUnixTime(long unixTime, TimeUnit timeUnit) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(TimeZone.getDefault());
-        long millis = unixTime * 1000L;
+        long millis = timeUnit.toMillis(unixTime);
         calendar.setTimeInMillis(millis);
         return calendar;
     }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts;
 
@@ -19,6 +19,9 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+
+import java.util.concurrent.TimeUnit;
+
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 
 /**
@@ -115,10 +118,10 @@ public class CoreTokenConfig {
     }
 
     /**
-     * @return The time period in seconds before a Session will timeout.
+     * @return The time period in the given time units before a Session will timeout.
      */
-    public int getSessionExpiryGracePeriod() {
-        return sessionExpiryGracePeriod;
+    public long getSessionExpiryGracePeriod(TimeUnit timeUnit) {
+        return timeUnit.convert(sessionExpiryGracePeriod, TimeUnit.SECONDS);
     }
 
     /**

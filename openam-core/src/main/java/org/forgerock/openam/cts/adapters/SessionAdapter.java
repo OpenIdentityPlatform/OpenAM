@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -29,6 +29,7 @@ import org.forgerock.openam.utils.TimeUtils;
 import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,8 +87,9 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         token.setUserId(userId);
 
         // Expiry Date
-        long unitTime = session.getExpirationTime() + config.getSessionExpiryGracePeriod();
-        Calendar expiryTimeStamp = TimeUtils.fromUnixTime(unitTime);
+        long unixTimeMillis = session.getExpirationTime(TimeUnit.MILLISECONDS)
+                + config.getSessionExpiryGracePeriod(TimeUnit.MILLISECONDS);
+        Calendar expiryTimeStamp = TimeUtils.fromUnixTime(unixTimeMillis, TimeUnit.MILLISECONDS);
         token.setExpiryTimestamp(expiryTimeStamp);
 
         // SessionID
