@@ -332,16 +332,13 @@ public class ServiceConfig {
         }
 
         // Get service schemas
-        ServiceSchemaImpl nss = null;
-        if (subConfigId != null) {
-            nss = ss.getSubSchema(subConfigId);
-        } else {
-            nss = ss.getSubSchema(subConfigName);
-        }
+        String subSchemaIdentifier = subConfigId == null ? subConfigName : subConfigId;
+        ServiceSchemaImpl nss = ss.getSubSchema(subSchemaIdentifier);
+
         if (nss == null) {
-            String[] args = { subConfigName };
+            String[] args = { subSchemaIdentifier };
             throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
-                    "sms-invalid-add-sub-config", args));
+                    "sms-invalid-add-sub-config-unknown-schema-name", args));
         }
 
         if (!nss.supportsMultipleConfigurations()
