@@ -24,10 +24,7 @@
  *
  * $Id: FMSessionProvider.java,v 1.23 2009/11/20 00:30:40 exu Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.plugin.session.impl;
@@ -306,7 +303,7 @@ public class FMSessionProvider implements SessionProvider {
             } catch (SMSException se) {
                 throw new SessionException(se);
             }
-            setLoadBalancerCookie(response);
+            setLoadBalancerCookie(request, response);
             Set cookieDomains = (Set)platformSchema.getAttributeDefaults().
                 get("iplanet-am-platform-cookie-domains");
             String value = ssoToken.getTokenID().toString();
@@ -364,13 +361,13 @@ public class FMSessionProvider implements SessionProvider {
      * Sets a load balancer cookie in the suppled HTTP response. The load
      * balancer cookie's value is set per server instance and is used to
      * support sticky load balancing.
-     * 
+     *
+     * @param request The HTTP request.
      * @param response the <code>HttpServletResponse</code> that will be sent
      *        to the user.
      */
-    public void setLoadBalancerCookie(HttpServletResponse response)
-    {
-        FSUtils.setlbCookie(response);
+    public void setLoadBalancerCookie(HttpServletRequest request, HttpServletResponse response) {
+        FSUtils.setlbCookie(request, response);
     }
 
     /**
@@ -621,7 +618,7 @@ public class FMSessionProvider implements SessionProvider {
      * @param session the session object.
      * @param listener listener for the session invalidation event.
      * 
-     * @throws SessoinException if adding the listener caused an error.
+     * @throws SessionException if adding the listener caused an error.
      */
     public void addListener(Object session, SessionListener listener)
         throws SessionException {

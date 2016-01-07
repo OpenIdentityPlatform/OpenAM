@@ -24,7 +24,7 @@
  *
  * $Id: LoginViewBean.java,v 1.28 2009/11/25 11:58:53 manish_rustagi Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.UI;
@@ -1637,22 +1637,22 @@ public class LoginViewBean extends AuthViewBeanBase {
     private void setCookie() {
         loginDebug.message("Set Auth or AM cookie");
         String cookieDomain = null;
-        Set cookieDomainSet = AuthClientUtils.getCookieDomainsForReq(request);
+        Set<String> cookieDomainSet = AuthClientUtils.getCookieDomainsForRequest(request);
         if (cookieDomainSet.isEmpty()) { //No cookie domain specified in profile
             try {
                 cookie = AuthUtils.getCookieString(ac, null);
-		int cookieTimeToLive = 0;
-		if (isCookieTimeToLiveEnabled()) {
-		    cookieTimeToLive = getCookieTimeToLive();
-		    if ((cookieTimeToLive > 0)
-			    && ac.getStatus() == AuthContext.Status.SUCCESS) {
-			if (loginDebug.messageEnabled()) {
-			    loginDebug.message("LoginViewBean.setCookie():"
-				    + "set cookie maxAge=" + cookieTimeToLive);
-			}
-			cookie.setMaxAge(cookieTimeToLive);
-		    }
-		}
+                int cookieTimeToLive = 0;
+                if (isCookieTimeToLiveEnabled()) {
+                    cookieTimeToLive = getCookieTimeToLive();
+                    if ((cookieTimeToLive > 0)
+                            && ac.getStatus() == AuthContext.Status.SUCCESS) {
+                        if (loginDebug.messageEnabled()) {
+                            loginDebug.message("LoginViewBean.setCookie():"
+                                    + "set cookie maxAge=" + cookieTimeToLive);
+                        }
+                        cookie.setMaxAge(cookieTimeToLive);
+                    }
+                }
                 CookieUtils.addCookieToResponse(response, cookie);
                 if ((cookie.getName()).equals(AuthUtils.getCookieName())) {
                     AuthUtils.setHostUrlCookie(response);
@@ -1672,15 +1672,15 @@ public class LoginViewBean extends AuthViewBeanBase {
                 }
             }
             while (iter.hasNext()) {
-                cookieDomain = (String)iter.next();
+                cookieDomain = (String) iter.next();
                 cookie = AuthUtils.getCookieString(ac, cookieDomain);
-		if (isCookieTimeToLiveEnabled() && cookieTimeToLive > 0
-			&& ac.getStatus() == AuthContext.Status.SUCCESS) {
-		    cookie.setMaxAge(cookieTimeToLive);
-		}
+                if (isCookieTimeToLiveEnabled() && cookieTimeToLive > 0
+                        && ac.getStatus() == AuthContext.Status.SUCCESS) {
+                    cookie.setMaxAge(cookieTimeToLive);
+                }
                 if (loginDebug.messageEnabled()) {
                     loginDebug.message("cookie for new request : "
-                    + cookie.toString());
+                            + cookie.toString());
                 }
                 CookieUtils.addCookieToResponse(response, cookie);
                 if ((cookie.getName()).equals(AuthUtils.getCookieName())) {
@@ -1715,7 +1715,7 @@ public class LoginViewBean extends AuthViewBeanBase {
      */
     private void clearCookie(String cookieName) {
         String cookieDomain = null;
-        Set cookieDomainSet = AuthClientUtils.getCookieDomainsForReq(request);
+        Set<String> cookieDomainSet = AuthClientUtils.getCookieDomainsForRequest(request);
         if (cookieDomainSet.isEmpty()) {// No cookie domain specified in profile
             cookie = AuthUtils.createCookie(cookieName,LOGOUTCOOKIEVALUE, null);
             cookie.setMaxAge(0);

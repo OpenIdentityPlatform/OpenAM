@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
@@ -144,7 +144,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
         secureCookie = CollectionHelper.getBooleanMapAttr(options, SECURE_COOKIE_KEY, true);
         httpOnlyCookie = CollectionHelper.getBooleanMapAttr(options, HTTP_ONLY_COOKIE_KEY, true);
         cookieName = CollectionHelper.getMapAttr(options, COOKIE_NAME_KEY);
-        cookieDomains = coreWrapper.getCookieDomains();
+        cookieDomains = coreWrapper.getCookieDomainsForRequest(getHttpServletRequest());
 
         try {
             return initialize(tokenIdleTime.toString(), maxTokenLife.toString(), enforceClientIP, getRequestOrg(),

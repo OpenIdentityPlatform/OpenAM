@@ -24,7 +24,7 @@
  *
  * $Id: CDCServlet.java,v 1.13 2009/11/13 23:43:17 dknab Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.services.cdc;
@@ -316,7 +316,7 @@ public class CDCServlet extends HttpServlet {
                 try {
                     String cookieValue = token.getTokenID().toString();
                     if (cookieName != null && cookieName.length() != 0) {
-                        Set domains = AuthClientUtils.getCookieDomainsForReq(request);
+                        Set<String> domains = AuthClientUtils.getCookieDomainsForRequest(request);
                         if (!domains.isEmpty()) {
                             for (Iterator it = domains.iterator(); it.hasNext(); ) {
                                 String domain = (String)it.next();

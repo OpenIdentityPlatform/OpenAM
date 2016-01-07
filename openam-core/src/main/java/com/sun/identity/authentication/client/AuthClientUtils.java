@@ -24,7 +24,7 @@
  *
  * $Id: AuthClientUtils.java,v 1.40 2010/01/22 03:31:01 222713 Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.client;
 
@@ -164,7 +164,6 @@ public class AuthClientUtils {
         SystemProperties.get(Constants.AM_DIST_AUTH_COOKIE_NAME,
         ISAuthConstants.DIST_AUTH_COOKIE_NAME);
     private static String serviceURI = getServiceURI() + "/UI/Login";
-    private static boolean setCookieToAllDomains = true;
 
     private static String serverURL = null;
     static Debug utilDebug = Debug.getInstance("amAuthClientUtils");
@@ -218,16 +217,6 @@ public class AuthClientUtils {
         }
         serverURL = proto + "://" + host + ":" + port;
 
-        String str = SystemProperties.get(
-                Constants.SET_COOKIE_TO_ALL_DOMAINS);
-        if (str != null && str.toLowerCase().equals("false")) {
-            setCookieToAllDomains = false;
-        }
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("AuthClientUtils: setCookieToAllDomains = "+
-                    setCookieToAllDomains);
-        }
-        
         if(distAuthCluster.length() != 0){
             try {
                 if (utilDebug.messageEnabled()) {
@@ -554,7 +543,7 @@ public class AuthClientUtils {
             HttpServletResponse response) throws AuthException {
         String cookieName = getlbCookieName();
         if (cookieName != null && cookieName.length() != 0) {
-            Set domains = getCookieDomainsForReq(request);
+            Set<String> domains = getCookieDomainsForRequest(request);
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
@@ -602,7 +591,7 @@ public class AuthClientUtils {
             HttpServletResponse response) {
         String cookieName = getlbCookieName();
         if (cookieName != null && cookieName.length() != 0) {
-            Set domains = getCookieDomainsForReq(request);
+            Set<String> domains = getCookieDomainsForRequest(request);
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
@@ -1326,6 +1315,12 @@ public class AuthClientUtils {
         }
     }
 
+    /**
+     * Return the set of cookie domains configured in Platform settings. Whenever possible, use
+     * {@link #getCookieDomainsForRequest(HttpServletRequest)} instead.
+     *
+     * @return The set of configured cookie domains. May contain null.
+     */
     public static Set<String> getCookieDomains() {
         Set<String> cookieDomains = Collections.EMPTY_SET;
         try {
@@ -1359,34 +1354,22 @@ public class AuthClientUtils {
     }
 
     /**
-     * Find the cookie domains from the cookie domain list based on
-     * the hostname of the incoming request
+     * Find the cookie domains from the cookie domain list based on the hostname of the incoming request.
      *
-     * @param request HttpServletRequest request
-     * @return a set of the cookie domains
+     * @param request HttpServletRequest request.
+     * @return Set of the matching cookie domains. May contain null.
      */
-    public static Set getCookieDomainsForReq(HttpServletRequest request) {
-        String host = request.getServerName();
-        Set allDomains = getCookieDomains();
-        if (setCookieToAllDomains) {
-            return allDomains;
+    public static Set<String> getCookieDomainsForRequest(HttpServletRequest request) {
+        Set<String> domains = getCookieDomains();
+        if (request == null) {
+            return domains;
         }
 
-        Set domains = new HashSet();
-        String domain = null;
-
-        if (!allDomains.isEmpty()) {
-            for (Iterator it = allDomains.iterator(); it.hasNext(); ) {
-                domain = (String)it.next();
-                if (host.indexOf(domain) > 0) {
-                    domains.add(domain);
-                }
-            }
-        }
-
+        domains = CookieUtils.getMatchingCookieDomains(request, domains);
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("AuthClientUtils:getCookieDomainsForReq returns " + domains);
+            utilDebug.message("AuthClientUtils:getCookieDomainsForRequest returns " + domains);
         }
+
         return domains;
     }
 
@@ -2791,7 +2774,7 @@ public class AuthClientUtils {
         String cookieName = aCookie.getName();
         String cookieValue = aCookie.getValue();
         if (cookieName != null && cookieName.length() != 0) {
-            Set domains = getCookieDomainsForReq(request);
+            Set<String> domains = getCookieDomainsForRequest(request);
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
@@ -2820,7 +2803,7 @@ public class AuthClientUtils {
             HttpServletResponse response) throws AuthException {
 
         if (cookieName != null && cookieName.length() != 0) {
-            Set domains = getCookieDomainsForReq(request);
+            Set<String> domains = getCookieDomainsForRequest(request);
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
@@ -2847,7 +2830,7 @@ public class AuthClientUtils {
             utilDebug.message("In clear server Cookie = " +  cookieName);
         }
         if (cookieName != null && cookieName.length() != 0) {
-            Set domains = getCookieDomainsForReq(request);
+            Set<String> domains = getCookieDomainsForRequest(request);
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();

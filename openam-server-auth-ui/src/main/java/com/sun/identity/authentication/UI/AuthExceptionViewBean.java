@@ -24,10 +24,8 @@
  *
  * $Id: AuthExceptionViewBean.java,v 1.8 2008/12/24 01:41:51 ericow Exp $
  *
- * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2015-2016 ForgeRock AS.
  */
-
-
 
 package com.sun.identity.authentication.UI;
 
@@ -187,7 +185,7 @@ public class AuthExceptionViewBean extends AuthViewBeanBase {
         if (ad != null ) {
             try {
                 String cookieDomain = null;
-                Set cookieDomainSet = AuthClientUtils.getCookieDomainsForReq(request);
+                Set<String> cookieDomainSet = AuthClientUtils.getCookieDomainsForRequest(request);
                 Cookie cookie;
                 setPageEncoding(request,response);
 

@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -286,7 +286,7 @@ public class SAML2 extends AMLoginModule {
                                          final HttpServletResponse response)  throws AuthLoginException {
 
         //first make sure to delete the cookie
-        removeCookiesForRedirects(response);
+        removeCookiesForRedirects(request, response);
 
         if (Boolean.parseBoolean(request.getParameter(SAML2Proxy.ERROR_PARAM_KEY))) {
             return handleRedirectError(request);
@@ -406,7 +406,7 @@ public class SAML2 extends AMLoginModule {
      * framework equiv.
      */
     private void setCookiesForRedirects(final HttpServletRequest request, final HttpServletResponse response) {
-        final Set<String> domains = AuthClientUtils.getCookieDomains();
+        final Set<String> domains = AuthClientUtils.getCookieDomainsForRequest(request);
         final StringBuilder originalUrl = new StringBuilder();
         final String requestedQuery = request.getQueryString();
 
@@ -437,8 +437,8 @@ public class SAML2 extends AMLoginModule {
     /**
      * Clears out the cookie from the user agent so we don't leave detritus.
      */
-    private void removeCookiesForRedirects(final HttpServletResponse response) {
-        final Set<String> domains = AuthClientUtils.getCookieDomains();
+    private void removeCookiesForRedirects(final HttpServletRequest request, final HttpServletResponse response) {
+        final Set<String> domains = AuthClientUtils.getCookieDomainsForRequest(request);
 
         // Set the return URL Cookie
         for (String domain : domains) {

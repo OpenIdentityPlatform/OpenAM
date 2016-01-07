@@ -20,6 +20,8 @@ import java.security.AccessController;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -245,12 +247,13 @@ public class CoreWrapper {
     }
 
     /**
-     * Gets the configured cookie domains for the server.
+     * Gets the configured cookie domains for the server matching the current request's domains.
      *
-     * @return The configured cookie domains.
+     * @param request The HTTP request.
+     * @return The matching cookie domains for the current request.
      */
-    public Collection<String> getCookieDomains() {
-        return AuthUtils.getCookieDomains();
+    public Collection<String> getCookieDomainsForRequest(HttpServletRequest request) {
+        return AuthUtils.getCookieDomainsForRequest(request);
     }
 
     /**

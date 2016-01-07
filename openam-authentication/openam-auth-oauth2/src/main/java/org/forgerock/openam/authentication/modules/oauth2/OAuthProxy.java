@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.util.Map;
-import java.util.Set;
+
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.shared.encode.CookieUtils;
 import org.forgerock.guice.core.InjectorHolder;
@@ -132,8 +132,7 @@ public class OAuthProxy  {
 
         OAuthUtil.debugMessage("OAuthProxy.toPostForm: removing cookie " + COOKIE_ORIG_URL);
 
-        Set<String> cookieDomains = AuthClientUtils.getCookieDomains();
-        for (String cookieDomain : cookieDomains) {
+        for (String cookieDomain : AuthClientUtils.getCookieDomainsForRequest(req)) {
             CookieUtils.addCookieToResponse(res, CookieUtils.newCookie(COOKIE_ORIG_URL, "", 0, "/", cookieDomain));
         }
         out.println(html.toString());

@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.saml2;
@@ -58,7 +58,7 @@ public class UtilProxyCookieRedirector implements FederateCookieRedirector {
             final HttpServletResponse response,
             final boolean isIDP) throws UnableToRedirectException {
 
-        FSUtils.setlbCookie(response);
+        FSUtils.setlbCookie(request, response);
 
         // turn off cookie hash redirect by default
         String tmpStr = SystemPropertiesManager.get(

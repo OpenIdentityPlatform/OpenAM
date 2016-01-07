@@ -24,6 +24,7 @@
  *
  * $Id: FSAssertionArtifactHandler.java,v 1.14 2009/11/03 00:49:49 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -114,7 +115,6 @@ public class FSAssertionArtifactHandler {
     private String idpSessionIndex = null;
     private Date reAuthnOnOrAfterDate = null; // TODO: not used currently
     private AuthnContext authnContextStmt = null;
-    private List cookieDomainList = FSServiceUtils.getCookieDomainList();
 
     protected HttpServletRequest request = null;
     protected HttpServletResponse response = null;
@@ -1310,27 +1310,13 @@ public class FSAssertionArtifactHandler {
             ssoToken = ssoSession;
             Iterator iter = null;
             //Set fed cookie
-            String fedCookieName = SystemConfigurationUtil.getProperty(
-                                   IFSConstants.FEDERATE_COOKIE_NAME);
+            String fedCookieName = SystemConfigurationUtil.getProperty(IFSConstants.FEDERATE_COOKIE_NAME);
             String fedCookieValue = "yes";
-            Cookie fedCookie = null;
-            if (cookieDomainList != null) {
-                iter = cookieDomainList.iterator();
-                while(iter != null && iter.hasNext()) {
-                    fedCookie = CookieUtils.newCookie(fedCookieName,
-                                        fedCookieValue,
-                                        IFSConstants.PERSISTENT_COOKIE_AGE,
-                                        "/",(String)iter.next());
-		    CookieUtils.addCookieToResponse(response, fedCookie);
-                }
-            } else {
-                fedCookie = CookieUtils.newCookie(fedCookieName,
-                                        fedCookieValue,
-                                        IFSConstants.PERSISTENT_COOKIE_AGE,
-                                        "/",null);
-		CookieUtils.addCookieToResponse(response, fedCookie);
+            for (String domain : SystemConfigurationUtil.getCookieDomainsForRequest(request)) {
+                CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(fedCookieName, fedCookieValue,
+                        IFSConstants.PERSISTENT_COOKIE_AGE, "/", domain));
             }
-            
+
             //keep local session ref
             FSSessionManager sessionManager = 
                         FSSessionManager.getInstance(hostMetaAlias);
@@ -1687,30 +1673,11 @@ public class FSAssertionArtifactHandler {
         if (nameIDPolicy == null ||
             !nameIDPolicy.equals(IFSConstants.NAME_ID_POLICY_ONETIME)) 
         {
-            String fedCookieName = SystemConfigurationUtil.getProperty(
-                IFSConstants.FEDERATE_COOKIE_NAME);
+            String fedCookieName = SystemConfigurationUtil.getProperty(IFSConstants.FEDERATE_COOKIE_NAME);
             String fedCookieValue = "yes";
-            Cookie fedCookie = null;
-            Iterator iter = null;
-            if (cookieDomainList != null) {
-                iter = cookieDomainList.iterator();
-                while(iter != null && iter.hasNext()) {
-                    fedCookie = CookieUtils.newCookie(
-                        fedCookieName,
-                        fedCookieValue,
-                        IFSConstants.PERSISTENT_COOKIE_AGE,
-                        "/",
-                        (String)iter.next());
-		    CookieUtils.addCookieToResponse(response, fedCookie);
-                }
-            } else {
-                fedCookie = CookieUtils.newCookie(
-                    fedCookieName,
-                    fedCookieValue,
-                    IFSConstants.PERSISTENT_COOKIE_AGE,
-                    "/",
-                    null);
-		CookieUtils.addCookieToResponse(response, fedCookie);
+            for (String domain : SystemConfigurationUtil.getCookieDomainsForRequest(request)) {
+                CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(fedCookieName, fedCookieValue,
+                        IFSConstants.PERSISTENT_COOKIE_AGE, "/", domain));
             }
         }
         

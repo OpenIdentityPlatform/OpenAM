@@ -24,7 +24,7 @@
  *
  * $Id: IPSigninRequest.java,v 1.8 2009/10/28 23:59:00 exu Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -246,7 +246,7 @@ public class IPSigninRequest extends WSFederationAction {
         
         // We want authentication request from browser to come back to this 
         // instance
-        WSFederationUtils.sessionProvider.setLoadBalancerCookie(response);
+        WSFederationUtils.sessionProvider.setLoadBalancerCookie(request, response);
         
         // TODO: here we should check if the new URL is one
         //       the same web container, if yes, forward,

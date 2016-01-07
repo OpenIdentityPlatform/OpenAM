@@ -24,6 +24,7 @@
  *
  * $Id: FSFedTerminationHandler.java,v 1.7 2009/11/03 00:49:26 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.federation.services.termination;
@@ -65,6 +66,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import org.w3c.dom.Document;
 
@@ -612,27 +614,13 @@ public class FSFedTerminationHandler {
                     FSUtils.debug.message("Setting Age to " +
                         IFSConstants.PERSISTENT_COOKIE_AGE + " Age");
                 }
-                List cookieDomainList  = FSServiceUtils.getCookieDomainList();
+                Set<String> domains = SystemConfigurationUtil.getCookieDomainsForRequest(request);
                 if (FSUtils.debug.messageEnabled()) {
-                    FSUtils.debug.message("Provider cookie domain list is " +
-                        cookieDomainList);
+                    FSUtils.debug.message("Provider cookie domain list is " + domains);
                 }
-                Iterator iter = null;
-                if(cookieDomainList != null) {
-                    iter = cookieDomainList.iterator();
-                    while(iter != null && iter.hasNext()) {
-                        fedCookie = CookieUtils.newCookie(FEDERATE_COOKIE_NAME,
-                                        cookieValue, 
-                                        IFSConstants.PERSISTENT_COOKIE_AGE,
-                                        "/", (String) iter.next());
-                        CookieUtils.addCookieToResponse(response, fedCookie);
-                    } 
-                } else  {
-                    fedCookie = CookieUtils.newCookie(FEDERATE_COOKIE_NAME,
-                                        cookieValue, 
-                                        IFSConstants.PERSISTENT_COOKIE_AGE,
-                                        "/",null);
-		    CookieUtils.addCookieToResponse(response, fedCookie);
+                for (String domain : domains) {
+                    CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(FEDERATE_COOKIE_NAME, cookieValue,
+                            IFSConstants.PERSISTENT_COOKIE_AGE, "/", domain));
                 }
             }
         } catch (FSAccountMgmtException e) {

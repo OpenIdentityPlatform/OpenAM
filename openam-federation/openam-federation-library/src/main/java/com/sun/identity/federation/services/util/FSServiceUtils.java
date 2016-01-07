@@ -24,9 +24,7 @@
  *
  * $Id: FSServiceUtils.java,v 1.11 2008/11/10 22:56:59 veiming Exp $
  *
- */
-/**
- * Portions Copyrighted 2012-2014 ForgeRock AS
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.federation.services.util;
 
@@ -106,12 +104,6 @@ public class FSServiceUtils {
             FSUtils.debug.error ("FSServiceUtils::static block) "+
                 "could not get factory instance");
             ex.printStackTrace ();
-        }
-        try {
-            cookieList = SystemConfigurationUtil.getCookieDomains();
-        } catch (SystemConfigurationException se) {
-            FSUtils.debug.error ("FSServiceUtils::staticBlock " +
-                "SystemConfigurationException while reading", se);
         }
 
         String signing = SystemConfigurationUtil.getProperty(
@@ -479,14 +471,6 @@ public class FSServiceUtils {
         }
     }
 
-    /**
-     * Returns list of cookie domains.
-     * @return List of cookie domains configured.
-     */
-    public synchronized static List getCookieDomainList(){
-          return cookieList;
-    }
-    
     /**
      * Gets the Affiliation ID for the provider that it belongs.
      * @param realm The realm under which the entity resides.

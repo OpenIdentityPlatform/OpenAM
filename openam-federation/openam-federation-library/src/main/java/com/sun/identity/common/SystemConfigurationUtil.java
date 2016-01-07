@@ -24,7 +24,7 @@
  *
  * $Id: SystemConfigurationUtil.java,v 1.7 2008/08/06 17:26:14 exu Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.common;
@@ -32,6 +32,7 @@ package com.sun.identity.common;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -40,15 +41,17 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import javax.servlet.http.HttpServletRequest;
+
 import com.sun.identity.plugin.configuration.ConfigurationActionEvent;
 import com.sun.identity.plugin.configuration.ConfigurationException;
 import com.sun.identity.plugin.configuration.ConfigurationInstance;
 import com.sun.identity.plugin.configuration.ConfigurationListener;
 import com.sun.identity.plugin.configuration.ConfigurationManager;
-import java.util.Collection;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
 
 /**
  * The <code>SystemConfigurationUtil</code> class provides methods to get
@@ -99,11 +102,12 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
      * @return list of cookie domains, return empty list if no cookie domain
      *     is defined.
      */
-    public static List getCookieDomains() throws SystemConfigurationException {
+    public static Set<String> getCookieDomainsForRequest(HttpServletRequest request) {
         if (!platformNamingInitialized) {
             initPlatformNaming();
         }
-        return cookieDomains;
+
+        return CookieUtils.getMatchingCookieDomains(request, cookieDomains);
     }
 
     /** 

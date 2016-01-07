@@ -24,7 +24,7 @@
  *
  * $Id: SessionProvider.java,v 1.7 2008/06/25 05:47:28 qcheng Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.plugin.session;
@@ -271,7 +271,7 @@ public interface SessionProvider {
      * @param response the <code>HttpServletResponse</code> that will be sent
      *        to the user.
      */
-    public void setLoadBalancerCookie(HttpServletResponse response);
+    public void setLoadBalancerCookie(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * Returns the time left for this session in seconds.

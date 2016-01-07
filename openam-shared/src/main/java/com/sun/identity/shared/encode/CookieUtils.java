@@ -24,18 +24,18 @@
  *
  * $Id: CookieUtils.java,v 1.6 2009/10/02 00:08:26 ericow Exp $
  *
- */
-/**
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.encode;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -451,5 +451,30 @@ public class CookieUtils {
             debug.message("CookieUtils:addCookieToResponse adds " + sb);
         }
         response.addHeader("Set-Cookie", sb.toString());
+    }
+
+    /**
+     * Matches the provided cookie domains against the current request's domain and returns the resulting set of
+     * matching cookie domains if the 'com.sun.identity.authentication.setCookieToAllDomains' advanced property is set
+     * to false.
+     *
+     * @param request The HTTP request.
+     * @param cookieDomains The configured cookie domains to match against.
+     * @return The set of matching cookie domains. May contain null.
+     */
+    public static Set<String> getMatchingCookieDomains(HttpServletRequest request, Collection<String> cookieDomains) {
+        if (SystemPropertiesManager.getAsBoolean(Constants.SET_COOKIE_TO_ALL_DOMAINS, true)) {
+            return new HashSet<>(cookieDomains);
+        }
+
+        String host = request.getServerName();
+        Set<String> domains = new HashSet<>();
+
+        for (String domain : cookieDomains) {
+            if (domain == null || host.contains(domain)) {
+                domains.add(domain);
+            }
+        }
+        return domains;
     }
 }

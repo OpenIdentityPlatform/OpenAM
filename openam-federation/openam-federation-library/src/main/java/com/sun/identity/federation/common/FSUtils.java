@@ -24,7 +24,7 @@
  *
  * $Id: FSUtils.java,v 1.10 2009/11/20 23:52:57 ww203982 Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.federation.common;
@@ -43,6 +43,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import com.sun.identity.common.SystemConfigurationException;
@@ -568,7 +569,7 @@ public class FSUtils {
                 " lbCookie not set.");
         }
 
-        setlbCookie(response);
+        setlbCookie(request, response);
 
         if (!requireRedirect(request)) {
             return false;
@@ -677,30 +678,15 @@ public class FSUtils {
      * Sets load balancer cookie.
      * @param response HttpServletResponse object
      */
-    public static void setlbCookie(HttpServletResponse response) {
+    public static void setlbCookie(HttpServletRequest request, HttpServletResponse response) {
         String cookieName = getlbCookieName();
         String cookieValue = getlbCookieValue();
         Cookie cookie = null;
         if ((cookieName != null) && (cookieName.length() != 0)) {
-            List domains = null;
-            try {
-                domains = SystemConfigurationUtil.getCookieDomains();
-            } catch (SystemConfigurationException scex) {
-                if (debug.warningEnabled()) {
-                    debug.warning("FSUtils.setlbCookie:", scex);
-                }
-            }
-            if ((domains!= null) && (!domains.isEmpty())) {
-                for (Iterator it = domains.iterator(); it.hasNext(); ) {
-                    String domain = (String)it.next();
-                    cookie = CookieUtils.newCookie(cookieName, cookieValue,
-                        "/", domain);
-		    CookieUtils.addCookieToResponse(response, cookie);
-                }
-            } else {
-                cookie = CookieUtils.newCookie(cookieName, cookieValue, "/",
-                    null);
-		CookieUtils.addCookieToResponse(response, cookie);
+            Set<String> domains = SystemConfigurationUtil.getCookieDomainsForRequest(request);
+            for (String domain : domains) {
+                cookie = CookieUtils.newCookie(cookieName, cookieValue, "/", domain);
+                CookieUtils.addCookieToResponse(response, cookie);
             }
         }
     }

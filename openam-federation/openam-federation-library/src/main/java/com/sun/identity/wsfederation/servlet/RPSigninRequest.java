@@ -24,6 +24,7 @@
  *
  * $Id: RPSigninRequest.java,v 1.9 2009/11/03 00:48:54 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -258,7 +259,7 @@ public class RPSigninRequest extends WSFederationAction {
         
         // Set LB cookie here so it's done regardless of which redirect happens
         // We want response to come back to this instance
-        WSFederationUtils.sessionProvider.setLoadBalancerCookie(response);
+        WSFederationUtils.sessionProvider.setLoadBalancerCookie(request, response);
 
         // If we still don't know the IdP, redirect to home realm discovery
         if (idp == null) {

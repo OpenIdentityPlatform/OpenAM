@@ -24,6 +24,7 @@
  *
  * $Id: FedletSessionProvider.java,v 1.4 2008/08/06 17:28:17 exu Exp $
  *
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.plugin.session.impl;
@@ -235,7 +236,7 @@ public class FedletSessionProvider implements SessionProvider {
      * @param session the session object.
      * @param listener listener for the session invalidation event.
      * 
-     * @throws SessoinException if adding the listener caused an error.
+     * @throws SessionException if adding the listener caused an error.
      */
     public void addListener(Object session, SessionListener listener)
         throws SessionException {
@@ -247,10 +248,11 @@ public class FedletSessionProvider implements SessionProvider {
      * balancer cookie's value is set per server instance and is used to
      * support sticky load balancing.
      *
+     * @param request The HTTP request.
      * @param response the <code>HttpServletResponse</code> that will be sent
      *        to the user.
      */
-    public void setLoadBalancerCookie(HttpServletResponse response) {
+    public void setLoadBalancerCookie(HttpServletRequest request, HttpServletResponse response) {
         debug.message("FedletSessionProvider.setLoadBalancerCookie called");
     }
     

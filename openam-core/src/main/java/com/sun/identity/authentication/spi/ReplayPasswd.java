@@ -24,9 +24,7 @@
  *
  * $Id: ReplayPasswd.java,v 1.6 2009/11/04 22:50:35 manish_rustagi Exp $
  *
- */
-/**
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.spi;
 
@@ -46,7 +44,6 @@ import com.sun.identity.shared.encode.CookieUtils;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
 import java.util.Map;
-import java.util.Set;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -147,9 +144,8 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
 
             if (Boolean.parseBoolean(iisOwaEnabled)) {
                 // Set OWA Auth Cookie
-                Cookie owaAuthCookie = null;
-                Set<String> domains = AuthUtils.getCookieDomains();
-                for (String domain : domains) {
+                Cookie owaAuthCookie;
+                for (String domain : AuthUtils.getCookieDomainsForRequest(request)) {
                     owaAuthCookie = CookieUtils.newCookie(OWA_AUTH_COOKIE, OWA_AUTH_COOKIE_VALUE, "/", domain);
                     CookieUtils.addCookieToResponse(response, owaAuthCookie);
                 }

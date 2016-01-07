@@ -24,10 +24,7 @@
  *
  * $Id: SystemPropertiesManager.java,v 1.3 2008/06/25 05:53:01 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2014 ForgeRock, AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.shared.configuration;
@@ -162,6 +159,22 @@ public final class SystemPropertiesManager {
      */
     public static boolean getAsBoolean(String key) {
         return Boolean.parseBoolean(get(key));
+    }
+
+    /**
+     * Returns the property value as a boolean.
+     *
+     * @since 13.0.0
+     * @param key The key whose value one is looking for.
+     * @param defaultValue The default value to return when the setting is not defined.
+     * @return The boolean value if the key exists; otherwise the default value is returned.
+     */
+    public static boolean getAsBoolean(String key, boolean defaultValue) {
+        final String value = get(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        return Boolean.parseBoolean(value);
     }
 
     /**

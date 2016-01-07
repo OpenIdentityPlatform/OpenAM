@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2016 ForgeRock AS. All rights reserved.
  * Copyright (c) 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -187,8 +187,8 @@ public class OAuth extends AMLoginModule {
                 }
 
                 // Find the domains for which we are configured
-                Set<String> domains = AuthClientUtils.getCookieDomains();
-                
+                Set<String> domains = AuthClientUtils.getCookieDomainsForRequest(request);
+
                 String ProviderLogoutURL = config.getLogoutServiceUrl();
 
                 String csrfStateTokenId = RandomStringUtils.randomAlphanumeric(32);

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2016 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,9 +21,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-
-/*
  * Portions Copyrighted 2013-2015 Nomura Research Institute, Ltd.
  */
 
@@ -1044,24 +1041,25 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
             }
             int autoLoginExpire = (60 * 60 * 24) * 365; // 1 year, configurable?
-            //Cookie domain?
+
+            final Set<String> cookieDomains = AuthUtils.getCookieDomainsForRequest(request);
             if (m.containsKey("LOGINNAME")) {
                 String value = m.get("LOGINVALUE");
                 String name = m.get("LOGINNAME");
 
-                addCookieToResponse(response, name, value, autoLoginExpire);
+                addCookieToResponse(response, cookieDomains, name, value, autoLoginExpire);
             }
             if (m.containsKey("COOKIENAME")) {
                 String name = m.get("COOKIENAME");
                 String value = m.get("COOKIEVALUE");
 
-                addCookieToResponse(response, name, value, autoLoginExpire);
+                addCookieToResponse(response, cookieDomains, name, value, autoLoginExpire);
             }
             if (m.containsKey("DEVICENAME")) {
                 String name = m.get("DEVICENAME");
                 String value = m.get("DEVICEVALUE");
 
-                addCookieToResponse(response, name, value, autoLoginExpire);
+                addCookieToResponse(response, cookieDomains, name, value, autoLoginExpire);
             }
         } catch (Exception e) {
             if (debug.messageEnabled()) {
@@ -1070,9 +1068,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
     }
 
-    private void addCookieToResponse(HttpServletResponse response, String name, String value, int expire) {
-        Set<String> domains = AuthUtils.getCookieDomains();
-        for (String domain : domains) {
+    private void addCookieToResponse(HttpServletResponse response, Set<String> cookieDomains, String name,
+            String value, int expire) {
+        for (String domain : cookieDomains) {
             CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(name, value, expire, "/", domain));
         }
     }

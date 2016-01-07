@@ -24,7 +24,7 @@
  *
  * $Id: AuthUtils.java,v 1.33 2009/12/15 16:39:47 qcheng Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -733,7 +733,7 @@ public class AuthUtils extends AuthClientUtils {
             throws AuthException {
         String cookieName = getlbCookieName();
         if (cookieName != null && cookieName.length() != 0) {
-            Set domains = getCookieDomainsForReq(request);
+            Set<String> domains = getCookieDomainsForRequest(request);
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
@@ -1868,7 +1868,7 @@ public class AuthUtils extends AuthClientUtils {
         HttpServletResponse response) {
 
         SessionID sid = new SessionID(request);
-        Set cookieDomainSet = getCookieDomainsForReq(request);
+        Set<String> cookieDomainSet = getCookieDomainsForRequest(request);
         if (cookieDomainSet.isEmpty()) {
             clearAllCookiesByDomain(sid, null, request, response);
         } else {
