@@ -16,8 +16,8 @@
 package org.forgerock.openam.cts.utils;
 
 import static org.mockito.BDDMockito.*;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.assertFalse;
 
 import java.util.Calendar;
 
@@ -145,8 +145,7 @@ public class LdapTokenAttributeConversionTest {
 
         // Then
         Attribute attribute = result.getAttribute(CoreTokenField.STRING_ONE.toString());
-        String string = attribute.firstValue().toString();
-        assertFalse(string.isEmpty());
+        assertNull(attribute);
     }
 
     @Test

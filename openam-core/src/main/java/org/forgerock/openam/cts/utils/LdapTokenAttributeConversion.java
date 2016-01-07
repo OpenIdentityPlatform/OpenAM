@@ -97,10 +97,9 @@ public class LdapTokenAttributeConversion {
                 entry.addAttribute(key, value);
             } else if (CoreTokenFieldTypes.isString(field)) {
                 String value = token.getValue(field);
-                if (value.isEmpty()) {
-                    value = EMPTY;
+                if (!value.isEmpty()) {
+                    entry.addAttribute(key, value);
                 }
-                entry.addAttribute(key, value);
             } else {
                 throw new IllegalStateException();
             }
