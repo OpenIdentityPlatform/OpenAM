@@ -46,7 +46,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
+/**
+ * NOTE: this code is for illustration purposes only and may be vulnerable to XSS and other attacks.
+ */
 public class PolicyClientServlet extends SampleBase {
     public void doPost(
         HttpServletRequest request,

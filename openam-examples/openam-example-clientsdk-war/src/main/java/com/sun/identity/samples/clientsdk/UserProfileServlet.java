@@ -44,6 +44,8 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Sample program that show user profile.
+ *
+ * NOTE: this code is for illustration purposes only and may be vulnerable to XSS and other attacks.
  */
 public class UserProfileServlet extends SampleBase {
     public void doPost(

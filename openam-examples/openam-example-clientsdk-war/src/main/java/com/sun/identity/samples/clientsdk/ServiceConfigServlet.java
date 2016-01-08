@@ -39,7 +39,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Sample program that lists service configurations
+ * Sample program that lists service configurations.
+ *
+ * NOTE: this code is for illustration purposes only and may be vulnerable to XSS and other attacks.
  */
 public class ServiceConfigServlet extends SampleBase {
     public void doPost(
