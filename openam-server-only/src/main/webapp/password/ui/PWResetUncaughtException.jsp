@@ -65,7 +65,7 @@
         </div>
         <div class="footer alt-color">
             <div class="grid_6 suffix_3">
-                <p>Copyright &copy; 2008-2015, ForgeRock AS. <br/>All Rights Reserved. Use of this software is subject to the
+                <p>Copyright &copy; 2010-2016, ForgeRock AS. <br/>All Rights Reserved. Use of this software is subject to the
                     terms and conditions of the ForgeRock&trade; License and Subscription Agreement.</p>
             </div>
         </div>

@@ -2089,7 +2089,7 @@
                     <additionalJOption>${javadoc.options}</additionalJOption>
                     <detectLinks>true</detectLinks>
                     <bottom>
-                        <![CDATA[Copyright &#169; 2010-2015, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]>
+                        <![CDATA[Copyright &#169; 2010-2016, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]>
                     </bottom>
                     <links>
                         <link>http://docs.oracle.com/javase/6/docs/api</link>
