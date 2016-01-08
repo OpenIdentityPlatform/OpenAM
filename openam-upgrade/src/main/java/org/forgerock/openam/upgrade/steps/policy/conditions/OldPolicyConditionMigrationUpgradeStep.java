@@ -17,6 +17,7 @@
 package org.forgerock.openam.upgrade.steps.policy.conditions;
 
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.upgrade.VersionUtils.isCurrentVersionLessThan;
 
 import java.security.PrivilegedAction;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 
+import com.sun.identity.entitlement.Application;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -41,6 +43,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * <p>Will attempt to migrate old policy conditions to new entitlement conditions.</p>
@@ -87,7 +90,9 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
      */
     @Override
     public void initialize() throws UpgradeException {
-
+        if (!isCurrentVersionLessThan(1200, true)) {
+            return;
+        }
         try {
             DEBUG.message("Initializing OldPolicyConditionMigrationStep");
 
@@ -192,12 +197,27 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
                 privilege.getEntitlement().clearCache();
 
                 try {
+                    addResourceType(privilege, realm);
                     privilegeManager.modify(privilege.getName(), privilege);
                 } catch (EntitlementException e) {
                     DEBUG.error("Failed to modify privilege!", e);
                     throw new UpgradeException("Failed to modify privilege!", e);
                 }
             }
+        }
+    }
+
+    private void addResourceType(Privilege privilege, String realm) throws UpgradeException, EntitlementException {
+        Application application = privilege.getEntitlement().getApplication(getAdminSubject(), realm);
+        Set<String> resourceTypeUuids = application.getResourceTypeUuids();
+        if (CollectionUtils.isNotEmpty(resourceTypeUuids)) {
+            // UpgradeResourceTypeStep only creates one Resource Type for each application, so there should
+            // only be one resource type associated with the application at this stage
+            privilege.setResourceTypeUuid(application.getResourceTypeUuids().iterator().next());
+        } else {
+            DEBUG.error("Failed to modify privilege {} in realm {}! Associated application has no Resource Types.",
+                    privilege.getName(), realm);
+            throw new UpgradeException("Failed to modify privilege!");
         }
     }
 
