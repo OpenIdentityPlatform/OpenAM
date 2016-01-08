@@ -63,7 +63,7 @@ public class InternalSessionTest {
         InternalSession.setPurgeDelay(0);
         session.setIsISStored(true);
         given(mockSessionServiceConfig.isSessionFailoverEnabled()).willReturn(true);
-        session.setTimedOut(12345L);
+        session.setTimedOutAt(12345L);
 
         // When
         session.setState(SessionConstants.VALID);
@@ -79,7 +79,7 @@ public class InternalSessionTest {
         InternalSession.setPurgeDelay(0);
         session.setIsISStored(true);
         given(mockSessionServiceConfig.isSessionFailoverEnabled()).willReturn(true);
-        session.setTimedOut(0);
+        session.setTimedOutAt(0);
 
         // When
         session.setState(SessionConstants.VALID);
@@ -94,7 +94,7 @@ public class InternalSessionTest {
         InternalSession.setPurgeDelay(120L);
         session.setIsISStored(true);
         given(mockSessionServiceConfig.isSessionFailoverEnabled()).willReturn(true);
-        session.setTimedOut(12345L);
+        session.setTimedOutAt(12345L);
 
         // When
         session.setState(SessionConstants.VALID);
