@@ -192,20 +192,6 @@
                         <Value>givenName</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="selfServiceUserRegistrationSuccessDestination"
-                                 type="single_choice"
-                                 syntax="string"
-                                 resourceName="userRegisteredSuccessDestination"
-                                 i18nKey="user.registration.success.destination">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="user.registration.success.destination.default">default</ChoiceValue>
-                        <ChoiceValue i18nKey="user.registration.success.destination.login">login</ChoiceValue>
-                        <ChoiceValue i18nKey="user.registration.success.destination.auto">autologin</ChoiceValue>
-                    </ChoiceValues>
-                    <DefaultValues>
-                        <Value>default</Value>
-                    </DefaultValues>
-                </AttributeSchema>
 
                 <!-- Forgotten password -->
 

@@ -37,7 +37,6 @@ final class SelfServiceInfo {
     private final boolean forgottenPasswordEnabled;
     private final boolean kbaEnabled;
     private final Set<String> protectedUserAttributes;
-    private final String successDestination;
 
     private SelfServiceInfo(SelfServiceInfoBuilder builder) {
         userRegistrationEnabled = builder.userRegistrationEnabled;
@@ -47,7 +46,6 @@ final class SelfServiceInfo {
                 builder.forgottenUsernameKbaEnabled ||
                 builder.forgottenPasswordKbaEnabled;
         protectedUserAttributes = builder.protectedUserAttributes;
-        successDestination = builder.successDestination;
     }
 
     /**
@@ -96,15 +94,6 @@ final class SelfServiceInfo {
     }
 
     /**
-     * Gets the success destination.
-     *
-     * @return the success destination
-     */
-    public String getSuccessDestination() {
-        return successDestination;
-    }
-
-    /**
      * Builder indented for the use by {@link SelfServiceInfo} to retrieve self service configuration.
      */
     @ConfigSource("selfService")
@@ -117,7 +106,6 @@ final class SelfServiceInfo {
         private boolean forgottenUsernameKbaEnabled;
         private boolean forgottenPasswordKbaEnabled;
         private final Set<String> protectedUserAttributes;
-        private String successDestination;
 
         /**
          * Constructs a new self service info builder.
@@ -203,21 +191,9 @@ final class SelfServiceInfo {
             this.protectedUserAttributes.addAll(protectedUserAttributes);
         }
 
-        /**
-         * Sets the success destination.
-         *
-         * @param successDestination
-         *         the success destination
-         */
-        @ConfigAttribute("selfServiceUserRegistrationSuccessDestination")
-        public void setSuccessDestination(String successDestination) {
-            this.successDestination = successDestination;
-        }
-
         @Override
         public SelfServiceInfo build(Map<String, Set<String>> attributes) {
             Reject.ifNull(protectedUserAttributes, "Protected user attributes are required");
-            Reject.ifNull(successDestination, "Success destination is required");
             return new SelfServiceInfo(this);
         }
 
