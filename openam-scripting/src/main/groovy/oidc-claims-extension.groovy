@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014-2015 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 import com.iplanet.sso.SSOException
 import com.sun.identity.idm.IdRepoException
@@ -21,7 +21,6 @@ import org.forgerock.oauth2.core.UserInfoClaims
 * Defined variables:
 * logger - always presents, the "OAuth2Provider" debug logger instance
 * claims - always present, default server provided claims
-* accessToken - always present, the OAuth2 access token
 * session - present if the request contains the session cookie, the user's session object
 * identity - always present, the identity of the resource owner
 * scopes - always present, the requested scopes
@@ -32,7 +31,11 @@ import org.forgerock.oauth2.core.UserInfoClaims
 *                  a single value in its Set indicates this is the only value that should be returned.
 * Required to return a Map of claims to be added to the id_token claims
 *
-* Expected return value struture:
+* Expected return value structure:
+* UserInfoClaims {
+*    Map<String, Object> values; // The values of the claims for the user information
+*    Map<String, List<String>> compositeScopes; // Mapping of scope name to a list of claim names.
+* }
 */
 
 // user session not guaranteed to be present

@@ -1086,7 +1086,6 @@ public class OAuth2Constants {
         public static final String IDENTITY = "identity";
         public static final String LOGGER = "logger";
         public static final String CLAIMS = "claims";
-        public static final String ACCESS_TOKEN = "accessToken";
         public static final String SESSION = "session";
         public static final String REQUESTED_CLAIMS = "requestedClaims";
     }

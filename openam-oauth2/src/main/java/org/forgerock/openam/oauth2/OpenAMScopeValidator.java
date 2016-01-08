@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -236,7 +236,6 @@ public class OpenAMScopeValidator implements ScopeValidator {
             scriptVariables.put(OAuth2Constants.ScriptParams.IDENTITY, id);
             scriptVariables.put(OAuth2Constants.ScriptParams.LOGGER, logger);
             scriptVariables.put(OAuth2Constants.ScriptParams.CLAIMS, response);
-            scriptVariables.put(OAuth2Constants.ScriptParams.ACCESS_TOKEN, token);
             scriptVariables.put(OAuth2Constants.ScriptParams.SESSION, ssoToken);
             scriptVariables.put(OAuth2Constants.ScriptParams.REQUESTED_CLAIMS, requestedClaimsValues);
 
