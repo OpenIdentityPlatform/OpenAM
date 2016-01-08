@@ -24,7 +24,7 @@
  *
  * $Id: WindowsDesktopSSO.java,v 1.7 2009/07/28 19:40:45 beomsuk Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.windowsdesktopsso;
@@ -282,17 +282,22 @@ public class WindowsDesktopSSO extends AMLoginModule {
                     }
                     GSSName user = context.getSrcName();
                     final String userPrincipalName = user.toString();
-                    boolean foundTrustedRealm = false;
-                    for (final String trustedRealm : trustedRealms) {
-                        if (isTokenTrusted(userPrincipalName, trustedRealm)) {
-                            foundTrustedRealm = true;
-                            break;
+
+                    // If the whitelist is empty, do not enforce it. This prevents issues with upgrading, and is the
+                    // expected default behaviour.
+                    if (!trustedRealms.isEmpty()) {
+                        boolean foundTrustedRealm = false;
+                        for (final String trustedRealm : trustedRealms) {
+                            if (isTokenTrusted(userPrincipalName, trustedRealm)) {
+                                foundTrustedRealm = true;
+                                break;
+                            }
                         }
-                    }
-                    if (!foundTrustedRealm) {
-                        debug.error("Kerberos token for " + userPrincipalName + " not trusted");
-                        final String[] data = {userPrincipalName};
-                        throw new AuthLoginException(amAuthWindowsDesktopSSO, "untrustedToken", data);
+                        if (!foundTrustedRealm) {
+                            debug.error("Kerberos token for " + userPrincipalName + " not trusted");
+                            final String[] data = {userPrincipalName};
+                            throw new AuthLoginException(amAuthWindowsDesktopSSO, "untrustedToken", data);
+                        }
                     }
                     
                     // Check if the user account from the Kerberos ticket exists 
