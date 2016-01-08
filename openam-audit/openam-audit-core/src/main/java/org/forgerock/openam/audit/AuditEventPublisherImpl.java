@@ -22,7 +22,6 @@ import static org.forgerock.openam.audit.AuditConstants.EVENT_REALM;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Connection;
