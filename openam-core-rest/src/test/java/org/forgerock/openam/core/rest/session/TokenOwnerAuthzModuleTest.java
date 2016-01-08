@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.core.rest.session;
 
@@ -52,7 +52,6 @@ public class TokenOwnerAuthzModuleTest {
     SessionService mockService;
     SSOTokenManager mockTokenManager;
     Context mockContext;
-    SSOToken mockToken;
 
     @BeforeTest
     public void theSetUp() throws SSOException {
@@ -62,15 +61,7 @@ public class TokenOwnerAuthzModuleTest {
         @SuppressWarnings("unchecked")
         Config<SessionService> mockConfig = mock(Config.class);
         given(mockConfig.get()).willReturn(mockService);
-
-        SSOTokenContext tc = mock(SSOTokenContext.class);
-
-        mockToken = mock(SSOToken.class);
-        given(tc.getCallerSSOToken()).willReturn(mockToken);
-        given(mockToken.getProperty(eq(Constants.UNIVERSAL_IDENTIFIER))).willReturn("universal_id");
-
-        mockContext = mock(Context.class);
-        given(mockContext.asContext(SSOTokenContext.class)).willReturn(tc);
+        mockContext = setupUser("universal_id");
 
         testModule = new TokenOwnerAuthzModule("tokenId", mockTokenManager, "deleteProperty");
     }
@@ -84,7 +75,6 @@ public class TokenOwnerAuthzModuleTest {
         request.setAdditionalParameter("tokenId", "token");
 
         given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
-        setupUsers("universal_id");
 
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, request);
@@ -103,10 +93,12 @@ public class TokenOwnerAuthzModuleTest {
         request.setAdditionalParameter("tokenId", "token");
 
         given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
-        setupUsers("john");
+        given(mockService.isSuperUser(eq("john"))).willReturn(false);
+        Context otherContext = setupUser("john");
+        setupUser("universal_id");
 
         //when
-        Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, request);
+        Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(otherContext, request);
 
         //then
         assertThat(result).failedWithException().isInstanceOf(ForbiddenException.class);
@@ -130,16 +122,27 @@ public class TokenOwnerAuthzModuleTest {
         assertThat(result).failedWithException().isInstanceOf(ForbiddenException.class);
     }
 
-    private void setupUsers(String finalId) throws SSOException {
+    private Context setupUser(String finalId) throws SSOException {
         Principal mockPrincipal = mock(Principal.class);
+
+        SSOTokenContext tc = mock(SSOTokenContext.class);
+
+        Context mockContext = mock(Context.class);
+        given(mockContext.asContext(SSOTokenContext.class)).willReturn(tc);
+
+        SSOToken mockToken = mock(SSOToken.class);
+        given(tc.getCallerSSOToken()).willReturn(mockToken);
+        given(mockToken.getProperty(eq(Constants.UNIVERSAL_IDENTIFIER))).willReturn("uid" + finalId);
 
         given(mockTokenManager.createSSOToken(eq("token"))).willReturn(mockToken);
         given(mockToken.getPrincipal()).willReturn(mockPrincipal);
         given(mockPrincipal.getName()).willReturn(finalId);
+
+        return mockContext;
     }
 
     @Test
-    public void testCreateIsForbidden() {
+    public void testCreateIsForbidden() throws Exception{
         //given
 
         //when

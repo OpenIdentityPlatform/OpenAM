@@ -1359,7 +1359,7 @@ public class SessionService {
             //Get the AMIdentity Object for login user
             AMIdentity user = IdUtils.getIdentity(dsameAdminTokenProvider.getAdminToken(), uuid);
             //Check for the equality
-            isSuperUser = user.equals(adminUserId);
+            isSuperUser = adminUserId.equals(user);
 
         } catch (SSOException ssoe) {
             sessionDebug.error("SessionService.isSuperUser: Cannot get the admin token for this operation.");

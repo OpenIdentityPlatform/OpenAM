@@ -140,7 +140,7 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
             return true;
         }
 
-        final String queryUsername = ssoTokenManager.createSSOToken(queryTemp).getPrincipal().getName();
+        final String queryUsername = ssoTokenManager.createSSOToken(queryTemp).getProperty(Constants.UNIVERSAL_IDENTIFIER);
         return queryUsername.equalsIgnoreCase(loggedInUserId);
     }
 
