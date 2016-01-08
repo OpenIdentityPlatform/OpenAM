@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/EditPolicySetView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/PoliciesView",
@@ -35,7 +35,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
              EventManager, Router, Constants, UIUtils) {
     return AbstractView.extend({
         partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
+            "partials/util/_HelpLink.html"
         ],
         APPLICATION_TYPE: "iPlanetAMWebAgentService",
         validationFields: ["name", "resourceTypeUuids"],

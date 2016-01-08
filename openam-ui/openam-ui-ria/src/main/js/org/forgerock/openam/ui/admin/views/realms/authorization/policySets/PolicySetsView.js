@@ -40,6 +40,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         template: "templates/admin/views/realms/authorization/policySets/PolicySetsTemplate.html",
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/policySets/PolicySetsToolbarTemplate.html",
+        partials: [
+            "partials/util/_HelpLink.html"
+        ],
         events: {
             "click #addNewPolicySet": "addNewPolicySet",
             "click #importPolicies": "startImportPolicies",

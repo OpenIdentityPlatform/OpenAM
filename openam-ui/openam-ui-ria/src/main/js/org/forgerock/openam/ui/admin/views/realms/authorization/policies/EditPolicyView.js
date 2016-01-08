@@ -17,7 +17,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPolicyView", [
     "jquery",
-    "underscore",
+    "lodash",
     "backbone",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -42,7 +42,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     return AbstractView.extend({
         partials: [
             "partials/breadcrumb/_Breadcrumb.html",
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
+            "partials/util/_HelpLink.html"
         ],
         validationFields: ["name", "resources"],
         events: {

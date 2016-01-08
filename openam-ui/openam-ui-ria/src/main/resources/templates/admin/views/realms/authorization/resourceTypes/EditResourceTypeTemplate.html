@@ -1,5 +1,7 @@
 {{#if entity.name}}
-    {{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.resourceTypes.edit.resourceType" icon="cube" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
+    {{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.resourceTypes.edit.resourceType"
+        icon="cube" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton"
+        helpLink="backstage.authz.resourceTypes"}}
 {{/if}}
 
 <p class="panel-description">{{entity.description}}</p>

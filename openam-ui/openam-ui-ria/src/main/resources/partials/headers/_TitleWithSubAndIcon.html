@@ -11,6 +11,10 @@
         <h1>{{t title}}</h1>
     </div>
 
+    {{#if helpLink}}
+        {{> util/_HelpLink className="deep-page-header-button-group"}}
+    {{/if}}
+
     {{#if buttons}}
         <div class="deep-page-header-button-group button-group pull-right">
             {{partial this.buttons this}}

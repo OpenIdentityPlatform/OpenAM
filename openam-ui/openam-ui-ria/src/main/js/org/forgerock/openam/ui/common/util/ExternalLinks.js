@@ -11,14 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2015-2016 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/main", [
-    "./common/delegates/SiteConfigurationDelegate",
-    "./common/util/Helpers",
-    "./user/login/RESTLoginHelper",
-    "./user/delegates/AuthNDelegate",
-    "./user/delegates/SessionDelegate",
-    "./user/login/RESTLoginView"
-]);
+/*global define*/
+
+define("org/forgerock/openam/ui/common/util/ExternalLinks", [
+    "lodash"
+], function (_) {
+
+    var backstageDocsUrl = "https://backstage.forgerock.com/#!/docs/openam/13/admin-guide";
+
+    return {
+        backstage: {
+            authz: _.mapValues({
+                policySets: "#configure-apps-with-console",
+                policies: "#configure-policies-with-console",
+                resourceTypes: "#configure-resource-types-with-console"
+            }, function (hash) {
+                return backstageDocsUrl + hash;
+            })
+        }
+    };
+});

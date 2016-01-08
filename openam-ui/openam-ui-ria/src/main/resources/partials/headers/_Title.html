@@ -8,4 +8,8 @@
             {{partial this.buttons this}}
         </div>
     {{/if}}
+
+    {{#if helpLink}}
+        {{> util/_HelpLink className="shallow-page-header-button-group"}}
+    {{/if}}
 </header>

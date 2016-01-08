@@ -11,13 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Helpers", [
-    "handlebars"
-], function (Handlebars) {
-    var obj = {};
+/*global define*/
+
+define("org/forgerock/openam/ui/common/util/Helpers", [
+    "handlebars",
+    "lodash",
+    "org/forgerock/openam/ui/common/util/ExternalLinks"
+], function (Handlebars, _, ExternalLinks) {
+
+    Handlebars.registerHelper("externalLink", function (key) {
+        return _.get(ExternalLinks, key, "");
+    });
 
     Handlebars.registerHelper("policyEditorResourceHelper", function () {
         var result = this.options.newPattern.replace("-*-", "̂");
@@ -28,6 +35,4 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Helpers"
 
         return new Handlebars.SafeString(result);
     });
-
-    return obj;
 });

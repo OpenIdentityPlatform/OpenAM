@@ -11,12 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/EditResourceTypeView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -33,7 +33,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
 
     return AbstractView.extend({
         partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
+            "partials/util/_HelpLink.html"
         ],
         events: {
             "click #saveChanges": "submitForm",

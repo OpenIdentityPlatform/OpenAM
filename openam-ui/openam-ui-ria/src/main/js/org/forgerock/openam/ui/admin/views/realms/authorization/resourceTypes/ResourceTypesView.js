@@ -38,6 +38,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
         template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesTemplate.html",
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesToolbarTemplate.html",
+        partials: [
+            "partials/util/_HelpLink.html"
+        ],
         events: {
             "click #addNewRes": "addNewResourceType"
         },
