@@ -251,7 +251,7 @@ public class ValidateSAML2 {
                 "workflowMessages", Locale.getLocale(locale));
             return rb.getString(key);
         } catch (MissingResourceException e) {
-            return key;
+            return null;
         }
     }
 
