@@ -50,6 +50,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -845,6 +846,17 @@ public class InternalSession implements TaskRunnable, Serializable {
     }
 
     /**
+     * Sets the time at which this session timed out due to idle/max timeout. The time is in seconds since the same
+     * epoch as {@link System#currentTimeMillis()}. A value of 0 indicates that the session has not timed out.
+     *
+     * @param timedOutAt the time in seconds at which the session timed out.
+     */
+    @VisibleForTesting
+    void setTimedOutAt(long timedOutAt) {
+        this.timedOutAt = timedOutAt;
+    }
+
+    /**
      * Returns the state of the Internal Session
      * @return the session state can be VALID,INVALID,INACTIVE,DESTORYED
      */
@@ -1252,7 +1264,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     private void changeStateAndNotify(int eventType) {
         sessionLogging.logEvent(toSessionInfo(), eventType);
-        timedOutAt = System.currentTimeMillis()/1000;
+        setTimedOutAt(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         putProperty("SessionTimedOut", String.valueOf(timedOutAt));
         sessionService.execSessionTimeoutHandlers(sessionID, eventType);
         if(purgeDelay == 0) {
@@ -1718,7 +1730,8 @@ public class InternalSession implements TaskRunnable, Serializable {
             if (sessionState != VALID) {
                 sessionService.deleteFromRepository(sessionID);
                 isISStored = false;
-            } else {
+            } else if (!isTimedOut() || purgeDelay > 0) {
+                // Only save for failover if we are not about to delete the session anyway.
                 sessionService.saveForFailover(this);
             }
         }
@@ -1906,5 +1919,9 @@ public class InternalSession implements TaskRunnable, Serializable {
         sessionService.sendEvent(this, SessionEvent.DESTROY);
     }
 
+    @VisibleForTesting
+    static void setPurgeDelay(long newPurgeDelay) {
+        purgeDelay = newPurgeDelay;
+    }
 
 }
