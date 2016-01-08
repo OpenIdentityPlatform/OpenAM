@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade;
 
@@ -104,6 +104,7 @@ public class DirectoryContentUpgrader {
         if (isEmbedded) {
             upgraders.add(new CreateCTSIndexes());
             upgraders.add(new UpdateCTSDate01Index());
+            upgraders.add(new DeleteUnusedCTSIndices());
             upgraders.add(new AddDashboardSchema());
             upgraders.add(new AddDevicePrintSchema());
             upgraders.add(new AddUmaAuditSchema());
@@ -354,6 +355,25 @@ public class DirectoryContentUpgrader {
             } catch (NoSuchElementException e) {
                 return true;
             }
+        }
+    }
+
+    /**
+     * Removes CTS indices that are not used in any queries but which are currently populated with data in order to
+     * reduce lock contention when inserting/modifying/deleting entries that reference these fields. Other unused
+     * indices will be removed in a future release.
+     */
+    private class DeleteUnusedCTSIndices implements Upgrader {
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/sfha/cts-remove-unused-indices.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(final Connection conn, final Schema schema) throws UpgradeException {
+            DN indexDN = DN.valueOf("ds-cfg-attribute=" + CoreTokenField.STRING_FOUR.toString()
+                    + ",cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config");
+            return entryExists(conn, indexDN);
         }
     }
 

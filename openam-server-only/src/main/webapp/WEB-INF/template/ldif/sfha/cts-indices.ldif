@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright 2011-2015 ForgeRock AS.
+# Copyright 2011-2016 ForgeRock AS.
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -54,28 +54,10 @@ objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString03
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenString04,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
-objectClass: top
-objectClass: ds-cfg-backend-index
-ds-cfg-attribute: coreTokenString04
-ds-cfg-index-type: equality
-
 dn: ds-cfg-attribute=coreTokenString05,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString05
-ds-cfg-index-type: equality
-
-dn: ds-cfg-attribute=coreTokenString06,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
-objectClass: top
-objectClass: ds-cfg-backend-index
-ds-cfg-attribute: coreTokenString06
-ds-cfg-index-type: equality
-
-dn: ds-cfg-attribute=coreTokenString07,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
-objectClass: top
-objectClass: ds-cfg-backend-index
-ds-cfg-attribute: coreTokenString07
 ds-cfg-index-type: equality
 
 dn: ds-cfg-attribute=coreTokenString08,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
@@ -94,24 +76,6 @@ dn: ds-cfg-attribute=coreTokenString10,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=B
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString10
-ds-cfg-index-type: equality
-
-dn: ds-cfg-attribute=coreTokenString11,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
-objectClass: top
-objectClass: ds-cfg-backend-index
-ds-cfg-attribute: coreTokenString11
-ds-cfg-index-type: equality
-
-dn: ds-cfg-attribute=coreTokenString12,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
-objectClass: top
-objectClass: ds-cfg-backend-index
-ds-cfg-attribute: coreTokenString12
-ds-cfg-index-type: equality
-
-dn: ds-cfg-attribute=coreTokenString13,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
-objectClass: top
-objectClass: ds-cfg-backend-index
-ds-cfg-attribute: coreTokenString13
 ds-cfg-index-type: equality
 
 dn: ds-cfg-attribute=coreTokenString14,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
