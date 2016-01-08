@@ -430,7 +430,6 @@ public class AuthenticatorOATH extends AMLoginModule {
     private OathDeviceSettings createBasicDevice() throws AuthLoginException {
 
         OathDeviceSettings settings = deviceFactory.createDeviceProfile(minSecretKeyLength);
-        settings.setLastLogin(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
         settings.setChecksumDigit(checksum);
         settings.setRecoveryCodes(OathDeviceSettings.generateRecoveryCodes(NUM_CODES));
 
@@ -668,7 +667,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                 //get Time Step
                 long localTime = (time / totpTimeStep) + (settings.getClockDriftSeconds() / totpTimeStep);
 
-                if(lastLoginTimeStep == localTime){
+                if (lastLoginTimeStep == localTime) {
                     debug.error("OATH.checkOTP(): Login failed attempting to use the same OTP in same Time Step: " + localTime);
                     throw new InvalidPasswordException(amAuthOATH, "authFailed", null, userName, null);
                 }
