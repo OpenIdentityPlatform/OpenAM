@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
@@ -38,6 +40,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 12.0.0
  */
+@Singleton
 public class TokenInfoServiceImpl implements TokenInfoService {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
