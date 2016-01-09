@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
@@ -95,9 +95,14 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         });
     };
 
-    obj.getLoginUrlParams = function () {
-        var url = Configuration.globalData.auth.fullLoginURL;
-        return URIUtils.parseQueryString(url.substring(url.indexOf("?") + 1));
+    obj.getSuccessfulLoginUrlParams = function () {
+        // The successfulLoginURL is populated by the server (not from window.location of the browser), upon successful
+        // authentication.
+        var successfulLoginURL = Configuration.globalData.auth.fullLoginURL,
+            successfulLoginURLParams = successfulLoginURL
+                ? successfulLoginURL.substring(successfulLoginURL.indexOf("?") + 1) : "";
+
+        return URIUtils.parseQueryString(successfulLoginURLParams);
     };
 
     obj.setSuccessURL = function (tokenId) {
@@ -132,15 +137,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
 
     obj.filterUrlParams = function (params) {
         var paramsToSave = ["arg", "authIndexType", "authIndexValue", "goto", "gotoOnFail", "ForceAuth", "locale"],
-            filteredParams = {};
+            filteredParams = _.pick(params, paramsToSave);
 
-        _.each(paramsToSave, function (p) {
-            if (params[p]) {
-                filteredParams[p] = params[p];
-            }
-        });
-
-        return (!$.isEmptyObject(filteredParams)) ? "&" + $.param(filteredParams) : "";
+        return _.isEmpty(filteredParams) ? "" : "&" + $.param(filteredParams);
     };
 
     obj.logout = function (successCallback, errorCallback) {

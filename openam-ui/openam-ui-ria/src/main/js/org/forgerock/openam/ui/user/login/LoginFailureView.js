@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
@@ -25,13 +25,7 @@ define("org/forgerock/openam/ui/user/login/LoginFailureView", [
         baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
         render: function (args) {
-            var subrealm = args[0],
-                params = args[1];
-
-            if (subrealm.charAt(0) === "/") {
-                subrealm = subrealm.substr(1);
-            }
-            this.data.fragment = subrealm + params;
+            this.data.params = args[1] || "";
             this.data.title = $.t("openam.authentication.unavailable");
             this.parentRender();
         }

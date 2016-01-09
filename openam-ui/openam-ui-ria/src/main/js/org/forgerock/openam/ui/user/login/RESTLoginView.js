@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/user/login/RESTLoginView", [
@@ -77,10 +77,22 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     }
 
     function routeToLoginUnavailable (urlParams) {
-        Router.navigate(
-            Router.getLink(Router.configuration.routes.loginFailure) + RealmHelper.getSubRealm() + urlParams, {
-                trigger: true
-            });
+
+        // FIXME: If there has been a previous successful login, the global configuration and login defaults are
+        // populated with the realm and subrealm. These are not being removed when the session ends, and so cause
+        // problems during the next failed login request because the Router.configuration.routes.login.defaults[0] is
+        // already populated with the previous subrealm.
+        // This quick solution just over-rides this property with the subrealm in the current request.
+        Router.configuration.routes.login.defaults[0] = "/" + RealmHelper.getSubRealm();
+
+        // We cannot use the Router.getLink() method here and simply apply the subrealm to the route because
+        // Router.getLink() does more than its title suggests. It also applies the default properties to the route and
+        // these are not always correct if there has been a previous successful login request.
+        // FIXME: Remove any session specific properties from the UI upon session end.
+        Router.routeTo(Router.configuration.routes.loginFailure, {
+            args: [urlParams],
+            trigger: true
+        });
     }
 
     var LoginView = AbstractView.extend({
@@ -256,7 +268,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                  * would normally only be applied when the user has logged in, so they should not contain invalid values
                  */
 
-                routeToLoginUnavailable (
+                routeToLoginUnavailable(
                     RESTLoginHelper.filterUrlParams (
                         URIUtils.parseQueryString (
                             URIUtils.getCurrentCompositeQueryString()

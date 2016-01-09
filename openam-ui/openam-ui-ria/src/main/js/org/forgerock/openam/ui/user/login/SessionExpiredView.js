@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/user/login/SessionExpiredView", [
@@ -21,28 +21,30 @@ define("org/forgerock/openam/ui/user/login/SessionExpiredView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function ($, AbstractView, Configuration, Constants, EventManager, LoginHelper) {
+], function ($, AbstractView, Configuration, Constants, EventManager, RESTLoginHelper) {
 
     var SessionExpiredView = AbstractView.extend({
         template: "templates/openam/ReturnToLoginTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
-        render: function (args, callback) {
+        render: function () {
+            /*
+            The RESTLoginHelper.filterUrlParams returns a filtered list of the parameters from the value set within
+            the Configuration.globalData.auth.fullLoginURL which is populated by the server upon successful login.
+            Once the session has ended we need to manually remove the fullLoginURL as it is no longer valid and can
+            cause problems to subsequent failed login requests - i.e ones which do not override the current value.
+            FIXME: Remove all session specific properties from the globalData object.
+            */
+            this.data.params = RESTLoginHelper.filterUrlParams(RESTLoginHelper.getSuccessfulLoginUrlParams());
+            delete Configuration.globalData.auth.fullLoginURL;
 
-            var params;
-
-            if (Configuration.globalData.auth.fullLoginURL) {
-                params = LoginHelper.filterUrlParams(LoginHelper.getLoginUrlParams());
-            }
-
-            LoginHelper.removeSessionCookie();
+            RESTLoginHelper.removeSessionCookie();
             Configuration.setProperty("loggedUser", null);
             delete Configuration.gotoURL;
             EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
 
-            this.data.fragment = params;
             this.data.title = $.t("templates.user.SessionExpiredTemplate.sessionExpired");
-            this.parentRender(callback);
+            this.parentRender();
         }
     });
 
