@@ -169,7 +169,7 @@ public final class SAML2Proxy {
 
         try {
             hostEntityId = metaManager.getEntityByMetaAlias(metaAlias);
-            if (hostEntityId == null ) {
+            if (hostEntityId == null) {
                 throw new SAML2MetaException("Caught Instantly");
             }
         } catch (SAML2MetaException sme) {
@@ -297,6 +297,12 @@ public final class SAML2Proxy {
         return new StringBuilder(value);
     }
 
+    /**
+     * Returns the HTML for an auto submitting form that will be submitted to the provided Url.
+     *
+     * @param value The form's action.
+     * @return The HTML for the auto submitting form.
+     */
     @VisibleForTesting
     protected static String getAutoSubmittingFormHtml(final String value) {
         StringBuilder html = new StringBuilder();
