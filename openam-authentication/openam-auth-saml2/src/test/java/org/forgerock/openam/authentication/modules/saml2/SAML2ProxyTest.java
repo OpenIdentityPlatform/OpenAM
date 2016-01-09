@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.xpath.XPathFactory;
 
 import org.forgerock.util.xml.XMLUtils;
-import org.owasp.esapi.ESAPI;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -47,75 +46,50 @@ public class SAML2ProxyTest {
     }
 
     @Test
-    public void shouldCreateValidHTMLPostFromDataViaPOST() {
-
+    public void shouldCreateValidUrlFromDataViaPOST() {
         //given
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         given(mockRequest.getCookies()).willReturn(validCookies);
         given(mockRequest.getMethod()).willReturn("POST");
 
         //when
-        String result = SAML2Proxy.toPostForm(mockRequest, KEY);
+        String result = SAML2Proxy.getUrlWithKey(mockRequest, KEY);
 
         //then
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(COOKIE_LOCATION))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                SAML2Proxy.RESPONSE_KEY + "=" + KEY))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                (SAML2Proxy.ERROR_PARAM_KEY + "=" + "false")))).isTrue();
+        assertThat(result).contains(COOKIE_LOCATION);
+        assertThat(result).contains(SAML2Proxy.RESPONSE_KEY + "=" + KEY);
+        assertThat(result).contains(SAML2Proxy.ERROR_PARAM_KEY + "=" + "false");
     }
 
     @Test
-    public void shouldCreateValidHTMLPostFromDataViaGET() {
-
+    public void shouldCreateValidUrlFromDataViaGET() {
         //given
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         given(mockRequest.getCookies()).willReturn(validCookies);
         given(mockRequest.getMethod()).willReturn("GET");
 
         //when
-        String result = SAML2Proxy.toPostForm(mockRequest, KEY);
+        String result = SAML2Proxy.getUrlWithKey(mockRequest, KEY);
 
         //then
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(COOKIE_LOCATION))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                SAML2Proxy.RESPONSE_KEY + "=" + KEY))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                (SAML2Proxy.ERROR_PARAM_KEY + "=" + "false")))).isTrue();
+        assertThat(result).contains(COOKIE_LOCATION);
+        assertThat(result).contains(SAML2Proxy.RESPONSE_KEY + "=" + KEY);
+        assertThat(result).contains(SAML2Proxy.ERROR_PARAM_KEY + "=" + "false");
     }
 
     @Test
-    public void shouldEscapeMaliciousHTMLInput() {
+    public void shouldEscapeMaliciousHtmlInputOnForm() {
         //given
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        given(mockRequest.getCookies()).willReturn(validCookies);
-        given(mockRequest.getMethod()).willReturn("GET");
         String malicious = "\"><script>alert('Bad thing);</script><form ";
 
         //when
-        String result = SAML2Proxy.toPostForm(mockRequest, malicious);
+        final String formHtml = SAML2Proxy.getAutoSubmittingFormHtml(URLEncDec.encode(malicious));
 
         //then
         // The malicious code should not be present
-        assertThat(result).doesNotContain(malicious);
+        assertThat(formHtml).doesNotContain(malicious);
         // However, it should be preserved when parsed again
-        assertThat(URLEncDec.decode(getFormAction(result))).contains(malicious);
-    }
-
-    @Test
-    public void shouldEscapeMaliciousURLInput() {
-        //given
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        given(mockRequest.getCookies()).willReturn(validCookies);
-        given(mockRequest.getMethod()).willReturn("GET");
-        String malicious = "&authIndexType=MODULE&authIndexValue=anonymous&file=../../etc/passwd";
-
-        //when
-        String result = SAML2Proxy.toPostForm(mockRequest, malicious);
-
-        //then
-        assertThat(result).doesNotContain(malicious);
-        assertThat(URLEncDec.decode(getFormAction(result))).contains(malicious);
+        assertThat(URLEncDec.decode(getFormAction(formHtml))).contains(malicious);
     }
 
     private String getFormAction(String html) {
@@ -127,21 +101,17 @@ public class SAML2ProxyTest {
         }
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class)
     public void shouldErrorDueToEmptyAuthenticationStepCookiePOST() {
-
         //given
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         given(mockRequest.getMethod()).willReturn("POST");
 
         //when
-        String response = SAML2Proxy.toPostForm(mockRequest, KEY);
-
-        //then
-        assertThat(response).contains(ESAPI.encoder().encodeForHTML(SAML2Proxy.DEFAULT_ERROR_MESSAGE));
+        SAML2Proxy.getUrlWithKey(mockRequest, KEY);
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class)
     public void shouldErrorDueToEmptyAuthenticationStepCookieGET() {
 
         //given
@@ -149,15 +119,11 @@ public class SAML2ProxyTest {
         given(mockRequest.getMethod()).willReturn("GET");
 
         //when
-        String response = SAML2Proxy.toPostForm(mockRequest, KEY);
-
-        //then
-        assertThat(response).contains(ESAPI.encoder().encodeForHTML(SAML2Proxy.DEFAULT_ERROR_MESSAGE));
+        SAML2Proxy.getUrlWithKey(mockRequest, KEY);
     }
 
     @Test
     public void shouldCreateDefaultErrorHTMLPostFromDataViaPOST() {
-
         //given
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         given(mockRequest.getCookies()).willReturn(validCookies);
@@ -165,16 +131,14 @@ public class SAML2ProxyTest {
         String errorType = "200";
 
         //when
-        String response = SAML2Proxy.toPostWithErrorForm(mockRequest, errorType);
+        String response = SAML2Proxy.getUrlWithError(mockRequest, errorType);
 
         //then
-        assertThat(response).contains(ESAPI.encoder().encodeForHTMLAttribute(
-                URLEncDec.encode(SAML2Proxy.DEFAULT_ERROR_MESSAGE)));
+        assertThat(response).contains(URLEncDec.encode(SAML2Proxy.DEFAULT_ERROR_MESSAGE));
     }
 
     @Test
     public void shouldCreateDefaultErrorHTMLPostFromDataViaGET() {
-
         //given
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         given(mockRequest.getCookies()).willReturn(validCookies);
@@ -182,16 +146,14 @@ public class SAML2ProxyTest {
         String errorType = "200";
 
         //when
-        String response = SAML2Proxy.toPostWithErrorForm(mockRequest, errorType);
+        String url = SAML2Proxy.getUrlWithError(mockRequest, errorType);
 
         //then
-        assertThat(response).contains(ESAPI.encoder().encodeForHTMLAttribute(
-                URLEncDec.encode(SAML2Proxy.DEFAULT_ERROR_MESSAGE)));
+        assertThat(url).contains(URLEncDec.encode(SAML2Proxy.DEFAULT_ERROR_MESSAGE));
     }
 
     @Test
     public void shouldCreateErrorHTMLPostFromDataViaPOST() {
-
         //given
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         given(mockRequest.getCookies()).willReturn(validCookies);
@@ -200,21 +162,17 @@ public class SAML2ProxyTest {
         given(mockRequest.getParameter(SAML2Constants.SAML_RESPONSE)).willReturn("SAMLResponse");
 
         //when
-        String result = SAML2Proxy.toPostWithErrorForm(mockRequest, errorType, "messageDetail");
+        String result = SAML2Proxy.getUrlWithError(mockRequest, errorType, "messageDetail");
 
         //then
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(COOKIE_LOCATION))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                "&" + SAML2Proxy.ERROR_PARAM_KEY + "=" + true))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                "&" + SAML2Proxy.ERROR_CODE_PARAM_KEY + "=" + errorType))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                "&" + SAML2Proxy.ERROR_MESSAGE_PARAM_KEY + "=" + "messageDetail"))).isTrue();
+        assertThat(result).contains(COOKIE_LOCATION);
+        assertThat(result).contains("&" + SAML2Proxy.ERROR_PARAM_KEY + "=" + true);
+        assertThat(result).contains("&" + SAML2Proxy.ERROR_CODE_PARAM_KEY + "=" + errorType);
+        assertThat(result).contains("&" + SAML2Proxy.ERROR_MESSAGE_PARAM_KEY + "=" + "messageDetail");
     }
 
     @Test
     public void shouldCreateErrorHTMLPostFromDataViaGET() {
-
         //given
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         given(mockRequest.getCookies()).willReturn(validCookies);
@@ -222,16 +180,13 @@ public class SAML2ProxyTest {
         String errorType = "200";
 
         //when
-        String result = SAML2Proxy.toPostWithErrorForm(mockRequest, errorType, "MyMessage");
+        String result = SAML2Proxy.getUrlWithError(mockRequest, errorType, "MyMessage");
 
         //then
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(COOKIE_LOCATION))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                "&" + SAML2Proxy.ERROR_PARAM_KEY + "=" + true))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                "&" + SAML2Proxy.ERROR_CODE_PARAM_KEY + "=" + errorType))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                "&" + SAML2Proxy.ERROR_MESSAGE_PARAM_KEY + "=" + "MyMessage"))).isTrue();
+        assertThat(result).contains(COOKIE_LOCATION);
+        assertThat(result).contains("&" + SAML2Proxy.ERROR_PARAM_KEY + "=" + true);
+        assertThat(result).contains("&" + SAML2Proxy.ERROR_CODE_PARAM_KEY + "=" + errorType);
+        assertThat(result).contains("&" + SAML2Proxy.ERROR_MESSAGE_PARAM_KEY + "=" + "MyMessage");
     }
 
     @Test
@@ -244,16 +199,12 @@ public class SAML2ProxyTest {
         String errorType = "200";
 
         //when
-        String result = SAML2Proxy.toPostWithErrorForm(mockRequest, errorType, "MyMessage");
+        String result = SAML2Proxy.getUrlWithError(mockRequest, errorType, "MyMessage");
 
         //then
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(COOKIE_LOCATION))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                "&" + SAML2Proxy.ERROR_PARAM_KEY + "=" + true))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                "&" + SAML2Proxy.ERROR_CODE_PARAM_KEY + "=" + errorType))).isTrue();
-        assertThat(result.contains(ESAPI.encoder().encodeForHTMLAttribute(
-                "&" + SAML2Proxy.ERROR_MESSAGE_PARAM_KEY + "=" + "MyMessage"))).isTrue();
+        assertThat(result).contains(COOKIE_LOCATION);
+        assertThat(result).contains("&" + SAML2Proxy.ERROR_PARAM_KEY + "=" + true);
+        assertThat(result).contains("&" + SAML2Proxy.ERROR_CODE_PARAM_KEY + "=" + errorType);
+        assertThat(result).contains("&" + SAML2Proxy.ERROR_MESSAGE_PARAM_KEY + "=" + "MyMessage");
     }
-
 }

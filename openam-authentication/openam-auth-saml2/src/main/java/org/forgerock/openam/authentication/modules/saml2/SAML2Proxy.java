@@ -11,17 +11,46 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.authentication.modules.saml2;
 
 import static org.forgerock.openam.authentication.modules.saml2.Constants.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.saml2.SAML2Store;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.xui.XUIState;
+import org.owasp.esapi.ESAPI;
+
+import com.sun.identity.federation.common.FSUtils;
+import com.sun.identity.saml.common.SAMLUtils;
+import com.sun.identity.saml2.assertion.Assertion;
+import com.sun.identity.saml2.assertion.Subject;
+import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.meta.SAML2MetaException;
+import com.sun.identity.saml2.meta.SAML2MetaManager;
+import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.saml2.profile.ResponseInfo;
+import com.sun.identity.saml2.profile.SPACSUtils;
+import com.sun.identity.saml2.profile.SPCache;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
-import javax.servlet.http.HttpServletRequest;
-import org.forgerock.openam.utils.StringUtils;
-import org.owasp.esapi.ESAPI;
 
 /**
  * Called on the way back into the SAML2 Authentication Module
@@ -78,10 +107,122 @@ public final class SAML2Proxy {
      */
     public static final String ERROR_MESSAGE_PARAM_KEY = "errorMessage";
 
+    private static final Debug DEBUG = Debug.getInstance("amAuthSAML2");
+
     /**
      * Private, utilities-class constructor.
      */
     private SAML2Proxy() {
+    }
+
+    private static String generateKey() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Processes the SAML response for the SAML2 authentication module and then directs the user back to the
+     * authentication process differently for XUI and non-XUI cases.
+     *
+     * @param request The HTTP request.
+     * @param response The HTTP response.
+     * @param out The {@link PrintWriter}.
+     * @throws IOException If there was an IO error while retrieving the SAML response.
+     */
+    public static void processSamlResponse(HttpServletRequest request, HttpServletResponse response, PrintWriter out)
+            throws IOException {
+        String url = getUrl(request, response);
+        XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
+        if (xuiState.isXUIEnabled()) {
+            response.sendRedirect(url);
+        } else {
+            out.println(getAutoSubmittingFormHtml(url));
+        }
+    }
+
+    private static String getUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (request == null || response == null) {
+            DEBUG.error("SAML2Proxy: Null request or response");
+            return getUrlWithError(request, BAD_REQUEST);
+        }
+
+        try {
+            SAMLUtils.checkHTTPContentLength(request);
+        } catch (ServletException se) {
+            DEBUG.error("SAML2Proxy: content length too large");
+            return getUrlWithError(request, BAD_REQUEST);
+        }
+
+        if (FSUtils.needSetLBCookieAndRedirect(request, response, false)) {
+            return getUrlWithError(request, MISSING_COOKIE);
+        }
+
+        // get entity id and orgName
+        String requestURL = request.getRequestURL().toString();
+        String metaAlias = SAML2MetaUtils.getMetaAliasByUri(requestURL);
+        SAML2MetaManager metaManager = SAML2Utils.getSAML2MetaManager();
+        String hostEntityId;
+
+        if (metaManager == null) {
+            DEBUG.error("SAML2Proxy: Unable to obtain metaManager");
+            return getUrlWithError(request, MISSING_META_MANAGER);
+        }
+
+        try {
+            hostEntityId = metaManager.getEntityByMetaAlias(metaAlias);
+            if (hostEntityId == null ) {
+                throw new SAML2MetaException("Caught Instantly");
+            }
+        } catch (SAML2MetaException sme) {
+            DEBUG.warning("SAML2Proxy: unable to find hosted entity with metaAlias: {} Exception: {}", metaAlias,
+                    sme.toString());
+            return getUrlWithError(request, META_DATA_ERROR);
+        }
+
+        String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
+
+        if (StringUtils.isEmpty(realm)) {
+            realm = "/";
+        }
+
+        ResponseInfo respInfo;
+        try {
+            respInfo = SPACSUtils.getResponse(request, response, realm, hostEntityId, metaManager);
+        } catch (SAML2Exception se) {
+            DEBUG.error("SAML2Proxy: Unable to obtain SAML response", se);
+            return getUrlWithError(request, SAML_GET_RESPONSE_ERROR, se.getL10NMessage(request.getLocale()));
+        }
+
+        Map smap;
+        try {
+            // check Response/Assertion and get back a Map of relevant data
+            smap = SAML2Utils.verifyResponse(request, response, respInfo.getResponse(), realm, hostEntityId,
+                    respInfo.getProfileBinding());
+        } catch (SAML2Exception se) {
+            DEBUG.error("SAML2Proxy: An error occurred while verifying the SAML response", se);
+            return getUrlWithError(request, SAML_VERIFY_RESPONSE_ERROR, se.getL10NMessage(request.getLocale()));
+        }
+        String key = generateKey();
+
+        //survival time is one hour
+
+        SAML2ResponseData data = new SAML2ResponseData((String) smap.get(SAML2Constants.SESSION_INDEX),
+                (Subject) smap.get(SAML2Constants.SUBJECT),
+                (Assertion) smap.get(SAML2Constants.POST_ASSERTION),
+                respInfo);
+
+        if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+            try {
+                long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval; //counted in seconds
+                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(key, data, sessionExpireTime);
+            } catch (SAML2TokenRepositoryException e) {
+                DEBUG.error("An error occurred while persisting the SAML token", e);
+                return getUrlWithError(request, SAML_FAILOVER_DISABLED_ERROR);
+            }
+        } else {
+            SAML2Store.saveTokenWithKey(key, data);
+        }
+
+        return getUrlWithKey(request, key);
     }
 
     /**
@@ -92,12 +233,12 @@ public final class SAML2Proxy {
      * @param key The key to reference.
      * @return An HTML form to render to the user's user-agent.
      */
-    public static String toPostForm(final HttpServletRequest req, final String key) {
-        final StringBuilder value = checkRequest(req);
+    protected static String getUrlWithKey(final HttpServletRequest req, final String key) {
+        final StringBuilder value = getLocationValue(req);
         if (value == null) {
-            return getError(DEFAULT_ERROR_MESSAGE).toString();
+            throw new IllegalStateException(DEFAULT_ERROR_MESSAGE);
         }
-        return getAutoSubmittingFormHtml(encodeMsg(value, key));
+        return encodeMessage(value, key);
     }
 
     /**
@@ -107,8 +248,8 @@ public final class SAML2Proxy {
      * @param errorType The Error type that has occurred.
      * @return An HTML form to render to the user's user-agent.
      */
-    public static String toPostWithErrorForm(HttpServletRequest req, String errorType) {
-        return toPostWithErrorForm(req, errorType, DEFAULT_ERROR_MESSAGE);
+    protected static String getUrlWithError(HttpServletRequest req, String errorType) {
+        return getUrlWithError(req, errorType, DEFAULT_ERROR_MESSAGE);
     }
 
     /**
@@ -119,30 +260,21 @@ public final class SAML2Proxy {
      * @param messageDetail a text description of the message.
      * @return An HTML form to render to the user's user-agent.
      */
-    public static String toPostWithErrorForm(HttpServletRequest req, String errorType, String messageDetail) {
-        StringBuilder value = checkRequest(req);
+    protected static String getUrlWithError(HttpServletRequest req, String errorType, String messageDetail) {
+        StringBuilder value = getLocationValue(req);
 
         if (value == null) {
-            return getError(DEFAULT_ERROR_MESSAGE).toString();
+            throw new IllegalStateException(DEFAULT_ERROR_MESSAGE);
         }
 
         value.append("&").append(ERROR_PARAM_KEY).append("=").append(true)
             .append("&").append(ERROR_CODE_PARAM_KEY).append("=").append(URLEncDec.encode(errorType))
             .append("&").append(ERROR_MESSAGE_PARAM_KEY).append("=").append(URLEncDec.encode(messageDetail));
 
-        return getAutoSubmittingFormHtml(value.toString());
+        return value.toString();
     }
 
-    private static StringBuilder getError(String message) {
-        StringBuilder html = new StringBuilder();
-        html.append("<html>\n").append("<body>\n")
-                .append("<h1>\n").append(ESAPI.encoder().encodeForHTML(message)).append("</h1>\n")
-                .append("</body>\n").append("</html>\n");
-        return html;
-    }
-
-    private static String encodeMsg(StringBuilder value, String key) {
-
+    private static String encodeMessage(StringBuilder value, String key) {
         if (value.toString().contains("?")) {
             value.append("&");
         } else {
@@ -155,7 +287,7 @@ public final class SAML2Proxy {
         return value.toString();
     }
 
-    private static StringBuilder checkRequest(HttpServletRequest req) {
+    private static StringBuilder getLocationValue(HttpServletRequest req) {
         String value = CookieUtils.getCookieValueFromReq(req, AM_LOCATION_COOKIE);
 
         if (StringUtils.isEmpty(value)) {
@@ -165,19 +297,19 @@ public final class SAML2Proxy {
         return new StringBuilder(value);
     }
 
-    private static String getAutoSubmittingFormHtml(final String value) {
+    @VisibleForTesting
+    protected static String getAutoSubmittingFormHtml(final String value) {
         StringBuilder html = new StringBuilder();
 
         html.append("<html>\n").append("<body onLoad=\"").append("document.postform.submit()").append("\">\n");
         html.append("<form name=\"postform\" action=\"").append(ESAPI.encoder().encodeForHTMLAttribute(value))
             .append("\" method=\"post\"").append(">\n");
         html.append("<noscript>\n<center>\n");
-        html.append("<p>Your browser does not have JavaScript enabled, you must click"
-                + " the button below to continue</p>\n");
-
+        html.append("<p>Your browser does not have JavaScript enabled, ");
+        html.append("you must click the button below to continue</p>\n");
+        html.append("<input type=\"submit\" value=\"submit\" />\n");
         html.append("</center>\n</noscript>\n").append("</form>\n").append("</body>\n").append("</html>\n");
 
         return html.toString();
     }
-
 }
