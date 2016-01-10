@@ -196,8 +196,6 @@ public class OAuth extends AMLoginModule {
                 Token csrfStateToken = new Token(csrfStateTokenId, TokenType.GENERIC);
                 csrfStateToken.setAttribute(CoreTokenField.STRING_ONE, csrfState);
 
-                csrfStateToken.setAttribute(CoreTokenField.STRING_TWO, getCodeVerifier(config.getCodeChallengeMethod()));
-
                 try {
                     ctsStore.create(csrfStateToken);
                 } catch (CoreTokenException e) {
@@ -231,9 +229,7 @@ public class OAuth extends AMLoginModule {
                 setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
 
-                String authServiceUrl = config.getAuthServiceUrl(proxyURL, csrfState,
-                        getCodeVerifier(config.getCodeChallengeMethod()),
-                        config.getCodeChallengeMethod());
+                String authServiceUrl = config.getAuthServiceUrl(proxyURL, csrfState);
                 OAuthUtil.debugMessage("OAuth.process(): New RedirectURL=" + authServiceUrl);
 
                 Callback[] callbacks1 = getCallback(2);
@@ -287,10 +283,7 @@ public class OAuth extends AMLoginModule {
 
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
-                    final String codeVerifier = csrfStateToken.getValue(CoreTokenField.STRING_TWO);
-                    String tokenSvcResponse = getContent(
-                            config.getTokenServiceUrl(code, proxyURL,
-                                    codeVerifier), null);
+                    String tokenSvcResponse = getContent(config.getTokenServiceUrl(code, proxyURL), null);
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
                     JwtClaimsSet jwtClaims = null;
@@ -487,20 +480,6 @@ public class OAuth extends AMLoginModule {
         }
         
         throw new AuthLoginException(BUNDLE_NAME, "unknownState", null);
-    }
-
-    private String getCodeVerifier(String codeChallengeMethod) throws LoginException {
-        String codeVerifier = Base64url.encode(RandomStringUtils.randomAlphanumeric(96).getBytes());
-        if (OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)) {
-            try {
-                return Base64url.encode(
-                        MessageDigest.getInstance("SHA-256").digest(codeVerifier.getBytes(StandardCharsets.US_ASCII)));
-            } catch (NoSuchAlgorithmException e) {
-                throw new LoginException("Error encoding code challenge");
-            }
-        } else {
-            return codeVerifier;
-        }
     }
 
     private String createAuthorizationState() {

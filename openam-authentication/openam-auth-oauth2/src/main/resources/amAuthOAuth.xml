@@ -241,17 +241,6 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         <Value>info@forgerock.com</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="org-forgerock-auth-oauth-code-challenge-method-algorithm"
-                                 type="single_choice" syntax="string" i18nKey="a145"
-                                 resourceName="codeChallengeAlgorithm">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="plain">plain</ChoiceValue>
-                        <ChoiceValue i18nKey="S256">S256</ChoiceValue>
-                    </ChoiceValues>
-                    <DefaultValues>
-                        <Value>S256</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
                                  type="single" syntax="number_range" rangeStart="0"
                                  rangeEnd="2147483647" i18nKey="a500" resourceName="authenticationLevel">
@@ -475,17 +464,6 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                      type="single" syntax="string" i18nKey="a144" resourceName="smtpFromAddress">
                         <DefaultValues>
                             <Value>info@forgerock.com</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="org-forgerock-auth-oauth-code-challenge-method-algorithm"
-                                     type="single_choice" syntax="string" i18nKey="a145"
-                                     resourceName="codeChallengeAlgorithm">
-                        <ChoiceValues>
-                            <ChoiceValue i18nKey="plain">plain</ChoiceValue>
-                            <ChoiceValue i18nKey="S256">S256</ChoiceValue>
-                        </ChoiceValues>
-                        <DefaultValues>
-                            <Value>S256</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-auth-level"

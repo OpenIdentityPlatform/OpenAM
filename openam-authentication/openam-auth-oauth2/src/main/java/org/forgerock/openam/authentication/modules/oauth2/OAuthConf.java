@@ -84,7 +84,6 @@ public class OAuthConf {
     private String smtpUserPassword = null;
     private String smtpSSLEnabled = "false";
     private String emailFrom = null;
-    private String codeChallengeMethod = null;
     private String authLevel = "0";
 
     OAuthConf() {
@@ -125,7 +124,6 @@ public class OAuthConf {
         smtpSSLEnabled = CollectionHelper.getMapAttr(config, KEY_SMTP_SSL_ENABLED);
         emailFrom = CollectionHelper.getMapAttr(config, KEY_EMAIL_FROM);
         authLevel = CollectionHelper.getMapAttr(config, KEY_AUTH_LEVEL);
-        codeChallengeMethod = CollectionHelper.getMapAttr(config, CODE_CHALLENGE_METHOD);
     }
 
     public int getAuthnLevel() {
@@ -238,7 +236,7 @@ public class OAuthConf {
         return scope;
     }
 
-    public String getAuthServiceUrl(String originalUrl, String state, String codeChallenge, String codeChallengeMethod) throws
+    public String getAuthServiceUrl(String originalUrl, String state) throws
             AuthLoginException {
 
         if (!authServiceUrl.contains("?")) {
@@ -253,9 +251,7 @@ public class OAuthConf {
                     + param(PARAM_SCOPE, OAuthUtil.oAuthEncode(scope))
                     + param(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(originalUrl))
                     + param("response_type", "code")
-                    + param("state", state)
-                    + param(OAuth2Constants.Custom.CODE_CHALLENGE, codeChallenge)
-                    + param(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD, codeChallengeMethod);
+                    + param("state", state);
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getAuthServiceUrl: problems while encoding "
                     + "the scope", ex);
@@ -263,7 +259,7 @@ public class OAuthConf {
         }
     }
 
-    String getTokenServiceUrl(String code, String authServiceURL, String codeVerifier)
+    String getTokenServiceUrl(String code, String authServiceURL)
             throws AuthLoginException {
 
         if (code == null) {
@@ -285,8 +281,7 @@ public class OAuthConf {
                     + param(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL))
                     + param(PARAM_CLIENT_SECRET, clientSecret)
                     + param(PARAM_CODE, OAuthUtil.oAuthEncode(code))
-                    + param("grant_type", "authorization_code")
-                    + param(OAuth2Constants.Custom.CODE_VERIFIER, codeVerifier);
+                    + param("grant_type", "authorization_code");
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
                     + "and building the Token Service URL", ex);
@@ -363,7 +358,4 @@ public class OAuthConf {
         return openIDConnect;
     }
 
-    public String getCodeChallengeMethod() {
-        return codeChallengeMethod;
-    }
 }
