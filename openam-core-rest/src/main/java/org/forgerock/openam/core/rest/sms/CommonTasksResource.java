@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -183,8 +183,6 @@ class CommonTasksResource implements CollectionResourceProvider {
                     field("salesforce", getSalesforceCommonTaskConfiguration(resourceBundle).getObject()),
                     field("socialauthentication",
                             getSocialAuthenticationCommonTaskConfiguration(resourceBundle).getObject()),
-                    field("testfederation",
-                            getTestFederationConnectivityCommonTaskConfiguration(resourceBundle).getObject()),
                     field("documentation", getProductDocumentationCommonTaskConfiguration(resourceBundle).getObject()),
                     field("soapstsdeployment",
                             getCreateSoapSTSDeploymentCommonTaskConfiguration(resourceBundle).getObject())
