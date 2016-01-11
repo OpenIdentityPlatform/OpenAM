@@ -24,16 +24,15 @@
  *
  * $Id: AccountUtils.java,v 1.2 2008/06/25 05:47:45 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.common;
 
-import java.security.AccessController;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -188,13 +187,7 @@ public class AccountUtils {
                   getAttributes(userID, set);
 
             if(existMap == null || existMap.isEmpty()) {
-               Set set1 = new HashSet();
-               set1.add(infoKey.toValueString());
-               map.put(nameIDInfoKeyAttr, set1);
-
-               Set set2= new HashSet();
-               set2.add(info.toValueString());
-               map.put(nameIDInfoAttr, set2);
+                map.putAll(convertToAttributes(info, infoKey));
             } else {
 
                Set set1 = (Set)existMap.get(nameIDInfoAttr);
@@ -242,6 +235,26 @@ public class AccountUtils {
         }
     }
 
+    /**
+     * Converts the provided NameIDInfo and NameIDInfoKey to a Map&lt;String, Set&lt;String&gt;&gt; structure.
+     *
+     * @param info The NameIDInfo.
+     * @param infoKey The NameIDInfoKey.
+     * @return An attribute map containing the serialized NameID data.
+     * @throws SAML2Exception If there was a problem whilst creating NameIDInfoKey.
+     */
+    public static Map<String, Set<String>> convertToAttributes(NameIDInfo info, NameIDInfoKey infoKey)
+            throws SAML2Exception {
+        Map<String, Set<String>> ret = new HashMap<>();
+        if (infoKey == null) {
+            infoKey = new NameIDInfoKey(info.getNameIDValue(), info.getHostEntityID(), info.getRemoteEntityID());
+        }
+        ret.put(getNameIDInfoAttribute(), Collections.singleton(info.toValueString()));
+        ret.put(getNameIDInfoKeyAttribute(), Collections.singleton(infoKey.toValueString()));
+
+        return ret;
+
+    }
     /**
      * Removes the account federation of a user.
      * @param info <code>NameIDInfo</code> object. 

@@ -24,7 +24,7 @@
  *
  * $Id: SAML2PluginsUtils.java,v 1.1 2008/07/08 23:03:34 hengming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.plugins;
@@ -60,6 +60,17 @@ public class SAML2PluginsUtils {
     }
 
     private SAML2PluginsUtils() {}
+
+    /**
+     * Checks if dynamic profile creation is enabled.
+     * @param realm Realm to check for the dynamic profile creation attribute.
+     * @return <code>true</code> if dynamic profile creation is enabled, false otherwise.
+     */
+    public static boolean isDynamicProfile(String realm) {
+        String profileAttribute = getProfileAttribute(realm);
+        return DYNAMIC_PROFILE.equalsIgnoreCase(profileAttribute)
+                || CREATE_ALIAS_PROFILE.equalsIgnoreCase(profileAttribute);
+    }
 
     /**
      * Checks if dynamical profile creation or ignore profile is enabled.

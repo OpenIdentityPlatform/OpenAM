@@ -329,6 +329,14 @@ public class SAML2 extends AMLoginModule {
         try { //you're already linked or we auto looked up user
             username = SPACSUtils.getPrincipalWithoutLogin(assertionSubject, authnAssertion,
                     realm, spName, metaManager, entityName, storageKey);
+            if (SAML2PluginsUtils.isDynamicProfile(realm)) {
+                String spEntityId = SPSSOFederate.getSPEntityId(metaAlias);
+                if (shouldPersistNameID(spEntityId)) {
+                    NameIDInfo info = new NameIDInfo(spEntityId, entityName, getNameId(), SAML2Constants.SP_ROLE,
+                            false);
+                    setUserAttributes(AccountUtils.convertToAttributes(info, null));
+                }
+            }
             if (username != null) {
                 principal = new SAML2Principal(username);
                 return success(authnAssertion, getNameId(), username);
@@ -673,26 +681,13 @@ public class SAML2 extends AMLoginModule {
     private void linkAccount(final String principalId, final NameID nameId)
             throws SAML2MetaException, AuthenticationException {
 
-        final String spName = metaManager.getEntityByMetaAlias(metaAlias);
+        final String spEntityId = metaManager.getEntityByMetaAlias(metaAlias);
 
         try {
-            NameIDInfo info = new NameIDInfo(spName, entityName, nameId, SAML2Constants.SP_ROLE, false);
+            NameIDInfo info = new NameIDInfo(spEntityId, entityName, nameId, SAML2Constants.SP_ROLE, false);
             DEBUG.message("SAML2 :: Local User {} Linked to Federation Account - {}", principalId, nameId.getValue());
 
-            final DefaultLibrarySPAccountMapper spAccountMapper = new DefaultLibrarySPAccountMapper();
-            final String spEntityID = SPSSOFederate.getSPEntityId(metaAlias);
-            final IDPSSODescriptorElement idpsso = SPSSOFederate.getIDPSSOForAuthnReq(realm, entityName);
-            final SPSSODescriptorElement spsso = SPSSOFederate.getSPSSOForAuthnReq(realm, spEntityID);
-
-            nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso, idpsso);
-            isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-            boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
-            boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
-
-            boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
-                    && spAccountMapper.shouldPersistNameIDFormat(realm, spName, entityName, nameIDFormat));
-
-            if (shouldPersistNameID) {
+            if (shouldPersistNameID(spEntityId)) {
                 AccountUtils.setAccountFederation(info, principalId);
             }
 
@@ -701,6 +696,21 @@ public class SAML2 extends AMLoginModule {
             // exception logged later
             throw new AuthenticationException(BUNDLE_NAME, "localLinkError", new Object[0]);
         }
+    }
+
+    private boolean shouldPersistNameID(String spEntityId) throws SAML2Exception {
+        final DefaultLibrarySPAccountMapper spAccountMapper = new DefaultLibrarySPAccountMapper();
+        final String spEntityID = SPSSOFederate.getSPEntityId(metaAlias);
+        final IDPSSODescriptorElement idpsso = SPSSOFederate.getIDPSSOForAuthnReq(realm, entityName);
+        final SPSSODescriptorElement spsso = SPSSOFederate.getSPSSOForAuthnReq(realm, spEntityID);
+
+        nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso, idpsso);
+        isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
+        boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
+        boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
+
+        return isPersistent || (!isTransient && !ignoreProfile
+                && spAccountMapper.shouldPersistNameIDFormat(realm, spEntityId, entityName, nameIDFormat));
     }
 
     /**
