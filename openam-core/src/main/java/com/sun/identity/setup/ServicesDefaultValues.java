@@ -24,13 +24,14 @@
  *
  * $Id: ServicesDefaultValues.java,v 1.38 2009/01/28 05:35:02 ww203982 Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,23 +40,30 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.util.Crypt;
-import com.sun.identity.common.DNUtils;
-import com.sun.identity.shared.encode.Hash;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.SMSSchema;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.ValidateIPaddress;
 import org.forgerock.opendj.ldap.DN;
+
+import com.iplanet.am.util.SecureRandomManager;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.util.Crypt;
+import com.sun.identity.common.DNUtils;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.SMSSchema;
 
 /**
  * This class holds the default values of service schema.
  */
 public class ServicesDefaultValues {
+    public static final String RANDOM_SECURE = "@128_BIT_RANDOM_SECURE@";
+
     private static ServicesDefaultValues instance = new ServicesDefaultValues();
     private static Set preappendSlash = new HashSet();
     private static Set trimSlash = new HashSet();
+    private static SecureRandom secureRandom;
+
     private Map defValues = new HashMap();
 
     static {
@@ -74,6 +82,12 @@ public class ServicesDefaultValues {
         while (e.hasMoreElements()) {
             String key = (String)e.nextElement();
             defValues.put(key, bundle.getString(key));
+        }
+
+        try {
+            secureRandom = SecureRandomManager.getSecureRandom();
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to initialise secure random");
         }
     }
 
@@ -574,6 +588,13 @@ public class ServicesDefaultValues {
                     }
                     orig = orig.replaceAll("@" + key + "@", value);
                 }
+            }
+
+            // Each Secure Random tag should be a newly generated random.
+            while (orig.contains(RANDOM_SECURE)) {
+                byte[] bytes = new byte[16]; // 16 * 8 = 128 bits
+                secureRandom.nextBytes(bytes);
+                orig = orig.replace(RANDOM_SECURE, Base64.encode(bytes));
             }
         }
         return orig;

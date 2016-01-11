@@ -16,21 +16,18 @@
 
 package com.sun.identity.authentication.service;
 
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.InternalSessionFactory;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
+import javax.security.auth.Subject;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 import org.forgerock.util.annotations.VisibleForTesting;
 
-import javax.security.auth.Subject;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.share.SessionInfo;
 
 /**
  * Creates stateless sessions after authentication.
@@ -64,8 +61,8 @@ class StatelessSessionActivator extends DefaultSessionActivator {
         if (loginState.isSessionUpgrade()) {
             //set our old session -- necessary as if the currently owned token is stateless this won't be set
             SessionID sid = new SessionID(loginState.getHttpServletRequest());
-            SessionInfo info = getStatelessSessionFactory().getSessionInfo(sid);
             try {
+                SessionInfo info = getStatelessSessionFactory().getSessionInfo(sid);
                 oldSession = getStatelessSessionFactory().generate(info);
                 loginState.setOldStatelessSession(oldSession);
             } catch (SessionException e) {

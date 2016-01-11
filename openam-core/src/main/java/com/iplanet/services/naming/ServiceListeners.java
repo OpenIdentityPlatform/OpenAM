@@ -11,9 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.iplanet.services.naming;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -21,14 +30,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchemaManager;
-
-import javax.inject.Inject;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * ServiceListeners provides a simplified API for creating appropriate {@link ServiceListener} instances
@@ -79,7 +80,11 @@ public class ServiceListeners {
         SCHEMA
     }
 
-    public class ListenerBuilder {
+    /**
+     * Builder responsible for providing fluent-like functions for building up
+     * Action instances which will respond to changes in Service configuration.
+     */
+    public static class ListenerBuilder {
         private final Map<ConfigType, Collection<Action>> actions;
         private ServiceSchemaManager schemaManager = null;
         private ServiceConfigManager configManager = null;

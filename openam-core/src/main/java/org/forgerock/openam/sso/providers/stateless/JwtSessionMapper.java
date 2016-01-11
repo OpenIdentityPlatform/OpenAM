@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sso.providers.stateless;
 
@@ -120,11 +120,11 @@ public final class JwtSessionMapper {
      *
      * @param jwtString Non-null, String which represents a JWT with SessionInfo state assigned to a serialized_session claim.
      *
-     * @throws JwtRuntimeException If the provided JWT was signed but the signature cannot be verified.
+     * @return SessionInfo A correctly parsed SessionInfo for the given JWT String.
      *
-     * @return SessionInfo
+     * @throws JwtRuntimeException If there was a problem reconstructing the JWT
      */
-    public SessionInfo fromJwt(@Nonnull String jwtString) {
+    public SessionInfo fromJwt(@Nonnull String jwtString) throws JwtRuntimeException {
 
         Reject.ifNull(jwtString, "jwtString must not ne null.");
 
@@ -132,12 +132,14 @@ public final class JwtSessionMapper {
 
         if (encryptionKeyPair != null) {
 
+            // could throw JwtRuntimeException
             SignedEncryptedJwt signedEncryptedJwt = jwtBuilderFactory.reconstruct(jwtString, SignedEncryptedJwt.class);
             signedEncryptedJwt.decrypt(encryptionKeyPair.getPrivate());
             signedJwt = signedEncryptedJwt;
 
         } else {
 
+            // could throw JwtRuntimeException
             signedJwt = jwtBuilderFactory.reconstruct(jwtString, SignedJwt.class);
 
         }

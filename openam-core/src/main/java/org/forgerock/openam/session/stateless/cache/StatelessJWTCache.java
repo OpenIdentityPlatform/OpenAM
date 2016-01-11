@@ -11,19 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.session.stateless.cache;
 
-import com.iplanet.dpro.session.share.SessionInfo;
-import org.forgerock.openam.session.stateless.StatelessConfig;
-import org.forgerock.openam.utils.collections.LeastRecentlyUsed;
-import org.forgerock.util.Reject;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.Map;
+
+import org.forgerock.openam.session.stateless.StatelessConfig;
+import org.forgerock.openam.utils.collections.LeastRecentlyUsed;
+import org.forgerock.util.Reject;
+import org.forgerock.util.annotations.VisibleForTesting;
+
+import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.services.naming.ServiceListeners;
 
 /**
  * Responsible for providing a caching layer for JWT/SessionInfo conversion.
@@ -43,9 +48,18 @@ public class StatelessJWTCache {
     private final Map<String, SessionInfo> sessionInfoCache;
 
     @Inject
-    public StatelessJWTCache(StatelessConfig config) {
+    public StatelessJWTCache(StatelessConfig config, ServiceListeners listeners) {
         sessionInfoCache = Collections.synchronizedMap(
                 new LeastRecentlyUsed<String, SessionInfo>(config.getJWTCacheSize()));
+
+        // Responds to configuration changes, preventing possibly invalid keys from remaining in the cache
+        final ServiceListeners.Action action = new ServiceListeners.Action() {
+            @Override
+            public void performUpdate() {
+                clear();
+            }
+        };
+        listeners.config(SessionServiceConfig.AM_SESSION_SERVICE_NAME).global(action).schema(action).listen();
     }
 
     /**
@@ -81,5 +95,16 @@ public class StatelessJWTCache {
      */
     public boolean contains(String jwtToken) {
         return sessionInfoCache.containsKey(jwtToken);
+    }
+
+    /**
+     * Clearing the cache will remove all cached mappings between JWT and SessionID.
+     *
+     * This may be required in the event of configuration changes which should
+     * mean that a JWT is no longer valid. E.g. Changes in Signing Shared Secret.
+     */
+    @VisibleForTesting
+    void clear() {
+        sessionInfoCache.clear();
     }
 }

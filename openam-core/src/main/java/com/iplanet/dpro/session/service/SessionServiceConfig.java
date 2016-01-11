@@ -24,7 +24,7 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
@@ -33,6 +33,23 @@ import static com.iplanet.dpro.session.service.SessionBroadcastMode.*;
 import static com.iplanet.dpro.session.service.SessionConstants.*;
 import static com.sun.identity.shared.Constants.*;
 import static org.forgerock.openam.cts.api.CoreTokenConstants.*;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
+import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
+import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.cluster.ClusterStateService;
 import com.iplanet.services.naming.ServiceListeners;
@@ -47,19 +64,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
-import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Responsible for collating System Properties and amSession.xml configuration state relating to the Session Service.
@@ -69,7 +73,7 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class SessionServiceConfig {
 
-    private static final String AM_SESSION_SERVICE_NAME = "iPlanetAMSessionService";
+    public static final String AM_SESSION_SERVICE_NAME = "iPlanetAMSessionService";
 
     private final Debug sessionDebug;
     private final SessionServerConfig sessionServerConfig;
@@ -323,6 +327,7 @@ public class SessionServiceConfig {
             @Named(SessionConstants.SESSION_DEBUG) final Debug sessionDebug,
             SessionServerConfig sessionServerConfig,
             PrivilegedAction<SSOToken> adminTokenProvider,
+            final StatelessJWTCache jwtCache,
             final ServiceListeners serviceListeners) {
 
         this.sessionDebug = sessionDebug;
@@ -359,27 +364,20 @@ public class SessionServiceConfig {
                     new ServiceSchemaManager(AM_SESSION_SERVICE_NAME, AccessController.doPrivileged(adminTokenProvider));
             hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
 
+            ServiceListeners.Action action = new ServiceListeners.Action() {
+                @Override
+                public void performUpdate() {
+                    try {
+                        loadSessionFailover();
+                        hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
+                    } catch (SSOException | SMSException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            };
             serviceListeners.config(AM_SESSION_SERVICE_NAME)
-                    .global(new ServiceListeners.Action() {
-                        @Override
-                        public void performUpdate() {
-                            try {
-                                loadSessionFailover();
-                            } catch (SSOException | SMSException e) {
-                                throw new IllegalStateException(e);
-                            }
-                        }
-                    })
-                    .schema(new ServiceListeners.Action() {
-                        @Override
-                        public void performUpdate() {
-                            try {
-                                hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
-                            } catch (Exception e) {
-                                sessionDebug.error("SessionConfigListener : Unable to get Session Service attributes", e);
-                            }
-                        }
-                    }).listen();
+                    .global(action)
+                    .schema(action).listen();
 
             loadSessionFailover();
 

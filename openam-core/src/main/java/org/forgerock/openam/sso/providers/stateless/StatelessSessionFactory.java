@@ -11,10 +11,17 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.sso.providers.stateless;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.json.jose.exceptions.JwtRuntimeException;
+import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -24,12 +31,6 @@ import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
-import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
-import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Responsible for creating StatelessSession and SessionInfo instances from JWT
@@ -119,14 +120,24 @@ public class StatelessSessionFactory {
      * Side Effect: Will cache the generated JWT and SessionInfo combination.
      *
      * @param sessionID Maybe null SessionID.
-     * @return SessionInfo which corresponds to this SessionID.
+     *
+     * @return SessionInfo Non null SessionInfo which corresponds to the SessionID.
+     *
+     * @throws SessionException If there was any problem with getting the SessionInfo
+     * from the JWT within with SessionID
      */
-    public SessionInfo getSessionInfo(SessionID sessionID) {
+    public SessionInfo getSessionInfo(SessionID sessionID) throws SessionException {
         String jwt = getJWTFromSessionID(sessionID, true);
         if (cache.contains(jwt)) {
             return cache.getSessionInfo(jwt);
         }
-        SessionInfo sessionInfo = getJwtSessionMapper().fromJwt(jwt);
+
+        SessionInfo sessionInfo;
+        try {
+            sessionInfo = getJwtSessionMapper().fromJwt(jwt);
+        } catch (JwtRuntimeException e) {
+            throw new SessionException(e);
+        }
         cache.cache(sessionInfo, jwt);
         return sessionInfo;
     }
