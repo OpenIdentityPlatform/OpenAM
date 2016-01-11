@@ -122,25 +122,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 });
         },
 
-        // TODO this should be removed and common 'pending changes' widget should be used instead
-        revertChanges: function () {
-            var activeTab = this.$el.find(".tab-pane.active"),
-                activeTabName = this.tabs[activeTab.index()].name;
-
-            switch (activeTabName) {
-                case "actions":
-                    this.actionsList.render(this.data.entity, this.initialActions, "#resTypeActions");
-                    break;
-                case "patterns":
-                    this.patternsView.render(this.data.entity, this.initialPatterns, "#resTypePatterns");
-                    break;
-                case "settings":
-                    _.extend(this.data.entity, _.pick(this.model, this.tabs[activeTab.index()].attr));
-                    this.renderSettings();
-                    break;
-            }
-        },
-
         updateFields: function () {
             var app = this.data.entity,
                 dataFields = this.$el.find("[data-field]"),

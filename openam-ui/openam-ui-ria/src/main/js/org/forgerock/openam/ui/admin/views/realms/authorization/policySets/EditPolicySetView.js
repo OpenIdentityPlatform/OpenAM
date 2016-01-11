@@ -192,13 +192,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             return result;
         },
 
-        // TODO this should be removed and common 'pending changes' widget should be used instead
-        revertChanges: function () {
-            this.resTypesSelection[0].selectize.clear(true);
-            this.resTypesSelection[0].selectize.addItems(
-                _.pluck(this.data.options.selectedResourceTypesInitial, "uuid"));
-        },
-
         submitForm: function (e) {
             e.preventDefault();
 

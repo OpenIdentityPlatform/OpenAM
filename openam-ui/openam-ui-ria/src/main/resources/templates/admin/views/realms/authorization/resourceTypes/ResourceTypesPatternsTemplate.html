@@ -4,7 +4,7 @@
     <ul class="list-group">
         {{#each items}}
         <li class="{{#equals this ../../options.justAdded}}text-success{{/equals}} list-group-item" data-item-name="{{this}}">
-            <span tabindex="0" class="fa fa-close pull-right"></span>
+            <span tabindex="0" data-delete class="fa fa-close pull-right"></span>
             <span class="key">{{this}}</span>
         </li>
         {{/each}}
