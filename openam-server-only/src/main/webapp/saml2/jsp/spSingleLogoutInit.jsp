@@ -79,7 +79,7 @@
 <%
     AuditEventPublisher aep = InjectorHolder.getInstance(AuditEventPublisher.class);
     AuditEventFactory aef = InjectorHolder.getInstance(AuditEventFactory.class);
-    SAML2Auditor saml2Auditor = new SAML2Auditor(SAML2Utils.debug, aep, aef, request);
+    SAML2Auditor saml2Auditor = new SAML2Auditor(aep, aef, request);
 
     saml2Auditor.setMethod("spSingleLogoutInit");
     saml2Auditor.setRealm(SAML2Utils.getRealm(request.getParameterMap()));
