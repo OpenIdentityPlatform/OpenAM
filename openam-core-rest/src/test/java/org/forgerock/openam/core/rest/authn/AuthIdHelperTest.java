@@ -11,17 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
+
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
@@ -44,23 +57,13 @@ import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
-
 public class AuthIdHelperTest {
+    // Use all-zeros as test key
+    private static final String SIGNING_KEY = Base64.encode(new byte[32]);
 
     private AuthIdHelper authIdHelper;
 
     private CoreServicesWrapper coreServicesWrapper;
-    private AMKeyProvider amKeyProvider;
     private JwtBuilderFactory jwtBuilderFactory;
     private SigningManager signingManager;
 
@@ -71,11 +74,10 @@ public class AuthIdHelperTest {
     public void setUp() {
 
         coreServicesWrapper = mock(CoreServicesWrapper.class);
-        amKeyProvider = mock(AMKeyProvider.class);
         jwtBuilderFactory = mock(JwtBuilderFactory.class);
         signingManager = mock(SigningManager.class);
 
-        authIdHelper = new AuthIdHelper(coreServicesWrapper, amKeyProvider, jwtBuilderFactory, signingManager);
+        authIdHelper = new AuthIdHelper(coreServicesWrapper, jwtBuilderFactory, signingManager);
 
         jwsHeaderBuilder = mock(JwsHeaderBuilder.class);
         claimsSetBuilder = mock(JwtClaimsSetBuilder.class);
@@ -97,18 +99,16 @@ public class AuthIdHelperTest {
         given(signedJwtBuilder.build()).willReturn("JWT_STRING");
     }
 
-    private void mockGetKeyAliasMethod(String orgName, boolean nullKeyAlias) throws SMSException, SSOException {
+    private void mockGetSigningKey(String orgName, boolean nullKeyAlias) throws SMSException, SSOException {
         SSOToken adminToken = mock(SSOToken.class);
         ServiceConfigManager serviceConfigManager = mock(ServiceConfigManager.class);
         ServiceConfig serviceConfig = mock(ServiceConfig.class);
         Map<String, Set<String>> orgConfigAttributes = new HashMap<String, Set<String>>();
         Set<String> orgConfigSet = new HashSet<String>();
-        orgConfigSet.add("");
-        orgConfigSet.add(null);
         if (!nullKeyAlias) {
-            orgConfigSet.add("KEY_ALIAS");
+            orgConfigSet.add(SIGNING_KEY);
         }
-        orgConfigAttributes.put("iplanet-am-auth-key-alias", orgConfigSet);
+        orgConfigAttributes.put("iplanet-am-auth-hmac-signing-shared-secret", orgConfigSet);
         given(coreServicesWrapper.getAdminToken()).willReturn(adminToken);
         given(coreServicesWrapper.getServiceConfigManager("iPlanetAMAuthService", adminToken))
                 .willReturn(serviceConfigManager);
@@ -128,10 +128,7 @@ public class AuthIdHelperTest {
         given(loginConfiguration.getIndexType()).willReturn(AuthIndexType.NONE);
         given(loginConfiguration.getIndexValue()).willReturn(null);
 
-        mockGetKeyAliasMethod("ORG_DN", false);
-
-        PublicKey publicKey = mock(PublicKey.class);
-        given(amKeyProvider.getPublicKey("KEY_ALIAS")).willReturn(publicKey);
+        mockGetSigningKey("ORG_DN", false);
 
         //When
         String authId = authIdHelper.createAuthId(loginConfiguration, authContext);
@@ -164,10 +161,7 @@ public class AuthIdHelperTest {
         given(loginConfiguration.getIndexType()).willReturn(AuthIndexType.SERVICE);
         given(loginConfiguration.getIndexValue()).willReturn("INDEX_VALUE");
 
-        mockGetKeyAliasMethod("ORG_DN", false);
-
-        PublicKey publicKey = mock(PublicKey.class);
-        given(amKeyProvider.getPublicKey("KEY_ALIAS")).willReturn(publicKey);
+        mockGetSigningKey("ORG_DN", false);
 
         //When
         String authId = authIdHelper.createAuthId(loginConfiguration, authContext);
@@ -202,7 +196,7 @@ public class AuthIdHelperTest {
         given(loginConfiguration.getIndexType()).willReturn(AuthIndexType.NONE);
         given(loginConfiguration.getIndexValue()).willReturn(null);
 
-        mockGetKeyAliasMethod("ORG_DN", true);
+        mockGetSigningKey("ORG_DN", true);
 
         //When
         boolean exceptionCaught = false;
@@ -215,7 +209,6 @@ public class AuthIdHelperTest {
 
         //Then
         assertTrue(exceptionCaught);
-        verify(amKeyProvider, never()).getPrivateKey(anyString());
     }
 
     @Test
@@ -242,7 +235,6 @@ public class AuthIdHelperTest {
         //Then
         assertTrue(exceptionCaught);
         assertEquals(exception.getStatusCode(), 500);
-        verify(amKeyProvider, never()).getPrivateKey(anyString());
     }
 
     @Test
@@ -269,7 +261,6 @@ public class AuthIdHelperTest {
         //Then
         assertTrue(exceptionCaught);
         assertEquals(exception.getStatusCode(), 500);
-        verify(amKeyProvider, never()).getPrivateKey(anyString());
     }
 
     @Test
@@ -315,9 +306,8 @@ public class AuthIdHelperTest {
 
         given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willReturn(signedJwt);
         given(signedJwt.verify(Matchers.<SigningHandler>anyObject())).willReturn(true);
-        given(amKeyProvider.getPublicKey(anyString())).willReturn(publicKey);
 
-        mockGetKeyAliasMethod("REALM_DN", false);
+        mockGetSigningKey("REALM_DN", false);
 
         //When
         authIdHelper.verifyAuthId("REALM_DN", "AUTH_ID");
@@ -337,9 +327,8 @@ public class AuthIdHelperTest {
 
         given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willReturn(signedJwt);
         given(signedJwt.verify(signingHandler)).willReturn(false);
-        given(amKeyProvider.getPublicKey("KEY_ALIAS")).willReturn(publicKey);
 
-        mockGetKeyAliasMethod("REALM_DN", false);
+        mockGetSigningKey("REALM_DN", false);
 
         //When
         boolean exceptionCaught = false;
@@ -363,9 +352,8 @@ public class AuthIdHelperTest {
         PublicKey publicKey = mock(PublicKey.class);
 
         given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willThrow(JwtRuntimeException.class);
-        given(amKeyProvider.getPublicKey("KEY_ALIAS")).willReturn(publicKey);
 
-        mockGetKeyAliasMethod("REALM_DN", false);
+        mockGetSigningKey("REALM_DN", false);
 
         //When
         boolean exceptionCaught = false;

@@ -11,18 +11,31 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn;
 
-import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
+import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.SESSION_ID;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.exceptions.JwtRuntimeException;
@@ -32,21 +45,11 @@ import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.core.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.core.AuthenticationContext;
 import org.forgerock.openam.core.rest.authn.core.LoginConfiguration;
-import org.forgerock.openam.core.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.math.BigInteger;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.SignatureException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Helper class to create and verify authentication JWTs.
@@ -56,10 +59,9 @@ public class AuthIdHelper {
 
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String AUTH_SERVICE_NAME = "iPlanetAMAuthService";
-    private static final String KEY_ALIAS_KEY = "iplanet-am-auth-key-alias";
+    private static final String SHARED_SECRET_ATTR = "iplanet-am-auth-hmac-signing-shared-secret";
 
     private final CoreServicesWrapper coreServicesWrapper;
-    private final AMKeyProvider amKeyProvider;
     private final JwtBuilderFactory jwtBuilderFactory;
     private final SigningManager signingManager;
 
@@ -67,15 +69,13 @@ public class AuthIdHelper {
      * Constructs an instance of the AuthIdHelper.
      *
      * @param coreServicesWrapper An instance of the CoreServicesWrapper.
-     * @param amKeyProvider An instance of the AMKeyProvider.
      * @param jwtBuilderFactory An instance of the JwtBuilderFactory.
      * @param signingManager An instance of the SigningManager.
      */
     @Inject
-    public AuthIdHelper(CoreServicesWrapper coreServicesWrapper, AMKeyProvider amKeyProvider,
+    public AuthIdHelper(CoreServicesWrapper coreServicesWrapper,
             JwtBuilderFactory jwtBuilderFactory, SigningManager signingManager) {
         this.coreServicesWrapper = coreServicesWrapper;
-        this.amKeyProvider = amKeyProvider;
         this.jwtBuilderFactory = jwtBuilderFactory;
         this.signingManager = signingManager;
     }
@@ -91,7 +91,7 @@ public class AuthIdHelper {
     public String createAuthId(LoginConfiguration loginConfiguration, AuthenticationContext authContext)
             throws SignatureException, RestAuthException {
 
-        String keyAlias = getKeyAlias(authContext.getOrgDN());
+        final SecretKey key = getSigningKey(authContext.getOrgDN());
 
         Map<String, Object> jwtValues = new HashMap<String, Object>();
         if (loginConfiguration.getIndexType().getIndexType() != null && loginConfiguration.getIndexValue() != null) {
@@ -102,8 +102,7 @@ public class AuthIdHelper {
         jwtValues.put("realm", authContext.getOrgDN());
         jwtValues.put(SESSION_ID, authContext.getSessionID().toString());
 
-        String authId = generateAuthId(keyAlias, jwtValues);
-        return authId;
+        return generateAuthId(key, jwtValues);
     }
 
     /**
@@ -117,55 +116,34 @@ public class AuthIdHelper {
     }
 
     /**
-     * Retrieves the alias of the key to use to sign the JWT.
+     * Retrieves the secret key to use to sign and verify the JWT.
      *
      * @param orgName The organisation name for the realm being authenticated against.
-     * @return The key alias.
+     * @return The signing key.
      */
-    private String getKeyAlias(String orgName) throws RestAuthException {
+    private SecretKey getSigningKey(String orgName) throws RestAuthException {
 
         SSOToken token = coreServicesWrapper.getAdminToken();
 
-        String keyAlias = null;
         try {
             ServiceConfigManager scm = coreServicesWrapper.getServiceConfigManager(AUTH_SERVICE_NAME, token);
-
             ServiceConfig orgConfig = scm.getOrganizationConfig(orgName, null);
-            Set<String> values = (Set<String>) orgConfig.getAttributes().get(KEY_ALIAS_KEY);
-            for (String value : values) {
-                if (value != null && !"".equals(value)) {
-                    keyAlias = value;
-                    break;
-                }
-            }
-        } catch (SMSException e) {
-            throw new RestAuthException(ResourceException.INTERNAL_ERROR, e);
-        } catch (SSOException e) {
+            byte[] key = Base64.decode(CollectionHelper.getMapAttr(orgConfig.getAttributes(), SHARED_SECRET_ATTR));
+            return new SecretKeySpec(key, "RAW");
+        } catch (SMSException | SSOException | NullPointerException e) {
             throw new RestAuthException(ResourceException.INTERNAL_ERROR, e);
         }
-
-        return keyAlias;
     }
 
     /**
      * Generates the authentication id JWT.
      *
-     * @param keyAlias The key alias.
      * @param jwtValues A Map of key values to include in the JWT payload. Must not be null.
      * @return The authentication id JWT.
      * @throws SignatureException If there is a problem signing the JWT.
      */
-    private String generateAuthId(String keyAlias, Map<String, Object> jwtValues) throws SignatureException, RestAuthException {
-
-        String keyStoreAlias = keyAlias;
-
-        if (keyStoreAlias == null) {
-            throw new RestAuthException(ResourceException.INTERNAL_ERROR,
-                    "Could not find Key Store with alias, " + keyStoreAlias);
-        }
-
-        PublicKey publicKey = amKeyProvider.getPublicKey(keyStoreAlias);
-
+    private String generateAuthId(SecretKey key, Map<String, Object> jwtValues) throws SignatureException,
+                                                                                       RestAuthException {
         String otk = new BigInteger(130, RANDOM).toString(32);
 
         JwtClaimsSet claimsSet = jwtBuilderFactory.claims()
@@ -173,7 +151,7 @@ public class AuthIdHelper {
                 .claims(jwtValues)
                 .build();
 
-        final SigningHandler signingHandler = signingManager.newHmacSigningHandler(publicKey.getEncoded());
+        final SigningHandler signingHandler = signingManager.newHmacSigningHandler(key.getEncoded());
         String jwt = jwtBuilderFactory.jws(signingHandler)
                 .headers()
                 .alg(JwsAlgorithm.HS256)
@@ -207,12 +185,10 @@ public class AuthIdHelper {
      */
     public void verifyAuthId(String realmDN, String authId) throws RestAuthException {
 
-        String keyAlias = getKeyAlias(realmDN);
-
-        PublicKey publicKey = amKeyProvider.getPublicKey(keyAlias);
+        SecretKey key = getSigningKey(realmDN);
 
         try {
-            final SigningHandler signingHandler = signingManager.newHmacSigningHandler(publicKey.getEncoded());
+            final SigningHandler signingHandler = signingManager.newHmacSigningHandler(key.getEncoded());
             boolean verified = jwtBuilderFactory.reconstruct(authId, SignedJwt.class).verify(signingHandler);
             if (!verified) {
                 throw new RestAuthException(ResourceException.BAD_REQUEST, "AuthId JWT Signature not valid");

@@ -170,12 +170,22 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-key-alias"
-                                 type="single"
-                                 syntax="string"
-                                 i18nKey="a151"
-                                 resourceName="keyAlias">
+                    type="single"
+                    syntax="string"
+                    i18nKey="a151"
+                    resourceName="keyAlias">
                     <DefaultValues>
                         <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-hmac-signing-shared-secret"
+                                 type="single"
+                                 syntax="password"
+                                 i18nKey="a160"
+                                 validator="RequiredValueValidator"
+                                 resourceName="sharedSecret">
+                    <DefaultValues>
+                        <DefaultValuesClassName className="org.forgerock.openam.sm.HmacSharedSecretDefaultValues"/>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-default-role"
