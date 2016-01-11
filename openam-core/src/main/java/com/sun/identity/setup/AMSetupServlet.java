@@ -145,6 +145,7 @@ import org.forgerock.openam.upgrade.OpenDJUpgrader;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.VersionUtils;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.config.ConfigurationFramework;
 
 /**
  * This class is the first class to get loaded by the Servlet container.
@@ -1960,6 +1961,17 @@ public class AMSetupServlet extends HttpServlet {
                 ServerGroup sg = getSMSServerGroup(sname); 
                 currServerDSSet.add(hname + ":" + getSMSPort(sg));
                 currServerDSAdminPortsSet.add(hname + ":" + p.getProperty(Constants.DS_ADMIN_PORT));
+            }
+
+            // Ensure OpenDJ system properties are setup so that it can discover its installation root
+            final String embeddedDjInstallRoot = getBaseDir() + "/" + SetupConstants.SMS_OPENDS_DATASTORE;
+            for (String property : OpenDJUpgrader.INSTALL_ROOT_PROPERTIES) {
+                System.setProperty(property, embeddedDjInstallRoot);
+            }
+
+            // Force initialization of embedded DJ configuration with the correct installation root
+            if (!ConfigurationFramework.getInstance().isInitialized()) {
+                ConfigurationFramework.getInstance().initialize(embeddedDjInstallRoot);
             }
 
             ServerGroup sGroup = getSMSServerGroup(myName); 

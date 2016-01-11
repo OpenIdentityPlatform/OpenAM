@@ -24,7 +24,7 @@
  *
  * $Id: EmbeddedOpenDS.java,v 1.27 2010/01/15 01:22:39 goodearth Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -924,8 +924,9 @@ public class EmbeddedOpenDS {
         DSConfig.main(args, bos, boe);
         String str = bos.toString();
         String stre = boe.toString();
-        if (stre.length() > 0 &&
-                !stre.contains("Unable to continue since there are no Replication Server currently")) {
+        final boolean hasReplicationServers = !stre.contains("Unable to continue since there are no Replication " +
+                "Server currently");
+        if (!stre.isEmpty() && hasReplicationServers) {
             debug.error("EmbeddedOpenDS:syncReplication: stderr is not empty:"
                     + stre);
             return false;
@@ -954,7 +955,9 @@ public class EmbeddedOpenDS {
             debug.error("EmbeddedOpenDS:syncReplication:Failed:", ex);
         }
         if (line == null) {
-            debug.error("EmbeddedOpenDS:syncReplication:cmd failed" + str);
+            if (hasReplicationServers) {
+                debug.error("EmbeddedOpenDS:syncReplication:cmd failed" + str);
+            }
             return false;
         }
         try {

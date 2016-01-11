@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -97,7 +97,7 @@ public final class OpenDJUpgrader {
     /**
      * List of system properties that need to be set to the DJ installation root before running the DJ upgrade tasks.
      */
-    private static final List<String> INSTALL_ROOT_PROPERTIES = Arrays.asList("INSTALL_ROOT",
+    public static final List<String> INSTALL_ROOT_PROPERTIES = Arrays.asList("INSTALL_ROOT",
             "org.opends.server.ServerRoot", "org.opends.quicksetup.Root");
 
 
