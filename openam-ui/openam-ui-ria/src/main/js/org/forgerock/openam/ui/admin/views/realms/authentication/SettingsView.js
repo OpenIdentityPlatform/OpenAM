@@ -23,11 +23,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSRealmDelegate) {
+], function ($, _, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSDelegateUtils,
+             SMSRealmDelegate) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
@@ -65,7 +67,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             this.$el.find("#tabpanel").empty();
 
             var id = $(event.target).attr("href").slice(1),
-                schema = this.data.formData.schema.properties[id],
+                schema = SMSDelegateUtils.sanitizeSchema(this.data.formData.schema.properties[id]),
                 element = this.$el.find("#tabpanel").get(0);
 
             this.data.form = new Form(element, schema, this.data.formData.values);

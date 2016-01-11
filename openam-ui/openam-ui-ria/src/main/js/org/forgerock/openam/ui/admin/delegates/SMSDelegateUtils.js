@@ -15,7 +15,7 @@
  */
 
 define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
-    "underscore"
+    "lodash"
 ], function (_) {
     /**
      * @exports org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils
@@ -93,7 +93,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
      * @param {Object} property Property to transform
      */
     function transformPropertyOrderAttributeToInt (property) {
-        if (property.hasOwnProperty("propertyOrder")) {
+        if (property.hasOwnProperty("propertyOrder") && !_.isNumber(property.propertyOrder)) {
             property.propertyOrder = parseInt(property.propertyOrder.slice(1), 10);
         }
     }
