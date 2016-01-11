@@ -51,6 +51,7 @@ import javax.servlet.ServletContext;
 
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.DN;
@@ -155,7 +156,8 @@ public final class OpenDJUpgrader {
      * @return {@code true} if an upgrade should be performed.
      */
     public boolean isUpgradeRequired() {
-        return newVersion.isMoreRecentThan(currentVersion);
+        return newVersion.isMoreRecentThan(currentVersion) ||
+                (newVersion.equals(currentVersion) && newVersion.isDifferentBuildTo(currentVersion));
     }
 
     /**
@@ -525,7 +527,10 @@ public final class OpenDJUpgrader {
     }
 
     /**
-     * Represents OpenDJ version information extracted from the installation directory or zip file buildinfo.
+     * Represents OpenDJ version information extracted from the installation directory or zip file buildinfo. Version
+     * numbers are compared to each other using only the major, minor and patch version numbers. If two versions are
+     * considered equal they may still be from different builds and this should be tested manually using the
+     * {@link #isDifferentBuildTo(OpenDJVersion)} method.
      */
     @VisibleForTesting
     static class OpenDJVersion implements Comparable<OpenDJVersion> {
@@ -575,14 +580,15 @@ public final class OpenDJUpgrader {
             if (result == 0) {
                 result = compare(this.patch, that.patch);
             }
-            if (result == 0) {
-                result = Objects.compare(this.build, that.build, String.CASE_INSENSITIVE_ORDER);
-            }
             return result;
         }
 
         public boolean isMoreRecentThan(OpenDJVersion that) {
             return this.compareTo(that) > 0;
+        }
+
+        public boolean isDifferentBuildTo(OpenDJVersion that) {
+            return !StringUtils.compareCaseInsensitiveString(this.build, that.build);
         }
 
         public boolean isOlderThan(OpenDJVersion that) {

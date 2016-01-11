@@ -11,12 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -36,6 +38,12 @@ public class OpenDJVersionTest {
         assertEquals(a.compareTo(b), expected);
     }
 
+    @Test
+    public void testDifferentBuilds() {
+        assertTrue(BUILD_A.isDifferentBuildTo(BUILD_B));
+        assertFalse(BUILD_A.isDifferentBuildTo(BUILD_A_UPPER));
+    }
+
     @DataProvider
     public Object[][] versionComparisons() {
         return new Object[][]{
@@ -50,8 +58,7 @@ public class OpenDJVersionTest {
                 {ONE_DOT_ONE, ONE_DOT_ONE_DOT_ONE, -1},
                 {ONE_DOT_ONE_DOT_ONE, ONE_DOT_ONE, 1},
                 {ONE_DOT_ONE_DOT_ONE, ONE_DOT_ONE_DOT_ONE, 0},
-                {BUILD_A, BUILD_B, -1},
-                {BUILD_A, BUILD_A_UPPER, 0} // Builds are compared case-insensitive
+                {BUILD_A, BUILD_B, 0} // Build is irrelevant to comparison
         };
     }
 
