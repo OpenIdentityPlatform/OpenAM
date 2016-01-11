@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug;
 
@@ -98,6 +98,19 @@ public class DebugTest extends DebugTestTemplate {
         Assert.assertEquals(debug.getState(), DebugLevel.ERROR.getLevel(), "Debug level state");
         checkLogFileStatus(true, DebugConstants.CONFIG_DEBUG_MERGEALL_FILE);
 
+    }
+
+    @Test
+    public void shouldFindFileWithWildCard() throws Exception {
+        // given
+        initializeProvider(DEBUG_CONFIG_FOR_TEST);
+        IDebug debug = provider.getInstance("org.forgerock.test.DebugTest");
+
+        // when
+        debug.error("Should appear in log", null);
+
+        // then
+        checkLogFileStatus(true, "wildcardTest");
     }
 
 }

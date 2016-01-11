@@ -27,9 +27,12 @@
  */
 
 /*
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.impl;
+
+import static java.util.Collections.newSetFromMap;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -39,24 +42,30 @@ import com.sun.identity.shared.debug.IDebug;
 import com.sun.identity.shared.debug.file.DebugFile;
 import com.sun.identity.shared.debug.file.DebugFileProvider;
 import com.sun.identity.shared.debug.file.impl.StdDebugFile;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.utils.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
-
-import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.openam.utils.IOUtils;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Debug implementation class.
  */
 public class DebugImpl implements IDebug {
 
-    private static Properties debugFileNames;
+    static final Map<String, String> INSTANCE_NAMES = new ConcurrentSkipListMap<>(new WildcardComparator());
+    static final Set<String> SINGLE_INSTANCE_CATEGORY = newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
     static {
+        SINGLE_INSTANCE_CATEGORY.add("EmbeddedDJ");
         initProperties();
     }
 
@@ -316,7 +325,7 @@ public class DebugImpl implements IDebug {
             return DebugConstants.CONFIG_DEBUG_MERGEALL_FILE;
         } else {
             // Find the bucket this debug belongs to
-            String nm = (String) debugFileNames.getProperty(debugName);
+            String nm = INSTANCE_NAMES.get(debugName);
             if (nm != null) {
                 return nm;
             } else {
@@ -332,7 +341,6 @@ public class DebugImpl implements IDebug {
      */
     public static synchronized void initProperties() {
 
-        debugFileNames = new Properties();
         // Load properties : debugmap.properties
         InputStream is = null;
         try {
@@ -341,7 +349,12 @@ public class DebugImpl implements IDebug {
                 is = DebugImpl.class.getResourceAsStream(SystemPropertiesManager.get(DebugConstants
                         .CONFIG_DEBUG_FILEMAP_VARIABLE));
             }
-            debugFileNames.load(is);
+            Properties fileNames = new Properties();
+            fileNames.load(is);
+            INSTANCE_NAMES.clear();
+            for (Map.Entry<Object, Object> entry : fileNames.entrySet()) {
+                INSTANCE_NAMES.put((String) entry.getKey(), (String) entry.getValue());
+            }
         } catch (Exception ex) {
             StdDebugFile.printError(DebugImpl.class.getSimpleName(), "Can't read debug files map. '. Please check the" +
                     " configuration file '" + DebugConstants.CONFIG_DEBUG_FILEMAP + "'.", ex);
@@ -350,4 +363,23 @@ public class DebugImpl implements IDebug {
         }
     }
 
+    private static final class WildcardComparator implements Comparator<String> {
+        @Override
+        public int compare(String s1, String s2) {
+            return wildCardMatch(s1, s2) ? 0 : stringCompare(s1, s2);
+        }
+
+        private int stringCompare(String s1, String s2) {
+            if (s1 == null || s2 == null) {
+                return s1 == null ? (s2 == null ? 0 : -1) : 1;
+            }
+            return s1.compareTo(s2);
+        }
+
+        private boolean wildCardMatch(String value, String pattern) {
+            return isNotEmpty(value) && isNotEmpty(pattern)
+                    && pattern.endsWith("*")
+                    && value.startsWith(pattern.substring(0, pattern.length() - 1));
+        }
+    }
 }

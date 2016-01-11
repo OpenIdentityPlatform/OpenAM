@@ -24,7 +24,7 @@
  *
  * $Id: Debug.java,v 1.6 2009/08/19 05:41:17 veiming Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  *
  */
 
@@ -201,10 +201,11 @@ public class Debug {
      */
     public static synchronized Debug getInstance(String debugName) {
 
-        Debug debug = (Debug) getDebugMap().get(debugName);
+        IDebug iDebug = getDebugProvider().getInstance(debugName);
+        Debug debug = (Debug) getDebugMap().get(iDebug.getName());
         if (debug == null) {
-            debug = new Debug(getDebugProvider().getInstance(debugName));
-            getDebugMap().put(debugName, debug);
+            debug = new Debug(iDebug);
+            getDebugMap().put(iDebug.getName(), debug);
         }
         return debug;
     }
