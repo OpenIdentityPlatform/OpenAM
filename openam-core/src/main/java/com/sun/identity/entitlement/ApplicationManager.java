@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationManager.java,v 1.11 2010/01/13 23:41:57 veiming Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -265,7 +265,7 @@ public final class ApplicationManager {
 
         Set<Application> appls = getApplications(adminSubject, realm);
         for (Application appl : appls) {
-            if (appl.getName().equals(name)) {
+            if (appl.getName().equalsIgnoreCase(name)) {
                 return appl;
             }
         }
@@ -275,7 +275,7 @@ public final class ApplicationManager {
 
         appls = getApplications(adminSubject, realm);
         for (Application appl : appls) {
-            if (appl.getName().equals(name)) {
+            if (appl.getName().equalsIgnoreCase(name)) {
                 return appl;
             }
         }
@@ -465,7 +465,7 @@ public final class ApplicationManager {
         String applName = application.getName();
 
         for (Application app : existingAppls) {
-            if (app.getName().equals(applName)) {
+            if (app.getName().equalsIgnoreCase(applName)) {
                 return false;
             }
         }
