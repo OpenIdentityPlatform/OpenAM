@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.am.sdk.common;
 
@@ -35,12 +35,16 @@ import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.sdk.AMObject;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.shared.debug.Debug;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
  * This class represents the value part stored in the AMCacheManager's cache.
@@ -74,26 +78,30 @@ public abstract class CacheBlockBase {
     private AMHashMap cacheEntries;
 
     // CacheBock representation entry DN
-    private String entryDN;
+    private final String entryDN;
 
-    private int objectType = AMObject.UNDETERMINED_OBJECT_TYPE; // Not known yet
+    private volatile int objectType = AMObject.UNDETERMINED_OBJECT_TYPE; // Not known yet
 
     private AMHashMap stringAttributes; // Stores all String attributes
 
     private AMHashMap byteAttributes; // Stores all byte attributes
 
-    private long lastModifiedTime = 0;
+    private volatile long lastModifiedTime = 0;
 
     // A true value here makes sures that timestamp is added the very first
     // time
-    private boolean isExpired = false; // indicates if the entry has expired
+    private volatile boolean isExpired = false; // indicates if the entry has expired
 
     // The Organization DN corresponding to this record
-    private String organizationDN = null; // Always pass a RFC lowercase
+    private volatile String organizationDN = null; // Always pass a RFC lowercase
                                             // string
 
     // Indicates if this Entry represents a valid DS Entry.
-    private boolean isValidEntry = true;
+    private volatile boolean isValidEntry = true;
+
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReadLock readLock = lock.readLock();
+    private final WriteLock writeLock = lock.writeLock();
 
     public abstract Debug getDebug();
 
@@ -121,37 +129,52 @@ public abstract class CacheBlockBase {
         this.organizationDN = orgDN;
     }
 
-    public synchronized void setExists(boolean exists) {
-        if (exists) {
-            cacheEntries = new AMHashMap();
-            stringAttributes = new AMHashMap(false);
-            byteAttributes = new AMHashMap(true);
+    public void setExists(boolean exists) {
+        writeLock.lock();
+        try {
+            if (exists) {
+                cacheEntries = new AMHashMap();
+                stringAttributes = new AMHashMap(false);
+                byteAttributes = new AMHashMap(true);
+            }
+            isValidEntry = exists;
+            updateLastModifiedTime();
+        } finally {
+            writeLock.unlock();
         }
-        isValidEntry = exists;
-        updateLastModifiedTime();
     }
 
-    private synchronized void setLastModifiedTime() {
+    private void setLastModifiedTime() {
         if (isEntryExpirationEnabled()) { // First time setup
             lastModifiedTime = System.currentTimeMillis();
         }
     }
 
-    private synchronized void updateLastModifiedTime() {
+    private void updateLastModifiedTime() {
         if (isEntryExpirationEnabled() && isExpired) {
             lastModifiedTime = System.currentTimeMillis();
             isExpired = false;
         }
     }
 
-    public synchronized void setObjectType(int type) {
-        objectType = type;
-        updateLastModifiedTime();
+    public void setObjectType(int type) {
+        writeLock.lock();
+        try {
+            objectType = type;
+            updateLastModifiedTime();
+        } finally {
+            writeLock.unlock();
+        }
     }
 
-    public synchronized void setOrganizationDN(String orgDN) {
-        organizationDN = orgDN;
-        updateLastModifiedTime();
+    public void setOrganizationDN(String orgDN) {
+        writeLock.lock();
+        try {
+            organizationDN = orgDN;
+            updateLastModifiedTime();
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     public String getOrganizationDN() {
@@ -183,13 +206,13 @@ public abstract class CacheBlockBase {
      * 
      * @return true if it represents a valid entry, false otherwise
      */
-    public synchronized boolean isExists() {
+    public boolean isExists() {
         // We cannot call expiredAndUpdated() here as it will change the
         // behaviour of the method. Hence it needs to called externally.
         return isValidEntry;
     }
 
-    public synchronized boolean hasExpiredAndUpdated() {
+    public boolean hasExpiredAndUpdated() {
         // We need to have the isExpired variable to make sure
         // the notifications are sent only once.
         if (isEntryExpirationEnabled() && !isExpired) { // Happens only if
@@ -220,168 +243,192 @@ public abstract class CacheBlockBase {
         return isExpired;
     }
 
-    public synchronized boolean hasCache(String principalDN) {
-        CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-        return (ce != null && !hasExpiredAndUpdated());
-    }
-
-    public synchronized boolean hasCompleteSet(String principalDN) {
-        CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-        boolean completeSet = false;
-        if (ce != null && !hasExpiredAndUpdated()) {
-            completeSet = ce.isCompleteSet();
+    public boolean hasCache(String principalDN) {
+        readLock.lock();
+        try {
+            CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
+            return (ce != null && !hasExpiredAndUpdated());
+        } finally {
+            readLock.unlock();
         }
-        return completeSet;
     }
 
-    public synchronized Map getAttributes(String principalDN, 
-            boolean byteValues) {
-        return (getAttributes(principalDN, null, byteValues));
+    public boolean hasCompleteSet(String principalDN) {
+        readLock.lock();
+        try {
+            CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
+            boolean completeSet = false;
+            if (ce != null && !hasExpiredAndUpdated()) {
+                completeSet = ce.isCompleteSet();
+            }
+            return completeSet;
+        } finally {
+            readLock.unlock();
+        }
     }
 
-    public synchronized Map getAttributes(String principalDN, Set attrNames,
-            boolean byteValues) {
+    public Map getAttributes(String principalDN, boolean byteValues) {
+        return getAttributes(principalDN, null, byteValues);
+    }
+
+    public Map getAttributes(String principalDN, Set attrNames, boolean byteValues) {
         Map attributes = new AMHashMap(byteValues);
 
-        // Get the cache entry for the principal
-        CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-        if (ce != null && !hasExpiredAndUpdated()) {
-            // Get the names of attributes that this principal can access
-            Set accessibleAttrs = null;
-            if (attrNames == null) {
-                accessibleAttrs = ce.getReadableAttrNames();
-            } else {
-                accessibleAttrs = ce.getReadableAttrNames(attrNames);
+        readLock.lock();
+        try {
+            // Get the cache entry for the principal
+            CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
+            if (ce != null && !hasExpiredAndUpdated()) {
+                // Get the names of attributes that this principal can access
+                Set accessibleAttrs = null;
+                if (attrNames == null) {
+                    accessibleAttrs = ce.getReadableAttrNames();
+                } else {
+                    accessibleAttrs = ce.getReadableAttrNames(attrNames);
+                }
+                // Get the attribute values from cache
+                if (!byteValues) {
+                    attributes = stringAttributes.getCopy(accessibleAttrs);
+                    if (ce.isCompleteSet()
+                            && !attributes.keySet().containsAll(accessibleAttrs)
+                            && !byteAttributes.isEmpty()) {
+                        // Since the flag for complete set does not distingusih
+                        // between string and binary attributes, check for
+                        // missing attributes in byteAttributes
+                        for (Iterator items = accessibleAttrs.iterator(); items
+                                .hasNext(); ) {
+                            Object key = items.next();
+                            if (!attributes.containsKey(key)
+                                    && byteAttributes.containsKey(key)) {
+                                byte[][] values = (byte[][]) byteAttributes
+                                        .get(key);
+                                Set valueSet = new HashSet(values.length * 2);
+                                for (int i = 0; i < values.length; i++) {
+                                    try {
+                                        valueSet.add(new String(values[i], "UTF8"));
+                                    } catch (UnsupportedEncodingException uee) {
+                                        // Use default encoding
+                                        valueSet.add(new String(values[i]));
+                                    }
+                                }
+                                attributes.put(key, valueSet);
+                            }
+                        }
+                    }
+                } else {
+                    attributes = byteAttributes.getCopy(accessibleAttrs);
+                    if (ce.isCompleteSet()
+                            && !attributes.keySet().containsAll(accessibleAttrs)
+                            && !stringAttributes.isEmpty()) {
+                        // Since the flag for complete set does not distingusih
+                        // between string and binary attributes, check for
+                        // missing attributes in stringAttributes
+                        for (Iterator items = accessibleAttrs.iterator(); items
+                                .hasNext(); ) {
+                            Object key = items.next();
+                            if (!attributes.containsKey(key)
+                                    && stringAttributes.containsKey(key)) {
+                                Set valueSet = (Set) stringAttributes.get(key);
+                                byte[][] values = new byte[valueSet.size()][];
+                                int item = 0;
+                                for (Iterator vals = valueSet.iterator(); vals
+                                        .hasNext(); ) {
+                                    String val = (String) vals.next();
+                                    values[item] = new byte[val.length()];
+                                    byte[] src = null;
+                                    try {
+                                        src = val.getBytes("UTF8");
+                                    } catch (UnsupportedEncodingException uee) {
+                                        // Use default encoding
+                                        src = val.getBytes();
+                                    }
+                                    System.arraycopy(src, 0, values[item], 0, val
+                                            .length());
+                                    item++;
+                                }
+                                attributes.put(key, values);
+                            }
+                        }
+                    }
+                }
+
+                // Get the names of attributes that are invalid/not accessible
+                Set inAccessibleAttrs = ce.getInaccessibleAttrNames(attrNames);
+                ((AMHashMap) attributes).addEmptyValues(inAccessibleAttrs);
             }
-            // Get the attribute values from cache
+
+            return attributes;
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public void putAttributes(String principalDN, Map attributes,
+            Set inAccessibleAttrNames, boolean isCompleteSet, boolean byteValues) {
+        writeLock.lock();
+        try {
+            CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
+            if (ce == null) {
+                ce = new CacheEntry();
+                cacheEntries.put(principalDN, ce);
+            }
+
+            // Copy only the attributes in the common place. Store the invalid/
+            // unreadable attrs per principal.
             if (!byteValues) {
-                attributes = stringAttributes.getCopy(accessibleAttrs);
-                if (ce.isCompleteSet()
-                        && !attributes.keySet().containsAll(accessibleAttrs)
-                        && !byteAttributes.isEmpty()) {
-                    // Since the flag for complete set does not distingusih
-                    // between string and binary attributes, check for
-                    // missing attributes in byteAttributes
-                    for (Iterator items = accessibleAttrs.iterator(); items
-                            .hasNext();) {
-                        Object key = items.next();
-                        if (!attributes.containsKey(key)
-                                && byteAttributes.containsKey(key)) {
-                            byte[][] values = (byte[][]) byteAttributes
-                                    .get(key);
-                            Set valueSet = new HashSet(values.length * 2);
-                            for (int i = 0; i < values.length; i++) {
-                                try {
-                                    valueSet.add(new String(values[i], "UTF8"));
-                                } catch (UnsupportedEncodingException uee) {
-                                    // Use default encoding
-                                    valueSet.add(new String(values[i]));
-                                }
-                            }
-                            attributes.put(key, valueSet);
-                        }
-                    }
-                }
+                Set attrsWithValues = stringAttributes.copyValuesOnly(attributes);
+                ce.putAttributes(attrsWithValues, inAccessibleAttrNames,
+                        isCompleteSet);
             } else {
-                attributes = byteAttributes.getCopy(accessibleAttrs);
-                if (ce.isCompleteSet()
-                        && !attributes.keySet().containsAll(accessibleAttrs)
-                        && !stringAttributes.isEmpty()) {
-                    // Since the flag for complete set does not distingusih
-                    // between string and binary attributes, check for
-                    // missing attributes in stringAttributes
-                    for (Iterator items = accessibleAttrs.iterator(); items
-                            .hasNext();) {
-                        Object key = items.next();
-                        if (!attributes.containsKey(key)
-                                && stringAttributes.containsKey(key)) {
-                            Set valueSet = (Set) stringAttributes.get(key);
-                            byte[][] values = new byte[valueSet.size()][];
-                            int item = 0;
-                            for (Iterator vals = valueSet.iterator(); vals
-                                    .hasNext();) {
-                                String val = (String) vals.next();
-                                values[item] = new byte[val.length()];
-                                byte[] src = null;
-                                try {
-                                    src = val.getBytes("UTF8");
-                                } catch (UnsupportedEncodingException uee) {
-                                    // Use default encoding
-                                    src = val.getBytes();
-                                }
-                                System.arraycopy(src, 0, values[item], 0, val
-                                        .length());
-                                item++;
-                            }
-                            attributes.put(key, values);
-                        }
-                    }
-                }
+                Set attrsWithValues = byteAttributes.copyValuesOnly(attributes);
+                ce.putAttributes(attrsWithValues, inAccessibleAttrNames,
+                        isCompleteSet);
             }
 
-            // Get the names of attributes that are invalid/not accessible
-            Set inAccessibleAttrs = ce.getInaccessibleAttrNames(attrNames);
-            ((AMHashMap) attributes).addEmptyValues(inAccessibleAttrs);
-        }
-
-        return attributes;
-    }
-
-    public synchronized void putAttributes(String principalDN, Map attributes,
-            Set inAccessibleAttrNames, boolean isCompleteSet, 
-            boolean byteValues) {
-        CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-        if (ce == null) {
-            ce = new CacheEntry();
-            cacheEntries.put(principalDN, ce);
-        }
-
-        // Copy only the attributes in the common place. Store the invalid/
-        // unreadable attrs per principal.
-        if (!byteValues) {
-            Set attrsWithValues = stringAttributes.copyValuesOnly(attributes);
-            ce.putAttributes(attrsWithValues, inAccessibleAttrNames,
-                    isCompleteSet);
-        } else {
-            Set attrsWithValues = byteAttributes.copyValuesOnly(attributes);
-            ce.putAttributes(attrsWithValues, inAccessibleAttrNames,
-                    isCompleteSet);
-        }
-
-        updateLastModifiedTime();
-    }
-
-    public synchronized void removeAttributes(String principalDN) {
-        CacheEntry ce = (CacheEntry) cacheEntries.remove(principalDN);
-        if (ce != null) {
-            ce.clear(); // To remove all used references
+            updateLastModifiedTime();
+        } finally {
+            writeLock.unlock();
         }
     }
 
-    public synchronized void removeAttributes(Set attrNames) {
+    public void removeAttributes(String principalDN) {
+        writeLock.lock();
+        try {
+            CacheEntry ce = (CacheEntry) cacheEntries.remove(principalDN);
+            if (ce != null) {
+                ce.clear(); // To remove all used references
+            }
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public void removeAttributes(Set attrNames) {
         if ((attrNames != null) && (!attrNames.isEmpty())) {
-            stringAttributes.removeKeys(attrNames);
-            byteAttributes.removeKeys(attrNames);
-            // Remove them from the list of readble attributes of each principal
-            Iterator itr = cacheEntries.keySet().iterator();
-            while (itr.hasNext()) {
-                String principalDN = (String) itr.next();
-                removeAttributes(principalDN, attrNames);
+            writeLock.lock();
+            try {
+                stringAttributes.removeKeys(attrNames);
+                byteAttributes.removeKeys(attrNames);
+                // Remove them from the list of readble attributes of each principal
+                Iterator itr = cacheEntries.keySet().iterator();
+                while (itr.hasNext()) {
+                    String principalDN = (String) itr.next();
+                    removeAttributes(principalDN, attrNames);
+                }
+            } finally {
+                writeLock.unlock();
             }
         }
     }
 
-    private synchronized void removeAttributes(String principalDN, 
-            Set attrNames) {
+    private void removeAttributes(String principalDN, Set attrNames) {
         CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
         if (ce != null) {
             ce.removeAttributeNames(attrNames);
         }
     }
 
-    public synchronized void replaceAttributes(String principalDN,
-            Map sAttributes, Map bAttributes) {
-
+    public void replaceAttributes(String principalDN, Map sAttributes, Map bAttributes) {
         if (sAttributes != null && !sAttributes.isEmpty()) {
             putAttributes(principalDN, sAttributes, null, false, false);
         } else if (bAttributes != null && !bAttributes.isEmpty()) {
@@ -393,18 +440,23 @@ public abstract class CacheBlockBase {
      * Should be cleared, only if the entry is still valid only the data has
      * changed. If entry has been deleted then should be removed.
      */
-    public synchronized void clear() {
-        if (isValidEntry) { // Clear only if it is a valid entry
-            // If entry is not valid then all these maps will be null
-            stringAttributes.clear();
-            byteAttributes.clear();
-            cacheEntries.clear();
+    public void clear() {
+        writeLock.lock();
+        try {
+            if (isValidEntry) { // Clear only if it is a valid entry
+                // If entry is not valid then all these maps will be null
+                stringAttributes.clear();
+                byteAttributes.clear();
+                cacheEntries.clear();
+            }
+            // Don't have to change isValidEntry as it would have been updated if
+            // the entry was deleted. Also do not change the object type here
+            // it is need. Ideally the object type won't change for a DN
+            lastModifiedTime = 0; // => expired
+            organizationDN = null; // Could have been renamed
+        } finally {
+            writeLock.unlock();
         }
-        // Don't have to change isValidEntry as it would have been updated if
-        // the entry was deleted. Also do not change the object type here
-        // it is need. Ideally the object type won't change for a DN
-        lastModifiedTime = 0; // => expired
-        organizationDN = null; // Could have been renamed
     }
 
     public String toString() {
