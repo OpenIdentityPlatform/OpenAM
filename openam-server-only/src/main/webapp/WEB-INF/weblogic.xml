@@ -12,7 +12,7 @@
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
-  ~ Copyright 2015 ForgeRock AS.
+  ~ Copyright 2015-2016 ForgeRock AS.
   -->
 <weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -20,6 +20,7 @@
      http://xmlns.oracle.com/weblogic/weblogic-web-app/1.3/weblogic-web-app.xsd">
     <context-root>/openam</context-root>
     <container-descriptor>
+        <container-initializer-enabled>false</container-initializer-enabled>
         <prefer-application-packages>
             <!-- Use bundled Jersey library -->
             <package-name>com.sun.jersey.*</package-name>
