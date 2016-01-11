@@ -77,7 +77,7 @@ public class OpenIDConnectDiscovery extends ServerResource {
 
         try {
             final String deploymentUrl =
-                    baseUrlProviderFactory.get(realm).getURL(ServletUtils.getRequest(getRequest()));
+                    baseUrlProviderFactory.get(realm).getRootURL(ServletUtils.getRequest(getRequest()));
 
             final Map<String, Object> response = providerDiscovery.discover(resource, rel, deploymentUrl, request);
 

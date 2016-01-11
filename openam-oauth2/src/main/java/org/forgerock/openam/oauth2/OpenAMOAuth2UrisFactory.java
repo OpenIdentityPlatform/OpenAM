@@ -16,10 +16,11 @@
 
 package org.forgerock.openam.oauth2;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -32,7 +33,9 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
+import org.forgerock.openam.services.baseurl.BaseURLProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.services.baseurl.InvalidBaseUrlException;
 import org.forgerock.services.context.Context;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
@@ -42,7 +45,7 @@ import org.restlet.ext.servlet.ServletUtils;
  */
 public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
 
-    private final Map<RealmInfo, OAuth2Uris> providerSettingsMap = new ConcurrentHashMap<>();
+    private final Map<String, OAuth2Uris> urisMap = new ConcurrentHashMap<>();
     private final OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
     private final BaseURLProviderFactory baseURLProviderFactory;
 
@@ -66,11 +69,10 @@ public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
      * @return A UmaProviderSettings instance.
      */
     @Override
-    public OAuth2Uris get(final OAuth2Request request) throws NotFoundException {
+    public OAuth2Uris get(final OAuth2Request request) throws NotFoundException, ServerException {
         RealmInfo realmInfo = request.getParameter(RestletRealmRouter.REALM_INFO);
         HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
-        String baseUrlPattern = baseURLProviderFactory.get(realmInfo.getAbsoluteRealm()).getURL(req);
-        return get(realmInfo, baseUrlPattern);
+        return get(req, realmInfo);
     }
 
     /**
@@ -81,49 +83,63 @@ public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
      * @return A UmaProviderSettings instance.
      */
     @Override
-    public OAuth2Uris get(Context context, RealmInfo realmInfo) throws NotFoundException {
-        String baseUrlPattern = baseURLProviderFactory.get(realmInfo.getAbsoluteRealm()).getURL(context.asContext(HttpContext.class));
-        return get(realmInfo, baseUrlPattern);
+    public OAuth2Uris get(Context context, RealmInfo realmInfo) throws NotFoundException, ServerException {
+        String absoluteRealm = realmInfo.getAbsoluteRealm();
+        BaseURLProvider baseURLProvider = baseURLProviderFactory.get(absoluteRealm);
+        String baseUrl;
+        try {
+            baseUrl = baseURLProvider.getRealmURL(context.asContext(HttpContext.class), "/oauth2", absoluteRealm);
+        } catch (InvalidBaseUrlException e) {
+            throw new ServerException("Configuration error");
+        }
+        return get(absoluteRealm, baseUrl);
     }
 
     @Override
-    public OAuth2Uris get(HttpServletRequest request, RealmInfo realmInfo) throws NotFoundException {
-        String baseUrlPattern = baseURLProviderFactory.get(realmInfo.getAbsoluteRealm()).getURL(request);
-        return get(realmInfo, baseUrlPattern);
-    }
-
-    private OAuth2Uris get(RealmInfo realmInfo, String baseUrlPattern) throws NotFoundException {
-        OAuth2Uris providerSettings = providerSettingsMap.get(realmInfo);
-        if (providerSettings == null) {
-            OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realmInfo.getAbsoluteRealm());
-            providerSettings = getOAuth2Uris(realmInfo, baseUrlPattern, oAuth2ProviderSettings);
+    public OAuth2Uris get(HttpServletRequest request, RealmInfo realmInfo) throws NotFoundException, ServerException {
+        String absoluteRealm = realmInfo.getAbsoluteRealm();
+        BaseURLProvider baseURLProvider = baseURLProviderFactory.get(absoluteRealm);
+        String baseUrl;
+        try {
+            baseUrl = baseURLProvider.getRealmURL(request, "/oauth2", absoluteRealm);
+        } catch (InvalidBaseUrlException e) {
+            throw new ServerException("Configuration error");
         }
-        return providerSettings;
+        return get(absoluteRealm, baseUrl);
     }
 
-    private OAuth2Uris getOAuth2Uris(RealmInfo realmInfo, String baseUrlPattern,
-            OAuth2ProviderSettings oAuth2ProviderSettings) throws NotFoundException {
-        OAuth2Uris providerSettings = new OAuth2UrisImpl(baseUrlPattern, realmInfo, oAuth2ProviderSettings);
-        providerSettingsMap.put(realmInfo, providerSettings);
-        return providerSettings;
+    private OAuth2Uris get(String absoluteRealm, String baseUrlPattern) throws NotFoundException {
+        OAuth2Uris uris = urisMap.get(baseUrlPattern);
+        if (uris == null) {
+            uris = getOAuth2Uris(absoluteRealm, baseUrlPattern);
+        }
+        return uris;
+    }
+
+    private synchronized OAuth2Uris getOAuth2Uris(String absoluteRealm, String baseUrlPattern)
+            throws NotFoundException {
+        OAuth2Uris uris = urisMap.get(baseUrlPattern);
+        if (uris != null) {
+            return uris;
+        }
+        OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(absoluteRealm);
+        uris = new OAuth2UrisImpl(baseUrlPattern, absoluteRealm, oAuth2ProviderSettings);
+        urisMap.put(baseUrlPattern, uris);
+        return uris;
     }
 
     static final class OAuth2UrisImpl implements OAuth2Uris {
 
         private final String deploymentUrl;
-        private final RealmInfo realmInfo;
+        private final String absoluteRealm;
         private final OAuth2ProviderSettings oAuth2ProviderSettings;
         private final String baseUrl;
 
-        OAuth2UrisImpl(String deploymentUrl, RealmInfo realmInfo, OAuth2ProviderSettings oAuth2ProviderSettings) {
+        OAuth2UrisImpl(String deploymentUrl, String absoluteRealm, OAuth2ProviderSettings oAuth2ProviderSettings) {
             this.deploymentUrl = deploymentUrl;
-            this.realmInfo = realmInfo;
+            this.absoluteRealm = absoluteRealm;
             this.oAuth2ProviderSettings = oAuth2ProviderSettings;
-            String baseUrl = deploymentUrl + "/oauth2" + realmInfo.getRealmSubPath();
-            if (baseUrl.endsWith("/")) {
-                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-            }
-            this.baseUrl = baseUrl;
+            this.baseUrl = deploymentUrl;
         }
 
         @Override
@@ -148,7 +164,7 @@ public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
 
         @Override
         public String getResourceSetRegistrationPolicyEndpoint(String resourceSetId) {
-            return deploymentUrl + "/XUI/?realm=" + realmInfo.getAbsoluteRealm() + "#uma/share/" + resourceSetId;
+            return deploymentUrl + "/XUI/?realm=" + absoluteRealm + "#uma/share/" + resourceSetId;
         }
 
         @Override

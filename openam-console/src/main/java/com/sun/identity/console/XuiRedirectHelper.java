@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.console;
@@ -50,7 +50,7 @@ public final class XuiRedirectHelper {
      */
     public static void redirectToXui(HttpServletRequest request, String redirectRealm, String xuiHash) {
         String deploymentUri = InjectorHolder.getInstance(BaseURLProviderFactory.class).get(redirectRealm)
-                .getURL(request);
+                .getRootURL(request);
         String redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri, xuiHash);
         RequestContext rc = RequestManager.getRequestContext();
         try {

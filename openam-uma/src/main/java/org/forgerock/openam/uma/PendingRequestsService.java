@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -121,7 +121,7 @@ public class PendingRequestsService {
             Pair<String, String> template = pendingRequestEmailTemplate.getCreationTemplate(resourceOwnerId, realm);
             try {
                 String scopesString = pendingRequestEmailTemplate.buildScopeString(scopes, resourceOwnerId, realm);
-                String baseUrl = baseURLProviderFactory.get(realm).getURL(httpRequest);
+                String baseUrl = baseURLProviderFactory.get(realm).getRootURL(httpRequest);
                 emailService.email(realm, resourceOwnerId, template.getFirst(),
                         MessageFormat.format(template.getSecond(), requestingPartyId, resourceSetName,
                                 scopesString, baseUrl, pendingRequest.getId()));

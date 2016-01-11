@@ -11,16 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.services.baseurl;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.iplanet.sso.SSOException;
+import com.sun.identity.idm.IdRepoException;
 
 /**
  * Provides the base URL for the OpenAM instance. Subclasses may use the HttpServletRequest
@@ -28,10 +38,16 @@ import org.forgerock.openam.utils.StringUtils;
  */
 public abstract class BaseURLProvider {
 
+    private final Logger logger = LoggerFactory.getLogger("amRequestUtils");
     private String contextPath;
+    private CoreWrapper coreWrapper;
 
     void setContextPath(String contextPath) {
         this.contextPath = contextPath;
+    }
+
+    void setCoreWrapper(CoreWrapper coreWrapper) {
+        this.coreWrapper = coreWrapper;
     }
 
     /**
@@ -60,9 +76,8 @@ public abstract class BaseURLProvider {
      * @param request The current request.
      * @return The base URL. This will never end in a / character.
      */
-    public String getURL(HttpServletRequest request) {
+    public String getRootURL(HttpServletRequest request) {
         return formatURL(getBaseURL(request));
-
     }
 
     /**
@@ -70,8 +85,38 @@ public abstract class BaseURLProvider {
      * @param context The current http context.
      * @return The base URL. This will never end in a / character.
      */
-    public String getURL(HttpContext context) {
+    public String getRootURL(HttpContext context) {
         return formatURL(getBaseURL(context));
+    }
+
+    /**
+     * Gets the base URL to use in the response to the request.
+     * @param request The current request.
+     * @param basePath The base path before the relative subrealm path, e.g. {@code /json}, {@code /uma},
+     * {@code /oauth2}, etc.
+     * @param realm The realm the URL should target. Should be an absolute realm path, starting with a /.
+     * @return The base URL. This will never end in a / character.
+     * @throws InvalidBaseUrlException When the realm is not a subrealm or the same realm as that deduced from
+     * the root URL for the base URL provider.
+     */
+    public String getRealmURL(HttpServletRequest request, String basePath, String realm) throws InvalidBaseUrlException {
+        String rootUrl = getRootURL(request);
+        return rootUrl + realmSubPath(realm, basePath, rootUrl);
+    }
+
+    /**
+     * Gets the base URL to use in the http context.
+     * @param context The current http context.
+     * @param basePath The base path before the relative subrealm path, e.g. {@code /json}, {@code /uma},
+     * {@code /oauth2}, etc.
+     * @param realm The realm the URL should target. Should be an absolute realm path, starting with a /.
+     * @return The base URL. This will never end in a / character.
+     * @throws InvalidBaseUrlException When the realm is not a subrealm or the same realm as that deduced from
+     * the root URL for the base URL provider.
+     */
+    public String getRealmURL(HttpContext context, String basePath, String realm) throws InvalidBaseUrlException {
+        String rootUrl = getRootURL(context);
+        return rootUrl + realmSubPath(realm, basePath, rootUrl);
     }
 
     /**
@@ -87,6 +132,42 @@ public abstract class BaseURLProvider {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
         return baseUrl;
+    }
+
+    private String realmSubPath(String realm, String basePath, String rootUrl) throws InvalidBaseUrlException {
+        Reject.ifFalse(basePath.startsWith("/"), "basePath must start with a / character");
+        String hostName;
+        try {
+            hostName = new URL(rootUrl).getHost();
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("URL from base url provider is malformed", e);
+        }
+        try {
+            String orgDN = coreWrapper.getOrganization(coreWrapper.getAdminToken(), hostName);
+            String dnsRealmPath = coreWrapper.convertOrgNameToRealmName(orgDN);
+            if (!realm.startsWith(dnsRealmPath)) {
+                logger.error("BaseURLProvider Configuration error: Realm {} is not a subrealm or same as {}, " +
+                        "from base url provider hostname {} as dns alias", realm,  dnsRealmPath, hostName);
+                throw new InvalidBaseUrlException("Realm " + realm + " is not a subrealm or same as " + dnsRealmPath);
+            }
+            String subrealmPath = realm.substring(dnsRealmPath.length());
+            if (subrealmPath.length() == 0) {
+                return basePath;
+            }
+            if (!subrealmPath.startsWith("/")) {
+                logger.error("BaseURLProvider Configuration error: Realm {} is not a subrealm or same as {}, " +
+                        "from base url provider hostname {}", realm,  dnsRealmPath, hostName);
+                throw new InvalidBaseUrlException("Realm " + realm + " is not a subrealm or same as " + dnsRealmPath);
+            }
+            if (subrealmPath.endsWith("/")) {
+                subrealmPath = subrealmPath.substring(0, subrealmPath.length() - 1);
+            }
+            return basePath + subrealmPath;
+        } catch (IdRepoException | SSOException e) {
+            logger.error("BaseURLProvider Configuration error: Realm does not exist for dns alias " +
+                    "from base url provider hostname {}", hostName);
+            throw new InvalidBaseUrlException("Realm does not exist: " + hostName, e);
+        }
     }
 
 }

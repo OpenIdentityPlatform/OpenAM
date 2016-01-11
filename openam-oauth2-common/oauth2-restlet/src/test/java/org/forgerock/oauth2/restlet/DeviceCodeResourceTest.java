@@ -190,7 +190,7 @@ public class DeviceCodeResourceTest {
     private void mockBaseUrlProvider() {
         BaseURLProvider urlProvider = mock(BaseURLProvider.class);
         given(baseURLProviderFactory.get("REALM")).willReturn(urlProvider);
-        given(urlProvider.getURL(any(HttpServletRequest.class))).willReturn("BASE_URL");
+        given(urlProvider.getRootURL(any(HttpServletRequest.class))).willReturn("BASE_URL");
     }
 
     private void mockProviderSettings() throws ServerException {

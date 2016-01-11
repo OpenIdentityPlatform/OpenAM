@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.services.baseurl;
@@ -53,7 +53,7 @@ public class ForwardedHeaderBaseURLProviderTest {
         provider.setContextPath("");
 
         // When
-        String url = provider.getURL(request);
+        String url = provider.getRootURL(request);
 
         // Then
         assertThat(url).isEqualTo("blah=;proto://fred=;quotetest");
@@ -70,7 +70,7 @@ public class ForwardedHeaderBaseURLProviderTest {
         provider.setContextPath("/openam");
 
         // When
-        String url = provider.getURL(request);
+        String url = provider.getRootURL(request);
 
         // Then
         assertThat(url).isEqualTo("blah=;proto://fred=;quotetest/openam");
@@ -83,7 +83,7 @@ public class ForwardedHeaderBaseURLProviderTest {
         when(request.getHeaders("Forwarded")).thenReturn(null);
 
         // When
-        String url = provider.getURL(request);
+        String url = provider.getRootURL(request);
 
         // Then - illegal argument exception;
     }
@@ -95,7 +95,7 @@ public class ForwardedHeaderBaseURLProviderTest {
         when(request.getHeaders("Forwarded")).thenReturn(Collections.enumeration(Arrays.asList("host=\"fred=;quotetest\"")));
 
         // When
-        String url = provider.getURL(request);
+        String url = provider.getRootURL(request);
 
         // Then - illegal argument exception;
     }
@@ -113,7 +113,7 @@ public class ForwardedHeaderBaseURLProviderTest {
         provider.setContextPath("");
 
         // When
-        String url = provider.getURL(httpContext);
+        String url = provider.getRootURL(httpContext);
 
         // Then
         assertThat(url).isEqualTo("http://fred");
@@ -132,7 +132,7 @@ public class ForwardedHeaderBaseURLProviderTest {
         provider.setContextPath("/openam");
 
         // When
-        String url = provider.getURL(httpContext);
+        String url = provider.getRootURL(httpContext);
 
         // Then
         assertThat(url).isEqualTo("http://fred/openam");
@@ -146,7 +146,7 @@ public class ForwardedHeaderBaseURLProviderTest {
                 field(BaseURLConstants.ATTR_PARAMETERS, Collections.emptyMap()))), null);
 
         // When
-        String url = provider.getURL(httpContext);
+        String url = provider.getRootURL(httpContext);
 
         // Then - illegal argument exception;
     }
@@ -164,7 +164,7 @@ public class ForwardedHeaderBaseURLProviderTest {
         provider.setContextPath("");
 
         // When
-        String url = provider.getURL(httpContext);
+        String url = provider.getRootURL(httpContext);
 
         // Then - illegal argument exception;
     }

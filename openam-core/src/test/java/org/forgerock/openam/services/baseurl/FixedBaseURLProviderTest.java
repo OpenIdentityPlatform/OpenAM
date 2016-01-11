@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.services.baseurl;
@@ -55,7 +55,7 @@ public class FixedBaseURLProviderTest {
         provider.setContextPath("");
 
         // When
-        String url = provider.getURL(mock(HttpServletRequest.class));
+        String url = provider.getRootURL(mock(HttpServletRequest.class));
 
         // Then
         assertThat(url).isEqualTo("fred");
@@ -73,7 +73,7 @@ public class FixedBaseURLProviderTest {
         when(request.getContextPath()).thenReturn("/fred");
 
         // When
-        String url = provider.getURL(request);
+        String url = provider.getRootURL(request);
 
         // Then
         assertThat(url).isEqualTo("fred/openam");

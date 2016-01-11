@@ -131,7 +131,7 @@ public class DeviceCodeResource extends ServerResource {
             if (StringUtils.isBlank(verificationUrl)) {
                 final HttpServletRequest servletRequest = ServletUtils.getRequest(restletRequest);
                 final String realm = request.getParameter(OAuth2Constants.Custom.REALM);
-                verificationUrl = baseURLProviderFactory.get(realm).getURL(servletRequest) + "/oauth2/device/user";
+                verificationUrl = baseURLProviderFactory.get(realm).getRootURL(servletRequest) + "/oauth2/device/user";
             }
             result.put(VERIFICATION_URL, verificationUrl);
 

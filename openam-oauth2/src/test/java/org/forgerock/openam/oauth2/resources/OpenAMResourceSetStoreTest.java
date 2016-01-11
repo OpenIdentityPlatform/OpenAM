@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.resources;
@@ -51,7 +51,7 @@ public class OpenAMResourceSetStoreTest {
 
     @BeforeMethod
     @SuppressWarnings("unchecked")
-    public void setup() throws NotFoundException {
+    public void setup() throws Exception {
 
         dataStore = mock(TokenDataStore.class);
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);

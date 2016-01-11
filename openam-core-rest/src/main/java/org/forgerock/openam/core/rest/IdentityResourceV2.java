@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest;
@@ -346,7 +346,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
             // Get full deployment URL
             HttpContext header = context.asContext(HttpContext.class);
-            String baseURL = baseURLProviderFactory.get(realm).getURL(header);
+            String baseURL = baseURLProviderFactory.get(realm).getRootURL(header);
 
             // Get the email address provided from registration page
             emailAddress = jVal.get(EMAIL).asString();
@@ -774,7 +774,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 // Get full deployment URL
                 HttpContext header = context.asContext(HttpContext.class);
 
-                String baseURL = baseURLProviderFactory.get(realm).getURL(header);
+                String baseURL = baseURLProviderFactory.get(realm).getRootURL(header);
 
                 String subject = jsonBody.get("subject").asString();
                 String message = jsonBody.get("message").asString();

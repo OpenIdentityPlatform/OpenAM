@@ -27,7 +27,6 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.routing.Redirector;
 import org.slf4j.Logger;
@@ -133,7 +132,7 @@ public class ExceptionHandler {
         final Map<String, String> data = new HashMap<>(exception.asMap());
         final String realm = requestFactory.create(request).getParameter("realm");
         data.put("realm", realm);
-        data.put("baseUrl", baseURLProviderFactory.get(realm).getURL(ServletUtils.getRequest(request)));
+        data.put("baseUrl", baseURLProviderFactory.get(realm).getRootURL(ServletUtils.getRequest(request)));
         response.setEntity(representation.getRepresentation(context, "page", "error.ftl", data));
     }
 

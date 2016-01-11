@@ -196,7 +196,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         Map<String, String> dataModel = new HashMap<>();
         dataModel.put("errorCode", errorCode);
         dataModel.put("baseUrl", baseURLProviderFactory.get(request.<String>getParameter("realm"))
-                .getURL(ServletUtils.getRequest(getRequest())));
+                .getRootURL(ServletUtils.getRequest(getRequest())));
         List<String> locale = new ArrayList<>();
         for (Preference<Language> language : getRequest().getClientInfo().getAcceptedLanguages()) {
             locale.add(language.getMetadata().getName());

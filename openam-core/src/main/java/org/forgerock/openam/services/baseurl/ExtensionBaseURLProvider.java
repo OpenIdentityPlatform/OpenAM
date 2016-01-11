@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.services.baseurl;
@@ -40,13 +40,13 @@ public class ExtensionBaseURLProvider extends BaseURLProvider {
     }
 
     @Override
-    public String getURL(HttpServletRequest request) {
-        return delegate.getURL(request);
+    public String getRootURL(HttpServletRequest request) {
+        return delegate.getRootURL(request);
     }
 
     @Override
-    public String getURL(HttpContext context) {
-        return delegate.getURL(context);
+    public String getRootURL(HttpContext context) {
+        return delegate.getRootURL(context);
     }
 
     @Override

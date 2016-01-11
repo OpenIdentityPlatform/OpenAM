@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.services.baseurl;
@@ -53,7 +53,7 @@ public class XForwardedHeadersBaseURLProviderTest {
         provider.setContextPath("");
 
         // When
-        String url = provider.getURL(request);
+        String url = provider.getRootURL(request);
 
         // Then
         assertThat(url).isEqualTo("http://fred");
@@ -70,7 +70,7 @@ public class XForwardedHeadersBaseURLProviderTest {
         provider.setContextPath("/openam");
 
         // When
-        String url = provider.getURL(request);
+        String url = provider.getRootURL(request);
 
         // Then
         assertThat(url).isEqualTo("http://fred:8080/openam");
@@ -89,7 +89,7 @@ public class XForwardedHeadersBaseURLProviderTest {
         provider.setContextPath("");
 
         // When
-        String url = provider.getURL(httpContext);
+        String url = provider.getRootURL(httpContext);
 
         // Then
         assertThat(url).isEqualTo("http://fred");
@@ -108,7 +108,7 @@ public class XForwardedHeadersBaseURLProviderTest {
         provider.setContextPath("/openam");
 
         // When
-        String url = provider.getURL(httpContext);
+        String url = provider.getRootURL(httpContext);
 
         // Then
         assertThat(url).isEqualTo("http://fred:8080/openam");

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.services.baseurl;
@@ -31,6 +31,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletContext;
+
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.core.guice.ServletContextCache;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 
@@ -49,10 +51,13 @@ public class BaseURLProviderFactory {
 
     private final Debug debug = Debug.getInstance("amBaseURL");
     private final Map<String, BaseURLProvider> providers = new ConcurrentHashMap<String, BaseURLProvider>();
+    private final CoreWrapper coreWrapper;
 
     @Inject
-    public BaseURLProviderFactory(@Named(ServletContextCache.CONTEXT_REFERENCE) ServletContext servletContext) {
+    public BaseURLProviderFactory(@Named(ServletContextCache.CONTEXT_REFERENCE) ServletContext servletContext,
+            CoreWrapper coreWrapper) {
         this.servletContext = servletContext;
+        this.coreWrapper = coreWrapper;
         addListener();
     }
 
@@ -88,12 +93,10 @@ public class BaseURLProviderFactory {
                     provider = new RequestValuesBaseURLProvider();
                     provider.setContextPath(servletContext.getContextPath());
                 }
+                provider.setCoreWrapper(coreWrapper);
 
                 providers.put(realmDN, provider);
-            } catch (SMSException e) {
-                debug.error("Unable to access BaseURL config for realm {}", realmDN, e);
-                throw new IllegalStateException(e);
-            } catch (SSOException e) {
+            } catch (SMSException | SSOException e) {
                 debug.error("Unable to access BaseURL config for realm {}", realmDN, e);
                 throw new IllegalStateException(e);
             }
@@ -138,6 +141,8 @@ public class BaseURLProviderFactory {
                 String serviceComponent, int type) {
             switch(type) {
                 case ServiceListener.ADDED:
+                    debug.message("BaseURLProviderFactory: Removing stale service configuration state for realm {}", orgName);
+                    providers.remove(DNMapper.orgNameToDN(orgName));
                     break;
                 case ServiceListener.MODIFIED:
                     debug.message("BaseURLProviderFactory: Removing stale service configuration state for realm {}", orgName);

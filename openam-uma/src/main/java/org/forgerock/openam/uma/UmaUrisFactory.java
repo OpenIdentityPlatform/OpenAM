@@ -16,13 +16,13 @@
 
 package org.forgerock.openam.uma;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.inject.Singleton;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2Uris;
@@ -34,9 +34,12 @@ import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.services.baseurl.InvalidBaseUrlException;
 import org.forgerock.services.context.Context;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
+
+import com.google.inject.Singleton;
 
 /**
  * <p>A factory for creating/retrieving UmaUris instances.</p>
@@ -46,7 +49,7 @@ import org.restlet.ext.servlet.ServletUtils;
 @Singleton
 public class UmaUrisFactory {
 
-    private final Map<RealmInfo, UmaUris> providerSettingsMap = new HashMap<>();
+    private final Map<String, UmaUris> urisMap = new HashMap<>();
     private final OAuth2UrisFactory<RealmInfo> oAuth2UriFactory;
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final BaseURLProviderFactory baseURLProviderFactory;
@@ -74,11 +77,11 @@ public class UmaUrisFactory {
      * @param req The Restlet request.
      * @return A UmaProviderSettings instance.
      */
-    UmaUris get(Request req) throws NotFoundException {
+    UmaUris get(Request req) throws NotFoundException, ServerException {
         return get(new RestletOAuth2Request(jacksonRepresentationFactory, req));
     }
 
-    public UmaUris get(OAuth2Request request) throws NotFoundException {
+    public UmaUris get(OAuth2Request request) throws NotFoundException, ServerException {
         RealmInfo realmInfo = request.getParameter(RestletRealmRouter.REALM_INFO);
         return get(ServletUtils.getRequest(request.<Request>getRequest()), realmInfo);
     }
@@ -92,17 +95,20 @@ public class UmaUrisFactory {
      * @param realmInfo The realm.
      * @return The OAuth2ProviderSettings instance.
      */
-    public UmaUris get(HttpServletRequest request, RealmInfo realmInfo) throws NotFoundException {
-        synchronized (providerSettingsMap) {
-            UmaUris providerSettings = providerSettingsMap.get(realmInfo);
-            if (providerSettings == null) {
-                UmaProviderSettings umaProviderSettings = umaProviderSettingsFactory.get(realmInfo.getAbsoluteRealm());
-                OAuth2Uris oAuth2Uris = oAuth2UriFactory.get(request, realmInfo);
-                String baseUrlPattern = baseURLProviderFactory.get(realmInfo.getAbsoluteRealm()).getURL(request);
-                providerSettings = getUmaProviderSettings(realmInfo, umaProviderSettings, oAuth2Uris, baseUrlPattern);
-            }
-            return providerSettings;
+    public UmaUris get(HttpServletRequest request, RealmInfo realmInfo) throws NotFoundException, ServerException {
+        String absoluteRealm = realmInfo.getAbsoluteRealm();
+        String baseUrl;
+        try {
+            baseUrl = baseURLProviderFactory.get(absoluteRealm).getRealmURL(request, "/uma", absoluteRealm);
+        } catch (InvalidBaseUrlException e) {
+            throw new ServerException("Configuration error");
         }
+        UmaUris uris = urisMap.get(baseUrl);
+        if (uris == null) {
+            OAuth2Uris oAuth2Uris = oAuth2UriFactory.get(request, realmInfo);
+            uris = getUmaUris(absoluteRealm, oAuth2Uris, baseUrl);
+        }
+        return uris;
     }
 
     /**
@@ -114,23 +120,40 @@ public class UmaUrisFactory {
      * @param realmInfo The realm.
      * @return The OAuth2ProviderSettings instance.
      */
-    public UmaUris get(Context context, RealmInfo realmInfo) throws NotFoundException {
-        synchronized (providerSettingsMap) {
-            UmaUris providerSettings = providerSettingsMap.get(realmInfo);
-            if (providerSettings == null) {
-                UmaProviderSettings umaProviderSettings = umaProviderSettingsFactory.get(realmInfo.getAbsoluteRealm());
-                OAuth2Uris oAuth2Uris = oAuth2UriFactory.get(context, realmInfo);
-                String baseUrlPattern = baseURLProviderFactory.get(realmInfo.getAbsoluteRealm()).getURL(context.asContext(HttpContext.class));
-                providerSettings = getUmaProviderSettings(realmInfo, umaProviderSettings, oAuth2Uris, baseUrlPattern);
-            }
-            return providerSettings;
+    public UmaUris get(Context context, RealmInfo realmInfo) throws NotFoundException, ServerException {
+        String absoluteRealm = realmInfo.getAbsoluteRealm();
+        HttpContext httpContext = context.asContext(HttpContext.class);
+        String baseUrl;
+        try {
+            baseUrl = baseURLProviderFactory.get(absoluteRealm).getRealmURL(httpContext, "/uma", absoluteRealm);
+        } catch (InvalidBaseUrlException e) {
+            throw new ServerException("Configuration error");
         }
+        UmaUris uris = urisMap.get(baseUrl);
+        if (uris == null) {
+            OAuth2Uris oAuth2Uris = oAuth2UriFactory.get(context, realmInfo);
+            uris = get(absoluteRealm, oAuth2Uris, baseUrl);
+        }
+        return uris;
     }
 
-    private UmaUris getUmaProviderSettings(RealmInfo realmInfo, UmaProviderSettings umaProviderSettings,
-            OAuth2Uris oAuth2Uris, String baseUrlPattern) throws NotFoundException {
-        UmaUris providerSettings = new UmaUrisImpl(realmInfo, baseUrlPattern, umaProviderSettings, oAuth2Uris);
-        providerSettingsMap.put(realmInfo, providerSettings);
+    private UmaUris get(String absoluteRealm, OAuth2Uris oAuth2Uris, String baseUrlPattern) throws NotFoundException {
+        UmaUris uris = urisMap.get(baseUrlPattern);
+        if (uris == null) {
+            uris = getUmaUris(absoluteRealm, oAuth2Uris, baseUrlPattern);
+        }
+        return uris;
+    }
+
+    private synchronized UmaUris getUmaUris(String absoluteRealm, OAuth2Uris oAuth2Uris, String baseUrlPattern)
+            throws NotFoundException {
+        UmaUris uris = urisMap.get(baseUrlPattern);
+        if (uris != null) {
+            return uris;
+        }
+        UmaProviderSettings umaProviderSettings = umaProviderSettingsFactory.get(absoluteRealm);
+        UmaUris providerSettings = new UmaUrisImpl(baseUrlPattern, umaProviderSettings, oAuth2Uris);
+        urisMap.put(baseUrlPattern, providerSettings);
         return providerSettings;
     }
 
@@ -140,15 +163,11 @@ public class UmaUrisFactory {
         private final OAuth2Uris oauth2Uris;
         private final String baseUrl;
 
-        UmaUrisImpl(RealmInfo realmInfo, String deploymentUrl, UmaProviderSettings umaProviderSettings,
+        UmaUrisImpl(String deploymentUrl, UmaProviderSettings umaProviderSettings,
                 OAuth2Uris oauth2Uris) throws NotFoundException {
             this.umaProviderSettings = umaProviderSettings;
             this.oauth2Uris = oauth2Uris;
-            String baseUrl = deploymentUrl + "/uma" + realmInfo.getRealmSubPath();
-            if (baseUrl.endsWith("/")) {
-                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-            }
-            this.baseUrl = baseUrl;
+            this.baseUrl = deploymentUrl;
         }
 
         @Override
