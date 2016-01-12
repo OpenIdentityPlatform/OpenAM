@@ -133,6 +133,11 @@
         </dependency>
 
         <dependency>
+            <groupId>external</groupId>
+            <artifactId>esapiport</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
