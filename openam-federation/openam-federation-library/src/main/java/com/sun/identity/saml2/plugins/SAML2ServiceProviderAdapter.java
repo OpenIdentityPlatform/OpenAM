@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,9 @@
  *
  * $Id: SAML2ServiceProviderAdapter.java,v 1.5 2008/08/19 19:11:15 veiming Exp $
  *
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
+
 package com.sun.identity.saml2.plugins;
 
 import com.sun.identity.saml2.common.SAML2Exception;

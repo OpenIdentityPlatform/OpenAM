@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,9 @@
  *
  * $Id: AssertionManager.java,v 1.13 2010/01/09 19:41:06 qcheng Exp $
  *
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
-/**
- * Portions Copyrighted 2013 ForgeRock AS
- */
+
 package com.sun.identity.saml;
 
 import java.util.Map;

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: TestGroupEvaluator.java,v 1.2 2009/11/12 18:37:40 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;

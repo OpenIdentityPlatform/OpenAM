@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: DelegationPrivilegeIdRepoAccessTest.java,v 1.3 2009/12/18 21:56:56 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;

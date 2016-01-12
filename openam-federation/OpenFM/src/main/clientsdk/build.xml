@@ -24,6 +24,8 @@
 
    $Id: build.xml,v 1.20 2009/09/17 05:44:02 mallas Exp $
 
+   Portions Copyrighted 2015 ForgeRock AS.
+
 -->
 
 <project name="openfm-clientsdk" default="package-clientsdk">

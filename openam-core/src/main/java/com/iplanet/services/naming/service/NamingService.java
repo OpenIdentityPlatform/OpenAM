@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: NamingService.java,v 1.13 2009/04/07 22:30:07 beomsuk Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2015 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.iplanet.services.naming.service;

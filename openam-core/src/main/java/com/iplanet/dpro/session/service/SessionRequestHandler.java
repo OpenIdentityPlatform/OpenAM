@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SessionRequestHandler.java,v 1.9 2009/04/02 04:11:44 ericow Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2015 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;

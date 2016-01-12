@@ -24,6 +24,7 @@
  *
  * $Id: SMAuthModule.java,v 1.6 2009/07/16 17:04:26 ericow Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.siteminder;

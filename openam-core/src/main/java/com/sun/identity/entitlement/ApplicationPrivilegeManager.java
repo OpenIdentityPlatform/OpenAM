@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationPrivilegeManager.java,v 1.5 2010/01/07 00:19:10 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;

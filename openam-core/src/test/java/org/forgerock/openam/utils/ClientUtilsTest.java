@@ -13,7 +13,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  * 
- * Portions Copyrighted 2015 ForgeRock, AS.
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;

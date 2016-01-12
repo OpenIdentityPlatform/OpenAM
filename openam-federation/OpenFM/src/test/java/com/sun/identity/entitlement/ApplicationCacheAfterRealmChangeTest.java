@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2010 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationCacheAfterRealmChangeTest.java,v 1.2 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;

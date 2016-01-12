@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: AuthPropertiesModelImpl.java,v 1.3 2008/07/09 02:04:49 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2015 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.console.authentication.model;
 

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,8 @@
  *
  * $Id: IDPPAuthorizer.java,v 1.6 2008/08/19 19:12:22 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 
 package com.sun.identity.liberty.ws.idpp.plugin;
 

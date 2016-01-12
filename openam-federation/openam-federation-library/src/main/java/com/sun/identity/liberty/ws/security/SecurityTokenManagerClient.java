@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: SecurityTokenManagerClient.java,v 1.9 2008/08/19 19:11:09 veiming Exp $
  *
+ * Portions Copyright 2013-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyright 2013 ForgeRock AS
- */
 package com.sun.identity.liberty.ws.security;
 
 import com.sun.identity.shared.locale.Locale;
@@ -65,7 +63,6 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 
 import javax.xml.soap.SOAPException;
-
 
 /**
  * The class <code>SecurityTokenManagerClient</code> is a <code>final</code> 

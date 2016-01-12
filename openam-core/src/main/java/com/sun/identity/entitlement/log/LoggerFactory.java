@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: LoggerFactory.java,v 1.2 2009/10/22 21:04:36 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.log;

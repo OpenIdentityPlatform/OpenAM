@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  */
+
 package com.sun.identity.shared.debug;
 
 import com.sun.identity.shared.debug.file.impl.DebugConfigurationFromProperties;

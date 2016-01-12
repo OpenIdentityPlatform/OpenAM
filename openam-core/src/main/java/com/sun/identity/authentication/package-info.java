@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: package-info.java,v 1.5 2008/08/19 19:08:48 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 /**

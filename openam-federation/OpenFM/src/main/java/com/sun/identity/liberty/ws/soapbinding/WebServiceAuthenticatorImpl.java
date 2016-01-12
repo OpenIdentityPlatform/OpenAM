@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: WebServiceAuthenticatorImpl.java,v 1.4 2008/08/06 17:29:25 exu Exp $
  *
- * Portions Copyrighted 2015 ForgeRock, AS."
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.liberty.ws.soapbinding;

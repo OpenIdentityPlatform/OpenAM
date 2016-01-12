@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems, Inc. All Rights Reserved.
@@ -23,7 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IdRepoAttributeValidator.java,v 1.1 2009/11/10 01:48:01 hengming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
+
 package com.sun.identity.idm.server;
 
 import java.util.Map;

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,8 @@
  *
  * $Id: AuthLevel.java,v 1.3 2008/06/25 05:42:04 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 
 package com.sun.identity.authentication.service;
 

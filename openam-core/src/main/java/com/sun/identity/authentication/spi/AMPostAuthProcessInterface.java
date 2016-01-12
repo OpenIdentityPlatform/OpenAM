@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,8 @@
  *
  * $Id: AMPostAuthProcessInterface.java,v 1.5 2009/01/16 23:31:34 higapa Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 
 package com.sun.identity.authentication.spi;
 

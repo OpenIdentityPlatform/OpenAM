@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,8 @@
  *
  * $Id: WebServicesClients.java,v 1.7 2009/06/09 00:41:37 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 
 package com.sun.identity.policy.plugins;
 

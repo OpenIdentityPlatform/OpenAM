@@ -9,7 +9,7 @@
  (http://trustee.ietf.org/license-info).
  */
 /**
- * Portions Copyrighted 2012-2015 ForgeRock AS
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.fr.oath;

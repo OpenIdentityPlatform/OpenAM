@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: UserAttributes.java,v 1.2 2009/09/21 18:33:45 dillidorai Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock Inc.
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 

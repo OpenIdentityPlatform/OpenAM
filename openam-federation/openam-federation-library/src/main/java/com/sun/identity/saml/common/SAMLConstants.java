@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: SAMLConstants.java,v 1.17 2009/06/12 22:21:39 mallas Exp $
  *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
- */
 package com.sun.identity.saml.common;
 
 import java.util.HashSet;

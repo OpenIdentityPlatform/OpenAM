@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,8 @@
  *
  * $Id: SAMLClient.java,v 1.6 2008/08/19 19:11:11 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 
 package com.sun.identity.saml; 
 

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,7 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DaoInterface.java,v 1.1 2009/04/21 20:04:48 sean_brydon Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
+
 package com.sun.identity.idm.plugins.database;
 
 import com.sun.identity.idm.IdRepoUnsupportedOpException;

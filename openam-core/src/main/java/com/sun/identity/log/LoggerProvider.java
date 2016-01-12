@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: LoggerProvider.java,v 1.1 2009/08/19 05:40:37 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.log;

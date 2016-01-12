@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,9 @@
  *
  * $Id: IDPSingleSignOnServiceSOAP.java,v 1.3 2009/10/14 23:59:44 exu Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
+
 package com.sun.identity.saml2.servlet;
 
 import com.sun.identity.saml.common.SAMLUtils;

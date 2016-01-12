@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ResourceResultCache.java,v 1.21 2010/01/21 22:18:01 dillidorai Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.policy.client;

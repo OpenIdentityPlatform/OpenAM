@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,8 @@
  *
  * $Id: ResponseProvider.java,v 1.5 2008/08/19 19:09:16 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
-
-
 
 package com.sun.identity.policy.interfaces;
 

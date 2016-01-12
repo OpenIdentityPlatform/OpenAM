@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
+
 package com.sun.identity.federation.services.util;
 
 import java.io.ByteArrayInputStream;

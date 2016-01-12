@@ -24,7 +24,7 @@
  *
  * $Id: SubRealmGroupTest.java,v 1.3 2009/11/19 01:02:04 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;

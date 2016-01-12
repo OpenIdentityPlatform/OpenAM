@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,8 @@
  *
  * $Id: NameIDMappingServiceSOAP.java,v 1.6 2009/10/14 23:59:44 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 
 package com.sun.identity.saml2.servlet;
 

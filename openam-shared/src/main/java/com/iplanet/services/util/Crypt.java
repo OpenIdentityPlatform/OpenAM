@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: Crypt.java,v 1.4 2008/08/19 19:14:54 veiming Exp $
  *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
- */
 package com.iplanet.services.util;
 
 import java.io.BufferedReader;

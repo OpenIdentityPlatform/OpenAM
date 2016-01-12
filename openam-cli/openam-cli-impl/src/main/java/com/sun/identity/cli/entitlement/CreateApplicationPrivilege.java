@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: CreateApplicationPrivilege.java,v 1.2 2009/11/19 01:02:02 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;

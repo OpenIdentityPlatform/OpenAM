@@ -24,6 +24,7 @@
  *
  * $Id: SMAdapter.java,v 1.4 2008/08/19 19:11:41 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.plugins;

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id4
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: NetworkMonitor.java,v 1.2 2009/12/17 18:03:51 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.util;

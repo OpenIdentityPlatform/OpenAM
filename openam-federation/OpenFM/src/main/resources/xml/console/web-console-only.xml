@@ -24,6 +24,8 @@
 
    $Id: web-console-only.xml,v 1.5 2008/08/19 19:12:30 veiming Exp $
 
+   Portions Copyrighted 2015 ForgeRock AS.
+
 -->
 
 <!-- For OpenAM Console Only WAR -->

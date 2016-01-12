@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -23,11 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EntitlementCondition.java,v 1.2 2009/09/05 00:24:04 veiming Exp $
+ *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
-/*
- * Portions copyright 2010-2014 ForgeRock AS.
- */
 package com.sun.identity.entitlement;
 
 import javax.security.auth.Subject;

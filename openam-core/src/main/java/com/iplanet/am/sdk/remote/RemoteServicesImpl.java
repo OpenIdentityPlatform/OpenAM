@@ -24,6 +24,7 @@
  *
  * $Id: RemoteServicesImpl.java,v 1.10 2009/07/02 20:26:16 hengming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk.remote;

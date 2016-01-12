@@ -24,6 +24,8 @@
 ##
 ##   $Id: opends_remove_user_schema.ldif,v 1.3 2009/11/13 00:16:03 qcheng Exp $
 ##
+##   Portions Copyrighted 2015 ForgeRock AS.
+##
 ##
 dn: cn=schema
 changetype: modify

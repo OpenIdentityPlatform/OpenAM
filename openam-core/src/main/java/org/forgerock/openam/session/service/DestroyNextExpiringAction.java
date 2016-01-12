@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -17,9 +17,8 @@
  * add the following below the CDDL Header, with the fields enclosed by brackets
  * [] replaced by your own identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- */
-/**
- * Portions Copyrighted 2011-2015 ForgeRock AS
+ *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package org.forgerock.openam.session.service;
 

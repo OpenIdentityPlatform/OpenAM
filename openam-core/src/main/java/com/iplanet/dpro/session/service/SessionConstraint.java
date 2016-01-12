@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SessionConstraint.java,v 1.6 2009/11/21 01:13:24 222713 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2015 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.iplanet.dpro.session.service;
 

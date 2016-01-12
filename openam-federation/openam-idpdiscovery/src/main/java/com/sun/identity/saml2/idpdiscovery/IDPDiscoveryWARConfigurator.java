@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,9 @@
  *
  * $Id: IDPDiscoveryWARConfigurator.java,v 1.4 2008/08/19 19:11:14 veiming Exp $
  *
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
-/**
- * Portions Copyrighted 2013 ForgeRock, Inc.
- */
+
 package com.sun.identity.saml2.idpdiscovery;
 
 import java.io.BufferedReader;

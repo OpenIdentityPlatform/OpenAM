@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: ConfigMonitoring.java,v 1.6 2009/12/23 23:50:21 bigfatrat Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2015 ForgeRock Inc
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.common;
 

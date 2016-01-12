@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: PropertyTemplate.java,v 1.5 2008/10/02 16:31:29 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2015 ForgeRock As.
  */
 
 package com.sun.identity.console.property;

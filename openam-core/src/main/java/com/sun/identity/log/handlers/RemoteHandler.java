@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: RemoteHandler.java,v 1.18 2009/12/13 22:58:06 hvijay Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2011-2012 ForgeRock Inc
- */
 package com.sun.identity.log.handlers;
 
 import com.iplanet.am.util.ThreadPoolException;

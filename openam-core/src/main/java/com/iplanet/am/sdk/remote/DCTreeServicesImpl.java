@@ -24,6 +24,7 @@
  *
  * $Id: DCTreeServicesImpl.java,v 1.4 2008/06/25 05:41:26 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk.remote;

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: LoginContext.java,v 1.6 2008/09/22 23:19:42 manish_rustagi Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2015 ForgeRock Inc.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.jaas;

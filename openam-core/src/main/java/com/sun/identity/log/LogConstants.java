@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,11 @@
  *
  * $Id: LogConstants.java,v 1.16 2008/09/18 22:56:31 veiming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2013 Cybernetica AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
+
 package com.sun.identity.log;
 
 import java.util.logging.Level;

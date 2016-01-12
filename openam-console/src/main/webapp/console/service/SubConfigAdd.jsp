@@ -24,6 +24,7 @@
 
    $Id: SubConfigAdd.jsp,v 1.3 2008/06/25 05:44:54 qcheng Exp $
 
+   Portions Copyrighted 2015 ForgeRock AS.
 --%>
 
 

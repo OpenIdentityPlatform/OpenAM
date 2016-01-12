@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,7 @@
  *
  * $Id: PLLRequestServlet.java,v 1.9 2009/02/12 17:24:13 bina Exp $
  *
- */
-/**
- * Portions Copyrighted 2012-2015 ForgeRock AS
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.iplanet.services.comm.server;
 

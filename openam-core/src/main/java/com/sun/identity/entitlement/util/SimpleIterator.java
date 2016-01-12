@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SimpleIterator.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.util;

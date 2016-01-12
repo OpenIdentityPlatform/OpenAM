@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,8 @@
  *
  * $Id: package-info.java,v 1.4 2008/08/19 19:09:08 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 
 /**
  * Provides classes for delegation service. Delegation service provides

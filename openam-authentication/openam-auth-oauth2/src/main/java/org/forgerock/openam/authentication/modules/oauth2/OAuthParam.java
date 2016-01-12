@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  * Copyright © 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -23,10 +23,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
-/* 
- * Portions Copyrighted 2013 ForgeRock Inc
- */
 
 package org.forgerock.openam.authentication.modules.oauth2;
 

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: SPSingleLogoutServiceSOAP.java,v 1.9 2009/10/14 23:59:45 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 

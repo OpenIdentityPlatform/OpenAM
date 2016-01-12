@@ -24,7 +24,7 @@
  *
  * $Id: WorkflowException.java,v 1.3 2008/06/25 05:50:03 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.workflow;

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: LogSSOTokenDetails.java,v 1.4 2008/09/05 00:51:01 ww203982 Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 

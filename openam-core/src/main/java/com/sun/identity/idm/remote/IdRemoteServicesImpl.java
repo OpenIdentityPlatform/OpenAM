@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,9 @@
  *
  * $Id: IdRemoteServicesImpl.java,v 1.23 2010/01/06 01:58:26 veiming Exp $
  *
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
-/**
- * Portions Copyrighted 2013-2014 ForgeRock AS
- */
+
 package com.sun.identity.idm.remote;
 
 import com.iplanet.am.sdk.AMHashMap;

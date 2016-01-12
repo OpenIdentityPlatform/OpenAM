@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,7 @@
  *
  * $Id: PWResetModel.java,v 1.5 2009/12/18 03:26:59 222713 Exp $
  *
- */
-/**
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 

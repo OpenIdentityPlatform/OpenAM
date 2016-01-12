@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -27,6 +27,7 @@
  * Portions Copyrighted 2011-2016 ForgeRock AS
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
+
 package com.sun.identity.log.service;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
