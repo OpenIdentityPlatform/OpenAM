@@ -136,6 +136,7 @@ public abstract class BaseURLProvider {
 
     private String realmSubPath(String realm, String basePath, String rootUrl) throws InvalidBaseUrlException {
         Reject.ifFalse(basePath.startsWith("/"), "basePath must start with a / character");
+        Reject.ifTrue(basePath.endsWith("/"), "basePath must not end with a / character");
         String hostName;
         try {
             hostName = new URL(rootUrl).getHost();
@@ -145,6 +146,9 @@ public abstract class BaseURLProvider {
         try {
             String orgDN = coreWrapper.getOrganization(coreWrapper.getAdminToken(), hostName);
             String dnsRealmPath = coreWrapper.convertOrgNameToRealmName(orgDN);
+            if ("/".equals(dnsRealmPath)) {
+                return "/".equals(realm) ? basePath : basePath + realm;
+            }
             if (!realm.startsWith(dnsRealmPath)) {
                 logger.error("BaseURLProvider Configuration error: Realm {} is not a subrealm or same as {}, " +
                         "from base url provider hostname {} as dns alias", realm,  dnsRealmPath, hostName);
