@@ -236,7 +236,7 @@ public final class LDAPUtils {
         }
 
         // Enable heartbeat
-        if (heartBeatInterval > 0) {
+        if (heartBeatInterval > 0 && heartBeatTimeUnit != null) {
             TimeUnit unit = TimeUnit.valueOf(heartBeatTimeUnit.toUpperCase());
             ldapOptions = ldapOptions
                     .set(HEARTBEAT_ENABLED, true)

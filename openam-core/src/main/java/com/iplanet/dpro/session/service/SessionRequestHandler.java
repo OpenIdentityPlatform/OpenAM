@@ -194,18 +194,6 @@ public class SessionRequestHandler implements RequestHandler {
         Session requesterSession = null;
 
         try {
-
-            /*
-             * Always lookup the Session so that we can extract audit information from it. If sid belongs to a remote
-             * session, then looking up the session may require further inter-server communication.
-             * Note, this also acts as a filter since we must have a valid session identifier in order to proceed.
-             */
-            requesterSession = sessionCache.getSession(sid);
-            auditor.setUserId(requesterSession.getClientID());
-            auditor.setTrackingId(requesterSession.getProperty(Constants.AM_CTX_ID));
-            auditor.setRealm(requesterSession.getProperty(Constants.ORGANIZATION));
-            auditor.auditAccessAttempt();
-
             /* common processing by groups of methods */
             switch (req.getMethodID()) {
             /*
@@ -218,9 +206,16 @@ public class SessionRequestHandler implements RequestHandler {
                 case SessionRequest.GetValidSessions:
                 case SessionRequest.AddSessionListenerOnAllSessions:
                 case SessionRequest.GetSessionCount:
-                /*
-                 * also check that sid is not a restricted token
-                 */
+                    /*
+                     * note that the purpose of the following is just to check the
+                     * authentication of the caller (which can also be used as a
+                     * filter for the operation scope!)
+                     */
+                    requesterSession = sessionCache.getSession(sid);
+                    auditAccessAttempt(auditor, requesterSession);
+                    /*
+                     * also check that sid is not a restricted token
+                     */
                     if (requesterSession.getProperty(TOKEN_RESTRICTION_PROP) != null) {
                         res.setException(sid + " " + SessionBundle.getString("noPrivilege"));
                         return res;
@@ -240,21 +235,32 @@ public class SessionRequestHandler implements RequestHandler {
                 case SessionRequest.SetProperty:
                 case SessionRequest.DestroySession:
                     if (req.getMethodID() == SessionRequest.DestroySession) {
-                    /*
-                     * also check that sid is not a restricted token
-                     */
+                        requesterSession = sessionCache.getSession(sid);
+                        auditAccessAttempt(auditor, requesterSession);
+                        /*
+                         * also check that sid is not a restricted token
+                         */
                         if (requesterSession.getProperty(TOKEN_RESTRICTION_PROP) != null) {
                             res.setException(sid + " " + SessionBundle.getString("noPrivilege"));
                             return res;
                         }
                         sid = new SessionID(req.getDestroySessionID());
-                    } else if (req.getMethodID() == SessionRequest.SetProperty) {
-                    /*
-                     * This fix is to avoid clients sneaking in to set
-                     * protected properties in server-2 or so through
-                     * server-1. Short circuit this operation without
-                     * forwrading it further.
-                     */
+                    } else {
+                        try {
+                            auditAccessAttempt(auditor, sessionCache.getSession(sid));
+                        } catch (SessionException ignored) {
+                            // ignore, we'll log the access attempt without session properties
+                            auditor.auditAccessAttempt();
+                        }
+                    }
+
+                    if (req.getMethodID() == SessionRequest.SetProperty) {
+                        /*
+                         * This fix is to avoid clients sneaking in to set
+                         * protected properties in server-2 or so through
+                         * server-1. Short circuit this operation without
+                         * forwarding it further.
+                         */
                         try {
                             SessionUtils.checkPermissionToSetProperty(
                                     this.clientToken, req.getPropertyName(),
@@ -333,7 +339,7 @@ public class SessionRequestHandler implements RequestHandler {
                             // iplanet-am-session-sfo-enabled=true (in direct contradiction to SMS property with same name)
                             throw new AssertionError("Unreachable code");
                         }
-                    
+
                     /*
                      * We determined that this server is the host and the
                      * session must be found(or recovered) locally
@@ -434,9 +440,21 @@ public class SessionRequestHandler implements RequestHandler {
                     break;
             }
         } catch (SessionException se) {
+            sessionDebug.error("processSessionRequest caught exception: " + se.getMessage(), se);
             res.setException(sid + " " + se.getMessage());
         }
         return res;
+    }
+
+    private void auditAccessAttempt(PLLAuditor auditor, Session session) {
+        try {
+            auditor.setUserId(session.getClientID());
+            auditor.setTrackingId(session.getProperty(Constants.AM_CTX_ID));
+            auditor.setRealm(session.getProperty(Constants.ORGANIZATION));
+        } catch (SessionException ignored) {
+            // Don't audit with session information.
+        }
+        auditor.auditAccessAttempt();
     }
 
     private SessionResponse forward(URL svcurl, SessionRequest sreq)
