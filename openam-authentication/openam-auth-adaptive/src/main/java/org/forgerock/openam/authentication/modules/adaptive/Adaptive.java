@@ -21,7 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2013-2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2013-2016 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
@@ -546,18 +546,21 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                             IPv6Address.fromString(first), IPv6Address.fromString(last));
                     if (iPv6AddressRange.contains(IPv6Address.fromString(clientIP))) {
                         retVal = IPRangeScore;
+                        break;
                     }
                 } else if (ipType.equalsIgnoreCase("CIDR")) {
                     // Subnet mask ip
                     IPv6Network iPv6Network = IPv6Network.fromString(nextIP);
                     if (iPv6Network.contains(IPv6Address.fromString(clientIP))) {
                         retVal = IPRangeScore;
+                        break;
                     }
                 } else {
                     // treat as single ip address
                     IPv6Address iPv6AddressNextIP = IPv6Address.fromString(nextIP);
                     if (iPv6AddressNextIP.compareTo(IPv6Address.fromString(clientIP)) == 0) {
                         retVal = IPRangeScore;
+                        break;
                     }
                 }
             } else if (ipVersion.equalsIgnoreCase(IP_V4) && ValidateIPaddress.isIPv4(clientIP)) { // treat as IPv4
@@ -569,6 +572,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 IPRange theRange = new IPRange(nextIP);
                 if (theRange.inRange(clientIP)) {
                     retVal = IPRangeScore;
+                    break;
                 }
             }
         }
