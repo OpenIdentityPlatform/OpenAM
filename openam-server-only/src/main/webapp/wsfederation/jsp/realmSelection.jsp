@@ -24,10 +24,7 @@
 
    $Id: realmSelection.jsp,v 1.10 2009/10/29 00:00:00 exu Exp $
 
---%>
-
-<%--
-    Portions Copyrighted 2013-2016 ForgeRock AS
+    Portions Copyrighted 2013-2016 ForgeRock AS.
 --%>
 
 <%@page

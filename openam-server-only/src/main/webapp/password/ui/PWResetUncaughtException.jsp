@@ -24,7 +24,7 @@
 
    $Id: PWResetUncaughtException.jsp,v 1.5 2008/08/28 06:41:11 mahesh_prasad_r Exp $
 
-   Portions Copyrighted 2012-2015 ForgeRock AS.
+   Portions Copyrighted 2012-2016 ForgeRock AS.
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 

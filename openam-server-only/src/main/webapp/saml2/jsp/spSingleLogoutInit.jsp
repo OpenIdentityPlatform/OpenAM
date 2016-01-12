@@ -24,7 +24,7 @@
 
    $Id: spSingleLogoutInit.jsp,v 1.13 2009/10/15 00:01:11 exu Exp $
 
-   Portions Copyrighted 2012-2015 ForgeRock AS.
+   Portions Copyrighted 2012-2016 ForgeRock AS.
 --%>
 
 <%@ page import="com.sun.identity.plugin.session.SessionManager" %>

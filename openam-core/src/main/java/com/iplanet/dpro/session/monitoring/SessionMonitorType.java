@@ -1,5 +1,3 @@
-package com.iplanet.dpro.session.monitoring;
-
 /*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,6 +13,8 @@ package com.iplanet.dpro.session.monitoring;
  *
  * Copyright 2014-2015 ForgeRock AS.
  */
+
+package com.iplanet.dpro.session.monitoring;
 
 /**
  * An enum representing the different types of sessions our monitoring component differentiates the various

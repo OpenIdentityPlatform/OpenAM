@@ -26,7 +26,7 @@
   
    $Id: amDelegation.xml,v 1.15 2009/12/21 22:02:42 veiming Exp $
 
-   Portions copyright 2014-2015 ForgeRock AS.
+   Portions copyright 2014-2016 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration

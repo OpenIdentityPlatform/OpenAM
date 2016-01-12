@@ -24,7 +24,7 @@
  *
  * $Id: AddAMSDKIdRepoPlugin.java,v 1.9 2009/12/11 06:50:36 hengming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.datastore;

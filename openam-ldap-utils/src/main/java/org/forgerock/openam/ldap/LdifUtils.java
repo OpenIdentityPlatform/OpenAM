@@ -25,7 +25,7 @@
  *
  * $Id: LDAPUtils.java,v 1.9 2009/08/05 20:39:01 hengming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 //@Checkstyle:on
 

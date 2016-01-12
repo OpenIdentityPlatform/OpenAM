@@ -24,7 +24,7 @@
  *
  * $Id: SMSRepositoryMig.java,v 1.4 2009/01/28 05:35:04 ww203982 Exp $
  *
- * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm.util;

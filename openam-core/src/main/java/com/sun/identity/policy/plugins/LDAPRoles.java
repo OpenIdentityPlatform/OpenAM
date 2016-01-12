@@ -24,7 +24,7 @@
  *
  * $Id: LDAPRoles.java,v 1.8 2009/11/20 23:52:55 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
  */
 

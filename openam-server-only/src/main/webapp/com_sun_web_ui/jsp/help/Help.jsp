@@ -6,7 +6,7 @@
  * Use is subject to license terms.
  */
 
-   Portions Copyrighted 2013-2015 ForgeRock AS.
+   Portions Copyrighted 2013-2016 ForgeRock AS.
 --%>
 
 <%@page language="java" %>

@@ -24,7 +24,7 @@
  *
  * $Id: UserIdRepo.java,v 1.21 2009/12/23 00:22:34 goodearth Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.setup;

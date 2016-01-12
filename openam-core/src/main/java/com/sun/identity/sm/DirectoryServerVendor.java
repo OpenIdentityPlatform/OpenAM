@@ -24,8 +24,9 @@
  *
  * $Id: DirectoryServerVendor.java,v 1.3 2009/01/28 05:35:03 ww203982 Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
+
 package com.sun.identity.sm;
 
 import org.forgerock.openam.ldap.LDAPRequests;

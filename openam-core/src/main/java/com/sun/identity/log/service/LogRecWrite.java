@@ -24,7 +24,7 @@
  *
  * $Id: LogRecWrite.java,v 1.6 2009/06/19 02:33:29 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 

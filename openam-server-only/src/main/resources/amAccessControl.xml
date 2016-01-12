@@ -24,7 +24,7 @@
 
    $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
 
-   Portions Copyrighted 2013-2015 ForgeRock AS.
+   Portions Copyrighted 2013-2016 ForgeRock AS.
    Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
 -->
 <accesscontrols>

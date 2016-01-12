@@ -24,7 +24,7 @@
 
    $Id: Version.jsp,v 1.1 2009/08/05 20:15:51 veiming Exp $
 
-   Portions Copyrighted 2011-2015 ForgeRock AS.
+   Portions Copyrighted 2011-2016 ForgeRock AS.
 --%>
 
 <%@ page language="java" %>

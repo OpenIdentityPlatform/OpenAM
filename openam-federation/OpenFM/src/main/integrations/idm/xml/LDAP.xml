@@ -25,6 +25,8 @@
 
     $Id: LDAP.xml,v 1.1 2009/07/24 23:13:22 manish_rustagi Exp $
 
+    Portions Copyrighted 2015-2016 ForgeRock AS.
+
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"

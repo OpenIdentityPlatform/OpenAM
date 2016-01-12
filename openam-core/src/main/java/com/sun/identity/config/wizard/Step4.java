@@ -24,7 +24,7 @@
  *
  * $Id: Step4.java,v 1.20 2009/10/27 05:31:45 hengming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;

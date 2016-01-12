@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems, Inc. All Rights Reserved.
@@ -24,8 +24,9 @@
  *
  * $Id: IdRepoUtils.java,v 1.3 2010/01/06 22:31:55 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
+
 package com.sun.identity.idm.common;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
