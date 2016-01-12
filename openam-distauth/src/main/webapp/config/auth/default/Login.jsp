@@ -26,7 +26,7 @@
                                                                                 
 --%>
 <%--
-  Portions Copyrighted 2012-2014 ForgeRock AS
+  Portions Copyrighted 2012-2016 ForgeRock AS
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -126,6 +126,9 @@
                                                 </label>
                                                 <input class="textbox" type="text" name="IDToken<jato:text name="txtIndex" />" id="IDToken<jato:text name="txtIndex" />" value="<jato:text name="txtValue" />" />
                                             </div>
+                                        </jato:content>
+                                        <jato:content name="hiddenValueBox">
+                                            <input class="hiddenValueBox" type="hidden" name="<jato:text name="txtId" />" id="<jato:text name="txtId" />" value="<jato:text name="txtValue" />" />
                                         </jato:content>
                                         <jato:content name="password">
                                             <div class="row">
