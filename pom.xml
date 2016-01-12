@@ -487,7 +487,7 @@
         <connection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</connection>
         <developerConnection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</developerConnection>
         <url>https://stash.forgerock.org/projects/OPENAM/repos/openam/browse</url>
-      <tag>HEAD</tag>
+      <tag>release/13.0.0</tag>
   </scm>
 
     <!-- Dependency Management -->
