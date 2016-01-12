@@ -165,8 +165,54 @@ public class RedirectUrlValidatorTest {
                 {"foo", true},
                 {"foo?abc=123", true},
                 {"foo/bar", true},
-                {"areallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurl", true},
-                {"areallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurltoolong", false},
+                {"areallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreally"
+                        + "longurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongur"
+                        + "lareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareal"
+                        + "lyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreal"
+                        + "lylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylong"
+                        + "urlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlare"
+                        + "allyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyre"
+                        + "allylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylo"
+                        + "ngurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurla"
+                        + "reallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareally"
+                        + "reallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreally"
+                        + "longurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongur"
+                        + "lareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareal"
+                        + "lyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreal"
+                        + "lylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylong"
+                        + "urlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlare"
+                        + "allyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyre"
+                        + "allylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylo"
+                        + "ngurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurla"
+                        + "reallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareally"
+                        + "reallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreally"
+                        + "longurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongur"
+                        + "lareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareal"
+                        + "lyreallylongurl", true},
+                {"areallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreally"
+                        + "longurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongur"
+                        + "lareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareal"
+                        + "lyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreal"
+                        + "lylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylong"
+                        + "urlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlare"
+                        + "allyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyre"
+                        + "allylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylo"
+                        + "ngurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurla"
+                        + "reallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareally"
+                        + "reallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreally"
+                        + "longurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongur"
+                        + "lareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareal"
+                        + "lyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreal"
+                        + "lylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylong"
+                        + "urlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlare"
+                        + "allyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyre"
+                        + "allylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylo"
+                        + "ngurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurla"
+                        + "reallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareally"
+                        + "reallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreally"
+                        + "longurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongur"
+                        + "lareallyreallylongurlareallyreallylongurlareallyreallylongurlareallyreallylongurlareal"
+                        + "lyreallylongurltoolong", false},
         };
     }
 

@@ -22,7 +22,6 @@ import com.sun.identity.shared.whitelist.URLPatternMatcher;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.json.JsonValue;
