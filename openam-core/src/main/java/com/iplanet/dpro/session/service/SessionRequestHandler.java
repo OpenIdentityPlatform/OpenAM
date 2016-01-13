@@ -440,7 +440,7 @@ public class SessionRequestHandler implements RequestHandler {
                     break;
             }
         } catch (SessionException se) {
-            sessionDebug.error("processSessionRequest caught exception: " + se.getMessage(), se);
+            sessionDebug.message("processSessionRequest caught exception: {}", se.getMessage(), se);
             res.setException(sid + " " + se.getMessage());
         }
         return res;
