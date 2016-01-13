@@ -55,7 +55,7 @@ public class URLPatternMatcher {
      *
      * @param requestedURL The URL to be matched.
      * @param patterns The patterns to match the URL against.
-     * @param wildcard Flag for wildcard comparison.
+     * @param wildcard Flag for wildcard comparison
      * @return <code>true</code> if matched, <code>false</code> otherwise.
      * @throws MalformedURLException If the URL or one of the patterns is invalid.
      */
@@ -69,14 +69,11 @@ public class URLPatternMatcher {
 
             requestedURL = resourceName.canonicalize(requestedURL);
 
-            // convert URI to URL if any.
-            if (pattern.startsWith("/")) {
-                pattern = convertToURL(pattern, requestedURL);
-            } else if (!patternLower.startsWith("http")) {
-                pattern = convertToURL("/" + pattern, requestedURL);
+            // convert URI to URL if required (but not if pattern is relative)
+            if (patternLower.startsWith("http")) {
+                pattern = resourceName.canonicalize(pattern);
             }
 
-            pattern = resourceName.canonicalize(pattern);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("URLPatternMatcher.match(" + requestedURL + "): matching by pattern: " + pattern);
             }
