@@ -44,16 +44,16 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     obj.getConfiguration = function (successCallback, errorCallback) {
         if (!Configuration.globalData.auth.subRealm) {
             try {
-                console.debug("No current SUB REALM was detected. Applying from current URI values...");
+                console.log("No current SUB REALM was detected. Applying from current URI values...");
                 var subRealm = RealmHelper.getSubRealm();
-                console.debug("Changing SUB REALM to '" + subRealm + "'");
+                console.log("Changing SUB REALM to '" + subRealm + "'");
 
                 Configuration.globalData.auth.subRealm = RealmHelper.getSubRealm();
 
                 lastKnownSubRealm = RealmHelper.getSubRealm();
                 lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
             } catch (error) {
-                console.debug("Unable to applying sub realm from URI values");
+                console.log("Unable to applying sub realm from URI values");
             }
         }
 
@@ -75,7 +75,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
             overrideRealmChanged = lastKnownOverrideRealm !== currentOverrideRealm;
         if (subRealmChanged || overrideRealmChanged) {
             if (currentSubRealm !== lastKnownSubRealm) {
-                console.debug("Changing SUB REALM from '" + lastKnownSubRealm + "' to '" + currentSubRealm + "'");
+                console.log("Changing SUB REALM from '" + lastKnownSubRealm + "' to '" + currentSubRealm + "'");
                 Configuration.globalData.auth.subRealm = currentSubRealm;
                 lastKnownSubRealm = currentSubRealm;
             }

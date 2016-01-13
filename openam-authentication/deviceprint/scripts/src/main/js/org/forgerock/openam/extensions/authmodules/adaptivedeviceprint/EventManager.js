@@ -25,38 +25,38 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock Inc.
  */
 
 /*global define*/
 
 define(["org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/Constants",
-        "org/forgerock/libwrappers/JQueryWrapper"], 
+        "org/forgerock/libwrappers/JQueryWrapper"],
 		function(constants, $) {
-    
+
     /**
      * listenerProxyMap - Association of real listeners and proxies which transforms parameter set
      */
-    var obj = {}, listenerProxyMap = [];    
+    var obj = {}, listenerProxyMap = [];
 
     obj.sendEvent = function (eventId, event) {
-        console.debug("sending event eventId=" + eventId);
+        console.log("sending event eventId=" + eventId);
         $(document).trigger(eventId, event);
     };
 
     obj.registerListener = function (eventId, callback) {
         var proxyFunction = function(element, event) {
-            console.debug("Handiling event");
+            console.log("Handiling event");
             callback(event);
         };
-        console.debug("registering event listener eventId=" + eventId);
+        console.log("registering event listener eventId=" + eventId);
         listenerProxyMap[callback] = proxyFunction;
         $(document).on(eventId, proxyFunction);
     };
 
     obj.unregisterListener = function (eventId, callback) {
         var proxyFunction;
-        console.debug("unregistering event listener eventId=" + eventId);
+        console.log("unregistering event listener eventId=" + eventId);
         proxyFunction = listenerProxyMap[callback];
         $(document).off(proxyFunction);
     };
