@@ -101,6 +101,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
 
         realmRouter.route("users/{user}/devices/trusted")
                 .auditAs(DEVICES)
+                .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .toCollection(TrustedDevicesResource.class);
 
         realmRouter.route("users/{user}/devices/2fa/oath")
