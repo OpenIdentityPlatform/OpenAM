@@ -126,7 +126,7 @@ public final class JwtSessionMapper {
      */
     public SessionInfo fromJwt(@Nonnull String jwtString) throws JwtRuntimeException {
 
-        Reject.ifNull(jwtString, "jwtString must not ne null.");
+        Reject.ifNull(jwtString, "jwtString must not be null.");
 
         SignedJwt signedJwt;
 
@@ -144,13 +144,21 @@ public final class JwtSessionMapper {
 
         }
 
-        if (!signedJwt.verify(verificationHandler)) {
+        if (!doesJwtAlgorithmMatch(signedJwt) || !signedJwt.verify(verificationHandler)) {
             throw new JwtRuntimeException("Invalid JWT!");
         }
 
         JwtClaimsSet claimsSet = signedJwt.getClaimsSet();
         String serializedSession = claimsSet.getClaim(SERIALIZED_SESSION_CLAIM, String.class);
         return fromJson(serializedSession);
+    }
+
+    private boolean doesJwtAlgorithmMatch(SignedJwt signedJwt) {
+        try {
+            return jwsAlgorithm.equals(signedJwt.getHeader().getAlgorithm());
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     /**
