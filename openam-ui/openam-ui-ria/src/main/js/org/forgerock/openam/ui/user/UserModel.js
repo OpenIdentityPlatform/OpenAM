@@ -34,6 +34,10 @@ define("org/forgerock/openam/ui/user/UserModel", [
             defaults: {
                 kbaInfo: []
             },
+            silentReset: function () {
+                var previousAttributes = this.previousAttributes();
+                this.set(previousAttributes, { silent: true });
+            },
             sync: function (method, model, options) {
                 var clearPassword = _.bind(function () {
                         delete this.currentPassword;
@@ -46,6 +50,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                             type: Messages.TYPE_DANGER,
                             response: response
                         });
+                        model.silentReset();
                     };
 
                 if (method === "update" || method === "patch") {
