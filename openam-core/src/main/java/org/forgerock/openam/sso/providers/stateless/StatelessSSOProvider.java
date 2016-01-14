@@ -11,10 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sso.providers.stateless;
+
+import java.security.Principal;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.session.blacklist.SessionBlacklist;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -23,18 +32,12 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOProvider;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.session.blacklist.SessionBlacklist;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
-import java.util.Set;
 
 public class StatelessSSOProvider implements SSOProvider {
 
     private final StatelessSessionFactory statelessSessionFactory;
     private final SessionBlacklist sessionBlacklist;
+    private final StatelessAdminRestriction restriction;
     private final Debug debug;
 
     /**
@@ -43,9 +46,11 @@ public class StatelessSSOProvider implements SSOProvider {
     @Inject
     public StatelessSSOProvider(StatelessSessionFactory statelessSessionFactory,
                                 SessionBlacklist sessionBlacklist,
+                                StatelessAdminRestriction restriction,
                                 @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
         this.statelessSessionFactory = statelessSessionFactory;
         this.sessionBlacklist = sessionBlacklist;
+        this.restriction = restriction;
         this.debug = debug;
     }
 
@@ -127,6 +132,17 @@ public class StatelessSSOProvider implements SSOProvider {
     public boolean isValidToken(SSOToken token, boolean refresh) {
         final StatelessSSOToken statelessSSOToken = (StatelessSSOToken) token;
         final StatelessSession session = statelessSSOToken.getSession();
+
+        // Stateless Sessions are not allowed for super users.
+        try {
+            if (restriction.isRestricted(token)) {
+                return false;
+            }
+        } catch (SessionException e) {
+            debug.message("Unable to verify if the SSOToken represents a super user", e);
+            return false;
+        }
+
         try {
             return statelessSSOToken.isValid(refresh) && !sessionBlacklist.isBlacklisted(session);
         } catch (SessionException e) {

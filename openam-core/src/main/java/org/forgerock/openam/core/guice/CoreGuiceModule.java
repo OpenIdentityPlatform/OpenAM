@@ -17,6 +17,76 @@
 
 package org.forgerock.openam.core.guice;
 
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.ServletContext;
+
+import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.auditors.SMSAuditFilter;
+import org.forgerock.openam.auditors.SMSAuditor;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.CTSPersistentStoreImpl;
+import org.forgerock.openam.cts.CoreTokenConfig;
+import org.forgerock.openam.cts.adapters.OAuthAdapter;
+import org.forgerock.openam.cts.adapters.SAMLAdapter;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.tokens.SAMLToken;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperConnection;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
+import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
+import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
+import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
+import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
+import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
+import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.SessionPollerPool;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.session.SessionURL;
+import org.forgerock.openam.session.blacklist.BloomFilterSessionBlacklist;
+import org.forgerock.openam.session.blacklist.CTSSessionBlacklist;
+import org.forgerock.openam.session.blacklist.CachingSessionBlacklist;
+import org.forgerock.openam.session.blacklist.NoOpSessionBlacklist;
+import org.forgerock.openam.session.blacklist.SessionBlacklist;
+import org.forgerock.openam.sm.SMSConfigurationFactory;
+import org.forgerock.openam.sm.ServerGroupConfiguration;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.openam.sm.config.ConsoleConfigHandlerImpl;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
+import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction;
+import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction.SuperUserDelegate;
+import org.forgerock.openam.utils.Config;
+import org.forgerock.openam.utils.OpenAMSettings;
+import org.forgerock.openam.utils.OpenAMSettingsImpl;
+import org.forgerock.util.Function;
+import org.forgerock.util.promise.NeverThrowsException;
+import org.forgerock.util.thread.ExecutorServiceFactory;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -67,71 +137,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import com.sun.identity.sm.ldap.ConfigAuditorFactory;
-import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.ServletContext;
-import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.openam.auditors.SMSAuditFilter;
-import org.forgerock.openam.auditors.SMSAuditor;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.CTSPersistentStoreImpl;
-import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.adapters.OAuthAdapter;
-import org.forgerock.openam.cts.adapters.SAMLAdapter;
-import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.tokens.SAMLToken;
-import org.forgerock.openam.cts.impl.query.reaper.ReaperConnection;
-import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
-import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
-import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
-import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
-import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
-import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
-import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
-import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
-import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
-import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
-import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.session.SessionCookies;
-import org.forgerock.openam.session.SessionPollerPool;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.session.SessionURL;
-import org.forgerock.openam.session.blacklist.BloomFilterSessionBlacklist;
-import org.forgerock.openam.session.blacklist.CTSSessionBlacklist;
-import org.forgerock.openam.session.blacklist.CachingSessionBlacklist;
-import org.forgerock.openam.session.blacklist.NoOpSessionBlacklist;
-import org.forgerock.openam.session.blacklist.SessionBlacklist;
-import org.forgerock.openam.sm.SMSConfigurationFactory;
-import org.forgerock.openam.sm.ServerGroupConfiguration;
-import org.forgerock.openam.sm.config.ConsoleConfigHandler;
-import org.forgerock.openam.sm.config.ConsoleConfigHandlerImpl;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayer;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.sm.datalayer.api.DataLayerException;
-import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
-import org.forgerock.openam.utils.Config;
-import org.forgerock.openam.utils.OpenAMSettings;
-import org.forgerock.openam.utils.OpenAMSettingsImpl;
-import org.forgerock.util.Function;
-import org.forgerock.util.promise.NeverThrowsException;
-import org.forgerock.util.thread.ExecutorServiceFactory;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -245,6 +250,7 @@ public class CoreGuiceModule extends AbstractModule {
         bind(Debug.class)
                 .annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
+
 
         bind(new TypeLiteral<Function<String, String, NeverThrowsException>>() {})
                 .annotatedWith(Names.named("tagSwapFunc"))
@@ -560,6 +566,11 @@ public class CoreGuiceModule extends AbstractModule {
         }
 
         return blacklist;
+    }
+
+    @Provides @Singleton @Inject
+    public SuperUserDelegate getSuperUserDelegate() {
+        return StatelessAdminRestriction.createAuthDDelegate();
     }
 
     /**
