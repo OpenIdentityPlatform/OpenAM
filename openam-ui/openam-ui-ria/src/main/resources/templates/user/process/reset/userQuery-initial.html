@@ -11,7 +11,7 @@
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
-  ~ Copyright 2015 ForgeRock AS.
+  ~ Copyright 2015-2016 ForgeRock AS.
   -->
 
 <form class="form" id="userQuery" aria-labelledby="userQueryDescription">
@@ -39,12 +39,16 @@
 
         <div class="filter-group filter-and" aria-labelledby="orAllEnterPrompt">
             <div class="form-group">
-                <label class="sr-only" for="input-givenName">{{t 'common.user.givenName'}}</label>
+                <label class="sr-only separator" for="input-givenName">
+                    <span>{{t 'common.user.givenName'}}</span>
+                </label>
                 <input type="text" placeholder="{{t 'common.user.givenName'}}" id="input-givenName" name="givenName" class="form-control filter-value input-lg" />
             </div>
 
             <div class="form-group">
-                <label class="sr-only" for="input-sn">{{t 'common.user.sn'}}</label>
+                <label class="sr-only separator" for="input-sn">
+                    <span>{{t 'common.user.sn'}}</span>
+                </label>
                 <input type="text" placeholder="{{t 'common.user.sn'}}" id="input-sn" name="sn" class="form-control filter-value input-lg" />
             </div>
         </div>
