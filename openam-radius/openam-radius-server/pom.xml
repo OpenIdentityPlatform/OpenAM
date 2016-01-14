@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-radius</artifactId>
-    <version>13.0.0</version>
+    <version>13.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>openam-radius-server</artifactId>
   <name>OpenAM RADIUS Server</name>
