@@ -25,8 +25,6 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.json.fluent.JsonValue;
 
-import org.owasp.esapi.ESAPI;
-
 /**
  * Validates the provided redirect URL against the list of valid goto URL domains.
  *
@@ -70,8 +68,7 @@ public class RedirectUrlValidator<T> {
             DEBUG.message("Validating goto URL " + url + " against patterns:\n" + patterns);
         }
 
-        // JavaScript URIs are a common vector for XSS attacks.
-        if (url.toLowerCase().startsWith("javascript:")) {
+        if (url.length() > MAX_URL_LENGTH) {
             return false;
         }
 
@@ -79,17 +76,16 @@ public class RedirectUrlValidator<T> {
             final URI uri = new URI(url);
             // Both Absolute and scheme relative URLs should be validated.
             if (!uri.isAbsolute() && !url.startsWith("//")) {
-                return ESAPI.validator().isValidInput("isRedirectUrlValid", url, "HTTPURI", MAX_URL_LENGTH,
-                        false);
+                return true;
+            }
+
+            if (uri.getScheme() != null && !uri.getScheme().equals("http") && !uri.getScheme().equals("https")) {
+                return false;
             }
         } catch (final URISyntaxException urise) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("The goto URL " + url + " is not a valid URI", urise);
             }
-            return false;
-        }
-
-        if (!ESAPI.validator().isValidInput("isRedirectUrlValid", url, "URL", MAX_URL_LENGTH, false)) {
             return false;
         }
 

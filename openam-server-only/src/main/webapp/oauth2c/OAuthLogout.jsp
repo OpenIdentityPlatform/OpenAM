@@ -86,7 +86,8 @@
    try {
        SSOToken ssoToken = manager.createSSOToken(request);
        String realm = ssoToken.getProperty("Organization");
-       boolean isValidGotoUrl = AuthD.getAuth().isGotoUrlValid(gotoURL, realm);
+       boolean isValidGotoUrl = AuthD.getAuth().isGotoUrlValid(gotoURL, realm)
+               && ESAPI.validator().isValidInput("URLContext", gotoURL, "HTTPURI", 2000, false);
        if (!isValidGotoUrl) {
            OAuthUtil.debugError("OAuthLogout: invalid or empty goto URL ignored on Logout page: " + gotoURL);
            gotoURL = ServiceURI + "/UI/Logout";
@@ -95,6 +96,7 @@
        OAuthUtil.debugMessage("OAuthLogout: using default goto URL because we failed to get a session");
        gotoURL = ServiceURI + "/UI/Logout";
    }
+   gotoURL = ESAPI.encoder().encodeForJavaScript(gotoURL);
    
    String logoutURL = request.getParameter(PARAM_LOGOUT_URL);
    if (logoutURL == null) {
@@ -112,6 +114,7 @@
            doYouWantToLogout = doYouWantToLogout.replace("#IDP#", OAuth2IdP);
        }
    }
+   logoutURL = ESAPI.encoder().encodeForJavaScript(logoutURL);
    String copyrightNotice = null;
    try{
        copyrightNotice = ResourceBundle.getBundle("amAuthUI", locale).getString("copyright.notice");

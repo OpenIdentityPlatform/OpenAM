@@ -186,6 +186,8 @@ public class RedirectUrlValidatorTest {
     public Object[][] getJavaScriptCases() {
         return new Object[][]{
                 {"javascript:alert", false},
+                {"java%73cript:alert", false},
+                {"  javascript:alert", false},
                 {"JavaSCRIpt:alert", false},
                 {"/javascript:alert", true},
         };
@@ -206,15 +208,19 @@ public class RedirectUrlValidatorTest {
     @DataProvider(name = "malformed")
     public Object[][] getMalformedCases() {
         return new Object[][]{
-                {"http:abc", false},
-                {"http:/abc", false},
-                {"/a$bc", false}
+                {"/a bc", false},
+                {"/a\"", false},
+                // invalid protocol
+                {"ftp://example.com", false},
+                // This is an example of a redirect URL that OpenAM can produce
+                {"http://example.com/openam/oauth2/authorize?nonce=1234&scope=test%20test2&response_type=code&"
+                        + "client_id=myagent&redirect_uri=http%3A%2F%2Fgoogle.com", true}
         };
     }
 
     @Test(dataProvider = "malformed")
     public void testMalformedUrlsWithWhitelist(String url, boolean result) {
-        RedirectUrlValidator<String> validator = getValidator(asSet("http://example.com/*"));
+        RedirectUrlValidator<String> validator = getValidator(asSet("http://example.com/*?*"));
         assertThat(validator.isRedirectUrlValid(url, null)).isEqualTo(result);
     }
 
