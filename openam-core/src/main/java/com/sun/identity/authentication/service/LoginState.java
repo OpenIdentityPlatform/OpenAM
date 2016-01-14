@@ -29,17 +29,10 @@
 
 package com.sun.identity.authentication.service;
 
-import static java.util.Collections.unmodifiableSet;
+import static java.util.Collections.*;
 import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.*;
 import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
 import java.net.InetAddress;
 import java.security.AccessController;
@@ -62,6 +55,27 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.guava.common.collect.ImmutableList;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
+import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
+import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
+import org.forgerock.openam.authentication.service.activators.ForceAuthSessionActivator;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
+import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.SearchScope;
+
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMObject;
 import com.iplanet.am.sdk.AMStoreConnection;
@@ -81,9 +95,9 @@ import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.server.AuthContextLocal;
+import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthenticationException;
-import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
@@ -110,19 +124,6 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
-
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.guava.common.collect.ImmutableList;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
-import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
-import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
-import org.forgerock.openam.authentication.service.activators.ForceAuthSessionActivator;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.utils.ClientUtils;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * This class maintains the User's login state information from the time user
@@ -354,6 +355,9 @@ public class LoginState {
 
     private final AuthenticationProcessEventAuditor auditor = InjectorHolder.getInstance(
             AuthenticationProcessEventAuditor.class);
+
+    private final StatelessAdminRestriction restriction =
+            InjectorHolder.getInstance(StatelessAdminRestriction.class);
 
     /**
      * Attempts to load the configured session property upgrader class.
@@ -1157,7 +1161,7 @@ public class LoginState {
             return NoSessionActivator.INSTANCE;
         }
 
-        if (LazyConfig.AUTHD.isSuperUser(getUserDN()) || LazyConfig.AUTHD.isSpecialUser(getUserDN())) {
+        if (restriction.isRestricted(getUserDN())) {
             DEBUG.message("Using stateful session activation for super admin");
             return DefaultSessionActivator.INSTANCE;
         }
