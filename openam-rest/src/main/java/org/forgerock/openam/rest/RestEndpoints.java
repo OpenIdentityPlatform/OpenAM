@@ -43,6 +43,7 @@ import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.dashboard.TrustedDevicesResource;
@@ -165,6 +166,7 @@ public class RestEndpoints {
                 .forVersion("2.0").to(IdentityResourceV2.class, "AgentsResource");
 
         dynamicRealmRouter.route("/users/{user}/devices/trusted")
+                .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").to(TrustedDevicesResource.class);
 
         //protected

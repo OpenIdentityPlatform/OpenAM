@@ -41,6 +41,7 @@ import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.security.AdminTokenAction;
@@ -811,7 +812,17 @@ public final class IdUtils {
             }
         }
         return (username);
-    } 
+    }
+
+    /**
+     * Returns <code>AMIdentityRepostiory</code> handle for an organization.
+     *
+     * @param orgDN the organization name.
+     * @return <code>AMIdentityRepostiory</code> object
+     */
+    public static AMIdentityRepository getAMIdentityRepository(String orgDN) {
+        return AuthD.getAuth().getAMIdentityRepository(orgDN);
+    }
     
     // SMS service listener to reinitialize if IdRepo service changes
     static class IdUtilsListener implements com.sun.identity.sm.ServiceListener 

@@ -15,16 +15,22 @@
 */
 package org.forgerock.openam.rest.authz;
 
+import static org.forgerock.json.resource.ResourceException.getException;
+import static org.forgerock.util.promise.Promises.newFailedPromise;
+import static org.forgerock.util.promise.Promises.newSuccessfulPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import javax.inject.Inject;
-import javax.inject.Named;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -36,7 +42,6 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
 
 /**
  * Filter which ensures that only users with an SSO Token which has Administrator-level access are allowed access
@@ -90,36 +95,37 @@ public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
         return authorize(context);
     }
 
-    /**
-     * Lets through any request which is coming from a verifiable administrator.
-     */
-    Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
-
+    protected Promise<AuthorizationResult, ResourceException> authorize(Context context) {
         SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
-
-        String userId;
         try {
             SSOToken token = tokenContext.getCallerSSOToken();
-            userId = token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
+            return validateToken(context, token);
         } catch (SSOException e) {
             if (debug.errorEnabled()) {
                 debug.error("AdminOnlyAuthZModule :: Unable to authorize as Admin user using SSO Token.", e);
             }
-            return Promises.newFailedPromise(ResourceException
-                    .getException(ResourceException.FORBIDDEN, e.getMessage(), e));
+            return newFailedPromise(getException(ResourceException.FORBIDDEN, e.getMessage(), e));
+        } catch (ResourceException e) {
+            return newFailedPromise(e);
         }
+    }
 
-        if (sessionService.get().isSuperUser(userId)) {
-            if (debug.messageEnabled()) {
-                debug.message("AdminOnlyAuthZModule :: User, " + userId + " accepted as Administrator.");
-            }
-            return Promises.newSuccessfulPromise(AuthorizationResult.success());
+    protected Promise<AuthorizationResult, ResourceException> validateToken(Context context, SSOToken token) throws SSOException, ResourceException {
+        String userId = getUserId(token);
+        if (userId != null && isSuperUser(userId)) {
+            debug.message("AdminOnlyAuthZModule :: User, {} accepted as Administrator.", userId);
+            return newSuccessfulPromise(AuthorizationResult.accessPermitted());
         } else {
-            if (debug.messageEnabled()) {
-                debug.message("AdminOnlyAuthZModule :: Restricted access to " + userId);
-            }
-            return Promises.newSuccessfulPromise(AuthorizationResult.failure("User is not an administrator."));
+            debug.message("AdminOnlyAuthZModule :: Restricted access to {}", userId);
+            return newSuccessfulPromise(AuthorizationResult.accessDenied("User is not an administrator."));
         }
+    }
 
+    protected static String getUserId(SSOToken token) throws SSOException {
+        return token == null ? null : token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
+    }
+
+    protected boolean isSuperUser(String userId) {
+        return sessionService.get().isSuperUser(userId);
     }
 }

@@ -15,17 +15,18 @@
 */
 package org.forgerock.openam.rest.authz;
 
+import javax.inject.Inject;
+
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
+import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Authorization module specifically designed for the Core Token Resource endpoint. This prevents access
@@ -53,7 +54,7 @@ public class CoreTokenResourceAuthzModule extends AdminOnlyAuthzModule {
      * a user with Administrator-level access.
      */
     @Override
-    Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
+    protected Promise<AuthorizationResult, ResourceException> validateToken(Context context, SSOToken token) throws SSOException, ResourceException {
 
         if (!enabled) {
             if (debug.messageEnabled()) {
@@ -66,7 +67,6 @@ public class CoreTokenResourceAuthzModule extends AdminOnlyAuthzModule {
             debug.message("CoreTokenResourceAuthzModule :: Request forwarded to AdminOnlyAuthzModule.");
         }
 
-        return super.authorize(context);
+        return super.validateToken(context, token);
     }
-
 }
