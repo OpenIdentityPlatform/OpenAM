@@ -3,7 +3,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright 2011-2015 ForgeRock AS.
+* Copyright 2011-2016 ForgeRock AS.
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -95,7 +95,7 @@
         <!-- Exclusion List will extract out of the OpenDJ distribution files which do not make sense to include -->
         <zip destfile="${opendj.repackage.dir}/opendj.zip"
              basedir="${opendj.repackage.dir}/opendj"
-            excludesfile="../openam-distribution/src/main/opendj/opendj_exclusion_list"/>
+             excludesfile="../openam-distribution/src/main/opendj/opendj_exclusion_list"/>
 
         <!-- OpenDJ 3.0: Deliver re-packaged zip to expected location -->
         <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">

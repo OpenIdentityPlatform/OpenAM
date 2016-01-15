@@ -27,10 +27,11 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.common.configuration;
 
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceAttributeValidator;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,10 +46,14 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Validates the values of server configuration properties.
  */
-public class ServerPropertyValidator implements ServiceAttributeValidator{
+public class ServerPropertyValidator implements ServiceAttributeValidator {
+
+    private static final Debug debug = Debug.getInstance("amServerProperties");
     private static Map keyToPossibleValues = new HashMap();
     private static Set arrayKeys = new HashSet();
     private static Set mapKeys = new HashSet();
@@ -135,44 +140,26 @@ public class ServerPropertyValidator implements ServiceAttributeValidator{
      * @throws ConfigurationException if property name and value are not in
      *         proper format.
      */
-    public static void validate(Map properties)
-        throws UnknownPropertyNameException, ConfigurationException {
-        Set unknownProperyNames = new HashSet();
-        for (Iterator i = properties.keySet().iterator(); i.hasNext(); ) {
-            String key = (String)i.next();
-            String value = (String)properties.get(key);
-            
-            if ((value.length() > 0) && (value.indexOf("%") == -1)) {
+    public static void validate(Map properties) throws UnknownPropertyNameException, ConfigurationException {
+        Set<String> unknownProperyNames = new HashSet<>();
+
+        for (final Object o : properties.keySet()) {
+            String key = (String) o;
+            String value = (String) properties.get(key);
+
+            if ((value.length() > 0) && (!value.contains("%"))) {
                 try {
-                    boolean valid = validateMap(key, value) ||
-                        validateNumber(key, value) || validate(key, value);
+                    boolean valid = validateMap(key, value) || validateNumber(key, value) || validate(key, value);
                 } catch (UnknownPropertyNameException e) {
+                    debug.error("Invalid server property {}", key, e);
                     unknownProperyNames.add(key);
                 }
             }
         }
 
         if (!unknownProperyNames.isEmpty()) {
-            if (unknownProperyNames.size() == 1) {
-                String key = (String)unknownProperyNames.iterator().next();
-                String[] param = {key};
-                throw new UnknownPropertyNameException("unknown.property",
-                    param);
-            } else {
-                StringBuilder keys = new StringBuilder();
-                boolean first = true;
-                for (Iterator i = unknownProperyNames.iterator(); i.hasNext();){
-                    if (first){
-                        first = false;
-                    } else {
-                        keys.append(", ");
-                    }
-                    keys.append((String)i.next());
-                }
-                String[] param = {keys.toString()};
-                throw new UnknownPropertyNameException("unknown.properties", 
-                    param);
-            }
+            throw new UnknownPropertyNameException("unknown.properties",
+                    new String[]{StringUtils.join(unknownProperyNames, ", ")});
         }
     }
     

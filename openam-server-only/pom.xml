@@ -39,6 +39,13 @@
     <artifactId>openam-server-only</artifactId>
     <packaging>war</packaging>
 
+    <properties>
+        <!-- default settings for standard embedded dj -->
+        <dj.backend.type>je</dj.backend.type>
+        <!-- By default this property is empty so as not to include the SecurID auth module -->
+        <auth.securID.xml />
+    </properties>
+
     <!-- Build -->
     <build>
         <finalName>OpenAM-ServerOnly-${project.version}</finalName>
@@ -429,6 +436,13 @@
                 </includes>
                 <targetPath>${project.build.directory}/classes</targetPath>
             </resource>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>AMConfig.properties</include>
+                </includes>
+            </resource>
         </resources>
     </build>
 
@@ -570,11 +584,6 @@
             </build>
         </profile>
     </profiles>
-
-    <properties>
-        <!-- By default this property is empty so as not to include the SecurID auth module -->
-        <auth.securID.xml />
-    </properties>
 
     <dependencies>
         <!-- Embedded OpenDJ Dependencies -->

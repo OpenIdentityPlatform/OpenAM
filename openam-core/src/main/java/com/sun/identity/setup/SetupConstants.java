@@ -24,7 +24,7 @@
  *
  * $Id: SetupConstants.java,v 1.46 2009/12/23 00:21:38 goodearth Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -737,4 +737,14 @@ public interface SetupConstants {
      * SSL LDAP to be used for LDAP connection mode in amAuthAD/amAuthLDAP and idRepo service
      */
     static final String LDAP_CONNECTION_MODE_LDAPS = "LDAPS";
+
+    /**
+     * The type of backing database to be used by OpenDJ.
+     */
+    String DJ_BACKEND_TYPE_CONFIG_NAME = "com.forgerock.openam.dj.backendType";
+
+    /**
+     * The Default value for the backing database to be used by OpenDJ.
+     */
+    String DJ_BACKEND_TYPE_DEFAULT = "je";
 }
