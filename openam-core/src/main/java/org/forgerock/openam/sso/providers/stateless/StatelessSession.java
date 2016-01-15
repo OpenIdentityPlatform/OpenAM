@@ -27,6 +27,8 @@ import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import org.forgerock.util.Reject;
 
+import java.util.Set;
+
 /**
  * The <code>StatelessSession</code> class represents a stateless session. It is a simple overridden version of
  * <code>Session</code> which allows for the addition of extra methods, or overriding of inherited ones.
@@ -74,4 +76,19 @@ public class StatelessSession extends Session {
     public boolean maxCachingTimeReached() {
         return true;
     }
+
+    public Set<String> getPropertyNames() {
+        return sessionProperties.keySet();
+    }
+
+    @Override
+    public String getProperty(String name) throws SessionException {
+        return sessionProperties.get(name);
+    }
+
+    @Override
+    public int getState(boolean reset) throws SessionException {
+        return sessionState;
+    }
+
 }

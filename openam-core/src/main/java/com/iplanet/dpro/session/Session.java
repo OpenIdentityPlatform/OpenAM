@@ -176,7 +176,7 @@ public class Session extends GeneralTaskRunnable {
      *     <li>3 - Destroyed</li>
      * </ul>
      */
-    private int sessionState;
+    protected int sessionState;
 
     /**
      * This is the time value (computed as System.currentTimeMillis()) when a DESTROYED
@@ -201,7 +201,7 @@ public class Session extends GeneralTaskRunnable {
      * All session related properties are stored as key-value pair in this
      * table.
      */
-    private Hashtable<String, String> sessionProperties = new Hashtable<String, String>();
+    protected Hashtable<String, String> sessionProperties = new Hashtable<>();
 
     /**
      * URL of the Session Server, where this session resides.
@@ -670,10 +670,6 @@ public class Session extends GeneralTaskRunnable {
             }
         }
         return sessionProperties.get(name);
-    }
-
-    public Set<String> getPropertyNames() {
-        return sessionProperties.keySet();
     }
 
     /**

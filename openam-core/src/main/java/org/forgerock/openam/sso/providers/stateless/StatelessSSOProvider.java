@@ -16,13 +16,22 @@
 
 package org.forgerock.openam.sso.providers.stateless;
 
+import static com.sun.identity.authentication.util.ISAuthConstants.AUTH_SERVICE_NAME;
+
+import java.security.AccessController;
 import java.security.Principal;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.sm.*;
 import org.forgerock.openam.session.blacklist.SessionBlacklist;
 
 import com.iplanet.dpro.session.SessionException;
@@ -33,12 +42,19 @@ import com.iplanet.sso.SSOProvider;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 
-public class StatelessSSOProvider implements SSOProvider {
+/**
+ * A provider for explicitly stateless SSO tokens. Exists as a service listener to ensure
+ * that updates to whether or not stateless sessions are enabled are cached per realm. Acts as the
+ * gateway barrier for stateless sessions to hit up against when stateless sessions are not enabled
+ * (they fail validation to be handled by this provider).
+ */
+public class StatelessSSOProvider implements SSOProvider, ServiceListener {
 
     private final StatelessSessionFactory statelessSessionFactory;
     private final SessionBlacklist sessionBlacklist;
     private final StatelessAdminRestriction restriction;
     private final Debug debug;
+    private final ConcurrentHashMap<String, Boolean> statelessEnabledMap = new ConcurrentHashMap<>();
 
     /**
      * Default constructor is required by interface.
@@ -52,6 +68,13 @@ public class StatelessSSOProvider implements SSOProvider {
         this.sessionBlacklist = sessionBlacklist;
         this.restriction = restriction;
         this.debug = debug;
+
+        try {
+            new ServiceConfigManager(AUTH_SERVICE_NAME,
+                    AccessController.doPrivileged(AdminTokenAction.getInstance())).addListener(this);
+        } catch (SMSException | SSOException e) {
+            debug.error("Unable to register StatelessSSOProvider against the service config listening system.");
+        }
     }
 
     private SSOToken createSSOToken(SessionID sessionId) throws SSOException {
@@ -144,8 +167,9 @@ public class StatelessSSOProvider implements SSOProvider {
         }
 
         try {
-            return statelessSSOToken.isValid(refresh) && !sessionBlacklist.isBlacklisted(session);
-        } catch (SessionException e) {
+            return isStatelessEnabled(token.getProperty(com.sun.identity.shared.Constants.ORGANIZATION)) &&
+                    statelessSSOToken.isValid(refresh) && !sessionBlacklist.isBlacklisted(session);
+        } catch (SessionException | SMSException | SSOException e) {
             debug.error("Unable to check session blacklist: {}", e);
             return false;
         }
@@ -196,6 +220,45 @@ public class StatelessSSOProvider implements SSOProvider {
             return ((StatelessSSOToken) token).getSession();
         } else {
             throw new SSOException("Not a stateless SSOToken");
+        }
+    }
+
+    private boolean isStatelessEnabled(String usrDn) throws SMSException {
+        String orgDn = AuthD.getAuth().getOrgDN(usrDn);
+
+        if (!statelessEnabledMap.containsKey(orgDn)) {
+            writeOrgConfigData(orgDn);
+        }
+
+        return statelessEnabledMap.get(orgDn);
+    }
+
+    @Override
+    public void schemaChanged(String serviceName, String version) {
+        //this section intentionally left blank
+    }
+
+    @Override
+    public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent,
+                                    int type) {
+        //this section intentionally left blank
+    }
+
+    @Override
+    public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
+                                          String serviceComponent, int type) {
+        if (serviceName.equals(AUTH_SERVICE_NAME)) {
+           writeOrgConfigData(orgName);
+        }
+    }
+
+    private void writeOrgConfigData(String orgDn) {
+        try {
+            statelessEnabledMap.put(orgDn, CollectionHelper.getBooleanMapAttr(
+                    AuthD.getAuth().getOrgConfigManager(DNMapper.orgNameToDN(orgDn)).getServiceAttributes(AUTH_SERVICE_NAME),
+                    ISAuthConstants.AUTH_STATELESS_SESSIONS, false));
+        } catch (SMSException e) {
+            debug.message("StatelessSSOProvider :: organizationConfigChanger - Unable to update org config.");
         }
     }
 }
