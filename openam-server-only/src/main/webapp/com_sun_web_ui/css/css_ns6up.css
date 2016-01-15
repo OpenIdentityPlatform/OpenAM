@@ -244,8 +244,7 @@ span.MstLbl, span.MstTxt, span.MstUsrRole, span.MstAlmDwnTxt, span.MstAlmCrtTxt,
 a.MstUsrLnk:link, a.MstUsrLnk:visited, a.MstAlmLnk:link, a.MstAlmLnk:visited, a.MstPrgLnk:link, a.MstPrgLnk:visited {color:#eef0f2;text-decoration:underline}
 a.MstUsrLnk:hover, a.MstAlmLnk:hover, a.MstPrgLnk:hover {text-decoration:underline}
 .MstBdy {background-color:#5A6C76}
-.MstTblEnd {background-color:#5A6C76;background-image:url(../images/masthead/masthead-sun-background.jpg)}
-.MstDiv {background-color:#495B67;background-image:url(../images/masthead/masthead-background.jpg)}
+.MstDiv {background-color:#1f2223;}
 .MstSecTbl {background-color:#4A5C6A;background-image:url(../images/masthead/sec-masthead-background.jpg)}
 a.MstLnk:link, a.MstLnk:visited {background-color:#D9E6EC;color:#000;text-decoration:none;border-top:solid 1px #2D3C46;border-left:solid 1px #1C262D;border-right:solid 1px #1C262D;border-bottom:solid 1px #0E1418;background-image:url(../images/masthead/masthead_link_enabled.gif)}
 a.MstLnk:hover {background-color:#EAF9FF;background-image:url(../images/masthead/masthead_link_roll.gif)}
@@ -405,7 +404,7 @@ a.DatOthBldLnk:hover {text-decoration:underline}
 
 /* SKIP NAVIGATION LINK */	
 .SkpWht {background-color:#FFF;height:0px}
-.SkpMedGry1 {background-color:#708290;height:0px}
+.SkpMedGry1 {background-color:#1f2223;height:0px}
 
 
 /* TABLE */
