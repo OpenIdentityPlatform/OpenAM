@@ -1149,6 +1149,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         if (returnAllAttrs || (returnAttrs != null && returnAttrs.contains("*"))) {
             Set<String> predefinedAttrs = getDefinedAttributes(type);
+            predefinedAttrs.add(searchAttr);
             attrs = predefinedAttrs.toArray(new String[predefinedAttrs.size()]);
             returnAllAttrs = true;
         } else if (returnAttrs != null && !returnAttrs.isEmpty()) {
