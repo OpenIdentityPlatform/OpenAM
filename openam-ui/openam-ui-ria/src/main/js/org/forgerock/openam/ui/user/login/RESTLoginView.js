@@ -42,7 +42,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         var self = this,
             firstUserNamePassStage = Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
 
-
         // self-service links should be shown only on the first stage of the username/password stages
         this.data.showForgotPassword = firstUserNamePassStage && Configuration.globalData.forgotPassword === "true";
         this.data.showForgotUserName = firstUserNamePassStage && Configuration.globalData.forgotUsername === "true";
@@ -140,6 +139,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 expire;
 
             e.preventDefault();
+            // disabled button before login
+            $(e.currentTarget).prop("disabled", true);
 
             submitContent = new Form2js(this.$el[0]);
             submitContent[$(e.target).attr("name")] = $(e.target).attr("index");
@@ -161,6 +162,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, {
                 submitContent:submitContent,
                 failureCallback: function () {
+                    // enabled the login button if login failure
+                    $(e.currentTarget).prop("disabled", false);
                     // If its not the first stage then render the Login Unavailable view with link back to login screen.
                     var urlParams;
                     if (Configuration.globalData.auth.currentStage > 1) {
