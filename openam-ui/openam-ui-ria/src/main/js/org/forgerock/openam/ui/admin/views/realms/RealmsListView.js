@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
@@ -25,10 +25,11 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/openam/ui/common/util/NavigationHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService"
 ], function ($, _, AbstractView, Backgrid, BackgridUtils, BootstrapDialog, CreateUpdateRealmDialog, Form, FormHelper,
-             Messages, Router, SMSGlobalService) {
+             Messages, NavigationHelper, Router, SMSGlobalService) {
     var RealmsView = AbstractView.extend({
         template: "templates/admin/views/realms/RealmsListTemplate.html",
         editDetailsDialogTemplate: "templates/admin/views/realms/RealmPropertiesDialogTemplate.html",
@@ -162,6 +163,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                 }
                 self.data.realms = data.result;
                 self.data.allRealmPaths = [];
+                NavigationHelper.populateRealmsDropdown(data);
 
                 _.each(self.data.realms, function (realm) {
                     realm.canDelete = self.canRealmBeDeleted(realm);

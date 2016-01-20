@@ -14,15 +14,25 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
+/**
+ * @module org/forgerock/openam/ui/common/util/NavigationHelper
+ */
 define("org/forgerock/openam/ui/common/util/NavigationHelper", [
     "lodash",
     "jquery",
     "org/forgerock/commons/ui/common/components/Navigation",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/commons/ui/common/main/Router"
-], function (_, $, Navigation, SMSGlobalService, Router) {
+], function (_, $, Navigation, Router) {
     return {
-        populateRealmsDropdown: function () {
+
+        /**
+         * Reset and populate the realm dynamic links in the navigation realms dropdown
+         * @param  {Object} data Result of the service call
+         * @param  {Array} data.result List of the available realms
+         * @example
+         *   SMSGlobalService.realms.all().then(NavigationHelper.populateRealmsDropdown);
+         */
+        populateRealmsDropdown: function (data) {
             var maxRealms = 4,
                 name;
 
@@ -38,27 +48,25 @@ define("org/forgerock/openam/ui/common/util/NavigationHelper", [
                     Navigation.configuration.links.admin.urls.realms.urls, "dynamicLink", true);
             }
 
-            SMSGlobalService.realms.all().done(function (data) {
-                _(data.result).filter("active").sortBy("path").take(maxRealms).forEach(function (realm) {
-                    name = realm.name === "/" ? $.t("console.common.topLevelRealm") : realm.name;
-                    Navigation.addLink({
-                        "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
-                            [encodeURIComponent(realm.path)]),
-                        "name": name,
-                        "cssClass": "dropdown-sub",
-                        "dynamicLink": true
-                    }, "admin", "realms");
-                }).run();
-
+            _(data.result).filter("active").sortBy("path").take(maxRealms).forEach(function (realm) {
+                name = realm.name === "/" ? $.t("console.common.topLevelRealm") : realm.name;
                 Navigation.addLink({
-                    "url": "#" + Router.getLink(Router.configuration.routes.realms),
-                    "name": $.t("config.AppConfiguration.Navigation.links.realms.viewAll"),
+                    "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
+                        [encodeURIComponent(realm.path)]),
+                    "name": name,
                     "cssClass": "dropdown-sub",
                     "dynamicLink": true
                 }, "admin", "realms");
+            }).run();
 
-                Navigation.reload();
-            });
+            Navigation.addLink({
+                "url": "#" + Router.getLink(Router.configuration.routes.realms),
+                "name": $.t("config.AppConfiguration.Navigation.links.realms.viewAll"),
+                "cssClass": "dropdown-sub",
+                "dynamicLink": true
+            }, "admin", "realms");
+
+            Navigation.reload();
         }
     };
 });

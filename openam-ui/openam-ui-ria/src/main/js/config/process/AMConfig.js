@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 
 define("config/process/AMConfig", [
@@ -233,14 +233,15 @@ define("config/process/AMConfig", [
         dependencies: [
             "org/forgerock/commons/ui/common/main/Configuration",
             "org/forgerock/commons/ui/common/util/CookieHelper",
+            "org/forgerock/openam/ui/admin/services/SMSGlobalService",
             "org/forgerock/openam/ui/common/sessions/SessionValidator",
             "org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy",
             "org/forgerock/openam/ui/common/util/NavigationHelper"
         ],
-        processDescription: function (event, Configuration, CookieHelper, SessionValidator, MaxIdleTimeLeftStrategy,
-                                      NavigationHelper) {
+        processDescription: function (event, Configuration, CookieHelper, SMSGlobalService, SessionValidator,
+                                      MaxIdleTimeLeftStrategy, NavigationHelper) {
             if (Configuration.loggedUser.hasRole("ui-realm-admin")) {
-                NavigationHelper.populateRealmsDropdown();
+                SMSGlobalService.realms.all().then(NavigationHelper.populateRealmsDropdown);
             }
 
             if (Configuration.globalData.xuiUserSessionValidationEnabled &&
