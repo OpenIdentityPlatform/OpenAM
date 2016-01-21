@@ -24,10 +24,7 @@
  *
  * $Id: RADIUS.java,v 1.3 2009/06/18 18:48:23 bigfatrat Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.modules.radius;
 
@@ -193,6 +190,9 @@ public class RADIUS extends AMLoginModule {
     }
 
     private void setDynamicText(int state) throws AuthLoginException {
+        // Callbacks may not be initialized or may contain stale data, we need to re-read them.
+        setForceCallbacksRead(true);
+        forceCallbacksInit();
         Callback[] callbacks = getCallback(state);
         String prompt = ((PasswordCallback)callbacks[0]).getPrompt();
         boolean echo = ((PasswordCallback)callbacks[0]).isEchoOn();
