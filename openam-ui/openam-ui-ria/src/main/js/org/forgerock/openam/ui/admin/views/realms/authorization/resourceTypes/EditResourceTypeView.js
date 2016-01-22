@@ -119,6 +119,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 this.data,
                 function (tpl) {
                     self.$el.find("#resTypeSetting").html(tpl);
+                    self.$el.find("#resTypeSetting [autofocus]").focus();
                 });
         },
 

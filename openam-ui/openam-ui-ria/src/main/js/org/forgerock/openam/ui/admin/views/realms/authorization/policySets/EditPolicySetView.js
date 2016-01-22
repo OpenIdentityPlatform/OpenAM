@@ -115,7 +115,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                                     self.$el.find("#policySetSettings").append(tpl);
                                     self.populateResourceTypes();
                                     FormHelper.setActiveTab(self);
-
+                                    self.$el.find("#policySetSettings [autofocus]").focus();
                                     if (self.renderCallback) {
                                         self.renderCallback();
                                     }

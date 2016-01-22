@@ -185,6 +185,9 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                                 dialog.getButton("submitButton").disable();
                             }
                         });
+                        dialog.$modalBody
+                            .find(".well input[type=\"text\"]:not(:disabled):first")
+                            .prop("autofocus", true);
                     },
                     onshown: function (dialog) {
                         dialog.$modalBody.find("[data-toggle='popover-realm-status']").popoverclickaway({
