@@ -33,11 +33,11 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/openam/ui/admin/utils/FormHelper"
 ], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, ThemeableSelectAllCell,
              Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script,
-             SMSGlobalDelegate, FormHelper) {
+             SSMSGlobalService, FormHelper) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/scripts/ScriptsTemplate.html",
@@ -58,8 +58,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
 
             this.realmPath = args[0];
             this.data.selectedUUIDs = [];
-            this.contextSchemaPromise = SMSGlobalDelegate.scripts.getSchema();
-            this.languageSchemaPromise = SMSGlobalDelegate.scripts.getContextSchema();
+            this.contextSchemaPromise = SSMSGlobalService.scripts.getSchema();
+            this.languageSchemaPromise = SSMSGlobalService.scripts.getContextSchema();
 
             Scripts = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/scripts"),

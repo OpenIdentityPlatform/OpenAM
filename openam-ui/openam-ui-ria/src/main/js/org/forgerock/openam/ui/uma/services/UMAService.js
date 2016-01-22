@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
+define("org/forgerock/openam/ui/uma/services/UMAService", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",

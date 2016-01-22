@@ -29,13 +29,13 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
+    "org/forgerock/openam/ui/uma/services/UMAService",
     "org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy",
 
     // jquery dependencies
     "selectize"
 ], function ($, _, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants,
-             EventManager, LabelTreeNavigationView, Messages, Router, UIUtils, UMADelegate, UMAResourceSetWithPolicy) {
+             EventManager, LabelTreeNavigationView, Messages, Router, UIUtils, UMAService, UMAResourceSetWithPolicy) {
     function isUserLabel (label) {
         return label.type === "USER";
     }
@@ -51,7 +51,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     }
     function createLabels (labelNames) {
         var creationPromises = _.map(labelNames, function (labelName) {
-            return UMADelegate.labels.create(labelName, "USER");
+            return UMAService.labels.create(labelName, "USER");
         });
         return $.when.apply($, creationPromises).then(function () {
             if (creationPromises.length === 1) {
@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
         });
     }
     function getAllLabels () {
-        return UMADelegate.labels.all().then(function (labels) {
+        return UMAService.labels.all().then(function (labels) {
             return labels.result;
         });
     }

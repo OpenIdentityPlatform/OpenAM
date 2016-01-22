@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -11,37 +11,37 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
- /**
-  * @module org/forgerock/openam/ui/common/delegates/ServerDelegate
-  */
-define("org/forgerock/openam/ui/common/delegates/ServerDelegate", [
+
+define("org/forgerock/openam/ui/dashboard/services/OAuthTokensService", [
     "jquery",
-    "lodash",
+    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Constants, RealmHelper) {
-
+], function ($, _, AbstractDelegate, Configuration, Constants, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
-    obj.getVersion = function () {
+    obj.getApplications = function () {
         return obj.serviceCall({
-            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/version")
-        }).then(function (data) {
-            return "OpenAM " + data.version + " " + $.t("common.form.build") + " " +
-                data.revision + " (" + data.date + ")";
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                encodeURIComponent(Configuration.loggedUser.get("username")) +
+                "/oauth2/applications?_queryFilter=true"),
+            headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
-    obj.getConfiguration = function (callParams) {
-        return obj.serviceCall(_.extend({
-            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/*")
-        }, callParams));
+    obj.revokeApplication = function (id) {
+        return obj.serviceCall({
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                encodeURIComponent(Configuration.loggedUser.get("username")) +
+                "/oauth2/applications/" + id),
+            type: "DELETE",
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+        });
     };
 
     return obj;

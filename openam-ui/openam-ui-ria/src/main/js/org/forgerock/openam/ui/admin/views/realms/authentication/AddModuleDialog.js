@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/AddModuleDialog", [
@@ -20,9 +20,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddModuleDialo
     "handlebars",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, BootstrapDialog, Handlebars, Messages, Router, SMSRealmDelegate, UIUtils) {
+], function ($, BootstrapDialog, Handlebars, Messages, Router, SMSRealmService, UIUtils) {
     function addModuleDialogValidation (dialog) {
         var valid = true,
             alert = "",
@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddModuleDialo
         if (addModuleDialogValidation(dialog)) {
             var moduleName = dialog.getModalBody().find("#newModuleName").val(),
                 moduleType = dialog.getModalBody().find("#newModuleType").val(),
-                modulesDelegate = SMSRealmDelegate.authentication.modules;
+                modulesDelegate = SMSRealmService.authentication.modules;
 
             modulesDelegate.exists(dialog.options.data.realmPath, moduleName).then(function (result) {
                 var authenticationModules = modulesDelegate;

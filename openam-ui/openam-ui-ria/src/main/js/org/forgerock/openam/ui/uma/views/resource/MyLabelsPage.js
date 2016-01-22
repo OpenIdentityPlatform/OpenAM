@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
@@ -26,9 +26,9 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate"
+    "org/forgerock/openam/ui/uma/services/UMAService"
 ], function ($, Backbone, Backgrid, BackgridUtils, BasePage, BootstrapDialog, Configuration, Constants, EventManager,
-             Router, RealmHelper, UMADelegate) {
+             Router, RealmHelper, UMAService) {
     var MyLabelsPage = BasePage.extend({
         template: "templates/uma/views/resource/MyLabelsPageTemplate.html",
         partials: [
@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
                         dialog.enableButtons(false);
                         dialog.getButton("ok").text($.t("common.form.working"));
 
-                        UMADelegate.labels.remove(self.data.label._id).done(function () {
+                        UMAService.labels.remove(self.data.label._id).done(function () {
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "deleteLabelSuccess");
 
                             dialog.close();
@@ -84,7 +84,7 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
             var labelId = args[0],
                 self = this;
 
-            UMADelegate.labels.get(labelId).then(function (result) {
+            UMAService.labels.get(labelId).then(function (result) {
                 self.data.label = result;
                 if (result) {
                     self.renderGrid(self.createLabelCollection(labelId), self.createColumns("mylabels/" + labelId),

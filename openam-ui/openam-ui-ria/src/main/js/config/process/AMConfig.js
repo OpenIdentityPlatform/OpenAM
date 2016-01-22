@@ -92,15 +92,15 @@ define("config/process/AMConfig", [
             "org/forgerock/commons/ui/common/main/Router",
             "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
             "org/forgerock/openam/ui/admin/views/realms/RealmsListView",
-            "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
+            "org/forgerock/openam/ui/admin/services/SMSGlobalService"
         ],
-        processDescription: function (event, Router, CreateUpdateRealmDialog, RealmsListView, SMSGlobalDelegate) {
+        processDescription: function (event, Router, CreateUpdateRealmDialog, RealmsListView, SMSGlobalService) {
             Router.routeTo(Router.configuration.routes.realms, {
                 args: [],
                 trigger: true
             });
 
-            SMSGlobalDelegate.realms.all().done(function (data) {
+            SMSGlobalService.realms.all().done(function (data) {
                 var allRealmPaths = [];
                 _.each(data.result, function (realm) {
                     allRealmPaths.push(realm.path);

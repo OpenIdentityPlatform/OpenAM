@@ -19,11 +19,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     "jquery",
     "underscore",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/services/PoliciesService",
 
     // jquery dependencies
     "selectize"
-], function ($, _, ConditionAttrBaseView, PoliciesDelegate) {
+], function ($, _, ConditionAttrBaseView, PoliciesService) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrArray.html",
         MIN_QUERY_LENGTH: 1,
@@ -160,7 +160,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
         queryIdentities: function (item, query, callback) {
             var selectize = this;
-            PoliciesDelegate.queryIdentities($(item).data().source, query)
+            PoliciesService.queryIdentities($(item).data().source, query)
                 .done(function (data) {
                     _.each(data.result, function (value) {
                         selectize.addOption({ value: value, text: value });
@@ -174,7 +174,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
         getUniversalId: function (item, type) {
             var self = this;
-            PoliciesDelegate.getUniversalId(item, type).done(function (subject) {
+            PoliciesService.getUniversalId(item, type).done(function (subject) {
                 self.data.itemData.subjectValues = _.union(self.data.itemData.subjectValues, subject.universalid);
                 self.data.hiddenData[type][subject.universalid[0]] = item;
             });
@@ -182,7 +182,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
         loadFromDataSource: function (item, callback) {
             var selectize = this;
-            PoliciesDelegate.getDataByType($(item).data().source)
+            PoliciesService.getDataByType($(item).data().source)
                 .done(function (data) {
                     _.each(data.result, function (value) {
                         selectize.addOption({ value: value._id, text: value.name });

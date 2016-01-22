@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
@@ -19,8 +19,8 @@ define("org/forgerock/openam/ui/dashboard/views/MyApplicationsView", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate"
-], function ($, _, AbstractView, MyApplicationsDelegate) {
+    "org/forgerock/openam/ui/dashboard/services/MyApplicationsService"
+], function ($, _, AbstractView, MyApplicationsService) {
     var Applications = AbstractView.extend({
         template: "templates/openam/dashboard/MyApplicationsTemplate.html",
         noBaseTemplate: true,
@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/dashboard/views/MyApplicationsView", [
         render: function () {
             var self = this;
 
-            MyApplicationsDelegate.getMyApplications().then(function (apps) {
+            MyApplicationsService.getMyApplications().then(function (apps) {
                 if (apps.length > 0) {
                     self.data.apps = apps;
                 }

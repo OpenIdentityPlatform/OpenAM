@@ -19,18 +19,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog",
     "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/openam/ui/common/util/Promise"
-], function ($, _, Messages, AbstractView, SMSRealmDelegate, FormHelper, AddChainDialog, arrayify, Promise) {
+], function ($, _, Messages, AbstractView, SMSRealmService, FormHelper, AddChainDialog, arrayify, Promise) {
     function getChainNameFromElement (element) {
         return $(element).data().chainName;
     }
     function performDeleteChains (realmPath, names) {
         return Promise.all(arrayify(names).map(function (name) {
-            return SMSRealmDelegate.authentication.chains.remove(realmPath, name);
+            return SMSRealmService.authentication.chains.remove(realmPath, name);
         }));
     }
 
@@ -132,7 +132,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
 
             this.data.realmPath = args[0];
 
-            SMSRealmDelegate.authentication.chains.all(this.data.realmPath).then(function (data) {
+            SMSRealmService.authentication.chains.all(this.data.realmPath).then(function (data) {
                 _.each(data.values.result, function (obj) {
                     // Add default chains to top of list.
                     if (obj.active) {

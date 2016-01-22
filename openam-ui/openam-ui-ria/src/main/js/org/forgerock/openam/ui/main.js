@@ -15,10 +15,10 @@
  */
 
 define("org/forgerock/openam/ui/main", [
-    "./common/delegates/SiteConfigurationDelegate",
+    "./common/services/SiteConfigurationService",
     "./common/util/Helpers",
     "./user/login/RESTLoginHelper",
-    "./user/delegates/AuthNDelegate",
-    "./user/delegates/SessionDelegate",
+    "./user/services/AuthNService",
+    "./user/services/SessionService",
     "./user/login/RESTLoginView"
 ]);

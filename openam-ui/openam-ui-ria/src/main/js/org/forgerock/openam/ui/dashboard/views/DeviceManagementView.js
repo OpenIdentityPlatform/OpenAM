@@ -20,10 +20,10 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate",
+    "org/forgerock/openam/ui/dashboard/services/DeviceManagementService",
     "org/forgerock/openam/ui/dashboard/views/DeviceDetailsDialog",
     "org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog"
-], function ($, _, Messages, AbstractView, DeviceManagementDelegate, DeviceDetailsDialog,
+], function ($, _, Messages, AbstractView, DeviceManagementService, DeviceDetailsDialog,
              DevicesSettingsDialog) {
     var DeviceManagementView = AbstractView.extend({
         template: "templates/openam/dashboard/DeviceManagementTemplate.html",
@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                 card = $(target).closest("div[data-device-uuid]"),
                 uuid = card.attr("data-device-uuid");
 
-            DeviceManagementDelegate.deleteDevice(uuid).then(function () {
+            DeviceManagementService.deleteDevice(uuid).then(function () {
                 card.parent().remove();
             }, function (response) {
                 Messages.addMessage({
@@ -69,7 +69,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
 
         render: function (callback) {
             var self = this;
-            DeviceManagementDelegate.getDevices().then(function (devicesData) {
+            DeviceManagementService.getDevices().then(function (devicesData) {
                 self.data.devices = devicesData.result;
                 self.parentRender(function () {
                     if (callback) {

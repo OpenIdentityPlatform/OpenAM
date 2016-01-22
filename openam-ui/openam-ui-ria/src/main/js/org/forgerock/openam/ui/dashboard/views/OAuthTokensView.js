@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
@@ -19,8 +19,8 @@ define("org/forgerock/openam/ui/dashboard/views/OAuthTokensView", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/dashboard/delegates/OAuthTokensDelegate"
-], function ($, _, AbstractView, OAuthTokensDelegate) {
+    "org/forgerock/openam/ui/dashboard/services/OAuthTokensService"
+], function ($, _, AbstractView, OAuthTokensService) {
     var OAuthToken = AbstractView.extend({
         template: "templates/openam/dashboard/TokensTemplate.html",
         noBaseTemplate: true,
@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/dashboard/views/OAuthTokensView", [
         render: function () {
             var self = this;
 
-            OAuthTokensDelegate.getApplications().then(function (data) {
+            OAuthTokensService.getApplications().then(function (data) {
                 self.data.applications = _.map(data.result, function (application) {
                     return {
                         id: application._id,
@@ -53,7 +53,7 @@ define("org/forgerock/openam/ui/dashboard/views/OAuthTokensView", [
             event.preventDefault();
             var self = this;
 
-            OAuthTokensDelegate.revokeApplication(event.currentTarget.id).then(function () {
+            OAuthTokensService.revokeApplication(event.currentTarget.id).then(function () {
                 self.render();
             }, function () {
                 console.error("Failed to revoke application");

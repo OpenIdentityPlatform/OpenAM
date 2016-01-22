@@ -41,7 +41,7 @@ define("config/AppConfiguration", [
                 selfRegistration: false,
                 enterprise: false,
                 remoteConfig: true,
-                delegate: "org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate"
+                delegate: "org/forgerock/openam/ui/common/services/SiteConfigurationService"
             }
         }, {
             moduleClass: "org/forgerock/commons/ui/common/main/ProcessConfiguration",

@@ -11,22 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/common/components/Footer", [
     "underscore",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/components/Footer",
-    "org/forgerock/openam/ui/common/delegates/ServerDelegate"
-], function (_, Configuration, Footer, ServerDelegate) {
+    "org/forgerock/openam/ui/common/services/ServerService"
+], function (_, Configuration, Footer, ServerService) {
     function isAdmin () {
         return Configuration.loggedUser && _.contains(Configuration.loggedUser.uiroles, "ui-realm-admin");
     }
 
     var Component = Footer.extend({
         getVersion: function () {
-            return ServerDelegate.getVersion();
+            return ServerService.getVersion();
         },
         showVersion: function () {
             return isAdmin();

@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 /**
- * @module org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate
+ * @module org/forgerock/openam/ui/dashboard/services/DeviceManagementService
  */
-define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
+define("org/forgerock/openam/ui/dashboard/services/DeviceManagementService", [
     "jquery",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",

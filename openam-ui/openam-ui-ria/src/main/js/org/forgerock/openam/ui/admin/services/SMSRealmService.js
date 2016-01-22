@@ -14,16 +14,16 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
+define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils",
+    "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Constants, SMSDelegateUtils, RealmHelper) {
+], function ($, _, AbstractDelegate, Constants, SMSServiceUtils, RealmHelper) {
     /**
-     * @exports org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate
+     * @exports org/forgerock/openam/ui/admin/services/SMSRealmService
      */
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json"),
         scopedByRealm = function (realm, path) {
@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 })
             ).then(function (schemaData, valuesData) {
                 return {
-                    schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
+                    schema: SMSServiceUtils.sanitizeSchema(schemaData[0]),
                     values: valuesData[0]
                 };
             });
@@ -169,7 +169,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/modules?_queryFilter=true"),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-                }).done(SMSDelegateUtils.sortResultBy("_id"));
+                }).done(SMSServiceUtils.sortResultBy("_id"));
             },
             create: function (realm, data, type) {
                 return obj.serviceCall({
@@ -220,7 +220,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     return obj.serviceCall({
                         url: scopedByRealm(realm, "authentication/modules/types?_queryFilter=true"),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-                    }).done(SMSDelegateUtils.sortResultBy("name"));
+                    }).done(SMSServiceUtils.sortResultBy("name"));
                 },
                 get: function (realm, type) {
                     // TODO: change this to a proper server-side call when OPENAM-7242 is implemented
@@ -235,7 +235,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
                 }).then(function (data) {
-                    return SMSDelegateUtils.sanitizeSchema(data);
+                    return SMSServiceUtils.sanitizeSchema(data);
                 });
             }
         }

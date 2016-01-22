@@ -18,9 +18,9 @@ define("org/forgerock/openam/ui/common/util/NavigationHelper", [
     "lodash",
     "jquery",
     "org/forgerock/commons/ui/common/components/Navigation",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/commons/ui/common/main/Router"
-], function (_, $, Navigation, SMSGlobalDelegate, Router) {
+], function (_, $, Navigation, SMSGlobalService, Router) {
     return {
         populateRealmsDropdown: function () {
             var maxRealms = 4,
@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/common/util/NavigationHelper", [
                     Navigation.configuration.links.admin.urls.realms.urls, "dynamicLink", true);
             }
 
-            SMSGlobalDelegate.realms.all().done(function (data) {
+            SMSGlobalService.realms.all().done(function (data) {
                 _(data.result).filter("active").sortBy("path").take(maxRealms).forEach(function (realm) {
                     name = realm.name === "/" ? $.t("console.common.topLevelRealm") : realm.name;
                     Navigation.addLink({

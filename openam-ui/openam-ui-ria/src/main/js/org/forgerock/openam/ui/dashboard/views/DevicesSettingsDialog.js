@@ -20,15 +20,15 @@ define("org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog", [
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate"
-], function ($, _, BootstrapDialog, Messages, UIUtils, DeviceManagementDelegate) {
+    "org/forgerock/openam/ui/dashboard/services/DeviceManagementService"
+], function ($, _, BootstrapDialog, Messages, UIUtils, DeviceManagementService) {
     function closeDialog (dialog) {
         dialog.close();
     }
 
     return function () {
         var template = "templates/openam/dashboard/DevicesSettingsDialogTemplate.html",
-            authSkip = DeviceManagementDelegate.checkDevicesOathSkippable();
+            authSkip = DeviceManagementService.checkDevicesOathSkippable();
 
         BootstrapDialog.show({
             title: $.t("openam.deviceManagement.devicesSettingDialog.title"),
@@ -42,7 +42,7 @@ define("org/forgerock/openam/ui/dashboard/views/DevicesSettingsDialog", [
                 cssClass: "btn-primary",
                 action: function (dialog) {
                     authSkip = !dialog.$modalBody.find("#oathStatus").is(":checked");
-                    DeviceManagementDelegate.setDevicesOathSkippable(authSkip).then(function () {
+                    DeviceManagementService.setDevicesOathSkippable(authSkip).then(function () {
                         dialog.close();
                     }, function (response) {
                         Messages.addMessage({

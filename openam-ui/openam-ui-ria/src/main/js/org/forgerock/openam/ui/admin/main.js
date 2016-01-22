@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define([
-    "./delegates/SMSDelegateUtils",
-    "./delegates/SMSGlobalDelegate",
-    "./delegates/SMSRealmDelegate",
+    "./services/SMSServiceUtils",
+    "./services/SMSGlobalService",
+    "./services/SMSRealmService",
 
     "./models/Form",
     "./models/FormCollection",

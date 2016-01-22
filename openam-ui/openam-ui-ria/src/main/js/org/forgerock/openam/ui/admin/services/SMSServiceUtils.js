@@ -14,11 +14,11 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
+define("org/forgerock/openam/ui/admin/services/SMSServiceUtils", [
     "lodash"
 ], function (_) {
     /**
-     * @exports org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils
+     * @exports org/forgerock/openam/ui/admin/services/SMSServiceUtils
      */
     var obj = {};
 

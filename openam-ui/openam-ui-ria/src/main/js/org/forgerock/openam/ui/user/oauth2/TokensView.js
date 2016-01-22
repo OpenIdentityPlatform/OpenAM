@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,18 +25,18 @@
 define("org/forgerock/openam/ui/user/oauth2/TokensView", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/user/delegates/TokenDelegate",
+    "org/forgerock/openam/ui/user/services/TokenService",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "dataTable",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "require"
-], function ($, AbstractView, tokensDelegate, eventManager, constants, dataTable, i18nManager, require) {
+], function ($, AbstractView, tokensService, eventManager, constants, dataTable, i18nManager, require) {
 
     var TokensView = AbstractView.extend({
         template: "templates/openam/oauth2/TokensTemplate.html",
 
-        delegate: tokensDelegate,
+        delegate: tokensService,
 
         events: {
             "click checkbox": "select",
@@ -63,7 +63,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                 "bProcessing": true,
                 "sAjaxSource": "",
                 "fnServerData": function (sUrl, aoData, fnCallback) {
-                    tokensDelegate.getAllTokens(function (tokens) {
+                    tokensService.getAllTokens(function (tokens) {
                         var data = { aaData: tokens }, i, cleanScope, cleanDate;
 
                         for (i = 0; i < data.aaData.length; i++) {
@@ -123,7 +123,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                 "fnRowCallback": function (row, data) {
                     $(row).children().not(":first").click(function () {
                         var id = data.id[0], htmlCode, table, temp = row, td;
-                        tokensDelegate.getTokenByID(function (tokenInfo) {
+                        tokensService.getTokenByID(function (tokenInfo) {
                             var output;
 
                             output = '<table width="100%" cellpadding="5" cellspacing="0" border="0" ' +
@@ -178,7 +178,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                 var id, td;
                 td = $(this);
                 id = td.attr("id");
-                tokensDelegate.deleteToken(
+                tokensService.deleteToken(
                     function () {
                         location.reload(true);
                     },

@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/services/PoliciesService",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/CreatedResourcesView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/PolicyActionsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/StaticResponseAttributesView",
@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "bootstrap-tabdrop",
     "selectize"
 ], function ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, PolicyModel, PolicySetModel,
-             PoliciesDelegate, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
+             PoliciesService, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
              SubjectResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView, FormHelper) {
     return AbstractView.extend({
         partials: [
@@ -79,12 +79,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
             // This piece of information is necessary both when creating new and editing existing policy
             this.policySetModelPromise = new PolicySetModel({ name: this.data.policySetName }).fetch();
-            this.resourceTypesPromise = PoliciesDelegate.listResourceTypes();
+            this.resourceTypesPromise = PoliciesService.listResourceTypes();
 
             if (policyName) {
-                this.allSubjectsPromise = PoliciesDelegate.getSubjectConditions();
-                this.allEnvironmentsPromise = PoliciesDelegate.getEnvironmentConditions();
-                this.allUserAttributesPromise = PoliciesDelegate.getAllUserAttributes();
+                this.allSubjectsPromise = PoliciesService.getSubjectConditions();
+                this.allEnvironmentsPromise = PoliciesService.getEnvironmentConditions();
+                this.allUserAttributesPromise = PoliciesService.getAllUserAttributes();
 
                 this.template = "templates/admin/views/realms/authorization/policies/EditPolicyTemplate.html";
                 this.model = new PolicyModel({ name: policyName });

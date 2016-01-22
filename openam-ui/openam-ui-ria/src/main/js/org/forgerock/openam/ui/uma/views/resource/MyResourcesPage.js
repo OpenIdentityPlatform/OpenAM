@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
@@ -22,8 +22,8 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function ($, _, BootstrapDialog, BasePage, Configuration, Constants, EventManager, UMADelegate) {
+    "org/forgerock/openam/ui/uma/services/UMAService"
+], function ($, _, BootstrapDialog, BasePage, Configuration, Constants, EventManager, UMAService) {
     var MyResourcesPage = BasePage.extend({
         template: "templates/uma/views/resource/MyResourcesPageTemplate.html",
         partials: [
@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
                                 callback);
             } else {
                 // Resolve label ID to name
-                UMADelegate.labels.get(labelId).done(function (data) {
+                UMAService.labels.get(labelId).done(function (data) {
                     var columns = self.createColumns("myresources/" + encodeURIComponent(data.id));
 
                     // Splice out the "Hosts" column
@@ -78,7 +78,7 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
                     dialog.enableButtons(false);
                     dialog.getButton("ok").text($.t("common.form.working"));
 
-                    UMADelegate.unshareAllResources().done(function () {
+                    UMAService.unshareAllResources().done(function () {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unshareAllResourcesSuccess");
 
                         dialog.close();

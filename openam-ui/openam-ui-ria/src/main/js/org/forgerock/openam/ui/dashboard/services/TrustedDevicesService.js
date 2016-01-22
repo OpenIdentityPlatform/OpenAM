@@ -11,11 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/dashboard/delegates/OAuthTokensDelegate", [
+define("org/forgerock/openam/ui/dashboard/services/TrustedDevicesService", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
@@ -25,20 +25,18 @@ define("org/forgerock/openam/ui/dashboard/delegates/OAuthTokensDelegate", [
 ], function ($, _, AbstractDelegate, Configuration, Constants, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
-    obj.getApplications = function () {
+    obj.getTrustedDevices = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                encodeURIComponent(Configuration.loggedUser.get("username")) +
-                "/oauth2/applications?_queryFilter=true"),
+            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + Configuration.loggedUser.get("uid") +
+                "/devices/trusted/?_queryId=*"),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
-    obj.revokeApplication = function (id) {
+    obj.deleteTrustedDevice = function (id) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                encodeURIComponent(Configuration.loggedUser.get("username")) +
-                "/oauth2/applications/" + id),
+            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + Configuration.loggedUser.get("uid") +
+                "/devices/trusted/" + id),
             type: "DELETE",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });

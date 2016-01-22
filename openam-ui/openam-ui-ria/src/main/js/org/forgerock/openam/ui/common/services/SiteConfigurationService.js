@@ -14,15 +14,15 @@
  * Portions copyright 2014-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
+define("org/forgerock/openam/ui/common/services/SiteConfigurationService", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/URIUtils",
-    "org/forgerock/openam/ui/common/delegates/ServerDelegate",
+    "org/forgerock/openam/ui/common/services/ServerService",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, AbstractDelegate, Configuration, Constants, URIUtils, ServerDelegate, RealmHelper) {
+], function ($, AbstractDelegate, Configuration, Constants, URIUtils, ServerService, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context),
         lastKnownSubRealm,
         lastKnownOverrideRealm,
@@ -57,7 +57,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
             }
         }
 
-        ServerDelegate.getConfiguration({ suppressEvents: true }).then(function (response) {
+        ServerService.getConfiguration({ suppressEvents: true }).then(function (response) {
             setRequireMapConfig(response);
             successCallback(response);
         }, errorCallback);
@@ -82,7 +82,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
 
             lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
 
-            return ServerDelegate.getConfiguration({
+            return ServerService.getConfiguration({
                 errorsHandlers: {
                     "unauthorized": { status: "401" },
                     "Bad Request": {

@@ -20,9 +20,9 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/openam/ui/common/components/TreeNavigation"
-], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, TreeNavigation) {
+], function ($, _, Constants, EventManager, Router, SMSGlobalService, TreeNavigation) {
     var RealmTreeNavigationView = TreeNavigation.extend({
         events: {
             "click [data-event]": "sendEvent"
@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
         },
         template: "templates/admin/views/realms/RealmTreeNavigationTemplate.html",
         realmExists: function (path) {
-            return SMSGlobalDelegate.realms.get(path);
+            return SMSGlobalService.realms.get(path);
         },
         render: function (args, callback) {
             var self = this;
