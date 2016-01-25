@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/SubjectResponseAttributesView", [
@@ -77,7 +77,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
             this.$el.find(".selectize").each(function () {
                 $(this).selectize({
                     plugins: ["restore_on_backspace"],
-                    delimiter: ",",
+                    delimiter: false,
                     persist: false,
                     create: false,
                     hideSelected: true,

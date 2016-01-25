@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
@@ -156,7 +156,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             var self = this,
                 labelsSelect = this.$el.find("#labels select").selectize({
                     plugins: ["restore_on_backspace"],
-                    delimiter: ",",
+                    delimiter: false,
                     persist: false,
                     create: true,
                     hideSelected: true,
@@ -205,7 +205,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                         this.$el.html(template);
                         select = this.$el.find("select").selectize({
                             create: false,
-                            delimiter: ",",
+                            delimiter: false,
                             dropdownParent: "#uma",
                             hideSelected: true,
                             persist: false,
