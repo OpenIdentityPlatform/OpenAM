@@ -123,6 +123,12 @@ define([
 
                 expect(RealmHelper.getSubRealm()).to.equal("");
             }));
+
+            it("normalizes the url with a subrealm by removing the trailing slash", sinon.test(function () {
+                this.stub(URIUtils, "getCurrentFragment").returns("login/realm1/");
+
+                expect(RealmHelper.getSubRealm()).to.equal("realm1");
+            }));
         });
     });
 });
