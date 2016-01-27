@@ -63,6 +63,7 @@ public class IdRepoErrorCode {
     public static final String UNABLE_SYNC_URL_ACCESS_AGENT = "232";
     public static final String NO_SPACE_IDENTITY_NAMES = "233";
     public static final String OLD_PASSWORD_INCORRECT = "234";
+    public static final String PASSWORD_POLICY_FAILED = "235";
 
     // Plugin related error messages
     public static final String NO_PLUGINS_CONFIGURED = "301";
