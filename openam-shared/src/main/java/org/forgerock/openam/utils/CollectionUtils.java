@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.utils;
 
@@ -365,6 +365,28 @@ public class CollectionUtils {
      */
     public static boolean isEmpty(Collection<?> collection) {
         return collection == null || collection.isEmpty();
+    }
+
+    /**
+     * Given a map determines whether it contains some values.
+     *
+     * @param map map in question
+     *
+     * @return whether the map contains any values
+     */
+    public static boolean isEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty();
+    }
+
+    /**
+     * Given a map determines whether it contains some values.
+     *
+     * @param map map in question
+     *
+     * @return whether the map contains any values
+     */
+    public static boolean isNotEmpty(Map<?, ?> map) {
+        return map != null && !map.isEmpty();
     }
 
     /**
