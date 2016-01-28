@@ -24,9 +24,6 @@
  *
  * $Id: CacheBlockBase.java,v 1.6 2009/10/29 00:28:46 hengming Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.am.sdk.common;
@@ -36,7 +33,6 @@ import com.iplanet.am.sdk.AMObject;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.shared.debug.Debug;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,14 +45,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 /**
  * This class represents the value part stored in the AMCacheManager's cache.
  * Each CacheBlock object would represent a Directory entry. It caches the
- * attributes corresponding to that entry. It also keeps track of red other
+ * attributes corresponding to that entry. It also keeps track of the other
  * details such as the Organization DN for the entry.
- * 
+ *
  * <p>
  * Also, this cache block can be used to serve as dummy block representing a
  * non-existent directory entry (negative caching). This prevents making
  * un-necessary directory calls for non-existent directory entries.
- * 
+ *
  * <p>
  * Since the attributes that can be retrieved depends on the principal
  * performing the operation (ACI's set), the result set would vary. The
@@ -69,7 +65,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  * object. Also this copy of attributes stored in the cache block keeps track of
  * non-existent directory attributes (invalid attributes). This would also
  * prevent un-necessary directory calls for non-existent entry attributes.
- * 
+ *
  * The attribute copy is dirtied by removing the entries which get modified.
  */
 public abstract class CacheBlockBase {
@@ -203,7 +199,7 @@ public abstract class CacheBlockBase {
      * good only it the entry has not expired. So, check anywhere it is called
      * the check should be if (!cb.expiredAndUpdated() && cb.isExists()) or
      * similar.
-     * 
+     *
      * @return true if it represents a valid entry, false otherwise
      */
     public boolean isExists() {
@@ -286,77 +282,32 @@ public abstract class CacheBlockBase {
                 } else {
                     accessibleAttrs = ce.getReadableAttrNames(attrNames);
                 }
-                // Get the attribute values from cache
-                if (!byteValues) {
-                    attributes = stringAttributes.getCopy(accessibleAttrs);
-                    if (ce.isCompleteSet()
-                            && !attributes.keySet().containsAll(accessibleAttrs)
-                            && !byteAttributes.isEmpty()) {
-                        // Since the flag for complete set does not distingusih
-                        // between string and binary attributes, check for
-                        // missing attributes in byteAttributes
-                        for (Iterator items = accessibleAttrs.iterator(); items
-                                .hasNext(); ) {
-                            Object key = items.next();
-                            if (!attributes.containsKey(key)
-                                    && byteAttributes.containsKey(key)) {
-                                byte[][] values = (byte[][]) byteAttributes
-                                        .get(key);
-                                Set valueSet = new HashSet(values.length * 2);
-                                for (int i = 0; i < values.length; i++) {
-                                    try {
-                                        valueSet.add(new String(values[i], "UTF8"));
-                                    } catch (UnsupportedEncodingException uee) {
-                                        // Use default encoding
-                                        valueSet.add(new String(values[i]));
-                                    }
-                                }
-                                attributes.put(key, valueSet);
+                if (!accessibleAttrs.isEmpty()) {
+                    // Get the attribute values from the appropriate string or binary cache if they exist.
+                    if (!byteValues) {
+                        attributes = stringAttributes.getCopy(accessibleAttrs);
+                        if (attributes.isEmpty()) {
+                            if (getDebug().messageEnabled()) {
+                                getDebug().message("CacheBlockBase.getAttributes(): accessibleAttrs:" + accessibleAttrs
+                                        + " not found in stringAttributes, attributes in the byteAttributes cache:"
+                                        + byteAttributes.keySet());
                             }
                         }
-                    }
-                } else {
-                    attributes = byteAttributes.getCopy(accessibleAttrs);
-                    if (ce.isCompleteSet()
-                            && !attributes.keySet().containsAll(accessibleAttrs)
-                            && !stringAttributes.isEmpty()) {
-                        // Since the flag for complete set does not distingusih
-                        // between string and binary attributes, check for
-                        // missing attributes in stringAttributes
-                        for (Iterator items = accessibleAttrs.iterator(); items
-                                .hasNext(); ) {
-                            Object key = items.next();
-                            if (!attributes.containsKey(key)
-                                    && stringAttributes.containsKey(key)) {
-                                Set valueSet = (Set) stringAttributes.get(key);
-                                byte[][] values = new byte[valueSet.size()][];
-                                int item = 0;
-                                for (Iterator vals = valueSet.iterator(); vals
-                                        .hasNext(); ) {
-                                    String val = (String) vals.next();
-                                    values[item] = new byte[val.length()];
-                                    byte[] src = null;
-                                    try {
-                                        src = val.getBytes("UTF8");
-                                    } catch (UnsupportedEncodingException uee) {
-                                        // Use default encoding
-                                        src = val.getBytes();
-                                    }
-                                    System.arraycopy(src, 0, values[item], 0, val
-                                            .length());
-                                    item++;
-                                }
-                                attributes.put(key, values);
+                    } else {
+                        attributes = byteAttributes.getCopy(accessibleAttrs);
+                        if (attributes.isEmpty()) {
+                            if (getDebug().messageEnabled()) {
+                                getDebug().message("CacheBlockBase.getAttributes(): accessibleAttrs:" + accessibleAttrs
+                                        + " not found in byteAttributes, attributes in the stringAttributes cache:"
+                                        + stringAttributes.keySet());
                             }
                         }
                     }
                 }
-
                 // Get the names of attributes that are invalid/not accessible
                 Set inAccessibleAttrs = ce.getInaccessibleAttrNames(attrNames);
                 ((AMHashMap) attributes).addEmptyValues(inAccessibleAttrs);
             }
-
             return attributes;
         } finally {
             readLock.unlock();
