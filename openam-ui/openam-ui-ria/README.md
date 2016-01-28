@@ -1,5 +1,31 @@
 # OpenAM XUI
 
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Dependencies](#dependencies)
+	- [Update Process](#update-process)
+- [Building](#building)
+- [Development](#development)
+	- [Unit Tests](#unit-tests)
+
+<!-- /TOC -->
+
+## Dependencies
+NPM dependencies for this project are "locked" to specific versions through two mechanisms:
+* Explicit version expressions (e.g. `"lodash": "4.1.0"` n.b. no `"^"`) in `package.json`
+* Shrink-wrapping of deeper dependencies using `npm shrinkwrap --dev` (e.g. `npm-shrinkwrap.json` contains a full set of explicit dependency versions for the entire dependency tree)
+
+Updates to dependency versions are performed manually in a periodic manner. Interim version updates are allowed but must still follow the update process described below.
+
+### Update Process
+1. Explicitly bump dependency versions within `package.json`
+  * Use a tool such as [npm-check-updates](https://www.npmjs.com/package/npm-check-updates) to automate this task
+  * ***Be mindful of breaking changes!***. Major version changes will most likely require code changes to align with changes in a dependency's API. A major dependency version update should be performed in a separate task.
+2. Run `npm shrinkwrap --dev` to regenerate `npm-shrinkwrap.json`
+  * Watch out for errors and warnings from executing the shrinkwrapping command.
+  * Sometimes a dependencies version requirements are broken making it impossible to perform the operation and an error will occur. In this instance you should identity the problem and contact the dependency author to fix the issue before updating.
+3. Commit it!
+
 ## Building
 
 You can build the package using Maven:
