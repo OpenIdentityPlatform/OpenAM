@@ -191,6 +191,9 @@
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
         <siteDistributionURL>scp://community.internal.forgerock.com/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+        <!-- Latest policy agent community versions -->
+        <webAgentsDocCommunityVersion>4.0.0-SNAPSHOT</webAgentsDocCommunityVersion>
+        <javaEEAgentsDocCommunityVersion>3.5.0-SNAPSHOT</javaEEAgentsDocCommunityVersion>
 
         <!-- Default license (CDDL) to package into the artifacts -->
         <forgerock.license.groupId>org.forgerock</forgerock.license.groupId>

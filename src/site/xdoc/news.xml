@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2016 ForgeRock AS.
   !    
 -->
 <document
@@ -33,18 +33,32 @@
  </properties>
  <body>
   <section name="New Releases">
+      <p>
+          January 27, 2016. ForgeRock Identity Platform, including OpenAM 13 is now
+          available.
+
+          This major release brings many new features and important fixes,
+          including fixes for security issues within OpenAM.
+
+          Get this ForgeRock release from the <a
+              href="https://backstage.forgerock.com/#!/downloads/enterprise/OpenAM">enterprise download</a> page.
+
+          Find the documentation for the release at the <a
+              href="https://backstage.forgerock.com/#!/docs/openam/13"
+              >ForgeRock BackStage</a> website.
+      </p>
    <p>
     December 18, 2014. OpenAM 12.0.0 is now available.
 
     This major release brings many new features and important fixes,
     including fixes for security issues within OpenAM.
 
-    Get this ForgeRock release from the <a
-    href="http://forgerock.com/download-stack/">download page</a>.
+   Get this ForgeRock release from the <a
+       href="https://backstage.forgerock.com/#!/downloads/enterprise/OpenAM">enterprise download</a> page.
 
-    Find the documentation for the release at <a
-    href="http://docs.forgerock.org/en/openam/12.0.0/"
-    >http://docs.forgerock.org/en/openam/12.0.0/</a>.
+   Find the documentation for the release at the <a
+       href="https://backstage.forgerock.com/#!/docs/openam/12.0.0"
+       >ForgeRock BackStage</a> website.
    </p>
 
    <p>
@@ -53,12 +67,12 @@
     This major release brings many new features and important fixes,
     including fixes for security issues within OpenAM and web policy agents.
 
-    Get this ForgeRock release from the <a
-    href="https://download.forgerock.com/#/openam">download page</a>.
+       Get this ForgeRock release from the <a
+           href="https://backstage.forgerock.com/#!/downloads/enterprise/OpenAM">enterprise download</a> page.
 
-    Find the documentation for the release at <a
-    href="http://docs.forgerock.org/en/openam"
-    >http://docs.forgerock.org/en/openam</a>.
+       Find the documentation for the release at the <a
+           href="https://backstage.forgerock.com/#!/docs/openam/11.0.0"
+           >ForgeRock BackStage</a> website.
    </p>
 
    <p>November 23, 2012. OpenAM 9.5.5 has been released and is available from
