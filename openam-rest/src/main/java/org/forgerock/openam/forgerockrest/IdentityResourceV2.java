@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -24,6 +24,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
@@ -109,6 +110,8 @@ import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -348,17 +351,14 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             }
 
             // Get full deployment URL
-            HttpContext header = context.asContext(HttpContext.class);
-            String baseURL = baseURLProviderFactory.get(realm).getURL(header);
+            HttpContext httpContext = context.asContext(HttpContext.class);
+            String baseURL = baseURLProviderFactory.get(realm).getURL(httpContext);
 
             // Get the email address provided from registration page
             emailAddress = jVal.get(EMAIL).asString();
             if (isNullOrEmpty(emailAddress)){
                 throw new BadRequestException("Email not provided");
             }
-
-            String subject = jVal.get("subject").asString();
-            String message = jVal.get("message").asString();
 
             // Retrieve email registration token life time
             Long tokenLifeTime = restSecurity.getSelfRegTLT();
@@ -392,11 +392,12 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                     .toString();
 
             // Send Registration
-            sendNotification(emailAddress, subject, message, realm, confirmationLink);
+            sendNotification(httpContext, restSecurity, emailAddress, "registrationSubject", "registrationMessage",
+                    realm, confirmationLink);
 
             if (debug.messageEnabled()) {
-                debug.message("IdentityResource.createRegistrationEmail() :: Sent notification to, " + emailAddress +
-                " with subject, " + subject + ". In realm, " + realm + " for token ID, " + tokenID);
+                debug.message("IdentityResource.createRegistrationEmail() :: Sent notification to, " + emailAddress
+                        + ". In realm, " + realm + " for token ID, " + tokenID);
             }
 
             handler.handleResult(result);
@@ -424,16 +425,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
         }
     }
 
-    /**
-     * Sends email notification to end user
-     * @param to Resource receiving notification
-     * @param subject Notification subject
-     * @param message Notification Message
-     * @param confirmationLink Confirmation Link to be sent
-     * @throws Exception when message cannot be sent
-     */
-    private void sendNotification(String to, String subject, String message,
-                                  String realm, String confirmationLink) throws ResourceException {
+    private void sendNotification(HttpContext httpContext, RestSecurity restSecurity, String to, String subjectKey,
+            String messageKey, String realm, String confirmationLink) throws ResourceException {
         ServiceConfig mailscm = getMailServiceConfig(realm);
         Map<String, Set<String>> mailattrs = mailscm.getAttributes();
 
@@ -448,31 +441,12 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             throw new InternalServerErrorException(error, e);
         }
 
-        try {
-            // Check if subject has not  been included
-            if (isNullOrEmpty(subject)){
-                // Use default email service subject
-                subject = mailattrs.get(MAIL_SUBJECT).iterator().next();
-            }
-        } catch (Exception e) {
-            if (debug.warningEnabled()) {
-                debug.warning(SEND_NOTIF_TAG + "no subject found ", e);
-            }
-            subject = "";
-        }
-        try {
-            // Check if Custom Message has been included
-            if (isNullOrEmpty(message)){
-                // Use default email service message
-                message = mailattrs.get(MAIL_MESSAGE).iterator().next();
-            }
-            message = message + System.getProperty("line.separator") + confirmationLink;
-        } catch (Exception e) {
-            if (debug.warningEnabled()) {
-                debug.warning(SEND_NOTIF_TAG + "no message found", e);
-            }
-            message = confirmationLink;
-        }
+        final ResourceBundle bundle = identityResourceV1.getBundle(httpContext, restSecurity.getLocalizationBundle());
+        String subject = identityResourceV1.getLocalization(bundle, subjectKey,
+                CollectionHelper.getMapAttr(mailattrs, MAIL_SUBJECT, ""));
+        String message = identityResourceV1.getLocalization(bundle, messageKey,
+                CollectionHelper.getMapAttr(mailattrs, MAIL_MESSAGE, ""));
+        message += System.getProperty("line.separator") + confirmationLink;
 
         // Send the emails via the implementation class
         try {
@@ -770,12 +744,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             }
 
             // Get full deployment URL
-            HttpContext header = context.asContext(HttpContext.class);
+            HttpContext httpContext = context.asContext(HttpContext.class);
 
-            String baseURL = baseURLProviderFactory.get(realm).getURL(header);
-
-            String subject = jsonBody.get("subject").asString();
-            String message = jsonBody.get("message").asString();
+            String baseURL = baseURLProviderFactory.get(realm).getURL(httpContext);
 
             // Retrieve email registration token life time
             if (restSecurity == null) {
@@ -814,7 +785,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                     .toString();
 
             // Send Registration
-            sendNotification(email, subject, message, realm, confirmationLink);
+            sendNotification(httpContext, restSecurity, email, "forgottenPasswordSubject", "forgottenPasswordMessage",
+                    realm, confirmationLink);
 
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 

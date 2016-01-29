@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -23,6 +23,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
@@ -38,6 +39,7 @@ import com.sun.identity.idsvcs.Token;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.UpdateResponse;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.SMSException;
@@ -95,6 +97,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -279,17 +283,14 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             }
 
             // Get full deployment URL
-            HttpContext header = context.asContext(HttpContext.class);
-            StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(header.getPath());
+            HttpContext httpContext = context.asContext(HttpContext.class);
+            StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(httpContext.getPath());
 
             // Get the email address provided from registration page
             emailAddress = jVal.get(EMAIL).asString();
             if (isNullOrEmpty(emailAddress)){
                 throw new BadRequestException("Email not provided");
             }
-
-            String subject = jVal.get("subject").asString();
-            String message = jVal.get("message").asString();
 
             // Retrieve email registration token life time
             Long tokenLifeTime = restSecurity.getSelfRegTLT();
@@ -321,11 +322,12 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                     .toString();
 
             // Send Registration
-            sendNotification(emailAddress, subject, message, realm, confirmationLink);
+            sendNotification(httpContext, restSecurity, emailAddress, "registrationSubject", "registrationMessage",
+                    realm, confirmationLink);
 
             if (debug.messageEnabled()) {
                 debug.message("IdentityResource.createRegistrationEmail() :: Sent notification to, " + emailAddress +
-                        " with subject, " + subject + ". In realm, " + realm + " for token ID, " + tokenID);
+                        ". In realm, " + realm + " for token ID, " + tokenID);
             }
 
             handler.handleResult(result);
@@ -347,16 +349,8 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
-    /**
-     * Sends email notification to end user
-     * @param to Resource receiving notification
-     * @param subject Notification subject
-     * @param message Notification Message
-     * @param confirmationLink Confirmation Link to be sent
-     * @throws Exception when message cannot be sent
-     */
-    private void sendNotification(String to, String subject, String message,
-                                  String realm, String confirmationLink) throws ResourceException {
+    private void sendNotification(HttpContext httpContext, RestSecurity restSecurity, String to, String subjectKey,
+            String messageKey, String realm, String confirmationLink) throws ResourceException {
 
         try {
             mailmgr = new ServiceConfigManager(RestUtils.getToken(),
@@ -395,31 +389,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             throw new InternalServerErrorException(error, e);
         }
 
-        try {
-            // Check if subject has not  been included
-            if (isNullOrEmpty(subject)){
-                // Use default email service subject
-                subject = mailattrs.get(MAIL_SUBJECT).iterator().next();
-            }
-        } catch (Exception e) {
-            if (debug.warningEnabled()) {
-                debug.warning(SEND_NOTIF_TAG + "no subject found ", e);
-            }
-            subject = "";
-        }
-        try {
-            // Check if Custom Message has been included
-            if (isNullOrEmpty(message)){
-                // Use default email service message
-                message = mailattrs.get(MAIL_MESSAGE).iterator().next();
-            }
-            message = message + System.getProperty("line.separator") + confirmationLink;
-        } catch (Exception e) {
-            if (debug.warningEnabled()) {
-                debug.warning(SEND_NOTIF_TAG + "no message found", e);
-            }
-            message = confirmationLink;
-        }
+        final ResourceBundle bundle = getBundle(httpContext, restSecurity.getLocalizationBundle());
+        String subject = getLocalization(bundle, subjectKey, CollectionHelper.getMapAttr(mailattrs, MAIL_SUBJECT, ""));
+        String message = getLocalization(bundle, messageKey, CollectionHelper.getMapAttr(mailattrs, MAIL_MESSAGE, ""));
+        message += System.getProperty("line.separator") + confirmationLink;
 
         // Send the emails via the implementation class
         try {
@@ -430,6 +403,34 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 debug.error(SEND_NOTIF_TAG + error, e);
             }
             throw new InternalServerErrorException(error, e);
+        }
+    }
+
+    /**
+     * Returns the {@link ResourceBundle} corresponding to the incoming request's locale.
+     * @param httpContext The {@link HttpContext} for the CREST request.
+     * @param bundleName The name of the bundle to retrieve.
+     * @return The ResourceBundle corresponding to the request's locale and the requested bundle name.
+     */
+    ResourceBundle getBundle(HttpContext httpContext, String bundleName) {
+        ISLocaleContext localeContext = new ISLocaleContext();
+        localeContext.setLocale(httpContext);
+        return ResourceBundle.getBundle(bundleName, localeContext.getLocale());
+    }
+
+    /**
+     * Returns the localized text for the requested key, or the defaultValue if the given key cannot be found.
+     *
+     * @param bundle The {@link ResourceBundle}.
+     * @param key The key to look up in the bundle.
+     * @param defaultValue The default value to return if the key cannot be found.
+     * @return The localized text.
+     */
+    String getLocalization(ResourceBundle bundle, String key, String defaultValue) {
+        try {
+            return bundle.getString(key);
+        } catch (MissingResourceException mre) {
+            return defaultValue;
         }
     }
 
@@ -696,11 +697,8 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 }
 
                 // Get full deployment URL
-                HttpContext header = context.asContext(HttpContext.class);
-                StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(header.getPath());
-
-                String subject = jsonBody.get("subject").asString();
-                String message = jsonBody.get("message").asString();
+                HttpContext httpContext = context.asContext(HttpContext.class);
+                StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(httpContext.getPath());
 
                 // Retrieve email registration token life time
                 if (restSecurity == null) {
@@ -736,7 +734,8 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                         .toString();
 
                 // Send Registration
-                sendNotification(email, subject, message, realm, confirmationLink);
+                sendNotification(httpContext, restSecurity, email, "forgottenPasswordSubject",
+                        "forgottenPasswordMessage", realm, confirmationLink);
 
                 String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 

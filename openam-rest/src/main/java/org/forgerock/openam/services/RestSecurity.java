@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -51,6 +51,7 @@ public class RestSecurity {
     private final static String FORGOT_PASSWORD_CONFIRMATION_URL = "forgerockRESTSecurityForgotPassConfirmationUrl";
     private final static String PROTECTED_USER_ATTRIBUTES = "forgerockRESTSecurityProtectedUserAttributes";
     private final static String SUCCESSFUL_USER_REGISTRATION_DESTINATION = "forgerockRESTSecuritySuccessfulUserRegistrationDestination";
+    private static final String LOCALIZATION_BUNDLE = "forgerockRESTSecurityLocalizationBundle";
 
     private final static String SERVICE_NAME = "RestSecurity";
     private final static String SERVICE_VERSION = "1.0";
@@ -116,9 +117,12 @@ public class RestSecurity {
         final Boolean forgotPassword;
         final Set<String> protectedUserAttributes;
         final String successfulUserRegistrationDestination;
+        final String localizationBundle;
 
-        private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl, Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, 
-        		Boolean selfRegistration, Boolean forgotPassword, Set<String> protectedUserAttributes, String successfulUserRegistrationDestination) {
+        private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl,
+                Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, Boolean selfRegistration,
+                Boolean forgotPassword, Set<String> protectedUserAttributes,
+                String successfulUserRegistrationDestination, String localizationBundle) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
             this.selfRegistrationConfirmationUrl = selfRegistrationConfirmationUrl;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
@@ -127,6 +131,7 @@ public class RestSecurity {
             this.forgotPassword = forgotPassword;
             this.protectedUserAttributes = protectedUserAttributes;
             this.successfulUserRegistrationDestination = successfulUserRegistrationDestination;
+            this.localizationBundle = localizationBundle;
         }
     }
 
@@ -141,6 +146,7 @@ public class RestSecurity {
             Long forgotPassTokLifeTime = ServiceConfigUtils.getLongAttribute(serviceConfig, FORGOT_PASSWORD_TOKEN_LIFE_TIME);
             Set<String> protectedUserAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
             String successfulUserRegistrationDestination = ServiceConfigUtils.getStringAttribute(serviceConfig, SUCCESSFUL_USER_REGISTRATION_DESTINATION);
+            String localizationBundle = ServiceConfigUtils.getStringAttribute(serviceConfig, LOCALIZATION_BUNDLE);
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
                     selfRegistrationConfirmationUrl,
@@ -149,7 +155,8 @@ public class RestSecurity {
                     selfRegistration,
                     forgotPassword,
                     protectedUserAttributes,
-                    successfulUserRegistrationDestination);
+                    successfulUserRegistrationDestination,
+                    localizationBundle);
 
             setProviderConfig(newRestSecuritySettings);
             if (debug.messageEnabled()) {
@@ -247,5 +254,14 @@ public class RestSecurity {
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }
+    }
+
+    /**
+     * Returns the name of the localization bundle associated with the current self service configuration.
+     *
+     * @return The name of the localization bundle to be used during localization lookups.
+     */
+    public String getLocalizationBundle() {
+        return restSecurityConfiguration.localizationBundle;
     }
 }
