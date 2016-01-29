@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
@@ -238,6 +238,32 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                     return SMSServiceUtils.sanitizeSchema(data);
                 });
             }
+        }
+    };
+
+    obj.services = {
+        mock: [{
+            "_id": "policy",
+            "name": "Policy Configuration"
+        }, {
+            "_id": "uma",
+            "name": "UMA Provider"
+        }],
+        // TODO: AME-9641
+        all: function () {
+            return $.Deferred().resolve({
+                "result": this.mock
+            });
+        },
+        // TODO: AME-9641
+        remove: function (realmPath, ids) {
+            var self = this,
+                promises = _.map(ids, function (id) {
+                    self.mock = _.reject(self.mock, { "_id": id });
+                    return $.Deferred().resolve();
+                });
+
+            return Promise.all(promises);
         }
     };
 

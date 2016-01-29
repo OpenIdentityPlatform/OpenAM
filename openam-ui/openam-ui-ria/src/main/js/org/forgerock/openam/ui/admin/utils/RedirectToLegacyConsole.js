@@ -51,7 +51,6 @@ define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
     };
 
     obj.realm = {
-        services      : redirector(13),
         dataStores    : redirector(14),
         privileges    : redirector(15),
         subjects      : redirector(17),

@@ -81,6 +81,15 @@ define("config/routes/admin/RealmsRoutes", function () {
                 role: "ui-realm-admin",
                 navGroup: "admin"
             },
+            "realmsServices": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/services/ServicesView",
+                url: scopedByRealm("services\/?"),
+                pattern: "realms/?/services",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
             "realmsServiceEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/services/EditServiceView",
