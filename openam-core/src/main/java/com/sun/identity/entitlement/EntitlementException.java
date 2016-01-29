@@ -24,7 +24,7 @@
  *
  * $Id: EntitlementException.java,v 1.2 2009/09/03 17:06:23 veiming Exp $
  *
- * Portions copyright 2010-2015 ForgeRock AS.
+ * Portions copyright 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -110,7 +110,7 @@ public class EntitlementException extends Exception {
     public static final int INVALID_PROPERTY_VALUE = 400;
     public static final int INVALID_VALUE = 401;
     public static final int START_DATE_AFTER_END_DATE = 402;
-    public static final int APP_NOT_CREATED_POLICIES_EXIST = 404;
+    public static final int POLICY_SET_ALTERATION_ERROR_POLICIES_EXIST = 404;
     public static final int INVALID_PROPERTY_VALUE_UNKNOWN_VALUE = 405;
     public static final int IP_CONDITION_CONFIGURATION_REQUIRED = 406;
 

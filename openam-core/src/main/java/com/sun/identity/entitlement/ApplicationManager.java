@@ -311,7 +311,7 @@ public final class ApplicationManager {
 
         if (app != null) {
             if (!app.canBeDeleted(realm)) {
-                throw new EntitlementException(EntitlementException.APP_NOT_CREATED_POLICIES_EXIST);
+                throw new EntitlementException(EntitlementException.POLICY_SET_ALTERATION_ERROR_POLICIES_EXIST);
             }
             EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
                 adminSubject, realm);

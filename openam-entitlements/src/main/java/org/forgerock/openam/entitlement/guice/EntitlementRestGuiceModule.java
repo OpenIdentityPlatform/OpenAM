@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.guice;
@@ -158,7 +158,7 @@ public class EntitlementRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.END_IP_BEFORE_START_IP, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.IP_CONDITION_CONFIGURATION_REQUIRED, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.PAIR_PROPERTY_NOT_DEFINED, ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.APP_NOT_CREATED_POLICIES_EXIST, ResourceException.CONFLICT);
+            handlers.put(EntitlementException.POLICY_SET_ALTERATION_ERROR_POLICIES_EXIST, ResourceException.CONFLICT);
             handlers.put(EntitlementException.INVALID_APP_TYPE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_APP_REALM, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.PROPERTY_CONTAINS_BLANK_VALUE, ResourceException.BAD_REQUEST);
