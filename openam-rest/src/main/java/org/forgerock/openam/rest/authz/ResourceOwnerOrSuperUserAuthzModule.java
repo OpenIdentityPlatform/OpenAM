@@ -13,7 +13,6 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.rest.authz;
 
 import static org.forgerock.util.promise.Promises.newSuccessfulPromise;
@@ -62,11 +61,11 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
     protected Promise<AuthorizationResult, ResourceException> validateToken(Context context, SSOToken token)
             throws SSOException, ResourceException {
         String loggedInUserId = getUserId(token);
-        boolean ignoreCase = SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID);
+        boolean caseSensitive = SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID);
         if (isSuperUser(loggedInUserId)) {
             debug.message("{} :: User, {} accepted as Super user", NAME, loggedInUserId);
             return newSuccessfulPromise(AuthorizationResult.accessPermitted());
-        } else if (ignoreCase ? loggedInUserId.equalsIgnoreCase(getUserIdFromUri(context))
+        } else if (caseSensitive ? loggedInUserId.equals(getUserIdFromUri(context))
                 : loggedInUserId.equalsIgnoreCase(getUserIdFromUri(context))) {
             debug.message("{} :: User, {} accepted as Resource Owner", NAME, loggedInUserId);
             return newSuccessfulPromise(AuthorizationResult.accessPermitted());
