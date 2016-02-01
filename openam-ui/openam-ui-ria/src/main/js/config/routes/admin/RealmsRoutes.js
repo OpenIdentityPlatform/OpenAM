@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("config/routes/admin/RealmsRoutes", function () {
@@ -80,6 +80,24 @@ define("config/routes/admin/RealmsRoutes", function () {
                 pattern: "realms/?/authentication/modules/?/?",
                 role: "ui-realm-admin",
                 navGroup: "admin"
+            },
+            "realmsServiceEdit": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/services/EditServiceView",
+                url: scopedByRealm("services\/edit\/([^\/]+)"),
+                pattern: "realms/?/services/edit/?",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
+            "realmsServiceNew": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/services/EditServiceView",
+                url: scopedByRealm("services\/new"),
+                pattern: "realms/?/services/new",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
             },
             "realmsPolicySets": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",

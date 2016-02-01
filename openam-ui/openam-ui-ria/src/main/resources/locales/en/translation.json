@@ -827,6 +827,9 @@
             },
             "realmNameValidationError" : "Characters $, &, +, comma, /, :, ;, =, ?, @, space, #, %% are not allowed in a realm's name"
         },
+        "services": {
+            "service": "Service"
+        },
         "scripts": {
             "edit": {
                 "language": "Language",
