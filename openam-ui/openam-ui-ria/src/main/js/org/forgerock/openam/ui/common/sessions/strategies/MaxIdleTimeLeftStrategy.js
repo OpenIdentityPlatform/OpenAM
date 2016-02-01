@@ -32,18 +32,18 @@
   */
 define("org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy", [
     "lodash",
-    "org/forgerock/openam/ui/user/delegates/SessionDelegate"
-], function (_, SessionDelegate) {
+    "org/forgerock/openam/ui/user/services/SessionService"
+], function (_, SessionService) {
     var maximumIdleSeconds = null;
 
     function getMaxIdle (token) {
-        return SessionDelegate.getMaxIdle(token).then(function (response) {
+        return SessionService.getMaxIdle(token).then(function (response) {
             return response.maxidletime * 60;
         });
     }
 
     function getTimeLeft (token) {
-        return SessionDelegate.getTimeLeft(token).then(function (response) {
+        return SessionService.getTimeLeft(token).then(function (response) {
             return response.maxtime;
         });
     }

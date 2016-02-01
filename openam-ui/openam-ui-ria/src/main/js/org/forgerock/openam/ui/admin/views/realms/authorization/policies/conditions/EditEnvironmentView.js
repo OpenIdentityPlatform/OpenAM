@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/EditEnvironmentView", [
@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/services/PoliciesService",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBooleanView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrArrayView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrStringView",
@@ -29,7 +29,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrDayView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrDateView",
     "handlebars"
-], function ($, _, AbstractView, UIUtils, PoliciesDelegate, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr,
+], function ($, _, AbstractView, UIUtils, PoliciesService, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr,
              TimeAttr, DayAttr, DateAttr, Handlebars) {
     return AbstractView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/EditEnvironmentTemplate.html",
@@ -107,7 +107,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 if (type === self.SCRIPT_RESOURCE) {
                     itemToDisplay["console.common.type"] = $.t(self.i18n.condition.key + type +
                         self.i18n.condition.title);
-                    PoliciesDelegate.getScriptById(mergedData.scriptId).done(function (script) {
+                    PoliciesService.getScriptById(mergedData.scriptId).done(function (script) {
                         itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + "scriptId"] =
                             script.name;
                         self.setListItemHtml(item, itemToDisplay);
@@ -250,7 +250,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             } else if (schema.title === self.SCRIPT_RESOURCE) {
                 attributesWrapper = '<div class="no-float"></div>';
                 if (itemData && itemData.scriptId) {
-                    PoliciesDelegate.getScriptById(itemData.scriptId).done(function (script) {
+                    PoliciesService.getScriptById(itemData.scriptId).done(function (script) {
                         hiddenData[itemData.type] = script.name;
                         buildScriptAttr();
                     });

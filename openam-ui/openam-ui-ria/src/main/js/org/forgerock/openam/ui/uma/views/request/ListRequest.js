@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
@@ -27,9 +27,9 @@ define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate"
+    "org/forgerock/openam/ui/uma/services/UMAService"
 ], function ($, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator,
-             AbstractView, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMADelegate) {
+             AbstractView, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMAService) {
     var ListRequest = AbstractView.extend({
         template: "templates/uma/views/request/ListRequestTemplate.html",
 
@@ -103,13 +103,13 @@ define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
                         "click button[data-permission=deny]": "deny"
                     },
                     allow: function () {
-                        UMADelegate.approveRequest(this.model.get("_id"), this.model.get("permissions"))
+                        UMAService.approveRequest(this.model.get("_id"), this.model.get("permissions"))
                         .done(function () {
                             self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
                         });
                     },
                     deny: function () {
-                        UMADelegate.denyRequest(this.model.get("_id")).done(function () {
+                        UMAService.denyRequest(this.model.get("_id")).done(function () {
                             self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
                         });
                     }

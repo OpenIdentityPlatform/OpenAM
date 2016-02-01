@@ -14,7 +14,7 @@
  * Portions copyright 2014-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
+define("org/forgerock/openam/ui/admin/services/PoliciesService", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",

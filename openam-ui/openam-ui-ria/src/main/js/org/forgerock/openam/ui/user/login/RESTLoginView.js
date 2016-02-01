@@ -18,7 +18,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
+    "org/forgerock/openam/ui/user/services/AuthNService",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, AbstractView, AuthNDelegate, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager,
+], function ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager,
             Form2js, Handlebars, i18nManager, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils,
             URIUtils) {
 
@@ -196,7 +196,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 }
             }
 
-            AuthNDelegate.getRequirements().then(_.bind(function (reqs) {
+            AuthNService.getRequirements().then(_.bind(function (reqs) {
                 var auth = Configuration.globalData.auth;
 
                 // Clear out existing session if instructed

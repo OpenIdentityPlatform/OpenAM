@@ -21,7 +21,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/PoliciesView",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/services/PoliciesService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -31,7 +31,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
     "org/forgerock/commons/ui/common/util/UIUtils",
     "bootstrap-tabdrop",
     "selectize"
-], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesDelegate, FormHelper, Messages, AbstractView,
+], function ($, _, PolicySetModel, StripedListView, PoliciesView, PoliciesService, FormHelper, Messages, AbstractView,
              EventManager, Router, Constants, UIUtils) {
     return AbstractView.extend({
         partials: [
@@ -63,11 +63,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                 this.renderCallback = callback;
             }
 
-            this.appTypePromise = PoliciesDelegate.getApplicationType(this.APPLICATION_TYPE);
-            this.envConditionsPromise = PoliciesDelegate.getEnvironmentConditions();
-            this.subjConditionsPromise = PoliciesDelegate.getSubjectConditions();
-            this.decisionCombinersPromise = PoliciesDelegate.getDecisionCombiners();
-            this.resourceTypesPromise = PoliciesDelegate.listResourceTypes();
+            this.appTypePromise = PoliciesService.getApplicationType(this.APPLICATION_TYPE);
+            this.envConditionsPromise = PoliciesService.getEnvironmentConditions();
+            this.subjConditionsPromise = PoliciesService.getSubjectConditions();
+            this.decisionCombinersPromise = PoliciesService.getDecisionCombiners();
+            this.resourceTypesPromise = PoliciesService.listResourceTypes();
 
             if (policySetName) {
                 this.template = "templates/admin/views/realms/authorization/policySets/EditPolicySetTemplate.html";

@@ -29,13 +29,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/services/PoliciesService",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/openam/ui/common/util/URLHelper"
 ], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Configuration,
              EventManager, Router, Constants, PolicySetModel, AbstractListView,
-             PoliciesDelegate, BackgridUtils, RealmHelper, URLHelper) {
+             PoliciesService, BackgridUtils, RealmHelper, URLHelper) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/authorization/policySets/PolicySetsTemplate.html",
         // Used in AbstractListView
@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         },
         render: function (args, callback) {
             this.realmPath = args[0];
-            PoliciesDelegate.listResourceTypes().then(_.bind(function (resourceTypes) {
+            PoliciesService.listResourceTypes().then(_.bind(function (resourceTypes) {
                 if (resourceTypes.resultCount < 1) {
                     this.data.hasResourceTypes = false;
                     this.parentRender(this.renderToolbar);
@@ -180,7 +180,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         },
 
         importPolicies: function (e) {
-            PoliciesDelegate.importPolicies(e.target.result)
+            PoliciesService.importPolicies(e.target.result)
                 .done(function () {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploaded");
                 })

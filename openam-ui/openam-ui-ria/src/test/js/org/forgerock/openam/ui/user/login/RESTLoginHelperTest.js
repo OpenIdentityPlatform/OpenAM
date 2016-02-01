@@ -24,7 +24,7 @@ define([
             var injector = new Squire();
 
             injector
-                .mock("org/forgerock/openam/ui/user/delegates/AuthNDelegate", {})
+                .mock("org/forgerock/openam/ui/user/services/AuthNService", {})
                 .mock("org/forgerock/openam/ui/user/UserModel", {})
                 .mock("org/forgerock/commons/ui/common/main/ViewManager", {})
                 .require(["org/forgerock/openam/ui/user/login/RESTLoginHelper"], function (subject) {

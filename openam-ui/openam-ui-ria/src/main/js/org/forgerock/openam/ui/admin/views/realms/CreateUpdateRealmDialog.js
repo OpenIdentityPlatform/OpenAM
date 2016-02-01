@@ -21,10 +21,10 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/openam/ui/admin/models/Form",
     "popoverclickaway" // depends on jquery and bootstrap
-], function ($, _, Handlebars, BootstrapDialog, Messages, AbstractView, SMSGlobalDelegate, Form) {
+], function ($, _, Handlebars, BootstrapDialog, Messages, AbstractView, SMSGlobalService, Form) {
     function validateRealmName (dialog) {
         var valid = true,
             alert = "",
@@ -87,13 +87,13 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
             if (options.allRealmPaths) {
                 allRealmsPromise.resolve();
             } else {
-                allRealmsPromise = SMSGlobalDelegate.realms.all();
+                allRealmsPromise = SMSGlobalService.realms.all();
             }
 
             if (newRealm) {
-                promise = SMSGlobalDelegate.realms.schema();
+                promise = SMSGlobalService.realms.schema();
             } else {
-                promise = SMSGlobalDelegate.realms.get(options.realmPath);
+                promise = SMSGlobalService.realms.get(options.realmPath);
             }
 
             $.when(promise, allRealmsPromise).then(function (data, allRealmsData) {
@@ -145,9 +145,9 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                             this.disable();
 
                             if (newRealm) {
-                                promise = SMSGlobalDelegate.realms.create(dialog.form.data());
+                                promise = SMSGlobalService.realms.create(dialog.form.data());
                             } else {
-                                promise = SMSGlobalDelegate.realms.update(dialog.form.data());
+                                promise = SMSGlobalService.realms.update(dialog.form.data());
                             }
 
                             promise.then(function () {

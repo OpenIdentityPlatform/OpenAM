@@ -21,14 +21,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
 
     // jquery dependencies
     "bootstrap-tabdrop"
 ], function ($, AbstractView, Configuration, EventManager, Router, Constants,
-             SMSRealmDelegate, Form, FormHelper) {
+             SMSRealmService, Form, FormHelper) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
@@ -44,9 +44,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             this.data.name = args[2];
 
             $.when(
-                SMSRealmDelegate.authentication.modules.schema(this.data.realmPath, this.data.type),
-                SMSRealmDelegate.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type),
-                SMSRealmDelegate.authentication.modules.types.get(this.data.realmPath, this.data.type)
+                SMSRealmService.authentication.modules.schema(this.data.realmPath, this.data.type),
+                SMSRealmService.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type),
+                SMSRealmService.authentication.modules.types.get(this.data.realmPath, this.data.type)
             ).done(function (schemaData, valuesData, moduleType) {
                 self.data.schema = schemaData;
                 self.data.values = valuesData;
@@ -69,7 +69,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             });
         },
         save: function (event) {
-            var promise = SMSRealmDelegate.authentication.modules.update(this.data.realmPath,
+            var promise = SMSRealmService.authentication.modules.update(this.data.realmPath,
                                                                          this.data.name,
                                                                          this.data.type,
                                                                          this.data.form.data());

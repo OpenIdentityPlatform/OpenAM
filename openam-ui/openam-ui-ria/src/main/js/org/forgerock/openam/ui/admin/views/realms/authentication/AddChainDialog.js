@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog", [
@@ -21,9 +21,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
     "handlebars",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, BootstrapDialog, Handlebars, Messages, Router, SMSRealmDelegate, UIUtils) {
+], function ($, _, BootstrapDialog, Handlebars, Messages, Router, SMSRealmService, UIUtils) {
     function closeDialog (dialog) {
         dialog.close();
     }
@@ -55,7 +55,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
         var name = dialog.getModalBody().find("#name").val().trim();
 
         if (nameValid(dialog)) {
-            SMSRealmDelegate.authentication.chains.create(
+            SMSRealmService.authentication.chains.create(
                 dialog.options.data.realmPath,
                 { _id: name }
             ).then(function () {

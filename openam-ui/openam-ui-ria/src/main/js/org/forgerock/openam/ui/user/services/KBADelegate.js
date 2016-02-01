@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/delegates/KBADelegate", [
+define("org/forgerock/openam/ui/user/services/KBADelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/user/delegates/KBADelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"

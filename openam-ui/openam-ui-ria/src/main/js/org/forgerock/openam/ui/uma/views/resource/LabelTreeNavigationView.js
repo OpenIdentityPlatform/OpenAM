@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
@@ -19,8 +19,8 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
     "jquery",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/components/TreeNavigation",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function (_, $, Router, TreeNavigation, UMADelegate) {
+    "org/forgerock/openam/ui/uma/services/UMAService"
+], function (_, $, Router, TreeNavigation, UMAService) {
     var LabelTreeNavigationView = TreeNavigation.extend({
         template: "templates/uma/views/resource/LabelTreeNavigationTemplate.html",
         partials: ["templates/uma/views/resource/_NestedList.html"],
@@ -56,11 +56,11 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
             this.args = args;
             this.callback = callback;
 
-            UMADelegate.labels.all().done(function (data) {
+            UMAService.labels.all().done(function (data) {
                 if (!_.any(data.result, function (label) {
                     return label.name.toLowerCase() === "starred";
                 })) {
-                    UMADelegate.labels.create("starred", "STAR");
+                    UMAService.labels.create("starred", "STAR");
                 }
 
                 userLabels = _.filter(data.result, function (label) { return label.type.toLowerCase() === "user"; });

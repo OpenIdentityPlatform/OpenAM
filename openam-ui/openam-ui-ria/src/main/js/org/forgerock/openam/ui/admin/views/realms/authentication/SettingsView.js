@@ -23,13 +23,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
+    "org/forgerock/openam/ui/admin/services/SMSRealmService",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSDelegateUtils,
-             SMSRealmDelegate) {
+], function ($, _, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSServiceUtils,
+             SMSRealmService) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
             this.data.realmLocation = args[0];
 
-            SMSRealmDelegate.authentication.get(this.data.realmLocation).then(function (data) {
+            SMSRealmService.authentication.get(this.data.realmLocation).then(function (data) {
                 self.data.formData = data;
 
                 self.parentRender(function () {
@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             this.$el.find("#tabpanel").empty();
 
             var id = $(event.target).attr("href").slice(1),
-                schema = SMSDelegateUtils.sanitizeSchema(this.data.formData.schema.properties[id]),
+                schema = SMSServiceUtils.sanitizeSchema(this.data.formData.schema.properties[id]),
                 element = this.$el.find("#tabpanel").get(0);
 
             this.data.form = new Form(element, schema, this.data.formData.values);
@@ -77,7 +77,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
         },
         save: function (event) {
             var data = this.data.form.data(),
-                promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, data),
+                promise = SMSRealmService.authentication.update(this.data.realmLocation, data),
                 self = this;
 
             promise.then(function () {

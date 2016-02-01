@@ -18,21 +18,21 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
-    "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
+    "org/forgerock/openam/ui/user/services/AuthNService",
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/user/delegates/SessionDelegate",
+    "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/user/UserModel",
     "org/forgerock/commons/ui/common/main/ViewManager"
-], function ($, _, AbstractConfigurationAware, AuthNDelegate, CookieHelper, Configuration, Constants, SessionDelegate,
+], function ($, _, AbstractConfigurationAware, AuthNService, CookieHelper, Configuration, Constants, SessionService,
              URIUtils, UserModel, ViewManager) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
         var self = this;
-        AuthNDelegate.getRequirements().then(function (requirements) {
+        AuthNService.getRequirements().then(function (requirements) {
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
 
@@ -48,13 +48,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 });
             }
 
-            AuthNDelegate.submitRequirements(populatedRequirements).then(function (result) {
+            AuthNService.submitRequirements(populatedRequirements).then(function (result) {
                 if (result.hasOwnProperty("tokenId")) {
                     obj.getLoggedUser(function (user) {
                         Configuration.setProperty("loggedUser", user);
                         self.setSuccessURL(result.tokenId).then(function () {
                             successCallback(user);
-                            AuthNDelegate.resetProcess();
+                            AuthNService.resetProcess();
                         });
                     }, errorCallback);
                 } else if (result.hasOwnProperty("authId")) {
@@ -111,7 +111,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
             url = Configuration.globalData.auth.successURL,
             context = "";
         if (urlParams && urlParams.goto) {
-            AuthNDelegate.setGoToUrl(tokenId, urlParams.goto).then(function (data) {
+            AuthNService.setGoToUrl(tokenId, urlParams.goto).then(function (data) {
                 if (data.successURL.indexOf("/") === 0 &&
                     data.successURL.indexOf("/" + Constants.context) !== 0) {
                     context = "/" + Constants.context;
@@ -144,9 +144,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
 
     obj.logout = function (successCallback, errorCallback) {
         var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-        SessionDelegate.isSessionValid(tokenCookie).then(function (result) {
+        SessionService.isSessionValid(tokenCookie).then(function (result) {
             if (result.valid) {
-                SessionDelegate.logout(tokenCookie).then(function (response) {
+                SessionService.logout(tokenCookie).then(function (response) {
                     obj.removeSessionCookie();
 
                     successCallback(response);
@@ -166,9 +166,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
 
     obj.removeSession = function () {
         var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-        SessionDelegate.isSessionValid(tokenCookie).then(function (result) {
+        SessionService.isSessionValid(tokenCookie).then(function (result) {
             if (result.valid) {
-                SessionDelegate.logout(tokenCookie).then(function () {
+                SessionService.logout(tokenCookie).then(function () {
                     obj.removeSessionCookie();
                 });
             }

@@ -11,20 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/uma/views/resource/StarredPage", [
     "underscore",
     "org/forgerock/openam/ui/uma/views/resource/BasePage",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function (_, BasePage, UMADelegate) {
+    "org/forgerock/openam/ui/uma/services/UMAService"
+], function (_, BasePage, UMAService) {
     var StarredPage = BasePage.extend({
         template: "templates/uma/views/resource/StarredPageTemplate.html",
         render: function (args, callback) {
             var self = this;
 
-            UMADelegate.labels.all().done(function (data) {
+            UMAService.labels.all().done(function (data) {
                 var starred = _.find(data.result, function (label) {
                     return label.name.toLowerCase() === "starred";
                 });

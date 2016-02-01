@@ -134,6 +134,7 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
 
         if (page && _.include(subRealmSpecifiablePages, page)) {
             subRealm = subRealmSplit.join("/").split("&")[0];
+            subRealm = subRealm.slice(-1) === "/" ? subRealm.slice(0, -1) : subRealm;
         } else if (Configuration.globalData.auth.subRealm) {
             subRealm = Configuration.globalData.auth.subRealm;
         } else {

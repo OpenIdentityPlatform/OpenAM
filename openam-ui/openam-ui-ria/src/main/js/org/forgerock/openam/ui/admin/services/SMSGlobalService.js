@@ -14,16 +14,16 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
+define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils",
+    "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Constants, SMSDelegateUtils, RealmHelper) {
+], function ($, _, AbstractDelegate, Constants, SMSServiceUtils, RealmHelper) {
     /**
-     * @exports org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate
+     * @exports org/forgerock/openam/ui/admin/services/SMSGlobalService
      */
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/global-config/"),
         schemaWithValues = function (url) {
@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                 })
             ).then(function (schemaData, valuesData) {
                 return {
-                    schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
+                    schema: SMSServiceUtils.sanitizeSchema(schemaData[0]),
                     values: valuesData[0]
                 };
             });
@@ -58,7 +58,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                 })
             ).then(function (schemaData, templateData) {
                 return {
-                    schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
+                    schema: SMSServiceUtils.sanitizeSchema(schemaData[0]),
                     values: templateData[0]
                 };
             });

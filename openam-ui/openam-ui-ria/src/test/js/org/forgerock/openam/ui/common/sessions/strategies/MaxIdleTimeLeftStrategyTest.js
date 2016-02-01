@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define([
@@ -19,7 +19,7 @@ define([
     "squire",
     "sinon"
 ], function ($, Squire, sinon) {
-    var getMaxIdlePromise, getTimeLeftPromise, MaxIdleTimeLeftStrategy, SessionDelegate;
+    var getMaxIdlePromise, getTimeLeftPromise, MaxIdleTimeLeftStrategy, SessionService;
     describe("org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy", function () {
         beforeEach(function (done) {
             var injector = new Squire();
@@ -27,13 +27,13 @@ define([
             getMaxIdlePromise = $.Deferred();
             getTimeLeftPromise = $.Deferred();
 
-            SessionDelegate = {
+            SessionService = {
                 getMaxIdle: sinon.stub().returns(getMaxIdlePromise),
                 getTimeLeft: sinon.stub().returns(getTimeLeftPromise)
             };
 
             injector
-                .mock("org/forgerock/openam/ui/user/delegates/SessionDelegate", SessionDelegate)
+                .mock("org/forgerock/openam/ui/user/services/SessionService", SessionService)
                 .require(
                     ["org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy"]
                 , function (subject) {

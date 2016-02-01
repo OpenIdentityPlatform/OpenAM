@@ -218,7 +218,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 //         return callback();
                 //     }
                 //
-                //     UMADelegate.searchUsers(query)
+                //     UMAService.searchUsers(query)
                 //     .then(function (data) {
                 //         return _.map(data.result, function (username) {
                 //             return new User(username);

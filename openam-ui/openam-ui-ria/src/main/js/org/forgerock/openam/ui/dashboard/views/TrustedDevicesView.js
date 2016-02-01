@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
@@ -19,8 +19,8 @@ define("org/forgerock/openam/ui/dashboard/views/TrustedDevicesView", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/dashboard/delegates/TrustedDevicesDelegate"
-], function ($, _, AbstractView, TrustedDevicesDelegate) {
+    "org/forgerock/openam/ui/dashboard/services/TrustedDevicesService"
+], function ($, _, AbstractView, TrustedDevicesService) {
     var TrustedDevices = AbstractView.extend({
         template: "templates/openam/dashboard/TrustedDevicesTemplate.html",
         noBaseTemplate: true,
@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/dashboard/views/TrustedDevicesView", [
         render: function () {
             var self = this;
 
-            TrustedDevicesDelegate.getTrustedDevices().then(function (data) {
+            TrustedDevicesService.getTrustedDevices().then(function (data) {
                 self.data.devices = data.result;
                 self.parentRender(function () {
                     self.$el.find("[data-toggle=\"tooltip\"]").tooltip();
@@ -44,7 +44,7 @@ define("org/forgerock/openam/ui/dashboard/views/TrustedDevicesView", [
             event.preventDefault();
             var self = this;
 
-            TrustedDevicesDelegate.deleteTrustedDevice(event.currentTarget.id).then(function () {
+            TrustedDevicesService.deleteTrustedDevice(event.currentTarget.id).then(function () {
                 console.log("Deleted trusted device");
                 self.render();
             }, function () {
