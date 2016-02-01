@@ -859,30 +859,40 @@ public class WebtopNaming {
      *
      * @param serverid server ID
      *
-     * @return Site ID
+     * @return Site ID or null if the Server ID is not known.
+     *
      */
     public static String getSiteID(String serverid) {
         String primary_site = null;
-        String sitelist = null;
+        String sitelist = getSiteList(serverid);
 
-        if (config.getSiteIDsTable() == null) {
-            return null;
-        }
+        if (sitelist != null ) {
 
-        sitelist = config.getSiteIDsTable().get(serverid);
-        StringTokenizer tok = new StringTokenizer(sitelist, NODE_SEPARATOR);
-        if (tok != null) {
-            primary_site = tok.nextToken();
-        }
+            StringTokenizer tok = new StringTokenizer(sitelist, NODE_SEPARATOR);
+            if (tok != null) {
+                primary_site = tok.nextToken();
+            }
 
-        if (debug.messageEnabled()) {
-            debug.message("WebtopNaming : SiteID for " + serverid + " is "
-                    + primary_site);
+            if (debug.messageEnabled()) {
+                debug.message("WebtopNaming : SiteID for " + serverid + " is "
+                        + primary_site);
+            }
         }
 
         return primary_site;
     }
-    
+
+    private static String getSiteList(String serverId) {
+        String sitelist = null;
+        Map<String, String> siteIds = config.getSiteIDsTable();
+
+        if (siteIds != null && siteIds.get(serverId) != null ) {
+            sitelist = siteIds.get(serverId);
+        }
+
+        return sitelist;
+    }
+
     public static String getSiteIdByName(String siteName) {
         String siteId = null;
         
@@ -954,26 +964,20 @@ public class WebtopNaming {
      * @return the secondary site list
      */
     public static String getSecondarySites(String serverid) {
-        String sitelist = null;
         String secondarysites = null;
+        String sitelist = getSiteList(serverid);
 
-        if (config.getSiteIDsTable() == null) {
-            return null;
-        }
+        if (sitelist != null) {
 
-        sitelist = config.getSiteIDsTable().get(serverid);
-        if (sitelist == null) {
-            return null;
-        }
+            int index = sitelist.indexOf(NODE_SEPARATOR);
+            if (index != -1) {
+                secondarysites = sitelist.substring(index + 1, sitelist.length());
+            }
 
-        int index = sitelist.indexOf(NODE_SEPARATOR);
-        if (index != -1) {
-            secondarysites = sitelist.substring(index + 1, sitelist.length());
-        }
-
-        if (debug.messageEnabled()) {
-            debug.message("WebtopNaming : SecondarySites for " + serverid
-                    + " is " + secondarysites);
+            if (debug.messageEnabled()) {
+                debug.message("WebtopNaming : SecondarySites for " + serverid
+                        + " is " + secondarysites);
+            }
         }
 
         return secondarysites;

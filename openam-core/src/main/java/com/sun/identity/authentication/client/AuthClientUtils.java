@@ -3014,7 +3014,7 @@ public class AuthClientUtils {
                         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
                 hostUrlCookieValue = hostUrlCookieValue.substring(0, 
                         (hostUrlCookieValue.length() - uri.length()));
-            } catch(ServerEntryNotFoundException e) { 
+            } catch(ServerEntryNotFoundException e) {
                 utilDebug.message("AuthClientUtils.setHostUrlCookie:", e);
             }
 

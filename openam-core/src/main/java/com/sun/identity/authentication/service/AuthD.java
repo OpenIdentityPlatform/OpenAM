@@ -24,7 +24,7 @@
  *
  * $Id: AuthD.java,v 1.23 2009/11/25 12:02:02 manish_rustagi Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -550,14 +550,7 @@ public class AuthD implements ConfigurationListener {
         String domain, 
         HttpSession httpSession,
         boolean stateless) {
-        InternalSession is = null;
-        try {
-            is = getSessionService().newInternalSession(domain, httpSession, stateless);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            debug.error("Error creating session: ", ex);
-        }
-        return is;
+        return getSessionService().newInternalSession(domain, httpSession, stateless);
     }
     
     /**

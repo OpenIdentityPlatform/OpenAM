@@ -24,7 +24,7 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
@@ -63,7 +63,7 @@ public class SessionServerConfig {
     /*
      * Local server details are those of the server on which the code is executing.
      */
-    private final String localServerID;
+    private String localServerID;
     private final String localServerProtocol;
     private final String localServerHost;
     private final int localServerPort;
@@ -71,6 +71,7 @@ public class SessionServerConfig {
     private final URL localServerURL;
     private final URL localServerSessionServiceURL;
     private final Debug sessionDebug;
+    private final String localServerPortAsString;
 
     /**
      * Constructor called by Guice to initialize the Singleton instance of SessionServerConfig.
@@ -86,7 +87,7 @@ public class SessionServerConfig {
 
             localServerProtocol = requiredSystemProperty(AM_SERVER_PROTOCOL);
             localServerHost = requiredSystemProperty(AM_SERVER_HOST);
-            final String localServerPortAsString = requiredSystemProperty(AM_SERVER_PORT);
+            localServerPortAsString = requiredSystemProperty(AM_SERVER_PORT);
             localServerPort = Integer.parseInt(localServerPortAsString);
             localServerDeploymentPath = requiredSystemProperty(AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
             // TODO: Establish whether or not the previous fields can be dropped in favour of WebtopNaming.getLocalServer()
@@ -96,8 +97,7 @@ public class SessionServerConfig {
             localServerSessionServiceURL = sessionServiceURLService.getSessionServiceURL(
                     localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
 
-            localServerID = WebtopNaming.getServerID(
-                    localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
+            localServerID = refreshLocalServerID();
 
         } catch (Exception ex) {
             sessionDebug.error("Failed to load Session Server configuration", ex);
@@ -131,10 +131,18 @@ public class SessionServerConfig {
     }
 
     /**
-     * Gets ID for this OpenAM server.
+     * Gets ID for this OpenAM server from cache.
      */
     public String getLocalServerID() {
-        return localServerID;
+        return getLocalServerID(false);
+    }
+
+    /**
+     * Gets ID for this OpenAM server from cache or refreshed depends on the parameter
+     * @param forceReload - if true reloads the localServerID and does not use the cashed value.
+     */
+    public String getLocalServerID(boolean forceReload) {
+        return (forceReload)? refreshLocalServerID() : localServerID ;
     }
 
     /**
@@ -160,7 +168,7 @@ public class SessionServerConfig {
      */
     public boolean isSiteEnabled() {
         try {
-            return WebtopNaming.isSiteEnabled(getLocalServerID());
+            return WebtopNaming.isSiteEnabled(getLocalServerID(true));
         } catch (Exception e) {
             sessionDebug.error("Failed to check if local server {0} is part of site", getLocalServerID(), e);
             throw new IllegalStateException(e);
@@ -392,6 +400,16 @@ public class SessionServerConfig {
         }
 
         return Collections.unmodifiableSet(results);
+    }
+
+    private String refreshLocalServerID() {
+        try {
+            localServerID = WebtopNaming.getServerID(
+                    localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
+        } catch (ServerEntryNotFoundException e) {
+            throw new IllegalStateException("Failed to load Session Server configuration", e);
+        }
+        return localServerID;
     }
 
 }
