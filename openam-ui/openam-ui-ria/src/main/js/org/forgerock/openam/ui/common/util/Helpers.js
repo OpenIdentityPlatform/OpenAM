@@ -35,4 +35,10 @@ define("org/forgerock/openam/ui/common/util/Helpers", [
 
         return new Handlebars.SafeString(result);
     });
+
+    // TODO: Commons Candidate
+    Handlebars.registerHelper("debug", function () {
+        console.warn("[handlebars] debug. Value of `this`");
+        console.warn(this);
+    });
 });
