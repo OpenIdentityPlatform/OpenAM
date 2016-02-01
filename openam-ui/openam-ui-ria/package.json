@@ -5,6 +5,7 @@
   "scripts": {
     "predocs": "rimraf docs",
     "docs": "jsdoc -P package.json -d docs -r src/main/js",
+    "build:production": "NODE_ENV=production grunt prod",
     "test": "grunt karma:dev"
   },
   "devDependencies": {

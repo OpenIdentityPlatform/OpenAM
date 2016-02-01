@@ -1,9 +1,13 @@
 {
+    "env": {
+        "development": {
+            "sourceMaps": "inline"
+        }
+    },
     "only": [
         "main-authorize.js",
         "main-device.js",
         "main.js",
         "org/forgerock/openam/**/*.js"
-    ],
-    "sourceMaps": true
+    ]
 }

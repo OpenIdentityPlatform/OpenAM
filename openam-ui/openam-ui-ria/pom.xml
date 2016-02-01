@@ -294,13 +294,13 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>grunt</id>
+                        <id>npm-build</id>
                         <goals>
-                            <goal>grunt</goal>
+                            <goal>npm</goal>
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <arguments>prod --target-version=${project.version}</arguments>
+                            <arguments>run build:production -- --target-version=${project.version}</arguments>
                         </configuration>
                     </execution>
                 </executions>
