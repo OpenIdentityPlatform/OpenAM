@@ -1834,7 +1834,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.schema.ExportServiceConfiguration",
-          description="Export service configuration. In production environments, you should back up the service configuration using file system utilities or the export-ldif command.",
+          description="Export service configuration. In production environments, you should back up the service configuration using file system utilities or the export-ldif command. Note that export-ldif/import-ldif commands must be on the same deployment where the encryption keys are located.",
           webSupport="false",
           mandatoryOptions={
                   "encryptsecret|e|s|Secret key for encrypting password. Any arbitrary value can be specified."},
@@ -1849,7 +1849,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.schema.ImportServiceConfiguration",
-          description="Import service configuration. In production environments, you should restore the service configuration using file system utilities or the import-ldif command.",
+          description="Import service configuration. In production environments, you should restore the service configuration using file system utilities or the import-ldif command. Note that import-ldif/export-ldif commands must be on the same deployment where the encryption keys are located.",
           webSupport="false",
           mandatoryOptions={
                   "encryptsecret|e|s|Secret key for decrypting password.",
