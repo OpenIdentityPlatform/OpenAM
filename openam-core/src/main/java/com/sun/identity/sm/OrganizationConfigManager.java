@@ -1309,7 +1309,7 @@ public class OrganizationConfigManager {
      *             if there is an error accessing the data store to read the
      *             service configuration
      */
-    public Set getAssignableServices() throws SMSException {
+    public Set<String> getAssignableServices() throws SMSException {
         // Get all service names, and remove the assigned services
         // Set containing service names that has organization schema
         Set orgSchemaServiceNames = new HashSet();

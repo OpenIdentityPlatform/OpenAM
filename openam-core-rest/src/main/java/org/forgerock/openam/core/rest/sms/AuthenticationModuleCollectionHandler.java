@@ -11,21 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
+import static org.forgerock.json.resource.Responses.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -39,13 +31,16 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.rest.query.QueryResponsePresentation;
-import org.forgerock.services.context.Context;
-import org.forgerock.json.JsonPointer;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -60,10 +55,11 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.query.QueryFilter;
-import org.forgerock.util.query.QueryFilterVisitor;
 
 /**
  * Collection handler for handling queries on the {@literal /authentication/modules} resource.
@@ -92,7 +88,7 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
 
         String searchForId;
         try {
-            searchForId = request.getQueryFilter().accept(new AuthenticationModuleQueryFilterVisitor(), null);
+            searchForId = request.getQueryFilter().accept(new IdQueryFilterVisitor(), null);
         } catch (UnsupportedOperationException e) {
             return new NotSupportedException("Query not supported: " + request.getQueryFilter()).asPromise();
         }
@@ -137,14 +133,14 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
             return QueryResponsePresentation.perform(handler, request, resourceResponses);
 
         } catch (AMConfigurationException e) {
-            debug.warning("::AuthenticationModuleCollectionHandler:: AMConfigurationException on create", e);
+            debug.warning("::AuthenticationModuleCollectionHandler:: Querying configured auth modules failed", e);
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (SSOException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: SSOException on create", e);
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (SMSException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: SMSException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
+            return new InternalServerErrorException("Unable to create SMS config.").asPromise();
         }
     }
 
@@ -171,121 +167,31 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
 
     @Override
     public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        // TODO: i18n
-        return new BadRequestException(
-                "The resource collection " + request.getResourcePath() + " cannot perform actions").asPromise();
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
-        // TODO: i18n
-        return new BadRequestException("Authentication modules must be created per type").asPromise();
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest request) {
-        // TODO: i18n
-        return new BadRequestException("The resource collection " + request.getResourcePath() + " cannot be deleted")
-                .asPromise();
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
-        // TODO: i18n
-        return new BadRequestException("The resource collection " + request.getResourcePath() + " cannot be patched")
-                .asPromise();
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
-        // TODO: i18n
-        return new BadRequestException("The resource collection " + request.getResourcePath() + " cannot be read")
-                .asPromise();
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
-        // TODO: i18n
-        return new BadRequestException("The resource collection " + request.getResourcePath() + " cannot be updated")
-                .asPromise();
-    }
-
-    private static final class AuthenticationModuleQueryFilterVisitor implements QueryFilterVisitor<String, Void, JsonPointer> {
-
-        @Override
-        public String visitAndFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
-            throw new UnsupportedOperationException("And is not supported");
-        }
-
-        @Override
-        public String visitBooleanLiteralFilter(Void aVoid, boolean value) {
-            if (value) {
-                return null;
-            } else {
-                throw new UnsupportedOperationException("Boolean literal 'false' is not supported");
-            }
-        }
-
-        @Override
-        public String visitContainsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
-            throw new UnsupportedOperationException("Contains is not supported");
-        }
-
-        @Override
-        public String visitEqualsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
-            if ("_id".equalsIgnoreCase(field.leaf())) {
-                if (!(valueAssertion instanceof String)) {
-                    throw new IllegalArgumentException("Invalid value assertion type: "
-                            + valueAssertion.getClass().getSimpleName());
-                }
-                return (String) valueAssertion;
-            }
-            throw new UnsupportedOperationException("Equals is not supported");
-        }
-
-        @Override
-        public String visitExtendedMatchFilter(Void aVoid, JsonPointer field, String operator, Object valueAssertion) {
-            throw new UnsupportedOperationException("Extended match is not supported");
-        }
-
-        @Override
-        public String visitGreaterThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
-            throw new UnsupportedOperationException("Greater than is not supported");
-        }
-
-        @Override
-        public String visitGreaterThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
-            throw new UnsupportedOperationException("Greater than or equal to is not supported");
-        }
-
-        @Override
-        public String visitLessThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
-            throw new UnsupportedOperationException("Less than is not supported");
-        }
-
-        @Override
-        public String visitLessThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
-            throw new UnsupportedOperationException("Less than or equal to is not supported");
-        }
-
-        @Override
-        public String visitNotFilter(Void aVoid, QueryFilter<JsonPointer> subFilter) {
-            throw new UnsupportedOperationException("Not is not supported");
-        }
-
-        @Override
-        public String visitOrFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
-            throw new UnsupportedOperationException("Or is not supported");
-        }
-
-        @Override
-        public String visitPresentFilter(Void aVoid, JsonPointer field) {
-            throw new UnsupportedOperationException("Present is not supported");
-        }
-
-        @Override
-        public String visitStartsWithFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
-            throw new UnsupportedOperationException("Starts with is not supported");
-        }
+        return RestUtils.generateUnsupportedOperation();
     }
 }

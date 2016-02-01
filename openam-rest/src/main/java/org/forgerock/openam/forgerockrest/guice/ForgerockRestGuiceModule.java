@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -88,6 +88,11 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 PrivilegeDefinition.getInstance("validate", PrivilegeDefinition.Action.READ));
         definitions.put("template",
                 PrivilegeDefinition.getInstance("template", PrivilegeDefinition.Action.READ));
+
+        definitions.put("getAllTypes",
+                PrivilegeDefinition.getInstance("getAllTypes", PrivilegeDefinition.Action.READ));
+        definitions.put("getCreatableTypes",
+                PrivilegeDefinition.getInstance("getCreatableTypes", PrivilegeDefinition.Action.READ));
 
         definitions.put("getPropertyNames",
                 PrivilegeDefinition.getInstance("getPropertyNames", PrivilegeDefinition.Action.READ));

@@ -111,13 +111,13 @@ public class AuthenticationModuleTypeHandler implements RequestHandler {
 
         } catch (AMConfigurationException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: AMConfigurationException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
+            return new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()).asPromise();
         } catch (SSOException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: SSOException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
+            return new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()).asPromise();
         } catch (SMSException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: SMSException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
+            return new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()).asPromise();
         }
     }
 

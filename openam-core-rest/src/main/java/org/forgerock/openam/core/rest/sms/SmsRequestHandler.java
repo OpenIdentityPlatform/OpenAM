@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -44,6 +44,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.configuration.ConfigurationBase;
+import com.sun.identity.policy.ServiceTypeManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
@@ -177,6 +178,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final Collection<String> excludedServices;
     private final AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler;
     private final AuthenticationModuleTypeHandler authenticationModuleTypeHandler;
+    private final ServiceInstanceCollectionHandler serviceInstanceCollectionHandler;
     private final RealmContextFilter realmContextFilter;
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceSingletons =
             new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
@@ -196,6 +198,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             ExcludedServicesFactory excludedServicesFactory,
             AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler,
             AuthenticationModuleTypeHandler authenticationModuleTypeHandler,
+            ServiceInstanceCollectionHandler serviceInstanceCollectionHandler,
             SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter,
             RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
             RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
@@ -213,6 +216,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.excludedServices = excludedServicesFactory.get(type);
         this.authenticationModuleCollectionHandler = authenticationModuleCollectionHandler;
         this.authenticationModuleTypeHandler = authenticationModuleTypeHandler;
+        this.serviceInstanceCollectionHandler = serviceInstanceCollectionHandler;
         this.realmContextFilter = realmContextFilter;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
@@ -244,9 +248,10 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
     }
 
-    private void addSpecialCaseRoutes() {
+    private void addSpecialCaseRoutes() throws SMSException, SSOException {
         addAuthenticationModulesQueryHandler();
         addAuthenticationModuleTypesQueryHandler();
+        addServiceInstancesQueryHandler();
         addRealmHandler();
         addCommonTasksHandler();
         addSitesHandler();
@@ -260,6 +265,25 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
 
     private SmsRouteTree getAuthenticationModuleRouter() {
         return routeTree.handles(new ArrayList<>(AMAuthenticationManager.getAuthenticationServiceNames()).get(0));
+    }
+
+    private SmsRouteTree getServiceInstanceRouter() throws SMSException, SSOException {
+
+        final Set<String> serviceNames = getServiceManager().getServiceNames();
+
+        for (String serviceName : serviceNames) {
+            if (SERVICES_HANDLES_FUNCTION.apply(serviceName)) {
+                return routeTree.handles(serviceName);
+            }
+        }
+
+        throw new IllegalStateException("Services SmsRouteTree could not be located");
+    }
+
+    private void addServiceInstancesQueryHandler() throws SSOException, SMSException {
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            getServiceInstanceRouter().addRoute(EQUALS, "", serviceInstanceCollectionHandler);
+        }
     }
 
     private void addAuthenticationModulesQueryHandler() {

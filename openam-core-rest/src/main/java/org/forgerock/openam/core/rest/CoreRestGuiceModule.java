@@ -22,7 +22,7 @@ import static org.forgerock.http.routing.RouteMatchers.*;
 import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.http.routing.Version.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
-import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.resourcePath;
+import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.*;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -35,9 +35,11 @@ import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SchemaType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +55,6 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.routing.RouteMatchers;
-import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.openam.audit.AbstractHttpAccessAuditFilter;
 import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.audit.HttpAccessAuditFilterFactory;
@@ -83,7 +84,6 @@ import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.AnyPrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
@@ -342,5 +342,30 @@ public class CoreRestGuiceModule extends AbstractModule {
         return patchableAttributes;
     }
 
-}
+    @Provides
+    @Named("serviceSupportedSchemaTypes")
+    public Set<SchemaType> getServiceSupportedSchemaTypes() {
+        Set<SchemaType> supportedSchemaTypes = new HashSet<>();
+        supportedSchemaTypes.add(SchemaType.ORGANIZATION);
+        supportedSchemaTypes.add(SchemaType.DYNAMIC);
+        return supportedSchemaTypes;
+    }
 
+    @Provides
+    @Named("authenticationServices")
+    public Set<String> getAuthenticationServices() {
+        return AMAuthenticationManager.getAuthenticationServiceNames();
+    }
+
+    @Provides
+    @Named("hiddenServices")
+    public Set<String> getHiddenServiceNames() {
+        Set<String> hiddenServices = new HashSet<>();
+        hiddenServices.add("iPlanetAMAuthConfiguration");
+        hiddenServices.add("iPlanetAMAuthService");
+        hiddenServices.add("RestSecurityTokenService");
+        hiddenServices.add("SoapSecurityTokenService");
+        return hiddenServices;
+    }
+
+}

@@ -24,7 +24,7 @@
  *
  * $Id: ServiceManager.java,v 1.27 2009/10/28 04:24:26 hengming Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -239,7 +239,7 @@ public class ServiceManager {
      *
      * @supported.api
      */
-    public Set getServiceNames() throws SMSException {
+    public Set<String> getServiceNames() throws SMSException {
         try {
             if (serviceNames == null) {
                 serviceNames = CachedSubEntries.getInstance(token, serviceDN);

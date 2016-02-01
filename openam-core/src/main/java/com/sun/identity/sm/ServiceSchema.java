@@ -354,7 +354,7 @@ public class ServiceSchema {
      * 
      * @return attribute schemas defined for the service
      */
-    public Set getAttributeSchemas() {
+    public Set<AttributeSchema> getAttributeSchemas() {
         Set answer = new HashSet();
         for (Iterator items = getAttributeSchemaNames().iterator(); items
                 .hasNext();) {

@@ -24,7 +24,7 @@
  *
  * $Id: AMIdentity.java,v 1.37 2009/11/20 23:52:54 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.idm;
 
@@ -552,7 +552,7 @@ public class AMIdentity {
      *             If user's single sign on token is invalid.
      * @supported.api
      */
-    public Set getAssignedServices() throws IdRepoException, SSOException {
+    public Set<String> getAssignedServices() throws IdRepoException, SSOException {
         // Get all service names for the type from SMS
         ServiceManager sm;
         try {
@@ -591,7 +591,7 @@ public class AMIdentity {
      *             If user's single sign on token is invalid.
      * @supported.api
      */
-    public Set getAssignableServices() throws IdRepoException, SSOException {
+    public Set<String> getAssignableServices() throws IdRepoException, SSOException {
         // Get all service names for the type from SMS
         ServiceManager sm;
         try {
