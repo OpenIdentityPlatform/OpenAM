@@ -11,17 +11,18 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014-2015 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 package org.forgerock.openam.entitlement.rest.wrappers;
+
+import java.util.Set;
+
+import javax.security.auth.Subject;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.util.SearchFilter;
-
-import javax.security.auth.Subject;
-import java.util.Set;
 
 /**
  * Simple wrapper for the ApplicationManager class.
@@ -36,10 +37,12 @@ public class ApplicationManagerWrapper {
      * @param realm The realm in which to save the {@link Application}
      * @param application The {@link Application} to save
      * @throws EntitlementException If there was an issue saving the application
+     *
+     * @return The saved application, which will include any modifications to its fields.
      */
-    public void saveApplication(Subject adminSubject, String realm, Application application)
-            throws EntitlementException {
-        ApplicationManager.saveApplication(adminSubject, realm, application);
+    public Application saveApplication(Subject adminSubject, String realm, Application application) throws
+            EntitlementException {
+        return ApplicationManager.saveApplication(adminSubject, realm, application);
     }
 
     /**
@@ -66,8 +69,7 @@ public class ApplicationManagerWrapper {
      * @return the Application if found without issue, null otherwise
      * @throws EntitlementException if there were problems retrieving the application
      */
-    public Application getApplication(Subject adminSubject, String realm, String name)
-            throws EntitlementException {
+    public Application getApplication(Subject adminSubject, String realm, String name) throws EntitlementException {
         return ApplicationManager.getApplication(adminSubject, realm, name);
     }
 
@@ -83,21 +85,6 @@ public class ApplicationManagerWrapper {
     public Set<String> getApplicationNames(Subject adminSubject, String realm)
             throws EntitlementException {
         return ApplicationManager.getApplicationNames(adminSubject, realm);
-    }
-
-    /**
-     * Wrapper for the static method
-     * {@link ApplicationManager#updateApplication(Application, Application, Subject, String)}.
-     *
-     * @param oldApplication The (existing) application, to update
-     * @param newApplication The new version of the existing application. The name of the new and old much match.
-     * @param subject The subject authorizing the update - will be validated for permission.
-     * @param realm The realm in which to update the {@link Application}
-     * @throws EntitlementException if there was a problem deleting the old resource
-     */
-    public void updateApplication(Application oldApplication, Application newApplication, Subject subject, String realm)
-            throws EntitlementException {
-        ApplicationManager.updateApplication(oldApplication, newApplication, subject, realm);
     }
 
     /**

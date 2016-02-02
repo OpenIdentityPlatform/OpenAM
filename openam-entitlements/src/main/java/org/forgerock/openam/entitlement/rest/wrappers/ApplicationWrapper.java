@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014-2015 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 package org.forgerock.openam.entitlement.rest.wrappers;
 
@@ -80,6 +80,16 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
     @JsonProperty("name")
     public String getName() {
         return application.getName();
+    }
+
+    @JsonProperty("displayName")
+    public void setDisplayName(String id) {
+        application.setDisplayName(id);
+    }
+
+    @JsonProperty("displayName")
+    public String getDisplayName() {
+        return application.getDisplayName();
     }
 
     @JsonProperty("description")

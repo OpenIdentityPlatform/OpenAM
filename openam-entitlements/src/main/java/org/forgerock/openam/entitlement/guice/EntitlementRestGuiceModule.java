@@ -175,6 +175,7 @@ public class EntitlementRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.CONDITION_EVALUATION_FAILED, ResourceException.INTERNAL_ERROR);
             handlers.put(EntitlementException.RESOURCE_TYPE_ID_MISMATCH, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.NO_RESOURCE_TYPE_EXPECTED, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.MISSING_APPLICATION_NAME, ResourceException.BAD_REQUEST);
 
             return handlers;
         }

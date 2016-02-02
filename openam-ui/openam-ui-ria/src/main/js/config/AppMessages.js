@@ -49,6 +49,10 @@ define("config/AppMessages", [
             msg: "config.messages.AdminMessages.policies.error.noName",
             type: "error"
         },
+        "errorNoId": {
+            msg: "config.messages.AdminMessages.policies.error.noId",
+            type: "error"
+        },
         "errorCantStartWithHash": {
             msg: "config.messages.AdminMessages.policies.error.cantStartWithHash",
             type: "error"

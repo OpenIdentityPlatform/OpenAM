@@ -28,17 +28,11 @@
  */
 package com.sun.identity.entitlement;
 
-import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.entitlement.util.SearchFilter.Operator;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.entitlement.PolicyConstants;
-import org.forgerock.openam.entitlement.service.ResourceTypeService;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.annotations.VisibleForTesting;
+import static com.sun.identity.entitlement.EntitlementException.MODIFY_APPLICATION_FAIL;
+import static com.sun.identity.entitlement.EntitlementException.PERMISSION_DENIED;
+import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
+import static org.forgerock.openam.utils.StringUtils.isBlank;
 
-import javax.security.auth.Subject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
@@ -49,6 +43,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
+
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.entitlement.util.SearchFilter.Operator;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Application Manager handles addition, deletion and listing of applications for each realm.
@@ -304,7 +310,7 @@ public final class ApplicationManager {
         }
 
         if (!allowed) {
-            throw new EntitlementException(EntitlementException.PERMISSION_DENIED);
+            throw new EntitlementException(PERMISSION_DENIED);
         }
 
         Application app = getApplication(adminSubject, realm, name);
@@ -323,34 +329,55 @@ public final class ApplicationManager {
     /**
      * Saves application data.
      *
-     * @param adminSubject Admin Subject who has the rights to access
-     *        configuration datastore.
+     * @param adminSubject Admin Subject who has the rights to access configuration datastore.
      * @param realm Realm Name.
      * @param application Application object.
+     *
+     * @return The saved application, which will include any modifications to its fields.
      */
-    public static void saveApplication(
-            Subject adminSubject,
-            String realm,
-            Application application
-    ) throws EntitlementException {
+    public static Application saveApplication(Subject adminSubject, String realm, Application application)
+            throws EntitlementException {
+
+        checkUserPrivileges(adminSubject, realm, application);
+        checkIfResourceTypeExists(adminSubject, realm, application);
+        setApplicationMetaData(adminSubject, realm, application);
+
+        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(adminSubject, realm);
+        if (ec == null) {
+            throw new EntitlementException(MODIFY_APPLICATION_FAIL);
+        } else {
+            ec.storeApplication(application);
+            clearCache(realm);
+        }
+
+        return application;
+    }
+
+    private static void checkUserPrivileges(Subject adminSubject, String realm, Application application)
+            throws EntitlementException {
+
         boolean allow = (adminSubject == PolicyConstants.SUPER_ADMIN_SUBJECT);
-        
+
         if (!allow) {
-            ApplicationPrivilegeManager apm =
-                ApplicationPrivilegeManager.getInstance(realm, adminSubject);
-            if (isNewApplication(realm, application)) {
+            ApplicationPrivilegeManager apm = ApplicationPrivilegeManager.getInstance(realm, adminSubject);
+            if (apm == null) {
+                allow = false;
+            } else if (isNewApplication(realm, application)) {
                 allow = apm.canCreateApplication(realm);
             } else {
-                allow = hasAccessToApplication(apm, application,
-                    ApplicationPrivilege.Action.MODIFY);
+                allow = hasAccessToApplication(apm, application, ApplicationPrivilege.Action.MODIFY);
             }
         }
 
         if (!allow) {
-            throw new EntitlementException(326);
+            throw new EntitlementException(PERMISSION_DENIED);
         }
+    }
 
-        if (CollectionUtils.isNotEmpty(application.getResourceTypeUuids())) {
+    private static void checkIfResourceTypeExists(Subject adminSubject, String realm, Application application)
+            throws EntitlementException {
+
+        if (isNotEmpty(application.getResourceTypeUuids())) {
             Set<String> resourceTypeIds = application.getResourceTypeUuids();
 
             // When this class is refactored (AME-6287) this dependency should be injected.
@@ -362,15 +389,14 @@ public final class ApplicationManager {
                 }
             }
         }
+    }
 
+    private static void setApplicationMetaData(Subject adminSubject, String realm, Application application) {
         Date date = new Date();
         Set<Principal> principals = adminSubject.getPrincipals();
-        String principalName = ((principals != null) && !principals.isEmpty()) ?
-            principals.iterator().next().getName() : null;
-
+        String principalName = isNotEmpty(principals) ? principals.iterator().next().getName() : null;
         if (application.getCreationDate() == -1) {
-            long creationDate = getApplicationCreationDate(realm,
-                application.getName());
+            long creationDate = getApplicationCreationDate(realm, application.getName());
             if (creationDate == -1) {
                 application.setCreationDate(date.getTime());
                 if (principalName != null) {
@@ -379,11 +405,9 @@ public final class ApplicationManager {
             } else {
                 application.setCreationDate(creationDate);
                 String createdBy = application.getCreatedBy();
-                if ((createdBy == null) || (createdBy.trim().length() == 0)) {
-                    createdBy = getApplicationCreatedBy(realm,
-                        application.getName());
-                    if ((createdBy == null) || (createdBy.trim().length() == 0))
-                    {
+                if (isBlank(createdBy)) {
+                    createdBy = getApplicationCreatedBy(realm, application.getName());
+                    if (isBlank(createdBy)) {
                         application.setCreatedBy(principalName);
                     } else {
                         application.setCreatedBy(createdBy);
@@ -395,11 +419,6 @@ public final class ApplicationManager {
         if (principalName != null) {
             application.setLastModifiedBy(principalName);
         }
-
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, realm);
-        ec.storeApplication(application);
-        clearCache(realm);
     }
 
     private static String getApplicationCreatedBy(
@@ -543,29 +562,6 @@ public final class ApplicationManager {
             throw new EntitlementException(6, ex);
         } catch (InvocationTargetException ex) {
             throw new EntitlementException(6, ex);
-        }
-    }
-
-    /**
-     * Replaces an existing application with a newer version of itself.
-     *
-     * @param oldApplication The application to update
-     * @param newApplication The updated version of the application
-     * @retun the new application
-     */
-    public static void updateApplication(Application oldApplication, Application newApplication, Subject subject,
-                                            String realm)
-            throws EntitlementException {
-
-        readWriteLock.writeLock().lock();
-
-        try {
-            newApplication.setCreationDate(oldApplication.getCreationDate());
-            newApplication.setCreatedBy(oldApplication.getCreatedBy());
-            deleteApplication(subject, realm, oldApplication.getName());
-            saveApplication(subject, realm, newApplication);
-        } finally {
-            readWriteLock.writeLock().unlock();
         }
     }
 }

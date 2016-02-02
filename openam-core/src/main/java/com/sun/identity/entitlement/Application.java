@@ -24,7 +24,7 @@
  *
  * $Id: Application.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  *
- * Portions copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -119,6 +119,7 @@ public class Application implements Cloneable {
         LAST_MODIFIED_DATE_ATTRIBUTE.length();
 
     private String name;
+    private String displayName;
     private String description;
     private ApplicationType applicationType;
     private Set<String> conditions;
@@ -175,6 +176,7 @@ public class Application implements Cloneable {
 
     protected void cloneAppl(Application clone) {
         clone.name = name;
+        clone.displayName = displayName;
         clone.description = description;
         clone.applicationType = applicationType;
 
@@ -272,6 +274,15 @@ public class Application implements Cloneable {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Returns application display name.
+     *
+     * @return application display name.
+     */
+    public String getDisplayName() {
+        return displayName;
     }
 
     /**
@@ -684,6 +695,15 @@ public class Application implements Cloneable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Sets the application display name.
+     *
+     * @param displayName The application display name.
+     */
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public boolean canBeDeleted(String realm) {

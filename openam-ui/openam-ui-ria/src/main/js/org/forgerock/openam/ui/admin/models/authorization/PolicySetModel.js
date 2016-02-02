@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
@@ -27,15 +27,26 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
         defaults: function () {
             return {
                 name: null,
+                displayName: null,
                 description: "",
                 resourceTypeUuids: [],
                 realm: ""
             };
         },
 
+        parse: function (response) {
+            if (_.isEmpty(response.displayName)) {
+                this.displayName = response.name;
+            } else {
+                this.displayName = response.displayName;
+            }
+
+            return response;
+        },
+
         validate: function (attrs) {
             if (attrs.name.trim() === "") {
-                return "errorNoName";
+                return "errorNoId";
             }
 
             // entities that are stored in LDAP can't start with '#'. http://www.jguru.com/faq/view.jsp?EID=113588

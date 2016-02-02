@@ -172,7 +172,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                     }
 
                     if (callback) {
-                        callback(self.data.items.length);
+                        callback();
                     }
                 });
             });

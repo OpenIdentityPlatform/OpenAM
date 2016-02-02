@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -52,7 +52,7 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
                 .forVersion(1)
                 .through(ApplicationV1Filter.class)
                 .toCollection(ApplicationsResource.class)
-                .forVersion(2)
+                .forVersion(2, 1)
                 .toCollection(ApplicationsResource.class);
 
         realmRouter.route("subjectattributes")

@@ -11,19 +11,29 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014-2015 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 package org.forgerock.openam.entitlement.rest;
 
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
+import static com.sun.identity.entitlement.Application.NAME_SEARCH_ATTRIBUTE;
+import static java.util.Collections.singleton;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils.getPrincipalNameFromSubject;
+import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
+import static org.forgerock.openam.utils.StringUtils.isBlank;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -39,26 +49,27 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
 import org.forgerock.openam.entitlement.rest.query.QueryFilterVisitorAdapter;
-import org.forgerock.openam.rest.RestUtils;
-import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationWrapper;
-import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
+import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.rest.RealmAwareResource;
+import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import java.io.IOException;
-import java.util.*;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Endpoint for the ApplicationsResource.
@@ -140,71 +151,27 @@ public class ApplicationsResource extends RealmAwareResource {
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
 
-        //auth
-        final Subject callingSubject = getContextSubject(context);
-
-        if (callingSubject == null) {
+        final Subject subject = getContextSubject(context);
+        if (subject == null) {
             debug.error("ApplicationsResource :: CREATE : Unknown Subject");
             return new BadRequestException().asPromise();
         }
 
         final String realm = getRealm(context);
-
-        //select
-        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(callingSubject);
-        final JsonValue creationRequest = request.getContent();
-
-        final ApplicationWrapper wrapp;
-        final Application previousApp;
-
         try {
-            wrapp = createApplicationWrapper(creationRequest, callingSubject);
-            String wrappName = wrapp.getName();
-            String newResourceId = request.getNewResourceId();
-
-            if (wrappName != null && newResourceId != null) {
-                if (!wrappName.equals(newResourceId)) {
-                    debug.error("ApplicationsResource :: CREATE : Resource name and JSON body name do not match.");
-                    throw new EntitlementException(EntitlementException.APPLICATION_NAME_MISMATCH);
-                }
-            }
-
-            // OPENAM-5031
-            // This is a bad solution and should be rewritten when we have time.  This code rejects anything in the
-            // name that when encoded differs from the original.  So, for instance "+" becomes "\+".
-            // What we should do is to encode the name for storage purposes, and decode it before presentation to the
-            // user.
-            if (wrappName == null) {
-                wrapp.setName(newResourceId);
-            }
-            String appName = wrapp.getApplication().getName();
-            if (!appName.equals(DN.escapeAttributeValue(appName))) {
-                throw new EntitlementException(EntitlementException.INVALID_VALUE,
-                        new Object[]{"policy name \"" + appName + "\""});
-            }
-
-            previousApp = appManager.getApplication(callingSubject, realm, appName);
-
-            if (previousApp != null) { //return conflict
+            ApplicationWrapper applicationWrapper = createApplicationWrapper(request.getContent(), subject);
+            ensureApplicationIdMatch(applicationWrapper, request.getNewResourceId());
+            String applicationId = applicationWrapper.getName();
+            validateApplicationId(applicationId);
+            if (applicationExists(applicationId, realm, subject)) {
                 throw new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS);
             }
-
-            appManager.saveApplication(callingSubject, realm, wrapp.getApplication());
-            Application savedApp = appManager.getApplication(callingSubject, realm, appName);
-            ApplicationWrapper savedAppWrapper = createApplicationWrapper(savedApp, appTypeManagerWrapper);
-
-            ResourceResponse resource = newResourceResponse(savedAppWrapper.getName(),
-                    Long.toString(savedAppWrapper.getLastModifiedDate()), savedAppWrapper.toJsonValue());
-            if (debug.messageEnabled()) {
-                debug.message("ApplicationsResource :: CREATE by " + principalName +
-                        ": for Application: " + wrapp.getName());
-            }
-            return newResultPromise(resource);
+            Application application = appManager.saveApplication(subject, realm, applicationWrapper.getApplication());
+            return newResultPromise(newResourceResponse(application.getName(),
+                    Long.toString(application.getLastModifiedDate()), applicationToJson(application)));
         } catch (EntitlementException e) {
-            if (debug.errorEnabled()) {
-                debug.error("ApplicationsResource :: CREATE by " + principalName +
-                        ": Application creation failed. ", e);
-            }
+            debug.error("ApplicationsResource :: CREATE by {}: Application creation failed. ",
+                    getPrincipalNameFromSubject(subject), e);
             return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
@@ -242,10 +209,8 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (appTypeValue.getObject() == null || appTypeValue.asString().isEmpty()
                 || !wrapp.setApplicationType(mySubject, appTypeValue.asString())) {
-            if (debug.errorEnabled()) {
-                debug.error("ApplicationsResource.createApplicationWrapper() : " +
+            debug.error("ApplicationsResource.createApplicationWrapper() : " +
                         "Specified Application Type was not available.");
-            }
             throw new EntitlementException(EntitlementException.INVALID_APP_TYPE);
         }
 
@@ -279,34 +244,22 @@ public class ApplicationsResource extends RealmAwareResource {
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
 
-        //auth
-        final Subject callingSubject = getContextSubject(context);
-
-        if (callingSubject == null) {
+        final Subject subject = getContextSubject(context);
+        if (subject == null) {
             debug.error("ApplicationsResource :: DELETE : Unknown Subject");
             return new BadRequestException().asPromise();
         }
 
         final String realm = getRealm(context);
-        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(callingSubject);
-
         try {
-            Application oldApp = appManager.getApplication(callingSubject, realm, resourceId);
-
-            if (oldApp == null) {
-                throw new EntitlementException(EntitlementException.NO_SUCH_APPLICATION,
-                                new String[] { resourceId });
+            if (!applicationExists(resourceId, realm, subject)) {
+                throw new EntitlementException(EntitlementException.NO_SUCH_APPLICATION, resourceId);
             }
-
-            appManager.deleteApplication(callingSubject, realm, resourceId);
-
-            ResourceResponse resource = newResourceResponse(resourceId, "0", JsonValue.json(JsonValue.object()));
-            return newResultPromise(resource);
+            appManager.deleteApplication(subject, realm, resourceId);
+            return newResultPromise(newResourceResponse(resourceId, "0", JsonValue.json(JsonValue.object())));
         } catch (EntitlementException e) {
-            if (debug.errorEnabled()) {
-                debug.error("ApplicationsResource :: DELETE by " + principalName +
-                        ": Application failed to delete the resource specified. ", e);
-            }
+            debug.error("ApplicationsResource :: DELETE by {}: Application failed to delete the resource specified. ",
+                    getPrincipalNameFromSubject(subject), e);
             return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
@@ -335,41 +288,30 @@ public class ApplicationsResource extends RealmAwareResource {
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
-        //auth
-        final Subject mySubject = getContextSubject(context);
-
-        if (mySubject == null) {
+        final Subject subject = getContextSubject(context);
+        if (subject == null) {
             debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
             return new BadRequestException().asPromise();
         }
 
-        //select
         final String realm = getRealm(context);
-        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
-
         try {
             List<ResourceResponse> results = new ArrayList<>();
-            final Set<String> appNames = query(request, mySubject, realm);
-            for (String appName : appNames) {
-                final Application application = appManager.getApplication(mySubject, realm, appName);
-
+            final Set<String> applicationIds = query(request, subject, realm);
+            for (String applicationId : applicationIds) {
+                final Application application = appManager.getApplication(subject, realm, applicationId);
                 if (application == null) {
-                    debug.warning("Unable to find application " + appName);
+                    debug.warning("Unable to find application {}", applicationId);
                     continue;
                 }
-
                 ApplicationWrapper wrapper = createApplicationWrapper(application, appTypeManagerWrapper);
                 results.add(newResourceResponse(wrapper.getName(), null, wrapper.toJsonValue()));
             }
-
             QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
             return QueryResponsePresentation.perform(handler, request, results);
         } catch (EntitlementException e) {
-            if (debug.errorEnabled()) {
-                debug.error("ApplicationsResource :: QUERY by " + principalName +
-                        ": Failed to query resource.", e);
-
-            }
+            debug.error("ApplicationsResource :: QUERY by {}: Failed to query resource.",
+                    getPrincipalNameFromSubject(subject), e);
             return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
@@ -385,33 +327,24 @@ public class ApplicationsResource extends RealmAwareResource {
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 
-        final Subject mySubject = getContextSubject(context);
-
-        if (mySubject == null) {
+        final Subject subject = getContextSubject(context);
+        if (subject == null) {
             debug.error("ApplicationsResource :: READ : Unknown Subject");
             return new BadRequestException().asPromise();
         }
 
         final String realm = getRealm(context);
-        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
-
         try {
-            final Application app = appManager.getApplication(mySubject, realm, resourceId);
-
-            if (app == null) {
-                throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, new String[] { realm });
+            final Application application = appManager.getApplication(subject, realm, resourceId);
+            if (application == null) {
+                throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, realm);
             }
-
-            final ApplicationWrapper wrapp = createApplicationWrapper(app, appTypeManagerWrapper);
-
-            ResourceResponse resource = newResourceResponse(resourceId, Long.toString(app.getLastModifiedDate()),
-                    wrapp.toJsonValue());
-            return newResultPromise(resource);
+            ApplicationWrapper applicationWrapper = createApplicationWrapper(application, appTypeManagerWrapper);
+            return newResultPromise(newResourceResponse(resourceId,
+                    Long.toString(application.getLastModifiedDate()), applicationWrapper.toJsonValue()));
         } catch (EntitlementException e) {
-            if (debug.errorEnabled()) {
-                debug.error("ApplicationsResource :: READ by " + principalName +
-                        ": Application failed to retrieve the resource specified.", e);
-            }
+            debug.error("ApplicationsResource :: READ by {}: Application failed to retrieve the resource specified.",
+                    getPrincipalNameFromSubject(subject), e);
             return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
@@ -430,48 +363,25 @@ public class ApplicationsResource extends RealmAwareResource {
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
 
-        final Subject mySubject = getContextSubject(context);
-
-        if (mySubject == null) {
+        final Subject subject = getContextSubject(context);
+        if (subject == null) {
             debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
             return new BadRequestException().asPromise();
         }
 
-        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
-
-        final ApplicationWrapper wrapp;
-        final Application oldApplication;
-
+        final String realm = getRealm(context);
         try {
-            wrapp = createApplicationWrapper(request.getContent(), mySubject);
-
-            if (wrapp.getName() == null) {
-                wrapp.setName(resourceId);
+            ApplicationWrapper applicationWrapper = createApplicationWrapper(request.getContent(), subject);
+            ensureApplicationIdMatch(applicationWrapper, resourceId);
+            if (!applicationExists(resourceId, realm, subject)) {
+                throw new EntitlementException(EntitlementException.NOT_FOUND, resourceId);
             }
-
-            oldApplication = appManager.getApplication(mySubject, getRealm(context), resourceId);
-
-            if (oldApplication == null) {
-                throw new EntitlementException(EntitlementException.NOT_FOUND, new String[] { resourceId });
-            }
-
-            if (!resourceId.equals(wrapp.getName()) && //return conflict
-                    appManager.getApplication(mySubject, getRealm(context), wrapp.getName()) != null) {
-                throw new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS);
-            }
-
-            appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject, getRealm(context));
-
-            ResourceResponse resource = newResourceResponse(wrapp.getName(),
-                    Long.toString(wrapp.getApplication().getLastModifiedDate()), wrapp.toJsonValue());
-
-            return newResultPromise(resource);
-
+            Application application = appManager.saveApplication(subject, realm, applicationWrapper.getApplication());
+            return newResultPromise(newResourceResponse(application.getName(),
+                    Long.toString(application.getLastModifiedDate()), applicationToJson(application)));
         } catch (EntitlementException e) {
-            if (debug.errorEnabled()) {
-                debug.error("ApplicationsResource :: UPDATE by " + principalName +
-                        ": Error performing update operation.", e);
-            }
+            debug.error("ApplicationsResource :: UPDATE by {}: Error performing update operation.",
+                    getPrincipalNameFromSubject(subject), e);
             return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
@@ -496,15 +406,54 @@ public class ApplicationsResource extends RealmAwareResource {
 
         try {
             Set<SearchFilter> searchFilters = queryFilter.accept(
-                    new ApplicationQueryBuilder(queryAttributes),
-                    new HashSet<SearchFilter>());
+                    new ApplicationQueryBuilder(queryAttributes), new HashSet<SearchFilter>());
             return appManager.search(subject, realm, searchFilters);
 
         } catch (UnsupportedOperationException ex) {
-            throw new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER, new Object[]{ ex.getMessage() });
+            throw new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER, ex.getMessage());
         } catch (IllegalArgumentException ex) {
-            throw new EntitlementException(EntitlementException.INVALID_VALUE, new Object[] { ex.getMessage() });
+            throw new EntitlementException(EntitlementException.INVALID_VALUE, ex.getMessage());
         }
+    }
+
+    private boolean applicationExists(String applicationId, String realm, Subject subject) throws EntitlementException {
+        SearchFilter searchFilter = new SearchFilter(NAME_SEARCH_ATTRIBUTE, applicationId);
+        Set<String> applicationIds = appManager.search(subject, realm, singleton(searchFilter));
+        return isNotEmpty(applicationIds);
+    }
+
+    private void ensureApplicationIdMatch(ApplicationWrapper applicationWrapper, String resourceId)
+            throws EntitlementException {
+
+        String applicationId = applicationWrapper.getName();
+        if (applicationId != null && resourceId != null) {
+            if (!applicationId.equals(resourceId)) {
+                debug.error("ApplicationsResource :: Resource name and JSON body name do not match.");
+                throw new EntitlementException(EntitlementException.APPLICATION_NAME_MISMATCH);
+            }
+        }
+
+        if (isBlank(applicationId)) {
+            applicationWrapper.setName(resourceId);
+        }
+    }
+
+    private void validateApplicationId(String applicationId) throws EntitlementException {
+        if (applicationId == null) {
+            throw new EntitlementException(EntitlementException.MISSING_APPLICATION_NAME);
+        }
+        // OPENAM-5031
+        // This is a bad solution and should be rewritten when we have time.  This code rejects anything in the
+        // name that when encoded differs from the original.  So, for instance "+" becomes "\+".
+        // What we should do is to encode the name for storage purposes, and decode it before presentation to the
+        // user.
+        if (!applicationId.equals(DN.escapeAttributeValue(applicationId))) {
+            throw new EntitlementException(EntitlementException.INVALID_VALUE, "policy name \"" + applicationId + "\"");
+        }
+    }
+
+    private JsonValue applicationToJson(Application application) throws EntitlementException {
+        return createApplicationWrapper(application, appTypeManagerWrapper).toJsonValue();
     }
 
     /**

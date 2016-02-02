@@ -254,6 +254,10 @@
                 </SubSchema>
                 <SubSchema name="applications" inheritance="multiple">
                     <SubSchema name="application" inheritance="multiple">
+                        <AttributeSchema name="displayName"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
                         <AttributeSchema name="applicationType"
                             type="single"
                             syntax="string"
@@ -568,6 +572,10 @@
                     <SubConfiguration name="iPlanetAMWebAgentService"
                         id="application">
                         <AttributeValuePair>
+                            <Attribute name="displayName" />
+                            <Value>Default Policy Set</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
                             <Attribute name="description" />
                             <Value>The built-in Application used by OpenAM Policy Agents.</Value>
                         </AttributeValuePair>
@@ -617,6 +625,10 @@
                     </SubConfiguration>
                     <SubConfiguration name="sunAMDelegationService"
                         id="application">
+                        <AttributeValuePair>
+                            <Attribute name="displayName" />
+                            <Value>Delegation Policy Set</Value>
+                        </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="applicationType" />
                             <Value>sunAMDelegationService</Value>

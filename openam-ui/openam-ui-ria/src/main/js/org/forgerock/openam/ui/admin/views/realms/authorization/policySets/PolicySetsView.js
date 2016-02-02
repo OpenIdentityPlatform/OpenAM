@@ -105,7 +105,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                             label: $.t("console.authorization.policySets.list.grid.0"),
                             cell: BackgridUtils.TemplateCell.extend({
                                 iconClass: "fa-folder",
-                                template: "templates/admin/backgrid/cell/IconAndNameCell.html",
+                                template: "templates/admin/backgrid/cell/IconAndDisplayNameCell.html",
                                 rendered: function () {
                                     this.$el.find("i.fa").addClass(this.iconClass);
                                 }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.entitlement.rest;
@@ -75,6 +75,7 @@ public class ApplicationV1Filter implements Filter {
     public static final String ACTIONS = "actions";
     public static final String RESOURCES = "resources";
     public static final String APPLICATION_NAME = "name";
+    public static final String APPLICATION_DISPLAY_NAME = "displayName";
     public static final String REALM = "realm";
 
     private final ResourceTypeService resourceTypeService;

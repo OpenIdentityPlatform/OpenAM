@@ -78,6 +78,7 @@
                     "error": {
                         "cantStartWithHash": "LDAP entity can't start with #",
                         "noName": "Name is required",
+                        "noId": "ID is required",
                         "noResourceTypes": "Please select one or more resource types",
                         "noResources": "Please select one or more resources",
                         "noActions": "Please add one or more actions",
@@ -664,6 +665,7 @@
             "realmDnsAliases": "Aliases/DNS Aliases",
             "noResults": "No results to display",
             "name": "Name",
+            "id": "ID",
             "nav": {
                 "dashboard": "Dashboard",
                 "authn": {
@@ -965,8 +967,7 @@
                     "resourceTypes": {
                         "availableResourceTypes": "Available Resource Types",
                         "selectedResourceTypes": "Selected Resource Types"
-                    },
-                    "cannotEditPolicySet": "To edit a policy set first delete all policies that it contains."
+                    }
                 },
                 "list": {
                     "addNew": "New Policy Set",

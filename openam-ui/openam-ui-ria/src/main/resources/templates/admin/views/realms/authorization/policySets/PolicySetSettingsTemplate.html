@@ -1,24 +1,19 @@
-{{#if disableSettingsEdit}}
-<div class="alert alert-info">
-    <div class="media">
-        <div class="media-left">
-            <i class="fa fa-info-circle"></i>
-        </div>
-        <div class="media-body">
-            {{t "console.authorization.policySets.edit.cannotEditPolicySet"}}
-        </div>
-    </div>
-</div>
-{{/if}}
-
 <div class="block clearfix form-horizontal">
     <div class="form-group">
-        <label class="col-sm-2 control-label">{{t "console.common.name"}}</label>
+        <label class="col-sm-2 control-label" for="appId">{{t "console.common.id"}}</label>
 
         <div class="col-sm-9">
-            <input type="text" id="appName" class="form-control" value="{{entity.name}}" data-field="name" autofocus
-                   required placeholder="{{t 'common.form.validation.required'}}" name="entityName"
-                   {{#if disableSettingsEdit}}disabled{{/if}}>
+            <input type="text" id="appId" class="form-control" value="{{entity.name}}" data-field="name"
+                   autofocus required placeholder="{{t 'common.form.validation.required'}}" name="entityId"
+                   {{#unless newEntity}}disabled{{/unless}}>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="appName">{{t "console.common.name"}}</label>
+
+        <div class="col-sm-9">
+            <input type="text" id="appName" class="form-control" value="{{entity.displayName}}" data-field="displayName"
+                   name="entityName">
         </div>
     </div>
 
@@ -26,8 +21,7 @@
         <label class="col-sm-2 control-label" for="appDescription">{{t "console.common.description"}}</label>
 
         <div class="col-sm-9">
-            <textarea class="form-control" id="appDescription" data-field="description"
-                      {{#if disableSettingsEdit}}disabled{{/if}}>{{entity.description}}</textarea>
+            <textarea class="form-control" id="appDescription" data-field="description">{{entity.description}}</textarea>
         </div>
     </div>
 

@@ -24,14 +24,13 @@
  *
  * $Id: EntitlementService.java,v 1.13 2010/01/08 23:59:32 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
 
 import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
 
-import javax.security.auth.Subject;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,6 +38,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -64,10 +70,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.entitlement.PolicyConstants;
-import org.forgerock.openam.entitlement.utils.EntitlementUtils;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  *
@@ -838,6 +840,9 @@ public class EntitlementService extends EntitlementConfiguration {
         for (String m : appl.getMetaData()) {
             data.add(ATTR_NAME_META + "=" + m);
         }
+
+        String displayName = appl.getDisplayName();
+        data.add(EntitlementUtils.CONFIG_DISPLAY_NAME + "=" + (displayName == null ? "" : displayName));
 
         if (!appl.getResourceTypeUuids().isEmpty()) {
             Set<String> searchableAttributes = new HashSet<String>();

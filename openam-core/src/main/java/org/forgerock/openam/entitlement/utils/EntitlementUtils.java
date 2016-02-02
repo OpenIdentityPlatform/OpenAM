@@ -15,15 +15,22 @@
  */
 package org.forgerock.openam.entitlement.utils;
 
-import static com.sun.identity.entitlement.opensso.EntitlementService.APPLICATION_CLASSNAME;
-import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_META;
-import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_SUBJECT_ATTR_NAMES;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_CONDITIONS;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_ENTITLEMENT_COMBINER;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_RESOURCE_COMP_IMPL;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SAVE_INDEX_IMPL;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SEARCH_INDEX_IMPL;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SUBJECTS;
+import static com.sun.identity.entitlement.opensso.EntitlementService.*;
+
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.util.Reject;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
@@ -35,20 +42,6 @@ import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.entitlement.EntitlementRegistry;
-import org.forgerock.openam.entitlement.PolicyConstants;
-import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.util.Reject;
-
-import javax.security.auth.Subject;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Utility methods for managing entitlements.
@@ -68,6 +61,7 @@ public final class EntitlementUtils {
     public static final String CONFIG_LAST_MODIFIED_BY = "lastModifiedBy";
     public static final String CONFIG_LAST_MODIFIED_DATE = "lastModifiedDate";
     public static final String CONFIG_NAME = "name";
+    public static final String CONFIG_DISPLAY_NAME = "displayName";
     public static final String CONFIG_APPLICATION_TYPE = "applicationType";
     public static final String EMPTY = "";
     public static final String SCHEMA_RESOURCE_TYPES = "resourceTypes";
@@ -128,6 +122,11 @@ public final class EntitlementUtils {
         final Set<String> resourceTypeUuids = data.get(CONFIG_RESOURCE_TYPE_UUIDS);
         if (resourceTypeUuids != null) {
             app.addAllResourceTypeUuids(resourceTypeUuids);
+        }
+
+        String displayName = getAttribute(data, CONFIG_DISPLAY_NAME);
+        if (displayName != null) {
+            app.setDisplayName(displayName);
         }
 
         String description = getAttribute(data, CONFIG_DESCRIPTION);

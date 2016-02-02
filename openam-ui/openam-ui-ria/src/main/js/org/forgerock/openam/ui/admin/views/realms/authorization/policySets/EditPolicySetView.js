@@ -75,7 +75,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
-                this.newEntity = true;
+                this.data.newEntity = true;
                 this.template = "templates/admin/views/realms/authorization/policySets/NewPolicySetTemplate.html";
                 this.model = new PolicySetModel();
                 this.listenTo(this.model, "sync", this.onModelSync);
@@ -85,6 +85,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
 
         renderAfterSyncModel: function () {
             this.data.entity = this.model.attributes;
+            this.data.displayName = this.model.displayName;
 
             if (!this.data.entity.realm) {
                 this.data.entity.realm = this.realmPath;
@@ -100,13 +101,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                         PoliciesView.render({
                             realmPath: self.realmPath,
                             policySetModel: self.model
-                        }, function (policiesNumber) {
+                        }, function () {
                             self.$el.find(".tab-menu .nav-tabs").tabdrop();
-
-                            if (policiesNumber > 0) {
-                                self.data.disableSettingsEdit = true;
-                                self.$el.find("#saveChanges, #delete").attr("disabled", true);
-                            }
 
                             UIUtils.fillTemplateWithData(
                                 "templates/admin/views/realms/authorization/policySets/PolicySetSettingsTemplate.html",
@@ -171,14 +167,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                     self.data.entity.resourceTypeUuids = value;
                 }
             });
-
-            if (this.data.disableSettingsEdit) {
-                this.resTypesSelection[0].selectize.disable();
-            }
         },
 
         processConditions: function (data, envConditions, subjConditions) {
-            if (!data.entityName) {
+            if (!data.entityId) {
                 data.entity.conditions = this.populateConditions(envConditions, envConditions);
                 data.entity.subjects = this.populateConditions(subjConditions, subjConditions);
             }
@@ -208,7 +200,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
             if (savePromise) {
                 savePromise
                     .done(function () {
-                        if (self.newEntity) {
+                        if (self.data.newEntity) {
                             Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {
                                 args: _.map([self.realmPath, self.model.id], encodeURIComponent),
                                 trigger: true
