@@ -226,7 +226,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
         },
 
         addNewScript: function () {
-            Router.routeTo(Router.configuration.routes.realmsScriptEdit, {
+            Router.routeTo(Router.configuration.routes.realmsScriptNew, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });

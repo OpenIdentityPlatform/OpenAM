@@ -1,0 +1,38 @@
+{{> headers/_Title title="console.scripts.edit.title"}}
+
+<div class="panel panel-default panel-content">
+
+    <div class="panel-body form-horizontal">
+        <!-- NAME -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="name">{{t "console.common.name"}}</label>
+
+            <div class="col-sm-9">
+                <input type="text" id="name" name="scriptName" class="form-control" value="{{entity.name}}"
+                       data-field="name" placeholder="{{t 'common.form.validation.required'}}" autofocus required>
+            </div>
+        </div>
+        <!-- CONTEXT -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="context">{{t "console.scripts.edit.scriptType"}}</label>
+
+            <div class="col-sm-9">
+                <select class="form-control" data-field="context" id="context">
+                    {{#each contexts}}
+                    <option value="{{_id}}" {{#equals ../../defaultContext _id}} selected {{/equals}} >
+                        {{name}}
+                    </option>
+                    {{/each}}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <a class="btn btn-default" href="{{routeTo 'realmsScripts' realmPath}}">{{t "common.form.cancel"}}</a>
+            <button data-save class="btn btn-primary" type="button" disabled>
+                {{t "common.form.create"}}
+            </button>
+        </div>
+    </div>
+</div>

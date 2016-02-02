@@ -850,6 +850,7 @@
         },
         "scripts": {
             "edit": {
+                "title": "New Script",
                 "language": "Language",
                 "script": "Script",
                 "scriptType": "Script Type",
@@ -861,11 +862,7 @@
                     "noErrors": "No errors found."
                 },
                 "dialog": {
-                    "title": {
-                        "change": "Change Script Type",
-                        "select": "Select Script Type"
-                    },
-                    "helper": "To create a new script, first select one of the available script types.",
+                    "title":  "Change Script Type",
                     "warning": "By changing the script type you will lose any unsaved data."
                 }
             },

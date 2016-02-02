@@ -197,6 +197,15 @@ define("config/routes/admin/RealmsRoutes", function () {
                 role: "ui-realm-admin",
                 navGroup: "admin",
                 forceUpdate: true
+            },
+            "realmsScriptNew": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView",
+                url: scopedByRealm("scripts\/new"),
+                pattern: "realms/?/scripts/new",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
             }
         };
 
