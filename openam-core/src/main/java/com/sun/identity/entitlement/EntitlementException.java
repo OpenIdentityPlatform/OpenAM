@@ -110,7 +110,7 @@ public class EntitlementException extends Exception {
     public static final int INVALID_PROPERTY_VALUE = 400;
     public static final int INVALID_VALUE = 401;
     public static final int START_DATE_AFTER_END_DATE = 402;
-    public static final int POLICY_SET_ALTERATION_ERROR_POLICIES_EXIST = 404;
+    public static final int APP_NOT_CREATED_POLICIES_EXIST = 404;
     public static final int INVALID_PROPERTY_VALUE_UNKNOWN_VALUE = 405;
     public static final int IP_CONDITION_CONFIGURATION_REQUIRED = 406;
 
