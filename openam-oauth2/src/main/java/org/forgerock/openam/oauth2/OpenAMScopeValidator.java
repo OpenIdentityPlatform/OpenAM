@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -347,12 +347,16 @@ public class OpenAMScopeValidator implements ScopeValidator {
             final String modifyTimestamp = CollectionHelper.getMapAttr(timestamps, modifyTimestampAttributeName);
 
             if (modifyTimestamp != null) {
-                return Long.toString(TIMESTAMP_DATE_FORMAT.parse(modifyTimestamp).getTime() / 1000);
+                synchronized (TIMESTAMP_DATE_FORMAT) {
+                    return Long.toString(TIMESTAMP_DATE_FORMAT.parse(modifyTimestamp).getTime() / 1000);
+                }
             } else {
                 final String createTimestamp = CollectionHelper.getMapAttr(timestamps, createdTimestampAttributeName);
 
                 if (createTimestamp != null) {
-                    return Long.toString(TIMESTAMP_DATE_FORMAT.parse(createTimestamp).getTime() / 1000);
+                    synchronized (TIMESTAMP_DATE_FORMAT) {
+                        return Long.toString(TIMESTAMP_DATE_FORMAT.parse(createTimestamp).getTime() / 1000);
+                    }
                 } else {
                     return DEFAULT_TIMESTAMP;
                 }
