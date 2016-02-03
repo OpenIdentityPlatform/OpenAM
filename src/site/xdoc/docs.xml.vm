@@ -38,116 +38,96 @@
    <p>For completed, released documentation, see <a
    href="http://docs.forgerock.org/en/openam/">docs.forgerock.org</a>.</p>
     <section name="OpenAM">
-    <table>
-        <tr><th>Document</th><th>Formats</th></tr>
-        <tr>
-          <td>OpenAM Release Notes</td>
-          <td>
-              <a href="./doc/bootstrap/release-notes/index.html">HTML</a>,
-              <a href="./doc/OpenAM-${project.version}-Release-Notes.pdf">PDF</a>
-          </td>
-        </tr>
-        <tr>
-            <td>Getting Started With OpenAM</td>
-            <td>
+        <dl>
+            <dt>OpenAM Release Notes</dt>
+            <dd>
+                <a href="./doc/bootstrap/release-notes/index.html">HTML</a>,
+                <a href="./doc/OpenAM-${project.version}-Release-Notes.pdf">PDF</a>
+            </dd>
+
+            <dt>Getting Started With OpenAM</dt>
+            <dd>
                 <a href="./doc/bootstrap/getting-started/index.html">HTML</a>,
                 <a href="./doc/OpenAM-${project.version}-Getting-Started.pdf">PDF</a>
-            </td>
-        </tr>
-        <tr>
-            <td>OpenAM Installation Guide</td>
-            <td>
+            </dd>
+
+            <dt>OpenAM Installation Guide</dt>
+            <dd>
                 <a href="./doc/bootstrap/install-guide/index.html">HTML</a>,
                 <a href="./doc/OpenAM-${project.version}-Install-Guide.pdf">PDF</a>
-            </td>
-        </tr>
-        <tr>
-            <td>OpenAM Upgrade Guide</td>
-            <td>
+            </dd>
+
+            <dt>OpenAM Upgrade Guide</dt>
+            <dd>
                 <a href="./doc/bootstrap/upgrade-guide/index.html">HTML</a>,
                 <a href="./doc/OpenAM-${project.version}-Upgrade-Guide.pdf">PDF</a>
-            </td>
-        </tr>
-        <tr>
-            <td>OpenAM Administration Guide</td>
-            <td>
+            </dd>
+
+            <dt>OpenAM Administration Guide</dt>
+            <dd>
                 <a href="./doc/bootstrap/admin-guide/index.html">HTML</a>,
-                <a href="./doc/OpenAM-Admin-Guide.pdf">PDF</a>
-            </td>
-        </tr>
-        <tr>
-            <td>OpenAM Developer's Guide</td>
-            <td>
+                <a href="./doc/OpenAM-${project.version}-Admin-Guide.pdf">PDF</a>
+            </dd>
+
+            <dt>OpenAM Developer's Guide</dt>
+            <dd>
                 <a href="./doc/bootstrap/dev-guide/index.html">HTML</a>,
                 <a href="./doc/OpenAM-${project.version}-Dev-Guide.pdf">PDF</a>
-            </td>
-        </tr>
-        <tr>
-            <td>OpenAM Deployment Planning Guide</td>
-            <td>
+            </dd>
+
+            <dt>OpenAM Deployment Planning Guide</dt>
+            <dd>
                 <a href="./doc/bootstrap/deployment-planning/index.html">HTML</a>,
                 <a href="./doc/OpenAM-${project.version}-Deployment-Planning.pdf">PDF</a>
-            </td>
-        </tr>
-        <tr>
-            <td>OpenAM Reference</td>
-            <td>
+            </dd>
+
+            <dt>OpenAM Reference</dt>
+            <dd>
                 <a href="./doc/bootstrap/reference/index.html">HTML</a>,
                 <a href="./doc/OpenAM-${project.version}-Reference.pdf">PDF</a>
-            </td>
-        </tr>
-        <tr>
-            <td>OpenAM Javadoc</td>
-            <td>
+            </dd>
+
+            <dt>OpenAM Javadoc</dt>
+            <dd>
                 <a href="./apidocs/index.html">HTML</a>
-            </td>
-        </tr>
-    </table>
-    </section>
-      <section name="Jave EE Policy Agents">
-          <table>
-              <tr><th>Document</th><th>Formats</th></tr>
-              <tr>
-                  <td>Java EE Policy Agent Release Notes</td>
-                  <td>
-                      <a href="./doc/bootstrap/jee-release-notes/index.html">HTML</a>,
-                      <a href="./doc/OpenAM-${javaEEAgentsDocCommunityVersion}-Jee-Release-Notes.pdf}">PDF</a>
-                  </td>
-              </tr>
-              <tr>
-                  <td>Java EE Policy Agent User's Guide</td>
-                  <td>
-                      <a href="./doc/bootstrap/jee-users-guide/index.html">HTML</a>,
-                      <a href="./doc/OpenAM-${javaEEAgentsDocCommunityVersion}-Jee-Users-Guide.pdf">PDF</a>
-                  </td>
-              </tr>
-              <tr>
-                  <td>Java EE Policy Agent Reference</td>
-                  <td>
-                      <a href="./doc/bootstrap/jee-reference/index.html">HTML</a>,
-                      <a href="./doc/OpenAM-${javaEEAgentsDocCommunityVersion}-Jee-Reference.pdf">PDF</a>
-                  </td>
-              </tr>
-          </table>
+            </dd>
+        </dl>
+      </section>
+      <section name="Java EE Policy Agents">
+          <dl>
+              <dt>Java EE Policy Agent Release Notes</dt>
+              <dd>
+                  <a href="./doc/bootstrap/jee-release-notes/index.html">HTML</a>,
+                  <a href="./doc/OpenAM-${javaEEAgentsDocCommunityVersion}-Jee-Release-Notes.pdf">PDF</a>
+              </dd>
+
+              <dt>Java EE Policy Agent User's Guide</dt>
+              <dd>
+                  <a href="./doc/bootstrap/jee-users-guide/index.html">HTML</a>,
+                  <a href="./doc/OpenAM-${javaEEAgentsDocCommunityVersion}-Jee-Users-Guide.pdf">PDF</a>
+              </dd>
+
+              <dt>Java EE Policy Agent Reference</dt>
+              <dd>
+                  <a href="./doc/bootstrap/jee-reference/index.html">HTML</a>,
+                  <a href="./doc/OpenAM-${javaEEAgentsDocCommunityVersion}-Jee-Reference.pdf">PDF</a>
+              </dd>
+          </dl>
       </section>
       <section name="Web Policy Agents">
-          <table>
-              <tr><th>Document</th><th>Formats</th></tr>
-              <tr>
-                  <td>Web Policy Agent Release Notes</td>
-                  <td>
-                      <a href="./doc/bootstrap/web-release-notes/index.html">HTML</a>,
-                      <a href="./doc/OpenAM-${webAgentsDocCommunityVersion}-Web-Release-Notes.pdf">PDF</a>
-                  </td>
-              </tr>
-              <tr>
-                  <td>Web Policy Agent User's Guide</td>
-                  <td>
-                      <a href="./doc/bootstrap/web-users-guide/index.html">HTML</a>,
-                      <a href="./doc/OpenAM-${webAgentsDocCommunityVersion}-Web-Users-Guide.pdf">PDF</a>
-                  </td>
-              </tr>
-          </table>
+          <dl>
+              <dt>Web Policy Agent Release Notes</dt>
+              <dd>
+                  <a href="./doc/bootstrap/web-release-notes/index.html">HTML</a>,
+                  <a href="./doc/OpenAM-${webAgentsDocCommunityVersion}-Web-Release-Notes.pdf">PDF</a>
+              </dd>
+
+              <dt>Web Policy Agent User's Guide</dt>
+              <dd>
+                  <a href="./doc/bootstrap/web-users-guide/index.html">HTML</a>,
+                  <a href="./doc/OpenAM-${webAgentsDocCommunityVersion}-Web-Users-Guide.pdf">PDF</a>
+              </dd>
+          </dl>
       </section>
   </section>
  </body>

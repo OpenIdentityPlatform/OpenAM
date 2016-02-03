@@ -31,10 +31,10 @@
  <skin>
   <groupId>org.forgerock.commons</groupId>
   <artifactId>forgerock-community-skin</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0-SNAPSHOT</version>
  </skin>
     <custom>
-        <googleAnalytics>UA-23412190-7</googleAnalytics>
+        <googleAnalytics>UA-23412190-14</googleAnalytics>
         <openproject>
             <href>http://openam.forgerock.org/</href>
             <src>./images/FR_plogo_org_FC_openAM-300x76.png</src>
