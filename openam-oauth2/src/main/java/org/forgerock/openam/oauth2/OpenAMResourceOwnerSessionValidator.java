@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -194,7 +194,8 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                     logger.error("Error authenticating user against OpenAM: ", e);
                     throw new LoginRequiredException();
                 }
-            } else if (PASSWORD.equals(request.getParameter(GRANT_TYPE))) {
+            } else if (OAuth2Constants.TokenEndpoint.PASSWORD.equals(request.getParameter(GRANT_TYPE))
+                    || OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS.equals(request.getParameter(GRANT_TYPE))) {
                 // If we're doing password grant type, the SSOToken will have been created and deleted again within
                 // OpenAMResourceOwnerAuthenticator. The request will not have a session, and so the token will have
                 // been null from the attempted creation in L148.
