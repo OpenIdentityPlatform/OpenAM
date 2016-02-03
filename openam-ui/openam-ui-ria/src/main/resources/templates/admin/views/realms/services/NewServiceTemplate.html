@@ -1,0 +1,31 @@
+{{> headers/_Title title="console.services.edit.titleNew" }}
+
+<div class="panel multiple-panels panel-content">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="serviceSelection">{{t "console.services.edit.chooseServiceType"}}</label>
+
+                    <div class="col-sm-6">
+                        <select class="selectize form-control" id="serviceSelection">
+                            <option disabled selected value="">{{t "console.services.edit.serviceTypes"}}</option>
+                            {{#each creatableTypes}}
+                            <option value="{{_id}}">{{name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div data-service-form-holder></div>
+
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <a class="btn btn-default" href="{{routeTo 'realmsServices' realmPath}}">{{t "common.form.cancel"}}</a>
+            <button data-save class="btn btn-primary" type="button">{{t "common.form.create"}}</button>
+        </div>
+    </div>
+</div>

@@ -34,6 +34,18 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
             }
 
             return encodedRealm + "/realm-config/" + path;
+        },
+        getServiceSchema = function (realm, type) {
+            // TODO temporary defaulting to an email service until server side is ready
+            type = "email";
+
+            return obj.serviceCall({
+                url: scopedByRealm(realm, "services/" + type + "?_action=schema"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            }).then(function (data) {
+                return SMSServiceUtils.sanitizeSchema(data);
+            });
         };
 
     obj.authentication = {
@@ -241,29 +253,97 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
         }
     };
 
+    // TODO AME-9702 and AME-9641: update when server-side is ready (do not forget to pass in the realm into the calls)
     obj.services = {
-        mock: [{
-            "_id": "policy",
-            "name": "Policy Configuration"
-        }, {
-            "_id": "uma",
-            "name": "UMA Provider"
-        }],
-        // TODO: AME-9641
-        all: function () {
-            return $.Deferred().resolve({
-                "result": this.mock
-            });
-        },
-        // TODO: AME-9641
-        remove: function (realmPath, ids) {
-            var self = this,
-                promises = _.map(ids, function (id) {
-                    self.mock = _.reject(self.mock, { "_id": id });
-                    return $.Deferred().resolve();
-                });
+        mock: [
+            { "_id":"audit", "name":"Audit Logging" },
+            { "_id":"dashboard", "name":"Dashboard" },
+            { "_id":"email", "name":"Email Service" }
+        ],
 
-            return Promise.all(promises);
+        instance: {
+            getAll: function () {
+                return $.Deferred().resolve({
+                    "result": obj.services.mock
+                });
+            },
+
+            get: function (realm, type) {
+                function getInstance () {
+                    // TODO temporary defaulting to an email service until server side is ready
+                    return $.Deferred().resolve({
+                        "emailAddressAttribute": "mail", "password": null, "hostname": "smtp.gmail.com",
+                        "sslState": "SSL", "port": 465, "subject": null, "from": "no-reply@openam.org", "message": null,
+                        "emailImplClassName": "org.forgerock.openam.services.email.MailServerImpl",
+                        "username": "forgerocksmtp"
+                    });
+                }
+
+                function getName (type) {
+                    return $.Deferred().resolve({
+                        "result": obj.services.mock
+                    }).then(function (all) {
+                        // TODO temporary defaulting to an email service until server side is ready
+                        type = "email";
+                        return _.findWhere(all.result, { "_id": type }).name;
+                    });
+                }
+
+                return $.when(getServiceSchema(realm, type), getInstance(), getName(type))
+                    .then(function (schema, values, name) {
+                        return {
+                            schema: schema,
+                            values: values,
+                            name: name
+                        };
+                    });
+            },
+
+            getInitialState: function (realm, type) {
+                function getTemplate (type) {
+                    // TODO temporary defaulting to an email service until server side is ready
+                    type = "email";
+
+                    return obj.serviceCall({
+                        url: scopedByRealm(realm, "services/" + type + "?_action=template"),
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                        type: "POST"
+                    });
+                }
+
+                return $.when(getServiceSchema(realm, type), getTemplate(type)).then(function (schema, values) {
+                    return {
+                        schema: schema,
+                        values: values[0]
+                    };
+                });
+            },
+
+            remove: function (realmPath, ids) {
+                var self = this,
+                    promises = _.map(ids, function (id) {
+                        self.mock = _.reject(self.mock, { "_id": id });
+                        return $.Deferred().resolve();
+                    });
+
+                return Promise.all(promises);
+            },
+
+            update: function () {
+                return $.Deferred().resolve();
+            },
+
+            create: function () {
+                return $.Deferred().resolve();
+            }
+        },
+
+        type: {
+            getCreatables: function () {
+                return $.Deferred().resolve({
+                    "result": obj.services.mock
+                });
+            }
         }
     };
 

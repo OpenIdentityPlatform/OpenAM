@@ -43,8 +43,6 @@ define([
     "./views/realms/dashboard/DashboardTasksView",
     "./views/realms/dataStores/DataStoresView",
 
-    "./views/realms/services/EditServiceView",
-
     "./views/realms/authorization/common/AbstractListView",
 
     "./views/realms/authorization/policies/EditPolicyView",

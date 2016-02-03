@@ -803,6 +803,12 @@
             "quickStart" : "Common Tasks"
         },
         "services": {
+            "edit": {
+                "title": "Service",
+                "titleNew": "New Service",
+                "chooseServiceType": "Choose a service type",
+                "serviceTypes": "Service Types..."
+            },
             "list": {
                 "service": "Service",
                 "title": "Services",

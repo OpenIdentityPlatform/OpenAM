@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
         return $(element).closest("tr").data("serviceId");
     }
     function loadServicesFromServer (realmPath) {
-        return SMSRealmService.services.all(realmPath);
+        return SMSRealmService.services.instance.getAll(realmPath);
     }
     function deleteServices (ids) {
         var self = this;
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
         FormHelper.showConfirmationBeforeDeleting({
             message: $.t("console.services.list.confirmDeleteSelected", { count: ids.length })
         }, function () {
-            SMSRealmService.services.remove(self.data.realmPath, ids).then(function () {
+            SMSRealmService.services.instance.remove(self.data.realmPath, ids).then(function () {
                 self.rerender();
             }, function (reason) {
                 Messages.addMessage({

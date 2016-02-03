@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
@@ -123,9 +123,7 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                 },
 
                 getIndentedPanel: function () {
-                    var el = document.createElement("div");
-                    el.className = "well well-sm";
-                    return el;
+                    return document.createElement("div");
                 },
 
                 getFormInputDescription: function (text) {

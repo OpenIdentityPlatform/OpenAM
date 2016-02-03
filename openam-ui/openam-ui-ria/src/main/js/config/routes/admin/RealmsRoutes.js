@@ -101,7 +101,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             },
             "realmsServiceNew": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-                page: "org/forgerock/openam/ui/admin/views/realms/services/EditServiceView",
+                page: "org/forgerock/openam/ui/admin/views/realms/services/NewServiceView",
                 url: scopedByRealm("services\/new"),
                 pattern: "realms/?/services/new",
                 role: "ui-realm-admin",

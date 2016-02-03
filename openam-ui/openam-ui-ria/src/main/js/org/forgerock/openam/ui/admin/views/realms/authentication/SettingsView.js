@@ -33,8 +33,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
-            "click #revert": "revert",
-            "click #save": "save",
+            "click [data-revert]": "revert",
+            "click [data-save]": "save",
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
 
