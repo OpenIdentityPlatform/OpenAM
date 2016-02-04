@@ -38,6 +38,7 @@ define([
     "./views/realms/authentication/ChainsView",
     "./views/realms/authentication/ModulesView",
     "./views/realms/authentication/modules/EditModuleView",
+    "./views/realms/authentication/modules/AddModuleView",
     "./views/realms/authentication/SettingsView",
     "./views/realms/dashboard/DashboardView",
     "./views/realms/dashboard/DashboardTasksView",

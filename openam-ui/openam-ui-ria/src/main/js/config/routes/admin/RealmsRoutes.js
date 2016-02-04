@@ -67,8 +67,17 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationModules": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView",
-                url: scopedByRealm("authentication\/modules\/?"),
-                pattern: "realms/?/authentication/modules",
+                url: scopedByRealm("authentication\/modules\/list"),
+                pattern: "realms/?/authentication/modules/list",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
+            "realmsAuthenticationModuleNew": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/authentication/modules/AddModuleView",
+                url: scopedByRealm("authentication\/modules\/new"),
+                pattern: "realms/?/authentication/modules/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
                 forceUpdate: true
@@ -76,8 +85,8 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationModuleEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditModuleView",
-                url: scopedByRealm("authentication\/modules\/([^\/]+)\/([^\/]+)"),
-                pattern: "realms/?/authentication/modules/?/?",
+                url: scopedByRealm("authentication\/modules\/edit\/([^\/]+)\/([^\/]+)"),
+                pattern: "realms/?/authentication/modules/edit/?/?",
                 role: "ui-realm-admin",
                 navGroup: "admin"
             },

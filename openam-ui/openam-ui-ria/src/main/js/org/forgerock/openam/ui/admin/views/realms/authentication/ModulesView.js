@@ -18,7 +18,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/views/realms/authentication/AddModuleDialog",
     "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/admin/views/realms/authentication/EditModuleDialog",
@@ -30,7 +29,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
 
     // jquery dependencies
     "selectize"
-], function ($, _, AbstractView, AddModuleDialog, arrayify, Configuration, EditModuleDialog, Form, FormHelper, Messages,
+], function ($, _, AbstractView, arrayify, Configuration, EditModuleDialog, Form, FormHelper, Messages,
              Promise, SMSRealmService) {
     function getModuleInfoFromElement (element) {
         return $(element).closest("tr").data();
@@ -45,7 +44,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
     var ModulesView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ModulesTemplate.html",
         events: {
-            "click #addModule": "addModule",
             "change input.select-module": "moduleSelected",
             "click button.delete-module-button": "onDeleteSingle",
             "click #deleteModules": "onDeleteMultiple",
@@ -55,19 +53,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             "partials/alerts/_Alert.html"
         ],
         data: {},
-        addModule: function (event) {
-            event.preventDefault();
-            var self = this;
-
-            SMSRealmService.authentication.modules.types.all(this.data.realmPath).then(function (data) {
-                AddModuleDialog(self.data.realmPath, data.result);
-            }, function (response) {
-                Messages.addMessage({
-                    type: Messages.TYPE_DANGER,
-                    response: response
-                });
-            });
-        },
         moduleSelected: function (event) {
             var hasModuleSelected = this.$el.find("input[type=checkbox]").is(":checked"),
                 row = $(event.currentTarget).closest("tr"),
