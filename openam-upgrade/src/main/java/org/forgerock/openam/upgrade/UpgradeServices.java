@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  *
- * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2014-2016 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.upgrade;
@@ -213,8 +213,10 @@ public class UpgradeServices {
 
             sb.append(generateDetailedUpgradeReport(adminToken, false));
             writeToFile(reportFile, sb.toString());
-        } catch (IOException ioe) {
-            throw new UpgradeException(ioe.getMessage());
+        } catch (Exception e) {
+            debug.error("Failed to write upgrade report: ", e);
+            UpgradeProgress.reportEnd("upgrade.failed");
+            throw new UpgradeException("Failed to write upgrade report, check debug logs for more information.");
         }
     }
 
@@ -273,6 +275,7 @@ public class UpgradeServices {
 
         if (backupFile.exists()) {
             debug.error("Upgrade cannot continue as backup file exists! " + backupFile.getName());
+            UpgradeProgress.reportEnd("upgrade.failed");
             throw new UpgradeException("Upgrade cannot continue as backup file exists");
         }
 
@@ -287,8 +290,9 @@ public class UpgradeServices {
 
             fout.write(resultXML.getBytes("UTF-8"));
         } catch (Exception ex) {
-            debug.error("Unable to write backup: ", ex);
-            throw new UpgradeException("Unable to write backup: " + ex.getMessage());
+            debug.error("Failed to write backup file: ", ex);
+            UpgradeProgress.reportEnd("upgrade.failed");
+            throw new UpgradeException("Failed to write backup file, check debug logs for more information.");
         } finally {
             if (fout != null) {
                 try {
@@ -301,6 +305,7 @@ public class UpgradeServices {
 
         if (backupPasswdFile.exists()) {
             debug.error("Upgrade cannot continue as backup password file exists! " + backupPasswdFile.getName());
+            UpgradeProgress.reportEnd("upgrade.failed");
             throw new UpgradeException("Upgrade cannot continue as backup password file exists");
         }
 
@@ -310,12 +315,10 @@ public class UpgradeServices {
             out = new PrintWriter(new FileOutputStream(backupPasswdFile));
             out.println(backupPassword);
             out.flush();
-        } catch (IOException ioe) {
-            debug.error("Unable to write backup: ", ioe);
-            throw new UpgradeException("Unable to write backup: " + ioe.getMessage());
         } catch (Exception ex) {
-            debug.error("Unable to write backup: ", ex);
-            throw new UpgradeException("Unable to write backup: " + ex.getMessage());
+            debug.error("Failed to write backup password file: ", ex);
+            UpgradeProgress.reportEnd("upgrade.failed");
+            throw new UpgradeException("Failed to write backup password file, check debug logs for more information.");
         } finally {
             if (out != null) {
                 out.close();
@@ -388,8 +391,10 @@ public class UpgradeServices {
                 debug.error("File " + dotVersionFile.getName() + " does not exist!");
             }
             writeToFile(dotVersionFilePath, version);
-        } catch (IOException ioe) {
-            throw new UpgradeException(ioe);
+        } catch (Exception e) {
+            debug.error("Failed to update .version file: ", e);
+            UpgradeProgress.reportEnd("upgrade.failed");
+            throw new UpgradeException("Failed to update .version file, check debug logs for more information.");
         }
     }
 }
