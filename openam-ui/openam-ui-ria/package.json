@@ -5,11 +5,13 @@
   "scripts": {
     "predocs": "rimraf docs",
     "docs": "jsdoc -P package.json -d docs -r src/main/js",
-    "build:production": "NODE_ENV=production grunt prod",
+    "start": "grunt",
+    "build:production": "cross-env NODE_ENV=production grunt prod",
     "test": "grunt karma:dev"
   },
   "devDependencies": {
     "chai": "3.5.0",
+    "cross-env": "1.0.7",
     "eslint": "1.10.3",
     "eslint-config-forgerock": "1.1.0",
     "eslint-formatter-warning-summary": "1.0.1",
