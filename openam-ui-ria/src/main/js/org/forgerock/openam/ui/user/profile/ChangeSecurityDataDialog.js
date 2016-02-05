@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2016 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -34,8 +34,9 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
     "UserDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function(Dialog, validatorsManager, conf, userDelegate, uiUtils, eventManager, constants) {
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/components/Messages"
+], function(Dialog, validatorsManager, conf, userDelegate, uiUtils, eventManager, constants, Messages) {
     var ChangeSecurityDataDialog = Dialog.extend({    
         contentTemplate: "templates/openam/ChangeSecurityDataDialogTemplate.html",
         
@@ -66,15 +67,15 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
                 this.delegate.changePassword(conf.loggedUser, data, _.bind(function() {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "securityDataChanged");
                     _this.close();
-                }, this), function(e) {
-                    if(JSON.parse(e.responseText).message === "Invalid Password"){
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidOldPassword");
-                        _this.close();
-                    }
+                }, this), function(response) {
+                    Messages.addMessage({
+                        type: Messages.TYPE_DANGER,
+                        message: JSON.parse(response.responseText).message
+                    });
                 },_this.errorsHandlers);
 
             }
-            
+
         },
         customValidate: function () {
             if (validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#securityDataChange"))) {

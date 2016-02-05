@@ -32,7 +32,6 @@
                 "userAccountExpired" : "Your Account has expired. Please contact service desk to extend the expiration time"
             },
             "UserMessages" : {
-                "invalidOldPassword" : "Old password is invalid.",
                 "usernameNotFound" : "Username not found",
                 "noEmailProvided" : "No email provided in profile",
                 "emailNotSent" : "Email not sent",
