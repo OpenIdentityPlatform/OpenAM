@@ -43,7 +43,7 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="commonAudit">
+                <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="audit">
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
@@ -169,7 +169,7 @@
                 </SubSchema>
 
                 <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
-                           i18nFileName="commonAudit">
+                           i18nFileName="audit">
                     <AttributeSchema name="PositiveIntegerValidator"
                                      type="validator"
                                      syntax="string">
@@ -267,7 +267,7 @@
                     </AttributeSchema>
                 </SubSchema>
 
-                <SubSchema name="JDBC" inheritance="multiple" i18nKey="handler.name.jdbc" i18nFileName="commonAudit">
+                <SubSchema name="JDBC" inheritance="multiple" i18nKey="handler.name.jdbc" i18nFileName="audit">
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
@@ -466,7 +466,7 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="commonAudit">
+                <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="audit">
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
@@ -592,7 +592,7 @@
                 </SubSchema>
 
                 <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
-                           i18nFileName="commonAudit">
+                           i18nFileName="audit">
                     <AttributeSchema name="PositiveIntegerValidator"
                                      type="validator"
                                      syntax="string">
@@ -690,7 +690,7 @@
                     </AttributeSchema>
                 </SubSchema>
 
-                <SubSchema name="JDBC" inheritance="multiple" i18nKey="handler.name.jdbc" i18nFileName="commonAudit">
+                <SubSchema name="JDBC" inheritance="multiple" i18nKey="handler.name.jdbc" i18nFileName="audit">
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
