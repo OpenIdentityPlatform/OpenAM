@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         template: "templates/admin/views/realms/services/NewServiceTemplate.html",
         events: {
             "click [data-save]": "onSave",
-            "change #serviceSelection": "onServiceSelection"
+            "change #serviceSelection": "onSelectService"
         },
 
         render: function (args, callback) {
@@ -42,15 +42,21 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                 this.data.creatableTypes = creatableTypes.result;
 
                 this.parentRender(function () {
-                    this.$el.find("#serviceSelection").selectize();
+                    if (this.data.creatableTypes.length > 1) {
+                        this.$el.find("#serviceSelection").selectize();
+                    } else if (this.data.creatableTypes[0] && this.data.creatableTypes[0]._id) {
+                        this.selectService(this.data.creatableTypes[0]._id);
+                    }
                     if (callback) { callback(); }
                 });
             }, this));
         },
 
-        onServiceSelection: function (e) {
-            var service = e.target.value;
+        onSelectService: function (e) {
+            this.selectService(e.target.value);
+        },
 
+        selectService: function (service) {
             if (this.data.type !== service) {
                 this.data.type = service;
 

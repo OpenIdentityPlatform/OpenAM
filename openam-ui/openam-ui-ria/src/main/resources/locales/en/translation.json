@@ -236,6 +236,7 @@
             "true" : "True",
             "false" : "False",
             "add": "Add",
+            "type": "Type",
             "update" : "Update",
             "save" : "Save",
             "create" : "Create",

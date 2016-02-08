@@ -20,8 +20,9 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
+    "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Constants, SMSServiceUtils, RealmHelper) {
+], function ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) {
     /**
      * @exports org/forgerock/openam/ui/admin/services/SMSRealmService
      */
@@ -274,12 +275,13 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
 
             get: function (realm, type) {
                 function getInstance () {
-                    // TODO temporary defaulting to an email service until server side is ready
-                    return $.Deferred().resolve({
-                        "emailAddressAttribute": "mail", "password": null, "hostname": "smtp.gmail.com",
-                        "sslState": "SSL", "port": 465, "subject": null, "from": "no-reply@openam.org", "message": null,
-                        "emailImplClassName": "org.forgerock.openam.services.email.MailServerImpl",
-                        "username": "forgerocksmtp"
+                    // TODO temporary defaulting to authentication settings until server side is ready as these are
+                    // tabbable.
+                    return $.when(obj.authentication.get(realm, type)).then(function (data) {
+                        // removing some of the mock data as there's too much of it!
+                        delete data.schema.properties.postauthprocess;
+                        data.schema.orderedProperties.pop();
+                        return data;
                     });
                 }
 
@@ -293,14 +295,59 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                     });
                 }
 
-                return $.when(getServiceSchema(realm, type), getInstance(), getName(type))
-                    .then(function (schema, values, name) {
-                        return {
-                            schema: schema,
-                            values: values,
-                            name: name
-                        };
+                function getSubSchemaTypes () {
+                    // "{{openamUrl}}/json/realm-config/" + realm + "services/" + type + "?_action=getAllTypes";
+                    return $.Deferred().resolve([
+                        { "_id":"CSV", "description":"CSV" },
+                        { "_id":"JDBC", "description":"CSV" },
+                        { "_id":"Syslog", "description":"JDBC" }
+                    ]);
+                }
+
+                function getSubSchemaInstances () {
+                    // "{{openamUrl}}/json/realm-config/" + realm + "services/" + type + "?_queryFilter=true";
+                    return $.Deferred().resolve([
+                        { "_id":"csv1", "type":"CSV", "typeDescription":"CSV" },
+                        { "_id":"csv2", "type":"CSV", "typeDescription":"CSV" },
+                        { "_id":"jdbc", "type":"JDBC", "typeDescription":"JDBC" }
+                    ]);
+                }
+
+                function getSubSchema (realm, type) {
+                    return getSubSchemaTypes(realm, type).then(function (types) {
+                        if (types.length > 0) {
+                            return getSubSchemaInstances(type).then(function (instances) {
+                                return instances;
+                            });
+                        } else {
+                            return [];
+                        }
                     });
+                }
+
+                return Promise.all([
+                    getServiceSchema(realm, type),
+                    getInstance(),
+                    getName(type),
+                    getSubSchema(realm, type)
+                ]).then(function (data) {
+                    if (data[3]) {
+                        data[1].schema.grouped = true;
+                    }
+                    // Temporarly changing the return to -
+                    // schema: data[1].schema,
+                    // values: data[1].values
+                    // so that we can use the mock authentication data objects.
+                    // Once endpoints complete we can chenage this back to -
+                    // schema: data[0],
+                    // values: data[1]
+                    return {
+                        schema: data[1].schema,
+                        values: data[1].values,
+                        name: data[2],
+                        subschema: data[3]
+                    };
+                });
             },
 
             getInitialState: function (realm, type) {

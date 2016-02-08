@@ -62,6 +62,8 @@ define([
 
     "./views/realms/subjects/SubjectsView",
 
+    "./views/realms/services/SubSchemaListView",
+
     "./views/realms/RealmsListView",
     "./views/realms/RealmTreeNavigationView",
     "./views/realms/CreateUpdateRealmDialog"

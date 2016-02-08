@@ -1,0 +1,35 @@
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>{{t 'common.form.name'}}</th>
+                <th>{{t 'common.form.type'}}</th>
+                <th class="fr-col-btn-2"/>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each subschema}}
+                <tr data-service-id="{{_id}}">
+                    <td class="wordwrap">
+                        <a href="#AME-9651-TODO-Routing/{{_id}}" title="{{t 'common.form.edit'}}">{{typeDescription}}</a>
+                    </td>
+                    <td class="wordwrap">{{type}}</td>
+                    <td class="fr-col-btn-2">
+                        <div class="btn-group">
+                            <a class="btn btn-link" href="#AME-9651-TODO-Routing/{{_id}}" title="{{t 'common.form.edit'}}">
+                                <i class="fa fa-pencil"/>
+                            </a>
+                            <button type="button" data-delete class="btn btn-link">
+                                <i class="fa fa-close" title="{{t 'common.form.delete'}}"/>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <a href="#TODO" class="btn btn-default pull-right">
+        <i class="fa fa-plus"></i> {{t 'common.form.add'}}
+    </a>
+</div>

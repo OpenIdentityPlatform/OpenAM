@@ -24,11 +24,13 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "org/forgerock/openam/ui/admin/views/realms/services/renderForm",
+    "org/forgerock/openam/ui/admin/models/Form",
+    "org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, Messages, AbstractView, EventManager, Router, Constants, SMSRealmService, FormHelper, renderForm) {
+], function ($, _, Messages, AbstractView, EventManager, Router, Constants, SMSRealmService, FormHelper, Form,
+             SubschemaListView) {
 
     function deleteService () {
         SMSRealmService.services.instance.remove().then(_.bind(function () {
@@ -53,26 +55,39 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
         ],
         events: {
             "click [data-save]": "onSave",
-            "click [data-delete]": "onDelete"
+            "click [data-delete]": "onDelete",
+            "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
 
         render: function (args, callback) {
             this.data.realmPath = args[0];
             this.data.type = args[1];
 
-            SMSRealmService.services.instance.get(this.data.realmPath, this.data.type)
-                .then(_.bind(function (instance) {
-                    this.data.schema = instance.schema;
-                    this.data.values = instance.values;
-                    this.data.name = instance.name;
+            var self = this;
 
-                    this.parentRender(function () {
-                        renderForm(this.$el.find("[data-service-form-holder]"), this.data, _.bind(function (form) {
-                            this.form = form;
-                        }, this));
-                        if (callback) { callback(); }
-                    });
-                }, this));
+            SMSRealmService.services.instance.get(this.data.realmPath, this.data.type).then(function (data) {
+
+                self.data.schema = data.schema;
+                self.data.values = data.values;
+                self.data.name = data.name;
+                self.data.subschema = data.subschema;
+
+                self.parentRender(function () {
+
+                    if (self.data.schema.grouped) {
+                        self.$el.find("ul.nav a:first").tab("show");
+                        self.$el.find(".tab-menu .nav-tabs").tabdrop();
+                        SubschemaListView.element = this.$el.find("#tabpanel");
+                    } else {
+                        self.data.form = new Form(
+                            self.$el.find("#tabpanel")[0],
+                            self.data.schema,
+                            self.data.values
+                        );
+                    }
+                    if (callback) { callback(); }
+                });
+            });
         },
 
         onSave: function () {
@@ -87,6 +102,17 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
             FormHelper.showConfirmationBeforeDeleting({
                 message: $.t("console.services.list.confirmDeleteSelected")
             }, _.bind(deleteService, this, e));
+        },
+        renderTab: function (event) {
+            var tabId = $(event.target).data("tabid"),
+                schema = this.data.schema.properties[tabId],
+                element = this.$el.find("#tabpanel").empty().get(0);
+
+            if (this.data.schema.grouped && tabId === "subschema") {
+                SubschemaListView.render(this.data.subschema);
+            } else {
+                this.data.form = new Form(element, schema, this.data.values);
+            }
         }
     });
 });
