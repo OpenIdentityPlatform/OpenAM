@@ -46,6 +46,15 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
             }).then(function (data) {
                 return SMSServiceUtils.sanitizeSchema(data);
             });
+        },
+        getServiceSubSchema = function (realm, serviceType, subSchemaType) {
+            return obj.serviceCall({
+                url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType + "?_action=schema"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            }).then(function (data) {
+                return SMSServiceUtils.sanitizeSchema(data);
+            });
         };
 
     obj.authentication = {
@@ -255,16 +264,11 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
 
     // TODO AME-9702 and AME-9641: update when server-side is ready (do not forget to pass in the realm into the calls)
     obj.services = {
-        mock: [
-            { "_id":"audit", "name":"Audit Logging" },
-            { "_id":"dashboard", "name":"Dashboard" },
-            { "_id":"email", "name":"Email Service" }
-        ],
-
         instance: {
-            getAll: function () {
-                return $.Deferred().resolve({
-                    "result": obj.services.mock
+            getAll: function (realm) {
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "services?_queryFilter=true"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 });
             },
 
@@ -280,11 +284,11 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                 }
 
                 function getName (type) {
-                    return $.Deferred().resolve({
-                        "result": obj.services.mock
+                    return obj.serviceCall({
+                        url: scopedByRealm(realm, "services?_action=getAllTypes"),
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                        type: "POST"
                     }).then(function (all) {
-                        // TODO temporary defaulting to an email service until server side is ready
-                        type = "email";
                         return _.findWhere(all.result, { "_id": type }).name;
                     });
                 }
@@ -320,9 +324,13 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
             },
 
             remove: function (realmPath, ids) {
-                var self = this,
+                var mock = [
+                        { "_id":"audit", "name":"Audit Logging" },
+                        { "_id":"dashboard", "name":"Dashboard" },
+                        { "_id":"email", "name":"Email Service" }
+                    ],
                     promises = _.map(ids, function (id) {
-                        self.mock = _.reject(self.mock, { "_id": id });
+                        mock = _.reject(mock, { "_id": id });
                         return $.Deferred().resolve();
                     });
 
@@ -339,10 +347,73 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
         },
 
         type: {
-            getCreatables: function () {
-                return $.Deferred().resolve({
-                    "result": obj.services.mock
+            getCreatables: function (realm) {
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "services?_action=getCreatableTypes"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "POST"
                 });
+            },
+
+            subSchema: {
+                instance: {
+                    get: function (realm, serviceType, subSchemaType, subSchemaInstance) {
+                        function getInstance () {
+                            return obj.serviceCall({
+                                url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType + "/" +
+                                    subSchemaInstance),
+                                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                            });
+                        }
+
+                        return $.when(getServiceSubSchema(realm, serviceType, subSchemaType), getInstance())
+                            .then(function (subSchema, values) {
+                                return {
+                                    subSchema: subSchema,
+                                    values: values
+                                };
+                            });
+                    },
+
+                    getInitialState: function (realm, serviceType, subSchemaType) {
+                        function getTemplate (serviceType, subSchemaType) {
+                            return obj.serviceCall({
+                                url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType +
+                                    "?_action=template"),
+                                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                                type: "POST"
+                            });
+                        }
+
+                        return $.when(
+                            getServiceSubSchema(realm, serviceType, subSchemaType),
+                            getTemplate(serviceType, subSchemaType)
+                        ).then(function (subSchema, values) {
+                            return {
+                                subSchema: subSchema,
+                                values: values[0]
+                            };
+                        });
+                    },
+
+                    remove: function () {
+                        return $.Deferred().resolve();
+                    },
+
+                    update: function () {
+                        return $.Deferred().resolve();
+                    },
+
+                    create: function () {
+                        return $.Deferred().resolve();
+                    }
+                },
+
+                type: {
+                    getCreatables: function () {
+                        return $.Deferred().resolve();
+                    }
+                }
             }
         }
     };

@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         render: function (args, callback) {
             this.data.realmPath = args[0];
 
-            SMSRealmService.services.type.getCreatables().then(_.bind(function (creatableTypes) {
+            SMSRealmService.services.type.getCreatables(this.data.realmPath).then(_.bind(function (creatableTypes) {
                 this.data.creatableTypes = creatableTypes.result;
 
                 this.parentRender(function () {
