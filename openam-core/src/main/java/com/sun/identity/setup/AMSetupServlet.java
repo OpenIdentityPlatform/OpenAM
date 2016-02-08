@@ -95,6 +95,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.UI.LoginLogoutMapping;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.internal.server.SMSAuthModule;
+import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.common.ConfigMonitoring;
 import com.sun.identity.common.DebugPropertiesObserver;
 import com.sun.identity.common.FQDNUtils;
@@ -1949,9 +1950,9 @@ public class AMSetupServlet extends HttpServlet {
 
             String dsAdminPort = props.getProperty(Constants.DS_ADMIN_PORT);
 
-            Set<String> currServerSet = new HashSet<String>();
-            Set<String> currServerDSSet = new HashSet<String>();
-            Set<String> currServerDSAdminPortsSet = new HashSet<String>();
+            Set<String> currServerSet = new CaseInsensitiveHashSet<String>();
+            Set<String> currServerDSSet = new CaseInsensitiveHashSet<String>();
+            Set<String> currServerDSAdminPortsSet = new CaseInsensitiveHashSet<String>();
 
             for (String sname : serverSet) {
                 Properties p = ServerConfiguration.getServerInstance(adminToken, sname);
