@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -349,7 +349,7 @@ public class IDPSSOFederate {
                     spSSODescriptor = null;
                 }
 
-                if (isFromECP || idpSSODescriptor.isWantAuthnRequestsSigned()
+                if (idpSSODescriptor.isWantAuthnRequestsSigned()
                         || (spSSODescriptor == null ? false : spSSODescriptor.isAuthnRequestsSigned())) {
                     // need to verify the query string containing authnRequest
                     if ((spEntityID == null) || 
