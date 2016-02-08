@@ -24,15 +24,13 @@
  *
  * $Id: PWResetQuestionTiledView.java,v 1.4 2009/12/08 10:32:23 bhavnab Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2016 ForgeRock Inc
  */
 package com.sun.identity.password.ui;
 
 import com.iplanet.jato.RequestHandler;
 import com.iplanet.jato.model.DatasetModel;
+import com.iplanet.jato.model.DefaultModel;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.RequestHandlingTiledViewBase;
 import com.iplanet.jato.view.TiledView;
@@ -46,10 +44,10 @@ import com.sun.identity.sm.DNMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * <code>PWResetQuestionTiledView</code> is a tiled view
@@ -73,8 +71,7 @@ public class PWResetQuestionTiledView extends RequestHandlingTiledViewBase
      */
     public static final String FLD_ATTR_NAME = "fldAttrName";
 
-    private List list = null;
-    private Map map = null;
+    private List<String> questionKeys = null;
     private boolean missingData = false;
 
     
@@ -129,8 +126,8 @@ public class PWResetQuestionTiledView extends RequestHandlingTiledViewBase
 	    throw new ModelControlException("Primary model is null");
 	}
 	
-	if (list != null) {
-	    getPrimaryModel().setSize(list.size());
+	if (questionKeys != null) {
+	    getPrimaryModel().setSize(questionKeys.size());
 	} else {
 	    getPrimaryModel().setSize(0);
 	}
@@ -152,7 +149,7 @@ public class PWResetQuestionTiledView extends RequestHandlingTiledViewBase
 	
         PWResetQuestionModel model = getModel();
 	if (movedToRow) {
-            String question = (String) list.get(getTileIndex());
+            String question = questionKeys.get(getTileIndex());
             String localizedStr = model.getLocalizedStrForQuestion(question);
             HiddenField hf = (HiddenField)getChild(FLD_ATTR_NAME);
             hf.setValue(question);
@@ -167,13 +164,12 @@ public class PWResetQuestionTiledView extends RequestHandlingTiledViewBase
      * @return model from parent view bean
      */
     private PWResetQuestionModel getModel() {
-	PWResetQuestionViewBean parentVB = 
-            (PWResetQuestionViewBean) getParentViewBean();
-	return (PWResetQuestionModel) parentVB.getModel();
+	    PWResetQuestionViewBean parentVB = (PWResetQuestionViewBean)getParentViewBean();
+	    return (PWResetQuestionModel) parentVB.getModel();
     }
 
     /**
-     * Populates secret question list
+     * Populates secret questionKeys list
      *
      * @param userDN  user DN
      * @param orgDN  organization DN
@@ -181,47 +177,39 @@ public class PWResetQuestionTiledView extends RequestHandlingTiledViewBase
     public void populateQuestionsList(String userDN, String orgDN) {
         PWResetQuestionModel model = getModel();
         int maxQuestions = model.getMaxNumQuestions(DNMapper.orgNameToRealmName(orgDN));
-        Map secretMap = model.getSecretQuestions(userDN, orgDN);
-        if (secretMap != null && !secretMap.isEmpty()) {
-            if (maxQuestions >=0 && maxQuestions < secretMap.size())  {
-                map = new HashMap(maxQuestions);
-                Set secretSet = secretMap.keySet();
-                Iterator it = secretSet.iterator();
-                int i = 0;
-                while  (it.hasNext()) {
-                    Object obj = (Object)it.next();
-                    map.put(obj, secretMap.get(obj));
-                    i++;
-                    if  (i == maxQuestions) {
-                        break;
-                    }
+        Map<String, String> secretMap = model.getSecretQuestions(userDN, orgDN);
+        if (CollectionUtils.isNotEmpty(secretMap)) {
+            if (maxQuestions >= 0 && maxQuestions < secretMap.size()) {
+                // Shuffle the keys as a way to provide a random set of secret questions each time they are requested.
+                List<String> secretKeys = new ArrayList<>(secretMap.keySet());
+                Collections.shuffle(secretKeys);
+                questionKeys = new ArrayList<>(maxQuestions);
+                for (int i = 0; i < maxQuestions; i++) {
+                    questionKeys.add(secretKeys.get(i));
                 }
             } else {
-                map = new HashMap(secretMap.size());
-                map.putAll(secretMap);
+                // Just return the entire set questions since they are equal to or less than the number requested.
+                questionKeys = new ArrayList<>(secretMap.keySet());
             }
-        } 
-        if (map != null && !map.isEmpty() ) {
-            Set set = map.keySet();
-            list = new ArrayList(set);
         }
     }
 
     /**
-     * Gets the answer to the secret question
+     * Gets the users answers to the secret questions
      *
-     * @return answer to the secret question
+     * @return a map of the users answers to the secret questions
      */
-    public Map getAnswers() {
-        Map map = Collections.EMPTY_MAP;
+    public Map<String, String> getAnswers() {
+
+        Map<String, String> map = Collections.emptyMap();
         PWResetQuestionModel model = getModel();
 
+        DatasetModel dataModel = getPrimaryModel();
         try {
-            DatasetModel dataModel = getPrimaryModel();
             int size = dataModel.getSize();
             if (size > 0) {
                 dataModel.first();
-                map = new HashMap(size);
+                map = new HashMap<>(size);
             }
             for (int i = 0; i < size; i++) {
                 HiddenField hf = (HiddenField)getChild(FLD_ATTR_NAME);
@@ -239,6 +227,13 @@ public class PWResetQuestionTiledView extends RequestHandlingTiledViewBase
         } catch (ModelControlException mce) {
             model.debugError("PWResetQuestionTiledView.getAnswers", mce);
         }
+
+        // Attempt to clear out the answers after being collected to avoid them being pre-populated
+        // in the case when the answers are wrong and the question screen is shown again.
+        if (dataModel instanceof DefaultModel) {
+            ((DefaultModel)dataModel).clear();
+        }
+
         return map;
     }
 
