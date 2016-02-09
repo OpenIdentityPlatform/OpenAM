@@ -153,6 +153,15 @@ define("config/process/AMConfig", [
             RedirectToLegacyConsole.global.sessions();
         }
     }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_SERVICES,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.realm.services(event);
+        }
+    }, {
         startEvent: Constants.EVENT_REDIRECT_TO_JATO_DATASTORE,
         description: "",
         dependencies: [
