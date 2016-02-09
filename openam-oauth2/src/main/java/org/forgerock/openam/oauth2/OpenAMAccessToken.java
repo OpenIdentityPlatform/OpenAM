@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -126,7 +126,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setClientId(String clientId) {
-        put(CLIENT_ID, stringToSet(clientId));
+        put(CLIENT_ID, CollectionUtils.asSet(clientId));
     }
 
     /**
