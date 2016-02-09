@@ -54,6 +54,7 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.collect.Maps;
@@ -206,20 +207,6 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
     }
 
-    private SmsRouteTree getServiceInstanceRouter() throws SMSException, SSOException {
-
-        final Set<String> serviceNames = getServiceManager().getServiceNames();
-
-        for (String serviceName : serviceNames) {
-            if (smsServiceHandlerFunction.apply(serviceName)) {
-                return routeTree.handles(serviceName);
-            }
-        }
-
-        throw new IllegalStateException("Services SmsRouteTree could not be located");
-
-    }
-
     //hard-coded services routes
     private void addServiceInstancesQueryHandler() throws SSOException, SMSException {
         // realm-config/services -> service realm collection
@@ -249,6 +236,19 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         if (SchemaType.GLOBAL.equals(schemaType)) {
             routeTree.addRoute(STARTS_WITH, "sites", Resources.newCollection(sitesResourceProvider));
         }
+    }
+
+    private SmsRouteTree getServiceInstanceRouter() throws SMSException, SSOException {
+
+        final Set<String> serviceNames = getServiceManager().getServiceNames();
+
+        for (String serviceName : serviceNames) {
+            if (smsServiceHandlerFunction.apply(serviceName)) {
+                return routeTree.handles(serviceName);
+            }
+        }
+
+        throw new IllegalStateException("Services SmsRouteTree could not be located");
     }
 
     private SmsRouteTree getAuthenticationModuleRouter() {
