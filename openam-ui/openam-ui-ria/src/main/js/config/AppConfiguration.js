@@ -32,6 +32,7 @@ define("config/AppConfiguration", [
                     { "routes": "config/routes/CommonRoutesConfig" },
                     { "routes": "config/routes/UserRoutesConfig" },
                     { "routes": "config/routes/admin/RealmsRoutes" },
+                    { "routes": "config/routes/admin/GlobalRoutes" },
                     { "routes": "config/routes/user/UMARoutes" }
                 ]
             }

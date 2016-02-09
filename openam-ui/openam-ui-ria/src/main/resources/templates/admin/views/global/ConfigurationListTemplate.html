@@ -1,0 +1,11 @@
+<div class="container">
+    {{> headers/_Title title=title }}
+
+    <div class="panel panel-default">
+        <div class="list-group">
+            {{#each items}}
+                <a href="#configuration/service/{{this._id}}" class="list-group-item">{{name}}</a>
+            {{/each}}
+        </div>
+    </div>
+</div>

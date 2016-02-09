@@ -153,6 +153,38 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
         }
     };
 
+    obj.configuration = {
+        mockSystem: [
+            { "_id":"clientDetection", "name":"Client Detection" },
+            { "_id":"logging", "name":"Logging" },
+            { "_id":"monitoring", "name":"Monitoring" },
+            { "_id":"naming", "name":"Naming" },
+            { "_id":"platform", "name":"Platform" }
+        ],
+        mockConsole: [
+            { "_id":"administration", "name":"Administration" },
+            { "_id":"globalizationsettings", "name":"Globalization Settings" }
+        ],
+        services: {
+            system: {
+                getAll: function () {
+                    return $.Deferred().resolve(obj.configuration.mockSystem);
+                }
+            },
+            console: {
+                getAll: function () {
+                    return $.Deferred().resolve(obj.configuration.mockConsole);
+                }
+            }
+            // getAll: function () {
+            //     return obj.serviceCall({
+            //         url: "services?_queryFilter=true",
+            //         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+            //     });
+            // }
+        }
+    };
+
     obj.scripts = {
         /**
          * Gets all script's contexts.

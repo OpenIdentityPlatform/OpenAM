@@ -873,6 +873,16 @@
                 "confirmDeleteText": "Are you sure you want to delete the selected scripts?"
             }
         },
+        "configuration" : {
+            "global" : {
+                "system" : {
+                    "title": "System Properties"
+                },
+                "console" : {
+                    "title": "Console Properties"
+                }
+            }
+        },
         "authorization": {
             "common": {
                 "realm": "Realm",

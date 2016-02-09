@@ -66,6 +66,10 @@ define([
 
     "./views/realms/RealmsListView",
     "./views/realms/RealmTreeNavigationView",
-    "./views/realms/CreateUpdateRealmDialog"
+    "./views/realms/CreateUpdateRealmDialog",
+
+    "./views/global/createConfigurationListView",
+    "./views/global/ConsoleConfigurationListView",
+    "./views/global/SystemConfigurationListView"
 
 ]);
