@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.Utils.joinScope;
+
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
@@ -30,8 +32,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
 import java.util.Set;
-
-import static org.forgerock.oauth2.core.Utils.joinScope;
 
 /**
  * Implementation of the GrantTypeHandler for the OAuth2 Authorization Code grant.
@@ -96,7 +96,7 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
         OAuth2ProviderSettings providerSettings;
         Set<String> authorizationScope;
         // Only allow one request per code through here at a time, to prevent replay.
-        synchronized (code) {
+        synchronized (code.intern()) {
             if (authorizationCode.isIssued()) {
                 tokenInvalidator.invalidateTokens(code);
                 tokenStore.deleteAuthorizationCode(code);
