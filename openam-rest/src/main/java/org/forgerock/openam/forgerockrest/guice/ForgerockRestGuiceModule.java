@@ -31,6 +31,7 @@ import org.forgerock.openam.forgerockrest.utils.AgentIdentityImpl;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentityImpl;
+import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.rest.authz.PrivilegeDefinition;
 import org.forgerock.openam.rest.router.DelegationEvaluatorProxy;
 import org.forgerock.openam.utils.AMKeyProvider;
@@ -86,14 +87,12 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 PrivilegeDefinition.getInstance("schema", PrivilegeDefinition.Action.READ));
         definitions.put("validate",
                 PrivilegeDefinition.getInstance("validate", PrivilegeDefinition.Action.READ));
-        definitions.put("template",
-                PrivilegeDefinition.getInstance("template", PrivilegeDefinition.Action.READ));
-
-        definitions.put("getAllTypes",
-                PrivilegeDefinition.getInstance("getAllTypes", PrivilegeDefinition.Action.READ));
-        definitions.put("getCreatableTypes",
-                PrivilegeDefinition.getInstance("getCreatableTypes", PrivilegeDefinition.Action.READ));
-
+        definitions.put(RestConstants.TEMPLATE,
+                PrivilegeDefinition.getInstance(RestConstants.TEMPLATE, PrivilegeDefinition.Action.READ));
+        definitions.put(RestConstants.GET_ALL_TYPES,
+                PrivilegeDefinition.getInstance(RestConstants.GET_ALL_TYPES, PrivilegeDefinition.Action.READ));
+        definitions.put(RestConstants.GET_CREATABLE_TYPES,
+                PrivilegeDefinition.getInstance(RestConstants.GET_CREATABLE_TYPES, PrivilegeDefinition.Action.READ));
         definitions.put("getPropertyNames",
                 PrivilegeDefinition.getInstance("getPropertyNames", PrivilegeDefinition.Action.READ));
         definitions.put("getProperty",

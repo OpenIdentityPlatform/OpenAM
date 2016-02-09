@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.authz;
@@ -47,7 +47,11 @@ import com.sun.identity.delegation.DelegationPermissionFactory;
  */
 public class PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule extends PrivilegeAuthzModule {
 
-    private static final Set<String> READ_ONLY_ACTIONS = asSet(RestConstants.SCHEMA, RestConstants.TEMPLATE);
+    private static final Set<String> READ_ONLY_ACTIONS = asSet(
+            RestConstants.SCHEMA,
+            RestConstants.TEMPLATE,
+            RestConstants.GET_ALL_TYPES,
+            RestConstants.GET_CREATABLE_TYPES);
 
     private final AnyPrivilegeAuthzModule anyPrivilegeAuthzModule;
     @Inject

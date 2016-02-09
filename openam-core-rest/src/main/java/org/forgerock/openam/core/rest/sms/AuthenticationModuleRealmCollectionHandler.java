@@ -25,56 +25,46 @@ import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMAuthenticationSchema;
 import com.sun.identity.authentication.config.AMConfigurationException;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Locale;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 /**
- * Collection handler for handling queries on the {@literal /authentication/modules} resource.
+ * Collection handler for handling queries on the {@literal realm-config/authentication/modules} resource.
  *
  * @since 13.0.0
  */
-public class AuthenticationModuleCollectionHandler implements RequestHandler {
-
-    private final Debug debug;
-    private final SSOToken adminToken;
+public class AuthenticationModuleRealmCollectionHandler extends AuthenticationModuleGlobalCollectionHandler {
 
     @Inject
-    AuthenticationModuleCollectionHandler(@Named("frRest") Debug debug) {
-        this.debug = debug;
-        this.adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+    public AuthenticationModuleRealmCollectionHandler(@Named("frRest") Debug debug,
+                                                      @Named("adminToken") SSOToken adminToken,
+                                                      @Named("AMAuthenticationServices")
+                                                      Set<String> authenticationServiceNames,
+                                                      @Named("AMResourceBundleCache")
+                                                      AMResourceBundleCache resourceBundleCache,
+                                                      @Named("DefaultLocale") Locale defaultLocale) {
+        super(debug, adminToken, authenticationServiceNames, resourceBundleCache, defaultLocale);
     }
 
     /**
@@ -151,47 +141,4 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
         return new ServiceSchemaManager(schema.getServiceName(), adminToken);
     }
 
-    static String getI18NValue(ServiceSchemaManager schemaManager, String authType, Debug debug) {
-        String i18nKey = schemaManager.getI18NKey();
-        String i18nName = authType;
-        ResourceBundle rb = getBundle(schemaManager.getI18NFileName(), Locale.getDefaultLocale());
-        if (rb != null && i18nKey != null && !i18nKey.isEmpty()) {
-            i18nName = Locale.getString(rb, i18nKey, debug);
-        }
-        return i18nName;
-    }
-
-    private static ResourceBundle getBundle(String name, java.util.Locale locale) {
-        return AMResourceBundleCache.getInstance().getResBundle(name, locale);
-    }
-
-    @Override
-    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
 }

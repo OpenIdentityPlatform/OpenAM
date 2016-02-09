@@ -37,6 +37,23 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.configuration.ConfigurationBase;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSNotificationManager;
+import com.sun.identity.sm.SMSObjectListener;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+import com.sun.identity.sm.ServiceManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.collect.Maps;
@@ -70,24 +87,6 @@ import org.forgerock.services.context.Context;
 import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.util.promise.Promise;
 
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.configuration.ConfigurationBase;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSNotificationManager;
-import com.sun.identity.sm.SMSObjectListener;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
-import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
-
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
  * the SMS configuration services. Uses the {@link ServiceManager} to get a list of all registered
@@ -112,14 +111,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final Debug debug;
     private final Pattern schemaDnPattern;
     private final Collection<String> excludedServices;
-    private final AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler;
-    private final AuthenticationModuleTypeHandler authenticationModuleTypeHandler;
-    private final ServiceInstanceCollectionHandler serviceInstanceCollectionHandler;
+    private final AuthenticationModuleRealmCollectionHandler authenticationModuleRealmCollectionHandler;
+    private final AuthenticationModuleGlobalCollectionHandler authenticationModuleGlobalCollectionHandler;
+    private final ServicesRealmCollectionHandler servicesRealmCollectionHandler;
     private final RealmContextFilter realmContextFilter;
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceSingletons =
-            new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
+            new HashMap<>();
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceCollections =
-            new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
+            new HashMap<>();
     private final SitesResourceProvider sitesResourceProvider;
     private final RealmNormaliser realmNormaliser;
     private Map<String, Map<SmsRouteTree, Set<RouteMatcher<Request>>>> serviceRoutes = new HashMap<>();
@@ -133,9 +132,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             SmsSingletonProviderFactory singletonProviderFactory,
             SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
             ExcludedServicesFactory excludedServicesFactory,
-            AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler,
-            AuthenticationModuleTypeHandler authenticationModuleTypeHandler,
-            ServiceInstanceCollectionHandler serviceInstanceCollectionHandler,
+            AuthenticationModuleRealmCollectionHandler authenticationModuleRealmCollectionHandler,
+            ServicesRealmCollectionHandler servicesRealmCollectionHandler,
+            AuthenticationModuleGlobalCollectionHandler authenticationModuleGlobalCollectionHandler,
             SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter,
             RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
             RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
@@ -151,9 +150,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.coreWrapper = coreWrapper;
         this.realmNormaliser = realmNormaliser;
         this.excludedServices = excludedServicesFactory.get(type);
-        this.authenticationModuleCollectionHandler = authenticationModuleCollectionHandler;
-        this.authenticationModuleTypeHandler = authenticationModuleTypeHandler;
-        this.serviceInstanceCollectionHandler = serviceInstanceCollectionHandler;
+        this.authenticationModuleGlobalCollectionHandler = authenticationModuleGlobalCollectionHandler;
+        this.authenticationModuleRealmCollectionHandler = authenticationModuleRealmCollectionHandler;
+        this.servicesRealmCollectionHandler = servicesRealmCollectionHandler;
         this.realmContextFilter = realmContextFilter;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
@@ -187,22 +186,24 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     }
 
     private void addSpecialCaseRoutes() throws SMSException, SSOException {
-        addAuthenticationModulesQueryHandler();
-        addAuthenticationModuleTypesQueryHandler();
         addServiceInstancesQueryHandler();
+        addAuthenticationHandlers();
         addRealmHandler();
         addCommonTasksHandler();
         addSitesHandler();
     }
 
-    private void addSitesHandler() {
-        if (SchemaType.GLOBAL.equals(schemaType)) {
-            routeTree.addRoute(STARTS_WITH, "sites", Resources.newCollection(sitesResourceProvider));
+    //hard-coded authentication routes
+    private void addAuthenticationHandlers() {
+        // realm-config/authentication -> realm module collection handler
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            getAuthenticationModuleRouter().addRoute(EQUALS, "", authenticationModuleRealmCollectionHandler);
         }
-    }
 
-    private SmsRouteTree getAuthenticationModuleRouter() {
-        return routeTree.handles(new ArrayList<>(AMAuthenticationManager.getAuthenticationServiceNames()).get(0));
+        // global-config/authentication/modules -> global module collection handler
+        if (SchemaType.GLOBAL.equals(schemaType)) {
+            routeTree.addRoute(EQUALS, "/authentication/modules", authenticationModuleGlobalCollectionHandler);
+        }
     }
 
     private SmsRouteTree getServiceInstanceRouter() throws SMSException, SSOException {
@@ -216,26 +217,26 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
 
         throw new IllegalStateException("Services SmsRouteTree could not be located");
+
     }
 
+    //hard-coded services routes
     private void addServiceInstancesQueryHandler() throws SSOException, SMSException {
+        // realm-config/services -> service realm collection
         if (SchemaType.ORGANIZATION.equals(schemaType)) {
-            getServiceInstanceRouter().addRoute(EQUALS, "", serviceInstanceCollectionHandler);
+            getServiceInstanceRouter().addRoute(EQUALS, "", servicesRealmCollectionHandler);
         }
     }
 
-    private void addAuthenticationModulesQueryHandler() {
+    //hard-coded realm-config/commontasks route
+    private void addCommonTasksHandler() {
         if (SchemaType.ORGANIZATION.equals(schemaType)) {
-            getAuthenticationModuleRouter().addRoute(EQUALS, "", authenticationModuleCollectionHandler);
+            routeTree.addRoute(STARTS_WITH, "/commontasks",
+                    Resources.newCollection(InjectorHolder.getInstance(CommonTasksResource.class)));
         }
     }
 
-    private void addAuthenticationModuleTypesQueryHandler() {
-        if (SchemaType.ORGANIZATION.equals(schemaType)) {
-            getAuthenticationModuleRouter().addRoute(EQUALS, "types", authenticationModuleTypeHandler);
-        }
-    }
-
+    //routes under global-config/realms route
     private void addRealmHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
             routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", new FilterChain(new SmsRealmProvider(
@@ -243,11 +244,15 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
     }
 
-    private void addCommonTasksHandler() {
-        if (SchemaType.ORGANIZATION.equals(schemaType)) {
-            routeTree.addRoute(STARTS_WITH, "/commontasks",
-                    Resources.newCollection(InjectorHolder.getInstance(CommonTasksResource.class)));
+    //routes under global-config/sites
+    private void addSitesHandler() {
+        if (SchemaType.GLOBAL.equals(schemaType)) {
+            routeTree.addRoute(STARTS_WITH, "sites", Resources.newCollection(sitesResourceProvider));
         }
+    }
+
+    private SmsRouteTree getAuthenticationModuleRouter() {
+        return routeTree.handles(new ArrayList<>(AMAuthenticationManager.getAuthenticationServiceNames()).get(0));
     }
 
     private void addExcludedServiceProviders() {

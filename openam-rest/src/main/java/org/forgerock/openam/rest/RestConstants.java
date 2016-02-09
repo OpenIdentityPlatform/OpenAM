@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
@@ -27,6 +27,15 @@ public final class RestConstants {
     public static final String TEMPLATE = "template";
     /** The action ID for the schema action. */
     public static final String SCHEMA = "schema";
+    /** The action ID to return all possible subschema types.  */
+    public static final String GET_ALL_TYPES = "getAllTypes";
+    /** The action ID to return all creatable subschema types. */
+    public static final String GET_CREATABLE_TYPES = "getCreatableTypes";
+
+    /** The name field constants. **/
+    public final static String NAME = "name";
+    /** The result field constant. **/
+    public final static String RESULT = "result";
 
     private RestConstants() {
         // No extensions.

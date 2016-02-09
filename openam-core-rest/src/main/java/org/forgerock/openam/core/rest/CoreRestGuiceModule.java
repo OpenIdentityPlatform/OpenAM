@@ -24,11 +24,32 @@ import static org.forgerock.http.routing.Version.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.*;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Key;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
+import com.sun.identity.sm.SchemaType;
 import java.io.IOException;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
@@ -376,4 +397,18 @@ public class CoreRestGuiceModule extends AbstractModule {
     public Set<String> getAMAuthenticationServices() {
         return AMAuthenticationManager.getAuthenticationServiceNames();
     }
+
+    @Provides
+    @Named("AMResourceBundleCache")
+    public AMResourceBundleCache getAMResourceBundleCache() {
+        return AMResourceBundleCache.getInstance();
+    }
+
+    @Provides
+    @Named("DefaultLocale")
+    public Locale getDefaultLocale() { return Locale.getDefault(); }
+
+    @Provides
+    @Named("adminToken")
+    public SSOToken getAdminToken() { return AccessController.doPrivileged(AdminTokenAction.getInstance()); }
 }

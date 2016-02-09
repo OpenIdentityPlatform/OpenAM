@@ -18,6 +18,7 @@ package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.rest.RestConstants.*;
 import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.sso.SSOException;
@@ -38,19 +39,13 @@ import javax.inject.Named;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
@@ -65,19 +60,13 @@ import org.forgerock.util.promise.Promise;
  * 'getCreatableTypes' will return the set of all service types which have not been
  * instantiated on the server.
  */
-public class ServiceInstanceCollectionHandler implements RequestHandler {
-
-    private final static String NAME = "name";
-    private final static String RESULT = "result";
-
-    private final static String getAllTypesAction = "getAllTypes";
-    private final static String getCreatableTypesAction = "getCreatableTypes";
+public class ServicesRealmCollectionHandler extends NoOpCollectionHandler {
 
     private final Debug debug;
     private final SmsConsoleServiceNameFilter consoleNameFilter;
 
     @Inject
-    ServiceInstanceCollectionHandler(@Named("frRest") Debug debug, SmsConsoleServiceNameFilter consoleNameFilter) {
+    ServicesRealmCollectionHandler(@Named("frRest") Debug debug, SmsConsoleServiceNameFilter consoleNameFilter) {
         this.debug = debug;
         this.consoleNameFilter = consoleNameFilter;
     }
@@ -132,7 +121,7 @@ public class ServiceInstanceCollectionHandler implements RequestHandler {
     public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest actionRequest) {
         switch (actionRequest.getAction()) {
 
-            case getAllTypesAction :
+            case GET_ALL_TYPES :
                 try {
                     return getAllTypesAction(context);
                 } catch (SMSException | SSOException | IdRepoException e) {
@@ -140,7 +129,7 @@ public class ServiceInstanceCollectionHandler implements RequestHandler {
                     return new InternalServerErrorException("Unable to query SMS config: "
                             + e.getMessage(), e).asPromise();
                 }
-            case getCreatableTypesAction :
+            case GET_CREATABLE_TYPES :
                 try {
                     return getCreatableTypesAction(context);
                 } catch (SMSException | SSOException | IdRepoException e) {
@@ -210,31 +199,6 @@ public class ServiceInstanceCollectionHandler implements RequestHandler {
             throws IdRepoException, SSOException {
         AMIdentityRepository repo = new AMIdentityRepository(realmName, userSSOToken);
         return repo.getRealmIdentity();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest createRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest deleteRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest patchRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest readRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest updateRequest) {
-        return RestUtils.generateUnsupportedOperation();
     }
 
 }
