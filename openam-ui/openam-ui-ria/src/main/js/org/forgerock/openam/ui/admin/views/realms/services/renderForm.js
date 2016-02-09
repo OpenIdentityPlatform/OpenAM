@@ -23,11 +23,12 @@ define("org/forgerock/openam/ui/admin/views/realms/services/renderForm", [
     "org/forgerock/openam/ui/admin/models/Form"
 ], function (_, UIUtils, Form) {
 
-    var exports = function (placeHolder, data, callback) {
+    var exports = function ($el, data, callback) {
         UIUtils.fillTemplateWithData(
-            "templates/admin/views/realms/services/ServiceFormTemplate.html",
+            "templates/admin/views/realms/services/FormTemplate.html",
             data,
             function (template) {
+                var placeHolder = $el.find("[data-service-form-holder]");
                 placeHolder.html(template);
                 callback(new Form(placeHolder.find("[data-service-form]")[0], data.schema, data.values));
             }

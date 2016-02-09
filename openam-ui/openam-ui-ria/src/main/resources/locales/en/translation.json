@@ -821,6 +821,11 @@
                 },
                 "confirmDeleteSelected": "Are you sure you want to delete the selected service?",
                 "confirmDeleteSelected_plural": "Are you sure you want to delete the selected services?"
+            },
+            "subSchema": {
+                "new": {
+                    "title": "New __subSchema__ instance"
+                }
             }
         },
         "realms": {

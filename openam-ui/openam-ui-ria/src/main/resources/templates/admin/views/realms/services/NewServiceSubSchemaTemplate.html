@@ -1,0 +1,13 @@
+{{> breadcrumb/_Breadcrumb backLink=backLink}}
+{{> headers/_Title title=(tWithParams "console.services.subSchema.new.title" subSchema=subSchemaType) }}
+
+<div class="panel multiple-panels panel-content">
+    <div data-service-form-holder></div>
+
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <a class="btn btn-default" href="{{routeTo 'realmsServiceEdit' realmPath serviceInstance}}">{{t "common.form.cancel"}}</a>
+            <button data-save class="btn btn-primary" type="button">{{t "common.form.create"}}</button>
+        </div>
+    </div>
+</div>

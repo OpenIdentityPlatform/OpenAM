@@ -37,20 +37,22 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         },
 
         render: function (args, callback) {
+            var self = this;
+
             this.data.realmPath = args[0];
 
-            SMSRealmService.services.type.getCreatables(this.data.realmPath).then(_.bind(function (creatableTypes) {
-                this.data.creatableTypes = creatableTypes;
+            SMSRealmService.services.type.getCreatables(this.data.realmPath).then(function (creatableTypes) {
+                self.data.creatableTypes = creatableTypes.result;
 
-                this.parentRender(function () {
-                    if (this.data.creatableTypes.length > 1) {
-                        this.$el.find("#serviceSelection").selectize();
-                    } else if (this.data.creatableTypes[0] && this.data.creatableTypes[0]._id) {
-                        this.selectService(this.data.creatableTypes[0]._id);
+                self.parentRender(function () {
+                    if (self.data.creatableTypes.length > 1) {
+                        self.$el.find("#serviceSelection").selectize();
+                    } else if (self.data.creatableTypes[0] && self.data.creatableTypes[0]._id) {
+                        self.selectService(self.data.creatableTypes[0]._id);
                     }
                     if (callback) { callback(); }
                 });
-            }, this));
+            });
         },
 
         onSelectService: function (e) {
@@ -58,31 +60,35 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         },
 
         selectService: function (service) {
+            var self = this;
+
             if (this.data.type !== service) {
                 this.data.type = service;
 
                 SMSRealmService.services.instance.getInitialState(this.data.realmPath, this.data.type)
-                    .then(_.bind(function (initialState) {
-                        this.data.schema = initialState.schema;
-                        this.data.values = initialState.values;
-
-                        renderForm(this.$el.find("[data-service-form-holder]"), this.data, _.bind(function (form) {
-                            this.form = form;
-                        }, this));
-                    }, this));
+                    .then(function (initialState) {
+                        renderForm(self.$el, {
+                            schema: initialState.schema,
+                            values: initialState.values
+                        }, function (form) {
+                            self.form = form;
+                        });
+                    });
             }
         },
 
         onSave: function () {
+            var self = this;
+
             SMSRealmService.services.instance.create(this.data.realmPath, this.data.type, this.form.data())
-                .then(_.bind(function () {
+                .then(function () {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
                     Router.routeTo(Router.configuration.routes.realmsServiceEdit, {
-                        args: _.map([this.data.realmPath, this.data.type], encodeURIComponent),
+                        args: _.map([self.data.realmPath, self.data.type], encodeURIComponent),
                         trigger: true
                     });
-                }, this), function (response) {
+                }, function (response) {
                     Messages.addMessage({
                         response: response,
                         type: Messages.TYPE_DANGER

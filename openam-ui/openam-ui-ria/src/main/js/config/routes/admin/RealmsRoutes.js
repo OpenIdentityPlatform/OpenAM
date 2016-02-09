@@ -108,6 +108,24 @@ define("config/routes/admin/RealmsRoutes", function () {
                 navGroup: "admin",
                 forceUpdate: true
             },
+            "realmsServiceSubSchemaNew": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaView",
+                url: scopedByRealm("services\/edit\/([^\/]+)\/([^\/]+)\/new"),
+                pattern: "realms/?/services/edit/?/?/new",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
+            "realmsServiceSubSchemaEdit": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchemaView",
+                url: scopedByRealm("services\/edit\/([^\/]+)\/([^\/]+)\/edit\/([^\/]+)"),
+                pattern: "realms/?/services/edit/?/?/edit/?",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
             "realmsPolicySets": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/PolicySetsView",

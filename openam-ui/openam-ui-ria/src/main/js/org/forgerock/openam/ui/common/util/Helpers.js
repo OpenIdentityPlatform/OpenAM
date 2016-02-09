@@ -17,10 +17,11 @@
 /*global define*/
 
 define("org/forgerock/openam/ui/common/util/Helpers", [
+    "jquery",
     "handlebars",
     "lodash",
     "org/forgerock/openam/ui/common/util/ExternalLinks"
-], function (Handlebars, _, ExternalLinks) {
+], function ($, Handlebars, _, ExternalLinks) {
 
     Handlebars.registerHelper("externalLink", function (key) {
         return _.get(ExternalLinks, key, "");
@@ -40,5 +41,27 @@ define("org/forgerock/openam/ui/common/util/Helpers", [
     Handlebars.registerHelper("debug", function () {
         console.warn("[handlebars] debug. Value of `this`");
         console.warn(this);
+    });
+
+    // TODO: Commons Candidate
+    /**
+     * Handlebars parameterized translation helper
+     * @example
+     * 1) In translation file define a value under "key.to.my.translation.string" key,
+     *    e.g. "Display __foo__ and __bar__"
+     * 2) Call helper function with parameters: {{tWithParams "key.to.my.translation.string" foo="test1" bar="test2"}}
+     * 3) Resulting string will be "Display test1 and test2"
+     */
+    Handlebars.registerHelper("tWithParams", function (translationKey, options) {
+        var parameters = {},
+            key;
+
+        for (key in options.hash) {
+            if (options.hash.hasOwnProperty(key)) {
+                parameters[key] = options.hash[key];
+            }
+        }
+
+        return $.t(translationKey, parameters);
     });
 });
