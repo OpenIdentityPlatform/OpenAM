@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
              SubschemaListView) {
 
     function deleteService () {
-        SMSRealmService.services.instance.remove().then(_.bind(function () {
+        SMSRealmService.services.instance.remove(this.data.realmPath, this.data.type).then(_.bind(function () {
             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
             Router.routeTo(Router.configuration.routes.realmsServices, {
@@ -66,7 +66,6 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
             var self = this;
 
             SMSRealmService.services.instance.get(this.data.realmPath, this.data.type).then(function (data) {
-
                 self.data.schema = data.schema;
                 self.data.values = data.values;
                 self.data.name = data.name;
@@ -79,7 +78,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                         self.$el.find(".tab-menu .nav-tabs").tabdrop();
                         SubschemaListView.element = this.$el.find("#tabpanel");
                     } else {
-                        self.data.form = new Form(
+                        self.form = new Form(
                             self.$el.find("#tabpanel")[0],
                             self.data.schema,
                             self.data.values
@@ -91,9 +90,15 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
         },
 
         onSave: function () {
-            SMSRealmService.services.instance.update().then(function () {
-                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-            });
+            SMSRealmService.services.instance.update(this.data.realmPath, this.data.type, this.form.data())
+                .then(function () {
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                }, function (response) {
+                    Messages.addMessage({
+                        response: response,
+                        type: Messages.TYPE_DANGER
+                    });
+                });
         },
 
         onDelete: function (e) {
@@ -103,6 +108,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                 message: $.t("console.services.list.confirmDeleteSelected")
             }, _.bind(deleteService, this, e));
         },
+
         renderTab: function (event) {
             var tabId = $(event.target).data("tabid"),
                 schema = this.data.schema.properties[tabId],
@@ -111,7 +117,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
             if (this.data.schema.grouped && tabId === "subschema") {
                 SubschemaListView.render(this.data.subschema);
             } else {
-                this.data.form = new Form(element, schema, this.data.values);
+                this.form = new Form(element, schema, this.data.values);
             }
         }
     });

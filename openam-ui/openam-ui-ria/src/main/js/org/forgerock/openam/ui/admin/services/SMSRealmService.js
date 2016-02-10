@@ -37,9 +37,6 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
             return encodedRealm + "/realm-config/" + path;
         },
         getServiceSchema = function (realm, type) {
-            // TODO temporary defaulting to an email service until server side is ready
-            type = "email";
-
             return obj.serviceCall({
                 url: scopedByRealm(realm, "services/" + type + "?_action=schema"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -263,7 +260,6 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
         }
     };
 
-    // TODO AME-9702 and AME-9641: update when server-side is ready (do not forget to pass in the realm into the calls)
     obj.services = {
         instance: {
             getAll: function (realm) {
@@ -275,17 +271,13 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
 
             get: function (realm, type) {
                 function getInstance () {
-                    // TODO temporary defaulting to authentication settings until server side is ready as these are
-                    // tabbable.
-                    return $.when(obj.authentication.get(realm, type)).then(function (data) {
-                        // removing some of the mock data as there's too much of it!
-                        delete data.schema.properties.postauthprocess;
-                        data.schema.orderedProperties.pop();
-                        return data;
+                    return obj.serviceCall({
+                        url: scopedByRealm(realm, "services/" + type),
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     });
                 }
 
-                function getName (type) {
+                function getName () {
                     return obj.serviceCall({
                         url: scopedByRealm(realm, "services?_action=getAllTypes"),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -296,7 +288,12 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                 }
 
                 function getSubSchemaTypes () {
-                    // "{{openamUrl}}/json/realm-config/" + realm + "services/" + type + "?_action=getAllTypes";
+                    // return obj.serviceCall({
+                    //     url: scopedByRealm(realm, "services/" + type + "?_action=getAllTypes"),
+                    //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    //     type: "POST"
+                    // });
+
                     return $.Deferred().resolve([
                         { "_id":"CSV", "description":"CSV" },
                         { "_id":"JDBC", "description":"CSV" },
@@ -305,7 +302,11 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                 }
 
                 function getSubSchemaInstances () {
-                    // "{{openamUrl}}/json/realm-config/" + realm + "services/" + type + "?_queryFilter=true";
+                    // return obj.serviceCall({
+                    //     url: scopedByRealm(realm, "services/" + type + "?_queryFilter=true"),
+                    //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                    // });
+
                     return $.Deferred().resolve([
                         { "_id":"csv1", "type":"CSV", "typeDescription":"CSV" },
                         { "_id":"csv2", "type":"CSV", "typeDescription":"CSV" },
@@ -313,7 +314,7 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                     ]);
                 }
 
-                function getSubSchema (realm, type) {
+                function getSubSchema () {
                     return getSubSchemaTypes(realm, type).then(function (types) {
                         if (types.length > 0) {
                             return getSubSchemaInstances(type).then(function (instances) {
@@ -325,36 +326,26 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                     });
                 }
 
-                return Promise.all([
-                    getServiceSchema(realm, type),
-                    getInstance(),
-                    getName(type),
-                    getSubSchema(realm, type)
-                ]).then(function (data) {
-                    if (data[3]) {
-                        data[1].schema.grouped = true;
-                    }
-                    // Temporarly changing the return to -
-                    // schema: data[1].schema,
-                    // values: data[1].values
-                    // so that we can use the mock authentication data objects.
-                    // Once endpoints complete we can chenage this back to -
-                    // schema: data[0],
-                    // values: data[1]
-                    return {
-                        schema: data[1].schema,
-                        values: data[1].values,
-                        name: data[2],
-                        subschema: data[3]
-                    };
-                });
+                return Promise.all([getServiceSchema(realm, type), getInstance(), getName(), getSubSchema()])
+                    .then(function (data) {
+                        var schema = data[0],
+                            subSchema = data[3];
+
+                        if (subSchema) {
+                            schema.grouped = true;
+                        }
+
+                        return {
+                            schema: schema,
+                            values: data[1],
+                            name: data[2],
+                            subschema: subSchema
+                        };
+                    });
             },
 
             getInitialState: function (realm, type) {
                 function getTemplate (type) {
-                    // TODO temporary defaulting to an email service until server side is ready
-                    type = "email";
-
                     return obj.serviceCall({
                         url: scopedByRealm(realm, "services/" + type + "?_action=template"),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -370,26 +361,38 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                 });
             },
 
-            remove: function (realmPath, ids) {
-                var mock = [
-                        { "_id":"audit", "name":"Audit Logging" },
-                        { "_id":"dashboard", "name":"Dashboard" },
-                        { "_id":"email", "name":"Email Service" }
-                    ],
-                    promises = _.map(ids, function (id) {
-                        mock = _.reject(mock, { "_id": id });
-                        return $.Deferred().resolve();
+            remove: function (realm, types) {
+                if (!_.isArray(types)) {
+                    types = [types];
+                }
+
+                var promises = _.map(types, function (type) {
+                    return obj.serviceCall({
+                        url: scopedByRealm(realm, "services/" + type),
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                        type: "DELETE"
                     });
+                });
 
                 return Promise.all(promises);
             },
 
-            update: function () {
-                return $.Deferred().resolve();
+            update: function (realm, type, data) {
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "services/" + type),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "PUT",
+                    data: JSON.stringify(data)
+                });
             },
 
-            create: function () {
-                return $.Deferred().resolve();
+            create: function (realm, type, data) {
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "services/" + type + "?_action=create"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "POST",
+                    data: JSON.stringify(data)
+                });
             }
         },
 
@@ -443,22 +446,43 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                         });
                     },
 
-                    remove: function () {
-                        return $.Deferred().resolve();
+                    remove: function (realm, serviceType, subSchemaType, subSchemaInstance) {
+                        return obj.serviceCall({
+                            url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType +
+                                "/" + subSchemaInstance),
+                            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                            type: "DELETE"
+                        });
                     },
 
-                    update: function () {
-                        return $.Deferred().resolve();
+                    update: function (realm, serviceType, subSchemaType, subSchemaInstance, data) {
+                        return obj.serviceCall({
+                            url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType +
+                                "/" + subSchemaInstance),
+                            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                            type: "PUT",
+                            data: JSON.stringify(data)
+                        });
                     },
 
-                    create: function () {
-                        return $.Deferred().resolve();
+                    create: function (realm, serviceType, subSchemaType, subSchemaInstance, data) {
+                        return obj.serviceCall({
+                            url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType +
+                                "/" + subSchemaInstance),
+                            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                            type: "POST",
+                            data: JSON.stringify(data)
+                        });
                     }
                 },
 
                 type: {
-                    getCreatables: function () {
-                        return $.Deferred().resolve();
+                    getCreatables: function (realm, serviceType) {
+                        return obj.serviceCall({
+                            url: scopedByRealm(realm, "services/" + serviceType + "?_action=getCreatableTypes"),
+                            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                            type: "POST"
+                        });
                     }
                 }
             }
