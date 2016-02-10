@@ -535,7 +535,12 @@ public final class LDAPUtils {
      * @return {@code true} if the string is a DN.
      */
     public static boolean isDN(String candidateDN) {
-        return newDN(candidateDN).size() > 0;
+        try {
+            return newDN(candidateDN).size() > 0;
+        } catch (LocalizedIllegalArgumentException e) {
+            DEBUG.error("LDAPUtils.isDN: Invalid DN", e);
+        }
+        return false;
     }
 
     /**
