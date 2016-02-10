@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -53,7 +53,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             "click #register": "selfServiceClick"
         },
         selfServiceClick: function(e) {
-            e.preventDefault();
             //save the login params in a cookie for use with the cancel button on forgotPassword/register page
             //and also the "proceed to login" link once password has been successfully changed or registration is complete
             var expire = new Date(),
