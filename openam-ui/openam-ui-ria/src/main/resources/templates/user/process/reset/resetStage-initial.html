@@ -6,7 +6,7 @@
         <input type="password" placeholder="{{t 'common.user.password'}}" id="input-password" name="password" class="form-control input-lg"
             data-validation-dependents="input-confirmPassword" data-validator-event="keyup"
             data-validator="required minLength" minLength="8" />
-        <span class="error form-control-feedback"><i class="fa validation-icon"></i></span>
+        <span class="error form-control-feedback form-control-feedback-lg"><i class="fa validation-icon"></i></span>
     </div>
 
     <div class="form-group">
@@ -14,7 +14,7 @@
             <span>{{t 'common.user.confirmPassword'}}</span>
         </label>
         <input type="password" placeholder="{{t 'common.user.confirmPassword'}}" id="input-confirmPassword" class="form-control input-lg" data-validator="passwordConfirm" passwordField="input-password" data-validator-event="keyup" required />
-        <span class="error form-control-feedback"><i class="fa validation-icon"></i></span>
+        <span class="error form-control-feedback form-control-feedback-lg"><i class="fa validation-icon"></i></span>
     </div>
 
     <input type="submit" class="btn btn-lg btn-primary btn-block btn-uppercase" value="{{t 'common.form.submit'}}" />
