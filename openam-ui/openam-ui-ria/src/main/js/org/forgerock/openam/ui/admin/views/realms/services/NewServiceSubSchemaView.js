@@ -31,9 +31,6 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
 
     AbstractView.extend({
         template: "templates/admin/views/realms/services/NewServiceSubSchemaTemplate.html",
-        partials: [
-            "partials/breadcrumb/_Breadcrumb.html"
-        ],
         events: {
             "click [data-save]": "onSave"
         },
@@ -42,13 +39,6 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
             this.data.realmPath = args[0];
             this.data.serviceInstance = args[1];
             this.data.subSchemaType = args[2];
-
-            this.data.backLink = {
-                href: "#" + Router.getLink(Router.configuration.routes.realmsServiceEdit,
-                    _.map([this.data.realmPath, this.data.serviceInstance], encodeURIComponent)),
-                text: this.data.serviceInstance,
-                icon: "fa-plug"
-            };
 
             this.parentRender(function () {
                 ServicesService.type.subSchema.instance.getInitialState(

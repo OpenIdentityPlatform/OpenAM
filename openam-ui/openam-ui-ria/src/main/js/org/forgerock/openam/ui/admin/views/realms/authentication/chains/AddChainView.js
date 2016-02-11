@@ -20,8 +20,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/AddChai
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/services/SMSRealmService"
-], function ($, _, AbstractView, Router, Messages,
-  SMSRealmService) {
+], function ($, _, AbstractView, Router, Messages, SMSRealmService) {
     function validateChainProps () {
         var name = this.$el.find("[data-chain-name]").val().trim(),
             nameExists,
