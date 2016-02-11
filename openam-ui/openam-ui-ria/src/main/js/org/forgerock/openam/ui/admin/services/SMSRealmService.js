@@ -398,11 +398,17 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
 
         type: {
             getCreatables: function (realm) {
-                return obj.serviceCall({
+                function sortByName (response) {
+                    return _.sortBy(response.result, "name");
+                }
+
+                var promise = obj.serviceCall({
                     url: scopedByRealm(realm, "services?_action=getCreatableTypes"),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
                 });
+
+                return promise.then(sortByName);
             },
 
             subSchema: {
