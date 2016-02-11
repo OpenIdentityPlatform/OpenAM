@@ -11,11 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jwk.JWKSet;
@@ -296,5 +298,11 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     public boolean exists() {
         return true;
     }
+
+    @Override
+    public Template getCustomLoginUrlTemplate() throws ServerException {
+        return null;
+    }
+
 
 }

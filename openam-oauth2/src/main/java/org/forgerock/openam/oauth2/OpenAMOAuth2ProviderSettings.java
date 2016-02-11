@@ -11,28 +11,32 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.oauth2.core.Utils.joinScope;
 
+import java.io.IOException;
+import java.io.StringReader;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jwk.KeyUse;
@@ -78,15 +82,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
-
-import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.oauth2.core.Utils.*;
 
 /**
  * Models all of the possible settings the OpenAM OAuth2 provider can have and that can be configured.
@@ -99,8 +97,8 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     private final String realm;
     private final String deploymentUrl;
     private final CookieExtractor cookieExtractor;
-
     private ScopeValidator scopeValidator;
+    private volatile Template loginUrlTemplate;
 
     /**
      * Constructs a new OpenAMOAuth2ProviderSettings.
@@ -886,6 +884,28 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         }
     }
 
+    @Override
+    public Template getCustomLoginUrlTemplate() throws ServerException {
+        try {
+            String loginUrlTemplateString = getStringSetting(realm,
+                    OAuth2ProviderService.RESOURCE_OWNER_CUSTOM_LOGIN_URL_TEMPLATE);
+            if (loginUrlTemplateString != null) {
+                loginUrlTemplate = new Template("customLoginUrlTemplate", new StringReader(loginUrlTemplateString),
+                        new Configuration());
+            }
+            return loginUrlTemplate;
+        } catch (SSOException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        } catch (IOException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        } catch (SMSException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */
@@ -911,6 +931,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                 synchronized (attributeCache) {
                     attributeCache.clear();
                     jwks.clear();
+                    loginUrlTemplate = null;
                 }
             } else {
                 if (logger.messageEnabled()) {

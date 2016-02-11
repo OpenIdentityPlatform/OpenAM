@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -810,6 +810,7 @@ public class OAuth2Constants {
         public static final String ACR_VALUE_MAPPING = "forgerock-oauth2-provider-loa-mapping";
         public static final String DEFAULT_ACR = "forgerock-oauth2-provider-default-acr";
         public static final String INVALID_SCOPE_BEHAVIOUR = "forgerock-oauth2-provider-invalid-scope-behaviour";
+        public static final String RESOURCE_OWNER_CUSTOM_LOGIN_URL_TEMPLATE = "customLoginUrlTemplate";
     }
 
     /**
