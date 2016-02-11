@@ -181,15 +181,15 @@ public class PWResetQuestionTiledView extends RequestHandlingTiledViewBase
         if (CollectionUtils.isNotEmpty(secretMap)) {
             if (maxQuestions >= 0 && maxQuestions < secretMap.size()) {
                 // Shuffle the keys as a way to provide a random set of secret questions each time they are requested.
-                List<String> secretKeys = new ArrayList<>(secretMap.keySet());
+                List<String> secretKeys = new ArrayList<String>(secretMap.keySet());
                 Collections.shuffle(secretKeys);
-                questionKeys = new ArrayList<>(maxQuestions);
+                questionKeys = new ArrayList<String>(maxQuestions);
                 for (int i = 0; i < maxQuestions; i++) {
                     questionKeys.add(secretKeys.get(i));
                 }
             } else {
                 // Just return the entire set questions since they are equal to or less than the number requested.
-                questionKeys = new ArrayList<>(secretMap.keySet());
+                questionKeys = new ArrayList<String>(secretMap.keySet());
             }
         }
     }
@@ -209,7 +209,7 @@ public class PWResetQuestionTiledView extends RequestHandlingTiledViewBase
             int size = dataModel.getSize();
             if (size > 0) {
                 dataModel.first();
-                map = new HashMap<>(size);
+                map = new HashMap<String, String>(size);
             }
             for (int i = 0; i < size; i++) {
                 HiddenField hf = (HiddenField)getChild(FLD_ATTR_NAME);
