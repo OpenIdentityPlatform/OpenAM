@@ -104,7 +104,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             "click #saveEditChain":  "saveChain",
             "click #saveSettings":   "saveSettings",
             "click .add-new-module": "addNewModule",
-            "click #delete":         "onDeleteClick"
+            "click [data-delete]":   "onDeleteClick"
         },
         partials: [
             "partials/alerts/_Alert.html",

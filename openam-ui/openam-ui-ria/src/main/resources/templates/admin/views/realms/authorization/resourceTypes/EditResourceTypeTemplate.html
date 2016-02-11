@@ -1,5 +1,5 @@
 {{#if entity.name}}
-    {{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.resourceTypes.edit.resourceType"
+    {{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.common.resourceType"
         icon="cube" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton"
         helpLink="backstage.authz.resourceTypes"}}
 {{/if}}
@@ -34,7 +34,7 @@
     </div>
     <div class="panel-footer clearfix">
         <div class="pull-right">
-            <button id="saveChanges" class="btn btn-primary" type="button">{{t "common.form.saveChanges"}}</button>
+            <button data-save class="btn btn-primary" type="button">{{t "common.form.saveChanges"}}</button>
         </div>
     </div>
 </div>

@@ -1,4 +1,4 @@
-{{> headers/_Title title="console.authorization.resourceTypes.edit.newResourceType"
+{{> headers/_Title title="console.authorization.resourceTypes.edit.title"
     helpLink="backstage.authz.resourceTypes"}}
 
 <div class="panel multiple-panels panel-content">
@@ -38,8 +38,8 @@
     <div class="panel-footer clearfix">
         <div class="pull-right">
             <a class="btn btn-default" href="{{routeTo 'realmsResourceTypes' realmPath}}">{{t "common.form.cancel"}}</a>
-            <button id="saveChanges" class="btn btn-primary" type="button">
-                {{t "console.authorization.resourceTypes.edit.createResourceType"}}
+            <button data-save class="btn btn-primary" type="button">
+                {{t "common.form.create"}}
             </button>
         </div>
     </div>

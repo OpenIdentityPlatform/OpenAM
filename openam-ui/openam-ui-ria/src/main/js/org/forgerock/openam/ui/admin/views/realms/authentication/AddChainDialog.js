@@ -81,7 +81,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog
         {},
         function (html) {
             BootstrapDialog.show({
-                title: $.t("console.authentication.chains.createNewChain"),
+                title: $.t("console.authentication.chains.newChain"),
                 message: $(html),
                 buttons: [{
                     label: $.t("common.form.cancel"),

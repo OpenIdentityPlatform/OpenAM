@@ -37,8 +37,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             "partials/util/_HelpLink.html"
         ],
         events: {
-            "click #saveChanges": "submitForm",
-            "click #delete": "onDeleteClick"
+            "click [data-save]": "submitForm",
+            "click [data-delete]": "onDeleteClick"
         },
         tabs: [
             { name: "patterns", attr: ["patterns"] },

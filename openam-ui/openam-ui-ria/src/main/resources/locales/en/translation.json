@@ -702,11 +702,11 @@
             },
             "modules": {
                 "title" : "Authentication Modules",
+                "newModule": "New Module",
                 "description" : "OpenAM uses authentication modules to identify the user. Normally authentication modules are associated with an authentication chain. Each realm has a default authentication chain that will be used to authenticate users. This section is used to add, configure or remove authentication module available for authentication into this realm.",
                 "addModuleDialogTitle" : "Create new Module",
                 "addModuleDialogError": "Authentication instance already exists.",
                 "selectModuleType" : "Select Module type   ",
-                "addModule" : "Add Module",
                 "moduleName" : "Module Name",
                 "moduleType" : "Type",
                 "chain" : "Chain",
@@ -720,13 +720,12 @@
             },
             "chains": {
                 "title" : "Authentication Chains",
-                "action" : "Add Chain",
+                "newChain": "New Chain",
                 "chainName" : "Chain Name",
                 "description" : "Use authentication chains to define the steps a subject takes to authenticate. Authentication chains consist of a series of one or more authentication modules, with credentials being passed down the chain to each module instance.",
                 "defaultAdminAuthConfiguration" : "Default Administrator Authentication Chain",
                 "defaultOrgAuthConfiguration" : "Default Organization Authentication Chain",
                 "duplicateChain" : "A Chain with the same name already exists",
-                "createNewChain" : "Create new chain",
                 "confirmDeleteSelected": "Are you sure you want to delete the selected chain?",
                 "confirmDeleteSelected_plural": "Are you sure you want to delete the selected chains?"
             },
@@ -1167,9 +1166,7 @@
                     "grid": ["Name"]
                 },
                 "edit": {
-                    "resourceType": "Resource Type",
-                    "newResourceType" : "New Resource Type",
-                    "createResourceType" : "Create Resource Type",
+                    "title" : "New Resource Type",
                     "actionsDescription" : "Define the actions that policies using this resource type can allow or deny.",
                     "specifyActions" : "Specify Actions",
                     "addAction": "Add Action",
