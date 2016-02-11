@@ -24,7 +24,7 @@
  *
  * $Id: AMSetupFilter.java,v 1.12 2008/07/13 06:06:49 kevinserwin Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -58,14 +58,14 @@ public final class AMSetupFilter implements Filter {
     private static final String UPGRADE_URI = "/config/upgrade/upgrade.htm";
     private static final String SETUP_PROGRESS_URI = "/setup/setSetupProgress";
     private static final String UPGRADE_PROGESS_URI = "/upgrade/setUpgradeProgress";
-    private static final String NOWRITE_PERMISSION = "/nowritewarning.jsp";
     private static final String CONFIGURATOR_URI = "configurator";
 
     private static final String AM_ENCRYPTION_PASSWORD_PROPERTY_KEY = "am.enc.pwd";
     private static final String CONFIG_STORE_DOWN_ERROR_CODE = "configstore.down";
+    private static final String NOWRITE_PERMISSION_ERROR_CODE = "nowrite.permission";
 
     private static final Collection<String> ALLOWED_RESOURCES = CollectionUtils.asSet("SMSObjectIF", "setSetupProgress",
-            "setUpgradeProgress", "/legal-notices/", NOWRITE_PERMISSION);
+            "setUpgradeProgress", "/legal-notices/");
     private static final Collection<String> ALLOWED_FILE_EXTENSIONS = CollectionUtils.asSet(".ico", ".htm", ".css",
             ".js", ".jpg", ".gif", ".png");
 
@@ -123,7 +123,8 @@ public final class AMSetupFilter implements Filter {
                         if (hasWritePermissionOnUserHomeDirectory()) {
                             url += SETUP_URI;
                         } else {
-                            url += NOWRITE_PERMISSION;
+                            throw new ConfigurationException(NOWRITE_PERMISSION_ERROR_CODE,
+                                    new String[] {setupManager.getUserHomeDirectory().getAbsolutePath()});
                         }
                         response.sendRedirect(url);
                         enablePassthrough();

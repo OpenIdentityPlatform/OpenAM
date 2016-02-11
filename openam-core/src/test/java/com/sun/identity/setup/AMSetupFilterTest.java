@@ -233,7 +233,7 @@ public class AMSetupFilterTest {
     }
 
     @Test
-    public void filterShouldRedirectRequestsToNoWritePermissionPageIfNotConfiguredAndCannotWriteToUseHomeDirectory()
+    public void filterShouldThrowExceptionIfNotConfiguredAndCannotWriteToUserHomeDirectory()
             throws Exception {
 
         //Given
@@ -246,11 +246,14 @@ public class AMSetupFilterTest {
         noWritePermissionsOnBootstrapRootDirectory();
 
         //When
-        setupFilter.doFilter(request, response, chain);
-
-        //Then
-        verify(response).sendRedirect("SCHEME://SERVER_NAME:8080/CONTEXT_PATH/nowritewarning.jsp");
-        verifyZeroInteractions(chain);
+        try {
+            setupFilter.doFilter(request, response, chain);
+            fail("Expected ServletException with ConfigurationException as cause");
+        } catch (ServletException e) {
+            //Then
+            assertThat(e.getCause()).isInstanceOf(ConfigurationException.class);
+            verifyZeroInteractions(response, chain);
+        }
     }
 
     @DataProvider
