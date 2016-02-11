@@ -16,15 +16,11 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static java.util.Collections.emptyMap;
-import static org.forgerock.http.routing.RoutingMode.EQUALS;
-import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static java.util.Collections.*;
+import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.openam.core.rest.sms.SmsRouteTree.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,37 +34,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.configuration.ConfigurationBase;
-import com.sun.identity.policy.ServiceTypeManager;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSNotificationManager;
-import com.sun.identity.sm.SMSObjectListener;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
-import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.collect.Maps;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.resource.ResourcePath;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.utils.RealmNormaliser;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -87,9 +59,34 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.openam.rest.RealmContextFilter;
+import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.util.promise.Promise;
+
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.configuration.ConfigurationBase;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSNotificationManager;
+import com.sun.identity.sm.SMSObjectListener;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+import com.sun.identity.sm.ServiceManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
@@ -102,67 +99,6 @@ import org.forgerock.util.promise.Promise;
  * @since 13.0.0
  */
 public class SmsRequestHandler implements RequestHandler, SMSObjectListener, ServiceListener {
-
-    static final String COT_CONFIG_SERVICE = "sunFMCOTConfigService";
-    static final String IDFF_METADATA_SERVICE = "sunFMIDFFMetadataService";
-    static final String SAML2_METADATA_SERVICE = "sunFMSAML2MetadataService";
-    static final String WS_METADATA_SERVICE = "sunFMWSFederationMetadataService";
-
-    private static final Function<String, Boolean> CIRCLES_OF_TRUST_HANDLES_FUNCTION =
-            new SingleServiceFunction(COT_CONFIG_SERVICE);
-    private static final Function<String, Boolean> ENTITYPROVIDER_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        private final List<String> services =
-                Arrays.asList(IDFF_METADATA_SERVICE, SAML2_METADATA_SERVICE, WS_METADATA_SERVICE);
-
-        public Boolean apply(@Nullable String name) {
-            return services.contains(name);
-        }
-    };
-
-    private static final Function<String, Boolean> AUTHENTICATION_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        @Nullable
-        @Override
-        public Boolean apply(@Nullable String s) {
-            return ISAuthConstants.AUTH_SERVICE_NAME.equals(s);
-        }
-    };
-
-    private static final Function<String, Boolean> AUTHENTICATION_CHAINS_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        @Nullable
-        @Override
-        public Boolean apply(@Nullable String s) {
-            return ISAuthConstants.AUTHCONFIG_SERVICE_NAME.equals(s);
-        }
-    };
-
-    private static final Function<String, Boolean> AUTHENTICATION_MODULE_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        @Override
-        public Boolean apply(String serviceName) {
-            return AMAuthenticationManager.getAuthenticationServiceNames().contains(serviceName);
-        }
-    };
-
-    /**
-     * Services are all the services not handled by other handlers for specific service schema types.
-     */
-    private static final Function<String, Boolean> SERVICES_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        private final List<Function<String, Boolean>> ALREADY_HANDLED = Arrays.asList(
-                AUTHENTICATION_HANDLES_FUNCTION,
-                AUTHENTICATION_CHAINS_HANDLES_FUNCTION,
-                AUTHENTICATION_MODULE_HANDLES_FUNCTION,
-                CIRCLES_OF_TRUST_HANDLES_FUNCTION,
-                ENTITYPROVIDER_HANDLES_FUNCTION
-        );
-        @Override
-        public Boolean apply(String serviceName) {
-            for (Function<String, Boolean> handled : ALREADY_HANDLED) {
-                if (handled.apply(serviceName)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    };
 
     private static final List<Pattern> DEFAULT_IGNORED_ROUTES =
             Arrays.asList(Pattern.compile("^platform/sites(/.*)?$"), Pattern.compile("^platform/servers(/.*)?$"));
@@ -190,6 +126,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final SmsRouteTree routeTree;
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
+    private final SmsServiceHandlerFunction smsServiceHandlerFunction;
 
     @Inject
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
@@ -202,7 +139,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter,
             RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
             RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
-            PrivilegeAuthzModule privilegeAuthzModule)
+            PrivilegeAuthzModule privilegeAuthzModule, SmsServiceHandlerFunction smsServiceHandlerFunction)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
@@ -224,13 +161,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                 ? globalAuthzModules
                 : Collections.<MatchingResourcePath, CrestAuthorizationModule>emptyMap();
         routeTree = tree(authzModules, privilegeAuthzModule,
-                branch("/authentication", AUTHENTICATION_HANDLES_FUNCTION,
-                        leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION),
-                        filter("/chains", AUTHENTICATION_CHAINS_HANDLES_FUNCTION, authenticationChainsFilter)),
-                branch("/federation", CIRCLES_OF_TRUST_HANDLES_FUNCTION,
-                        leaf("/entityproviders", ENTITYPROVIDER_HANDLES_FUNCTION)),
-                leaf("/services", SERVICES_HANDLES_FUNCTION)
+                branch("/authentication", smsServiceHandlerFunction.AUTHENTICATION_HANDLES_FUNCTION,
+                        leaf("/modules", smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION),
+                        filter("/chains", smsServiceHandlerFunction.AUTHENTICATION_CHAINS_HANDLES_FUNCTION, authenticationChainsFilter)),
+                branch("/federation", smsServiceHandlerFunction.CIRCLES_OF_TRUST_HANDLES_FUNCTION,
+                        leaf("/entityproviders", smsServiceHandlerFunction.ENTITYPROVIDER_HANDLES_FUNCTION)),
+                leaf("/services", smsServiceHandlerFunction)
         );
+        this.smsServiceHandlerFunction = smsServiceHandlerFunction;
         addExcludedServiceProviders();
 
         createServices();
@@ -272,7 +210,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         final Set<String> serviceNames = getServiceManager().getServiceNames();
 
         for (String serviceName : serviceNames) {
-            if (SERVICES_HANDLES_FUNCTION.apply(serviceName)) {
+            if (smsServiceHandlerFunction.apply(serviceName)) {
                 return routeTree.handles(serviceName);
             }
         }
@@ -314,8 +252,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
 
     private void addExcludedServiceProviders() {
         excludedServiceSingletons.put(SchemaType.GLOBAL, CollectionUtils.<Function<String, Boolean>>asSet());
-        excludedServiceSingletons.put(SchemaType.ORGANIZATION, asSet(AUTHENTICATION_MODULE_HANDLES_FUNCTION));
-        excludedServiceCollections.put(SchemaType.GLOBAL, asSet(AUTHENTICATION_MODULE_HANDLES_FUNCTION));
+        excludedServiceSingletons.put(SchemaType.ORGANIZATION, asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
+        excludedServiceCollections.put(SchemaType.GLOBAL, asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
         excludedServiceCollections.put(SchemaType.ORGANIZATION, CollectionUtils.<Function<String, Boolean>>asSet());
     }
 
@@ -696,21 +634,6 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     @Override
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
         return routeTree.handleUpdate(context, request);
-    }
-
-    private static final class SingleServiceFunction implements Function<String, Boolean> {
-
-        private final String serviceName;
-
-        SingleServiceFunction(String serviceName) {
-            this.serviceName = serviceName;
-        }
-
-        @Nullable
-        @Override
-        public Boolean apply(String name) {
-            return serviceName.equals(name);
-        }
     }
 
     @Override

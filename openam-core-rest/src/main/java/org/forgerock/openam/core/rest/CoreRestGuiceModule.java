@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest;
@@ -24,22 +24,6 @@ import static org.forgerock.http.routing.Version.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.*;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Key;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SchemaType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,9 +31,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
@@ -90,6 +76,23 @@ import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.services.routing.RouteMatcher;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Key;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SchemaType;
 
 /**
  * Guice module for binding the core REST endpoints.
@@ -368,4 +371,9 @@ public class CoreRestGuiceModule extends AbstractModule {
         return hiddenServices;
     }
 
+    @Provides
+    @Named("AMAuthenticationServices")
+    public Set<String> getAMAuthenticationServices() {
+        return AMAuthenticationManager.getAuthenticationServiceNames();
+    }
 }
