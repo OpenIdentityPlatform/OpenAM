@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.file.impl;
 
@@ -130,14 +130,6 @@ public class DebugFileImpl implements DebugFile {
     @Override
     public void writeIt(String prefix, String msg, Throwable th) throws IOException {
 
-        if (isConfigChanged()) {
-            initialize();
-        }
-
-        if (needsRotate()) {
-            rotate();
-        }
-
         StringBuilder buf = new StringBuilder();
         buf.append(prefix);
         buf.append('\n');
@@ -154,7 +146,19 @@ public class DebugFileImpl implements DebugFile {
         // printing is the printer can be consider here as a reading access to it
         fileLock.readLock().lock();
         try {
-            debugWriter.println(buf.toString());
+            if (isConfigChanged()) {
+                initialize();
+            }
+
+            if (needsRotate()) {
+                rotate();
+            }
+
+            if (debugWriter != null) { 
+                debugWriter.println(buf.toString());
+            } else {
+                StdDebugFile.printError(prefix, msg, th);
+            } 
         } finally {
             fileLock.readLock().unlock();
         }
