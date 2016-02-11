@@ -121,6 +121,7 @@ public class OATH extends AMLoginModule {
     private String sharedSecretImplClass = null;
 
     protected String amAuthOATH = null;
+    private final int START_STATE = 2;
 
     /**
      * Standard constructor sets-up the debug logging module.
@@ -258,7 +259,10 @@ public class OATH extends AMLoginModule {
             }
 
             switch (state) {
+
                 case ISAuthConstants.LOGIN_START:
+                    return START_STATE;
+                case START_STATE:
                     // process callbacks
                     // callback[0] = Password CallBack (OTP)
                     // callback[1] = Confirmation CallBack (Submit OTP)
@@ -409,7 +413,7 @@ public class OATH extends AMLoginModule {
                     throw new AuthLoginException(amAuthOATH, "authFailed", null);
                 }
 
-                // we have to do counter+1 because counter is the last previous 
+                // we have to do counter+1 because counter is the last previous
                 //accepted counter
                 counter++;
 

@@ -21,7 +21,7 @@
  If applicable, add the following below the CDDL Header,
  with the fields enclosed by brackets [] replaced by
  your own identifying information:
- "Portions Copyrighted 2012 ForgeRock AS"
+ "Portions Copyrighted 2012-2016 ForgeRock AS"
  -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -29,7 +29,8 @@
 
 
 <ModuleProperties moduleName="OATH" version="1.0">
-    <Callbacks length="2" order="1" timeout="120" header="Sign in to OpenAM">
+    <Callbacks length="0" order="1" timeout="120" header="#WILL NOT BE SHOWN#" />
+    <Callbacks length="2" order="2" timeout="120" header="Sign in to OpenAM">
         <PasswordCallback>
             <Prompt>One Time Password:</Prompt>
         </PasswordCallback>
