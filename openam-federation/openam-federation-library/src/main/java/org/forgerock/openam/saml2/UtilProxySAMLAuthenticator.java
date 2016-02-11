@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.saml2;
 
@@ -158,8 +158,8 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
             SAML2Utils.debug.error(classMethod, sme);
         }
 
-        if (isFromECP || idpSSODescriptor.isWantAuthnRequestsSigned() ||
-                (spSSODescriptor != null && spSSODescriptor.isAuthnRequestsSigned())) {
+        if (idpSSODescriptor.isWantAuthnRequestsSigned()
+                || (spSSODescriptor != null && spSSODescriptor.isAuthnRequestsSigned())) {
             // need to verify the query string containing authnRequest
             if (StringUtils.isBlank(data.getSpEntityID())) {
                 throw new ClientFaultException(data.getIdpAdapter(), INVALID_SAML_REQUEST);
