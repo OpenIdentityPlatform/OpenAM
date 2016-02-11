@@ -62,7 +62,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         selectService: function (service) {
             var self = this;
 
-            if (this.data.type !== service) {
+            this.$el.find("[data-save]").prop("disabled", !service);
+
+            if (service && service !== this.data.type) {
                 this.data.type = service;
 
                 SMSRealmService.services.instance.getInitialState(this.data.realmPath, this.data.type)
