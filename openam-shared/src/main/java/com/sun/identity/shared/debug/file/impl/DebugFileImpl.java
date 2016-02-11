@@ -132,14 +132,6 @@ public class DebugFileImpl implements DebugFile {
     @Override
     public void writeIt(String prefix, String msg, Throwable th) throws IOException {
 
-        if (isConfigChanged()) {
-            initialize();
-        }
-
-        if (needsTimeRotation() || needsSizeRotation()) {
-            rotate();
-        }
-
         StringBuilder buf = new StringBuilder();
         buf.append(prefix);
         buf.append('\n');
@@ -155,7 +147,19 @@ public class DebugFileImpl implements DebugFile {
 
         fileLock.readLock().lock();
         try {
-            debugWriter.println(buf.toString());
+            if (isConfigChanged()) {
+                initialize();
+            }
+
+            if (needsTimeRotation() || needsSizeRotation()) {
+                rotate();
+            }
+
+            if (debugWriter != null) { 
+                debugWriter.println(buf.toString());
+            } else {
+                StdDebugFile.printError(prefix, msg, th);
+            } 
         } finally {
             fileLock.readLock().unlock();
         }
