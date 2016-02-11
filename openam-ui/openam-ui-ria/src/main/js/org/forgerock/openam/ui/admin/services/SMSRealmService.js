@@ -274,6 +274,8 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                     return obj.serviceCall({
                         url: scopedByRealm(realm, "services/" + type),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                    }).then(function (response) {
+                        return _.isArray(response) ? response[0] : response;
                     });
                 }
 
@@ -330,10 +332,6 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                     .then(function (data) {
                         var schema = data[0],
                             subSchema = data[3];
-
-                        if (subSchema) {
-                            schema.grouped = true;
-                        }
 
                         return {
                             schema: schema,

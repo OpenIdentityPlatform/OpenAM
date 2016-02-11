@@ -808,7 +808,9 @@
                 "title": "Service",
                 "titleNew": "New Service",
                 "chooseServiceType": "Choose a service type",
-                "serviceTypes": "Service Types..."
+                "serviceTypes": "Service Types...",
+                "secondaryConfiguration": "Secondary Configuration",
+                "settings": "Settings"
             },
             "list": {
                 "service": "Service",

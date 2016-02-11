@@ -1,20 +1,24 @@
 {{> headers/_TitleWithSubAndIcon title=name type="console.services.edit.title" icon="plug"
     buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
 
-{{#if schema.grouped}}
+{{#if tabbed}}
 <div class="tab-menu">
     <ul class="nav nav-tabs" role="tablist">
-        {{#each schema.orderedProperties}}
-            <li><a href="#{{this._id}}" data-tabid="{{this._id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a></li>
-        {{/each}}
+        {{#if schema.grouped}}
+            {{#each schema.orderedProperties}}
+            <li><a href="#" data-tab-id="{{this._id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a></li>
+            {{/each}}
+        {{else}}
+            <li><a href="#" data-tab-id="schema" role="tab" data-toggle="tab" aria-expanded="false">{{t "console.services.edit.settings"}}</a></li>
+        {{/if}}
         {{#if subschema}}
-            <li><a href="#" data-tabid="subschema" role="tab" data-toggle="tab" aria-expanded="false">subschema.name</a></li>
+            <li><a href="#" data-tab-id="subschema" role="tab" data-toggle="tab" aria-expanded="false">{{t "console.services.edit.secondaryConfiguration"}}</a></li>
         {{/if}}
     </ul>
 </div>
 {{/if}}
 
-<div class="panel panel-default {{#if schema.grouped}}fr-panel-tab{{/if}}">
+<div class="panel panel-default {{#if tabbed}}fr-panel-tab{{/if}}">
     <div class="panel-body tab-content">
         <div role="tabpanel" class="tab-pane active" id="tabpanel" data-service-form-holder></div>
     </div>

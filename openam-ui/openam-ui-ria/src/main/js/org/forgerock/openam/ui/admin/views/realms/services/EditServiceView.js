@@ -70,10 +70,11 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                 self.data.values = data.values;
                 self.data.name = data.name;
                 self.data.subschema = data.subschema;
+                self.data.tabbed = self.data.schema.grouped || self.data.subschema;
 
                 self.parentRender(function () {
 
-                    if (self.data.schema.grouped) {
+                    if (self.data.tabbed) {
                         self.$el.find("ul.nav a:first").tab("show");
                         self.$el.find(".tab-menu .nav-tabs").tabdrop();
                         SubschemaListView.element = this.$el.find("#tabpanel");
@@ -90,9 +91,11 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
         },
 
         onSave: function () {
+            var self = this;
             SMSRealmService.services.instance.update(this.data.realmPath, this.data.type, this.form.data())
-                .then(function () {
+                .then(function (data) {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                    self.data.values = data;
                 }, function (response) {
                     Messages.addMessage({
                         response: response,
@@ -110,11 +113,11 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
         },
 
         renderTab: function (event) {
-            var tabId = $(event.target).data("tabid"),
-                schema = this.data.schema.properties[tabId],
+            var tabId = $(event.target).data("tabId"),
+                schema = this.data.schema.grouped ? this.data.schema.properties[tabId] : this.data.schema,
                 element = this.$el.find("#tabpanel").empty().get(0);
 
-            if (this.data.schema.grouped && tabId === "subschema") {
+            if (tabId === "subschema") {
                 SubschemaListView.render(this.data.subschema);
             } else {
                 this.form = new Form(element, schema, this.data.values);
