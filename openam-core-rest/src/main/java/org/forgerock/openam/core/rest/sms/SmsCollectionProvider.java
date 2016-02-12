@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -75,8 +75,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
 
     @Inject
     SmsCollectionProvider(@Assisted SmsJsonConverter converter, @Assisted ServiceSchema schema,
-            @Assisted SchemaType type, @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
-            @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug) {
+                          @Assisted SchemaType type, @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
+                          @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug) {
         super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug);
         Reject.ifTrue(type != SchemaType.GLOBAL && type != SchemaType.ORGANIZATION, "Unsupported type: " + type);
         Reject.ifTrue(subSchemaPath.isEmpty(), "Root schemas do not support multiple instances");

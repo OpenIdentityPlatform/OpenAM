@@ -18,9 +18,7 @@ package org.forgerock.openam.core.rest.sms;
 
 import static com.sun.identity.sm.AttributeSchema.Syntax.*;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
-import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -48,29 +46,26 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.Set;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
-import org.forgerock.util.promise.Promise;
 
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
- * navigating SMS schemas.
+ * navigating SMS schemas. It implements basic functionality such as reading of schema, template and
+ * creatable types, while allowing all of those mechanisms to be overridden by more specific subclasses.
  * @since 13.0.0
  */
-abstract class SmsResourceProvider {
+abstract class SmsResourceProvider extends DefaultSmsHandler {
 
     /**
      * Contains the mapping of auto created authentication modules and their type so that
@@ -215,14 +210,24 @@ abstract class SmsResourceProvider {
         return schema.getName();
     }
 
-    protected Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        if (request.getAction().equals(RestConstants.TEMPLATE)) {
-            return newResultPromise(newActionResponse(converter.toJson(schema.getAttributeDefaults())));
-        } else if (RestConstants.SCHEMA.equals(request.getAction())) {
-            return newResultPromise(newActionResponse(createSchema(context)));
-        } else {
-            return new NotSupportedException("Action not supported: " + request.getAction()).asPromise();
-        }
+    @Override
+    public JsonValue getAllTypes(Context context, ActionRequest request) throws NotSupportedException, InternalServerErrorException {
+        throw new NotSupportedException("AME-9668");
+    }
+
+    @Override
+    public JsonValue getSchema(Context context, ActionRequest request) {
+        return createSchema(context);
+    }
+
+    @Override
+    public JsonValue getTemplate(Context context, ActionRequest request) {
+        return converter.toJson(schema.getAttributeDefaults());
+    }
+
+    @Override
+    public JsonValue getCreatableTypes(Context context, ActionRequest request) throws NotSupportedException, InternalServerErrorException {
+        throw new NotSupportedException("AME-9667");
     }
 
     protected JsonValue createSchema(Context context) {
@@ -251,7 +256,7 @@ abstract class SmsResourceProvider {
         ResourceBundle schemaI18n = ResourceBundle.getBundle(schema.getI18NFileName(), getLocale(context));
         NumberFormat sectionFormat = new DecimalFormat("00");
 
-        for (AttributeSchema attribute : (Set<AttributeSchema>) schema.getAttributeSchemas()) {
+        for (AttributeSchema attribute : schema.getAttributeSchemas()) {
             String i18NKey = attribute.getI18NKey();
             if (i18NKey != null && i18NKey.length() > 0) {
                 String attributePath = attribute.getResourceName();
