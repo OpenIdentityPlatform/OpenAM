@@ -28,14 +28,12 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
     // jquery dependencies
     "bootstrap-tabdrop"
 ], function ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, renderForm) {
-
     return AbstractView.extend({
         template: "templates/admin/views/realms/services/NewServiceTemplate.html",
         events: {
-            "click [data-save]": "onSave",
+            "click [data-create]": "onCreateClick",
             "change #serviceSelection": "onSelectService"
         },
-
         render: function (args, callback) {
             var self = this;
 
@@ -54,15 +52,13 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                 });
             });
         },
-
         onSelectService: function (e) {
             this.selectService(e.target.value);
         },
-
         selectService: function (service) {
             var self = this;
 
-            this.$el.find("[data-save]").prop("disabled", !service);
+            this.$el.find("[data-create]").prop("disabled", !service);
 
             if (service && service !== this.data.type) {
                 this.data.type = service;
@@ -78,24 +74,22 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                     });
             }
         },
-
-        onSave: function () {
+        onCreateClick: function () {
             var self = this;
 
-            ServicesService.instance.create(this.data.realmPath, this.data.type, this.form.data())
-                .then(function () {
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+            ServicesService.instance.create(this.data.realmPath, this.data.type, this.form.data()).then(function () {
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
-                    Router.routeTo(Router.configuration.routes.realmsServiceEdit, {
-                        args: _.map([self.data.realmPath, self.data.type], encodeURIComponent),
-                        trigger: true
-                    });
-                }, function (response) {
-                    Messages.addMessage({
-                        response: response,
-                        type: Messages.TYPE_DANGER
-                    });
+                Router.routeTo(Router.configuration.routes.realmsServiceEdit, {
+                    args: _.map([self.data.realmPath, self.data.type], encodeURIComponent),
+                    trigger: true
                 });
+            }, function (response) {
+                Messages.addMessage({
+                    response: response,
+                    type: Messages.TYPE_DANGER
+                });
+            });
         }
     });
 });
