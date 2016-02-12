@@ -275,7 +275,7 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                         url: scopedByRealm(realm, "services/" + type),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }).then(function (response) {
-                        return _.isArray(response) ? response[0] : response;
+                        return response;
                     });
                 }
 
